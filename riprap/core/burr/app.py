@@ -491,7 +491,6 @@ def run(query: str) -> dict:
     Chicago / heat / air deployment gets its own pebbles in the response
     without code edits.
     """
-    from riprap.core.pebbles.bridge import get_registry
 
     app = build_app(query)
     _, _, final = app.run(halt_after=["reconcile"])
@@ -517,8 +516,8 @@ def run(query: str) -> dict:
     # a Boston query routed to the Boston deployment would surface NYC
     # pebble keys (all None) and drop boston_311.
     try:
-        from riprap.core.pebbles.deployments import deployment_by_name
         from riprap.core.pebbles import load_registry as _load_registry
+        from riprap.core.pebbles.deployments import deployment_by_name
         dep_for_out = deployment_by_name(chosen) if chosen else None
         if dep_for_out is not None:
             reg = _load_registry(dep_for_out.root)

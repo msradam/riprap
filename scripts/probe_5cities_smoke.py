@@ -24,7 +24,6 @@ from urllib.parse import quote
 
 import httpx
 
-
 CITIES = [
     {
         "name": "nyc",

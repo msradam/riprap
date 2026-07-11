@@ -20,11 +20,10 @@ jobs:
         uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
-      - run: uv pip install --system ruff
       # The riprap/ package + my new scripts/tests/load surface should
       # always lint clean. Pre-session app/* legacy code has known noise
       # we don't want to gate PRs on; tighten that scope as it lands.
-      - run: ruff check riprap/ scripts/probe_5cities_smoke.py tests/test_byod_load.py tests/test_stone_envelope.py load/triton-local/ app/geocode.py
+      - run: uvx ruff check riprap/ scripts/probe_5cities_smoke.py tests/test_byod_load.py tests/test_stone_envelope.py load/triton-local/ app/geocode.py
 
   tests:
     name: tests (pebble framework + BYOD)
@@ -41,7 +40,7 @@ jobs:
       - name: Create venv and install deps
         run: |
           uv venv --python 3.12
-          uv pip install -r requirements.txt
+          uv pip install -r requirements.txt pytest
 
       - name: Import smoke test
         env:
