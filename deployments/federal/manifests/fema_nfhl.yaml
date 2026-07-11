@@ -1,0 +1,53 @@
+id: fema_nfhl
+type: live
+title: FEMA National Flood Hazard Layer — flood zone at this point
+stone: cornerstone
+tier: modeled
+adapter: python_call
+
+# Federal pebble — FEMA's NFHL ArcGIS point query returns the effective
+# regulatory flood zone for any mapped US point, plus the FIRM panel
+# effective date (the map vintage FEMA 1.5 requires in citations).
+# Unmapped points (open water, no effective FIRM) return None and the
+# pebble skips cleanly.
+coverage:
+  region: us_conus
+
+spatial:
+  scope: point
+  crs: EPSG:4326
+
+config:
+  module: app.context.fema_nfhl
+  function: summary_for_point
+  args:
+    - {source: lat}
+    - {source: lon}
+  on_none: offline
+
+trace_summary:
+  zone: fld_zone
+  sfha: sfha
+  panel: firm_panel
+  vintage: effective_year
+
+provenance:
+  source_name: FEMA National Flood Hazard Layer (NFHL) — effective flood zones
+  source_url: https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS
+  license: U.S. Public Domain
+  doc_id: fema_nfhl
+  citation: FEMA NFHL effective flood-zone polygon and FIRM panel intersecting the address point.
+
+narration:
+  short: FEMA National Flood Hazard Layer effective flood zone at this address.
+  template: "{narrative}"
+
+display:
+  order: 12
+  kind: stat
+  map_layer: false
+  icon: "🗺️"
+
+fallback:
+  on_offline: skip
+  message: FEMA NFHL ArcGIS endpoint unreachable or point unmapped.

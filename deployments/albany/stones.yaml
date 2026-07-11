@@ -1,0 +1,37 @@
+# Albany, NY — flood-exposure briefing deployment.
+#
+# Same architecture as the NYC reference. Federal pebbles (NWS, NOAA)
+# port unchanged; the Hudson is tidal to the Federal Lock at Troy, so
+# the NOAA water-level pebble resolves to the Albany station (8518995).
+# Albany runs its 311 intake on SeeClickFix, not a Socrata/CKAN portal,
+# so the 311 pebble uses the python_call adapter.
+coverage:
+  bbox: [-73.90, 42.60, -73.72, 42.73]
+  city: Albany
+  state: NY
+stones:
+  - id: cornerstone
+    name: Cornerstone
+    tagline: The Hazard Reader
+    description: Reads what Albany remembers about flooding — FEMA flood zones, the tidal Hudson at the head of navigation, Patroon and Normans Kill creeks, and Capital Region ice-jam and snowmelt history.
+    order: 1
+  - id: touchstone
+    name: Touchstone
+    tagline: The Live Observer
+    description: Watches current flood signals — Albany SeeClickFix flood reports, the USGS Patroon Creek gauge, NWS Albany forecast office, NOAA Hudson River water levels at the Albany gauge.
+    order: 2
+  - id: keystone
+    name: Keystone
+    tagline: The Asset Register
+    description: Counts public assets exposed — Albany city schools, Capital District facilities, hospitals — and their accessibility from this address.
+    order: 3
+  - id: lodestone
+    name: Lodestone
+    tagline: The Projector
+    description: Projects what's coming — NWS Albany forecasts, Hudson River tidal predictions, Northeast climate projections.
+    order: 4
+  - id: capstone
+    name: Capstone
+    tagline: The Synthesiser
+    description: Writes the cited flood-exposure briefing — Granite 4.1 + Mellea grounding check.
+    order: 5

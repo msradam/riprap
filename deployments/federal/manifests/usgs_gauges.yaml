@@ -1,0 +1,51 @@
+id: usgs_gauges
+type: live
+title: USGS stream gauge — live stage at the nearest gauge
+stone: touchstone
+tier: empirical
+adapter: python_call
+
+# Federal pebble — waterservices.usgs.gov covers the whole US; the
+# module searches a ~25 km box around the address and reports the
+# nearest active gauge publishing stage (00065). Points with no gauge
+# in the box return None and the pebble skips cleanly.
+coverage:
+  region: us_conus
+
+spatial:
+  scope: point
+  crs: EPSG:4326
+
+config:
+  module: app.context.usgs_gauges
+  function: summary_for_point
+  args:
+    - {source: lat}
+    - {source: lon}
+  on_none: offline
+
+trace_summary:
+  station: site_no
+  stage_ft: stage_ft
+  discharge_cfs: discharge_cfs
+
+provenance:
+  source_name: USGS NWIS — instantaneous stream-gauge values
+  source_url: https://waterservices.usgs.gov/
+  license: U.S. Public Domain
+  doc_id: usgs_gauges
+  citation: USGS NWIS instantaneous values, nearest active stream gauge to address.
+
+narration:
+  short: Live stage at the nearest USGS stream gauge to this address.
+  template: "{narrative}"
+
+display:
+  order: 45
+  kind: stat
+  map_layer: false
+  icon: "📏"
+
+fallback:
+  on_offline: skip
+  message: No active USGS stream gauge within the search box, or NWIS unreachable.

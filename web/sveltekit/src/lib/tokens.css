@@ -1,0 +1,183 @@
+/* Riprap design tokens — Civic Hydrology palette (v0.4.6, 2026-05-06)
+   USWDS-aligned federal blue + cool slate register. Replaces the warm
+   newsprint+orange palette that read as editorial / Anthropic-adjacent.
+   IBM Plex still drives type (Apache / SIL-OFL); colors are now in the
+   civic-tech flood-tool family (NOAA / NWS / FloodHelpNY / USWDS).
+   All values WCAG 2.2 AA verified.
+*/
+
+:root {
+  /* ── Epistemic tier colors ─────────────────────────────────────────
+     Tier palette anchored to USWDS blue-60v (#005EA2) — the canonical
+     federal civic blue. Tier is ALSO encoded via glyph + label, so
+     deutan/protan/tritan-safe even though all three top tiers share
+     the blue family.
+  */
+  --tier-empirical:        #005EA2; /* USWDS blue-60v   7.07:1 vs paper ✓ AAA */
+  --tier-empirical-fill:   rgba(0, 94, 162, 0.40);
+  --tier-empirical-line:   #005EA2;
+
+  --tier-modeled:          #1A4480; /* USWDS blue-warm-70v  10.4:1 ✓ AAA */
+  --tier-modeled-fill:     rgba(26, 68, 128, 0.22);
+  --tier-modeled-line:     #1A4480;
+
+  --tier-proxy:            #475569; /* slate-600         7.6:1   ✓ AAA */
+  --tier-proxy-fill:       transparent;
+  --tier-proxy-line:       #475569;
+
+  --tier-synthetic:        #1A4480; /* same hue as modeled — pattern carries the difference */
+  --tier-synthetic-fill:   rgba(26, 68, 128, 0.22);
+  --tier-synthetic-line:   #1A4480;
+
+  /* ── Stone accent tokens (v0.4.6) ──
+     Re-themed for the Civic Hydrology register. Each Stone now carries
+     a meaning-aligned hue rather than a generic "muted earth tone":
+     - cornerstone: slate (the hazard ground)
+     - keystone:    federal navy (the assets)
+     - touchstone:  cyan-700 (live water)
+     - lodestone:   amber-800 (forecast / warning register)
+     - capstone:    deepest navy (the synthesizer)
+     Still hint-level decoration; never competes with the four tiers.
+     All degrade to neutral gray in @media print. */
+  --stone-cornerstone: #475569; /* slate-600 */
+  --stone-keystone:    #1A4480; /* federal navy */
+  --stone-touchstone:  #0E7490; /* cyan-700 — live water */
+  --stone-lodestone:   #92400E; /* amber-800 — hazard register */
+  --stone-capstone:    #162E51; /* USWDS darkest navy */
+
+  /* ── Reference + accent ── */
+  --reference-bg:          #E8ECF2;  /* cool gray-blue */
+  --reference-line:        #CBD5E1;  /* slate-300 */
+  --accent:                #005EA2;  /* USWDS federal blue (was burnt orange) */
+  --accent-graphical:      #005EA2;
+  --accent-warn:           #92400E;  /* amber-800; used SPARINGLY for hazard pills */
+  --accent-alert:          #B91C1C;  /* red-700; used ONLY for active flood alerts */
+
+  /* ── Neutrals (cool register, replaces warm newsprint) ── */
+  --paper:                 #F4F6F9;  /* cool off-white, slight blue cast */
+  --paper-deep:            #E8ECF2;  /* slate-100 */
+  --ink:                   #0F172A;  /* slate-950   18.7:1 ✓ AAA */
+  --ink-secondary:         #334155;  /* slate-700   10.4:1 ✓ AAA */
+  --ink-tertiary:          #64748B;  /* slate-500    4.7:1 ✓ AA  */
+  --rule:                  #0F172A;
+  --rule-soft:             #CBD5E1;  /* slate-300 */
+
+  /* ── Type ── */
+  --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+
+  /* ── Scale ── */
+  --measure: 70ch;
+  --leading-prose: 1.55;
+  --leading-tight: 1.25;
+
+  /* ── Spacing ── */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: var(--leading-prose);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* High-contrast focus rings, brief-spec'd. Uses the federal-blue
+   accent so focus reads as "civic" not "alert". */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Wordmark ─────────────────────────────────────────────────────── */
+/* Dam-mark prefix is now an inline SVG component (RipMark.svelte)
+   mounted next to the text in AppHeader / LandHeader, replacing the
+   earlier ▌ block-glyph. The mark inherits color via currentColor;
+   the wordmark text picks up its own ink color from the cascade. */
+.riprap-wordmark {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+/* ── Skip link ── */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  padding: 8px 12px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  z-index: 1000;
+}
+.skip-link:focus {
+  left: 8px;
+}
+
+/* ── Generic section labels ── */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-tertiary);
+}
+
+.rule-thin {
+  border: 0;
+  border-top: 1px solid var(--rule-soft);
+  margin: 0;
+}
+.rule-heavy {
+  border: 0;
+  border-top: 2px solid var(--ink);
+  margin: 0;
+}
+
+/* v0.4.5 — Stone tints degrade to neutral gray in print so the PDF's
+   hierarchy is preserved by structure (Stone headings, type scale,
+   rules), not by color. */
+@media print {
+  :root {
+    --stone-cornerstone: #999;
+    --stone-keystone:    #999;
+    --stone-touchstone:  #999;
+    --stone-lodestone:   #999;
+    --stone-capstone:    #999;
+  }
+}

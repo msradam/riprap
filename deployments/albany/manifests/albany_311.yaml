@@ -1,0 +1,46 @@
+id: albany_311
+type: live
+title: Albany 311 (SeeClickFix) service requests near this address
+stone: touchstone
+adapter: python_call
+
+spatial:
+  scope: point
+  crs: EPSG:4326
+
+# Albany's 311 intake runs on SeeClickFix — there is no Socrata/CKAN
+# export — so this pebble calls the SeeClickFix public API through
+# app.context.seeclickfix, which returns the same records shape as the
+# socrata_records adapter.
+config:
+  module: app.context.seeclickfix
+  function: records_near
+  args:
+    - {source: lat}
+    - {source: lon}
+  kwargs:
+    radius_m: {const: 300}
+  on_none: offline
+
+provenance:
+  source_name: SeeClickFix — Albany, NY service requests (public API)
+  source_url: https://seeclickfix.com/albany
+  license: SeeClickFix public API terms
+  doc_id: albany_311
+  citation: SeeClickFix public API, all Albany service-request categories within 300 m of address.
+
+narration:
+  short: Albany 311 (SeeClickFix) service requests filed within 300 m of this address (all categories).
+  template: >-
+    Albany 311 (SeeClickFix) received {n_records} service requests within
+    {radius_m} m of this address.
+
+display:
+  order: 20
+  kind: list
+  map_layer: true
+  icon: "📞"
+
+fallback:
+  on_offline: skip
+  message: SeeClickFix API unreachable.

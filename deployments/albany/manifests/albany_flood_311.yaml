@@ -1,0 +1,49 @@
+id: albany_flood_311
+type: live
+title: Albany flood-related service requests near this address
+stone: touchstone
+tier: empirical
+adapter: python_call
+
+spatial:
+  scope: point
+  crs: EPSG:4326
+
+# Server-side category filter on Albany's flood-adjacent SeeClickFix
+# request types: 3418 Water Issues (flooding, etc.), 12499 Sinkholes,
+# 12500 Sewers/Drainage. Wider radius than the all-category pebble —
+# flood complaints are sparse, and a block-scale zero is less
+# informative than a neighbourhood-scale count.
+config:
+  module: app.context.seeclickfix
+  function: records_near
+  args:
+    - {source: lat}
+    - {source: lon}
+  kwargs:
+    radius_m: {const: 800}
+    request_types: {const: "3418,12499,12500"}
+  on_none: offline
+
+provenance:
+  source_name: SeeClickFix — Albany, NY flood-related service requests (public API)
+  source_url: https://seeclickfix.com/albany
+  license: SeeClickFix public API terms
+  doc_id: albany_flood_311
+  citation: SeeClickFix public API, Albany flooding / sewers-drainage / sinkhole requests within 800 m of address.
+
+narration:
+  short: Albany flood-related service requests (flooding, sewers/drainage, sinkholes) filed within 800 m of this address.
+  template: >-
+    Flood-related Albany 311 reports (flooding, sewers/drainage,
+    sinkholes) within {radius_m} m of this address: {n_records}.
+
+display:
+  order: 15
+  kind: list
+  map_layer: true
+  icon: "🌧️"
+
+fallback:
+  on_offline: skip
+  message: SeeClickFix API unreachable.

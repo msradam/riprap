@@ -1,0 +1,47 @@
+id: water_level
+type: live
+title: Local water level — NOAA Albany, NY (Hudson River, station 8518995)
+stone: touchstone
+adapter: python_call
+
+spatial:
+  scope: point
+  crs: EPSG:4326
+
+# `app.context.noaa_tides.summary_for_point` finds the nearest NOAA
+# tide / water-level station automatically; the Hudson is tidal to the
+# Federal Lock at Troy, so for Albany addresses that's station 8518995
+# (Albany, NY — Hudson River).
+config:
+  module: app.context.noaa_tides
+  function: summary_for_point
+  args:
+    - {source: lat}
+    - {source: lon}
+  on_none: passthrough
+
+trace_summary:
+  station: station_id
+  observed_ft_mllw: observed_ft_mllw
+  residual_ft: residual_ft
+
+provenance:
+  source_name: NOAA CO-OPS — water level (nearest station to Albany)
+  source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8518995
+  license: U.S. Public Domain
+  doc_id: noaa_tides
+  citation: NOAA CO-OPS water-level observations, nearest station to address.
+
+narration:
+  short: Recent NOAA water-level reading at the nearest Hudson River station to this address.
+  template: "{narrative}"
+
+display:
+  order: 40
+  kind: stat
+  map_layer: false
+  icon: "🌊"
+
+fallback:
+  on_offline: skip
+  message: NOAA tidesandcurrents endpoint unreachable.

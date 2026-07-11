@@ -1,0 +1,45 @@
+id: dep_moderate_2050
+type: baked
+title: NYC DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)
+stone: cornerstone
+tier: modeled
+adapter: python_call
+shaper: dep_scenario
+
+spatial:
+  scope: point
+  crs: EPSG:4326
+
+config:
+  module: app.flood_layers.dep_stormwater
+  function: join_raster
+  args:
+    - {source: pt_2263}
+    - {const: dep_moderate_2050}
+  on_none: passthrough
+
+trace_summary:
+  depth_label: depth_label
+  depth_class: depth_class
+
+provenance:
+  source_name: NYC DEP Stormwater Flood Map — Moderate (2.13 in/hr, 2050 SLR)
+  source_url: https://www.nyc.gov/site/dep/environment/stormwater-flood-maps.page
+  license: NYC Open Data Terms of Use
+  doc_id: dep_moderate_2050
+  citation: NYC DEP Stormwater Flood Map — Moderate (2.13 in/hr, 2050 SLR)
+
+narration:
+  short: NYC DEP moderate stormwater scenario (2050 SLR) at this address.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: DEP moderate 2050 raster + GDB both unavailable.
+
+display:
+  variant: headline
+  order: 22
+  kind: text
+  map_layer: true
+  icon: "💧"

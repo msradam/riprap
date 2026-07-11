@@ -1,0 +1,49 @@
+id: nws_alerts
+type: live
+title: NWS active alerts (flood/coastal/wind)
+stone: lodestone
+tier: modeled
+adapter: python_call
+
+# Federal pebble — the NWS Alerts API (api.weather.gov) resolves any
+# CONUS lat/lon to its active alert set, so this single manifest serves
+# every spatially-routed deployment.
+coverage:
+  region: us_conus
+
+spatial:
+  scope: point
+  crs: EPSG:4326
+
+config:
+  module: app.context.nws_alerts
+  function: summary_for_point
+  args:
+    - {source: lat}
+    - {source: lon}
+  on_none: passthrough
+
+trace_summary:
+  n_active: n_active
+
+provenance:
+  source_name: National Weather Service (NOAA) — active alerts at point
+  source_url: https://api.weather.gov/
+  license: U.S. Public Domain
+  doc_id: nws_alerts
+  citation: NWS active alerts at address (flood / coastal / wind).
+
+narration:
+  short: Currently active NWS alerts intersecting this address.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: NWS alerts endpoint unreachable.
+
+display:
+  variant: tabular
+  order: 10
+  kind: list
+  map_layer: false
+  icon: "⚠️"

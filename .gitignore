@@ -1,0 +1,124 @@
+# Session artifacts (legacy agent reports — not for the public repo)
+*MORNING-BRIEF*.md
+*OVERNIGHT*.md
+*COMMS-OVERNIGHT*.md
+CODE-MORNING-BRIEF*.md
+MONDAY.md
+FRIDAY*.md
+*-REPORT.md
+docs/sessions/
+docs/design_handoff/
+
+# Local-only secrets / credentials
+AMD_TOKEN
+
+# Probe / batch / diagnostic output (regenerable; not for the repo)
+tests/batch_results.json
+tests/overnight_audit.json
+scripts/diagnostic_*.py
+scripts/find_top_locations.py
+scripts/verify_locations.py
+
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+.env
+.DS_Store
+outputs/
+node_modules/
+*.tmp
+*.log
+.ruff_cache/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Claude Code context (per-machine, not for the public repo)
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+
+# legacy / intermediate Prithvi artifacts (not shipped)
+data/hls_stack_*.tif
+data/prithvi_runs/
+data/*.legacy_*
+web/svelte/node_modules/
+web/sveltekit/node_modules/
+web/sveltekit/.svelte-kit/
+# web/sveltekit/build/ (uncommented to allow deployment to HF Space)
+# web/sveltekit/build/
+
+# Experiments — cached HF model downloads, training artifacts, intermediate
+# fixtures. RESULTS.md, NOTES.md, and source code stay tracked.
+experiments/**/.cache/
+experiments/**/restore/
+experiments/**/publish/
+experiments/**/*.tif
+experiments/**/*.png
+experiments/**/*.jpg
+experiments/**/*.parquet
+experiments/**/*.npy
+pitch/screenshots-*/
+
+# Presentation slides and internal working materials (→ riprap-work)
+slides/
+pitch/
+research/
+submission/
+
+# Internal ops scripts (→ riprap-work)
+scripts/deploy_droplet.sh
+scripts/deploy_inference_space.sh
+scripts/deploy_personal_space.sh
+scripts/deploy_vllm_space.sh
+scripts/redeploy.sh
+scripts/save_droplet_image.sh
+scripts/point_lablab_at_vllm_space.sh
+scripts/probe_30.py
+scripts/runpod_setup.sh
+riprap.sh
+riprap-continue.sh
+refactor.sh
+SAT_MAY_9.md
+github_repo_cleanup.prompt
+
+# Burr persisted runs (per-invocation artifacts)
+.burr/
+
+# Local Triton test rig — model weights + cached patches are huge.
+# The scripts (entrypoint.sh, run.sh, test_*.py, proxy_launcher.py)
+# are kept under version control.
+load/triton-local/model_repository/
+load/triton-local/hf_cache/
+
+# Internal docs (→ riprap-work)
+docs/HF_BLOG.md
+docs/COMPLIANCE.md
+docs/DROPLET-RUNBOOK.md
+docs/legacy/
+
+# Session artifacts
+/tmp/riprap-*
+.deploy-state
+*.bak
+*.swp
+*.swo
+.playwright-mcp/
+
+# Demo recordings (large; not committed)
+assets/video/
+slides/*.mp4
+slides/asce/speaker_notes.md
+
+# Local env overlays
+.env.local
+*.local.env
+
+# Sensitive
+AMD_TOKEN
+submission.md
+riprap-triton/
+outputs/handoff/
+Riprap.zip
