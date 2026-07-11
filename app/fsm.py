@@ -1310,8 +1310,9 @@ def step_reconcile(state: State) -> State:
                 # If Mellea returned empty (streaming stall / LLM failure),
                 # do NOT call run_reconcile as a fallback: Mellea's daemon
                 # thread is likely still running a streaming vLLM request,
-                # and a second concurrent request overloads RunPod, causing
-                # both to hang for the full 240 s LiteLLM timeout.
+                # and a second concurrent request overloads the remote
+                # deployment, causing both to hang for the full 240 s
+                # LiteLLM timeout.
                 if not para or len(para.strip()) < 50:
                     log.warning("mellea returned empty — skipping fallback to avoid concurrent vLLM")
                 else:
@@ -1360,13 +1361,13 @@ import os as _os  # noqa: E402
 # the longest single specialist; the linear FSM exposes it.
 #
 # Default OFF on local-Ollama so the demo briefing returns in well under
-# 90 s. Enable explicitly with RIPRAP_HEAVY_SPECIALISTS=1 (e.g. on the
-# AMD-vLLM path, where the reconciler's ~5 s leaves room for the joins).
+# 90 s. Enable explicitly with RIPRAP_HEAVY_SPECIALISTS=1 (e.g. on a
+# remote-vLLM path, where the reconciler's ~5 s leaves room for the joins).
 #
 # Remote ML lift: when RIPRAP_ML_BACKEND=remote (or auto with a base URL
-# set) the heavy specialists' GPU work runs on the droplet, so the local
-# wall-clock cost drops from ~60 s to ~5 s. Default ON in that case so
-# the public demo never silently disables them.
+# set) the heavy specialists' GPU work runs on the remote backend, so
+# the local wall-clock cost drops from ~60 s to ~5 s. Default ON in
+# that case so the public demo never silently disables them.
 def _remote_ml_configured() -> bool:
     backend = _os.environ.get("RIPRAP_ML_BACKEND", "auto").lower()
     if backend == "local":
@@ -1388,7 +1389,8 @@ _HEAVY_SPECIALISTS_ENABLED = _os.environ.get(
 # geopandas on first call.  On machines with slow I/O or single-threaded
 # Python GIL contention (M3 local dev) this takes 3–5 min and makes the
 # first single_address query appear hung.  Disable by default; enable on
-# the AMD droplet where the server pre-warms these at startup.
+# a deployment where the server pre-warms these at startup (see
+# web/main.py's startup sequence — Modal and the Mac Mini both do).
 _NYCHA_REGISTERS_ENABLED = _os.environ.get(
     "RIPRAP_NYCHA_REGISTERS", "0",
 ).lower() in ("1", "true", "yes")

@@ -3,22 +3,28 @@
 Mirrors the call-surface shape of `app/llm.py` but for the non-LLM
 heavy models (Prithvi, TerraMind, TTM, Granite Embedding, GLiNER).
 
-The droplet runs a `riprap-models` FastAPI service alongside vLLM that
-exposes an OpenAI-style endpoint per model class. When configured the
-router POSTs the relevant payload there and returns the parsed response;
-on connection error / 5xx / timeout it surfaces a typed exception that
+The remote backend — a Modal deployment (companion repo
+msradam/riprap-triton), a self-hosted `services/riprap-models/`
+container, or `msradam/riprap-inference` on a Mac Mini — exposes an
+OpenAI-style endpoint per model class. When configured the router
+POSTs the relevant payload there and returns the parsed response; on
+connection error / 5xx / timeout it surfaces a typed exception that
 caller modules catch and fall back to a local in-process model load.
 
 Backend selection (env):
 
   RIPRAP_ML_BACKEND   = "remote" | "local" | "auto"  (default: auto)
-                        - remote: use only the droplet, raise if it errors
-                        - local : never call the droplet, always use the
-                                  in-process model
+                        - remote: use only the remote backend, raise
+                                  if it errors
+                        - local : never call the remote backend, always
+                                  use the in-process model
                         - auto  : try remote first, fall back to local if
                                   remote is unreachable / errors out;
                                   same semantics as app/llm.py
-  RIPRAP_ML_BASE_URL  = http://129.212.181.238:8002    (no trailing slash)
+  RIPRAP_ML_BASE_URL  = http://localhost:8000    (no trailing slash —
+                        localhost means Apple Silicon in emissions
+                        .hardware_for(); anything else is treated as a
+                        remote L4)
   RIPRAP_ML_API_KEY   = <bearer token>
 
 The router is *transport*-only — it does not own model bytes, weights,

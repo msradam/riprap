@@ -359,8 +359,8 @@ def reconcile_strict_streaming(
     ]
     # num_predict 350 for the 4-section briefing (typically 250-350 tokens).
     # Lower ceiling (was 512) frees ~160 tokens of input budget, keeping the
-    # full prompt (documents + system prompt + 350 output) under
-    # max_model_len=2352 for the RunPod vLLM deployment.
+    # full prompt (documents + system prompt + 350 output) under the
+    # remote vLLM deployment's max_model_len.
     # Override with RIPRAP_MELLEA_NUM_PREDICT if needed.
     # num_ctx (Ollama only) is forwarded via extra_body; vLLM ignores it.
     base_opts = {"temperature": 0,
@@ -376,18 +376,21 @@ def reconcile_strict_streaming(
     attempts = 0
     _streaming_hung = False  # set on first per-token timeout; skip retries
 
-    # Two-phase timeout: the FIRST token from a cold RunPod pod can take
-    # 3-4 min (container boot + model load into GPU VRAM). Once streaming
-    # has started, each subsequent token should arrive in < 5 s; we use a
+    # Two-phase timeout: the FIRST token from a cold remote deployment
+    # (e.g. a Modal container waking from scale-to-zero) can take 3-4 min
+    # (container boot + model load into GPU VRAM). Once streaming has
+    # started, each subsequent token should arrive in < 5 s; we use a
     # tight 45 s inter-token timeout to catch mid-stream stalls quickly.
     _first_token_timeout = int(os.environ.get("RIPRAP_FIRST_TOKEN_TIMEOUT_S", "400"))
     _inter_token_timeout = int(os.environ.get("RIPRAP_TOKEN_TIMEOUT_S", "45"))
 
-    # When PRIMARY=vllm, RunPod cold-starts take ~250-360s (container boot +
-    # model load). The pod starts when the warmup request hits the proxy, but
-    # the proxy returns 503 immediately. LiteLLM would fall back to Ollama and
-    # fail before RunPod is ready. Poll /v1/models here (after specialists, but
-    # before generation) and wait — keepalives keep the SSE connection alive.
+    # When PRIMARY=vllm, a scale-to-zero remote deployment (e.g. Modal)
+    # can take ~250-360s to cold-start (container boot + model load). The
+    # container starts when the warmup request hits the proxy, but the
+    # proxy returns 503 immediately. LiteLLM would fall back to Ollama
+    # and fail before the remote is ready. Poll /v1/models here (after
+    # specialists, but before generation) and wait — keepalives keep the
+    # SSE connection alive.
     _vllm_base = os.environ.get("RIPRAP_LLM_BASE_URL", "").rstrip("/")
     if os.environ.get("RIPRAP_LLM_PRIMARY", "ollama") == "vllm" and _vllm_base:
         try:

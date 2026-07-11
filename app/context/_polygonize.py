@@ -2,12 +2,12 @@
 into an EPSG:4326 GeoJSON FeatureCollection so the frontend can paint
 it on the MapLibre map.
 
-The droplet's `/v1/prithvi-pluvial` and `/v1/terramind` routes return
-their predictions as base64-encoded uint8 with a shape and (where
-relevant) a class-label list. This module reconstructs the affine
-transform from the chip's geographic bounds (which the HF Space
-already knows) and walks `rasterio.features.shapes` to build polygons
-in the chip's native CRS, then reprojects to WGS84 for the map.
+The remote ML backend's `/v1/prithvi-pluvial` and `/v1/terramind`
+routes return their predictions as base64-encoded uint8 with a shape
+and (where relevant) a class-label list. This module reconstructs the
+affine transform from the chip's geographic bounds (already known by
+the caller) and walks `rasterio.features.shapes` to build polygons in
+the chip's native CRS, then reprojects to WGS84 for the map.
 
 Best-effort: any failure returns an empty FeatureCollection rather
 than raising into the caller's path. The map layer is decorative —
@@ -24,8 +24,8 @@ EMPTY: dict = {"type": "FeatureCollection", "features": []}
 
 
 def _decode_pred(pred_b64: str, pred_shape: list[int]):
-    """Inverse of the droplet's `base64(pred.tobytes())`. Returns a
-    uint8 numpy array of shape `pred_shape`, or None on decode error."""
+    """Inverse of the remote backend's `base64(pred.tobytes())`. Returns
+    a uint8 numpy array of shape `pred_shape`, or None on decode error."""
     try:
         import numpy as np
         raw = base64.b64decode(pred_b64)

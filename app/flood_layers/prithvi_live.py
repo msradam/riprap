@@ -71,9 +71,10 @@ def _has_required_deps() -> tuple[bool, str | None]:
     inference runs.
 
     Tier 2 — local inference (terratorch) is only required when remote
-    inference is unavailable. On the HF Space we have remote inference
-    on the AMD MI300X via app/inference.py, so terratorch is not needed
-    even though chip-fetch is.
+    inference is unavailable. When RIPRAP_ML_BASE_URL is configured
+    (Modal, self-hosted, or a Mac Mini) remote inference runs via
+    app/inference.py, so terratorch is not needed even though chip-fetch
+    is.
 
     Returns (False, missing) if any required dep is missing. Splitting
     the gate this way lets the HF Space deployment fetch chips and run
@@ -411,7 +412,7 @@ def _fetch_inner(lat: float, lon: float, timeout_s: float) -> dict[str, Any]:
         if time.time() - t0 > timeout_s:
             return {"ok": False, "skipped": "chip build exceeded budget"}
 
-        # v0.4.5 — try the MI300X inference service first if configured.
+        # v0.4.5 — try the remote inference service first if configured.
         # On RemoteUnreachable (service down / not configured / 5xx) fall
         # through to the local terratorch path. When remote is configured
         # but returns non-ok we surface that signal directly: the local
@@ -432,9 +433,9 @@ def _fetch_inner(lat: float, lon: float, timeout_s: float) -> dict[str, Any]:
                 if remote.get("ok"):
                     # Vectorize the remote prediction raster so the map
                     # actually renders the live water polygons. The
-                    # droplet returns `pred_b64` (uint8 binary mask);
-                    # we polygonize against the chip's WGS84 bounds
-                    # which we know locally from `ref_da`.
+                    # remote backend returns `pred_b64` (uint8 binary
+                    # mask); we polygonize against the chip's WGS84
+                    # bounds which we know locally from `ref_da`.
                     polys = None
                     pred_b64 = remote.get("pred_b64")
                     pred_shape = remote.get("pred_shape")

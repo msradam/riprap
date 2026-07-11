@@ -258,10 +258,11 @@ def fetch(timeout_s: float = 60.0) -> dict[str, Any]:
 
         residuals = df["surge_residual_m"].to_numpy().astype("float32")
 
-        # v0.4.5 — try the MI300X service first. The remote handles its
+        # v0.4.5 — try the remote service first. The remote handles its
         # own model loading; if it's reachable we never need local
-        # tsfm_public, which lets the HF Space drop the granite-tsfm
-        # bake from the image. When the remote is configured but returns
+        # tsfm_public, which lets a cpu-basic surface drop the
+        # granite-tsfm bake from the image. When the remote is configured
+        # but returns
         # non-ok we surface the remote error rather than try a local
         # load — the local code path can ModuleNotFoundError on transient
         # transformers-registry races and that's a worse user signal.

@@ -282,11 +282,12 @@ def fetch(lat: float, lon: float, timeout_s: float = 60.0) -> dict[str, Any]:
         dem, bounds_4326 = patch
         dem_mean = float(dem.mean())
 
-        # v0.4.5+ — try the MI300X inference service first if configured.
-        # The droplet's /v1/terramind dispatch handles adapter='synthesis'
-        # via _terramind_synthesis_inference (DEM -> generative LULC). On
-        # the HF Space terratorch's torchvision binary doesn't load, so
-        # this is the only working path there.
+        # v0.4.5+ — try the remote inference service first if configured.
+        # The remote backend's /v1/terramind dispatch handles
+        # adapter='synthesis' via _terramind_synthesis_inference
+        # (DEM -> generative LULC). On a cpu-basic surface terratorch's
+        # torchvision binary doesn't load, so remote is the only
+        # working path there.
         try:
             from app import inference as _inf
             if _inf.remote_enabled():
@@ -315,8 +316,8 @@ def fetch(lat: float, lon: float, timeout_s: float = 60.0) -> dict[str, Any]:
                 if remote.get("ok"):
                     elapsed = round(time.time() - t0, 2)
                     # Polygonize the prediction raster for the map
-                    # layer. The droplet returns the per-pixel argmax;
-                    # we vectorize against the chip's bounds.
+                    # layer. The remote backend returns the per-pixel
+                    # argmax; we vectorize against the chip's bounds.
                     polys = None
                     pred_b64 = remote.get("pred_b64")
                     pred_shape = remote.get("pred_shape")

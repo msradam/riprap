@@ -43,8 +43,8 @@ HARDWARE: dict[str, tuple[str, float, str]] = {
         60.0,
         "NVIDIA L4 Tensor Core GPU data sheet (72 W TGP, Ada Lovelace, "
         "24 GB); ~60 W sustained during transformer inference. The "
-        "active backend for the Riprap inference Space "
-        "(msradam/riprap-vllm). When the proxy is reachable and NVML "
+        "active backend for the Modal deployment (companion repo "
+        "msradam/riprap-triton). When the proxy is reachable and NVML "
         "is initialized, real per-call power is read off the device "
         "via nvmlDeviceGetPowerUsage and this fallback is unused.",
     ),
@@ -88,8 +88,8 @@ def hardware_for(remote_base_url: str) -> str:
 
     `remote_base_url` empty, or pointing at localhost/127.0.0.1 (the
     Mac Mini's own Ollama / riprap-inference LitServe server), means
-    Apple Silicon. Anything else remote is treated as the L4 HF Space,
-    the only remote GPU tier Riprap currently deploys to."""
+    Apple Silicon. Anything else remote is treated as the L4 Modal
+    deployment, the only remote GPU tier Riprap currently deploys to."""
     override = (os.environ.get("RIPRAP_HARDWARE_LABEL") or "").lower()
     if "mi300x" in override or "amd" in override:
         return "amd_mi300x"

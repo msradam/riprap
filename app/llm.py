@@ -92,8 +92,9 @@ def _build_router() -> Router:
     fallbacks: list[dict[str, list[str]]] = []
     use_vllm = _PRIMARY == "vllm" and bool(_VLLM_BASE)
 
-    # vLLM on RunPod can take 250+ seconds to cold-start (container boot +
-    # model load into GPU VRAM). The first-token timeout must exceed that.
+    # A scale-to-zero remote vLLM deployment (e.g. Modal) can take 250+
+    # seconds to cold-start (container boot + model load into GPU VRAM).
+    # The first-token timeout must exceed that.
     _vllm_first_token_timeout = int(os.environ.get("RIPRAP_LITELLM_TIMEOUT_S", "360"))
     # litellm.Router._get_timeout uses `stream_timeout` as the TOTAL
     # wall-clock budget for a streaming call, not a per-chunk idle timeout
@@ -380,11 +381,12 @@ def _default_hardware_label() -> str:
     RIPRAP_HARDWARE_LABEL (e.g. "NVIDIA L4" / "AMD MI300X" /
     "NVIDIA T4" / "Apple M3 Pro").
 
-    Default when a remote vLLM/Ollama backend is configured is "NVIDIA
-    L4" — both Riprap inference Spaces (msradam/riprap-vllm,
-    msradam/riprap-inference) run on L4. The MI300X droplet was
-    decommissioned 2026-05-06; set RIPRAP_HARDWARE_LABEL=AMD MI300X
-    explicitly if redeploying to that hardware.
+    Default when a remote vLLM backend is configured is "NVIDIA L4" —
+    the companion Modal deployment (msradam/riprap-triton) runs on L4.
+    Set RIPRAP_HARDWARE_LABEL=AMD MI300X explicitly if deploying against
+    your own AMD GPU box (docker-compose --profile with-models); set it
+    to an Apple label (or leave a local Ollama run unset — see
+    app.power_mac) for the Mac Mini path.
     """
     if _PRIMARY == "vllm" and _VLLM_BASE:
         return "NVIDIA L4"

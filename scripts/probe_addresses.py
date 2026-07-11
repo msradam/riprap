@@ -6,10 +6,8 @@ reason), the briefing prose contains all four sections, Mellea
 grounding passes within attempt budget, and no specialist crashes with
 an internal-API error (PreTrainedModel ModuleNotFoundError, etc).
 
-Designed to be runnable both locally (M3 → laptop) and against the
-deployed HF Space. The remote ML stack on the AMD MI300X is the same in
-both cases when the env is configured, so an address that passes here
-is the same address the hackathon judges will see.
+Designed to be runnable against any deployment — local, docker-compose,
+Modal, or a Mac Mini (`--base`) — with the same assertions either way.
 
 Usage:
     .venv/bin/python scripts/probe_addresses.py

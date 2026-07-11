@@ -195,7 +195,7 @@ def _run_ttm(history: np.ndarray,
     """Channel-wise standardize, run model, de-standardize. Returns a
     `prediction_length`-step de-standardized forecast in input units.
 
-    v0.4.5 — tries the MI300X riprap-models service first; falls back
+    v0.4.5 — tries the remote riprap-models service first; falls back
     to the local in-process model on RemoteUnreachable. The
     standardize / de-standardize math is owned by THIS function so the
     remote service stays a thin "given a series, give me a forecast"
@@ -211,8 +211,8 @@ def _run_ttm(history: np.ndarray,
     # silently falling through to a local model load (which on cpu-basic
     # surfaces would 502 with a cryptic transformers-internal
     # ModuleNotFoundError). Local fallback is only used when the remote
-    # is unreachable (transport-level), which is what a degraded droplet
-    # actually looks like.
+    # is unreachable (transport-level), which is what a degraded remote
+    # backend actually looks like.
     remote_attempted = False
     try:
         from app import inference as _inf
