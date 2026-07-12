@@ -203,14 +203,19 @@ def geocode_target(state: State) -> State:
 
     trace = list(state.get("trace", []))
     rec = trace_rec_for("geocode")
-    target = (state.get("first_target") or state.get("query") or "").strip()
+    raw_query = state.get("query") or ""
+    target = (state.get("first_target") or raw_query or "").strip()
     if not target:
         rec["ok"] = False
         rec["err"] = "no target text"
         trace.append(rec)
         return state.update(geocode=None, lat=None, lon=None, trace=trace)
     try:
-        h = geocode_one(target)
+        # scope_hint carries the full raw query so a locality dropped
+        # during target extraction (planner pulled "10 Downing Street"
+        # out of "...at 10 Downing Street in London?") still reaches the
+        # non-US scope check in geocode_one.
+        h = geocode_one(target, scope_hint=raw_query)
         if h is None:
             rec["ok"] = False
             rec["err"] = "no geocode match (NYC Geosearch + Nominatim both empty)"

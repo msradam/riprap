@@ -92,6 +92,24 @@ def step_policy_corpus(state: State) -> State:
     rec = trace_rec_for("policy_corpus")
     try:
         geo = state.get("geocode") or {}
+
+        # No real address resolved (geocode failed, or the point is out
+        # of coverage) means no legitimate location to search policy
+        # documents *about*. Without this gate the query below still
+        # runs on its generic "flood resilience plan, vulnerability,
+        # hardening, mitigation" tail alone, pulls back real PDF chunks
+        # by topic-similarity with zero place relevance, and the
+        # reconciler cites them as if they grounded an answer for
+        # whatever address was actually asked about — a real production
+        # case: a London query with no NYC geocode still got NYCHA/DEP/
+        # Con Edison citations synthesized into a confident paragraph.
+        if not geo.get("address") and state.get("lat") is None:
+            rec["ok"] = True
+            rec["result"] = {"skipped": "no geocode — nothing to search policy documents about"}
+            rec["elapsed_s"] = round(time.time() - rec["started_at"], 4)
+            trace.append(rec)
+            return state.update(policy_corpus=None, rag=[], gliner={}, trace=trace)
+
         sandy = state.get("sandy")
         dep = state.get("dep") or {}
 

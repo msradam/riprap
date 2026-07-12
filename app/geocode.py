@@ -102,7 +102,8 @@ def geocode(text: str, limit: int = 5) -> list[GeocodeHit]:
 
 
 def geocode_nominatim(
-    text: str, *, viewbox: list | None = None, bounded: bool = False
+    text: str, *, viewbox: list | None = None, bounded: bool = False,
+    country_codes: str | None = "us",
 ) -> GeocodeHit | None:
     """National OSM Nominatim fallback.
 
@@ -115,6 +116,16 @@ def geocode_nominatim(
     `viewbox` (a list of two (lat, lon) corner points) plus `bounded=True`
     restricts results to that box, used to keep an ambiguous name resolving
     inside the served region.
+
+    `country_codes="us"` by default — Riprap only has coverage data for
+    US addresses, so biasing here is normally correct. Pass `None` to
+    disable it: with the restriction on, a query naming a real foreign
+    place (e.g. "10 Downing Street, London") doesn't fail, it silently
+    resolves to whatever US street best matches on leftover tokens
+    ("Downing Street" alone, once "London" can't contribute) — a
+    confident-looking wrong answer, not an honest "out of scope" one.
+    See geocode_one, which detects a non-US signal in the query and
+    reruns unrestricted specifically to catch this.
     """
     from geopy.extra.rate_limiter import RateLimiter  # noqa: PLC0415
     from geopy.geocoders import Nominatim  # noqa: PLC0415
@@ -123,9 +134,10 @@ def geocode_nominatim(
     geocode_call = RateLimiter(geocoder.geocode, min_delay_seconds=1.0, swallow_exceptions=False)
     call_kwargs: dict = {
         "addressdetails": True,
-        "country_codes": "us",
         "exactly_one": True,
     }
+    if country_codes is not None:
+        call_kwargs["country_codes"] = country_codes
     if viewbox is not None:
         call_kwargs["viewbox"] = viewbox
         call_kwargs["bounded"] = bounded
@@ -201,6 +213,36 @@ def _looks_non_nyc(text: str) -> bool:
     return bool(_NON_NYC_HINT_RE.search(text))
 
 
+# Same non-US country tokens as _NON_NYC_HINT_RE, isolated so geocode_one
+# can tell "this is probably Chicago" (still worth a US-bounded Nominatim
+# lookup) apart from "this is probably London" (worth checking whether
+# it actually resolves outside the US before ever calling it a match —
+# see _looks_non_us below).
+_NON_US_HINT_RE = re.compile(
+    r"(?:,|\s)\s*(?:"
+    r"japan|china|korea|mexico|canada|uk|united kingdom|france|germany|"
+    r"italy|spain|portugal|netherlands|belgium|sweden|norway|denmark|"
+    r"australia|new zealand|india|brazil|argentina|chile|colombia|"
+    r"russia|poland|turkey|egypt|south africa|israel|"
+    r"prefecture|province|kingdom of|"
+    # Major foreign cities named without their country — a real user
+    # asking about "London" rarely also types "UK" (this is the exact
+    # phrasing that silently mis-geocoded to Oklahoma before this fix).
+    r"london|paris|tokyo|beijing|shanghai|mumbai|delhi|toronto|"
+    r"vancouver|sydney|melbourne|berlin|rome|madrid|amsterdam|dublin|"
+    r"seoul|hong kong|singapore|dubai|cairo|lagos|nairobi|"
+    r"mexico city|sao paulo|buenos aires|moscow|istanbul"
+    r")\b",
+    re.IGNORECASE,
+)
+
+
+def _looks_non_us(text: str) -> bool:
+    """Returns True only when the query explicitly names a country (or
+    country-shaped token) outside the US."""
+    return bool(_NON_US_HINT_RE.search(text))
+
+
 @lru_cache(maxsize=1)
 def _active_deployment_bbox() -> tuple[float, float, float, float] | None:
     """Coverage bbox (min_lon, min_lat, max_lon, max_lat) of the deployment
@@ -220,8 +262,18 @@ def _active_deployment_bbox() -> tuple[float, float, float, float] | None:
         return None
 
 
-def geocode_one(text: str) -> GeocodeHit | None:
+def geocode_one(text: str, *, scope_hint: str | None = None) -> GeocodeHit | None:
     """Dynamic geocoder — Nominatim first, NYC Geosearch as enrichment.
+
+    `scope_hint`: the original raw user query, when `text` is a narrower
+    target string a planner LLM already extracted from it (e.g. text=
+    "10 Downing Street" pulled out of "what's the flood risk at 10
+    Downing Street in London?"). Target extraction routinely drops the
+    city/country — the planner's own rationale can say "this is about
+    London" while the extracted target string never mentions it. The
+    non-US scope check below needs to see whatever locality context
+    exists *anywhere* in the request, not just what survived extraction,
+    so it scans `text` and `scope_hint` together.
 
     Previous order had NYC Geosearch as the primary and Nominatim as a
     fallback. That gave NYC Geosearch's aggressive fuzzy-match free
@@ -238,7 +290,21 @@ def geocode_one(text: str) -> GeocodeHit | None:
     enrich the hit with BBL / BIN identifiers the NYC-specific
     pebbles need (NYCHA / MTA / DOE / DOH joins). When Nominatim
     fails or returns non-NYC, we never touch Geosearch.
+
+    Before any of that: if the query names a real foreign country
+    ("London", "Tokyo, Japan"), every US-restricted lookup below is
+    guaranteed to force-fit the wrong country rather than fail — that's
+    what country_codes="us" does by construction, not an edge case.
+    Confirm the mismatch with one unrestricted lookup and return None
+    (honest "not covered") instead of a confident wrong-country hit.
     """
+    if _looks_non_us(text) or (scope_hint and _looks_non_us(scope_hint)):
+        check = geocode_nominatim(text, country_codes=None)
+        cc = ((check.raw.get("address") or {}).get("country_code") or "").lower() if check else ""
+        if cc != "us":
+            log.info("geocode_one: %r named a non-US place (resolved country=%r) — "
+                     "out of scope, not forcing a US match", text, cc or None)
+            return None
     # Region-bias the resolver to the active deployment so ambiguous names
     # land in-area. bounded=True returns only in-region hits; if the query is
     # genuinely outside (or no deployment bbox is known), fall back to the

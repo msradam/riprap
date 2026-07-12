@@ -68,6 +68,36 @@ def run(plan, query: str, progress_q=None) -> dict[str, Any]:  # TODO(cleanup): 
         lat, lon = BOROUGH_POINTS[boro]
         place = boro
     else:
+        # No NYC borough resolved. Before defaulting to NYC, check whether
+        # the query actually named one of Riprap's *other* deployments —
+        # this intent has no geocoder of its own (see module docstring:
+        # "No geocode... speed matters more"), so without this check
+        # "flooding near albany" silently became a Battery, Manhattan
+        # tide reading with no indication the location never matched.
+        # Real production case. Checked against the live deployment
+        # registry rather than a hardcoded city list, so a new deployment
+        # (e.g. a 7th city) is covered automatically, no list to maintain.
+        from riprap.core.pebbles.deployments import discover_deployments  # noqa: PLC0415
+        q_lower = query.lower()
+        other_city = next(
+            (d.city for d in discover_deployments()
+             if d.city and d.name != "nyc" and d.city.lower() in q_lower),
+            None,
+        )
+        if other_city:
+            return {
+                "intent": "live_now", "query": query, "place": None,
+                "plan": {"intent": plan.intent, "targets": plan.targets,
+                        "specialists": plan.specialists, "rationale": plan.rationale},
+                "noaa_tides": None, "nws_alerts": None, "nws_obs": None,
+                "ttm_forecast": None,
+                "paragraph": (f"Live-conditions monitoring currently covers New York City "
+                             f"only. This question named {other_city}, so no live signals "
+                             f"were checked — a live_now report for it would otherwise "
+                             f"default to NYC data with no indication of the mismatch."),
+                "audit": {"raw": "", "dropped": []},
+                "trace": [], "total_s": round(time.time() - t0, 2),
+            }
         lat, lon = BOROUGH_POINTS["NYC"]
         place = "NYC"
 
