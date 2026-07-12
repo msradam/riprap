@@ -30,8 +30,9 @@ log = logging.getLogger("riprap.reconcile")
 # Reconciliation is the synthesis step — citation discipline + structured
 # output adherence both improve materially with the 8b variant.
 # RIPRAP_RECONCILER_MODEL is the canonical name; RIPRAP_OLLAMA_MODEL is
-# kept as a back-compat fallback. Default is now 8b on production
-# deployments (HF Space ships granite4.1:8b in the container).
+# kept as a back-compat fallback. Default is 8b for a self-hosted
+# deployment with real inference (Modal, a Mac Mini, local Ollama); HF
+# Spaces run data probes only post-hackathon, with inferencing disabled.
 OLLAMA_MODEL = os.environ.get("RIPRAP_RECONCILER_MODEL",
                               os.environ.get("RIPRAP_OLLAMA_MODEL", "granite4.1:8b"))
 

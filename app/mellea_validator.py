@@ -1,23 +1,23 @@
 """Mellea-validated reconciliation for Riprap.
 
-Wraps the existing Granite-via-Ollama reconciliation in IBM Research's
-Mellea framework: typed output + programmatic post-conditions +
-rejection sampling. Replaces post-hoc sentence-dropping with
-"don't accept output until requirements pass."
+`reconcile_strict_streaming` is the one reconciler on the "strict" path
+(single_address, neighborhood, development_check all call it): a
+hand-rolled rejection sampler — typed requirements + reroll-until-pass,
+in the spirit of IBM Research's Mellea framework — that streams each
+attempt's tokens to the user instead of validating silently behind a
+"validating" skeleton. Replaces post-hoc sentence-dropping with "don't
+accept output until requirements pass."
 
-Streaming and rejection sampling are mutually exclusive — by the time
-we'd validate, the user has watched the bad output appear. Strict mode
-trades streaming for compliance; the UI shows a "validating" skeleton
-instead of token-by-token render.
+The five invariants checked each attempt (four ported from the parent
+project's mellea_probe, one added here):
 
-The four invariants ported from the parent project's mellea_probe:
-
-  1. no_invented_numbers       — every number in output appears in source
-  2. no_placeholder_tokens     — output never contains "[source]" or
+  1. non_empty                 — the attempt produced at least ~50 chars
+  2. no_invented_numbers       — every number in output appears in source
+  3. no_placeholder_tokens     — output never contains "[source]" or
                                  raw <document> markup
-  3. every_claim_cited         — each numeric token has a [doc_id] within
+  4. every_claim_cited         — each numeric token has a [doc_id] within
                                  ~40 chars
-  4. referenced_doc_ids_exist  — cited doc_ids ⊆ input doc_ids
+  5. referenced_doc_ids_exist  — cited doc_ids ⊆ input doc_ids
 """
 from __future__ import annotations
 
@@ -28,10 +28,6 @@ import re
 import threading
 import time
 from typing import Any
-
-from mellea import start_session
-from mellea.stdlib.requirements import req, simple_validate
-from mellea.stdlib.sampling import RejectionSamplingStrategy
 
 from app import llm
 
@@ -265,124 +261,6 @@ def _check_referenced_doc_ids_exist(doc_msgs: list[dict]):
 # --- main entry point ------------------------------------------------------
 
 
-def reconcile_strict(doc_msgs: list[dict],
-                     system_prompt: str,
-                     user_prompt: str = "Write the cited briefing now.",
-                     model: str | None = None,
-                     loop_budget: int = DEFAULT_LOOP_BUDGET,
-                     ollama_options: dict | None = None) -> dict[str, Any]:
-    """Run Granite reconciliation with Mellea rejection sampling.
-
-    Returns a dict with:
-        paragraph         — final validated text
-        rerolls           — number of resamples (0 = passed first try)
-        requirements_passed — list of requirement names that passed in the
-                              accepted sample
-        requirements_failed — list of requirement names that failed
-                              (empty on accepted sample)
-        elapsed_s         — total seconds including rerolls
-        model             — model id used
-        loop_budget       — configured budget
-    """
-    model = model or DEFAULT_MODEL
-    t0 = time.time()
-
-    # Per-requirement closures wired with the doc context.
-    # Keep the validator functions in our own table so we can re-run them
-    # on the final paragraph to produce reliable pass/fail metadata for
-    # the report — Mellea's internal validation-result objects vary by
-    # version and aren't great for downstream display.
-    checks = [
-        ("numerics_grounded",
-         "All numbers in the output must appear verbatim in the source documents.",
-         _check_no_invented_numbers(doc_msgs)),
-        ("no_placeholder_tokens",
-         "The output must not contain placeholder tokens like [source] or raw <document> markup.",
-         _check_no_placeholder_tokens()),
-        ("citations_dense",
-         "Every numeric claim must have a [doc_id] citation within ~120 characters.",
-         _check_every_claim_cited()),
-        ("citations_resolve",
-         "Every cited [doc_id] must correspond to a real source document.",
-         _check_referenced_doc_ids_exist(doc_msgs)),
-    ]
-    requirements = [
-        req(desc, validation_fn=simple_validate(fn, reason=name))
-        for name, desc, fn in checks
-    ]
-
-    session = start_session(backend_name="ollama", model_id=model,
-                            model_options=ollama_options or {})
-    try:
-        # Build the prompt: system + serialized doc context + user task.
-        # Mellea's instruct() takes the whole instruction; we serialize
-        # the doc messages into the description so the haystack is
-        # available to the model the same way it would be via
-        # ollama.chat with role="document <id>" messages.
-        doc_block = "\n\n".join(
-            f"<document id=\"{m['role'].split(' ', 1)[1] if m['role'].startswith('document ') else 'unknown'}\">\n"
-            f"{m['content']}\n</document>"
-            for m in doc_msgs
-        )
-        instruction = (
-            f"{system_prompt}\n\n"
-            f"DOCUMENTS:\n{doc_block}\n\n"
-            f"TASK: {user_prompt}"
-        )
-
-        result = session.instruct(
-            description=instruction,
-            strategy=RejectionSamplingStrategy(
-                loop_budget=loop_budget,
-                requirements=requirements,
-            ),
-            requirements=requirements,
-            return_sampling_results=True,
-            model_options={"temperature": 0,
-                           "num_ctx": int(os.environ.get("RIPRAP_MELLEA_NUM_CTX", "4096")),
-                           "num_predict": int(os.environ.get("RIPRAP_MELLEA_NUM_PREDICT", "600")),
-                           **(ollama_options or {})},
-        )
-
-        paragraph = _extract_text(result).strip()
-        from app.reconcile import _strip_code_fences  # noqa: PLC0415
-        paragraph = _strip_code_fences(paragraph)
-        paragraph = _fix_parenthetical_citations(paragraph, _doc_ids(doc_msgs))
-        n_attempts = _extract_attempts(result)
-        rerolls = max(0, n_attempts - 1)
-    finally:
-        try:
-            session.cleanup()
-        except Exception:
-            pass
-
-    # Re-run our own checks on the final paragraph for clean pass/fail
-    # metadata. This is what shows up in the report's compliance section.
-    passed: list[str] = []
-    failed: list[str] = []
-    for name, _desc, fn in checks:
-        try:
-            if fn(paragraph):
-                passed.append(name)
-            else:
-                failed.append(name)
-        except Exception as e:
-            log.warning("requirement %s raised: %r", name, e)
-            failed.append(name)
-
-    return {
-        "paragraph": paragraph,
-        "rerolls": rerolls,
-        "n_attempts": n_attempts,
-        "requirements_total": len(checks),
-        "requirements_passed": passed,
-        "requirements_failed": failed,
-        "elapsed_s": round(time.time() - t0, 2),
-        "model": model,
-        "loop_budget": loop_budget,
-    }
-
-
 def reconcile_strict_streaming(
     doc_msgs: list[dict],
     system_prompt: str,
@@ -393,11 +271,12 @@ def reconcile_strict_streaming(
     on_token=None,
     on_attempt_end=None,
 ) -> dict[str, Any]:
-    """Hand-rolled rejection sampler that *streams* each attempt to the
-    user instead of waiting silently for Mellea to validate behind the
-    scenes. Same compliance contract as reconcile_strict plus one more
-    (non_empty), accepts the first attempt that passes, falls back
-    to the last attempt if the budget is exhausted.
+    """Hand-rolled rejection sampler that *streams* each attempt's tokens
+    to the user as they arrive from Granite, instead of validating
+    silently behind a "validating" skeleton. Checks the five invariants
+    in this module's docstring each attempt, accepts the first attempt
+    that passes all of them, falls back to the last attempt if the
+    budget is exhausted.
 
     Callbacks (both optional, both fire on the calling thread):
       on_token(delta: str, attempt_idx: int)
@@ -427,9 +306,8 @@ def reconcile_strict_streaming(
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
-    # num_predict 600 — matches reconcile_strict's default (this function
-    # and that one write the same 4-section briefing under the same
-    # requirements). A denser deployment (NYC: 25 pebbles + RAG over the
+    # num_predict 600 — this function writes a 4-section briefing under
+    # the requirements above. A denser deployment (NYC: 25 pebbles + RAG over the
     # policy corpus) can genuinely need most of that; 350 (this path's
     # old default, tuned for a much smaller vLLM max_model_len that no
     # longer reflects the primary Ollama/Mac-Mini deployment) truncated

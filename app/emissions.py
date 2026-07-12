@@ -4,12 +4,15 @@ Records every LLM and ML-inference call made during a single query and
 summarizes:
   - wallclock duration per call
   - prompt + completion tokens (LLM)
-  - energy in watt-hours, **measured from the L4 GPU when available**
-    (the inference proxy reports per-call `X-GPU-Power-W` /
-    `X-GPU-Energy-J` headers from a 100 ms-cadence NVML sampler).
-    Falls back to a duration × data-sheet-power estimate when the
-    proxy is unreachable / NVML init failed / call went to a backend
-    that doesn't surface power readings.
+  - energy in watt-hours, **measured from the active hardware when
+    available** — an NVIDIA L4 or AMD MI300X GPU via the inference
+    proxy's per-call `X-GPU-Power-W` / `X-GPU-Energy-J` headers (a
+    100 ms-cadence NVML sampler), or Apple Silicon via a local
+    `powermetrics` log (`RIPRAP_POWERMETRICS_LOG`, see `app/power_mac.py`).
+    Falls back to a duration × data-sheet-power estimate per `HARDWARE`
+    below when none of those is available (proxy unreachable / NVML
+    init failed / no fresh powermetrics log / call went to a backend
+    that doesn't surface power readings).
 
 Each call record carries a `measured: bool` flag indicating which path
 was used, so the UI can disclose. `summarize()` aggregates total Wh,

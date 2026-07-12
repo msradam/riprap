@@ -8,9 +8,11 @@ Three actions in sequence:
                           `dep` dict the reconciler reads. Most pebble
                           keys are already in the legacy shape after the
                           shaper layer, so this is mostly the DEP fan-in.
-  rag                   → identity reuse of app.fsm.step_rag. Retrieves
-                          policy-corpus passages based on the geocoded
-                          address + flood signals.
+  policy_corpus         → step_policy_corpus, a text-mining pebble that
+                          owns retrieval + NER in one Burr action.
+                          Replaced the old step_rag + step_gliner pair
+                          from app.fsm — see the comment above
+                          step_policy_corpus below.
   reconcile             → identity reuse of app.fsm.step_reconcile.
                           Granite 4.1 + Mellea grounded rejection-sampling
                           loop (the loop is INTERNAL to mellea_validator;
@@ -38,7 +40,7 @@ from riprap.core.burr.pebble import trace_rec_for
 )
 def assemble_legacy_state(state: State) -> State:
     """Compose the three DEP scenario pebble values into the legacy `dep`
-    compound dict that step_rag + step_reconcile read.
+    compound dict that step_policy_corpus + step_reconcile read.
 
     All other pebbles (sandy, ida_hwm, floodnet, etc.) already write the
     legacy state keys directly via their shapers — no other compounding

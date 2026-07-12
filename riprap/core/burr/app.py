@@ -4,12 +4,14 @@ Composes the four pieces of the briefing pipeline:
 
   intake     (plan_intent → geocode_target)        — what does the user want?
   stones     (cornerstone | touchstone | lodestone | keystone)  — what does the city say?
-  capstone   (assemble_legacy_state → rag → gliner → reconcile)  — write the briefing
+  capstone   (assemble_legacy_state → policy_corpus → reconcile)  — write the briefing
 
 Each Stone is a Burr `MapActions` parallel fan-out over its manifest
-pebbles (`riprap/core/burr/stones.py`). The Capstone reuses the existing
-`step_rag` / `step_gliner` / `step_reconcile` actions from `app/fsm.py`
-unchanged — the Mellea grounding loop stays inside `mellea_validator`.
+pebbles (`riprap/core/burr/stones.py`). The Capstone's `step_reconcile`
+is a straight reuse of `app/fsm.py`'s action — the Mellea grounding loop
+stays inside `mellea_validator`. `step_policy_corpus` (retrieval + NER
+in one Burr action) replaced the old `step_rag` + `step_gliner` pair;
+see `_capstone_actions` below.
 
 Replaces the linear ~20-action graph in `app/fsm.py:build_app`. The new
 graph is 9 actions wide (4 of which fan out internally), with one

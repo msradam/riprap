@@ -10,7 +10,7 @@ Two responsibilities, modelled as two Burr actions chained sequentially:
 Branching:
   - If `plan.intent == "not_implemented"`, downstream Stones are skipped
     (the top-level Application's transitions wire that branch).
-  - If `geocode` fails (no NYC match), Stones still get to run with
+  - If `geocode` fails (no match), Stones still get to run with
     lat=lon=None; each pebble action degrades to its `no coords` trace
     record. The reconciler can still produce a "we couldn't locate this
     address" briefing.
