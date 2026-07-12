@@ -69,6 +69,21 @@ DEFAULT_LOOP_BUDGET = _default_loop_budget()
 # Inside QN1206 there's no \b between any chars, so no submatch leaks.
 _NUM_RE = re.compile(r"\b-?\d[\d,]*(?:\.\d+)?\b")
 _CITE_RE = re.compile(r"\[(?P<id>[a-z][a-z0-9_]*)\]")
+_PAREN_CITE_RE = re.compile(r"\((?P<id>[a-z][a-z0-9_]*)\)")
+
+
+def _fix_parenthetical_citations(text: str, valid_ids: set[str]) -> str:
+    """Granite occasionally cites with (doc_id) instead of [doc_id] —
+    same intent, wrong bracket, and _CITE_RE only recognizes square
+    brackets, so it reads as an uncited claim. Rewrite only when the
+    parenthetical content is an exact match against a real doc_id for
+    *this* query; an ordinary aside that happens to be a single
+    lowercase word (e.g. "(approximately)") never matches a real id,
+    so this can't misfire into treating prose as a citation."""
+    def _sub(m: re.Match) -> str:
+        tok = m.group("id")
+        return f"[{tok}]" if tok in valid_ids else m.group(0)
+    return _PAREN_CITE_RE.sub(_sub, text)
 # Same trivial-numbers list as the post-hoc verifier — well-known service
 # line numbers, single digits.
 _TRIVIAL_NUMS = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "100",
@@ -278,6 +293,7 @@ def reconcile_strict(doc_msgs: list[dict],
         )
 
         paragraph = _extract_text(result).strip()
+        paragraph = _fix_parenthetical_citations(paragraph, _doc_ids(doc_msgs))
         n_attempts = _extract_attempts(result)
         rerolls = max(0, n_attempts - 1)
     finally:
@@ -505,6 +521,7 @@ def reconcile_strict_streaming(
                     except Exception:
                         log.exception("on_token callback raised")
         paragraph = "".join(chunks).strip()
+        paragraph = _fix_parenthetical_citations(paragraph, _doc_ids(doc_msgs))
         if paragraph:
             best_paragraph = paragraph
 
