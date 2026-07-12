@@ -8,30 +8,39 @@ only thing that changes is where the LLM and specialist ML calls execute.
 ## 1. Modal (scale-to-zero cloud GPU)
 
 The lowest-effort way to get a real GPU-backed deployment without
-paying for idle time. `msradam/riprap-triton`'s `modal/riprap_modal.py`
-packages all five Triton-era specialists (Prithvi, TerraMind, TTM,
-Granite Embedding, GLiNER) plus a vLLM-served Granite 4.1 8B in one
-container, and `modal/riprap_frontend.py` in this repo serves the app
-itself.
+paying for idle time. Two components, both scale-to-zero:
+
+**Specialists** — `msradam/riprap-inference`'s `modal_app.py` deploys
+the same LitServe backend that also runs natively on a Mac Mini (see
+§2). One codebase, either target:
 
 ```bash
-# in msradam/riprap-triton
-modal deploy modal/riprap_modal.py
+# in msradam/riprap-inference
+modal secret create riprap-inference-secret \
+    RIPRAP_INFERENCE_API_KEY=$(openssl rand -hex 24) --env riprap
+modal deploy modal_app.py --env riprap
 ```
 
-Cold start is a couple of minutes on a warm Modal Volume (cached
-weights); the container scales to zero — and to $0 — when idle. Point
-this repo's app at the deployed URL:
+**LLM** — point `RIPRAP_LLM_BASE_URL` at any OpenAI-compatible vLLM
+endpoint. `msradam/riprap-triton`'s `modal/riprap_modal.py` is one way
+to get one on Modal (it bundles vLLM with its own Triton-based
+specialist stack in a single container, an alternative all-in-one path
+if you'd rather not run two Modal apps — see
+`msradam/riprap-triton/modal/README.md`).
+
+Point this repo's app at whichever you deployed:
 
 ```bash
 export RIPRAP_LLM_PRIMARY=vllm
-export RIPRAP_LLM_BASE_URL=<your Modal deployment's riprap-proxy URL>
-export RIPRAP_ML_BASE_URL=<same URL>
-export RIPRAP_LLM_API_KEY=<the proxy bearer token — `modal secret list`>
+export RIPRAP_LLM_BASE_URL=<your vLLM endpoint>
+export RIPRAP_LLM_API_KEY=<its bearer token>
+export RIPRAP_ML_BACKEND=remote
+export RIPRAP_ML_BASE_URL=<your riprap-inference Modal URL>
+export RIPRAP_ML_API_KEY=<the RIPRAP_INFERENCE_API_KEY value above>
 ```
 
-or deploy the frontend itself to Modal with `modal/riprap_frontend.py`.
-See `msradam/riprap-triton/modal/README.md` for the full walkthrough.
+Cold start is roughly a minute or two on a warm Modal Volume (cached
+weights); every container scales to zero — and to $0 — when idle.
 
 ## 2. Mac Mini / Apple Silicon (fully local, no cloud)
 
@@ -48,7 +57,8 @@ ollama pull granite4.1:8b       # or a smaller/quantized tag for a
                                  # lower-memory box — see README
 
 # 2. ML specialists — a separate process so the app/model split stays
-#    clean even on a single box; see msradam/riprap-inference
+#    clean even on a single box. Same codebase as the Modal path in
+#    §1, just run natively for real MPS access.
 git clone https://github.com/msradam/riprap-inference
 cd riprap-inference && python server.py &
 
