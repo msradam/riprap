@@ -387,6 +387,8 @@ def run(plan, query: str, progress_q=None, strict: bool = False) -> dict[str, An
             )
             paragraph = mres["paragraph"]
             audit = {"raw": paragraph, "dropped": []}
+            from app.reconcile import wrap_mellea_paragraph
+            paragraph = wrap_mellea_paragraph(paragraph)
             mellea_meta = {
                 "rerolls": mres["rerolls"],
                 "n_attempts": mres["n_attempts"],
@@ -459,7 +461,7 @@ def _doc(doc_id: str, body_lines: list[str]) -> dict:
 
 
 def _reconcile(docs: list[dict], on_token=None) -> tuple[str, dict]:
-    from app.reconcile import verify_paragraph
+    from app.reconcile import verify_paragraph, wrap_with_scope
     messages = docs + [
         {"role": "system", "content": EXTRA_SYSTEM_PROMPT},
         {"role": "user", "content": "Write the cited briefing now."},
@@ -481,6 +483,7 @@ def _reconcile(docs: list[dict], on_token=None) -> tuple[str, dict]:
                 on_token(delta)
         raw = "".join(chunks).strip()
     cleaned, dropped = verify_paragraph(raw, docs)
+    cleaned = wrap_with_scope(cleaned)
     return cleaned, {"raw": raw, "dropped": dropped}
 
 

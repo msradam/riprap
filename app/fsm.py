@@ -1316,8 +1316,8 @@ def step_reconcile(state: State) -> State:
                 if not para or len(para.strip()) < 50:
                     log.warning("mellea returned empty — skipping fallback to avoid concurrent vLLM")
                 else:
-                    from app.reconcile import wrap_with_scope
-                    para = wrap_with_scope(para)
+                    from app.reconcile import wrap_mellea_paragraph
+                    para = wrap_mellea_paragraph(para)
             rec["result"] = {
                 "rerolls": (mellea_meta or {}).get("rerolls"),
                 "passed": (f"{len((mellea_meta or {}).get('requirements_passed') or [])}/"

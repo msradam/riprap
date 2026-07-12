@@ -1180,6 +1180,11 @@ async def api_agent_stream(q: str):
                 else:
                     final = i_addr.run(p, q, progress_q=out_q, strict=True)
             final["emissions"] = tracker.summarize()
+            # Every intent's `final` dict converges here — the one place
+            # that can run the 13 briefing-standards predicates against
+            # every response regardless of which intent produced it.
+            from riprap.core.burr.app import _attach_compliance_audit
+            final = _attach_compliance_audit(final)
             out_q.put({"kind": "final", **final})
         except Exception as e:
             out_q.put({"kind": "error", "err": str(e)})

@@ -190,6 +190,15 @@ def wrap_with_scope(content: str) -> str:
     return f"{SCOPE_HEADER}\n\n{content}\n\n{NON_SCOPE_FOOTER}"
 
 
+def wrap_mellea_paragraph(paragraph: str) -> str:
+    """wrap_with_scope for a Mellea rejection-sampling result. A short/empty
+    paragraph means the streaming attempt stalled or failed upstream — leave
+    it alone rather than wrap near-nothing in a header/footer."""
+    if paragraph and len(paragraph.strip()) >= 50:
+        return wrap_with_scope(paragraph)
+    return paragraph
+
+
 EXTRA_SYSTEM_PROMPT = """Write the body of a flood-exposure briefing for an NYC address. Use ONLY the facts in the provided documents.
 
 Output ONLY the four sections below, filling each <...> with content drawn only from the documents — do NOT write any opening scope sentence or closing "out of scope" line; those are added automatically by the caller, not by you. **Every sentence that contains a number MUST include a citation tag using the actual document id it came from, not a placeholder — cite ONLY doc_ids that actually appear in THIS query's documents list, never a doc_id you recall from a different address or example (e.g. [sandy], [nyc311], [dep_extreme_2080] are NYC-only and will not exist for most addresses — use them only if they are literally present in the documents given to you).** Bold at most one phrase per section using `**...**`. Omit any section whose supporting facts are absent from the documents — do NOT fill an empty section with generic, uncited sentences like "reinforcing the need for flood mitigation measures", and do NOT speculate about what a scenario or model "would likely show" when no such document is present; state plainly that no modeled-scenario data is available for this section and stop there.

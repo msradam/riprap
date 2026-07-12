@@ -271,11 +271,11 @@ def iter_steps_from_plan(query: str, plan: dict | None, intent: str,
         yield {"kind": "final", "paragraph": "",
                "error": "FSM failed before any action completed"}
         return
-    yield {
-        "kind": "final",
+    final_out = _attach_compliance_audit({
         **_state_to_final(state),
         "trace": state.get("trace", []),
-    }
+    })
+    yield {"kind": "final", **final_out}
 
 
 def build_app(query: str, *, project: str = "riprap", step_queue=None):
@@ -417,11 +417,11 @@ def iter_steps(query: str):
         yield {"kind": "final", "paragraph": "",
                "error": "FSM failed before any action completed"}
         return
-    yield {
-        "kind": "final",
+    final_out = _attach_compliance_audit({
         **_state_to_final(state),
         "trace": state.get("trace", []),
-    }
+    })
+    yield {"kind": "final", **final_out}
 
 
 _PIPELINE_KEYS = (

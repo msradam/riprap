@@ -245,14 +245,17 @@ def _doc(doc_id: str, body_lines: list[str]) -> dict:
 
 def _reconcile(docs: list[dict], on_token=None,
                 system_prompt: str = EXTRA_SYSTEM_PROMPT) -> tuple[str, dict]:
-    from app.reconcile import verify_paragraph
+    from app.reconcile import verify_paragraph, wrap_with_scope
     messages = docs + [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": "Write the live-conditions briefing now."},
     ]
     # live_now is the smallest intent: ~4 live docs, short briefing.
-    # num_predict 200 caps to a 2-section status note.
-    OPTS = {"temperature": 0, "num_ctx": 2048, "num_predict": 200}
+    # num_predict 200 truncated real output mid-sentence whenever both the
+    # tide-observation bullet and the TTM-forecast bullet fired together
+    # (live query, 2026-07-12: cut off after "...context window (most",
+    # no closing citation) — 350 covers status + 2 bullets with margin.
+    OPTS = {"temperature": 0, "num_ctx": 2048, "num_predict": 350}
     if on_token is None:
         resp = llm.chat(model=OLLAMA_MODEL, messages=messages, options=OPTS)
         raw = resp["message"]["content"].strip()
@@ -266,4 +269,5 @@ def _reconcile(docs: list[dict], on_token=None,
                 on_token(delta)
         raw = "".join(chunks).strip()
     cleaned, dropped = verify_paragraph(raw, docs)
+    cleaned = wrap_with_scope(cleaned)
     return cleaned, {"raw": raw, "dropped": dropped}
