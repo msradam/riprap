@@ -325,8 +325,8 @@ def reconcile_strict_streaming(
 ) -> dict[str, Any]:
     """Hand-rolled rejection sampler that *streams* each attempt to the
     user instead of waiting silently for Mellea to validate behind the
-    scenes. Same compliance contract as reconcile_strict — runs the
-    same four checks, accepts the first attempt that passes, falls back
+    scenes. Same compliance contract as reconcile_strict plus one more
+    (non_empty), accepts the first attempt that passes, falls back
     to the last attempt if the budget is exhausted.
 
     Callbacks (both optional, both fire on the calling thread):
@@ -357,15 +357,19 @@ def reconcile_strict_streaming(
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
-    # num_predict 350 for the 4-section briefing (typically 250-350 tokens).
-    # Lower ceiling (was 512) frees ~160 tokens of input budget, keeping the
-    # full prompt (documents + system prompt + 350 output) under the
-    # remote vLLM deployment's max_model_len.
-    # Override with RIPRAP_MELLEA_NUM_PREDICT if needed.
+    # num_predict 600 — matches reconcile_strict's default (this function
+    # and that one write the same 4-section briefing under the same
+    # requirements). A denser deployment (NYC: 25 pebbles + RAG over the
+    # policy corpus) can genuinely need most of that; 350 (this path's
+    # old default, tuned for a much smaller vLLM max_model_len that no
+    # longer reflects the primary Ollama/Mac-Mini deployment) truncated
+    # NYC briefings mid-sentence before the fixed scope footer, verified
+    # against a real query. Override with RIPRAP_MELLEA_NUM_PREDICT if
+    # a specific remote deployment needs a tighter ceiling again.
     # num_ctx (Ollama only) is forwarded via extra_body; vLLM ignores it.
     base_opts = {"temperature": 0,
                  "num_ctx": int(os.environ.get("RIPRAP_MELLEA_NUM_CTX", "4096")),
-                 "num_predict": int(os.environ.get("RIPRAP_MELLEA_NUM_PREDICT", "350")),
+                 "num_predict": int(os.environ.get("RIPRAP_MELLEA_NUM_PREDICT", "600")),
                  **(ollama_options or {})}
 
     paragraph = ""
