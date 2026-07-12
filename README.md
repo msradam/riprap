@@ -112,7 +112,18 @@ citation.
 
 ## Quickstart
 
-Four ways to use Riprap, in increasing order of self-host:
+Four ways to use Riprap, in increasing order of self-host. Any option
+that clones the repo needs [Git LFS](https://git-lfs.com) first —
+`data/` and `corpus/` are LFS-tracked, and a clone without it silently
+checks out small pointer files instead of the real data, then the app
+crashes on startup trying to parse one as GeoJSON:
+
+```bash
+brew install git-lfs && git lfs install   # once per machine
+```
+
+(Already cloned without it? `git lfs pull` inside the repo fetches the
+real files retroactively.)
 
 ### 1. Try the original hackathon demo
 

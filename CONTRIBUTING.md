@@ -24,13 +24,24 @@ PRs welcome. Three high-leverage paths in:
 
 ## Quickstart
 
-Python 3.12 + `uv`:
+Requires [Git LFS](https://git-lfs.com) — `data/` (flood layers, ~150 MB
+of GeoJSON/raster) and `corpus/` (policy PDFs) are LFS-tracked. Without
+it, `git clone` silently checks out small text pointer files instead of
+the real data, and the app crashes on startup trying to parse one as
+GeoJSON (`DataSourceError: not recognized as being in a supported file
+format`). Install it once, then clone normally:
 
 ```bash
+brew install git-lfs   # or apt/your package manager
+git lfs install        # one-time, per machine
+
 git clone https://github.com/msradam/riprap
 cd riprap
 uv venv && uv pip install -r requirements.txt
 ```
+
+If you already cloned before installing Git LFS, `git lfs pull` inside
+the repo fetches the real files retroactively.
 
 The PDF route (`/api/print`) uses WeasyPrint, which needs pango / cairo
 system libraries:
