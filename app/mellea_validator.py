@@ -71,6 +71,33 @@ _NUM_RE = re.compile(r"\b-?\d[\d,]*(?:\.\d+)?\b")
 _CITE_RE = re.compile(r"\[(?P<id>[a-z][a-z0-9_]*)\]")
 _PAREN_CITE_RE = re.compile(r"\((?P<id>[a-z][a-z0-9_]*)\)")
 
+# A street number ("20 Coffey St") is an address identifier, not a fresh
+# statistical claim — it's already carrying whatever citation it needs
+# wherever the full address first appears (e.g. a "Flagged projects"
+# bullet). A later summary sentence that just re-lists the same street
+# numbers for readability ("concentrated on 20 Coffey St, 100 Sullivan
+# St...") shouldn't have to re-cite each one — real production case from
+# development_check output. Matches "<number> <Capitalized word(s)>
+# <street suffix>" immediately after the digits.
+_STREET_SUFFIXES = (
+    "St|Street|Ave|Avenue|Blvd|Boulevard|Rd|Road|Pl|Place|Dr|Drive|"
+    "Ln|Lane|Ct|Court|Way|Sq|Square|Ter|Terrace|Pkwy|Parkway|Cir|Circle|"
+    "Hwy|Highway|Plaza|Broadway"
+)
+_STREET_ADDRESS_TAIL_RE = re.compile(
+    # No leading ^ — this is matched via .match(text, pos) at a specific
+    # offset, and ^ only anchors to true position 0 of the string, not
+    # to `pos`. Without dropping it, this silently never matches at any
+    # nonzero offset (i.e. almost always).
+    r"\s+[A-Z][a-zA-Z]*(?:\s+[A-Z][a-zA-Z]*){0,2}\s+(?:" + _STREET_SUFFIXES + r")\b"
+)
+
+
+def _is_street_address_number(text: str, end_pos: int) -> bool:
+    """True if the number ending at `end_pos` is immediately followed by
+    a street-address tail ("... St", "... Avenue", ...)."""
+    return bool(_STREET_ADDRESS_TAIL_RE.match(text, end_pos))
+
 
 def _fix_parenthetical_citations(text: str, valid_ids: set[str]) -> str:
     """Granite occasionally cites with (doc_id) instead of [doc_id] —
@@ -154,33 +181,51 @@ def _check_no_placeholder_tokens():
     return _fn
 
 
+# Sentence end = `. ` or `.\n` or end-of-string. Question/exclamation
+# marks rarely appear in these briefings; period is enough.
+_SENT_END = re.compile(r"\.[\s)]|\.$")
+
+
+def _citation_span(text: str, pos: int) -> tuple[int, int]:
+    """The span of text a citation near `pos` could plausibly cover.
+
+    Base case: the sentence containing `pos` (bounded by the previous
+    and next `_SENT_END` match) — the citation can be anywhere in the
+    sentence, not just adjacent to the number.
+
+    Bulleted list items are the one place that's too narrow: a bullet
+    like "- 20 Coffey St (BBL ...). new building, issued 11/26/2025.
+    [dob_permits]" packs several period-delimited clauses under one
+    citation at the end, same as how a human writes a footnoted list
+    (one citation per item, not one per clause) — real production case
+    from development_check output. When `pos` falls on a line starting
+    with "- " or "* ", extend the span to the whole line so a citation
+    anywhere on it counts for every clause in it.
+    """
+    start = 0
+    for m in _SENT_END.finditer(text, 0, pos):
+        start = m.end()
+    m = _SENT_END.search(text, pos)
+    end = m.start() + 1 if m else len(text)
+
+    line_start = text.rfind("\n", 0, pos) + 1
+    line_end_nl = text.find("\n", pos)
+    line_end = line_end_nl if line_end_nl != -1 else len(text)
+    if text[line_start:line_end].lstrip().startswith(("- ", "* ")):
+        start, end = min(start, line_start), max(end, line_end)
+    return start, end
+
+
 def _check_every_claim_cited():
     """Each non-trivial numeric token must have a [doc_id] somewhere in
-    the same sentence. Sentence boundaries are conservative: a period
-    followed by whitespace, or end of text. This matches how a reader
-    actually attributes claims — the citation can be anywhere in the
-    sentence, not just adjacent to the number."""
-    # Sentence end = `. ` or `.\n` or end-of-string. Question/exclamation
-    # marks rarely appear in these briefings; period is enough.
-    _SENT_END = re.compile(r"\.[\s)]|\.$")
-
-    def _sentence_span(text: str, pos: int) -> tuple[int, int]:
-        # Walk backwards to the previous sentence terminator.
-        start = 0
-        for m in _SENT_END.finditer(text, 0, pos):
-            start = m.end()
-        # Walk forwards to the next.
-        m = _SENT_END.search(text, pos)
-        end = m.start() + 1 if m else len(text)
-        return start, end
-
+    its citation span (see _citation_span)."""
     def _fn(text: str):
         clean = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
         for m in _NUM_RE.finditer(clean):
             n = m.group(0)
-            if n in _TRIVIAL_NUMS:
+            if n in _TRIVIAL_NUMS or _is_street_address_number(clean, m.end()):
                 continue
-            s, e = _sentence_span(clean, m.start())
+            s, e = _citation_span(clean, m.start())
             if not _CITE_RE.search(clean[s:e]):
                 return False
         return True
@@ -188,16 +233,23 @@ def _check_every_claim_cited():
 
 
 def _failing_sentences_for_citations(text: str) -> list[str]:
-    """Return the sentences in `text` that contain a non-trivial number
-    but no [doc_id] citation. Used to give the model targeted reroll
-    feedback so it can fix the exact spots that failed."""
+    """Return the citation spans (see _citation_span) that contain a
+    non-trivial number but no [doc_id] citation. Used to give the model
+    targeted reroll feedback so it can fix the exact spots that failed."""
     clean = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
-    sents = re.split(r"\.[\s)]|\.$", clean)
-    bad = []
-    for s in sents:
-        nums = [n for n in _NUM_RE.findall(s) if n not in _TRIVIAL_NUMS]
-        if nums and not _CITE_RE.search(s):
-            bad.append(s)
+    bad: list[str] = []
+    seen_spans: set[tuple[int, int]] = set()
+    for m in _NUM_RE.finditer(clean):
+        n = m.group(0)
+        if n in _TRIVIAL_NUMS or _is_street_address_number(clean, m.end()):
+            continue
+        span = _citation_span(clean, m.start())
+        if span in seen_spans:
+            continue
+        s, e = span
+        if not _CITE_RE.search(clean[s:e]):
+            seen_spans.add(span)
+            bad.append(clean[s:e].strip())
     return bad
 
 
