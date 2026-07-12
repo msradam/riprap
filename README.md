@@ -11,7 +11,7 @@
 [![Civic Hydrology](https://img.shields.io/badge/palette-civic%20hydrology-005EA2)](web/sveltekit/src/lib/tokens.css)
 [![Apache-2.0 foundation models](https://img.shields.io/badge/models-Apache--2.0%20end--to--end-1A4480)](#nyc-specialised-foundation-models-apache-20)
 
-## Flood risk analysis for any NYC address.
+## Citation-grounded climate-exposure briefings, city by city.
 
 A multi-agent AI system that reads satellites, watches sensors, forecasts
 surges, and refuses to ship a sentence it cannot ground in a citation.
@@ -34,15 +34,23 @@ a Mac Mini, or docker-compose).
 >   `.riprap/` auto-discovery or the `RIPRAP_EXTRA_MANIFESTS` env var.
 > - **[`docs/PORT-YOUR-CITY.md`](docs/PORT-YOUR-CITY.md)** — walkthrough
 >   for adding a new city, using the Boston port as the worked example.
+> - **[`docs/multi-hazard.md`](docs/multi-hazard.md)** — the same Five
+>   Stones produce a heat-exposure or air-quality briefing from a
+>   `deployments/heat/` or `deployments/air/` directory. Flood/NYC is
+>   the production-grade deployment (22 pebbles); heat and air are
+>   working scaffolds (3-4 pebbles) proving the architecture
+>   generalizes past flood.
 
 ---
 
 ## The problem Riprap solves
 
-NYC has spent decades publishing the flood-exposure inputs an engineer needs:
-Sandy 2012 inundation, NYC DEP stormwater scenarios, FloodNet sensors, NOAA
-tide gauges, USGS 3DEP LiDAR, 311 complaints, MTA, NYCHA, schools, hospitals.
-The data is public. None of it composes itself.
+Cities publish the hazard-exposure inputs an engineer needs. NYC alone has
+decades of it: Sandy 2012 inundation, NYC DEP stormwater scenarios,
+FloodNet sensors, NOAA tide gauges, USGS 3DEP LiDAR, 311 complaints, MTA,
+NYCHA, schools, hospitals — and Chicago, Seattle, San Francisco, Boston,
+and Albany each publish their own equivalents. The data is public. None of
+it composes itself.
 
 Every engineer doing a drainage review, every resilience office siting a
 capital project, every climate-adaptation team prioritising blocks
@@ -51,9 +59,9 @@ briefing that should be a tool call ends up as a half-day of manual joins.
 Existing tools either return opaque vendor risk scores or skip the audit
 trail a stamped engineering memo actually requires.
 
-Riprap composes it. Type any NYC address, get a four-section,
-citation-grounded briefing in about two minutes, with every claim pointing
-back to a `[doc_id]` in public-record data.
+Riprap composes it. Type an address in any deployed city, get a
+four-section, citation-grounded briefing in about two minutes, with every
+claim pointing back to a `[doc_id]` in public-record data.
 
 ---
 
@@ -317,7 +325,7 @@ All three are loaded at runtime by their respective FSM probes in
 ## Architecture
 
 ```
-NYC address ──► Granite 4.1 3B planner ──► Plan{intent, targets, specialists}
+Address ──► Granite 4.1 3B planner ──► Plan{intent, targets, specialists}
                                                   │
                                                   ▼
                   Five-Stone Burr FSM (manifest pebbles, MapActions fan-out)
