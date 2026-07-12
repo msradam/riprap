@@ -16,10 +16,15 @@
 > — including the Mac Mini `powermetrics` path — is documented in
 > [`docs/EMISSIONS.md`](EMISSIONS.md).
 
-> **What it is.** A web tool that takes any NYC address and produces a
-> short, citation-grounded **flood-exposure briefing**. A tier (1–4)
-> with a paragraph of evidence, where every numeric claim links back to
-> the specific dataset, agency report, or model output it came from.
+> **What it is.** A web tool that takes an address and produces a
+> short, citation-grounded **climate-exposure briefing** — a paragraph
+> of evidence where every numeric claim links back to the specific
+> dataset, agency report, or model output it came from. NYC/flood is
+> the production-grade reference deployment (this document describes
+> it end to end); the same architecture ships five more city
+> deployments (see [`docs/multi-city.md`](multi-city.md)) and, as a
+> proven experiment, heat- and air-quality hazards on top of the same
+> pebble/Stone framework (see [`docs/multi-hazard.md`](multi-hazard.md)).
 >
 > **Who it's for.** Urban planners, journalists on deadline, NYCEM
 > grant writers filing FEMA BRIC sub-applications, agency capital
@@ -118,26 +123,38 @@ Neither is a flood prediction; both are exposure indicators that say
 
 ## 2. What Riprap actually produces
 
-For a given address (or any of three modes; see [§4](#4-three-user-modes)),
+For a given address (or any of five intents; see [§4](#4-five-planner-intents)),
 Riprap returns:
 
-1. **A tier 1–4** computed by a deterministic, published rubric
-   ([§5](#5-the-scoring-rubric)). Tier 1 = "high exposure"; Tier 4 =
-   "limited exposure"; Tier 0 = "no flagged exposure."
-2. **A 4-section briefing paragraph** synthesised by Granite 4.1 with
+1. **A 4-section briefing paragraph** synthesised by Granite 4.1 with
    `[doc_id]` citations after every numeric claim. Sections:
    *Status*, *Empirical evidence*, *Modeled scenarios*, *Policy
-   context*. A section is omitted entirely if no specialist fired for
+   context*. A section is omitted entirely if no pebble fired for
    it (silence-over-confabulation contract).
-3. **Evidence cards**. One per fired specialist, with the raw values
+2. **Evidence cards**. One per fired pebble, with the raw values
    and a link to the source dataset.
-4. **Map overlay**. The address pinned, with the empirical and
+3. **Map overlay**. The address pinned, with the empirical and
    modeled flood extents that overlap it.
-5. **Live "right now" signals**. Active NWS flood alerts, current
-   tide residual at the Battery, recent precipitation at the nearest
-   ASOS, and a Granite TTM short-horizon forecast of the surge
-   residual. **These do not modify the tier** (per IPCC AR6 WG II's
-   distinction between exposure and event occurrence).
+4. **Live "right now" signals**. Active NWS flood alerts, current
+   tide residual at the nearest gauge, recent precipitation at the
+   nearest ASOS, and a Granite TTM short-horizon forecast of the surge
+   residual.
+5. **A compliance audit**. The 13 briefing-standards predicates
+   (FEMA / IPCC AR6 / TCFD / ASTM E1527-21 / AP Stylebook / SPJ — see
+   `riprap/core/compliance/`) evaluated against the actual rendered
+   paragraph, attached to every response.
+
+**The deterministic tier 1–4 rubric** ([§5](#5-the-scoring-rubric),
+`app/score.py`) still exists and is still exactly what it says —
+empirical-floor-weighted, published, not LLM-computed — but it is not
+part of the live single-query response today. Its live callers are the
+offline bulk register builders (`scripts/build_*_register.py`, the
+`/register/{schools,nycha,mta_entrances}` browsable pages), which tier
+thousands of assets to decide which get a full reconciled paragraph
+vs. a bare listing. §5 documents the rubric itself; if you're looking
+for where a single query's tier appears in the JSON response, it
+doesn't — that's the gap between this section's older framing and
+the current wiring.
 
 The full output is a JSON blob with all specialist outputs preserved,
 so a journalist or planner can audit every number that appears in the
@@ -145,116 +162,141 @@ prose.
 
 ---
 
-## 3. The Burr FSM and how the specialists chain
+## 3. The manifest-driven pebble framework, and how a query actually flows
 
-Riprap is a **state machine**, a Burr FSM (DAGWorks), that walks
-through a fixed list of "specialist" functions in order. Each
-specialist either produces a structured fact or stays silent. At the
-end, the reconciler reads all the produced facts and writes the
-paragraph.
+Riprap is a **state machine**, a Burr Application (DAGWorks). Two
+generations of that state machine currently coexist in this codebase:
 
-The full chain, in execution order:
+- **`riprap/core/burr/app.py`** — the current, manifest-driven runtime.
+  A deployment (`deployments/<city>/`) is a directory of YAML **pebble**
+  manifests plus a `stones.yaml`. Each pebble declares its own `stone`
+  (which of the Five Stones it belongs to), `coverage` (the bbox it's
+  eligible to fire in), data source, and citation metadata — no
+  hand-coded specialist list. This is the path a `single_address` query
+  takes by default (`RIPRAP_USE_BURR_APP=1`, the default — see
+  [§12](#12-deployment)), and it's what makes adding a city or a hazard
+  a directory of YAML rather than a code change (see
+  [`docs/multi-city.md`](multi-city.md), [`docs/multi-hazard.md`](multi-hazard.md)).
+- **`app/fsm.py`** — the original linear FSM this replaced for
+  `single_address`. It's not dead: `riprap/core/burr/capstone.py`
+  reuses its `step_reconcile` action as-is (the Mellea-grounded Granite
+  call), and it's still the full execution path for the other four
+  intents — `neighborhood`, `development_check`, `live_now`, and
+  `compare` each have their own orchestration module under
+  `app/intents/` that calls point/polygon-scoped specialist functions
+  directly, not the pebble registry. `RIPRAP_USE_BURR_APP=0` also
+  falls `single_address` back to this path entirely, for regression
+  testing against the pebble-framework path.
+
+This section describes the `single_address` pebble-framework path in
+detail, since it's both the default and the architecture the rest of
+this codebase is migrating toward.
+
+### 3.0 The shape of a query
 
 ```
-            ┌─────────────────────────────┐
-  query ──► │ 1. geocode (DCP Geosearch)  │  address text → lat/lon, BBL, borough
-            └────────────┬────────────────┘
-                         ▼
-         ┌─────────────────────────────────────────────┐
-         │     STATIC EMPIRICAL + REGULATORY LAYERS    │
-         │ (snapshot of city-published flood layers)   │
-         ├─────────────────────────────────────────────┤
-         │ 2. sandy           in 2012 Sandy zone? Y/N  │  empirical
-         │ 3. dep_stormwater  in 3 modeled scenarios?  │  modeled
-         │ 4. floodnet        live sensor history      │  empirical
-         │ 5. nyc311          flood complaints in 200m │  proxy
-         └────────────┬────────────────────────────────┘
-                      ▼
-         ┌─────────────────────────────────────────────┐
-         │            LIVE "RIGHT NOW" LAYER           │
-         │ (out of static score; reported separately)  │
-         ├─────────────────────────────────────────────┤
-         │ 6. noaa_tides    Battery / Kings Pt level   │  live, 6-min
-         │ 7. nws_alerts    active flood-relevant      │  live
-         │ 8. nws_obs       nearest ASOS recent precip │  live
-         │ 9. ttm_forecast  9.6h surge-residual nowcast│  Granite TTM r2
-         └────────────┬────────────────────────────────┘
-                      ▼
-         ┌─────────────────────────────────────────────┐
-         │   TERRAIN + EVENT-LEVEL EMPIRICAL LAYERS    │
-         ├─────────────────────────────────────────────┤
-         │ 10. microtopo    DEM + TWI + HAND at point  │  proxy
-         │ 11. ida_hwm      USGS Ida 2021 HWM proximity│  empirical
-         │ 12. prithvi      Prithvi-EO Ida flood polys │  empirical (model-derived)
-         └────────────┬────────────────────────────────┘
-                      ▼
-         ┌─────────────────────────────────────────────┐
-         │ 10. microtopo    DEM + TWI + HAND at point  │  proxy
-         │ 11. ida_hwm      USGS Ida 2021 HWM proximity│  empirical
-         │ 12. mta_entrance MTA subway entrance exposure│  empirical
-         │ 13. prithvi_v2   Prithvi Ida flood polys     │  empirical (model-derived)
-         │ 14. prithvi_live live Prithvi inference      │  (gpu-only; skipped cpu-basic)
-         │ 15. terramind    TerraMind LULC synthesis    │  (gpu-only; skipped cpu-basic)
-         └────────────┬────────────────────────────────┘
-                      ▼
-         ┌─────────────────────────────────────────────┐
-         │ 16. rag (Granite Embedding 278M)            │  retrieves policy paragraphs
-         │     query corpus of 5 NYC agency PDFs        │  relevant to this address
-         │ 17. gliner_extract (GLiNER medium-v2.1)     │  entity extraction over RAG hits
-         └────────────┬────────────────────────────────┘
-                      ▼
-         ┌─────────────────────────────────────────────┐
-         │ 18. reconcile (Granite 4.1 :8b)             │  document-grounded synthesis
-         │     reads all "documents" produced by 1-17  │  → 4-section cited paragraph
-         │     Mellea rejects ungrounded outputs        │  → audit trail
-         └────────────┬────────────────────────────────┘
-                      ▼
-                 cited briefing
-                 + tier badge + evidence cards + map
+            ┌───────────────────────────────┐
+  query ──► │ plan_intent (Granite 4.1:3b)  │  free text → {intent, targets, specialists}
+            └───────────────┬───────────────┘
+                            ▼
+            ┌───────────────────────────────┐
+            │ geocode_target (Nominatim,     │  target text → lat, lon
+            │ NYC Geosearch enrichment)      │  (+ BBL/BIN for NYC pebbles)
+            └───────────────┬───────────────┘
+                            ▼
+            ┌───────────────────────────────┐
+            │ select_deployment              │  (lat, lon) → which deployments/<city>/
+            └───────────────┬───────────────┘  bbox contains this point (or none)
+                            ▼
+       ┌───────────────────────────────────────────────────────────┐
+       │   STONE FAN-OUT — MapActions parallel over 4 of the 5       │
+       │   Stones (Capstone follows below). Each Stone reads the     │
+       │   deployment's pebble registry at call time and fans out    │
+       │   to every pebble tagged with that stone whose `coverage`   │
+       │   contains the point.                                       │
+       │                                                              │
+       │   Cornerstone (hazard memory) │ Touchstone (live observation)│
+       │   Lodestone (forecasts)       │ Keystone (assets)            │
+       └──────────────────────────┬───────────────────────────────────┘
+                                    ▼
+                     ┌──────────────────────────────┐
+                     │ assemble_legacy_state          │  reshapes the 3 DEP-scenario
+                     └───────────────┬────────────────┘  pebble values into one dict
+                                    ▼
+                     ┌──────────────────────────────┐
+                     │ step_policy_corpus             │  retrieval + NER in one pebble
+                     └───────────────┬────────────────┘  (Granite Embedding 278M + GLiNER)
+                                    ▼
+                     ┌──────────────────────────────┐
+                     │ step_reconcile (from app.fsm)  │  Granite 4.1 + Mellea
+                     │ reads every fired pebble's      │  rejection-sampling loop
+                     │ "document" and writes the       │  (up to loop_budget attempts)
+                     │ 4-section cited paragraph       │
+                     └───────────────┬────────────────┘
+                                    ▼
+                     cited briefing + evidence cards + map
+                     + 13-predicate compliance audit
 ```
 
-The `single_address` path emits **24 step events** (including the live
-sub-specialists ttm_311_forecast, ttm_battery_surge, floodnet_forecast,
-and the eo_chip_fetch / terramind_lulc / terramind_buildings gates).
-`neighborhood` emits 8–10 steps (NTA-level specialists only; per-address
-registers don't run).
+If geocoding fails or no deployment covers the resolved point, the
+Stones still run (each pebble degrades to its `no coords` /
+`no deployment` trace record) and the reconciler produces an honest
+"couldn't locate this" or "outside coverage" briefing instead of
+silently guessing — see `app/geocode.py` and `riprap/core/burr/intake.py`
+for the specific decline logic (Nominatim-primary resolution, an
+explicit non-US decline path, and a deployment-registry-based "this
+query names a different Riprap deployment's city" check).
 
-Each step is implemented as a `@action` in `app/fsm.py`. The Burr
-runtime handles state-passing between actions and emits a trace record
-per step (timing, ok/err, summary fields) which the front-end shows live.
+Each Stone's fan-out and each of the three Capstone steps
+(`assemble_legacy_state`, `step_policy_corpus`, `step_reconcile`) are
+Burr actions with their own trace record (timing, ok/err, a small
+result summary) that streams to the frontend live as `step` SSE events.
 
-### 3.1 What every specialist does, plain language
+### 3.1 What every pebble does, plain language
 
-| # | Specialist                | Plain-language description                                                                                                                                                       | Class              |
-|---|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
-| 1 | **geocode**               | Resolve the user's text ("116-50 Sutphin Blvd, Queens") to a (lat, lon) and a NYC tax-lot ID (BBL). Uses NYC Planning's free Geosearch API.                                      | n/a                |
-| 2 | **sandy**                 | Did the address get flooded by Hurricane Sandy in 2012? Point-in-polygon over the official NYC Sandy Inundation Zone.                                                            | empirical          |
-| 3 | **dep_stormwater**        | Three modeled stormwater-flooding scenarios from NYC DEP: Moderate-2050, Extreme-2080, Tidal-2050. Each tells you depth (none / 0.4–0.8 ft / etc.) at this point.                | modeled            |
-| 4 | **floodnet**              | NYC's ultrasonic flood-sensor network. How many sensors are within 600 m, and have any of them registered a flood event in the last 3 years?                                     | empirical          |
-| 5 | **nyc311**                | The 311 service-request archive. How many flood-related complaints (street flooding, sewer backup, catch-basin clogged) within 200 m of the address over the last 5 years?       | proxy              |
-| 6 | **noaa_tides** *(live)*   | Current tide observation at the nearest of three NOAA gauges (Battery / Kings Pt / Sandy Hook). Reports observed water level, predicted astronomical tide, and the **residual** (≈ surge). | live               |
-| 7 | **nws_alerts** *(live)*   | Are there active NWS flood-relevant alerts at this point right now? Flash Flood Warnings, Coastal Flood Advisories, etc.                                                         | live               |
-| 8 | **nws_obs** *(live)*      | Recent precipitation from the nearest airport ASOS station (KNYC / KLGA / KJFK / KEWR / KFRG).                                                                                   | live               |
-| 9 | **ttm_forecast** *(live)* | Granite TTM r2 zero-shot forecast of the surge **residual** at the Battery for the next ~9.6 h. NOAA already publishes the astronomical tide; TTM forecasts the part NOAA doesn't. | live (model-derived) |
-| 10 | **microtopo**            | LiDAR-derived terrain features at the point: elevation, HAND, TWI, local relief percentile.                                                                                      | proxy              |
-| 11 | **ida_hwm**              | USGS Hurricane Ida 2021 high-water marks. Actual measured water heights surveyed in the days after the storm.                                                                   | empirical          |
-| 12 | **mta_entrance_exposure** | MTA subway entrances within radius: how many, how many are inside Sandy 2012 zone, how many are in DEP Extreme-2080. | empirical          |
-| 13 | **prithvi_eo_v2**        | Pre-computed point-in-polygon against 166 Prithvi-derived Ida 2021 flood polygons (offline-built; instant at request time).                                                      | empirical (model-derived) |
-| 14 | **prithvi_eo_live** / **terramind_synthesis** | Live Prithvi / TerraMind inference over fresh EO chips. GPU-only; silenced (deterministic skip) on cpu-basic HF Space. | empirical (model-derived) |
-| 15 | **rag**                  | Granite Embedding 278M retrieves the most-relevant paragraphs from 5 NYC policy PDFs (Comptroller, NPCC4, MTA, NYCHA, ConEd) given the address's borough + which scenarios fired. | policy             |
-| 16 | **gliner_extract**       | GLiNER medium-v2.1 runs named-entity extraction over the RAG-retrieved paragraphs: locations, agencies, dates, infrastructure-project names. Results ride into the reconciler as additional grounding context. | ancillary |
-| 17 | **reconcile**            | Granite 4.1 :8b reads all documents produced by steps 1–16 and writes the cited briefing paragraph. Mellea rejection-sampling validates 4 grounding requirements; up to 3 attempts. See [§6](#6-document-grounded-reconciliation). | LLM synthesis |
+The NYC deployment's registry (`deployments/nyc/manifests/`) currently
+carries 25 pebbles. Every other deployment has its own, smaller set —
+see [`docs/multi-city.md`](multi-city.md) for the per-city pebble
+counts and [`docs/multi-hazard.md`](multi-hazard.md) for heat/air.
+`geocode` and `reconcile` below aren't pebbles — they're the two fixed
+framework steps that bracket the Stone fan-out (§3.0).
+
+| Pebble | Plain-language description | Tier |
+|---|---|---|
+| **geocode** *(framework, not a pebble)* | Resolve the query text to (lat, lon). Nominatim resolves any US address; when the point falls inside NYC, NYC DCP Geosearch additionally enriches the hit with BBL/BIN identifiers the NYC-specific pebbles below need. | n/a |
+| **sandy** | Did the address get flooded by Hurricane Sandy in 2012? Point-in-polygon over the official NYC Sandy Inundation Zone. | empirical |
+| **fema_nfhl** | FEMA's National Flood Hazard Layer effective flood zone at this point. | modeled |
+| **dep_moderate_current**, **dep_moderate_2050**, **dep_extreme_2080** | Three modeled NYC DEP stormwater scenarios — current SLR baseline, 2050 moderate, 2080 extreme. Each reports a depth class at this point. | modeled |
+| **ida_hwm** | USGS Hurricane Ida 2021 high-water marks near this address — actual measured water heights surveyed after the storm. | empirical |
+| **prithvi_water** | Prithvi-EO 2.0-derived Hurricane Ida pre/post flood inundation polygons (offline pre-compute; instant at request time). | modeled |
+| **microtopo** | LiDAR/DEM-derived micro-topography at the point: elevation percentile, HAND, TWI, basin relief. | proxy |
+| **policy_corpus** | Granite Embedding 278M retrieves the most-relevant passages from 5 NYC agency PDFs, and GLiNER extracts typed entities (agency, dollar amount, date, location) from them — one pebble owning retrieval + NER, replacing the older separate rag/gliner_extract steps. | empirical |
+| **mta_entrances**, **nycha_developments**, **doe_schools**, **doh_hospitals** | MTA subway/rail entrances, NYCHA developments, NYC DOE schools, and NYS DOH hospitals within range of this address, and their flood exposure. | empirical |
+| **nws_alerts** *(live)* | Currently active NWS alerts (flood/coastal/wind) intersecting this address. | modeled |
+| **ttm_forecast** *(live)* | Granite TTM r2 zero-shot forecast of the Battery storm-surge residual, 9.6-hour horizon at 6-minute cadence. | modeled |
+| **ttm_battery_surge** *(live)* | Granite-TTM-r2-Battery-Surge — a fine-tuned nowcast of Battery storm-surge over the next 96 hours. | modeled |
+| **ttm_311_forecast** *(live)* | 4-week forecast of NYC 311 flood-complaint volume at this address. | modeled |
+| **floodnet_forecast** *(live)* | 28-day forecast of flood-event recurrence at the nearest FloodNet sensor. | modeled |
+| **npcc4_slr** | NYC Panel on Climate Change (2024) sea-level rise projections at the Battery. | modeled |
+| **floodnet** *(live)* | FloodNet ultrasonic depth sensors near this address and their historical flood events. | empirical |
+| **nyc311** *(live)* | NYC 311 flood-related complaints filed near this address over the past 5 years. | proxy |
+| **nws_obs** *(live)* | Most recent NWS hourly observation at the nearest METAR station. | empirical |
+| **noaa_tides** *(live)* | Recent NOAA tide-gauge water-level reading — observed level, predicted astronomical tide, and the **residual** (≈ surge) — at the nearest station. | empirical |
+| **usgs_gauges** *(live)* | Live stage at the nearest USGS stream gauge. | empirical |
+| **prithvi_live** *(live)* | Live Sentinel-2 water segmentation around this address (Prithvi-EO 2.0 NYC-Pluvial fine-tune). | modeled |
+| **terramind_lulc**, **terramind_buildings** *(live, not yet manifest-driven)* | TerraMind land-cover and building-footprint synthesis over a fresh EO chip. Still an `app/fsm.py` step rather than a pebble manifest — one of the pieces README's "legacy `app/` modules... the framework has not yet absorbed" refers to. | modeled |
+| **reconcile** *(framework, not a pebble)* | Granite 4.1 reads every fired pebble's "document" and writes the 4-section cited briefing paragraph. Mellea rejection-sampling validates the invariants in `app/mellea_validator.py`'s module docstring; up to `loop_budget` attempts. See [§6](#6-document-grounded-reconciliation). | LLM synthesis |
 
 ### 3.2 Worked example: 2940 Brighton 3rd St, Brooklyn
 
-To make the chain concrete, here's what fires for a Brighton Beach
+To make the pipeline concrete, here's what fires for a Brighton Beach
 address:
 
-| Step | What it returns |
+| Pebble | What it returns |
 |---|---|
 | geocode    | `(40.5780, -73.9617)`, BBL `3-08660-0001`, Brooklyn |
 | sandy      | **YES**. Inside the 2012 Sandy Inundation Zone |
-| dep_stormwater | `dep_moderate_2050`: depth 0.4-0.8 ft; `dep_extreme_2080`: depth 0.8-2.0 ft |
+| dep_moderate_2050, dep_extreme_2080 | `dep_moderate_2050`: depth 0.4-0.8 ft; `dep_extreme_2080`: depth 0.8-2.0 ft |
 | floodnet   | 2 sensors within 600 m; 1 trigger event in last 3 yr (peak 14 cm) |
 | nyc311     | 11 flood-related complaints in 200 m, 5-yr window |
 | noaa_tides | Sandy Hook gauge, +0.49 ft residual *(today's reading)* |
@@ -263,10 +305,13 @@ address:
 | ttm_forecast | Forecast peak residual +0.6 ft in 4.2 h *(today's run)* |
 | microtopo  | Elevation 2.36 m, HAND 0.7 m, TWI 11.3, percentile 8 (very low) |
 | ida_hwm    | 0 USGS HWMs within 800 m (Ida hit Queens hardest, not Brighton) |
-| prithvi    | Inside an Ida-attributable polygon? **NO** (Ida was pluvial-inland) |
-| rag        | Top hits: NPCC4 Ch.3 (coastal), MTA Resilience (Coney Island D-train), Comptroller |
+| prithvi_water | Inside an Ida-attributable polygon? **NO** (Ida was pluvial-inland) |
+| policy_corpus | Top hits: NPCC4 Ch.3 (coastal), MTA Resilience (Coney Island D-train), Comptroller |
 | reconcile  | (see below) |
-| **Tier**   | **1 (High exposure)** with empirical floor applied |
+
+(An offline register build would additionally tier this address 1
+"High exposure" under the empirical-floor rubric — [§5](#5-the-scoring-rubric)
+— but that tier isn't part of this live response; see [§2](#2-what-riprap-actually-produces).)
 
 The reconciler then writes:
 
@@ -284,8 +329,9 @@ years [floodnet].
 with depth class 0.4-0.8 ft and **DEP Extreme-2080** with depth class
 0.8-2.0 ft [dep_moderate_2050][dep_extreme_2080].
 
-**Policy context.** **NPCC4 Ch. 3** documents accelerating coastal-
-flood frequency along this stretch [rag_npcc4].
+**Policy context.** The **MTA Climate Resilience Roadmap** flags the
+nearby Coney Island D-train infrastructure for coastal-flood exposure
+[rag_mta].
 ```
 
 Note what *didn't* fire: no Ida HWM doc (Ida didn't flood here), no
@@ -298,22 +344,29 @@ saw those headers and didn't invent them.
 ## 4. Five planner intents
 
 The planner (`app/planner.py`) classifies every free-text query into one of
-five intents before the FSM runs. This happens in a single Granite 4.1 call
-that streams its JSON output to the client as `plan_token` events.
+five intents before anything else runs. This happens in a single Granite
+4.1 call that streams its JSON output to the client as `plan_token` events.
 
-| Intent                | Triggered by                                  | FSM path                         | Steps |
-|-----------------------|-----------------------------------------------|----------------------------------|-------|
-| `single_address`      | Fully-qualified street address                | Full linear FSM (geocode → 19 specialists → reconcile) | 24 |
-| `neighborhood`        | NTA name, borough name, bare zip              | NTA-level specialists only (no per-address registers)   | 8–10 |
-| `compare`             | "A vs B", "compare X to Y"                   | Two sequential single_address runs; merged two-column paragraph | 2 × 24 |
-| `development_check`   | "what's being built at X", "is Y risky"       | DOB filings + flood layers                              | 3–5 |
-| `live_now`            | "is it flooding now", "current alerts"        | Live-only specialists (tides, alerts, obs) — no Mellea  | 4 |
-| `not_implemented`     | Retrospective, ranking, cross-city queries    | Returns rationale immediately                           | 0 |
+| Intent                | Triggered by                                  | Execution path                         |
+|-----------------------|-----------------------------------------------|----------------------------------|
+| `single_address`      | Fully-qualified street address                | The manifest-driven pebble framework by default (§3): geocode → Five-Stone fan-out → policy_corpus → reconcile. Falls back to the legacy linear `app/fsm.py` FSM when `RIPRAP_USE_BURR_APP=0`. |
+| `neighborhood`        | NTA name, borough name, bare zip              | `app/intents/neighborhood.py` — its own orchestration, NTA-polygon-scoped specialist calls (not the pebble registry) |
+| `compare`             | "A vs B", "compare X to Y"                   | Two sequential single_address runs; merged two-column paragraph |
+| `development_check`   | "what's being built at X", "is Y risky"       | `app/intents/development_check.py` — DOB filings + flood layers, own orchestration |
+| `live_now`            | "is it flooding now", "current alerts"        | `app/intents/live_now.py` — live-only specialists (tides, alerts, obs), non-strict reconcile (no Mellea) |
+| `not_implemented`     | Retrospective, ranking, cross-city queries    | Returns rationale immediately |
+
+`neighborhood`, `development_check`, and `live_now` each have their own
+orchestration module under `app/intents/` — they call point/polygon-scoped
+specialist functions directly and don't go through the pebble registry
+that `single_address` uses by default. This is the concrete shape of the
+"legacy `app/` modules remain for... multi-intent paths the framework
+has not yet absorbed" note in the top-level README.
 
 ### Compare intent detail
 
-`_run_compare()` in `web/main.py` executes the full `single_address` FSM
-sequentially for each target, then merges the two paragraphs under
+`_run_compare()` in `web/main.py` executes the full `single_address`
+path sequentially for each target, then merges the two paragraphs under
 `## PLACE A: …` / `## PLACE B: …` headers separated by `---`. The
 `CompareBriefing.svelte` component renders this as a two-column layout with
 a "Key differences" delta bar above. During streaming the tokens are rendered
@@ -491,7 +544,7 @@ loading. Mellea's `OllamaBackend` explicitly raises
 
 | Model | Params | Runtime | Role |
 |-------|--------|---------|------|
-| **Granite 4.1 :3b alias**   | 8 B†   | Ollama or vLLM (AMD MI300X)          | Planner (intent + specialist routing) + `live_now` reconciler. †Production alias `RIPRAP_OLLAMA_3B_TAG=granite4.1:8b` — planner runs 8b in production. |
+| **Granite 4.1 :3b alias**   | 8 B†   | Ollama or vLLM (AMD MI300X)          | Planner (intent + specialist routing) + `live_now` reconciler. †Production alias `RIPRAP_OLLAMA_3B_TAG=granite4.1:8b` — planner runs 8b in production. Same knob, opposite direction, on a memory-constrained box: `docs/DEPLOY.md`'s "Memory-constrained boxes" section remaps it to a real 1B tag instead. |
 | **Granite 4.1 :8b**         | 8 B    | Ollama or vLLM (AMD MI300X)          | Synthesis reconciler for `single_address`, `neighborhood`, `development_check`, `compare`. Validated by Mellea (4 grounding requirements + reroll). |
 | **Granite Embedding 278M**  | 278 M  | sentence-transformers (CPU)          | RAG retrieval over 5 policy PDFs at query time.    |
 | **Prithvi-EO 2.0**          | 300 M  | TerraTorch (offline pre-compute)     | NYC-Pluvial fine-tune; segmented Hurricane Ida 2021 pre/post Sentinel-2 polygons baked into `data/`. Fine-tune: `msradam/Prithvi-EO-2.0-NYC-Pluvial`. |
@@ -533,12 +586,15 @@ astronomical tide (NOAA already publishes that exactly).
 
 ## 8. Live signals separation
 
-Live data (steps 6–9 in the FSM diagram) is fundamentally different
-from static layers and is handled separately:
+Live pebbles (`noaa_tides`, `nws_alerts`, `nws_obs`, `ttm_forecast` and
+the rest of the Touchstone/Lodestone Stones — §3.1) are fundamentally
+different from the static Cornerstone layers and are handled
+separately:
 
 - **Surface**: in evidence cards and a "Right now" section in the UI.
-- **Score**: explicitly excluded. Tier is reproducible across queries
-  unless source data changed.
+- **Score**: explicitly excluded from the tier rubric (§5) — a live
+  reading changing between two runs of the register builder
+  shouldn't retier an asset that hasn't actually changed hazard class.
 - **Cadence**: NOAA tides update every 6 min; NWS alerts on push;
   NWS obs ~hourly; TTM is computed per query (cheap).
 - **Failure mode**: graceful. If NOAA times out, no `noaa_tides`
@@ -552,112 +608,39 @@ Flood Map from real-time intelligence.
 
 ## 9. Repository layout
 
-```
-riprap-nyc/
-  ARCHITECTURE.md            this file
-  METHODOLOGY.md             scoring methodology + full citations
-  README.md                  HF Spaces frontmatter + user-facing summary
-  Dockerfile                 nvidia/cuda:12.4 base + Ollama + Granite
-  entrypoint.sh              Ollama daemon + uvicorn launcher
-  requirements.txt           runtime deps (FastAPI, geopandas, sentence-transformers, ollama, burr, granite-tsfm)
-  pyproject.toml             ruff + vulture config
-  riprap.py                  CLI driver for register builds
-  agent.py                   single-address CLI
+The repo root is `riprap/` (this document used to say `riprap-nyc/` —
+that was the frozen HF Space's name, not the repo's). See README's
+"Repository structure" section for the current top-level tree; it's
+kept there rather than duplicated here, since a second copy is a
+second place to go stale.
 
-  app/
-    fsm.py                   Burr FSM (14 actions; Mellea hooks via threadlocal)
-    planner.py               Granite 4.1:3b intent router (5 intents)
-    geocode.py               NYC DCP Geosearch + borough-hint filter
-    reconcile.py             Granite 4.1 grounded reconciler + numeric guardrail
-    mellea_validator.py      streaming rejection sampler + 4 grounding checks
-    rag.py                   Granite Embedding 278M retrieval
-    score.py                 deterministic exposure rubric (3 sub-indices, floor)
-    spatial.py               geopandas join helpers
-    energy.py                per-query inference Wh accounting
-    register_builder.py      bulk-mode runner (offline)
+Two things worth calling out that aren't obvious from a file listing
+alone:
 
-    intents/                 per-intent orchestration on top of fsm.py
-      live_now.py            shoreline tide + alerts (cheap, non-strict)
-      single_address.py      drives the linear FSM with strict reconcile
-      neighborhood.py        polygon-aggregated specialists
-      development_check.py   DOB permit overlap with flood polygons
-    llm.py                   LiteLLM Router shim — all LLM calls go here.
-                             Routes to vLLM (AMD) or Ollama; normalizes
-                             role names and citation token format.
-    areas/
-      nta.py                 NYC NTA 2020 polygon resolver
-
-    flood_layers/
-      sandy_inundation.py    NYC OD 5xsi-dfpx
-      dep_stormwater.py      9i7c-xyvv (3 scenarios)
-      ida_hwm.py             USGS STN Event 312
-      prithvi_water.py       Ida pre/post diff polygons (offline-built)
-
-    context/
-      microtopo.py           DEM + TWI + HAND raster sampling
-      nyc311.py              erm2-nwe9 buffer aggregation
-      floodnet.py            api.floodnet.nyc Hasura GraphQL
-      noaa_tides.py          live water level + residual
-      nws_alerts.py          live alerts at point
-      nws_obs.py             nearest ASOS hourly METAR
-
-    live/
-      ttm_forecast.py        Granite TTM r2 surge-residual nowcast
-
-    assets/
-      schools.py             DCP FacDB
-      nycha.py               phvi-damg
-      mta_entrances.py       i9wp-a4ja
-
-  web/
-    main.py                  FastAPI. Primary SSE at /api/agent/stream.
-                             _run_compare() handles the compare intent
-                             (sequential single_address × 2; no separate
-                             intent module). /api/backend returns live
-                             backend descriptor for the UI pill.
-    static/
-      agent.html             legacy UI, not the primary surface (Svelte
-                             custom elements, still reachable at
-                             /static/agent.html but unlinked from /)
-      dist/                  Svelte 5 custom-element bundle (committed,
-                              frozen — the source repo pruned the
-                              legacy web/svelte/ source once
-                              web/sveltekit/ became primary)
-
-  web/sveltekit/             SvelteKit app (primary UI). Build →
-                             web/sveltekit/build/. Served at / by FastAPI.
-    src/routes/
-      +page.svelte           landing + query form
-      q/[queryId]/+page.svelte  live query page (SSE stream consumer)
-    src/lib/components/
-      briefing/
-        Briefing.svelte      4-section cited paragraph renderer
-        CompareBriefing.svelte  two-column compare layout + delta bar
-      shell/StatusPill.svelte   AMD / Ollama / Local backend indicator
-
-  scripts/                   offline pre-compute + diagnostic probes
-    run_prithvi_ida.py
-    compute_hydrology_indices.py
-    fetch_nyc_dem.py
-    fetch_ida_hwms.py
-    build_schools_register.py
-    build_nycha_register.py
-    build_mta_entrances_register.py
-    probe_mellea.py          drives the SSE stream N times, dumps
-                              per-attempt pass/fail to CSV
-
-  corpus/                    5 LFS-tracked NYC policy PDFs
-  data/                      LFS-tracked baked fixtures
-    sandy_inundation.geojson
-    prithvi_ida_2021.geojson 166 Hurricane Ida polygons
-    ida_2021_hwms_ny.geojson
-    nyc_dem_30m.tif, twi.tif, hand.tif
-    schools.geojson, nycha.geojson, mta_entrances.geojson
-    dep/                     Esri FileGDBs (DEP scenarios)
-    registers/               pre-computed register outputs
-```
+- **`riprap/core/`** is the manifest-driven framework Section 3
+  describes — `pebbles/` (registry, schema, adapters, shapers),
+  `burr/` (the current Application: intake, per-Stone `MapActions`,
+  capstone), `compliance/` (the 13 briefing-standards predicates).
+  `riprap/mcp/` exposes Riprap as an MCP tool (`get_briefing`,
+  `list_sources`, `get_citation`) on top of the same framework.
+- **`app/`** predates that framework and still does real work: the
+  original linear FSM (`fsm.py`, whose `step_reconcile` action
+  `riprap/core/burr/capstone.py` reuses directly), the planner, the
+  four `intents/` orchestration modules (`neighborhood.py`,
+  `development_check.py`, `live_now.py`, and `single_address.py`'s
+  `RIPRAP_USE_BURR_APP=0` fallback path), and every specialist data
+  probe under `context/`, `flood_layers/`, `live/`, `assets/` — the
+  actual Python functions a pebble manifest's `config.module` /
+  `config.function` points at. Adding a pebble to a manifest usually
+  doesn't mean writing new Python; it means pointing a manifest at one
+  of these existing functions, or a new one shaped the same way.
+- **`deployments/<city>/`** is a directory of pebble manifests +
+  `stones.yaml` + (for NYC) the geospatial fixtures and policy corpus
+  the manifests reference. `deployments/nyc/` is the reference
+  deployment this whole document is written against.
 
 ---
+
 
 ## 10. Honest scope (what Riprap does NOT do)
 
