@@ -162,6 +162,39 @@ def polygon_for(code: str) -> Polygon | None:
     return hit["geometry"] if hit else None
 
 
+def blending_note(query_text: str, target: dict) -> str | None:
+    """NTAs are hyphen-joined compounds of several named places (e.g. "Red
+    Hook" queries resolve to "Carroll Gardens-Cobble Hill-Gowanus-Red
+    Hook", NTA BK0601) — every figure returned is a polygon-wide average
+    or count across the whole compound, not the sub-place alone, and a
+    user who asked about only one of them has no way to know that from
+    the numbers themselves. Real production case: a resilience-planning
+    query for "Red Hook, Brooklyn" got Carroll Gardens/Cobble
+    Hill/Gowanus data blended in with no disclosure. Returns a deterministic
+    disclosure sentence when the query named one compound part but not the
+    others, or None if the query already named the full compound (or we
+    can't tell which part motivated it)."""
+    name = target["nta_name"]
+    parts = [p.strip() for p in name.split("-") if p.strip()]
+    if len(parts) < 2:
+        return None
+    q_norm = _normalize(query_text)
+    if _normalize(name) in q_norm:
+        return None
+    matched = [p for p in parts if _normalize(p) in q_norm]
+    if not matched or len(matched) == len(parts):
+        return None
+    other = [p for p in parts if p not in matched]
+    return (
+        f"**Note on geographic scope.** {' and '.join(matched)} is not its "
+        f"own reporting unit in this data — it is blended into the NYC DCP "
+        f"Neighborhood Tabulation Area \"{name}\" (NTA {target['nta_code']}), "
+        f"together with {', '.join(other)}. Every figure below is a "
+        f"polygon-wide average or count across that full blended area, not "
+        f"{' or '.join(matched)} alone."
+    )
+
+
 def resolve_from_text(text: str) -> list[dict[str, Any]]:  # TODO(cleanup): cc-grade-D (25)
     """Scan free-text (e.g. a full natural-language query) for any known NTA
     name, alias, or borough. Returns the first match. This is the fallback

@@ -91,6 +91,7 @@ def run(plan, query: str, progress_q=None, strict: bool = False) -> dict[str, An
         rec["elapsed_s"] = round(time.time() - t0, 2)
         return _empty_result(plan, query, trace, error=rec["err"])
     target = matches[0]
+    blending_note = nta.blending_note(query, target)
     rec["ok"] = True
     rec["result"] = {
         "nta_code": target["nta_code"],
@@ -422,6 +423,8 @@ def run(plan, query: str, progress_q=None, strict: bool = False) -> dict[str, An
         paragraph = "No grounded data available for this neighborhood."
         rec_step["ok"] = True
         rec_step["result"] = {"paragraph_chars": len(paragraph)}
+    if blending_note and paragraph:
+        paragraph = f"{blending_note}\n\n{paragraph}"
     rec_step["elapsed_s"] = round(time.time() - rec_t0, 2)
     _emit(rec_step)
 
