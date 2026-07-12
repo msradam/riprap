@@ -15,9 +15,9 @@ Drop two new deployment directories alongside `deployments/nyc/`
 
 ```
 deployments/
-  nyc/        — flood (22 pebbles, full production stack)
-  heat/       — heat (4 pebbles, scaffold)
-  air/        — air quality (3 pebbles, scaffold)
+  nyc/        — flood (25 pebbles, full production stack)
+  heat/       — heat (6 pebbles, scaffold)
+  air/        — air quality (5 pebbles, scaffold)
 ```
 
 Each carries:
@@ -34,7 +34,7 @@ RIPRAP_RECONCILER_TIER=no_llm \
   .venv/bin/python -c "import riprap.core.burr.app as a; print(a.run('189 Atlantic Ave, Brooklyn')['paragraph'])"
 ```
 
-## Result — heat deployment (4 pebbles, no LLM)
+## Result — heat deployment (6 pebbles, no LLM)
 
 ```
 This is an automated heat-exposure briefing produced by Riprap from
@@ -124,7 +124,7 @@ Each deployment needs:
 | TerraMind LULC | Cross-hazard — land-use mix matters for all of heat / flood / air |
 | TTM time-series | Cross-hazard — same forecasting backbone, different feature signals |
 
-The 22 flood pebbles aren't ported wholesale. But the **adapters** are.
+The 25 flood pebbles aren't ported wholesale. But the **adapters** are.
 A new hazard means writing 5-10 hazard-specific manifests and pointing
 the existing adapters at new data sources. Hours of work per hazard,
 not weeks.

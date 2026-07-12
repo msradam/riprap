@@ -20,7 +20,7 @@ predicates pass.
 
 ```bash
 git clone https://github.com/msradam/riprap.git
-cd riprap-nyc
+cd riprap
 RIPRAP_RECONCILER_TIER=no_llm \
 docker compose up -d
 ```

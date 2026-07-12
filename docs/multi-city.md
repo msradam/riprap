@@ -163,7 +163,7 @@ across NYC and Boston deployments.
 
 > Riprap is an open-source climate briefing tool. Deployments are
 > directories of YAML pointing at place-specific data sources. **NYC**
-> is the reference (23 pebbles). **Chicago, Seattle, San Francisco**
+> is the reference (25 pebbles). **Chicago, Seattle, San Francisco**
 > prove the framework generalises across the Socrata ecosystem; **Boston**
 > proves it generalises across platforms entirely, via a CKAN adapter
 > that uses bbox SQL push-down + haversine refine; **Albany** proves it

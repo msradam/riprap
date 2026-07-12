@@ -2,12 +2,14 @@
 
 The "open-source climate briefing tool" MVP, in three deployments. Same
 code, same Burr graph, same compliance predicates, same web UI. Three
-hazards, three `deployments/` directories, zero core-code differences.
+hazards, three `deployments/` directories, no per-hazard code branches
+in the pebble/Stone/reconciler pipeline — see "Known gaps in the MVP"
+below for the one known exception (`/api/agent/stream`'s SSE path).
 
 ## What the demo shows
 
 1. **Flood briefing** at an NYC address — the production deployment.
-   22 pebbles across Cornerstone / Touchstone / Lodestone / Keystone,
+   25 pebbles across Cornerstone / Touchstone / Lodestone / Keystone,
    13/13 compliance, LLM tier or templated tier.
 2. **Heat briefing** at the same address — `deployments/heat/`.
    NYC HVI + NYC Forestry + NWS observations + NWS alerts. Same UI,

@@ -2,6 +2,8 @@
 
 Live measurements collected against the lablab demo Space (`lablab-ai-amd-developer-hackathon-riprap-nyc.hf.space`) on **2026-05-09**, running the canonical four-address verification set defined in `scripts/probe_addresses.py` (`DEFAULT_ADDRESSES`). Inference served from `msradam/riprap-vllm` on a single NVIDIA L4 (24 GB, Ada Lovelace, 72 W TGP).
 
+**Not reproducible against that Space today** — it's a frozen post-hackathon demo running data probes only, with inferencing disabled (see `docs/ARCHITECTURE.md` §12.1). To reproduce these numbers, run `scripts/probe_addresses.py` against a Modal or Mac Mini deployment with live inference (see `docs/DEPLOY.md`) instead.
+
 Every per-call energy figure is **measured off the device** via `nvmlDeviceGetPowerUsage` (remote GPU) or `powermetrics` (Apple Silicon) — see [`docs/EMISSIONS.md`](EMISSIONS.md) for the pipeline. The reproducer is `scripts/probe_addresses.py`; raw output in `outputs/probe_addresses.csv` / the `--json` flag's target.
 
 vLLM was warm before the run (CUDA-graph compile already paid). The first call after a cold restart pays an additional ~120 s penalty — see "Cold-start" below.
