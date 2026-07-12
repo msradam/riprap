@@ -181,7 +181,7 @@ NOT_IMPLEMENTED_INTENTS = {
         "Historical-date mode (\"what would Riprap have said on [date]\") "
         "is on the roadmap but not yet available. Riprap currently reports "
         "present-state flood exposure; past-state reconstruction is planned "
-        "for a future release (see deck slide 8).",
+        "for a future release.",
     ),
     "ranking": (
         _RANKING_RE,

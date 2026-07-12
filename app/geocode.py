@@ -1,10 +1,17 @@
-"""Address geocoding — NYC primary + national fallback.
+"""Address geocoding — Nominatim primary, NYC Geosearch as NYC enrichment.
 
-NYC primary: NYC DCP Geosearch (geosearch.planninglabs.nyc), no auth,
-NYC-only. It will fuzzy-match upstate addresses to NYC streets — e.g.
-'257 Washington Ave, Albany NY' silently maps to Clinton Hill, Brooklyn.
-We detect this via a non-NYC region or non-NYC ZIP and fall back to
-OpenStreetMap Nominatim (no key, free, rate-limited per usage policy).
+`geocode_one()` is the entry point every deployment (NYC, Chicago,
+Seattle, ...) actually calls: OpenStreetMap Nominatim (no key, free,
+rate-limited per usage policy) resolves the address, region-biased
+to the active deployment's bbox. Only when the resolved point falls
+inside NYC does it call NYC DCP Geosearch (geosearch.planninglabs.nyc,
+no auth, NYC-only) to enrich the hit with BBL/BIN identifiers the
+NYC-specific pebbles need (NYCHA / MTA / DOE / DOH joins) — Geosearch
+never runs as a first-pass resolver, since its aggressive fuzzy-match
+will silently map an out-of-city address to the nearest NYC street
+(e.g. '257 Washington Ave, Albany NY' -> Clinton Hill, Brooklyn). See
+`geocode_one`'s docstring for why the order used to be reversed and
+what broke.
 
 Includes a borough-hint post-filter so Queens hyphenated-style addresses
 (e.g. '153-09 90 Ave, Jamaica, Queens') preferentially resolve to the
