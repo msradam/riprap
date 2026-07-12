@@ -1010,6 +1010,64 @@ def api_agent(q: str):
         emissions.install(None)
 
 
+_BATCH_MAX_ADDRESSES = 25
+
+
+@app.post("/api/agent/batch")
+async def api_agent_batch(request: Request) -> JSONResponse:
+    """Run a single_address flood-exposure assessment over a list of
+    addresses, one request in, one JSON array of briefings out.
+
+    For a civic engineer or NGO checking a portfolio (a block of NYCHA
+    buildings, a list of schools) rather than one address at a time —
+    the single biggest gap for that audience, since every other route
+    takes one query at a time.
+
+    Body: {"addresses": ["123 Main St, Brooklyn", "456 Oak Ave, Queens"]}
+
+    Runs sequentially, not concurrently: each address holds the local
+    Ollama reconciler and the RAG/specialist stack, and this is one
+    shared instance, not a pool. Capped at _BATCH_MAX_ADDRESSES to
+    protect that shared instance from an unbounded request. One
+    address's failure doesn't fail the batch — its slot in `results`
+    carries an `error` key instead of a briefing.
+    """
+    try:
+        payload = await request.json()
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": f"invalid JSON: {e}"}, status_code=400)
+    addresses = payload.get("addresses") if isinstance(payload, dict) else None
+    if not isinstance(addresses, list) or not addresses:
+        return JSONResponse(
+            {"error": "expected a JSON object with a non-empty 'addresses' list"},
+            status_code=400,
+        )
+    if not all(isinstance(a, str) and a.strip() for a in addresses):
+        return JSONResponse({"error": "every address must be a non-empty string"}, status_code=400)
+    if len(addresses) > _BATCH_MAX_ADDRESSES:
+        return JSONResponse(
+            {"error": f"batch size {len(addresses)} exceeds the max of {_BATCH_MAX_ADDRESSES}"},
+            status_code=400,
+        )
+
+    from riprap.core.burr.app import run as burr_run  # noqa: PLC0415
+
+    results = []
+    for addr in addresses:
+        tracker = emissions.Tracker()
+        emissions.install(tracker)
+        try:
+            out = burr_run(addr)
+            out["emissions"] = tracker.summarize()
+            results.append(_to_json_safe(out))
+        except Exception as e:  # noqa: BLE001
+            results.append({"query": addr, "error": str(e)})
+        finally:
+            emissions.install(None)
+
+    return JSONResponse({"results": results, "n": len(results)})
+
+
 def _run_burr_single_address(plan, query: str, out_q) -> dict:
     """SSE-streaming single_address path through the new Burr Application.
 
