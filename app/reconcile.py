@@ -294,6 +294,21 @@ def _strip_markdown(text: str) -> str:
     return text
 
 
+_CODE_FENCE_LINE_RE = re.compile(r"^\s*```[a-zA-Z]*\s*$", re.MULTILINE)
+
+
+def _strip_code_fences(text: str) -> str:
+    """Several EXTRA_SYSTEM_PROMPT templates show the desired output
+    shape wrapped in a ``` fence (a normal way to write instructions —
+    "your output should look like this"), and the model sometimes
+    imitates the fence itself into its actual output, most often as a
+    stray trailing ``` with no matching open. Real production case from
+    a neighborhood briefing. Briefing prose never legitimately contains
+    a code block, so any bare fence line is always this leak, never a
+    real one to preserve."""
+    return _CODE_FENCE_LINE_RE.sub("", text).strip()
+
+
 def verify_paragraph(paragraph: str, doc_msgs: list[dict]) -> tuple[str, list[dict]]:
     """Drop sentences whose numeric tokens don't appear in any source doc.
 
@@ -304,6 +319,7 @@ def verify_paragraph(paragraph: str, doc_msgs: list[dict]) -> tuple[str, list[di
 
     Returns (clean_paragraph, dropped_sentences_with_reason).
     """
+    paragraph = _strip_code_fences(paragraph)
     paragraph = _split_inline_headers(paragraph)
     haystack = _docs_corpus(doc_msgs)
     out_blocks: list[str] = []

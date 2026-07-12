@@ -345,6 +345,8 @@ def reconcile_strict(doc_msgs: list[dict],
         )
 
         paragraph = _extract_text(result).strip()
+        from app.reconcile import _strip_code_fences  # noqa: PLC0415
+        paragraph = _strip_code_fences(paragraph)
         paragraph = _fix_parenthetical_citations(paragraph, _doc_ids(doc_msgs))
         n_attempts = _extract_attempts(result)
         rerolls = max(0, n_attempts - 1)
@@ -573,6 +575,8 @@ def reconcile_strict_streaming(
                     except Exception:
                         log.exception("on_token callback raised")
         paragraph = "".join(chunks).strip()
+        from app.reconcile import _strip_code_fences  # noqa: PLC0415
+        paragraph = _strip_code_fences(paragraph)
         paragraph = _fix_parenthetical_citations(paragraph, _doc_ids(doc_msgs))
         if paragraph:
             best_paragraph = paragraph
