@@ -13,7 +13,7 @@ against /api/agent/stream and checks:
     `narrative` field the frontend renders verbatim.
 
 Run with:
-    RIPRAP_RECONCILER_TIER=no_llm uv run python scripts/probe_5cities_smoke.py
+    RIPRAP_RECONCILER_TIER=no_llm uv run python scripts/probe_cities_smoke.py
 """
 from __future__ import annotations
 

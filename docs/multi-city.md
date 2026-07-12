@@ -14,12 +14,12 @@ CKAN, SeeClickFix). Adding a city is a directory of YAML.
 | `boston/` | 6 | Analyze Boston `1a0b420d-...` | **CKAN** | NOAA Boston Harbor 8443970 |
 | `albany/` | 7 | SeeClickFix public API (all + flood-filtered) | **SeeClickFix** | NOAA Albany, Hudson River 8518995 |
 
-Plus three NYC-only hazard variants: `nyc-flood/` (the original),
-`heat/`, `air/`.
+Plus two NYC-only hazard variants beyond the original flood deployment
+(`nyc/`): `heat/`, `air/`.
 
 ## Test results
 
-Sweep run via `scripts/probe_5cities_smoke.py` (6 deployments, no-LLM tier,
+Sweep run via `scripts/probe_cities_smoke.py` (6 deployments, no-LLM tier,
 real upstream APIs):
 
 ```
@@ -46,7 +46,7 @@ manifest, not a code change.
 Reproduce:
 
 ```bash
-.venv/bin/python scripts/probe_5cities_smoke.py http://127.0.0.1:7860
+.venv/bin/python scripts/probe_cities_smoke.py http://127.0.0.1:7860
 # PASS on every city line expected; exits non-zero if any fail.
 ```
 

@@ -13,7 +13,6 @@ authors:
     email: msrahmanadam@gmail.com
     affiliation: "Independent"
 repository-code: "https://github.com/msradam/riprap"
-url: "https://lablab-ai-amd-developer-hackathon-riprap-nyc.hf.space"
 abstract: >-
   Riprap composes ~25 federal, state, and city public-record data
   sources into a citation-grounded climate-exposure briefing for any

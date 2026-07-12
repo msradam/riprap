@@ -16,7 +16,7 @@ boston              1 City Hall Square, Boston, MA                    13/13 ✓ 
 ```
 
 5/5 PASS. Reproduce with
-`.venv/bin/python scripts/probe_5cities_smoke.py http://127.0.0.1:7860`
+`.venv/bin/python scripts/probe_cities_smoke.py http://127.0.0.1:7860`
 (consolidated from the `probe_cities.py` this snapshot originally ran).
 
 ## Pytest
@@ -128,9 +128,9 @@ checked-in `requirements.txt`.
 
 ## Known follow-ups
 
-- **LLM happy-path UI smoke against RunPod** — verified locally on M3
-  via Ollama + Triton-on-Docker. Cloud-GPU bring-up runbook lives in
-  `~/hackathons/riprap-triton/` (separate repo).
+- **LLM happy-path UI smoke against a cloud GPU backend** — verified
+  locally on M3 via Ollama + Triton-on-Docker. Cloud-GPU bring-up
+  runbook lives in the companion `msradam/riprap-triton` repo.
 - **Triton bring-up runbook** — the local-Docker rig at
   `load/triton-local/` doubles as the canonical bring-up reference for
   fixing `riprap-triton/scripts/runpod_triton_setup.sh` (missing

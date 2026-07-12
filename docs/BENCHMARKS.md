@@ -182,7 +182,11 @@ Cloud reference (Epoch AI, 2025): a typical GPT-4o-class query draws ~0.3 Wh. Ri
 
 The first inference after a Space restart pays a ~120 s vLLM CUDA-graph compile. During that window the planner alone takes 2–3 minutes; subsequent queries fall to the steady-state numbers above. The riprap-models EO stack is now eager-loaded at lifespan startup (Prithvi + all three TerraMind paths + GLiNER + Embedding), so the *first* user query after restart pays only the vLLM cold-compile, not an additional 30–60 s of EO model loads on top.
 
-For demos: prime once with a throwaway query right after restart. Steady-state numbers above are what the judge experience will look like.
+Operational implication: run one warm-up query immediately after any
+cold restart (container boot, redeploy) before serving real traffic.
+The steady-state numbers above are what every query after that first
+one looks like — this is standard practice for any cold-start-sensitive
+service, not a benchmark artifact.
 
 ---
 

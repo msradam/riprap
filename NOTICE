@@ -1,4 +1,4 @@
-Riprap — Citation-Grounded NYC Flood-Exposure Briefings
+Riprap — Composable, Citation-Grounded Civic Climate-Exposure Briefings
 Copyright 2026 Adam Munawar Rahman
 
 This product is licensed under the Apache License, Version 2.0
@@ -56,9 +56,11 @@ IBM-ESA TerraMind 1.0) at inference time. It does not generate model
 weights. The NYC fine-tunes referenced by this system are trained
 separately and documented at github.com/msradam/riprap-models.
 
-Commits prior to 2026-05-10 may include "Co-Authored-By" trailers
-referencing Anthropic Claude. These trailers are preserved as historical
-record of how the project was built during the AMD Developer Cloud
-hackathon (May 4-10, 2026); commits going forward do not include them.
-The artifact-level disclosure in this NOTICE supersedes the per-commit
-attribution.
+This repository's initial commit consolidates work developed across many
+commits in the project's working repository (msradam/riprap-nyc) between
+May and July 2026, starting with the AMD Developer Cloud hackathon
+(May 4-10, 2026) and continuing through the open-source release cut here.
+That working history — including any "Co-Authored-By" trailers referencing
+Anthropic Claude on individual commits — lives in msradam/riprap-nyc, not
+in this repository's git log. This NOTICE is the artifact-level disclosure
+for what ships here.

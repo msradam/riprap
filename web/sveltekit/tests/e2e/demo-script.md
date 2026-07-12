@@ -67,9 +67,9 @@ Each image captures the full page after the SSE `done` event. Look for:
 cd web/sveltekit
 RIPRAP_HEAVY_SPECIALISTS=1 npm run test:demo
 
-# AMD MI300X (vLLM, ~15 s/query)
-RIPRAP_LLM_PRIMARY=vllm RIPRAP_LLM_BASE_URL=http://129.212.182.52:8000/v1 \
-RIPRAP_LLM_API_KEY=<vllm-token> .venv/bin/uvicorn web.main:app --port 7860 &
+# Remote vLLM — Modal or your own GPU box (~15 s/query)
+RIPRAP_LLM_PRIMARY=vllm RIPRAP_LLM_BASE_URL=<your backend's OpenAI-compatible URL> \
+RIPRAP_LLM_API_KEY=<token> .venv/bin/uvicorn web.main:app --port 7860 &
 cd web/sveltekit && npm run test:demo
 ```
 

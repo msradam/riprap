@@ -17,7 +17,7 @@ you're new; jump directly if you know what you need.
 | [PORT-YOUR-CITY.md](PORT-YOUR-CITY.md) | Step-by-step walkthrough for adding your jurisdiction, using the Boston port as the worked example. The natural follow-on from multi-city.md. |
 | [byod.md](byod.md) | Bring Your Own Data — `.riprap/` auto-discovery + `RIPRAP_EXTRA_MANIFESTS` env var. Drop a manifest, get a pebble. Worked example with real FDNY data. |
 | [multi-hazard.md](multi-hazard.md) | Hazard-agnostic deployments — `deployments/heat/`, `deployments/air/` reuse the same Stones taxonomy. |
-| [VERIFICATION.md](VERIFICATION.md) | What's been verified deterministically against the current branch — sweep results, pytest, lint, BYOD evidence. |
+| [VERIFICATION.md](VERIFICATION.md) | Dated snapshot (2026-05-16) of a deterministic verification pass — sweep results, pytest, lint, BYOD evidence. Historical record, not a live status page; see the CI badge and `docs/BENCHMARKS.md` for current numbers. |
 
 Top-level docs that complement these:
 

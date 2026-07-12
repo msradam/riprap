@@ -5,7 +5,7 @@
 # Riprap
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![CI](https://github.com/msradam/riprap/actions/workflows/check.yml/badge.svg)](https://github.com/msradam/riprap/actions/workflows/check.yml)
 [![Deployments](https://img.shields.io/badge/deployments-NYC%20·%20Chicago%20·%20Seattle%20·%20SF%20·%20Boston%20·%20Albany-005EA2)](docs/multi-city.md)
 [![Civic Hydrology](https://img.shields.io/badge/palette-civic%20hydrology-005EA2)](web/sveltekit/src/lib/tokens.css)
@@ -345,7 +345,10 @@ response (see the energy section below). Both the vLLM endpoint and the
 specialist proxy are served by the companion repo
 [`msradam/riprap-triton`](https://github.com/msradam/riprap-triton),
 which deploys to Modal (scale-to-zero, $0 idle) or a sustained-use cloud
-GPU.
+GPU. For a fully local Mac Mini / Apple Silicon deployment, the same
+specialist surface is served instead by
+[`msradam/riprap-inference`](https://github.com/msradam/riprap-inference)
+(LitServe, MPS-backed) — see `docs/DEPLOY.md`.
 
 Source-of-truth pointers:
 
@@ -484,13 +487,13 @@ changes since the v0.5.0 hackathon submission.
 If you reference Riprap in academic or professional work:
 
 ```bibtex
-@software{riprap_nyc_2026,
+@software{riprap_2026,
   author       = {Rahman, Adam Munawar},
-  title        = {Riprap: Citation-Grounded NYC Flood-Exposure Briefings},
+  title        = {Riprap: Composable, Citation-Grounded Civic Climate-Exposure Briefings for Any US Place},
   year         = {2026},
   url          = {https://github.com/msradam/riprap},
   version      = {v0.6.0},
-  note         = {Built for the AMD x lablab.ai Developer Hackathon}
+  note         = {Originated as the AMD x lablab.ai Developer Hackathon submission; evolved into a multi-city, multi-hazard open-source framework}
 }
 ```
 

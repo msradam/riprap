@@ -215,7 +215,7 @@ etc. headers, citations like `[<city>_311]` and `[nws_obs]`, and
 Add your city to the sweep:
 
 ```python
-# scripts/probe_5cities_smoke.py — append to CITIES
+# scripts/probe_cities_smoke.py — append to CITIES
 {
     "name": "<your-city>",
     "query": "<your test address>",
@@ -228,7 +228,7 @@ Add your city to the sweep:
 Then:
 
 ```bash
-.venv/bin/python scripts/probe_5cities_smoke.py
+.venv/bin/python scripts/probe_cities_smoke.py
 # Look for: PASS on every city line, exit code 0
 ```
 

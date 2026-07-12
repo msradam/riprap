@@ -85,7 +85,7 @@ run all three before opening a PR that touches anything load-bearing.
 # 1. Six-deployment sweep against a locally running server (no LLM,
 #    real upstream APIs). Each deployment's compliance must report
 #    13/13 PASS.
-.venv/bin/python scripts/probe_5cities_smoke.py http://127.0.0.1:7860
+.venv/bin/python scripts/probe_cities_smoke.py http://127.0.0.1:7860
 
 # 2. Unit + integration tests (skip live-server tests by default).
 .venv/bin/python -m pytest tests/ -q \
@@ -129,7 +129,7 @@ services/riprap-models/    The EO/forecast specialist HTTP service
 
 scripts/
 ├── probe_addresses.py     Canonical 5-address end-to-end suite
-├── probe_5cities_smoke.py Cross-city smoke probe (all six deployments)
+├── probe_cities_smoke.py  Cross-city smoke probe (all six deployments)
 ├── probe_narrative_contracts.py  Card/narrative contract checks
 ├── mac_powermetrics_start.sh     Start the Mac Mini power sampler
 └── …                       Register builders, raster bakers, etc.
