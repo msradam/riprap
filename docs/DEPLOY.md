@@ -53,8 +53,8 @@ reference "clone it and it just works, no GPU rental" deployment.
 # 1. Ollama, for the planner + reconciler LLM
 brew services start ollama
 ollama pull granite4.1:3b
-ollama pull granite4.1:8b       # or a smaller/quantized tag for a
-                                 # lower-memory box — see README
+ollama pull granite4.1:8b       # skip this pull on a <=16 GB box — see
+                                 # "Memory-constrained boxes" below instead
 
 # 2. ML specialists — a separate process so the app/model split stays
 #    clean even on a single box. Same codebase as the Modal path in
@@ -83,6 +83,40 @@ end-to-end number from this exact setup. `RIPRAP_HARDWARE_LABEL` and
 `RIPRAP_LLM_BASE_URL` should stay unset for this path (an empty or
 `localhost` base URL is what tells `emissions.hardware_for()` this is
 Apple Silicon, not a remote GPU — see `.env.example`).
+
+### Memory-constrained boxes (e.g. a 16 GB Mac Mini)
+
+`granite4.1:3b` + `granite4.1:8b` loaded simultaneously (the default —
+the planner stays on 3b for low TTFB even when the reconciler runs 8b)
+is ~8 GB of resident Ollama model weight alone, on top of the RAG
+embedder, geopandas/rasterio, and the app process. On a 16 GB box this
+is tight enough that a burst of back-to-back queries can push the
+kernel into swap-thrash and, in the worst case, a watchdog panic —
+observed in practice on a 16 GB Mac Mini running back-to-back live
+queries.
+
+`app/llm.py` already has the knob for this: `RIPRAP_OLLAMA_3B_TAG` /
+`RIPRAP_OLLAMA_8B_TAG` remap the two logical model slots ("granite-3b",
+used by the planner and by `live_now`'s reconciler; "granite-8b", used
+by the single_address / neighborhood / development_check reconciler) to
+whatever physical Ollama tag you actually want — the same knob already
+used to collapse both slots onto one pulled tag on disk-constrained
+deployments. Point them at a real 1B + 3B pair instead of 3B + 8B:
+
+```bash
+ollama pull ibm/granite4:1b-q4_K_M
+# (granite4.1:3b already pulled above)
+export RIPRAP_OLLAMA_3B_TAG=ibm/granite4:1b-q4_K_M   # routing (planner + live_now)
+export RIPRAP_OLLAMA_8B_TAG=granite4.1:3b            # summarizer (the other 3 intents)
+```
+
+~3.5 GB resident instead of ~8 GB. The 1B model shares the same Granite
+chat template (`document <id>`-role grounding included), so citation
+grounding still works — verified live: `live_now` and `neighborhood`
+both still hit 12-13/13 on the briefing-standards compliance predicates
+after the swap, with `neighborhood`'s one non-13/13 case being a
+pre-existing, unrelated gap (`projection_has_horizon`, TCFD 3.2) it has
+regardless of model tier.
 
 ## 3. Docker / docker-compose (self-host, any Linux box)
 
