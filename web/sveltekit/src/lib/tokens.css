@@ -1,8 +1,9 @@
 /* Riprap design tokens — Civic Hydrology palette (v0.4.6, 2026-05-06)
    USWDS-aligned federal blue + cool slate register. Replaces the warm
    newsprint+orange palette that read as editorial / Anthropic-adjacent.
-   IBM Plex still drives type (Apache / SIL-OFL); colors are now in the
-   civic-tech flood-tool family (NOAA / NWS / FloodHelpNY / USWDS).
+   Type is Sofia Sans + Overpass Mono (OFL), app-wide as of the
+   docs/design/handoff/ pass — see the Type block below. Colors are in
+   the civic-tech flood-tool family (NOAA / NWS / FloodHelpNY / USWDS).
    All values WCAG 2.2 AA verified.
 */
 
@@ -58,14 +59,25 @@
   --paper-deep:            #E8ECF2;  /* slate-100 */
   --ink:                   #0F172A;  /* slate-950   18.7:1 ✓ AAA */
   --ink-secondary:         #334155;  /* slate-700   10.4:1 ✓ AAA */
-  --ink-tertiary:          #64748B;  /* slate-500    4.7:1 ✓ AA  */
+  --ink-tertiary:          #4E5A6E;  /* was #64748B (4.01:1 on paper-deep — a real AA
+                                         failure per gates/lib/color.mjs; same bug the
+                                         report-content system's --riprap-text-tertiary
+                                         fixed). Min 5.88:1, confirmed live via axe. */
   --rule:                  #0F172A;
   --rule-soft:             #CBD5E1;  /* slate-300 */
 
-  /* ── Type ── */
-  --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  /* ── Type — app-wide, not just report content (docs/design/handoff/) ──
+     Sofia Sans + Overpass Mono everywhere; IBM Plex retired. No serif:
+     HANDOFF.md explicitly rejects the "serif headline + sans body" combo
+     as a current AI-generated-site trope, so --font-serif now aliases
+     Sofia Sans too — existing font-style:italic call sites synthesize
+     italic rather than using a real italic face (Sofia Sans's italic
+     weights aren't vendored). If that reads wrong on a specific
+     headline, that's a design call for a follow-up pass, not a silent
+     fix here. */
+  --font-sans: "Sofia Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Overpass Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-serif: "Sofia Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 
   /* ── Scale ── */
   --measure: 70ch;
@@ -180,4 +192,81 @@ html, body {
     --stone-lodestone:   #999;
     --stone-capstone:    #999;
   }
+}
+
+/* ── Report-content design system (docs/design/handoff/, v1) ──
+   Prefix --riprap-*, three-layer (primitive -> semantic -> purpose).
+   Scoped to report content only (briefing, register, marks, citations,
+   print, map layer encoding) — everything above this block (Stone
+   accents, epistemic --tier-* badges elsewhere in the app, NYSDS chrome)
+   is untouched and out of this system's scope. Source of truth and
+   gates live in docs/design/handoff/tokens/; keep this block identical
+   to docs/design/handoff/tokens/tokens.css's :root so the drift gate
+   and the live app never diverge. */
+:root {
+  --riprap-blue-60v:       #005EA2; /* USWDS blue-60v */
+  --riprap-blue-warm-70v:  #1A4480; /* USWDS blue-warm-70v */
+  --riprap-blue-warm-80v:  #162E51; /* USWDS darkest navy */
+  --riprap-cyan-700:       #0E7490;
+  --riprap-amber-800:      #92400E;
+  --riprap-red-700:        #B91C1C;
+  --riprap-slate-950:      #0F172A;
+  --riprap-slate-700:      #334155;
+  --riprap-slate-600:      #475569;
+  --riprap-slate-tertiary: #4E5A6E; /* fix for the #64748B AA bug — see docs/design/handoff/RIPRAP-MAPPING.md */
+  --riprap-slate-300:      #CBD5E1;
+  --riprap-slate-350:      #B9C2CE; /* print page edge */
+  --riprap-slate-250:      #DCE2EA; /* faint list hairline */
+  --riprap-slate-450:      #8FA3B8; /* basemap geographic label (imagery) */
+  --riprap-green-800:      #166534; /* success/done — 5.9:1 on inset, 6.9:1 on card */
+  --riprap-paper:          #F4F6F9;
+  --riprap-paper-sunken:   #E8ECF2;
+  --riprap-paper-inset:    #EEF1F5; /* map panel / meta strip / callout */
+  --riprap-mist:           #C9D2DD; /* app desk backdrop */
+  --riprap-sky-100:        #E3ECF2; /* basemap water fill (imagery) */
+  --riprap-white:          #FFFFFF;
+
+  --riprap-surface-page:   var(--riprap-paper);
+  --riprap-surface-sunken: var(--riprap-paper-sunken);
+  --riprap-surface-inset:  var(--riprap-paper-inset);
+  --riprap-surface-desk:   var(--riprap-mist);
+  --riprap-surface-card:   var(--riprap-white);
+
+  --riprap-text-primary:   var(--riprap-slate-950);
+  --riprap-text-secondary: var(--riprap-slate-700);
+  --riprap-text-tertiary:  var(--riprap-slate-tertiary);
+  --riprap-text-link:      var(--riprap-blue-60v);
+
+  --riprap-rule-strong:    var(--riprap-slate-950);
+  --riprap-rule-soft:      var(--riprap-slate-300);
+  --riprap-rule-hairline:  var(--riprap-slate-250);
+  --riprap-rule-print:     var(--riprap-slate-350);
+  --riprap-focus:          var(--riprap-blue-60v);
+
+  --riprap-status-ok:      var(--riprap-green-800);
+  --riprap-map-water:      var(--riprap-sky-100);
+  --riprap-map-label:      var(--riprap-slate-450);
+
+  --riprap-tier-empirical: var(--riprap-blue-60v);
+  --riprap-tier-modeled:   var(--riprap-blue-warm-70v);
+  --riprap-tier-proxy:     var(--riprap-slate-600);
+  --riprap-tier-synthetic: var(--riprap-blue-warm-70v);
+
+  --riprap-sev-1:          var(--riprap-slate-600);
+  --riprap-sev-2:          var(--riprap-amber-800);
+  --riprap-sev-3:          var(--riprap-amber-800);
+  --riprap-sev-4:          var(--riprap-red-700);
+
+  --riprap-accent:             var(--riprap-blue-60v);
+  --riprap-accent-warn:        var(--riprap-amber-800);
+  --riprap-accent-alert:       var(--riprap-red-700);
+  --riprap-stone-cornerstone:  var(--riprap-slate-600);
+  --riprap-stone-touchstone:   var(--riprap-cyan-700);
+  --riprap-stone-lodestone:    var(--riprap-amber-800);
+  --riprap-stone-keystone:     var(--riprap-blue-warm-70v);
+  --riprap-stone-capstone:     var(--riprap-blue-warm-80v);
+
+  --riprap-font-display: "Sofia Sans", system-ui, sans-serif;
+  --riprap-font-sans:    "Sofia Sans", system-ui, sans-serif;
+  --riprap-font-mono:    "Overpass Mono", ui-monospace, monospace;
 }

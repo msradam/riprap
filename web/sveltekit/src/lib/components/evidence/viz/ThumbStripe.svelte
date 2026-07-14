@@ -17,6 +17,6 @@
     <circle cx="100" cy="68" r="4" fill="#005EA2" stroke="#F4F6F9" stroke-width="1.5" />
   {:else}
     <rect x="0" y="0" width="220" height="110" fill="url(#thumb-{kind})" />
-    <text x="8" y="100" font-family="IBM Plex Mono" font-size="9" fill="#2A6FA8">SYN · 2025-09-14</text>
+    <text x="8" y="100" font-family="Overpass Mono" font-size="9" fill="#2A6FA8">SYN · 2025-09-14</text>
   {/if}
 </svg>

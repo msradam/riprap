@@ -30,7 +30,7 @@
     <path d={midD} fill="none" stroke="var(--tier-{card.tier})" stroke-width="1.5" />
     {#each data as d, i}
       <circle cx={xs[i]} cy={y(d.mid)} r="2.2" fill="var(--tier-{card.tier})" />
-      <text x={xs[i]} y={H - 1} font-size="9" font-family="IBM Plex Mono"
+      <text x={xs[i]} y={H - 1} font-size="9" font-family="Overpass Mono"
             text-anchor="middle" fill="#6B6B6B">{d.year}</text>
     {/each}
   </svg>

@@ -1,11 +1,15 @@
-@import '@fontsource/ibm-plex-sans/400.css';
-@import '@fontsource/ibm-plex-sans/500.css';
-@import '@fontsource/ibm-plex-sans/600.css';
-@import '@fontsource/ibm-plex-mono/400.css';
-@import '@fontsource/ibm-plex-mono/500.css';
-@import '@fontsource/ibm-plex-mono/600.css';
-@import '@fontsource/ibm-plex-serif/400.css';
-@import '@fontsource/ibm-plex-serif/600.css';
+/* App-wide type (docs/design/handoff/) — Sofia Sans + Overpass Mono,
+   self-hosted. IBM Plex retired: --font-sans/--font-mono/--font-serif
+   and the report-content --riprap-font-* tokens (tokens.css) all point
+   here now, so there's exactly one type system in the app. */
+@import '@fontsource/sofia-sans/400.css';
+@import '@fontsource/sofia-sans/500.css';
+@import '@fontsource/sofia-sans/600.css';
+@import '@fontsource/sofia-sans/700.css';
+@import '@fontsource/sofia-sans/800.css';
+@import '@fontsource/overpass-mono/400.css';
+@import '@fontsource/overpass-mono/500.css';
+@import '@fontsource/overpass-mono/600.css';
 
 @import './lib/tokens.css';
 @import './lib/styles.css';

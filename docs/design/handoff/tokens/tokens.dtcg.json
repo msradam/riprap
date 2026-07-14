@@ -1,0 +1,102 @@
+{
+  "$description": "Riprap report-content design tokens. W3C DTCG format. Three layers: primitive (raw values) -> semantic (roles) -> purpose (product concepts: evidence tier, severity). Grayscale-safe: tier/severity meaning is carried by shape/pattern in components, never hue alone.",
+  "primitive": {
+    "$type": "color",
+    "blue-60v": { "$value": "#005EA2", "$description": "USWDS blue-60v; Riprap's existing empirical-tier blue" },
+    "blue-warm-70v": { "$value": "#1A4480", "$description": "USWDS blue-warm-70v" },
+    "blue-warm-80v": { "$value": "#162E51", "$description": "USWDS darkest navy" },
+    "cyan-700": { "$value": "#0E7490" },
+    "amber-800": { "$value": "#92400E" },
+    "red-700": { "$value": "#B91C1C" },
+    "slate-950": { "$value": "#0F172A" },
+    "slate-700": { "$value": "#334155" },
+    "slate-600": { "$value": "#475569" },
+    "slate-tertiary": { "$value": "#4E5A6E", "$description": "AA-cleared replacement for the shipped #64748B (which failed at 4.01:1 on sunken)" },
+    "slate-300": { "$value": "#CBD5E1" },
+    "slate-350": { "$value": "#B9C2CE", "$description": "print page edge" },
+    "slate-250": { "$value": "#DCE2EA", "$description": "faint list hairline" },
+    "slate-450": { "$value": "#8FA3B8", "$description": "basemap geographic label (imagery)" },
+    "green-800": { "$value": "#166534", "$description": "success/done status; 5.9:1 on inset, 6.9:1 on card" },
+    "paper": { "$value": "#F4F6F9" },
+    "paper-sunken": { "$value": "#E8ECF2" },
+    "paper-inset": { "$value": "#EEF1F5", "$description": "map panel / meta strip / callout surface" },
+    "mist": { "$value": "#C9D2DD", "$description": "app desk backdrop" },
+    "sky-100": { "$value": "#E3ECF2", "$description": "basemap water fill (imagery)" },
+    "white": { "$value": "#FFFFFF" }
+  },
+  "semantic": {
+    "surface": {
+      "$type": "color",
+      "page": { "$value": "{primitive.paper}" },
+      "sunken": { "$value": "{primitive.paper-sunken}" },
+      "inset": { "$value": "{primitive.paper-inset}" },
+      "desk": { "$value": "{primitive.mist}" },
+      "card": { "$value": "{primitive.white}" }
+    },
+    "text": {
+      "$type": "color",
+      "primary": { "$value": "{primitive.slate-950}", "$description": "16-18.7:1 every surface" },
+      "secondary": { "$value": "{primitive.slate-700}", "$description": "9.4-10.9:1" },
+      "tertiary": { "$value": "{primitive.slate-tertiary}", "$description": "5.88-6.98:1 (min on sunken)" },
+      "link": { "$value": "{primitive.blue-60v}", "$description": "citation mark; 5.67-6.72:1" }
+    },
+    "line": {
+      "$type": "color",
+      "rule-strong": { "$value": "{primitive.slate-950}" },
+      "rule-soft": { "$value": "{primitive.slate-300}", "$description": "decorative hairline — not gated" },
+      "rule-hairline": { "$value": "{primitive.slate-250}", "$description": "faint list divider — decorative" },
+      "rule-print": { "$value": "{primitive.slate-350}", "$description": "print page edge — decorative" }
+    },
+    "status": {
+      "$type": "color",
+      "ok": { "$value": "{primitive.green-800}", "$description": "success / done — always paired with a ✓ glyph or text, never color alone" }
+    },
+    "map": {
+      "$type": "color",
+      "$description": "Basemap palette (CARTO Positron register). Rendered inside role=img SVG with a text-equivalent aria-label, so these are imagery, not gated UI color.",
+      "water": { "$value": "{primitive.sky-100}" },
+      "label": { "$value": "{primitive.slate-450}" }
+    },
+    "focus": { "$type": "color", "$value": "{primitive.blue-60v}" }
+  },
+  "purpose": {
+    "tier": {
+      "$type": "color",
+      "$description": "Evidence tier — how directly is this known. Shape carries the distinction (solid/hatched/hollow/stippled square); color is reinforcement.",
+      "empirical": { "$value": "{primitive.blue-60v}" },
+      "modeled": { "$value": "{primitive.blue-warm-70v}" },
+      "proxy": { "$value": "{primitive.slate-600}" },
+      "synthetic": { "$value": "{primitive.blue-warm-70v}" }
+    },
+    "severity": {
+      "$type": "color",
+      "$description": "Exposure severity — how bad is this (app/score.py tier 1-4). A SEPARATE axis from tier. Filled-step triangle carries the ordinal; hue ramps neutral->warm->alert.",
+      "1": { "$value": "{primitive.slate-600}" },
+      "2": { "$value": "{primitive.amber-800}" },
+      "3": { "$value": "{primitive.amber-800}" },
+      "4": { "$value": "{primitive.red-700}" }
+    },
+    "accent": {
+      "$type": "color",
+      "default": { "$value": "{primitive.blue-60v}" },
+      "warn": { "$value": "{primitive.amber-800}" },
+      "alert": { "$value": "{primitive.red-700}" }
+    },
+    "stone": {
+      "$type": "color",
+      "$description": "Five Stones grouping hints — decorative, degrade to gray in print.",
+      "cornerstone": { "$value": "{primitive.slate-600}" },
+      "touchstone": { "$value": "{primitive.cyan-700}" },
+      "lodestone": { "$value": "{primitive.amber-800}" },
+      "keystone": { "$value": "{primitive.blue-warm-70v}" },
+      "capstone": { "$value": "{primitive.blue-warm-80v}" }
+    }
+  },
+  "type": {
+    "$type": "fontFamily",
+    "$description": "Sofia Sans (display/UI/body — open Gotham-lineage geometric grotesque, NYC-civic register) + Overpass Mono (data, coordinates, citations, drafting labels — FHWA highway-signage lineage). Both OFL, self-hosted via @fontsource; NO CDN, offline-safe per Riprap's constraint. Sofia Sans sits comfortably in the CARTO basemap register beneath the deck.gl layers.",
+    "display": { "$value": ["Sofia Sans", "system-ui", "sans-serif"] },
+    "sans": { "$value": ["Sofia Sans", "system-ui", "sans-serif"] },
+    "mono": { "$value": ["Overpass Mono", "ui-monospace", "monospace"] }
+  }
+}

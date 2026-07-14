@@ -3,6 +3,23 @@
   import type { Map as MapLibreMap, GeoJSONSource } from 'maplibre-gl';
   import { POSITRON_NO_LABELS } from './baseStyle';
   import { registerSynStripe } from './synStripe';
+  import { MapboxOverlay } from '@deck.gl/mapbox';
+  import { GeoJsonLayer, ScatterplotLayer } from '@deck.gl/layers';
+  import { HeatmapLayer } from '@deck.gl/aggregation-layers';
+  import { PathStyleExtension } from '@deck.gl/extensions';
+
+  /** Reads a --riprap-* custom property (possibly a var()-chain of
+   *  primitives) off the live DOM and returns it as a deck.gl RGB(A)
+   *  color array — deck.gl layers take [r,g,b,a] 0-255, not CSS
+   *  strings. Custom properties resolve var() chains at computed-value
+   *  time, same as any other property, so one getComputedStyle read is
+   *  enough regardless of how many primitive layers the token aliases. */
+  function tokenColor(name: string, alpha = 255): [number, number, number, number] {
+    const hex = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+    if (!m) return [100, 100, 100, alpha]; // fallback: neutral gray, never invisible
+    return [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16), alpha];
+  }
 
   interface QueriedAddress {
     label: string;
@@ -66,6 +83,7 @@
 
   let container: HTMLDivElement | null = $state(null);
   let map: MapLibreMap | null = null;
+  let overlay: MapboxOverlay | null = null;
   let ready = $state(false);
 
   const EMPTY: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
@@ -82,23 +100,108 @@
     map.setLayoutProperty(id, 'visibility', visible ? 'visible' : 'none');
   }
 
-  $effect(() => { setSourceData('sandy-empirical', sandyEmpirical); });
-  $effect(() => { setSourceData('dep-modeled', depModeled); });
+  /** docs/design/handoff/CLAUDE-CODE-PROMPT.md Task 7 — Sandy/DEP/Ida
+   *  move to deck.gl over the MapLibre basemap via an interleaved
+   *  MapboxOverlay, so deck layers sort correctly with basemap labels.
+   *  Colors are read live off the --riprap-tier-* tokens (tokenColor
+   *  above), never hard-coded, so the map legend and these layers can
+   *  never drift from the report body's marks.
+   *
+   *  Deviation from the handoff's layer table: 311 flood requests are
+   *  tagged PROXY here, not empirical — matching this codebase's own
+   *  established epistemic taxonomy (tierForDocId: 'nyc311'/'311' ->
+   *  'proxy', an indirect indicator, not a direct measurement). The
+   *  handoff's table appears to use "empirical" loosely for "point
+   *  data" rather than the strict tier; following the app's own tested
+   *  taxonomy rather than silently taking on a tier regression. */
+  function buildDeckLayers() {
+    return [
+      new GeoJsonLayer({
+        id: 'deck-sandy-empirical',
+        data: sandyEmpirical ?? EMPTY,
+        visible: activeLayers.empirical,
+        stroked: true,
+        filled: true,
+        getFillColor: tokenColor('--riprap-tier-empirical', 102), // ~40% opacity
+        getLineColor: tokenColor('--riprap-tier-empirical'),
+        lineWidthMinPixels: 1.5,
+      }),
+      new GeoJsonLayer({
+        id: 'deck-dep-modeled',
+        data: depModeled ?? EMPTY,
+        visible: activeLayers.modeled,
+        stroked: true,
+        filled: true,
+        getFillColor: tokenColor('--riprap-tier-modeled', 41), // ~16% opacity
+        getLineColor: tokenColor('--riprap-tier-modeled'),
+        lineWidthMinPixels: 1.5,
+        getDashArray: [4, 3],
+        dashJustified: true,
+        extensions: [new PathStyleExtension({ dash: true })],
+      }),
+      new ScatterplotLayer({
+        id: 'deck-ida-hwm',
+        data: idaHwm?.features ?? [],
+        visible: activeLayers.empirical,
+        pickable: true,
+        stroked: true,
+        getPosition: (f: GeoJSON.Feature) => {
+          const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
+          return [lon, lat] as [number, number];
+        },
+        getFillColor: tokenColor('--riprap-amber-800', 235),
+        getLineColor: tokenColor('--riprap-white'),
+        lineWidthMinPixels: 1.5,
+        getRadius: (f: GeoJSON.Feature) => {
+          const h = Number((f.properties as Record<string, unknown> | null)?.height_above_gnd_ft ?? 0.5);
+          return 5 + Math.min(h, 5) * 1.4;
+        },
+        radiusUnits: 'pixels',
+        onClick: ({ object }: { object?: GeoJSON.Feature }) => {
+          if (!object || !map) return;
+          const p = (object.properties ?? {}) as Record<string, unknown>;
+          const site = String(p.site_description ?? '?');
+          const elev = p.elev_ft != null ? `${Number(p.elev_ft).toFixed(1)} ft NAVD88` : '—';
+          const height = p.height_above_gnd_ft != null ? `${Number(p.height_above_gnd_ft).toFixed(2)} ft above ground` : '—';
+          const html = `
+            <div style="font-family: 'Sofia Sans', system-ui; font-size: 12px; max-width: 220px;">
+              <div style="font-weight: 600; color: #92400E; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;">Ida 2021 HWM · USGS</div>
+              <div style="margin-top: 4px; color: #0F172A; font-size: 12px;">${site}</div>
+              <div style="margin-top: 6px; font-family: 'Overpass Mono', monospace; font-size: 10.5px; color: #4E5A6E;">elev: ${elev}<br>mark: ${height}</div>
+            </div>`;
+          import('maplibre-gl').then(({ Popup }) => {
+            if (!map) return;
+            const coords = (object.geometry as GeoJSON.Point).coordinates as [number, number];
+            new Popup({ closeButton: true, offset: 12 }).setLngLat(coords).setHTML(html).addTo(map);
+          });
+        },
+      }),
+      new HeatmapLayer({
+        id: 'deck-proxy-311',
+        data: proxy311?.features ?? [],
+        visible: activeLayers.proxy,
+        getPosition: (f: GeoJSON.Feature) => {
+          const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
+          return [lon, lat] as [number, number];
+        },
+        getWeight: (f: GeoJSON.Feature) => Number((f.properties as Record<string, unknown> | null)?.count ?? 1),
+        colorRange: [
+          [...tokenColor('--riprap-surface-sunken')].slice(0, 3),
+          [...tokenColor('--riprap-tier-proxy')].slice(0, 3),
+        ] as [number, number, number][],
+        radiusPixels: 40,
+      }),
+    ];
+  }
+
   $effect(() => { setSourceData('syn-prior', syntheticPrior); });
-  $effect(() => { setSourceData('proxy-311', proxy311); });
   $effect(() => { setSourceData('register-points', registerPoints); });
   $effect(() => { setSourceData('register-polygons', registerPolygons); });
   $effect(() => { setSourceData('terramind-lulc', terramindLulc); });
   $effect(() => { setSourceData('terramind-buildings', terramindBuildings); });
   $effect(() => { setSourceData('prithvi-live', prithviLive); });
-  $effect(() => { setSourceData('ida-hwm', idaHwm); });
 
   $effect(() => {
-    setLayerVisibility('tier-empirical-fill', activeLayers.empirical);
-    setLayerVisibility('tier-empirical-line', activeLayers.empirical);
-    setLayerVisibility('ida-hwm-circle', activeLayers.empirical);
-    setLayerVisibility('tier-modeled-fill', activeLayers.modeled);
-    setLayerVisibility('tier-modeled-line', activeLayers.modeled);
     setLayerVisibility('tier-synthetic-fill', activeLayers.synthetic);
     setLayerVisibility('tier-synthetic-line', activeLayers.synthetic);
     setLayerVisibility('terramind-lulc-fill', activeLayers.synthetic);
@@ -107,12 +210,26 @@
     setLayerVisibility('terramind-buildings-line', activeLayers.synthetic);
     setLayerVisibility('prithvi-live-fill', activeLayers.modeled);
     setLayerVisibility('prithvi-live-line', activeLayers.modeled);
-    setLayerVisibility('tier-proxy-dots', activeLayers.proxy);
+  });
+
+  // Sandy / DEP / Ida HWM / 311 now live entirely in deck.gl — rebuild
+  // and hand the overlay a fresh layer array whenever their data or
+  // visibility changes. deck.gl diffs by layer `id` internally, so this
+  // is cheap even though it reconstructs the array each time.
+  $effect(() => {
+    void sandyEmpirical; void depModeled; void idaHwm; void proxy311; void activeLayers;
+    if (!overlay || !ready) return;
+    overlay.setProps({ layers: buildDeckLayers() });
   });
 
   $effect(() => {
     if (!map || !ready) return;
-    map.flyTo({ center: [address.lon, address.lat], zoom: 15, essential: true });
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) {
+      map.jumpTo({ center: [address.lon, address.lat], zoom: 15 });
+    } else {
+      map.flyTo({ center: [address.lon, address.lat], zoom: 15, essential: true });
+    }
   });
 
   onMount(async () => {
@@ -140,18 +257,16 @@
       // v0.4.2 §14 — synthetic-prior fill pattern (SVG source, 2 densities)
       registerSynStripe(map);
 
-      // sources
+      // sources — sandy-empirical / dep-modeled / proxy-311 / ida-hwm
+      // moved to deck.gl (see buildDeckLayers above); no MapLibre source
+      // needed for them any more.
       const fcEmpty = (): GeoJSON.FeatureCollection => ({ type: 'FeatureCollection', features: [] });
-      map.addSource('sandy-empirical', { type: 'geojson', data: sandyEmpirical ?? fcEmpty() });
-      map.addSource('dep-modeled', { type: 'geojson', data: depModeled ?? fcEmpty() });
       map.addSource('syn-prior', { type: 'geojson', data: syntheticPrior ?? fcEmpty() });
-      map.addSource('proxy-311', { type: 'geojson', data: proxy311 ?? fcEmpty() });
       map.addSource('register-points', { type: 'geojson', data: registerPoints ?? fcEmpty() });
       map.addSource('register-polygons', { type: 'geojson', data: registerPolygons ?? fcEmpty() });
       map.addSource('terramind-lulc', { type: 'geojson', data: terramindLulc ?? fcEmpty() });
       map.addSource('terramind-buildings', { type: 'geojson', data: terramindBuildings ?? fcEmpty() });
       map.addSource('prithvi-live', { type: 'geojson', data: prithviLive ?? fcEmpty() });
-      map.addSource('ida-hwm', { type: 'geojson', data: idaHwm ?? fcEmpty() });
       map.addSource('queried-address', {
         type: 'geojson',
         data: {
@@ -164,25 +279,7 @@
         }
       });
 
-      // empirical fill + line
-      map.addLayer({
-        id: 'tier-empirical-fill', type: 'fill', source: 'sandy-empirical',
-        paint: { 'fill-color': '#0B5394', 'fill-opacity': 0.40 }
-      });
-      map.addLayer({
-        id: 'tier-empirical-line', type: 'line', source: 'sandy-empirical',
-        paint: { 'line-color': '#0B5394', 'line-width': 1.5 }
-      });
-
-      // modeled fill + line
-      map.addLayer({
-        id: 'tier-modeled-fill', type: 'fill', source: 'dep-modeled',
-        paint: { 'fill-color': '#2A6FA8', 'fill-opacity': 0.25 }
-      });
-      map.addLayer({
-        id: 'tier-modeled-line', type: 'line', source: 'dep-modeled',
-        paint: { 'line-color': '#2A6FA8', 'line-width': 1.5 }
-      });
+      // empirical (Sandy) + modeled (DEP) fill/line: deck.gl now (buildDeckLayers).
 
       // synthetic fill (pattern) + dashed line
       map.addLayer({
@@ -194,19 +291,7 @@
         paint: { 'line-color': '#2A6FA8', 'line-width': 1.5, 'line-dasharray': [4, 3] }
       });
 
-      // proxy graduated dots (no fill, stroked circle, radius interpolated by `count`)
-      map.addLayer({
-        id: 'tier-proxy-dots', type: 'circle', source: 'proxy-311',
-        paint: {
-          'circle-color': 'transparent',
-          'circle-stroke-color': '#6B6B6B',
-          'circle-stroke-width': 1.25,
-          'circle-radius': [
-            'interpolate', ['linear'], ['coalesce', ['get', 'count'], 1],
-            1, 3, 5, 6, 15, 9, 30, 12
-          ]
-        }
-      });
+      // proxy 311 requests: deck.gl HeatmapLayer now (buildDeckLayers).
 
       // TerraMind-synthesis LULC categorical fill (synthetic prior tier).
       // Per-feature fill_color property carries class-specific color from
@@ -261,53 +346,8 @@
         paint: { 'line-color': '#0B5394', 'line-width': 1.0, 'line-opacity': 0.85 }
       });
 
-      // Ida 2021 HWM points — USGS surveyed water marks, empirical tier.
-      // Amber fill distinguishes from Sandy blue polygons; size scaled by
-      // height_above_gnd_ft so higher water levels read as larger circles.
-      map.addLayer({
-        id: 'ida-hwm-circle', type: 'circle', source: 'ida-hwm',
-        paint: {
-          'circle-color': '#D97706',
-          'circle-stroke-color': '#F4F6F9',
-          'circle-stroke-width': 1.5,
-          'circle-radius': [
-            'interpolate', ['linear'],
-            ['coalesce', ['get', 'height_above_gnd_ft'], 0.5],
-            0, 5, 1, 7, 3, 9, 5, 12
-          ],
-          'circle-opacity': 0.92
-        }
-      });
-      map.on('mouseenter', 'ida-hwm-circle', () => {
-        if (map) map.getCanvas().style.cursor = 'pointer';
-      });
-      map.on('mouseleave', 'ida-hwm-circle', () => {
-        if (map) map.getCanvas().style.cursor = '';
-      });
-      map.on('click', 'ida-hwm-circle', (e) => {
-        if (!map || !e.features?.length) return;
-        const f = e.features[0];
-        const p = (f.properties ?? {}) as Record<string, unknown>;
-        const site = String(p.site_description ?? '?');
-        const elev = p.elev_ft != null ? `${Number(p.elev_ft).toFixed(1)} ft NAVD88` : '—';
-        const height = p.height_above_gnd_ft != null ? `${Number(p.height_above_gnd_ft).toFixed(2)} ft above ground` : '—';
-        const quality = String(p.hwm_quality ?? '');
-        const dist = p.distance_m != null ? `${p.distance_m} m from query` : '';
-        const html = `
-          <div style="font-family: 'IBM Plex Sans', system-ui; font-size: 12px; max-width: 220px;">
-            <div style="font-weight: 600; color: #D97706; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;">Ida 2021 HWM · USGS</div>
-            <div style="margin-top: 4px; color: #0F172A; font-size: 12px;">${site}</div>
-            <div style="margin-top: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6B6B6B;">
-              elev: ${elev}<br>
-              mark: ${height}<br>
-              ${quality ? `quality: ${quality}<br>` : ''}
-              ${dist}
-            </div>
-          </div>`;
-        const popup = new maplibre.Popup({ closeButton: true, offset: 12 });
-        const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
-        popup.setLngLat(coords).setHTML(html).addTo(map);
-      });
+      // Ida 2021 HWM points — deck.gl ScatterplotLayer now (buildDeckLayers);
+      // click popup lives in that layer's onClick.
 
       // Register-asset points (subway entrances, schools, hospitals).
       // Color: empirical-blue if inside_sandy_2012, ink-tertiary grey
@@ -354,15 +394,15 @@
         const inside = p.inside_sandy_2012 === true || p.inside_sandy_2012 === 'true';
         const docId = String(p.doc_id ?? '');
         const html = `
-          <div style="font-family: 'IBM Plex Sans', system-ui; font-size: 12px;">
+          <div style="font-family: 'Sofia Sans', system-ui; font-size: 12px;">
             <div style="font-weight: 600; color: #0F172A;">${name}</div>
             <div style="color: #6B6B6B; font-size: 11px; margin-top: 2px;">${kind}</div>
             <div style="margin-top: 6px;">
-              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: ${inside ? '#0B5394' : '#6B6B6B'};">
+              <span style="font-family: 'Overpass Mono', monospace; font-size: 10.5px; color: ${inside ? '#0B5394' : '#6B6B6B'};">
                 inside_sandy_2012=${inside}
               </span>
             </div>
-            ${docId ? `<div style="margin-top: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #005EA2;">[${docId}]</div>` : ''}
+            ${docId ? `<div style="margin-top: 4px; font-family: 'Overpass Mono', monospace; font-size: 10.5px; color: #005EA2;">[${docId}]</div>` : ''}
           </div>`;
         const popup = new maplibre.Popup({ closeButton: true, offset: 12 });
         const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
@@ -402,13 +442,21 @@
         }
       });
 
+      // Interleaved deck.gl overlay — sorts with basemap labels rather
+      // than always drawing on top of them. Layers start empty; the
+      // $effect above fills them in once `ready` flips true below.
+      overlay = new MapboxOverlay({ interleaved: true, layers: [] });
+      map.addControl(overlay);
+
       ready = true;
+      overlay.setProps({ layers: buildDeckLayers() });
     });
   });
 
   onDestroy(() => {
     map?.remove();
     map = null;
+    overlay = null;
   });
 </script>
 

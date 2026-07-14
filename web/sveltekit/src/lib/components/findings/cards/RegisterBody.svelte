@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Card } from '$lib/types/card';
-  import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
+  import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
 
   /** Hover-linking comes from the parent `FindingCard` chrome (which is
    *  itself a button when card.mapLayer is set) — it sets `linkedKey`
@@ -19,7 +19,7 @@
     {#each card.registers ?? [] as r}
       <li class="reg-row" class:silent={!r.label}>
         <span class="reg-tag" title={r.tier}>
-          <TierGlyph tier={r.tier} size={9} color="var(--tier-{r.tier})" />
+          <EvidenceMark tier={r.tier} size={9} />
           <span>{r.reg}</span>
         </span>
         {#if r.label}
@@ -50,8 +50,8 @@
     gap: var(--s-2);
     align-items: baseline;
     padding: 5px 0;
-    border-bottom: 1px solid var(--rule-soft);
-    font-family: var(--font-mono);
+    border-bottom: 1px solid var(--riprap-rule-soft);
+    font-family: var(--riprap-font-mono);
     font-size: 12px;
     line-height: 1.4;
   }
@@ -61,33 +61,33 @@
     display: inline-flex;
     gap: 4px;
     align-items: center;
-    color: var(--ink-tertiary);
+    color: var(--riprap-text-tertiary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: 500;
   }
   .reg-label {
-    color: var(--ink);
+    color: var(--riprap-text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   .reg-source {
-    color: var(--ink-tertiary);
+    color: var(--riprap-text-tertiary);
     font-size: 10px;
     letter-spacing: 0.05em;
   }
   .reg-silent {
     grid-column: 2 / span 2;
-    color: var(--ink-tertiary);
+    color: var(--riprap-text-tertiary);
     font-style: italic;
   }
   .reg-row.silent { opacity: 0.65; }
   .body-sub {
     margin-top: var(--s-2);
-    font-family: var(--font-mono);
+    font-family: var(--riprap-font-mono);
     font-size: 11px;
-    color: var(--ink-tertiary);
+    color: var(--riprap-text-tertiary);
     line-height: 1.5;
   }
 </style>

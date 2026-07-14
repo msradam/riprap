@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { EvidenceItem } from '$lib/types/evidence';
-  import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
+  import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
   import TierBadge from '$lib/components/glyphs/TierBadge.svelte';
   import Sparkline from './viz/Sparkline.svelte';
   import Histogram from './viz/Histogram.svelte';
@@ -10,7 +10,7 @@
 
   interface Props { ev: EvidenceItem; }
   let { ev }: Props = $props();
-  let tierColor = $derived(`var(--tier-${ev.tier})`);
+  let tierColor = $derived(`var(--riprap-tier-${ev.tier})`);
 
   function openCite() {
     citations.active = ev.citeId;
@@ -24,7 +24,7 @@
 >
   <header class="evidence-card-head">
     <div class="evidence-card-source">
-      <TierGlyph tier={ev.tier} size={11} color={tierColor} />
+      <EvidenceMark tier={ev.tier} size={11} />
       <span class="evidence-card-source-label">{ev.source}</span>
     </div>
     <span class="evidence-card-vintage" title="Data vintage">v. {ev.vintage}</span>

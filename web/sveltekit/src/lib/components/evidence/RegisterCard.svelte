@@ -9,9 +9,9 @@
    * Tap row to expand a per-field provenance grid.
    */
   import type { RegisterData } from '$lib/types/states';
-  import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
   import TierBadge from '$lib/components/glyphs/TierBadge.svelte';
   import AssetPin from '$lib/components/glyphs/AssetPin.svelte';
+  import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
 
   interface Props { data: RegisterData; }
   let { data }: Props = $props();
@@ -26,7 +26,7 @@
 <article class="register-card" aria-label="{data.type} register">
   <header class="register-card-head">
     <div class="register-card-source">
-      <TierGlyph tier="empirical" size={11} color="var(--tier-empirical)" />
+      <EvidenceMark tier="empirical" size={11} />
       <span class="register-card-source-label">{data.sourceLabel ?? 'MTA · USGS · FEMA · NYC OEM · NYC DEP'}</span>
     </div>
     <span class="register-card-vintage">v. {data.vintage ?? '2026-04'} · joined</span>
@@ -36,10 +36,14 @@
     <span class="register-card-type">{data.type} within {data.radius}</span>
   </h4>
   <table class="register-table">
+    <caption class="visually-hidden">
+      {data.count} {data.type} within {data.radius}, joined against FEMA, Sandy 2012, and DEP-modeled flood exposure
+    </caption>
     <thead>
       <tr>
-        <th></th><th>asset</th><th>elev.</th><th>ADA</th>
-        <th>FEMA</th><th>Sandy 2012</th><th>DEP modeled</th>
+        <th scope="col"><span class="visually-hidden">evidence tier</span></th>
+        <th scope="col">asset</th><th scope="col">elev.</th><th scope="col">ADA</th>
+        <th scope="col">FEMA</th><th scope="col">Sandy 2012</th><th scope="col">DEP modeled</th>
       </tr>
     </thead>
     <tbody>
@@ -51,10 +55,10 @@
         >
           <td class="register-row-glyph">
             <AssetPin kind={r.asset} size={10} />
-            <TierGlyph tier={r.primaryTier} size={9} color="var(--tier-{r.primaryTier})" />
+            <EvidenceMark tier={r.primaryTier} size={9} />
           </td>
           <td class="register-row-name">{r.name}</td>
-          <td>{r.elev}</td>
+          <td class="register-num">{r.elev}</td>
           <td class={r.ada ? 'register-yes' : 'register-no'}>{r.ada ? '✓' : '—'}</td>
           <td>{r.fema}</td>
           <td>{r.sandy}</td>

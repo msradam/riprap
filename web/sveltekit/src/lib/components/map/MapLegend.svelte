@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Tier } from '$lib/types/tier';
-  import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
+  import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
   import TierBadge from '$lib/components/glyphs/TierBadge.svelte';
   import type { StoneKey } from '$lib/types/card';
   import { STONE_META, STONE_ORDER } from '$lib/types/card';
@@ -129,7 +129,7 @@
           {#each stoneLayers[stone] as row, i (i)}
             <li class="layers-row" class:dim={!row.wired}>
               <span class="layers-glyph" aria-hidden="true">
-                <TierGlyph tier={row.tier} size={11} color="var(--tier-{row.tier})" />
+                <EvidenceMark tier={row.tier} size={11} />
               </span>
               <span class="layers-text">
                 <span class="layers-label">{row.label}</span>
@@ -164,7 +164,7 @@
           aria-pressed={active[m.k]}
           onclick={() => onToggle(m.k)}
         >
-          <TierGlyph tier={m.tier} size={11} color="var(--tier-{m.tier})" />
+          <EvidenceMark tier={m.tier} size={11} />
           <span>{m.label}</span>
           <span class="layers-master-state">{active[m.k] ? 'ON' : 'OFF'}</span>
         </button>
@@ -303,7 +303,8 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 4px 8px;
+    min-height: 24px; /* WCAG 2.5.8 target-size minimum */
+    padding: 6px 10px;
     background: var(--paper);
     border: 1px solid var(--rule-soft);
     cursor: pointer;
@@ -313,6 +314,10 @@
     color: var(--ink);
   }
   .layers-master.is-on { background: var(--paper-deep); border-color: var(--ink); }
+  .layers-master:focus-visible {
+    outline: 3px solid var(--riprap-focus);
+    outline-offset: 2px;
+  }
   .layers-master-state {
     margin-left: 4px;
     color: var(--ink-tertiary);

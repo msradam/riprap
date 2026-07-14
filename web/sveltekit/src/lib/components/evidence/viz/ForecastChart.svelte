@@ -23,7 +23,7 @@
   {#each data as d, i (i)}
     <g>
       <circle cx={xs[i]} cy={y(d.mid)} r="2" fill={color} />
-      <text x={xs[i]} y={h - 1} font-size="9" font-family="IBM Plex Mono" text-anchor="middle" fill="#6B6B6B">{d.year}</text>
+      <text x={xs[i]} y={h - 1} font-size="9" font-family="Overpass Mono" text-anchor="middle" fill="#6B6B6B">{d.year}</text>
     </g>
   {/each}
 </svg>

@@ -1,0 +1,95 @@
+/* Riprap report-content tokens — BUILT file (the gate reads this one).
+   Three layers: primitive -> semantic -> purpose. Grayscale-safe by
+   design: evidence tier and severity carry meaning through shape/pattern
+   in the components, never hue alone (see css/components.css).
+   Every ratio below is what gates/contrast-gate.mjs actually computes
+   with the WCAG 2.x formula in gates/lib/color.mjs — measured, not asserted.
+   Single :root, no ground-override or @media block, so the drift gate's
+   flat comparison against reference.css is exact.
+*/
+:root {
+  /* ── Primitives ─────────────────────────────────────────────────── */
+  --riprap-blue-60v:       #005EA2; /* USWDS blue-60v */
+  --riprap-blue-warm-70v:  #1A4480; /* USWDS blue-warm-70v */
+  --riprap-blue-warm-80v:  #162E51; /* USWDS darkest navy */
+  --riprap-cyan-700:       #0E7490;
+  --riprap-amber-800:      #92400E;
+  --riprap-red-700:        #B91C1C;
+  --riprap-slate-950:      #0F172A;
+  --riprap-slate-700:      #334155;
+  --riprap-slate-600:      #475569;
+  --riprap-slate-tertiary: #4E5A6E; /* fix for the #64748B AA bug — see RIPRAP-MAPPING note */
+  --riprap-slate-300:      #CBD5E1;
+  --riprap-slate-350:      #B9C2CE; /* print page edge */
+  --riprap-slate-250:      #DCE2EA; /* faint list hairline */
+  --riprap-slate-450:      #8FA3B8; /* basemap geographic label (imagery) */
+  --riprap-green-800:      #166534; /* success/done — 5.9:1 on inset, 6.9:1 on card */
+  --riprap-paper:          #F4F6F9;
+  --riprap-paper-sunken:   #E8ECF2;
+  --riprap-paper-inset:    #EEF1F5; /* map panel / meta strip / callout */
+  --riprap-mist:           #C9D2DD; /* app desk backdrop */
+  --riprap-sky-100:        #E3ECF2; /* basemap water fill (imagery) */
+  --riprap-white:          #FFFFFF;
+
+  /* ── Semantic: surfaces ─────────────────────────────────────────── */
+  --riprap-surface-page:   var(--riprap-paper);
+  --riprap-surface-sunken: var(--riprap-paper-sunken);
+  --riprap-surface-inset:  var(--riprap-paper-inset); /* map panel / meta strip / callout */
+  --riprap-surface-desk:   var(--riprap-mist);        /* app backdrop */
+  --riprap-surface-card:   var(--riprap-white);
+
+  /* ── Semantic: text ──
+     text-tertiary #4E5A6E measures 6.44:1 on page, 5.88:1 on sunken,
+     6.98:1 on card — all clear WCAG 1.4.3's 4.5:1 floor. It REPLACES the
+     shipped #64748B, which measured 4.01:1 on sunken (a real AA failure,
+     verified by gates/lib/color.mjs). */
+  --riprap-text-primary:   var(--riprap-slate-950);   /* ~16-18.7:1 every surface */
+  --riprap-text-secondary: var(--riprap-slate-700);   /* ~9.4-10.9:1 */
+  --riprap-text-tertiary:  var(--riprap-slate-tertiary);
+  --riprap-text-link:      var(--riprap-blue-60v);    /* citation mark; 5.67-6.72:1 */
+
+  /* ── Semantic: lines + focus ────────────────────────────────────── */
+  --riprap-rule-strong:    var(--riprap-slate-950);
+  --riprap-rule-soft:      var(--riprap-slate-300);   /* decorative hairline — NOT gated */
+  --riprap-rule-hairline:  var(--riprap-slate-250);   /* faint list divider — decorative */
+  --riprap-rule-print:     var(--riprap-slate-350);   /* print page edge — decorative */
+  --riprap-focus:          var(--riprap-blue-60v);
+
+  /* ── Semantic: status + map ─────────────────────────────────────── */
+  --riprap-status-ok:      var(--riprap-green-800);   /* success/done — always with ✓ or text */
+  --riprap-map-water:      var(--riprap-sky-100);     /* imagery (role=img) — not gated */
+  --riprap-map-label:      var(--riprap-slate-450);   /* imagery (role=img) — not gated */
+
+  /* ── Purpose: evidence tier (how directly is this known) ──
+     Distinction is carried by SHAPE in the component (solid / hatched /
+     hollow / stippled square); hue is reinforcement only. */
+  --riprap-tier-empirical: var(--riprap-blue-60v);
+  --riprap-tier-modeled:   var(--riprap-blue-warm-70v);
+  --riprap-tier-proxy:     var(--riprap-slate-600);
+  --riprap-tier-synthetic: var(--riprap-blue-warm-70v);
+
+  /* ── Purpose: severity (how bad is this — a SEPARATE axis) ──
+     Carried by a filled-step triangle (1-4); hue ramps neutral -> warm ->
+     alert as reinforcement. Deliberately not blue, not square. */
+  --riprap-sev-1:          var(--riprap-slate-600);
+  --riprap-sev-2:          var(--riprap-amber-800);
+  --riprap-sev-3:          var(--riprap-amber-800);
+  --riprap-sev-4:          var(--riprap-red-700);
+
+  /* ── Purpose: accents + Five Stones (decorative hints) ──────────── */
+  --riprap-accent:             var(--riprap-blue-60v);
+  --riprap-accent-warn:        var(--riprap-amber-800);
+  --riprap-accent-alert:       var(--riprap-red-700);
+  --riprap-stone-cornerstone:  var(--riprap-slate-600);
+  --riprap-stone-touchstone:   var(--riprap-cyan-700);
+  --riprap-stone-lodestone:    var(--riprap-amber-800);
+  --riprap-stone-keystone:     var(--riprap-blue-warm-70v);
+  --riprap-stone-capstone:     var(--riprap-blue-warm-80v);
+
+  /* ── Type (OFL, self-hosted via @fontsource; no CDN) ──
+     Sofia Sans = open Gotham-lineage civic grotesque (display/UI/body).
+     Overpass Mono = FHWA signage lineage (data/coordinates/citations). */
+  --riprap-font-display: "Sofia Sans", system-ui, sans-serif;
+  --riprap-font-sans:    "Sofia Sans", system-ui, sans-serif;
+  --riprap-font-mono:    "Overpass Mono", ui-monospace, monospace;
+}

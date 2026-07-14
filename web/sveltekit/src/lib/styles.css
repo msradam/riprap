@@ -227,15 +227,24 @@
   padding: 0 1px;
 }
 
+/* docs/design/handoff/css/components.css .riprap-citation-link —
+   periphery, not decoration: Overpass Mono, inline (exempt from the
+   2.5.8 target-size minimum — do not enlarge), own focus-visible ring
+   from --riprap-focus rather than the app-wide --accent ring. */
 .inline-cite {
-  color: var(--tier-empirical);
-  font-family: var(--font-sans);
+  color: var(--riprap-text-link);
+  font-family: var(--riprap-font-mono);
   font-weight: 500;
   text-decoration: none;
   font-size: 14px;
+  transition: color 120ms ease;
 }
 .inline-cite sup { font-size: 0.78em; }
-.inline-cite:hover { background: rgba(11,83,148,0.08); }
+.inline-cite:hover { color: var(--riprap-tier-modeled); }
+.inline-cite:focus-visible {
+  outline: 3px solid var(--riprap-focus);
+  outline-offset: 2px;
+}
 
 .is-dense .briefing-section-head { margin: 18px 0 10px; padding-top: 12px; }
 .is-dense .briefing-para { margin-bottom: 12px; }
@@ -271,7 +280,7 @@
   gap: 8px;
   padding: 10px 12px;
   border-left: 2px solid var(--rule-soft);
-  transition: background 200ms;
+  transition: background 150ms ease; /* one motion budget, report content: <=150ms */
 }
 .citation-item.is-active {
   border-left-color: var(--accent-graphical);
@@ -845,32 +854,49 @@
 .stripe-data .section-label { display: block; margin-bottom: 6px; }
 .stripe-data-uri { display: block; font-family: var(--font-mono); font-size: 10px; color: var(--ink-secondary); word-break: break-all; line-height: 1.5; max-height: 80px; overflow-y: auto; }
 
-/* §15 Register card */
+/* §15 Register card — docs/design/handoff/css/components.css
+   .riprap-register: mono uppercase headers, 2px header rule, sunken-
+   surface zebra, tabular-nums on numeric columns, tokens throughout
+   (was warm-newsprint hex left over from the Civic Hydrology palette
+   pass — see tokens.css's header comment). */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 .register-frame { padding: 28px; background: var(--paper); border: 1px solid var(--rule-soft); margin-bottom: 22px; }
-.register-card { background: white; border: 1px solid var(--rule-soft); padding: 22px 26px; max-width: 760px; }
+.register-card { background: var(--riprap-surface-card); border: 1px solid var(--rule-soft); padding: 22px 26px; max-width: 760px; font-family: var(--riprap-font-sans); }
 .register-card-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--rule-soft); margin-bottom: 14px; }
 .register-card-source { display: flex; align-items: center; gap: 6px; }
-.register-card-source-label { font-family: var(--font-mono); font-size: 11px; color: var(--ink-secondary); letter-spacing: 0.04em; }
-.register-card-vintage { font-family: var(--font-mono); font-size: 10px; color: var(--ink-tertiary); letter-spacing: 0.05em; }
-.register-card-title { font-family: var(--font-serif); margin: 0 0 16px; display: flex; align-items: baseline; gap: 10px; line-height: 1.2; }
-.register-card-count { font-size: 32px; font-weight: 600; color: var(--ink); }
+.register-card-source-label { font-family: var(--riprap-font-mono); font-size: 11px; color: var(--ink-secondary); letter-spacing: 0.04em; }
+.register-card-vintage { font-family: var(--riprap-font-mono); font-size: 10px; color: var(--riprap-text-tertiary); letter-spacing: 0.05em; }
+.register-card-title { font-family: var(--riprap-font-display); margin: 0 0 16px; display: flex; align-items: baseline; gap: 10px; line-height: 1.2; }
+.register-card-count { font-size: 32px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .register-card-type { font-size: 16px; font-weight: 400; color: var(--ink-secondary); }
 .register-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.register-table thead th { font-family: var(--font-mono); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-tertiary); padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--rule-soft); }
-.register-row { border-bottom: 1px solid #ECE8DD; cursor: pointer; transition: background 0.12s; }
-.register-row:hover { background: #FBF8EF; }
-.register-row.is-open { background: #F4EFE5; }
+.register-table thead th { font-family: var(--riprap-font-mono); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--riprap-text-tertiary); padding: 6px 8px; text-align: left; border-bottom: 2px solid var(--riprap-rule-strong); }
+/* No nth-child zebra here — .register-detail rows interleave
+   conditionally as rows expand, which breaks even/odd counting.
+   Row separation comes from the rule + hover/open state instead. */
+.register-row { border-bottom: 1px solid var(--riprap-rule-soft); cursor: pointer; transition: background 120ms ease; }
+.register-row:hover { background: var(--riprap-surface-inset); }
+.register-row.is-open { background: var(--riprap-surface-inset); }
 .register-row td { padding: 10px 8px; vertical-align: middle; }
 .register-row-glyph { display: flex; align-items: center; gap: 4px; }
-.register-row-name { font-family: var(--font-sans); font-weight: 500; color: var(--ink); }
-.register-yes { color: var(--tier-empirical); font-weight: 600; }
-.register-no { color: var(--ink-tertiary); }
-.register-detail td { padding: 0 8px 14px; background: #F4EFE5; border-bottom: 1px solid var(--rule-soft); }
+.register-row-name { font-family: var(--riprap-font-sans); font-weight: 500; color: var(--ink); }
+.register-num { font-variant-numeric: tabular-nums; }
+.register-yes { color: var(--riprap-status-ok); font-weight: 600; }
+.register-no { color: var(--riprap-text-tertiary); }
+.register-detail td { padding: 0 8px 14px; background: var(--riprap-surface-inset); border-bottom: 1px solid var(--rule-soft); }
 .register-detail-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; padding: 14px 0; }
 .register-detail-grid > div { display: flex; flex-direction: column; gap: 4px; }
 .register-detail-grid p { font-size: 12px; line-height: 1.45; color: var(--ink-secondary); margin: 0; }
 .register-card-foot { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; margin-top: 14px; border-top: 1px dashed var(--rule-soft); }
-.register-foot-note { font-size: 12px; color: var(--ink-tertiary); font-style: italic; max-width: 50ch; }
+.register-foot-note { font-size: 12px; color: var(--riprap-text-tertiary); font-style: italic; max-width: 50ch; }
 
 .register-rules { padding: 18px 22px; background: white; border: 1px solid var(--rule-soft); border-left: 3px solid var(--tier-empirical); }
 .register-rules ul { margin: 8px 0 0 18px; }

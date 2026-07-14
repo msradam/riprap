@@ -1,0 +1,160 @@
+
+@page {
+  size: Letter;
+  margin: 1in 0.9in 0.9in 0.9in;
+  @bottom-left {
+    content: "Riprap " counter(page) " / " counter(pages);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 8pt;
+    color: #64748b;
+  }
+  @bottom-right {
+    content: "Apache-2.0 · public-record sources only · no commercial APIs";
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 8pt;
+    color: #64748b;
+  }
+}
+@page :first {
+  @bottom-left { content: ""; }
+  @bottom-right { content: ""; }
+}
+body {
+  font-family: "IBM Plex Sans", -apple-system, system-ui, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.55;
+  color: #0F172A;
+}
+h1.cover-h1 {
+  font-family: "IBM Plex Serif", Georgia, serif;
+  font-size: 28pt;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+  margin: 0 0 16pt;
+}
+.cover-eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin: 0 0 12pt;
+}
+.cover-meta {
+  margin-top: 24pt;
+  border-top: 1px solid #CBD5E1;
+  padding-top: 14pt;
+}
+.cover-meta dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4pt 16pt;
+  font-size: 10pt;
+  margin: 0;
+}
+.cover-meta dt {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9pt;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+.cover-meta dd { margin: 0; color: #0F172A; }
+.cover-disclaim {
+  margin-top: 36pt;
+  padding: 14pt 18pt;
+  border-left: 3pt solid #92400E;
+  background: #F4F6F9;
+  font-size: 9.5pt;
+  line-height: 1.5;
+  color: #334155;
+}
+.cover-disclaim strong { color: #0F172A; }
+h2.section-h2 {
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 13pt;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #0F172A;
+  border-bottom: 1px solid #CBD5E1;
+  padding: 18pt 0 6pt;
+  margin: 0 0 12pt;
+  page-break-after: avoid;
+}
+.briefing-body {
+  font-family: "IBM Plex Serif", Georgia, serif;
+  font-size: 11pt;
+  line-height: 1.62;
+  color: #0F172A;
+  white-space: pre-wrap;
+}
+.cites {
+  margin-top: 18pt;
+  border-top: 1px solid #CBD5E1;
+  padding-top: 10pt;
+}
+.cites h3 {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9pt;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  margin: 0 0 8pt;
+}
+.cites ol {
+  /* `[N]` prefix in each item carries the citation marker — matches
+     what appears inline in the prose. The <ol> auto-marker would
+     duplicate that, so drop the auto-numbering. */
+  list-style: none;
+  font-size: 9.5pt;
+  line-height: 1.5;
+  padding-left: 0;
+  color: #334155;
+  margin: 0;
+}
+.cites li { margin-bottom: 4pt; }
+.cites li strong { color: #0F172A; }
+.cites li a {
+  color: #005EA2;
+  text-decoration: none;
+  word-break: break-all;
+}
+.stamp {
+  page-break-before: always;
+}
+.stamp .kv-block {
+  margin: 14pt 0;
+  border: 1px solid #CBD5E1;
+  padding: 12pt 14pt;
+}
+.stamp .kv-block dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4pt 12pt;
+  font-size: 9.5pt;
+  margin: 0;
+}
+.stamp .kv-block dt {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9pt;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+.stamp .kv-block dd { margin: 0; color: #0F172A; }
+.stamp .hash {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9pt;
+  word-break: break-all;
+  color: #0F172A;
+}
+.foot-note {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 8pt;
+  color: #64748b;
+  margin-top: 18pt;
+  padding-top: 8pt;
+  border-top: 1px dashed #CBD5E1;
+}

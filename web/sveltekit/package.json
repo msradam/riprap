@@ -17,6 +17,7 @@
     "check:all": "npm run check:types && npm run check:lint && npm run test:unit && npm run test:e2e"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.59.1",
     "@sveltejs/adapter-static": "^3.0.6",
@@ -33,6 +34,7 @@
     "eslint-plugin-svelte": "^3.17.1",
     "globals": "^17.6.0",
     "happy-dom": "^15.11.7",
+    "playwright": "^1.61.1",
     "svelte": "^5.16.0",
     "svelte-check": "^4.1.0",
     "typescript": "^5.6.0",
@@ -41,9 +43,14 @@
     "vitest": "^2.1.9"
   },
   "dependencies": {
-    "@fontsource/ibm-plex-mono": "^5.1.0",
-    "@fontsource/ibm-plex-sans": "^5.1.0",
-    "@fontsource/ibm-plex-serif": "^5.1.0",
+    "@deck.gl/aggregation-layers": "^9.3.6",
+    "@deck.gl/core": "^9.3.6",
+    "@deck.gl/extensions": "^9.3.6",
+    "@deck.gl/layers": "^9.3.6",
+    "@deck.gl/mapbox": "^9.3.6",
+    "@fontsource/overpass-mono": "^5.2.8",
+    "@fontsource/sofia-sans": "^5.2.8",
+    "deck.gl": "^9.3.6",
     "idb-keyval": "^6.2.2",
     "js-yaml": "^4.1.1",
     "maplibre-gl": "^4.7.0",

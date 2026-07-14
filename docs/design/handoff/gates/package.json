@@ -1,0 +1,10 @@
+{
+  "name": "riprap-design-gates",
+  "private": true,
+  "type": "module",
+  "description": "Deps for behavioral-gate.mjs only — the other gates are zero-dependency by design.",
+  "devDependencies": {
+    "playwright": "^1.61.1",
+    "@axe-core/playwright": "^4.10.2"
+  }
+}

@@ -46,6 +46,8 @@ import StatusGlyph from '$lib/components/trace/StatusGlyph.svelte';
 import AssetPin from '$lib/components/glyphs/AssetPin.svelte';
 import TierBadge from '$lib/components/glyphs/TierBadge.svelte';
 import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
+import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
+import SeverityMark from '$lib/components/glyphs/SeverityMark.svelte';
 
 import type { FindingsData, StoneTrace, StoneKey } from '$lib/types/card';
 
@@ -121,6 +123,12 @@ const CASES: SmokeCase[] = [
     props: { tier: 'empirical' as const } },
   { name: 'TierGlyph',         Component: TierGlyph,
     props: { tier: 'empirical' as const, size: 11, color: 'var(--tier-empirical)' } },
+  { name: 'EvidenceMark',      Component: EvidenceMark,
+    props: { tier: 'empirical' as const, size: 11 } },
+  { name: 'SeverityMark',      Component: SeverityMark,
+    // scoreTier 0 renders nothing by design (tested separately below) —
+    // use 1 here so the smoke suite's "produced some DOM" floor holds.
+    props: { scoreTier: 1 as const, size: 11 } },
 ];
 
 beforeEach(() => {

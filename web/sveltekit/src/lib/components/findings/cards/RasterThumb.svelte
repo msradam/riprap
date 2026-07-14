@@ -23,7 +23,7 @@
     <path d="M40 60 Q 80 54 110 70 Q 140 84 160 78 Q 165 90 130 92 Q 80 90 50 82 Z"
           fill="rgba(11,83,148,0.36)" stroke="#0B5394" stroke-width="0.6" />
     <circle cx="120" cy="74" r="3.2" fill="#005EA2" stroke="#F4F6F9" stroke-width="1.3" />
-    <text x={W - 6} y={H - 5} font-size="8" font-family="IBM Plex Mono" text-anchor="end" fill="#6B6B6B">2.13 in/hr · MOD</text>
+    <text x={W - 6} y={H - 5} font-size="8" font-family="Overpass Mono" text-anchor="end" fill="#6B6B6B">2.13 in/hr · MOD</text>
   </svg>
 {:else if kind === 'stormwater-dry'}
   <svg viewBox="0 0 {W} {H}" width="100%" height={H} aria-hidden="true">
@@ -37,7 +37,7 @@
     <path d="M180 92 Q 200 88 215 96 Q 220 105 200 104 Q 185 102 180 96 Z"
           fill="rgba(42,111,168,0.18)" stroke="#2A6FA8" stroke-width="0.5" stroke-dasharray="2 2" />
     <circle cx="120" cy="60" r="3.2" fill="#005EA2" stroke="#F4F6F9" stroke-width="1.3" />
-    <text x={W - 6} y={H - 5} font-size="8" font-family="IBM Plex Mono" text-anchor="end" fill="#6B6B6B">no ponding · MOD</text>
+    <text x={W - 6} y={H - 5} font-size="8" font-family="Overpass Mono" text-anchor="end" fill="#6B6B6B">no ponding · MOD</text>
   </svg>
 {:else if kind === 'prithvi'}
   <svg viewBox="0 0 {W} {H}" width="100%" height={H} aria-hidden="true">
@@ -52,8 +52,8 @@
     <rect x="0" y="55" width={W} height="6" fill="#A8A496" />
     <rect x="115" y="0" width="8" height={H} fill="#A8A496" />
     <ellipse cx="50" cy="92" rx="6" ry="3" fill="#2A6FA8" fill-opacity="0.65" />
-    <text x="6" y="14" font-size="9" font-family="IBM Plex Mono" fill="#F4F6F9">PRITHVI · 0.3%</text>
-    <text x={W - 6} y={H - 5} font-size="8" font-family="IBM Plex Mono" text-anchor="end" fill="#F4F6F9">scene 2026-05-02</text>
+    <text x="6" y="14" font-size="9" font-family="Overpass Mono" fill="#F4F6F9">PRITHVI · 0.3%</text>
+    <text x={W - 6} y={H - 5} font-size="8" font-family="Overpass Mono" text-anchor="end" fill="#F4F6F9">scene 2026-05-02</text>
   </svg>
 {:else if kind === 'lulc'}
   <svg viewBox="0 0 {W} {H}" width="100%" height={H} aria-hidden="true">
@@ -67,8 +67,8 @@
     <rect x="150" y="60" width="50" height="60" fill="#D9C75A" />
     <rect x="200" y="60" width="40" height="60" fill="#C66" />
     <rect x="100" y="100" width="50" height="20" fill="#A89A78" />
-    <text x="6" y="14" font-size="9" font-family="IBM Plex Mono" fill="#F4F6F9">LULC · TerraMind</text>
-    <text x={W - 6} y={H - 5} font-size="8" font-family="IBM Plex Mono" text-anchor="end" fill="#F4F6F9">scene 2026-05-02</text>
+    <text x="6" y="14" font-size="9" font-family="Overpass Mono" fill="#F4F6F9">LULC · TerraMind</text>
+    <text x={W - 6} y={H - 5} font-size="8" font-family="Overpass Mono" text-anchor="end" fill="#F4F6F9">scene 2026-05-02</text>
   </svg>
 {:else if kind === 'buildings'}
   <svg viewBox="0 0 {W} {H}" width="100%" height={H} aria-hidden="true">
@@ -83,8 +83,8 @@
       <rect x={r[0]} y={r[1]} width={r[2]} height={r[3]}
             fill="rgba(42,111,168,0.55)" stroke="#2A6FA8" stroke-width="0.4" />
     {/each}
-    <text x="6" y="14" font-size="9" font-family="IBM Plex Mono" fill="#F4F6F9">BLDG · TerraMind</text>
-    <text x={W - 6} y={H - 5} font-size="8" font-family="IBM Plex Mono" text-anchor="end" fill="#F4F6F9">36.2% built</text>
+    <text x="6" y="14" font-size="9" font-family="Overpass Mono" fill="#F4F6F9">BLDG · TerraMind</text>
+    <text x={W - 6} y={H - 5} font-size="8" font-family="Overpass Mono" text-anchor="end" fill="#F4F6F9">36.2% built</text>
   </svg>
 {:else}
   <div class="thumb-placeholder">raster preview</div>

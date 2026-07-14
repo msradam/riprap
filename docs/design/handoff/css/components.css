@@ -1,0 +1,82 @@
+/* Riprap report-content components — BUILT layer, checked by
+   gates/rules-lint.mjs. Rules the gate enforces on every future change:
+     - NO raw hex literals here; every color is a var(--riprap-*) token.
+     - every interactive class declares :focus-visible (WCAG 2.4.7).
+     - no box-shadow / blur: ALLOW_ELEVATION = false (a flat civic
+       register; hierarchy comes from rules, weight, and type — not
+       elevation).
+     - no transition/animation longer than the 150ms motion budget.
+   This is the on-screen layer; print geometry lives in the print
+   stylesheet (see docs/PRINT-GRAMMAR grounding in riprap-print-pdf). */
+
+.riprap-briefing {
+  background: var(--riprap-surface-page);
+  color: var(--riprap-text-primary);
+  font-family: "Sofia Sans", system-ui, sans-serif;
+}
+
+.riprap-prose {
+  font-family: "Sofia Sans", system-ui, sans-serif;
+  color: var(--riprap-text-primary);
+  line-height: 1.55;
+}
+
+.riprap-section-label {
+  font-family: "Overpass Mono", ui-monospace, monospace;
+  color: var(--riprap-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.riprap-rule-strong { border: 0; border-top: 2px solid var(--riprap-rule-strong); }
+.riprap-rule-soft   { border: 0; border-top: 1px solid var(--riprap-rule-soft); }
+
+/* Evidence-tier mark — fill/shape carries the tier; color reinforces. */
+.riprap-tier-mark { display: inline-block; vertical-align: middle; color: var(--riprap-tier-empirical); }
+.riprap-tier-mark--modeled   { color: var(--riprap-tier-modeled); }
+.riprap-tier-mark--proxy     { color: var(--riprap-tier-proxy); }
+.riprap-tier-mark--synthetic { color: var(--riprap-tier-synthetic); }
+
+/* Severity mark — separate axis; stepped triangle carries the 1-4. */
+.riprap-severity { color: var(--riprap-sev-1); }
+.riprap-severity--2 { color: var(--riprap-sev-2); }
+.riprap-severity--3 { color: var(--riprap-sev-3); }
+.riprap-severity--4 { color: var(--riprap-sev-4); }
+
+/* Citation mark — periphery, not decoration. Interactive: focus-visible. */
+.riprap-citation-link {
+  font-family: "Overpass Mono", ui-monospace, monospace;
+  color: var(--riprap-text-link);
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+.riprap-citation-link:hover { color: var(--riprap-tier-modeled); }
+.riprap-citation-link:focus-visible {
+  outline: 3px solid var(--riprap-focus);
+  outline-offset: 2px;
+}
+
+/* Map layer control (Five Stones grouping). Interactive: focus-visible. */
+.riprap-layer-toggle {
+  font-family: "Overpass Mono", ui-monospace, monospace;
+  color: var(--riprap-text-secondary);
+  background: var(--riprap-surface-card);
+  border: 1px solid var(--riprap-rule-soft);
+  transition: border-color 120ms ease;
+}
+.riprap-layer-toggle:hover { border-color: var(--riprap-accent); }
+.riprap-layer-toggle:focus-visible {
+  outline: 3px solid var(--riprap-focus);
+  outline-offset: 2px;
+}
+
+/* Register table — the highest-density surface. */
+.riprap-register { background: var(--riprap-surface-card); color: var(--riprap-text-primary); }
+.riprap-register th {
+  font-family: "Overpass Mono", ui-monospace, monospace;
+  color: var(--riprap-text-tertiary);
+  border-bottom: 2px solid var(--riprap-rule-strong);
+  text-align: left;
+}
+.riprap-register td { border-bottom: 1px solid var(--riprap-rule-soft); }
+.riprap-register tr:nth-child(even) td { background: var(--riprap-surface-sunken); }

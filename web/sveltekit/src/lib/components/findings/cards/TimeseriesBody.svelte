@@ -50,10 +50,10 @@
     <path d={pathD} fill="none" stroke="var(--tier-{card.tier})" stroke-width="1.4" />
     <circle cx={yScale.sx(ts.peak.x)} cy={yScale.sy(ts.peak.y)} r="3" fill="var(--tier-{card.tier})" />
     <text x={yScale.sx(ts.peak.x)} y={yScale.sy(ts.peak.y) - 6}
-          font-size="9" font-family="IBM Plex Mono"
+          font-size="9" font-family="Overpass Mono"
           text-anchor="middle" fill="var(--tier-{card.tier})">{ts.peakLabel}</text>
-    <text x={PAD} y={H - 2} font-size="8" font-family="IBM Plex Mono" fill="#6B6B6B">now</text>
-    <text x={W - PAD} y={H - 2} font-size="8" font-family="IBM Plex Mono"
+    <text x={PAD} y={H - 2} font-size="8" font-family="Overpass Mono" fill="#6B6B6B">now</text>
+    <text x={W - PAD} y={H - 2} font-size="8" font-family="Overpass Mono"
           text-anchor="end" fill="#6B6B6B">+{ts.hours}h</text>
   </svg>
   {#if card.spatialNote || card.sub}

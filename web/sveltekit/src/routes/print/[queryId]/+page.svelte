@@ -121,25 +121,25 @@
   .print-head { border-bottom: 1pt solid #111; padding-bottom: 8pt; margin-bottom: 14pt; }
   .print-head-top {
     display: flex; justify-content: space-between; align-items: baseline;
-    font: 9pt var(--font-mono, "IBM Plex Mono"); color: #4a4a4a;
+    font: 9pt var(--font-mono, "Overpass Mono"); color: #4a4a4a;
     text-transform: uppercase; letter-spacing: 0.04em;
   }
   .wordmark { font-weight: 600; color: #111; }
   .print-title {
-    font: 600 22pt var(--font-sans, "IBM Plex Sans");
+    font: 600 22pt var(--font-sans, "Sofia Sans");
     margin: 8pt 0 4pt; line-height: 1.15;
   }
   .print-sub {
-    font: 10pt var(--font-mono, "IBM Plex Mono"); color: #4a4a4a;
+    font: 10pt var(--font-mono, "Overpass Mono"); color: #4a4a4a;
   }
   .print-controls {
     display: flex; gap: 12px; align-items: center;
     margin: 12pt 0; padding: 8pt 10pt;
     background: #f5f5f3; border: 1px solid #d8d6d2; border-radius: 4px;
-    font: 10pt var(--font-sans, "IBM Plex Sans");
+    font: 10pt var(--font-sans, "Sofia Sans");
   }
   .print-controls button {
-    font: 10pt var(--font-sans, "IBM Plex Sans");
+    font: 10pt var(--font-sans, "Sofia Sans");
     padding: 4pt 10pt; background: #111; color: white; border: 0;
     border-radius: 3px; cursor: pointer;
   }
@@ -149,7 +149,7 @@
     page-break-before: always;
   }
   .print-citations h2 {
-    font: 600 13pt var(--font-sans, "IBM Plex Sans"); margin: 0 0 8pt;
+    font: 600 13pt var(--font-sans, "Sofia Sans"); margin: 0 0 8pt;
   }
   .print-citations ol { list-style: none; padding: 0; margin: 0; }
   .print-citations li {
@@ -159,22 +159,22 @@
   }
   .cn {
     position: absolute; left: 0; top: 0;
-    font: 600 10pt var(--font-mono, "IBM Plex Mono"); color: #0B5394;
+    font: 600 10pt var(--font-mono, "Overpass Mono"); color: #0B5394;
   }
   .cglyph { display: inline-block; vertical-align: middle; margin-right: 4pt; }
   .csrc { font-weight: 600; }
   .cvint { color: #4a4a4a; margin-left: 6pt; font-size: 9pt; }
   .ctitle { color: #1a1a1a; }
-  .curl { font: 8.5pt var(--font-mono, "IBM Plex Mono"); color: #0B5394; word-break: break-all; }
-  .cdocid { font: 8.5pt var(--font-mono, "IBM Plex Mono"); color: #6b6b6b; }
+  .curl { font: 8.5pt var(--font-mono, "Overpass Mono"); color: #0B5394; word-break: break-all; }
+  .cdocid { font: 8.5pt var(--font-mono, "Overpass Mono"); color: #6b6b6b; }
   .print-foot {
     margin-top: 18pt; padding-top: 6pt; border-top: 1pt solid #c8c6c2;
-    font: 8.5pt var(--font-mono, "IBM Plex Mono"); color: #6b6b6b;
+    font: 8.5pt var(--font-mono, "Overpass Mono"); color: #6b6b6b;
     line-height: 1.5;
   }
   .empty {
     max-width: 600px; margin: 100px auto; padding: 24px;
-    font-family: var(--font-sans, "IBM Plex Sans");
+    font-family: var(--font-sans, "Sofia Sans");
     color: #1a1a1a;
   }
   .empty h1 { font-size: 20pt; margin-bottom: 8pt; }
@@ -188,11 +188,11 @@
       margin: 0.85in 0.85in 0.85in 1in;
       @bottom-right {
         content: "page " counter(page) " of " counter(pages);
-        font: 9pt "IBM Plex Mono"; color: #4a4a4a;
+        font: 9pt "Overpass Mono"; color: #4a4a4a;
       }
       @bottom-left {
         content: "riprap.nyc";
-        font: 9pt "IBM Plex Mono"; color: #4a4a4a;
+        font: 9pt "Overpass Mono"; color: #4a4a4a;
       }
     }
     .print-citations { page-break-before: always; }

@@ -26,12 +26,23 @@ The PDF carries:
     verify by hash)
   - Energy ledger when the caller's payload has emissions data
   - Apache-2.0 + Plain-Writing-Act voice footer on every page
+  - Report-content type (Sofia Sans / Overpass Mono) registered via
+    @font-face against the woff files vendored in assets/fonts/ (see
+    docs/design/handoff/RIPRAP-MAPPING.md) — not a system font-family
+    name, so the PDF renders identically regardless of what's installed
+    on the machine running WeasyPrint.
 
 Future:
   - PDF/UA-1 tagged-structure post-pass via pikepdf (HANDOFF §PDF)
-  - Vector map page (HANDOFF §PDF page 3)
+  - Vector map page (HANDOFF §PDF page 3) — static deck.gl render of the
+    map, closing the print gap now that the map itself is deck.gl
   - Evidence-grouped-by-Stone page with per-Stone tints (HANDOFF §PDF page 4)
+  - Severity mark on the cover: app/score.py's composite().tier is
+    computed only in the offline register_builder.py path today, not
+    wired into the live per-query FSM/payload — needs that plumbing
+    before a real (non-fabricated) severity mark can render here
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -41,9 +52,17 @@ import logging
 import os
 import sys
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 log = logging.getLogger("riprap.print_pdf")
+
+# Local font files (Sofia Sans / Overpass Mono, OFL) for the report-content
+# type system — see docs/design/handoff/RIPRAP-MAPPING.md. Registered by
+# absolute file:// path rather than a font-family name Pango happens to
+# find installed, so the same bytes render on any machine and the
+# document hash claim ("two reviewers ... verify bit-for-bit") holds.
+_FONTS_DIR = Path(__file__).resolve().parent.parent / "assets" / "fonts"
 
 # ---------------------------------------------------------------------------
 # Lazy WeasyPrint loader — sets the macOS dyld fallback path if needed so the
@@ -71,6 +90,7 @@ def _ensure_loaded() -> None:
     try:
         from weasyprint import CSS as _C
         from weasyprint import HTML as _H  # noqa: PLC0415
+
         _HTML, _CSS = _H, _C
     except Exception as e:  # noqa: BLE001
         _LOAD_ERR = f"{type(e).__name__}: {e}"
@@ -97,21 +117,45 @@ def briefing_hash(payload: dict[str, Any]) -> str:
 # All inline styles to keep the file self-contained; this avoids the
 # need to ship an external print.css alongside the route.
 # ---------------------------------------------------------------------------
-_PDF_STYLES = """
+def _font_face_css() -> str:
+    """@font-face rules pointing at the vendored woff files, by weight."""
+    faces = [
+        ("Sofia Sans", 400, "sofia-sans-400.woff"),
+        ("Sofia Sans", 600, "sofia-sans-600.woff"),
+        ("Sofia Sans", 700, "sofia-sans-700.woff"),
+        ("Sofia Sans", 800, "sofia-sans-800.woff"),
+        ("Overpass Mono", 400, "overpass-mono-400.woff"),
+        ("Overpass Mono", 600, "overpass-mono-600.woff"),
+    ]
+    rules = []
+    for family, weight, filename in faces:
+        path = _FONTS_DIR / filename
+        rules.append(f"""@font-face {{
+  font-family: "{family}";
+  font-weight: {weight};
+  font-style: normal;
+  src: url("{path.as_uri()}") format("woff");
+}}""")
+    return "\n".join(rules)
+
+
+_PDF_STYLES = (
+    _font_face_css()
+    + """
 @page {
   size: Letter;
   margin: 1in 0.9in 0.9in 0.9in;
   @bottom-left {
     content: "Riprap " counter(page) " / " counter(pages);
-    font-family: "IBM Plex Mono", monospace;
+    font-family: "Overpass Mono", monospace;
     font-size: 8pt;
-    color: #64748b;
+    color: #4E5A6E;
   }
   @bottom-right {
     content: "Apache-2.0 · public-record sources only · no commercial APIs";
-    font-family: "IBM Plex Mono", monospace;
+    font-family: "Overpass Mono", monospace;
     font-size: 8pt;
-    color: #64748b;
+    color: #4E5A6E;
   }
 }
 @page :first {
@@ -119,25 +163,25 @@ _PDF_STYLES = """
   @bottom-right { content: ""; }
 }
 body {
-  font-family: "IBM Plex Sans", -apple-system, system-ui, sans-serif;
+  font-family: "Sofia Sans", -apple-system, system-ui, sans-serif;
   font-size: 10.5pt;
   line-height: 1.55;
   color: #0F172A;
 }
 h1.cover-h1 {
-  font-family: "IBM Plex Serif", Georgia, serif;
+  font-family: "Sofia Sans", -apple-system, system-ui, sans-serif;
   font-size: 28pt;
-  font-weight: 500;
+  font-weight: 800;
   letter-spacing: -0.01em;
   line-height: 1.12;
   margin: 0 0 16pt;
 }
 .cover-eyebrow {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Overpass Mono", monospace;
   font-size: 9pt;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #64748b;
+  color: #4E5A6E;
   margin: 0 0 12pt;
 }
 .cover-meta {
@@ -153,11 +197,11 @@ h1.cover-h1 {
   margin: 0;
 }
 .cover-meta dt {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Overpass Mono", monospace;
   font-size: 9pt;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #64748b;
+  color: #4E5A6E;
 }
 .cover-meta dd { margin: 0; color: #0F172A; }
 .cover-disclaim {
@@ -171,7 +215,7 @@ h1.cover-h1 {
 }
 .cover-disclaim strong { color: #0F172A; }
 h2.section-h2 {
-  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-family: "Sofia Sans", system-ui, sans-serif;
   font-size: 13pt;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -183,7 +227,7 @@ h2.section-h2 {
   page-break-after: avoid;
 }
 .briefing-body {
-  font-family: "IBM Plex Serif", Georgia, serif;
+  font-family: "Sofia Sans", -apple-system, system-ui, sans-serif;
   font-size: 11pt;
   line-height: 1.62;
   color: #0F172A;
@@ -195,11 +239,11 @@ h2.section-h2 {
   padding-top: 10pt;
 }
 .cites h3 {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Overpass Mono", monospace;
   font-size: 9pt;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #64748b;
+  color: #4E5A6E;
   margin: 0 0 8pt;
 }
 .cites ol {
@@ -236,28 +280,29 @@ h2.section-h2 {
   margin: 0;
 }
 .stamp .kv-block dt {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Overpass Mono", monospace;
   font-size: 9pt;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #64748b;
+  color: #4E5A6E;
 }
 .stamp .kv-block dd { margin: 0; color: #0F172A; }
 .stamp .hash {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Overpass Mono", monospace;
   font-size: 9pt;
   word-break: break-all;
   color: #0F172A;
 }
 .foot-note {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Overpass Mono", monospace;
   font-size: 8pt;
-  color: #64748b;
+  color: #4E5A6E;
   margin-top: 18pt;
   padding-top: 8pt;
   border-top: 1px dashed #CBD5E1;
 }
 """
+)
 
 
 def _e(s: str | None) -> str:
@@ -291,7 +336,7 @@ def _render_html(payload: dict[str, Any], doc_hash: str) -> str:
         url = c.get("url") or ""
         vintage = _e(c.get("vintage") or "")
         url_html = f' &middot; <a href="{_e(url)}">{_e(url)}</a>' if url else ""
-        vintage_html = f' &middot; <span>{vintage}</span>' if vintage else ""
+        vintage_html = f" &middot; <span>{vintage}</span>" if vintage else ""
         cite_lis.append(
             f"<li><strong>[{i}]</strong> "
             f"<strong>{doc_id}</strong> &middot; {source} &middot; {title}"
@@ -314,10 +359,10 @@ def _render_html(payload: dict[str, Any], doc_hash: str) -> str:
             continue
         ledger_rows.append((label, _e(str(v))))
     ledger_html = (
-        "<dl>"
-        + "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in ledger_rows)
-        + "</dl>"
-    ) if ledger_rows else "<p>(no energy ledger in payload)</p>"
+        ("<dl>" + "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in ledger_rows) + "</dl>")
+        if ledger_rows
+        else "<p>(no energy ledger in payload)</p>"
+    )
 
     mellea_attempts = mellea.get("attempts") or "—"
     mellea_passed = ", ".join(mellea.get("passed") or []) or "—"
@@ -382,7 +427,7 @@ def _render_html(payload: dict[str, Any], doc_hash: str) -> str:
       <dt>Mellea failed</dt><dd>{mellea_failed}</dd>
     </dl>
   </div>
-  <h3 style="font-family:'IBM Plex Mono',monospace;font-size:9pt;letter-spacing:0.08em;text-transform:uppercase;color:#64748b;margin:0 0 8pt;">Energy ledger</h3>
+  <h3 style="font-family:'Overpass Mono',monospace;font-size:9pt;letter-spacing:0.08em;text-transform:uppercase;color:#4E5A6E;margin:0 0 8pt;">Energy ledger</h3>
   <div class="kv-block">{ledger_html}</div>
   <p class="foot-note">
     Riprap composes federal, state, and city public-record data into a written, citation-grounded

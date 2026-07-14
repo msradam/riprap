@@ -100,22 +100,22 @@
     margin: 1in 1in 1in 1.25in;          /* extra left margin for tier glyphs */
     @top-left {
       content: "riprap · " var(--print-address, "flood-exposure briefing");
-      font: 9pt "IBM Plex Mono";
+      font: 9pt "Overpass Mono";
       color: #334155;
     }
     @top-right {
       content: "Generated " var(--print-date, "today") " · v0.4.2";
-      font: 9pt "IBM Plex Mono";
+      font: 9pt "Overpass Mono";
       color: #334155;
     }
     @bottom-left {
       content: var(--print-url, "riprap.nyc");
-      font: 9pt "IBM Plex Mono";
+      font: 9pt "Overpass Mono";
       color: #6B6B6B;
     }
     @bottom-right {
       content: "page " counter(page) " of " counter(pages);
-      font: 9pt "IBM Plex Mono";
+      font: 9pt "Overpass Mono";
     }
   }
 }
