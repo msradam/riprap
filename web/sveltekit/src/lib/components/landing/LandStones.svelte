@@ -29,7 +29,7 @@
 <section class="land-section-stones-detail" id="methodology">
   <div class="land-page">
     <div class="land-section-head">
-      <span class="section-label">How Riprap reads a place</span>
+      <h2 class="section-label land-section-h2">How Riprap reads a place</h2>
       <span class="land-section-meta">Five Stones · one taxonomy · every briefing</span>
     </div>
     <p class="land-stones-deck">
@@ -39,7 +39,7 @@
     <div class="land-stones-detail">
       {#each STONE_FRIEZE as s, i (s.name)}
         <article class="land-stones-detail-cell" style:--stone-tint={s.tint}>
-          <div class="land-stones-detail-num">{String(i + 1).padStart(2, '0')}</div>
+          <div class="land-stones-detail-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</div>
           <h3 class="land-stones-detail-name">{s.name}</h3>
           <div class="land-stones-detail-role">{s.role}</div>
           <p class="land-stones-detail-tag">{s.tag}</p>
@@ -66,6 +66,12 @@
     padding-bottom: 10px;
     border-bottom: 1px solid var(--rule-soft);
   }
+  /* .section-label is styled as a small mono eyebrow everywhere else in
+     the app; here it's promoted to a real <h2> for heading order (was a
+     bare <span>, jumping straight from the page's h1 to h3). Reset the
+     browser's default h2 margin so it still sits inline like the span
+     did. */
+  .land-section-h2 { margin: 0; }
   .land-section-meta {
     font-family: var(--font-serif);
     font-style: italic;
@@ -108,7 +114,11 @@
     font-weight: 400;
     font-size: 38px;
     line-height: 1;
-    color: var(--rule-soft);
+    /* aria-hidden exempts this from screen readers, but WCAG contrast
+       is a visual-perception requirement (low vision), not an AT one —
+       aria-hidden alone doesn't exempt it. --rule-soft measured 1.48:1
+       here, real WCAG 1.4.11 fail even for "decorative" large text. */
+    color: var(--ink-tertiary);
     letter-spacing: -0.02em;
     pointer-events: none;
   }

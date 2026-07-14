@@ -61,14 +61,18 @@
   }
 </script>
 
-<main class="land-hero">
+<!-- +layout.svelte already wraps every page in <main> — this was a
+     second, nested <main>, tripping axe's landmark-no-duplicate-main /
+     landmark-main-is-top-level checks. -->
+<section class="land-hero">
   <h1 class="land-hero-h1">
     <span class="land-hero-headline">
-      A climate-exposure briefing for <span
+      <span class="land-hero-headline-intro">A climate-exposure briefing for</span>
+      <span class="land-hero-headline-city"><span
         class="city-rotate"
         class:is-fading={cityFading}
         aria-live="polite"
-      >{CITIES[cityIdx]}</span>.
+      >{CITIES[cityIdx]}</span>.</span>
     </span>
     <span class="land-hero-deck">
       Type an address. Get a written briefing on flood, heat, or air-quality
@@ -99,7 +103,7 @@
       <span class="land-cycling-item" class:is-fading={cityFading}>{SAMPLE_QUERIES[queryIdx]}</span>
     </button>
   </div>
-</main>
+</section>
 
 <style>
   .land-hero { padding: 64px 32px 48px; }
@@ -117,6 +121,14 @@
     line-height: 1.08;
     color: var(--ink);
     letter-spacing: -0.015em;
+  }
+  /* Always two lines, city on its own line below — otherwise the
+     rotation reflows between one line (short cities like "Boston")
+     and two (e.g. "San Francisco"), changing the header's height
+     every 2.4s. */
+  .land-hero-headline-intro,
+  .land-hero-headline-city {
+    display: block;
   }
   .land-hero-deck {
     font-family: var(--font-serif);
@@ -196,17 +208,15 @@
   }
   .land-query-submit:hover { background: #000; }
 
-  /* Try-row: single-span fade pattern. Label + cycling text share a
-     real text baseline so `align-items: baseline` aligns visually.
-     (Previously the rail used absolute-positioned items inside a
-     fixed-height button, which had no real baseline and floated the
-     label upward relative to the address.) Font-sizes still differ —
-     label is the small all-caps register — but baseline-align rather
-     than top/center keeps the descenders on the same line. */
+  /* Try-row: single-span fade pattern. align-items: center rather than
+     baseline — .land-cycling-rail is a <button>, and buttons don't
+     reliably expose their inner text's baseline to a flex ancestor
+     (the same class of misalignment as the header wordmark), which
+     floated "TRY:" out of line with the address text. */
   .land-cycling {
     margin-top: 18px;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 10px;
     font-family: var(--font-mono);
     font-size: 13px;

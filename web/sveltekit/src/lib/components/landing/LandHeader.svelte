@@ -18,7 +18,13 @@
 <style>
   .land-header {
     display: flex;
-    align-items: baseline;
+    /* Not align-items: baseline — .riprap-wordmark is itself an
+       inline-flex (icon + text) and .land-header-nav links are
+       inline-flex too, and neither exposes a reliable CSS baseline to
+       align against plain text, which visibly misaligned the wordmark
+       against "CLIMATE-EXPOSURE BRIEFING". Center is stable regardless
+       of child display type. */
+    align-items: center;
     gap: 12px;
     padding: 20px 32px;
     border-bottom: 1px solid var(--rule-soft);
@@ -45,9 +51,16 @@
     font-size: 12px;
   }
   .land-header-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px; /* WCAG 2.5.8 pointer-target minimum */
     color: var(--ink-secondary);
     text-decoration: none;
     border-bottom: 1px dotted transparent;
   }
   .land-header-nav a:hover { border-bottom-color: var(--ink-secondary); }
+  .land-header-nav a:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
 </style>
