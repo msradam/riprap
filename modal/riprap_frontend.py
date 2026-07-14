@@ -25,8 +25,12 @@ REPO = Path(__file__).resolve().parent.parent
 
 # Build-time config. `.env()` is a build step, so it must precede the
 # add_local_* mounts per Modal's image ordering rules.
-# Proxy URL of the riprap-triton GPU app in the same Modal environment.
-_INFERENCE_URL = "https://msradam-riprap--riprap-triton-riprap-proxy.modal.run"
+# Proxy URL of the GPU inference app in the same Modal environment.
+# riprap-inference (LitServe) replaces riprap-triton (NVIDIA Triton) —
+# same vLLM, same 5 specialists, same client-facing /v1/* contract, but
+# no Triton base image / KFServing translation layer. See
+# msradam/riprap-triton's modal/riprap_modal_litserve.py + litserve_proto/.
+_INFERENCE_URL = "https://msradam-riprap--riprap-inference-riprap-proxy.modal.run"
 
 FRONTEND_ENV = {
     # Full LLM tier — Granite 4.1 reconciliation via the riprap-triton GPU app.
@@ -36,6 +40,15 @@ FRONTEND_ENV = {
     "RIPRAP_LLM_PRIMARY": "vllm",
     "RIPRAP_LLM_BASE_URL": f"{_INFERENCE_URL}/v1",
     "RIPRAP_LLM_VLLM_8B_NAME": "granite4.1:8b",
+    # app/llm.py defaults RIPRAP_LLM_FALLBACK to "ollama" whenever
+    # primary=vllm — a sane default for local dev, but there's no Ollama
+    # in this container. A transient vLLM error (cold GPU, a genuine 500)
+    # was masked by litellm's automatic failover attempt, which then
+    # failed with "Ollama_chatException - Connection refused" — a
+    # confusing, unrelated error that hid the real one and made every
+    # downstream specialist read as "unavailable" instead of surfacing
+    # the actual vLLM failure. No fallback to hide behind here.
+    "RIPRAP_LLM_FALLBACK": "",
     # mellea_validator.py's 350-token default was sized for the old RunPod
     # deployment's max_model_len=2352, where every completion token had to
     # be clawed back from the input budget. The Modal GPU app's vLLM now
@@ -63,9 +76,21 @@ FRONTEND_ENV = {
     "RIPRAP_ML_BACKEND": "remote",
     "RIPRAP_ML_BASE_URL": _INFERENCE_URL,
     "RIPRAP_HEAVY_SPECIALISTS": "1",
-    "RIPRAP_PRITHVI_LIVE_ENABLE": "1",
-    "RIPRAP_TERRAMIND_ENABLE": "1",
-    "RIPRAP_EO_CHIP_ENABLE": "1",
+    # TerraMind/eo_chip/Prithvi-live all disabled for this demo deploy: all
+    # three hit the same real external dependency — Microsoft's Planetary
+    # Computer STAC API for recent Sentinel-2/1 scenes — which is
+    # consistently slow/timing out from Modal's network (eo_chip_cache's
+    # own 75s hard timeout; prithvi_live has no such cap and one real
+    # query took 271s total because of it, pystac_client.exceptions.
+    # APIError: "The request exceeded the maximum allowed time"). Not a
+    # bug in this app — the rest of the briefing completes cleanly in
+    # ~40-90s on its own. Re-enable once STAC/COG latency from Modal is
+    # investigated separately (possibly needs a shorter per-search
+    # timeout + graceful skip in app/flood_layers/prithvi_live.py, same
+    # pattern eo_chip_cache.py already uses).
+    "RIPRAP_TERRAMIND_ENABLE": "0",
+    "RIPRAP_EO_CHIP_ENABLE": "0",
+    "RIPRAP_PRITHVI_LIVE_ENABLE": "0",
     # Scale-to-zero: skip the eager boot warm; everything lazy-loads on first
     # query, keeping the cold start within Modal's startup window.
     "RIPRAP_SKIP_WARM": "1",

@@ -9,6 +9,7 @@ import json
 import os
 import re
 import warnings
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 warnings.filterwarnings("ignore")
@@ -29,6 +30,20 @@ from app.fsm import iter_steps  # noqa: E402
 from riprap.core.json_safe import to_json_safe as _to_json_safe  # noqa: E402
 from riprap.core.pebbles import load_registry as _load_pebbles  # noqa: E402
 from riprap.core.stones import load_stones as _load_stones  # noqa: E402
+
+# Explicit, bounded thread pool for offloading blocking FSM/reconcile work
+# from SSE handlers (compare_stream, api_agent_stream). NOT
+# `loop.run_in_executor(None, ...)` — that lazily creates asyncio's
+# process-wide default executor sized `min(32, os.cpu_count() + 4)`, and
+# in a Modal container os.cpu_count() reflects the host's physical cores,
+# not the function's actual CPU allocation — so that pool can grow to 32
+# threads that then sit alive for the process lifetime, which is what
+# Modal's shutdown logging was flagging as "36 background threads still
+# running after container exit" (blocking a clean container recycle for
+# up to 30s). Bounded to the same width as @modal.concurrent's max_inputs
+# in modal/riprap_frontend.py — never more workers than could ever be
+# concurrently needed.
+_SSE_EXECUTOR = ThreadPoolExecutor(max_workers=20, thread_name_prefix="riprap-sse")
 
 # Deployment dir (default deployments/nyc; override via RIPRAP_DEPLOYMENT).
 # Stones + pebbles load once at import time.
@@ -781,8 +796,8 @@ async def compare_stream(a: str, b: str, request: Request):
         # its own state so this is safe, and Ollama with NUM_PARALLEL=2
         # serves both reconcile calls concurrently.
         loop = asyncio.get_event_loop()
-        loop.run_in_executor(None, gen_for_side, "a", a, out_q)
-        loop.run_in_executor(None, gen_for_side, "b", b, out_q)
+        loop.run_in_executor(_SSE_EXECUTOR, gen_for_side, "a", a, out_q)
+        loop.run_in_executor(_SSE_EXECUTOR, gen_for_side, "b", b, out_q)
 
     async def event_stream():
         kick()
@@ -1242,6 +1257,7 @@ async def api_agent_stream(q: str):
             # that can run the 13 briefing-standards predicates against
             # every response regardless of which intent produced it.
             from riprap.core.burr.app import _attach_compliance_audit
+
             final = _attach_compliance_audit(final)
             out_q.put({"kind": "final", **final})
         except Exception as e:
@@ -1252,7 +1268,7 @@ async def api_agent_stream(q: str):
 
     async def event_stream():
         loop = asyncio.get_event_loop()
-        loop.run_in_executor(None, runner)
+        loop.run_in_executor(_SSE_EXECUTOR, runner)
         yield f"event: hello\ndata: {json.dumps({'query': q})}\n\n"
 
         # Stone-boundary envelope: track current Stone so we can wrap
