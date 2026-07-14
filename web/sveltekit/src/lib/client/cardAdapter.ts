@@ -830,6 +830,15 @@ const KIND_TO_VARIANT: Record<PebbleManifest['display']['kind'], CardVariant | n
   map_only: null,
 };
 
+/** Valid CardVariant values, for validating manifest.display.variant
+ *  (typed as a loose `string | null` since it's server-supplied JSON)
+ *  before trusting it as an override in buildTemplated. */
+const VALID_CARD_VARIANTS: Record<CardVariant, true> = {
+  headline: true, tabular: true, scalars: true, spark: true, histogram: true,
+  timeseries: true, 'timeseries-ft': true, forecast: true, raster: true,
+  'raster-pred': true, lulc: true, register: true, comparison: true, meta: true,
+};
+
 /** Set of pebble ids that already have a special builder above. The
  *  templated pass skips these; they appear via the curated path. */
 const SPECIAL_BUILT_IDS = new Set<string>([
@@ -852,7 +861,18 @@ const SPECIAL_BUILT_IDS = new Set<string>([
 ]);
 
 function buildTemplated(m: PebbleManifest, value: unknown): Card | null {
-  const variant = KIND_TO_VARIANT[m.display.kind];
+  // The manifest's `display.variant` is an explicit per-pebble override
+  // of the kind→variant default (e.g. sandy.yaml: `kind: stat, variant:
+  // headline` — a boolean_zone result has no numeric fields, so the
+  // 'scalars' builder KIND_TO_VARIANT['stat'] would derive would always
+  // fall through to fallback.message even on success). Prefer it when
+  // it names a real CardVariant; this was silently ignored before,
+  // which made every kind:stat pebble with a non-numeric shaped value
+  // render as "unavailable" regardless of success.
+  const explicitVariant = m.display.variant as CardVariant | null;
+  const variant = (explicitVariant && explicitVariant in VALID_CARD_VARIANTS)
+    ? explicitVariant
+    : KIND_TO_VARIANT[m.display.kind];
   if (variant === null) return null;
   const tier = m.type === 'model' ? 'modeled'
              : m.type === 'live'  ? 'empirical'
@@ -926,9 +946,26 @@ function buildTemplated(m: PebbleManifest, value: unknown): Card | null {
       scalars.push({ value: value ? 'yes' : 'no', label: m.title });
     }
     if (!scalars.length) {
-      // No real measurement scalars. Look for an `error` string the
-      // pebble may have surfaced and render that as the headline so
-      // the user knows the source was unreachable — not silent.
+      // No *numeric* measurement scalars — but the pebble may still have
+      // succeeded with a real, meaningful non-numeric result (sandy's
+      // boolean_zone shaper: {inside, inside_phrasing, ...}, no numbers
+      // at all). Try the manifest's narration.template first; only a
+      // pebble that's genuinely offline/errored should fall to
+      // fallback.message. Without this, every `display.kind: stat`
+      // pebble whose value happens to be boolean/string-shaped rendered
+      // as "unavailable" even when it succeeded — sandy, dep_stormwater,
+      // etc. all falsely read as broken infrastructure.
+      const templated = m.narration.template
+        ? formatTemplate(m.narration.template, value)
+        : null;
+      if (templated) {
+        return { ...base, variant: 'headline',
+                 headline: m.narration.short ?? m.title,
+                 body: templated };
+      }
+      // Look for an `error` string the pebble may have surfaced and
+      // render that as the headline so the user knows the source was
+      // unreachable — not silent.
       const errStr = (typeof value === 'object' && value !== null
         ? (value as Record<string, unknown>).error
         : null);
@@ -959,6 +996,11 @@ function buildTemplated(m: PebbleManifest, value: unknown): Card | null {
       n_records?: number;
       n_truncated?: boolean;
       radius_m?: number;
+      // local_corpus_with_ner (policy_corpus): retrieved passages, not
+      // geospatial features or a records sample.
+      rag_hits?: { doc_id?: string; citation?: string; page?: number;
+                    text?: string; score?: number }[];
+      n_hits?: number;
     };
     // Path A — GeoJSON-style features
     const feats = Array.isArray(v?.features) ? v.features : [];
@@ -1017,7 +1059,26 @@ function buildTemplated(m: PebbleManifest, value: unknown): Card | null {
           : `${nLabel} record${n === 1 ? '' : 's'}`,
       };
     }
-    // No features and no sample — fall back to the pebble's
+    // Path C — local_corpus_with_ner's retrieved-passage shape
+    // ({rag_hits: [{doc_id, citation, page, text, score}]}). Neither a
+    // geospatial feature list nor a records sample, so it fell through
+    // to the generic "no records" fallback message before this — a
+    // real retrieval success (n_hits=1, n_entities=5 in the trace)
+    // rendered as "Policy-corpus index unavailable" regardless.
+    const ragHits = Array.isArray(v?.rag_hits) ? v.rag_hits : [];
+    if (ragHits.length) {
+      const rows: (string | number)[][] = ragHits.slice(0, 8).map((h) => [
+        h.citation ?? h.doc_id ?? '—',
+        h.page ?? '—',
+        h.text ? `${h.text.slice(0, 140)}${h.text.length > 140 ? '…' : ''}` : '—',
+      ]);
+      const n = v?.n_hits ?? ragHits.length;
+      return {
+        ...base, columns: ['Source', 'Page', 'Excerpt'], rows,
+        sub: `${n} passage${n === 1 ? '' : 's'} matched`,
+      };
+    }
+    // No features, sample, or rag_hits — fall back to the pebble's
     // narration.template formatted against the value (e.g. nws_alerts
     // returns {n_active: 0, alerts: [], narrative: "No active NWS..."};
     // the narrative is the human-readable card body). If the template
