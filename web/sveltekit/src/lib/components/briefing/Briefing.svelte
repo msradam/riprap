@@ -74,7 +74,9 @@
       <p class="briefing-para briefing-fade-in">
         {#each block.parts as part, j (j)}
           {#if part.tier}
-            <Claim tier={part.tier}>{part.text}</Claim>{#if part.cite && cites[part.cite]}<Cite c={cites[part.cite]} />{/if}
+            <Claim tier={part.tier}>{#if part.bold}<strong>{part.text}</strong>{:else}{part.text}{/if}</Claim>{#if part.cite && cites[part.cite]}<Cite c={cites[part.cite]} />{/if}
+          {:else if part.bold}
+            <strong>{part.text}</strong>
           {:else}
             <span>{part.text}</span>
           {/if}

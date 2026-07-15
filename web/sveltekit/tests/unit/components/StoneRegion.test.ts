@@ -1,14 +1,18 @@
 /**
- * StoneRegion — the per-Stone group in the Findings section. Two
- * user-visible bugs lived here:
- *   1. tagline hardcoded as "what NYC's ground remembers" via STONE_META.tag,
- *      shown even under a Boston chip.
- *   2. roster of pebble rows ("□ sandy not invoked", "□ ida_hwm not
+ * StoneRegion — the per-Stone group in the Findings section. One
+ * user-visible bug lived here:
+ *   1. roster of pebble rows ("□ sandy not invoked", "□ ida_hwm not
  *      invoked", …) read from pebbleManifest.byStone for every Stone
  *      — when the manifest was the boot NYC scaffold for a Boston run,
  *      every NYC pebble appeared as a "not invoked" ghost row.
  *
- * Both are deployment-store-driven now; these tests are the seal.
+ * That's deployment-store-driven now; these tests are the seal.
+ *
+ * The per-deployment Stone description ("Reads what Boston remembers
+ * about flooding…") used to also render here as `.region-tag`, duplicating
+ * MapLegend's own copy of the same string on every single query — removed
+ * 2026-07-15 as UI declutter (see MapLegend.test.ts for the tagline
+ * coverage, which still applies there).
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render } from '@testing-library/svelte';
@@ -28,26 +32,21 @@ const EMPTY_TRACE: StoneTrace = {
 
 beforeEach(resetStores);
 
-describe('StoneRegion tagline reflects per-deployment description', () => {
+describe('StoneRegion no longer renders the per-deployment tagline', () => {
   it.each([
-    ['boston',  BOSTON,  "Reads what Boston remembers about flooding"],
-    ['nyc',     NYC,     "Reads what NYC's ground remembers about flooding"],
-  ])(
-    'Cornerstone tagline for %s starts with the deployment-specific text',
-    (_key, city, expected) => {
-      seedForCity(city);
-      const { container } = render(StoneRegion, {
-        props: {
-          stone: 'cornerstone',
-          cards: [],
-          trace: { ...EMPTY_TRACE, stone: 'cornerstone' },
-        },
-      });
-      const tag = container.querySelector('.region-tag');
-      expect(tag, 'region-tag missing').not.toBeNull();
-      expect(tag).toHaveTextContent(expected);
-    },
-  );
+    ['boston', BOSTON],
+    ['nyc', NYC],
+  ])('%s Cornerstone has no .region-tag element', (_key, city) => {
+    seedForCity(city);
+    const { container } = render(StoneRegion, {
+      props: {
+        stone: 'cornerstone',
+        cards: [],
+        trace: { ...EMPTY_TRACE, stone: 'cornerstone' },
+      },
+    });
+    expect(container.querySelector('.region-tag')).toBeNull();
+  });
 
   it('non-NYC StoneRegion does not show the NYC tagline string', () => {
     for (const city of ALL_CITIES.filter((c) => c.key !== 'nyc' && c.key !== 'elsewhere')) {
@@ -82,11 +81,11 @@ describe('StoneRegion roster comes from pebbleManifest.byStone for the loaded ci
     }
   });
 
-  it('NYC cornerstone renders the NYC-specific tagline', () => {
+  it('NYC cornerstone renders the role tag and Stone name regardless of city', () => {
     // The pebble roster ("□ sandy not invoked", etc.) is built upstream
     // in cardAdapter.buildStoneTraces — StoneRegion just renders the
-    // StoneTrace it receives. Here we verify the tagline path; the
-    // roster-population behaviour is covered by cardAdapter.test.ts.
+    // StoneTrace it receives. Here we verify the header still renders;
+    // the roster-population behaviour is covered by cardAdapter.test.ts.
     seedForCity(NYC);
     const { container } = render(StoneRegion, {
       props: {
@@ -95,7 +94,8 @@ describe('StoneRegion roster comes from pebbleManifest.byStone for the loaded ci
         trace: { ...EMPTY_TRACE, stone: 'cornerstone' },
       },
     });
-    expect(container.textContent).toContain("ground remembers about flooding");
+    expect(container.textContent).toContain('Cornerstone');
+    expect(container.textContent).toContain('the hazard reader');
   });
 });
 

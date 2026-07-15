@@ -75,10 +75,47 @@ export function citationFromMeta(
 }
 
 const CITE_RE = /\[([a-z][a-z0-9_]*(?:\s*,\s*[a-z][a-z0-9_]*)*)\]/gi;
+const BOLD_RE = /\*\*(.+?)\*\*/g;
 
 function splitSentences(text: string): string[] {
   const parts = text.split(/(?<=[.!?])\s+(?=[A-Z(])/g);
   return parts.filter((s) => s.trim().length > 0);
+}
+
+// The reconciler emits **bold** for key figures (HAND, elevation, dates —
+// see app/reconcile.py:EXTRA_SYSTEM_PROMPT). Nothing renders markdown, so
+// without this the asterisks show up literally. Splits `text` into
+// alternating plain/bold runs; a part with no `**` markers returns as one
+// unbolded chunk, same shape as before this existed.
+function splitBold(text: string): Array<{ text: string; bold?: boolean }> {
+  const out: Array<{ text: string; bold?: boolean }> = [];
+  let cursor = 0;
+  let m: RegExpExecArray | null;
+  BOLD_RE.lastIndex = 0;
+  while ((m = BOLD_RE.exec(text))) {
+    if (m.index > cursor) out.push({ text: text.slice(cursor, m.index) });
+    out.push({ text: m[1], bold: true });
+    cursor = m.index + m[0].length;
+  }
+  if (cursor < text.length) out.push({ text: text.slice(cursor) });
+  return out.length ? out : [{ text }];
+}
+
+// tier/cite decorate the run immediately preceding a citation marker (see
+// Briefing.svelte's <Cite>) — when that run also contains bold markers,
+// the last chunk with real content keeps tier/cite (not just the last
+// chunk period — a bold run right before the citation bracket, e.g.
+// "**138 m** [doc_id]", leaves a trailing whitespace-only chunk after
+// splitBold, and that shouldn't be the one the citation glyph attaches to).
+function expandPart(part: ClaimPart): ClaimPart[] {
+  const chunks = splitBold(part.text);
+  let citeIdx = chunks.length - 1;
+  while (citeIdx > 0 && !chunks[citeIdx].text.trim()) citeIdx--;
+  return chunks.map((c, i) => ({
+    text: c.text,
+    bold: c.bold,
+    ...(i === citeIdx ? { tier: part.tier, cite: part.cite } : {})
+  }));
 }
 
 function parseSentenceParts(
@@ -91,7 +128,7 @@ function parseSentenceParts(
   let firstTier: Tier | undefined;
   const matches = [...sentence.matchAll(CITE_RE)];
   if (matches.length === 0) {
-    return [{ text: sentence }];
+    return expandPart({ text: sentence });
   }
   for (const m of matches) {
     const before = sentence.slice(cursor, m.index ?? 0);
@@ -101,14 +138,14 @@ function parseSentenceParts(
     const tier = tierForDocId(docIds[0]);
     if (!firstTier) firstTier = tier;
 
-    parts.push({ text: before, tier, cite: docIds[0] });
+    parts.push(...expandPart({ text: before, tier, cite: docIds[0] }));
     for (const id of docIds) {
       if (!cites[id]) cites[id] = registerCite(id);
     }
   }
   if (cursor < sentence.length) {
     const tail = sentence.slice(cursor);
-    if (tail.trim()) parts.push({ text: tail });
+    if (tail.trim()) parts.push(...expandPart({ text: tail }));
   }
   return parts;
 }

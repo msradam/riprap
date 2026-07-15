@@ -11,7 +11,7 @@ import { render } from '@testing-library/svelte';
 import FindingsRegion from '$lib/components/findings/FindingsRegion.svelte';
 import type { FindingsData, StoneTrace, StoneKey } from '$lib/types/card';
 import { resetStores, seedForCity } from '../helpers/stores';
-import { ALL_CITIES, BOSTON, NYC, NYC_LEAK_NEEDLES } from '../fixtures/cities';
+import { BOSTON, NYC, NYC_LEAK_NEEDLES } from '../fixtures/cities';
 
 function emptyTrace(stone: StoneKey): StoneTrace {
   return {
@@ -51,17 +51,4 @@ describe('FindingsRegion renders 5 Stones in canonical order', () => {
     }
   });
 
-  it.each(ALL_CITIES.filter((c) => c.key !== 'nyc' && c.key !== 'elsewhere'))(
-    'tagline for $key Cornerstone uses the deployment description',
-    (city) => {
-      resetStores();
-      seedForCity(city);
-      const { container } = render(FindingsRegion, {
-        props: { data: EMPTY_FINDINGS },
-      });
-      const text = container.textContent ?? '';
-      const expected = city.manifest.stones.find((s) => s.id === 'cornerstone')?.description;
-      if (expected) expect(text).toContain(expected);
-    },
-  );
 });

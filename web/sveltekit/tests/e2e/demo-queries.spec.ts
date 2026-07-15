@@ -199,13 +199,12 @@ test.describe('@demo live SSE end-to-end', () => {
 
       // One-line demo log.
       const heading = await page.locator('.brief-h1-addr').textContent();
-      const intentMeta = await page.locator('.region-head-meta').first().textContent();
       const tags: string[] = [];
       if (errorCardCount > 0) tags.push('ErrorCard');
       if (registerCardCount > 0) tags.push(`registers=${registerCardCount}`);
       if (d.expectLiveNow) tags.push('live_now');
       const tagStr = tags.length ? ` [${tags.join(' · ')}]` : '';
-      console.log(`[${d.name}] ${heading?.trim()} · sections=${headCount} cites=${citeCount} legend=${legendItems}${tagStr} · ${intentMeta?.trim()}`);
+      console.log(`[${d.name}] ${heading?.trim()} · sections=${headCount} cites=${citeCount} legend=${legendItems}${tagStr}`);
     });
   }
 });

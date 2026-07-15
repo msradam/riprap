@@ -16,6 +16,7 @@ export interface ClaimPart {
   text: string;
   tier?: Tier;
   cite?: string;
+  bold?: boolean;
 }
 
 export type BriefingBlock =

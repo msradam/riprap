@@ -1,12 +1,14 @@
 <script lang="ts">
   import type { Card } from '$lib/types/card';
+  import { isRedundantBody } from './headlineRedundancy';
   let { card }: { card: Card } = $props();
+  let showBody = $derived(!!card.body && !isRedundantBody(card.headline ?? '', card.body));
 </script>
 
 <div class="body body-headline">
   <div class="headline" style="color: var(--tier-{card.tier});">{card.headline ?? ''}</div>
   {#if card.subhead}<div class="subhead">{card.subhead}</div>{/if}
-  {#if card.body}<p class="body-prose">{card.body}</p>{/if}
+  {#if showBody}<p class="body-prose">{card.body}</p>{/if}
 </div>
 
 <style>

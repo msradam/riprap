@@ -66,6 +66,21 @@ describe('Briefing renders block kinds', () => {
     expect(text).toContain('third');
   });
 
+  it('bold ClaimPart renders as <strong>, not literal asterisks', () => {
+    const blocks: BriefingBlock[] = [
+      { kind: 'prose', parts: [
+        { text: 'The HAND is ' },
+        { text: '3.81 m', bold: true },
+        { text: ' at this address.' },
+      ]},
+    ];
+    const { container } = render(Briefing, {
+      props: { blocks, citations: {} },
+    });
+    expect(container.querySelector('strong')?.textContent).toBe('3.81 m');
+    expect(container.textContent).not.toContain('*');
+  });
+
   it('does not render NYC-specific text by itself (city-agnostic component)', () => {
     // Briefing is just a renderer — content comes from props. Empty
     // props should produce empty output, not leak any NYC string from

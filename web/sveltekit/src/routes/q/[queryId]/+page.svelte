@@ -748,14 +748,6 @@
       <main id="region-briefing" class="app-region app-region-brief" aria-labelledby="brief-h1">
         <header class="region-head">
           <span class="section-label">Briefing</span>
-          {#if plan}
-            <span class="region-head-meta">
-              intent: {plan.intent} · {plan.specialists?.length ?? 0} specialists · attempt {attempt}
-              {#if streamDone} · ✓ done{/if}
-            </span>
-          {:else}
-            <span class="region-head-meta">planning…</span>
-          {/if}
         </header>
         <h1 id="brief-h1" class="brief-h1">
           Flood-exposure briefing
@@ -773,7 +765,10 @@
             <RerollBanner {attempt} max={attemptMax} />
             {#if priorDraft}
               <div class="reroll-prev" aria-hidden="true">
-                <p class="reroll-prev-line">{priorDraft.slice(0, 360)}…</p>
+                <!-- Truncated, de-emphasized preview — not worth parseBriefing's
+                     full ClaimPart machinery, just strip the reconciler's
+                     **bold** markers so they don't show as literal asterisks. -->
+                <p class="reroll-prev-line">{priorDraft.replace(/\*\*/g, '').slice(0, 360)}…</p>
               </div>
             {/if}
           {/if}
@@ -837,14 +832,10 @@
           <header class="region-head">
             <span class="section-label">Map</span>
             {#if plan?.intent === 'compare'}
-              <span class="region-head-meta">
-                {#if compareAddressA || compareAddressB}Carto Positron · z15 · 2 locations{:else}awaiting geocode…{/if}
-              </span>
-            {:else if address}
-              <span class="region-head-meta">
-                Carto Positron · z15 · {address.lat.toFixed(4)}°N {Math.abs(address.lon).toFixed(4)}°W
-              </span>
-            {:else}
+              {#if !(compareAddressA || compareAddressB)}
+                <span class="region-head-meta">awaiting geocode…</span>
+              {/if}
+            {:else if !address}
               <span class="region-head-meta">awaiting geocode…</span>
             {/if}
           </header>

@@ -58,16 +58,22 @@ const NYC_NEEDLES = [
   'FloodHelpNY', 'FloodNet NYC', "what NYC's ground remembers",
 ];
 
-/** Wait for the briefing to settle (status pill hidden + region-head
- *  meta shows "✓ done"). Uses Playwright's polling expect under the
- *  hood, so a stuck pill fails fast with a screenshot. */
+/** Wait for the briefing to settle (generating-status gone + streaming
+ *  caret gone + status pill hidden). Uses Playwright's polling expect
+ *  under the hood, so a stuck pill fails fast with a screenshot.
+ *
+ *  Used to poll `#region-briefing .region-head-meta` for literal "✓ done"
+ *  text — that telemetry span (intent/specialist-count/attempt) was
+ *  removed 2026-07-15 as UI declutter (see StoneRegion.test.ts's docstring
+ *  for the broader cleanup). `.generating-status` alone isn't a safe
+ *  replacement: it disappears as soon as the FIRST reconciled block
+ *  streams in, not when streaming finishes — `blocks.length` truthy
+ *  switches the template into the <Briefing> branch immediately. The
+ *  `.streaming-caret` blink (`{#if !streamDone}`, +page.svelte) is what
+ *  actually tracks streamDone, so both must clear. */
 async function waitForDone(page: Page, timeoutMs: number): Promise<void> {
-  // The Briefing region's head meta shows "✓ done" once streamDone
-  // flips. There's a second `.region-head-meta` in the Map region
-  // (coords or "awaiting geocode…"); scope to the Briefing one.
-  await expect(
-    page.locator('#region-briefing .region-head-meta'),
-  ).toContainText('✓ done', { timeout: timeoutMs });
+  await expect(page.locator('.generating-status')).toHaveCount(0, { timeout: timeoutMs });
+  await expect(page.locator('.streaming-caret')).toHaveCount(0, { timeout: timeoutMs });
   // And the live status pill must have cleared (phase=done hides it).
   await expect(page.locator('.status')).toHaveCount(0, { timeout: 5_000 });
 }
