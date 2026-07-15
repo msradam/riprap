@@ -23,6 +23,18 @@ def test_remote_hf_space_url_is_l4(monkeypatch):
     assert emissions.hardware_for("https://msradam-riprap-vllm.hf.space/v1") == "nvidia_l4"
 
 
+def test_modal_vllm_url_is_a100(monkeypatch):
+    monkeypatch.delenv("RIPRAP_HARDWARE_LABEL", raising=False)
+    url = "https://msradam-riprap--riprap-vllm-riprap-proxy.modal.run/v1"
+    assert emissions.hardware_for(url) == "nvidia_a100"
+
+
+def test_modal_specialist_url_is_l4(monkeypatch):
+    monkeypatch.delenv("RIPRAP_HARDWARE_LABEL", raising=False)
+    url = "https://msradam-riprap--riprap-inference-serve.modal.run"
+    assert emissions.hardware_for(url) == "nvidia_l4"
+
+
 def test_hardware_label_override_wins_over_local_url(monkeypatch):
     monkeypatch.setenv("RIPRAP_HARDWARE_LABEL", "NVIDIA L4")
     assert emissions.hardware_for("http://localhost:8000") == "nvidia_l4"

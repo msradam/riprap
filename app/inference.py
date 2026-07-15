@@ -3,10 +3,10 @@
 Mirrors the call-surface shape of `app/llm.py` but for the non-LLM
 heavy models (Prithvi, TerraMind, TTM, Granite Embedding, GLiNER).
 
-The remote backend — a Modal deployment (companion repo
-msradam/riprap-triton), a self-hosted `services/riprap-models/`
-container, or `msradam/riprap-inference` on a Mac Mini — exposes an
-OpenAI-style endpoint per model class. When configured the router
+The remote backend — `msradam/riprap-inference`'s Modal deployment, a
+self-hosted `services/riprap-models/` container, or riprap-inference
+running natively on a Mac Mini — exposes an OpenAI-style endpoint per
+model class. When configured the router
 POSTs the relevant payload there and returns the parsed response; on
 connection error / 5xx / timeout it surfaces a typed exception that
 caller modules catch and fall back to a local in-process model load.

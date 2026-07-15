@@ -38,7 +38,7 @@ worth a report:
 - SSRF / abuse via crafted address strings that drive backend
   HTTP calls to unintended hosts.
 - Token leakage in proxy headers or SSE streams (`web/main.py`, or
-  the inference proxy in the companion `msradam/riprap-triton` repo).
+  the inference proxies in the companion `msradam/riprap-inference` repo).
 - Denial-of-service patterns that exceed the hosted Space's
   resource budget.
 - Supply-chain issues in pinned deps (`requirements.txt`,

@@ -45,11 +45,21 @@ HARDWARE: dict[str, tuple[str, float, str]] = {
         "NVIDIA L4",
         60.0,
         "NVIDIA L4 Tensor Core GPU data sheet (72 W TGP, Ada Lovelace, "
-        "24 GB); ~60 W sustained during transformer inference. The "
-        "active backend for the Modal deployment (companion repo "
-        "msradam/riprap-triton). When the proxy is reachable and NVML "
-        "is initialized, real per-call power is read off the device "
-        "via nvmlDeviceGetPowerUsage and this fallback is unused.",
+        "24 GB); ~60 W sustained during transformer inference. The ML "
+        "specialist backend for the Modal deployment (msradam/"
+        "riprap-inference's modal_app.py). When the proxy is reachable "
+        "and NVML is initialized, real per-call power is read off the "
+        "device via nvmlDeviceGetPowerUsage and this fallback is unused.",
+    ),
+    "nvidia_a100": (
+        "NVIDIA A100",
+        250.0,
+        "NVIDIA A100 40GB data sheet (250 W TDP); ~250 W sustained "
+        "during vLLM generation. The LLM backend for the Modal "
+        "deployment (msradam/riprap-inference's modal_vllm_app.py). "
+        "When the proxy is reachable and NVML is initialized, real "
+        "per-call power is read off the device via nvmlDeviceGetPowerUsage "
+        "and this fallback is unused.",
     ),
     "amd_mi300x": (
         "AMD MI300X",
@@ -90,12 +100,19 @@ def hardware_for(remote_base_url: str) -> str:
     (ML specialist calls) so both agree on what counts as "local".
 
     `remote_base_url` empty, or pointing at localhost/127.0.0.1 (the
-    Mac Mini's own Ollama / riprap-inference LitServe server), means
-    Apple Silicon. Anything else remote is treated as the L4 Modal
-    deployment, the only remote GPU tier Riprap currently deploys to."""
+    Mac Mini's own Ollama / riprap-inference server), means Apple Silicon.
+    A *.modal.run URL for the riprap-vllm app is the A100 LLM backend
+    (msradam/riprap-inference's modal_vllm_app.py) — checked narrowly by
+    hostname, not just "riprap-vllm" in the URL, since the retired HF
+    Spaces vLLM deployment (msradam-riprap-vllm.hf.space) ran on an L4
+    and shares that substring. Any other remote URL is treated as the L4
+    ML specialist backend (modal_app.py) — the two remote GPU tiers
+    Riprap currently deploys to."""
     override = (os.environ.get("RIPRAP_HARDWARE_LABEL") or "").lower()
     if "mi300x" in override or "amd" in override:
         return "amd_mi300x"
+    if "a100" in override:
+        return "nvidia_a100"
     if "l4" in override:
         return "nvidia_l4"
     if "t4" in override:
@@ -108,7 +125,8 @@ def hardware_for(remote_base_url: str) -> str:
         not remote_base_url or "localhost" in remote_base_url or "127.0.0.1" in remote_base_url
     )
     if remote_base_url and not is_local:
-        return "nvidia_l4"
+        is_modal_vllm = ".modal.run" in remote_base_url and "riprap-vllm" in remote_base_url
+        return "nvidia_a100" if is_modal_vllm else "nvidia_l4"
     if os.environ.get("SPACE_ID") or os.environ.get("HF_SPACE_ID"):
         return "nvidia_t4"
     return "apple_m"

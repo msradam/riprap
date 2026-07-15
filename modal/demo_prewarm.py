@@ -9,7 +9,8 @@ Deploy:  modal deploy modal/demo_prewarm.py --env riprap
 Remove:  modal app stop riprap-demo-prewarm --env riprap --yes
 
 Date-gated to DEMO_DATE: on any other day the cron fires but no-ops (~$0). The
-main riprap-frontend + riprap-triton apps must be deployed for this to warm them.
+main riprap-frontend + riprap-inference + riprap-vllm apps must be deployed
+for this to warm them.
 """
 from __future__ import annotations
 
@@ -21,7 +22,10 @@ import modal
 
 app = modal.App("riprap-demo-prewarm")
 
-_GPU_HEALTHZ = "https://msradam-riprap--riprap-triton-riprap-proxy.modal.run/healthz"
+# Two separate GPU apps now (riprap-triton retired) — each has its own
+# healthz and its own bearer token.
+_VLLM_HEALTHZ = "https://msradam-riprap--riprap-vllm-riprap-proxy.modal.run/healthz"
+_ML_HEALTHZ = "https://msradam-riprap--riprap-inference-serve.modal.run/healthz"
 _FRONTEND_STREAM = "https://msradam-riprap--riprap-frontend-web-app.modal.run/api/agent/stream"
 DEMO_DATE = datetime.date(2026, 6, 8)
 WARM_QUERY = "80 Pioneer Street, Red Hook, Brooklyn"
@@ -32,7 +36,10 @@ WARM_QUERY = "80 Pioneer Street, Red Hook, Brooklyn"
     # 13:53 UTC = 09:53 America/New_York (EDT). Cold warm + frontend lazy-load
     # (~5 min) finishes by ~09:58, warm through a 10:00 ET first query.
     schedule=modal.Cron("53 13 * * *"),
-    secrets=[modal.Secret.from_name("riprap-stack")],
+    secrets=[
+        modal.Secret.from_name("riprap-vllm-secret", required_keys=["RIPRAP_VLLM_API_KEY"]),
+        modal.Secret.from_name("riprap-inference-secret", required_keys=["RIPRAP_INFERENCE_API_KEY"]),
+    ],
     timeout=900,
 )
 def prewarm() -> None:
@@ -43,23 +50,25 @@ def prewarm() -> None:
         print(f"[prewarm] {today} is not the demo day {DEMO_DATE} - skipping", flush=True)
         return
 
-    tok = os.environ["RIPRAP_PROXY_TOKEN"]
+    vllm_tok = os.environ["RIPRAP_VLLM_API_KEY"]
+    ml_tok = os.environ["RIPRAP_INFERENCE_API_KEY"]
 
-    # 1) Warm the GPU first. LLM mode hard-fails if the planner's first call
-    #    hits a cold vLLM, so the throwaway query below must run on a warm GPU.
+    # 1) Warm both GPUs first. LLM mode hard-fails if the planner's first
+    #    call hits a cold vLLM, so the throwaway query below must run warm.
     healthy = False
     for i in range(30):
         try:
-            r = httpx.get(_GPU_HEALTHZ, headers={"Authorization": f"Bearer {tok}"}, timeout=30)
-            if r.status_code == 200 and r.json().get("vllm") == "ok":
-                print(f"[prewarm] GPU healthy after {i + 1} checks: {r.text[:160]}", flush=True)
+            rv = httpx.get(_VLLM_HEALTHZ, headers={"Authorization": f"Bearer {vllm_tok}"}, timeout=30)
+            rm = httpx.get(_ML_HEALTHZ, headers={"Authorization": f"Bearer {ml_tok}"}, timeout=30)
+            if rv.status_code == 200 and rv.json().get("vllm") == "ok" and rm.status_code == 200:
+                print(f"[prewarm] GPUs healthy after {i + 1} checks: {rv.text[:160]} / {rm.text[:80]}", flush=True)
                 healthy = True
                 break
         except Exception as e:  # noqa: BLE001
             print(f"[prewarm] healthz {i + 1}: {e}", flush=True)
         time.sleep(8)
     if not healthy:
-        print("[prewarm] GPU not confirmed healthy; firing warm query anyway", flush=True)
+        print("[prewarm] GPUs not confirmed healthy; firing warm query anyway", flush=True)
 
     # 2) Throwaway query: pays the frontend lazy-load (rasters + embedding model)
     #    so the first audience query is fast.

@@ -148,15 +148,14 @@ For the full LLM and specialist path, run the inference stack yourself.
 Three options — see [`docs/DEPLOY.md`](docs/DEPLOY.md) for the full
 walkthrough of each:
 
-- **Modal (scale-to-zero, recommended).** `modal deploy` the ML
-  specialists from [`msradam/riprap-inference`](https://github.com/msradam/riprap-inference)
-  — the same LitServe backend the Mac Mini path below runs natively —
-  plus a vLLM endpoint of your choice (the companion
-  [`msradam/riprap-triton`](https://github.com/msradam/riprap-triton)
-  repo bundles one with its own specialist stack, if you'd rather run
-  one Modal app than two). Both cost nothing while idle and wake on the
-  first request; a warm query returns a full cited briefing in about a
-  minute. See `docs/DEPLOY.md` for the full setup.
+- **Modal (scale-to-zero, recommended).** `modal deploy` two apps from
+  [`msradam/riprap-inference`](https://github.com/msradam/riprap-inference)
+  — the ML specialists (the same LitServe backend the Mac Mini path
+  below runs natively) and Granite 4.1 via vLLM, each its own
+  scale-to-zero app since they run on different GPU tiers. Both cost
+  nothing while idle and wake on the first request; a warm query
+  returns a full cited briefing in about a minute. See `docs/DEPLOY.md`
+  for the full setup.
 - **Mac Mini / Apple Silicon, fully local.** No cloud, no GPU rental —
   Ollama-served Granite 4.1 plus every ML specialist run on one box,
   with real measured power draw via `powermetrics` instead of a
@@ -184,12 +183,12 @@ docker compose up
 
 Visit `http://localhost:7860`.
 
-The GPU inference half lives in companion repos: ML specialists in
+The GPU inference half lives in a companion repo,
 [`msradam/riprap-inference`](https://github.com/msradam/riprap-inference)
-(deployable to Modal or run natively on a Mac Mini — same codebase
-either way), vLLM in [`msradam/riprap-triton`](https://github.com/msradam/riprap-triton)
-(or any OpenAI-compatible endpoint). Point this app at them via
-`RIPRAP_LLM_BASE_URL` / `RIPRAP_ML_BASE_URL`. See
+— ML specialists and Granite 4.1 (vLLM), deployable to Modal (as two
+apps) or run natively on a Mac Mini, same codebase either way (or point
+at any other OpenAI-compatible vLLM endpoint). Point this app at them
+via `RIPRAP_LLM_BASE_URL` / `RIPRAP_ML_BASE_URL`. See
 [`docs/DEPLOY.md`](docs/DEPLOY.md) for every deployment shape.
 
 ### 3. Develop
@@ -366,12 +365,10 @@ real GPU/Apple-Silicon power readings onto every response (see the
 energy section below). The specialist server is
 [`msradam/riprap-inference`](https://github.com/msradam/riprap-inference)
 (LitServe) — one codebase, deployable to Modal (scale-to-zero, $0 idle)
-or run natively on a Mac Mini / Apple Silicon for MPS access. The vLLM
-endpoint is a separate concern: any OpenAI-compatible deployment works,
-including [`msradam/riprap-triton`](https://github.com/msradam/riprap-triton),
-which bundles vLLM with its own Triton-based specialist stack in one
-container if you'd rather run a single Modal app. See `docs/DEPLOY.md`
-for every combination.
+or run natively on a Mac Mini / Apple Silicon for MPS access. Granite
+4.1 via vLLM is the same repo's second Modal app (its own GPU tier,
+its own image); any other OpenAI-compatible vLLM endpoint works too.
+See `docs/DEPLOY.md` for every combination.
 
 Source-of-truth pointers:
 
@@ -493,13 +490,12 @@ docs/                      ARCHITECTURE · DEPLOY · multi-city · PORT-YOUR-CIT
 tests/                     pytest (pebbles, stones, routing) + vitest (UI)
 ```
 
-The GPU/ML-specialist inference stack lives in separate repos:
+The GPU/ML-specialist inference stack lives in a separate repo,
 [`msradam/riprap-inference`](https://github.com/msradam/riprap-inference)
-(LitServe specialists, deployable to Modal or a Mac Mini) and
-[`msradam/riprap-triton`](https://github.com/msradam/riprap-triton)
-(vLLM, optionally bundled with its own specialist stack). `inference/`
-and `services/riprap-models/` in this repo are lighter self-host
-sidecars that predate both — see `docs/DEPLOY.md`.
+(LitServe specialists + Granite 4.1 via vLLM, deployable to Modal as
+two apps, or a Mac Mini). `inference/` and `services/riprap-models/`
+in this repo are lighter self-host sidecars that predate it — see
+`docs/DEPLOY.md`.
 
 [`CONTRIBUTING.md`](CONTRIBUTING.md) covers dev setup, the probe
 scripts, and house style. [`CHANGELOG.md`](CHANGELOG.md) tracks

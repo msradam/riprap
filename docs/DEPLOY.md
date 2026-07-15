@@ -21,19 +21,28 @@ modal secret create riprap-inference-secret \
 modal deploy modal_app.py --env riprap
 ```
 
-**LLM** — point `RIPRAP_LLM_BASE_URL` at any OpenAI-compatible vLLM
-endpoint. `msradam/riprap-triton`'s `modal/riprap_modal.py` is one way
-to get one on Modal (it bundles vLLM with its own Triton-based
-specialist stack in a single container, an alternative all-in-one path
-if you'd rather not run two Modal apps — see
-`msradam/riprap-triton/modal/README.md`).
+**LLM** — `msradam/riprap-inference`'s `modal_vllm_app.py` deploys
+Granite 4.1 via vLLM as its own scale-to-zero Modal app, separate from
+the specialists (different GPU profile — an 8B LLM at 8192 context
+wants more VRAM than the five specialists — and a different image,
+since vLLM pins its own torch):
+
+```bash
+# in msradam/riprap-inference
+modal secret create riprap-vllm-secret \
+    RIPRAP_VLLM_API_KEY=$(openssl rand -hex 24) --env riprap
+modal deploy modal_vllm_app.py --env riprap
+```
+
+Or point `RIPRAP_LLM_BASE_URL` at any other OpenAI-compatible vLLM
+endpoint you already run.
 
 Point this repo's app at whichever you deployed:
 
 ```bash
 export RIPRAP_LLM_PRIMARY=vllm
-export RIPRAP_LLM_BASE_URL=<your vLLM endpoint>
-export RIPRAP_LLM_API_KEY=<its bearer token>
+export RIPRAP_LLM_BASE_URL=<your riprap-vllm Modal URL>/v1
+export RIPRAP_LLM_API_KEY=<the RIPRAP_VLLM_API_KEY value above>
 export RIPRAP_ML_BACKEND=remote
 export RIPRAP_ML_BASE_URL=<your riprap-inference Modal URL>
 export RIPRAP_ML_API_KEY=<the RIPRAP_INFERENCE_API_KEY value above>

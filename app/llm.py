@@ -381,15 +381,18 @@ def _default_hardware_label() -> str:
     RIPRAP_HARDWARE_LABEL (e.g. "NVIDIA L4" / "AMD MI300X" /
     "NVIDIA T4" / "Apple M3 Pro").
 
-    Default when a remote vLLM backend is configured is "NVIDIA L4" —
-    the companion Modal deployment (msradam/riprap-triton) runs on L4.
+    Delegates to emissions.hardware_for so the UI badge and the
+    emissions accounting always agree — riprap-inference's two Modal
+    apps run on different GPU tiers (riprap-vllm: A100, riprap-inference:
+    L4), so a single hardcoded label here would be wrong for one of them.
     Set RIPRAP_HARDWARE_LABEL=AMD MI300X explicitly if deploying against
     your own AMD GPU box (docker-compose --profile with-models); set it
     to an Apple label (or leave a local Ollama run unset — see
     app.power_mac) for the Mac Mini path.
     """
     if _PRIMARY == "vllm" and _VLLM_BASE:
-        return "NVIDIA L4"
+        key = emissions.hardware_for(_VLLM_BASE)
+        return emissions.HARDWARE.get(key, (key,))[0]
     if os.environ.get("SPACE_ID") or os.environ.get("HF_SPACE_ID"):
         return "NVIDIA T4"
     return "Local"

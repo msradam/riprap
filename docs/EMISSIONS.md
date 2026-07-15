@@ -2,9 +2,9 @@
 
 Riprap surfaces the energy and token cost of every inference call it
 makes during a briefing. The numbers are **measured**, not data-sheet
-estimates: off the L4 GPU via NVML when a remote inference proxy is
-reachable, or off Apple Silicon via `powermetrics` on a Mac Mini /
-local-dev deployment.
+estimates: off the GPU via NVML when a remote inference proxy is
+reachable (L4 for ML specialists, A100 for the LLM), or off Apple
+Silicon via `powermetrics` on a Mac Mini / local-dev deployment.
 
 ```
 5 Stones · 21 fired · 11 evidence cards · 14.0s wall-clock · ✓ 1.4 Wh / 6.9K tok inference
@@ -15,7 +15,7 @@ total tokens. The leading icon discloses how the number was derived:
 
 | Icon | Meaning |
 |---|---|
-| `✓` | All recorded calls came back with a real NVML reading from the L4 GPU |
+| `✓` | All recorded calls came back with a real NVML reading from the GPU |
 | `◐` | Some calls measured, others fell back to the data-sheet estimate |
 | `~` | All calls used the data-sheet estimate (proxy unreachable, NVML disabled, or local-only run) |
 
@@ -31,7 +31,7 @@ vs completion split, and the method.
 | `duration_s` | Real wallclock on the client side (`time.monotonic` around each call) |
 | `prompt_tokens`, `completion_tokens` | Reported by the model server (LiteLLM `usage` block) for non-stream LLM calls |
 | `completion_tokens` (streaming) | Estimated as `len(response_text) / 4` when the backend doesn't surface a final usage block (Ollama path) |
-| `power_w` | **Measured** — `nvmlDeviceGetPowerUsage` on the L4 inference Space, sampled every 100 ms, mean of samples bracketing each call |
+| `power_w` | **Measured** — `nvmlDeviceGetPowerUsage` on the GPU inference backend, mean of two reads bracketing each call |
 | `wh`, `joules` | `power_w × duration_s` (when `measured: true`) or `data-sheet_W × duration_s` (when `measured: false`) |
 
 Each call record on the ledger carries a `measured: bool` flag plus
@@ -41,34 +41,31 @@ the exact `power_w` value used so a reviewer can audit any row.
 
 ## How the measurement works
 
-A remote L4 GPU backend (e.g. the Modal deployment, companion repo
-`msradam/riprap-triton`) runs a FastAPI proxy in front of vLLM and the
-ML specialist service. The proxy initialises NVML at startup and runs
-a background sampler that reads `nvmlDeviceGetPowerUsage` every
-100 ms into a 60-second ring buffer.
+Two remote GPU backends, both from companion repo
+`msradam/riprap-inference`: an L4 for the ML specialists
+(`server.py`) and an A100 for Granite 4.1 via vLLM (`modal_vllm_app.py`
++ `vllm_proxy.py`). Both use the same NVML instrumentation
+(`power.py`), lazily initialised on first use.
 
 ```
-riprap_proxy.py::_power_sampler   (in msradam/riprap-triton)
-  ├── NVML init at startup, single L4 device handle
-  ├── 100 ms ring buffer (600 samples = 60 s of history)
+power.py::NVMLPowerMiddleware / read_power_w   (in msradam/riprap-inference)
+  ├── NVML init on first call, single GPU device handle
+  ├── brackets each request with two nvmlDeviceGetPowerUsage reads, averaged
   └── degrades to no-op if NVML init fails
 ```
 
-When the proxy forwards a POST to vLLM or riprap-models, it stamps
-the upstream call window `(t0, t1)` and computes the mean power
-across the samples that fall inside that window. The result lands
-on the response as headers:
+For the ML specialist path, `NVMLPowerMiddleware` wraps every LitServe
+response with headers:
 
 ```
-X-GPU-Power-W      mean draw in watts
+X-GPU-Power-W      mean draw in watts (average of the pre/post reads)
 X-GPU-Energy-J     energy in joules over the window
 X-GPU-Duration-S   forwarded-call duration in seconds
-X-GPU-Device       "NVIDIA L4"
 ```
 
-`app/inference.py::_post()` reads those headers off the proxy
-response and forwards them into `emissions.Tracker.record_ml`. The
-tracker stamps `measured=True` and uses the exact joule value.
+`app/inference.py::_post()` reads those headers off the response and
+forwards them into `emissions.Tracker.record_ml`. The tracker stamps
+`measured=True` and uses the exact joule value.
 
 For the LLM client path (`app/llm.py::chat()`) we route through
 LiteLLM, which doesn't surface response headers. So instead the
@@ -107,7 +104,7 @@ line, and exposes `read_instant_w()` — the latest reading, or `None`
 if the log has gone stale (sampler died — treated as "no
 measurement," never a frozen number). Both `app/llm.py` (LLM calls)
 and `app/inference.py` (ML specialist calls) bracket their call the
-same before/after way the L4 path does, via the shared
+same before/after way the remote-GPU path does, via the shared
 `power_mac.avg_w(p0, p1)` helper, and fall back to the `apple_m`
 data-sheet estimate only when the sampler isn't running.
 
@@ -125,7 +122,8 @@ data sheet when no real measurement is available:
 
 | Key | Label | Sustained W | Source |
 |---|---|---|---|
-| `nvidia_l4` | NVIDIA L4 | 60 | L4 data sheet (72 W TGP, Ada Lovelace) |
+| `nvidia_l4` | NVIDIA L4 | 60 | L4 data sheet (72 W TGP, Ada Lovelace) — ML specialist backend |
+| `nvidia_a100` | NVIDIA A100 | 250 | A100 40GB data sheet (250 W TDP) — LLM (vLLM) backend |
 | `amd_mi300x` | AMD MI300X | 600 | MI300X data sheet (750 W TDP); used when `RIPRAP_HARDWARE_LABEL=AMD MI300X` |
 | `nvidia_t4` | NVIDIA T4 | 50 | T4 data sheet (70 W max) |
 | `apple_m` | Apple M-series | 20 | ml.energy / community measurements — used only when `RIPRAP_POWERMETRICS_LOG` isn't set or has gone stale; see the Apple Silicon section above for the real-measurement path |

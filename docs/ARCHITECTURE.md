@@ -4,10 +4,10 @@
 > the original AMD-judging deploy was decommissioned 2026-05-06. Post-
 > hackathon, HF Spaces serve the deterministic data probes only
 > (inferencing disabled); live inference now runs on Modal — specialists
-> via companion repo `msradam/riprap-inference`, vLLM via
-> `msradam/riprap-triton` or your own endpoint — or fully locally on a
-> Mac Mini (same `riprap-inference` codebase, run natively) with real
-> Apple Silicon power measurement.
+> and Granite 4.1 (vLLM) both via companion repo `msradam/riprap-inference`
+> (two scale-to-zero apps), or your own OpenAI-compatible vLLM endpoint —
+> or fully locally on a Mac Mini (same `riprap-inference` codebase, run
+> natively) with real Apple Silicon power measurement.
 > The MI300X language preserved elsewhere in this document remains
 > accurate for the original AMD-judging deploy, reproducible against
 > your own AMD GPU box via `docker-compose --profile with-models` +
@@ -693,11 +693,11 @@ Three live deployment shapes — full instructions in
 [`docs/DEPLOY.md`](DEPLOY.md):
 
 - **Modal** (scale-to-zero cloud GPU) — companion repo
-  `msradam/riprap-inference` deploys the ML specialists (same codebase
-  as the Mac Mini path below); vLLM is a separate endpoint, e.g.
-  `msradam/riprap-triton`, which alternatively bundles both in one
-  container. `modal/riprap_frontend.py` in this repo serves the app.
-  $0 idle, roughly a minute or two cold start on a warm Volume.
+  `msradam/riprap-inference` deploys two apps: the ML specialists
+  (same codebase as the Mac Mini path below, GPU=L4) and Granite 4.1
+  via vLLM (GPU=A100, its own image since vLLM pins its own torch).
+  `modal/riprap_frontend.py` in this repo serves the app. $0 idle,
+  roughly a minute or two cold start on a warm Volume.
 - **Mac Mini / Apple Silicon** (fully local, no cloud) — Ollama-served
   Granite 4.1 + `riprap-inference`'s specialists run natively on one
   box, with real measured power via `powermetrics` (`app/power_mac.py`).
