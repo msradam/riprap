@@ -1,32 +1,35 @@
-"""USGS NWIS instantaneous values — live stream gauges near a point.
+"""USGS Water Data OGC API: latest stream-gauge values near a point.
 
-waterservices.usgs.gov/nwis/iv, no auth, 15-minute cadence. National
-coverage, so this ships as a federal pebble: every deployment gets the
-nearest active stream gauge's stage (and discharge where published).
-For Albany that's Patroon Creek at Albany (01359135); for NYC it's the
-harbor-adjacent gauges; cities with no gauge in the search box skip
-the pebble cleanly (summary_for_point returns None).
+api.waterdata.usgs.gov `latest-continuous`, read through `dataretrieval`.
+It replaces the legacy waterservices.usgs.gov/nwis/iv service, which is
+being degraded and shuts down in Q1 2027. National coverage, so this
+ships as a federal pebble: every deployment gets the nearest active
+stream gauge's stage (and discharge where published). Points with no
+active gauge in the search box skip cleanly (summary_for_point returns
+None).
+
+No key is needed. Unauthenticated requests share USGS's small hourly
+quota; set API_USGS_PAT (read by dataretrieval) to raise it.
 """
 
 from __future__ import annotations
 
-import time
+import logging
+from datetime import UTC, datetime, timedelta
 from math import asin, cos, radians, sin, sqrt
 from typing import Any
 
-import httpx
-
-from riprap.core.pebbles._http import fetch_url_json
+log = logging.getLogger("riprap.usgs_gauges")
 
 DOC_ID = "usgs_gauges"
-CITATION = "USGS NWIS instantaneous values (waterservices.usgs.gov)"
-URL = "https://waterservices.usgs.gov/nwis/iv/"
+CITATION = "USGS Water Data OGC API, latest continuous values (api.waterdata.usgs.gov)"
 
-# NWIS rejects wider boxes with a 503 despite the documented 25-sq-deg
-# limit; 0.25° total width is empirically the reliable ceiling.
 _BOX_DEG = 0.125  # search half-width; ~14 km N-S
 _PARAM_STAGE = "00065"  # gage height, ft
 _PARAM_DISCHARGE = "00060"  # discharge, ft³/s
+# latest-continuous keeps the last value of retired gauges too (some date
+# from the 1990s); anything older than this is not a live reading.
+_MAX_AGE = timedelta(days=2)
 
 
 def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -44,53 +47,31 @@ def _pretty_name(raw: str) -> str:
     return " ".join(words)
 
 
-def _latest(series: dict) -> tuple[str, str] | None:
-    values = series["values"][0]["value"]
-    if not values:
+def summary_for_point(lat: float, lon: float) -> dict[str, Any] | None:
+    import dataretrieval.waterdata as wd  # noqa: PLC0415
+
+    bbox = [lon - _BOX_DEG, lat - _BOX_DEG, lon + _BOX_DEG, lat + _BOX_DEG]
+    try:
+        df, _ = wd.get_latest_continuous(
+            parameter_code=[_PARAM_STAGE, _PARAM_DISCHARGE], bbox=bbox
+        )
+    except Exception as e:  # noqa: BLE001 - an unreachable API skips the pebble
+        log.warning("USGS latest-continuous failed: %r", e)
         return None
-    return values[-1]["value"], values[-1]["dateTime"]
-
-
-def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 900) -> dict[str, Any] | None:
-    bbox = f"{lon - _BOX_DEG:.4f},{lat - _BOX_DEG:.4f},{lon + _BOX_DEG:.4f},{lat + _BOX_DEG:.4f}"
-    url = (
-        f"{URL}?format=json&bBox={bbox}"
-        f"&parameterCd={_PARAM_STAGE},{_PARAM_DISCHARGE}&siteStatus=active"
-    )
-    # NWIS throws intermittent 503s under load; one retry rides most out.
-    # A bbox with no matching sites is a 404, not an empty list — after
-    # the retry, treat any HTTP failure as "no gauge here".
-    for attempt in (1, 2):
-        try:
-            data = fetch_url_json(url, cache_ttl_s=cache_ttl_s, timeout_s=15.0)
-            break
-        except httpx.HTTPError:
-            if attempt == 2:
-                return None
-            time.sleep(1.5)
+    if df is None or df.empty:
+        return None
+    df = df[df["time"] >= datetime.now(UTC) - _MAX_AGE]
 
     sites: dict[str, dict[str, Any]] = {}
-    for ts in data.get("value", {}).get("timeSeries", []):
-        info = ts["sourceInfo"]
-        site_no = info["siteCode"][0]["value"]
-        loc = info["geoLocation"]["geogLocation"]
+    for row in df.itertuples():
         site = sites.setdefault(
-            site_no,
-            {
-                "site_no": site_no,
-                "site_name": _pretty_name(info["siteName"]),
-                "lat": loc["latitude"],
-                "lon": loc["longitude"],
-            },
+            row.monitoring_location_id,
+            {"site_id": row.monitoring_location_id, "lat": row.geometry.y, "lon": row.geometry.x},
         )
-        param = ts["variable"]["variableCode"][0]["value"]
-        latest = _latest(ts)
-        if latest is None:
-            continue
-        if param == _PARAM_STAGE:
-            site["stage_ft"], site["obs_time"] = float(latest[0]), latest[1]
-        elif param == _PARAM_DISCHARGE:
-            site["discharge_cfs"] = float(latest[0])
+        if row.parameter_code == _PARAM_STAGE:
+            site["stage_ft"], site["obs_time"] = float(row.value), row.time
+        elif row.parameter_code == _PARAM_DISCHARGE:
+            site["discharge_cfs"] = float(row.value)
 
     gauged = [s for s in sites.values() if "stage_ft" in s]
     if not gauged:
@@ -99,12 +80,19 @@ def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 900) -> dict[st
         s["distance_km"] = round(_haversine_km(lat, lon, s["lat"], s["lon"]), 1)
     nearest = min(gauged, key=lambda s: s["distance_km"])
 
-    # '2026-07-09T23:15:00.000-05:00' → '2026-07-09 23:15' for prose.
-    obs_time = str(nearest.get("obs_time", ""))[:16].replace("T", " ")
+    site_no = nearest["site_id"].removeprefix("USGS-")
+    try:
+        ml, _ = wd.get_monitoring_locations(
+            monitoring_location_id=nearest["site_id"], properties=["monitoring_location_name"]
+        )
+        site_name = _pretty_name(ml["monitoring_location_name"].iloc[0])
+    except Exception:  # noqa: BLE001 - the name is cosmetic
+        site_name = f"USGS {site_no}"
 
+    obs_time = nearest["obs_time"].strftime("%Y-%m-%d %H:%M UTC")
     bits = [
-        f"Nearest USGS stream gauge, {nearest['site_name']} "
-        f"({nearest['site_no']}, {nearest['distance_km']} km away): "
+        f"Nearest USGS stream gauge, {site_name} "
+        f"({site_no}, {nearest['distance_km']} km away): "
         f"stage {nearest['stage_ft']} ft"
     ]
     if "discharge_cfs" in nearest:
@@ -114,8 +102,8 @@ def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 900) -> dict[st
     # renders every numeric field as a hero stat, and a bare 42.66/-73.74
     # reads as noise next to stage/discharge.
     out: dict[str, Any] = {
-        "site_no": nearest["site_no"],
-        "site_name": nearest["site_name"],
+        "site_no": site_no,
+        "site_name": site_name,
         "distance_km": nearest["distance_km"],
         "stage_ft": nearest["stage_ft"],
         "obs_time": obs_time,

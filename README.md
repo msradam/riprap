@@ -5,7 +5,7 @@
 # Riprap
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
 [![CI](https://github.com/msradam/riprap/actions/workflows/check.yml/badge.svg)](https://github.com/msradam/riprap/actions/workflows/check.yml)
 [![Deployments](https://img.shields.io/badge/deployments-NYC%20·%20Chicago%20·%20Seattle%20·%20SF%20·%20Boston%20·%20Albany-005EA2)](docs/multi-city.md)
 [![Civic Hydrology](https://img.shields.io/badge/palette-civic%20hydrology-005EA2)](web/sveltekit/src/lib/tokens.css)
@@ -195,10 +195,10 @@ via `RIPRAP_LLM_BASE_URL` / `RIPRAP_ML_BASE_URL`. See
 
 ```bash
 # Python 3.12 venv via uv
-uv venv && uv pip install -r requirements.txt
+uv sync
 
 # SvelteKit frontend (committed pre-built; only rebuild if sources change)
-cd web/sveltekit && npm ci && npm run build && cd ../..
+cd web/sveltekit && pnpm install --frozen-lockfile && pnpm build && cd ../..
 
 # Local server (Ollama primary)
 .venv/bin/uvicorn web.main:app --host 127.0.0.1 --port 7860

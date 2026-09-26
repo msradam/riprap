@@ -26,9 +26,9 @@ from __future__ import annotations
 
 import argparse
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
-mcp = FastMCP(
+mcp = MCPServer(
     "riprap",
     instructions=(
         "Riprap composes public-record flood data (FEMA, NOAA, USGS, NWS, "
@@ -133,8 +133,7 @@ def main() -> None:
     ap.add_argument("--port", type=int, default=8765)
     args = ap.parse_args()
     if args.http:
-        mcp.settings.port = args.port
-        mcp.run(transport="streamable-http")
+        mcp.run(transport="streamable-http", port=args.port)
     else:
         mcp.run(transport="stdio")
 

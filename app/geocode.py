@@ -1,4 +1,4 @@
-"""Address geocoding — Nominatim primary, NYC Geosearch as NYC enrichment.
+"""Address geocoding: NYC Geosearch for exact NYC matches, Nominatim otherwise.
 
 `geocode_one()` is the entry point every deployment (NYC, Chicago,
 Seattle, ...) actually calls: OpenStreetMap Nominatim (no key, free,
@@ -108,6 +108,17 @@ def geocode(text: str, limit: int = 5) -> list[GeocodeHit]:
         return []
 
 
+@lru_cache(maxsize=1)
+def _nominatim_call():
+    """One process-wide client and RateLimiter, so the 1 request/s policy
+    holds across requests and threads (geopy's limiter takes a lock)."""
+    from geopy.extra.rate_limiter import RateLimiter  # noqa: PLC0415
+    from geopy.geocoders import Nominatim  # noqa: PLC0415
+
+    geocoder = Nominatim(user_agent=NOMINATIM_UA, timeout=10)
+    return RateLimiter(geocoder.geocode, min_delay_seconds=1.0, swallow_exceptions=False)
+
+
 def geocode_nominatim(
     text: str, *, viewbox: list | None = None, bounded: bool = False,
     country_codes: str | None = "us",
@@ -134,11 +145,7 @@ def geocode_nominatim(
     See geocode_one, which detects a non-US signal in the query and
     reruns unrestricted specifically to catch this.
     """
-    from geopy.extra.rate_limiter import RateLimiter  # noqa: PLC0415
-    from geopy.geocoders import Nominatim  # noqa: PLC0415
-
-    geocoder = Nominatim(user_agent=NOMINATIM_UA, timeout=10)
-    geocode_call = RateLimiter(geocoder.geocode, min_delay_seconds=1.0, swallow_exceptions=False)
+    geocode_call = _nominatim_call()
     call_kwargs: dict = {
         "addressdetails": True,
         "exactly_one": True,
@@ -305,6 +312,9 @@ def geocode_one(text: str, *, scope_hint: str | None = None) -> GeocodeHit | Non
     Confirm the mismatch with one unrestricted lookup and return None
     (honest "not covered") instead of a confident wrong-country hit.
     """
+    exact = _geosearch_exact(text)
+    if exact is not None:
+        return exact
     if _looks_non_us(text) or (scope_hint and _looks_non_us(scope_hint)):
         check = geocode_nominatim(text, country_codes=None)
         cc = ((check.raw.get("address") or {}).get("country_code") or "").lower() if check else ""
@@ -364,6 +374,46 @@ def geocode_one(text: str, *, scope_hint: str | None = None) -> GeocodeHit | Non
             raw={**primary.raw, "geosearch_enrichment": True},
         )
     return primary
+
+
+_NYC_PLACE_RE = re.compile(
+    r"\b(manhattan|brooklyn|queens|bronx|staten island|new york,? ny|nyc|1[01]\d{3})\b",
+    re.IGNORECASE,
+)
+_STREET_ABBREV = {
+    "AVE": "AVENUE", "AV": "AVENUE", "ST": "STREET", "RD": "ROAD", "BLVD": "BOULEVARD",
+    "PL": "PLACE", "DR": "DRIVE", "PKWY": "PARKWAY", "LN": "LANE", "CT": "COURT",
+    "TER": "TERRACE", "HWY": "HIGHWAY", "E": "EAST", "W": "WEST", "N": "NORTH", "S": "SOUTH",
+}
+
+
+def _norm_street(text: str) -> str:
+    """Uppercase, drop punctuation and ordinal suffixes, expand common
+    abbreviations: '189 Atlantic Ave.' and 'E 14th St' compare equal to
+    Geosearch's '189 ATLANTIC AVENUE' and 'EAST 14 STREET'."""
+    words = re.sub(r"[^\w\s-]", " ", text.upper()).split()
+    words = [re.sub(r"^(\d+)(ST|ND|RD|TH)$", r"\1", w) for w in words]
+    return " ".join(_STREET_ABBREV.get(w, w) for w in words)
+
+
+def _geosearch_exact(text: str) -> GeocodeHit | None:
+    """NYC Geosearch as the first resolver, but only when the match is
+    unambiguous. Geosearch fuzzy-matches everything it is given (see
+    geocode_one), so a hit is accepted only if the query names a NYC
+    borough, ZIP or 'New York, NY', and the hit's house number and street
+    both appear in the query. Anything else falls through to Nominatim."""
+    if not _NYC_PLACE_RE.search(text) or _looks_non_nyc(text):
+        return None
+    hits = geocode(text, limit=1)
+    if not hits or hits[0].lat is None:
+        return None
+    hit = hits[0]
+    number = str(hit.raw.get("housenumber") or "")
+    street = _norm_street(str(hit.raw.get("street") or ""))
+    query = f" {_norm_street(text)} "
+    if not number or not street or f" {number} {street} " not in query:
+        return None
+    return hit
 
 
 def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:

@@ -5,7 +5,7 @@ stone: touchstone
 tier: empirical
 adapter: python_call
 
-# Federal pebble — waterservices.usgs.gov covers the whole US; the
+# Federal pebble: the USGS Water Data OGC API covers the whole US; the
 # module searches a ~25 km box around the address and reports the
 # nearest active gauge publishing stage (00065). Points with no gauge
 # in the box return None and the pebble skips cleanly.
@@ -30,11 +30,11 @@ trace_summary:
   discharge_cfs: discharge_cfs
 
 provenance:
-  source_name: USGS NWIS — instantaneous stream-gauge values
-  source_url: https://waterservices.usgs.gov/
+  source_name: USGS Water Data OGC API, latest continuous values
+  source_url: https://api.waterdata.usgs.gov/ogcapi/v1/collections/latest-continuous
   license: U.S. Public Domain
   doc_id: usgs_gauges
-  citation: USGS NWIS instantaneous values, nearest active stream gauge to address.
+  citation: USGS Water Data latest continuous values, nearest active stream gauge to address.
 
 narration:
   short: Live stage at the nearest USGS stream gauge to this address.
@@ -48,4 +48,4 @@ display:
 
 fallback:
   on_offline: skip
-  message: No active USGS stream gauge within the search box, or NWIS unreachable.
+  message: No active USGS stream gauge within the search box, or the USGS API is unreachable.

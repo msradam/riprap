@@ -60,3 +60,14 @@ def test_get_briefing_shapes_burr_output(monkeypatch):
     assert out["compliance"] == stub_out["compliance"]
     assert "sandy" not in out
     assert "trace" not in out
+
+
+def test_server_imports_and_lists_tools():
+    """Fresh-install guard: the server module imports on the pinned SDK
+    and registers its tools."""
+    import asyncio
+
+    from riprap.mcp.server import mcp
+
+    names = {t.name for t in asyncio.run(mcp.list_tools())}
+    assert {"get_briefing", "list_sources", "get_citation"} <= names

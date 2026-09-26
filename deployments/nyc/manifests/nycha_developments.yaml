@@ -24,7 +24,7 @@ trace_summary:
 
 provenance:
   source_name: NYCHA developments register
-  source_url: https://data.cityofnewyork.us/Housing-Development/Map-of-NYCHA-Developments/i9rv-hdr5
+  source_url: https://data.cityofnewyork.us/Housing-Development/NYCHA-Public-Housing-Developments/phvi-damg
   license: NYC Open Data Terms of Use
   doc_id: nycha_development_exposure
   citation: NYCHA public housing developments, cross-referenced with Sandy 2012 + DEP extreme 2080.

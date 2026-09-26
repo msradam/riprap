@@ -1,59 +1,56 @@
-# Riprap — lightweight self-host image (FastAPI + SvelteKit).
+# Riprap self-host image (FastAPI + SvelteKit).
 #
-# This is the "I want to run Riprap on my own machine, pointed at
-# Modal, my own vLLM, or a self-hosted riprap-inference" image. It does
-# NOT ship Ollama, CUDA, or Granite weights — LLM inference is
-# dispatched over HTTP via RIPRAP_LLM_BASE_URL (vLLM / OpenAI-compatible)
-# and RIPRAP_ML_BASE_URL (the specialist ML service). See .env.example
-# and docs/DEPLOY.md.
+# Runs the evidence pipeline on CPU. It does not ship an LLM: point
+# RIPRAP_LLM_BASE_URL at an OpenAI-compatible endpoint, or set
+# RIPRAP_RECONCILER_TIER=no_llm for the evidence-only briefing.
+# See .env.example and docs/DEPLOY.md.
 #
-# For a fully local, no-cloud deployment with bundled Ollama + real
-# measured power, see docs/DEPLOY.md's Mac Mini section instead.
-#
-# Build:    docker build -t msradam/riprap:v0.6.0 -f Dockerfile.app .
-# Run:      docker run --rm -p 7860:7860 --env-file .env msradam/riprap:v0.6.0
+# Build:    docker build -t riprap -f Dockerfile.app .
+# Run:      docker run --rm -p 7860:7860 --env-file .env riprap
 
 # -----------------------------------------------------------------------
-# Stage 1 — build the SvelteKit static bundle
+# Stage 1: build the SvelteKit static bundle
 # -----------------------------------------------------------------------
-FROM node:20-slim AS frontend-build
+FROM node:24-slim AS frontend-build
 
 WORKDIR /build
-COPY web/sveltekit/package.json web/sveltekit/package-lock.json ./
-RUN npm ci --no-audit --no-fund
+RUN corepack enable
+COPY web/sveltekit/package.json web/sveltekit/pnpm-lock.yaml web/sveltekit/pnpm-workspace.yaml web/sveltekit/.npmrc ./
+RUN pnpm install --frozen-lockfile
 
 COPY web/sveltekit/ ./
-RUN npm run build
+RUN pnpm build
 
 # -----------------------------------------------------------------------
-# Stage 2 — Python runtime
+# Stage 2: Python runtime
 # -----------------------------------------------------------------------
-FROM python:3.10-slim AS runtime
+FROM python:3.12-slim AS runtime
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONUNBUFFERED=1 \
+ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    PATH=/app/.venv/bin:$PATH \
+    PYTHONPATH=/app
 
-# Geo libs: geopandas / rasterio / fiona / pyproj need GDAL + GEOS +
-# PROJ at runtime. curl for healthchecks.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        curl ca-certificates \
-        gdal-bin libgdal-dev libgeos-dev libproj-dev \
+# curl for healthchecks. GDAL, GEOS and PROJ come bundled in the
+# rasterio, pyogrio, shapely and pyproj wheels.
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+COPY --from=ghcr.io/astral-sh/uv:0.12 /uv /usr/local/bin/uv
 
 WORKDIR /app
 
-# Python deps first so a code-only edit doesn't bust the wheel cache.
-COPY requirements.txt ./
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Dependencies first so a code-only edit doesn't bust the layer cache.
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev --no-install-project
 
-# App code + fixtures + corpus.
+# App code, manifests, fixtures and corpus.
 COPY app/ ./app/
-COPY web/main.py ./web/main.py
+COPY riprap/ ./riprap/
+COPY deployments/ ./deployments/
+COPY web/__init__.py web/main.py ./web/
 COPY web/static/ ./web/static/
-COPY scripts/ ./scripts/
 COPY data/ ./data/
 COPY corpus/ ./corpus/
 
@@ -61,12 +58,6 @@ COPY corpus/ ./corpus/
 COPY --from=frontend-build /build/build ./web/sveltekit/build
 
 EXPOSE 7860
-
-# Default talks to remote LLM + ML backends via the env vars in
-# .env.example. RIPRAP_LLM_PRIMARY=vllm makes the LiteLLM Router
-# expect an OpenAI-compatible endpoint at RIPRAP_LLM_BASE_URL.
-ENV RIPRAP_LLM_PRIMARY=vllm \
-    PYTHONPATH=/app
 
 CMD ["uvicorn", "web.main:app", "--host", "0.0.0.0", "--port", "7860", \
      "--log-level", "info", "--proxy-headers"]

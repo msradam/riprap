@@ -40,7 +40,7 @@ class FloodEvent:
 
 def _gql(query: str, variables: dict[str, Any]) -> dict:
     r = httpx.post(URL, json={"query": query, "variables": variables},
-                   timeout=20, verify=False)
+                   timeout=20)
     r.raise_for_status()
     j = r.json()
     if "errors" in j:

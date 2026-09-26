@@ -35,12 +35,8 @@ jobs:
         uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
-      - name: Set up Python 3.12
-        run: uv python install 3.12
-      - name: Create venv and install deps
-        run: |
-          uv venv --python 3.12
-          uv pip install -r requirements.txt pytest
+      - name: Install deps (Python 3.12, locked)
+        run: uv sync --frozen
 
       - name: Import smoke test
         env:

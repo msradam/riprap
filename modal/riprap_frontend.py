@@ -119,7 +119,7 @@ def _image() -> modal.Image:
             "libgeos-dev",
             "libproj-dev",
         )
-        .pip_install_from_requirements(str(REPO / "requirements.txt"))
+        .pip_install_from_pyproject(str(REPO / "pyproject.toml"))
         .env(FRONTEND_ENV)
         .workdir("/app")
         # Runtime code + fixtures. The pebble framework resolves

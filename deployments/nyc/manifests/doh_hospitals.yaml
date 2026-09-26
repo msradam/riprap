@@ -23,11 +23,11 @@ trace_summary:
   n_in_dep_extreme_2080: n_in_dep_extreme_2080
 
 provenance:
-  source_name: NYC DOH — hospitals register
-  source_url: https://data.cityofnewyork.us/Health/Hospitals/u3ic-3hcp
+  source_name: NYS DOH hospitals register
+  source_url: https://health.data.ny.gov/Health/Health-Facility-General-Information/vn5v-hh5r
   license: NYC Open Data Terms of Use
   doc_id: doh_hospital_exposure
-  citation: NYC DOH hospitals, cross-referenced with Sandy 2012 + DEP extreme 2080.
+  citation: NYS DOH Health Facility General Information (vn5v-hh5r) hospitals in NYC, cross-referenced with Sandy 2012 + DEP extreme 2080.
 
 narration:
   short: NYC DOH-licensed hospitals within range of this address and their flood exposure.

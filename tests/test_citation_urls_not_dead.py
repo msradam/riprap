@@ -5,9 +5,19 @@ No network calls here — that would be flaky in CI — just a regression
 guard against the exact dead ids reappearing."""
 from __future__ import annotations
 
+from pathlib import Path
+
 from app.reconcile import _DOC_META
 
-_DEAD_DATASET_IDS = ("d73m-mf6p", "d3qk-pfyz", "i9rv-hdr5")
+_DEAD_DATASET_IDS = ("d73m-mf6p", "d3qk-pfyz", "i9rv-hdr5", "u3ic-3hcp", "4xj4-2vap")
+_DEPLOYMENTS = Path(__file__).resolve().parent.parent / "deployments"
+
+
+def test_no_manifest_cites_a_dead_dataset_id():
+    for manifest in _DEPLOYMENTS.glob("*/manifests/*.yaml"):
+        text = manifest.read_text()
+        for dead in _DEAD_DATASET_IDS:
+            assert dead not in text, f"{manifest} still points at retired dataset {dead}"
 
 
 def test_no_known_dead_dataset_ids():

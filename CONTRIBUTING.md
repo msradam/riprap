@@ -37,7 +37,7 @@ git lfs install        # one-time, per machine
 
 git clone https://github.com/msradam/riprap
 cd riprap
-uv venv && uv pip install -r requirements.txt
+uv sync
 ```
 
 If you already cloned before installing Git LFS, `git lfs pull` inside

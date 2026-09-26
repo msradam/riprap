@@ -32,7 +32,7 @@ config:
 
 provenance:
   source_name: NYC DOHMH — Heat Vulnerability Index (NTA, 2018)
-  source_url: https://data.cityofnewyork.us/Health/Heat-Vulnerability-Index-Rankings/4xj4-2vap
+  source_url: https://data.cityofnewyork.us/Health/Heat-Vulnerability-Index-Rankings/4mhf-duep
   license: NYC Open Data Terms of Use
   doc_id: nyc_hvi
   citation: NYC DOHMH Heat Vulnerability Index (2018), NTA-level 1-5 ranking.

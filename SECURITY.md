@@ -41,7 +41,7 @@ worth a report:
   the inference proxies in the companion `msradam/riprap-inference` repo).
 - Denial-of-service patterns that exceed the hosted Space's
   resource budget.
-- Supply-chain issues in pinned deps (`requirements.txt`,
+- Supply-chain issues in pinned deps (`pyproject.toml` and `uv.lock`,
   `web/sveltekit/package.json`).
 
 ## Out of scope

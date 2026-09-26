@@ -1,0 +1,14 @@
+.git
+.venv
+.burr
+**/node_modules
+**/__pycache__
+web/sveltekit/build
+web/sveltekit/.svelte-kit
+experiments
+research_notes
+tests
+docs
+reports
+.serena
+.env
