@@ -42,6 +42,33 @@ def _scope_header() -> str:
     )
 
 
+SCOPE_REFUSAL = (
+    "Riprap does not answer this question. It reports public flood evidence for a "
+    "place: flood maps, past flood records, live sensors and forecasts, each cited to "
+    "its source. It does not give advice on buying, renting or insuring property, "
+    "legal advice, or a prediction for a specific day. For those, consult a licensed "
+    "professional; for a regulatory flood determination, use FEMA's Flood Map "
+    "Service Center (msc.fema.gov)."
+)
+COVERAGE_REFUSAL = (
+    "Riprap's New York City deployment covers flood evidence only. It has no {what} "
+    "sources for this place, so it cannot answer this question. Ask about flooding "
+    "at this address to see what it does cover."
+)
+_HAZARD_WORDS = {"heat": "heat", "air": "air-quality"}
+
+
+def refusal(state) -> str:
+    """Fixed text for queries Riprap does not answer; never model prose."""
+    plan = state.get("plan") or {}
+    if state.get("intent") == "not_implemented":
+        return plan.get("rationale") or "Riprap cannot answer this query."
+    hazard = (plan.get("focus") or {}).get("hazard", "flood")
+    if hazard != "flood":
+        return COVERAGE_REFUSAL.format(what=_HAZARD_WORDS.get(hazard, "non-flood"))
+    return SCOPE_REFUSAL
+
+
 NON_SCOPE_FOOTER = (
     "**Out of scope.** This briefing does not assess title, structural "
     "condition, or compliance with specific zoning rules. Where a probe "
@@ -53,8 +80,8 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
     """One section per Stone (stones.yaml order), one cited sentence per
     pebble with a value. Returns (paragraph, citations by doc_id). A
     not_implemented query gets the planner's explanation instead."""
-    if state.get("intent") == "not_implemented":
-        return (state.get("plan") or {}).get("rationale") or "Riprap cannot answer this query.", {}
+    if state.get("intent") in ("not_implemented", "out_of_scope"):
+        return refusal(state), {}
     stones, registry = evidence.load(state.get("deployment"))
     items = evidence.collect(state, stones, registry)
     sections = [_scope_header()]

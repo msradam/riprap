@@ -55,6 +55,25 @@ then rewrites the evidence as a list of claims. It never writes free prose.
 If no endpoint answers, the briefing falls back to the no-LLM evidence and says
 why in `grounding.fallback_reason`.
 
+### Questions
+
+When the input is a question, not just a place, three more rules apply.
+
+- The planner chooses which sources to consult from each manifest's
+  `answers:` line; `select_pebbles` adds a short always-run floor (FEMA flood
+  zone, Sandy extent and the DEP 2050 scenario for an address; NWS alerts for
+  a "right now" question). Only those pebbles run, and every briefing lists the
+  sources consulted and the ones not checked. A bare address runs every source.
+- The claims schema gains a section `answer`. The model writes one to three
+  claims there that answer the question directly; they are verified exactly
+  like every other claim. The briefing opens with them. If none survives, it
+  opens with the fixed line "The sources consulted do not answer this question
+  directly. Here is what they show." A section whose only evidence is already
+  stated in the answer is not repeated.
+- Questions Riprap does not answer (buying, renting or insuring property,
+  legal advice, a prediction for a specific day, or a hazard other than
+  flooding) get a fixed refusal text, never model prose.
+
 ### Number tolerance
 
 A claimed number matches an evidence number when one of these holds:
@@ -67,7 +86,11 @@ A claimed number matches an evidence number when one of these holds:
   kilometres or kilometres to metres (16.89 m supports "55 ft"; 1417 m supports
   "1.4 km").
 
-The numbers 311 and 911 are treated as service names, not measurements. Numbers
+The numbers 311 and 911 are treated as service names, not measurements.
+Numbers that appear in the user's own question or in the resolved address
+(a house number, a street number, a year the user named) may be restated
+without evidence support; they are the user's words, not claims about the
+data. Numbers
 must come from the documents the claim cites: a real number from a different
 document does not count.
 

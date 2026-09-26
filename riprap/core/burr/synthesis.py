@@ -36,6 +36,9 @@ from riprap.core.burr.templated_reconciler import NON_SCOPE_FOOTER, _scope_heade
 log = logging.getLogger("riprap.synthesis")
 
 NO_EVIDENCE_LINE = "No grounded evidence for this section."
+ANSWER_SECTION = "answer"
+CANNOT_ANSWER = ("The sources consulted do not answer this question directly. "
+                 "Here is what they show.")
 POLICY_SECTION = "Policy context"
 
 # A number is not preceded by a letter, digit or '.', so 'Extreme-2080'
@@ -86,11 +89,12 @@ class Doc:
     experimental: bool
 
 
-def verify(claims: list[dict], docs: list[Doc]) -> tuple[list[dict], list[dict]]:
+def verify(claims: list[dict], docs: list[Doc], extra_sections: tuple[str, ...] = (),
+           exempt: frozenset[str] = frozenset()) -> tuple[list[dict], list[dict]]:
     """Split claims into (kept, dropped); each dropped claim carries a
     `reason`."""
     by_id = {d.doc_id: d for d in docs}
-    sections = {d.section for d in docs}
+    sections = {d.section for d in docs} | set(extra_sections)
     kept, dropped = [], []
     for c in claims:
         text = _BRACKET_RE.sub("", str(c.get("text", ""))).strip()
@@ -115,7 +119,7 @@ def verify(claims: list[dict], docs: list[Doc]) -> tuple[list[dict], list[dict]]
             # "2021-09-02"); tokenize them exactly as the evidence is.
             stated = set(numbers_in(text)) | {t for n in claim["numbers"] for t in numbers_in(n)}
             missing = sorted(n for n in stated
-                             if n.lstrip("+-") not in _NOT_MEASUREMENTS
+                             if n.lstrip("+-") not in _NOT_MEASUREMENTS and n not in exempt
                              and not number_supported(n, evidence_numbers))
             reason = (f"numbers not found in the cited documents: {', '.join(missing)}"
                       if missing else None)
@@ -159,6 +163,10 @@ Rules:
 - Never say a place "will flood", is "safe", or has "no risk". Say "is mapped within", "was recorded", "is modeled to".
 """
 
+ANSWER_RULES = """
+A question was asked. First write one to three claims in section "answer" that answer it directly, using only the documents, with the same citation and number rules. Lead with the fact that answers the question. If the documents do not contain the answer, write no "answer" claims; do not guess. Then write the other sections as usual.
+"""
+
 
 def _documents(state) -> tuple[list[Doc], list, object]:
     stones, registry = evidence.load(state.get("deployment"))
@@ -172,8 +180,13 @@ def _documents(state) -> tuple[list[Doc], list, object]:
     return docs, items, stones
 
 
-def _user_prompt(docs: list[Doc], sections: list[str]) -> str:
+def _user_prompt(docs: list[Doc], sections: list[str], question: str = "", focus: dict | None = None) -> str:
     lines = []
+    if question:
+        f = focus or {}
+        lines += [f"Question: {question}",
+                  f"Focus: hazard {f.get('hazard', 'flood')}, time frame {f.get('time_frame', 'any')}"
+                  + (f", assets {', '.join(f['assets'])}" if f.get("assets") else ""), ""]
     for sec in sections:
         lines.append(f"## {sec}")
         lines += [f"[{d.doc_id}] {d.text}" for d in docs if d.section == sec]
@@ -181,19 +194,31 @@ def _user_prompt(docs: list[Doc], sections: list[str]) -> str:
     return "Documents, grouped by section:\n\n" + "\n".join(lines) + "\nReturn the claims as JSON."
 
 
-def _render(kept: list[dict], docs: list[Doc], sections: list[str]) -> str:
+def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: str = "") -> str:
+    """Scope header, then the answer (when a question was asked), then one
+    section per Stone that ran, then the footer. Only verified claims."""
     experimental = {d.doc_id for d in docs if d.experimental}
-    parts = [_scope_header()]
-    for sec in sections:
-        sentences = []
+
+    def sentences(sec: str) -> str:
+        out = []
         for c in kept:
             if c["section"] != sec:
                 continue
             text = c["text"].rstrip(". ")
             if any(i in experimental for i in c["doc_ids"]) and "experimental" not in text.lower():
                 text = f"Experimental: {text}"
-            sentences.append(f"{text} {''.join(f'[{i}]' for i in c['doc_ids'])}.")
-        parts.append(f"**{sec}.**\n" + (" ".join(sentences) or NO_EVIDENCE_LINE))
+            out.append(f"{text} {''.join(f'[{i}]' for i in c['doc_ids'])}.")
+        return " ".join(out)
+
+    parts = [_scope_header()]
+    if question:
+        parts.append("**Answer.**\n" + (sentences(ANSWER_SECTION) or CANNOT_ANSWER))
+    in_answer = {i for c in kept if c["section"] == ANSWER_SECTION for i in c["doc_ids"]}
+    for sec in sections:
+        body = sentences(sec)
+        if not body and question and {d.doc_id for d in docs if d.section == sec} <= in_answer:
+            continue  # this section's evidence is already stated in the answer
+        parts.append(f"**{sec}.**\n" + (body or NO_EVIDENCE_LINE))
     parts.append(NON_SCOPE_FOOTER)
     return "\n\n".join(parts)
 
@@ -202,7 +227,7 @@ def synthesize(state) -> dict:
     """Run the claim loop. Returns paragraph, citations and a `grounding`
     record (kept claims, dropped claims with reasons, attempts, model).
     Falls back to the no-LLM briefing when no endpoint answers."""
-    if state.get("intent") == "not_implemented":
+    if state.get("intent") in ("not_implemented", "out_of_scope"):
         paragraph, _ = compose_briefing(state)
         return {"paragraph": paragraph, "citations": {},
                 "grounding": {"tier": "llm", "claims": [], "dropped_claims": [], "attempts": 0}}
@@ -210,15 +235,22 @@ def synthesize(state) -> dict:
     if not docs:
         return {"paragraph": "No grounded data available for this address.", "citations": {},
                 "grounding": {"tier": "llm", "claims": [], "dropped_claims": [], "attempts": 0}}
+    plan = state.get("plan") or {}
+    question, focus = plan.get("question") or "", plan.get("focus")
     sections = list(dict.fromkeys(d.section for d in docs))
-    schema = claims_schema(sorted({d.doc_id for d in docs}), sections)
-    messages = [{"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": _user_prompt(docs, sections)}]
+    extra = (ANSWER_SECTION,) if question else ()
+    # Numbers the user typed (the question, the place) may be restated;
+    # they are the user's words, not claims about the data.
+    exempt = frozenset(numbers_in(f"{question} {state.get('query') or ''} "
+                                  f"{(state.get('geocode') or {}).get('address') or ''}"))
+    schema = claims_schema(sorted({d.doc_id for d in docs}), [*extra, *sections])
+    messages = [{"role": "system", "content": SYSTEM_PROMPT + (ANSWER_RULES if question else "")},
+                {"role": "user", "content": _user_prompt(docs, sections, question, focus)}]
     attempts, model, first_dropped, calls = 0, None, [], []
     try:
         out, model = llm.chat_json(messages, schema, name="claims", ledger=calls)
         attempts = 1
-        kept, dropped = verify(out.get("claims") or [], docs)
+        kept, dropped = verify(out.get("claims") or [], docs, extra, exempt)
         first_dropped = dropped
         if dropped:
             failures = "\n".join(f'- "{d["text"]}": {d["reason"]}' for d in dropped)
@@ -230,7 +262,7 @@ def synthesize(state) -> dict:
             ]
             out, model = llm.chat_json(messages, schema, name="claims", ledger=calls)
             attempts = 2
-            kept, dropped = verify(out.get("claims") or [], docs)
+            kept, dropped = verify(out.get("claims") or [], docs, extra, exempt)
     except llm.LLMUnavailable as e:
         paragraph, cites = compose_briefing(state)
         return {"paragraph": paragraph, "citations": cites,
@@ -239,17 +271,19 @@ def synthesize(state) -> dict:
                               "llm_calls": calls}}
     cited = {i for c in kept for i in c["doc_ids"]}
     return {
-        "paragraph": _render(kept, docs, sections),
+        "paragraph": _render(kept, docs, sections, question),
         "citations": {k: v for k, v in evidence.citations(items).items() if k in cited},
         "grounding": {"tier": "llm", "model": model, "attempts": attempts,
                       "claims": kept, "dropped_claims": dropped,
                       "retried_claims": first_dropped if attempts == 2 else [],
-                      "n_kept": len(kept), "n_dropped": len(dropped), "llm_calls": calls},
+                      "n_kept": len(kept), "n_dropped": len(dropped), "llm_calls": calls,
+                      "question": question, "n_documents": len(docs),
+                      "answered": any(c["section"] == ANSWER_SECTION for c in kept) if question else None},
     }
 
 
 @action(
-    reads=["geocode", "intent", "deployment", "policy_corpus", *evidence.all_pebble_ids()],
+    reads=["geocode", "intent", "deployment", "plan", "policy_corpus", *evidence.all_pebble_ids()],
     writes=["paragraph", "audit", "grounding", "citations", "trace"],
 )
 def reconcile_claims(state: State) -> State:

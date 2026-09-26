@@ -1,0 +1,97 @@
+"""Question-driven routing: pebble selection, planner validation, the
+answer section, and fixed refusals. No LLM, no network."""
+from __future__ import annotations
+
+from app.planner import _validate, plan_schema
+from riprap.core.burr.intake import heuristic_plan
+from riprap.core.burr.stones import FLOOR, select_pebbles
+from riprap.core.burr.synthesis import CANNOT_ANSWER, Doc, _render, verify
+from riprap.core.burr.templated_reconciler import SCOPE_REFUSAL, refusal
+from riprap.core.pebbles.bridge import get_registry
+
+NYC = get_registry("nyc")
+POINT = [p.id for p in NYC.all() if p.manifest.spatial.scope == "point"]
+
+
+def test_bare_address_runs_every_point_pebble():
+    plan = {"intent": "single_address", "question": "", "pebbles": [], "catalog": [p.id for p in NYC.all()]}
+    assert set(select_pebbles(plan, NYC)) == set(POINT)
+
+
+def test_no_llm_plan_runs_every_pebble():
+    assert set(select_pebbles(heuristic_plan("80 Pioneer Street, Brooklyn, NY"), NYC)) == set(POINT)
+
+
+def test_question_runs_choice_plus_floor_only():
+    plan = {"intent": "single_address", "question": "How many 311 complaints?",
+            "pebbles": ["nyc311"], "catalog": [p.id for p in NYC.all()]}
+    assert set(select_pebbles(plan, NYC)) == {"nyc311", *FLOOR["single_address"]}
+
+
+def test_plan_from_another_catalog_falls_back_to_everything():
+    plan = {"intent": "single_address", "question": "q", "pebbles": ["nyc311"], "catalog": ["nyc311"]}
+    assert set(select_pebbles(plan, NYC)) == set(POINT)
+
+
+def test_neighborhood_selection_stays_in_polygon_scope():
+    plan = {"intent": "neighborhood", "question": "q", "pebbles": ["nyc311_nta", "nyc311"],
+            "catalog": [p.id for p in NYC.all()]}
+    assert set(select_pebbles(plan, NYC)) == {"nyc311_nta", *FLOOR["neighborhood"]}
+
+
+def test_planner_validation_drops_unknown_ids_and_defaults_focus():
+    p = _validate({"intent": "single_address", "targets": [{"type": "address", "text": "1 Main St"}],
+                   "question": "Q?", "focus": {"hazard": "lava"}, "pebbles": ["nyc311", "made_up"]},
+                  raw_query="Q?", catalog_ids=["nyc311", "sandy"])
+    assert p.pebbles == ["nyc311"] and p.focus["hazard"] == "flood" and p.focus["time_frame"] == "any"
+
+
+def test_plan_schema_enumerates_catalog_ids():
+    assert plan_schema(["a", "b"])["properties"]["pebbles"]["items"]["enum"] == ["a", "b"]
+
+
+DOCS = [Doc("nyc311", "Live observer", "82 flood-related 311 complaints within 200 m in 5 years.", False)]
+
+
+def test_answer_claims_are_verified_like_others():
+    good = {"section": "answer", "text": "82 flood complaints were filed.", "doc_ids": ["nyc311"], "numbers": ["82"]}
+    bad = {"section": "answer", "text": "120 flood complaints were filed.", "doc_ids": ["nyc311"], "numbers": ["120"]}
+    kept, dropped = verify([good, bad], DOCS, ("answer",))
+    assert kept == [{**good, "text": "82 flood complaints were filed."}]
+    assert "120" in dropped[0]["reason"]
+    # without a question, "answer" is not a valid section
+    assert not verify([good], DOCS)[0]
+
+
+def test_render_opens_with_answer_or_cannot_answer_line():
+    kept = [{"section": "answer", "text": "82 flood complaints were filed", "doc_ids": ["nyc311"], "numbers": ["82"]}]
+    docs = DOCS + [Doc("sandy_inundation", "Hazard reader", "This address sits outside the Sandy extent.", False)]
+    kept2 = kept + [{"section": "Hazard reader", "text": "It sits outside the Sandy extent",
+                     "doc_ids": ["sandy_inundation"], "numbers": []}]
+    text = _render(kept2, docs, ["Hazard reader", "Live observer"], question="How many complaints?")
+    assert text.index("**Answer.**\n82 flood complaints") < text.index("**Hazard reader.**")
+    empty = _render([], DOCS, ["Live observer"], question="How many complaints?")
+    assert f"**Answer.**\n{CANNOT_ANSWER}" in empty
+    assert "**Answer.**" not in _render([], DOCS, ["Live observer"])
+
+
+def test_out_of_scope_gets_fixed_text():
+    assert heuristic_plan("Should I buy the house at 2017 East 17th Street?")["intent"] == "out_of_scope"
+    heat = heuristic_plan("Is 560 Grand Street a heat island in the summer?")
+    assert heat["intent"] == "out_of_scope" and heat["focus"]["hazard"] == "heat"
+    assert refusal({"intent": "out_of_scope", "plan": {"focus": {"hazard": "flood"}}}) == SCOPE_REFUSAL
+    assert "heat" in refusal({"intent": "out_of_scope", "plan": {"focus": {"hazard": "heat"}}})
+
+
+def test_numbers_from_the_users_question_are_exempt():
+    claim = {"section": "answer", "text": "82 complaints were filed near 2017 East 17th Street.",
+             "doc_ids": ["nyc311"], "numbers": ["82"]}
+    assert not verify([claim], DOCS, ("answer",))[0]
+    exempt = frozenset(["2017", "17"])
+    assert verify([claim], DOCS, ("answer",), exempt)[0]
+
+
+def test_section_used_only_by_the_answer_is_omitted():
+    kept = [{"section": "answer", "text": "82 flood complaints were filed", "doc_ids": ["nyc311"], "numbers": ["82"]}]
+    text = _render(kept, DOCS, ["Live observer"], question="How many complaints?")
+    assert "**Live observer.**" not in text
