@@ -12,7 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from math import asin, cos, radians, sin, sqrt
 
-import httpx
+from riprap.core import http
 
 DOC_ID = "nws_obs"
 CITATION = "NWS station observations API (api.weather.gov/stations)"
@@ -87,7 +87,7 @@ def obs_at(lat: float, lon: float) -> Obs:
               precip_last_hour_mm=None, precip_last_3h_mm=None,
               precip_last_6h_mm=None)
     try:
-        r = httpx.get(
+        r = http.get(
             f"https://api.weather.gov/stations/{sid}/observations/latest",
             headers={"User-Agent": USER_AGENT, "Accept": "application/geo+json"},
             timeout=8.0,

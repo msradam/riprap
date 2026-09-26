@@ -22,8 +22,9 @@ from datetime import date, timedelta
 from typing import Any
 
 import geopandas as gpd
-import httpx
 from shapely.geometry import Point
+
+from riprap.core import http
 
 log = logging.getLogger("riprap.dob_permits")
 
@@ -89,7 +90,7 @@ def permits_in_bbox(min_lat: float, min_lon: float,
         f" AND gis_longitude::number >= {min_lon}"
         f" AND gis_longitude::number <= {max_lon}"
     )
-    r = httpx.get(URL, params={
+    r = http.get(URL, params={
         "$select": ",".join([
             "job__", "job_type", "permit_status", "issuance_date",
             "expiration_date", "house__", "street_name", "borough",

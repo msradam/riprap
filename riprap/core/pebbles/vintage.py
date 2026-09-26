@@ -14,13 +14,10 @@ from __future__ import annotations
 
 import logging
 import re
-import time
 from datetime import UTC, datetime
-from functools import lru_cache
 from urllib.parse import urlparse
 
-import httpx
-
+from riprap.core import http
 from riprap.core.pebbles.schema import Provenance
 
 log = logging.getLogger("riprap.vintage")
@@ -42,21 +39,15 @@ def socrata_dataset(url: str | None) -> tuple[str, str] | None:
     return None
 
 
-@lru_cache(maxsize=256)
-def _socrata_updated_at(domain: str, dataset_id: str, _hour: int) -> str | None:
-    # ponytail: `_hour` in the cache key gives an hourly refresh without a
-    # TTL cache class; swap for the shared hishel client if it matters.
+def socrata_updated_at(domain: str, dataset_id: str) -> str | None:
+    """The dataset's `dataUpdatedAt`, cached for an hour by the shared client."""
     try:
-        r = httpx.get(f"https://{domain}/api/views/metadata/v1/{dataset_id}", timeout=10)
+        r = http.get(f"https://{domain}/api/views/metadata/v1/{dataset_id}", timeout=10, ttl_s=3600)
         r.raise_for_status()
         return r.json().get("dataUpdatedAt")
     except Exception as e:  # noqa: BLE001 - vintage is best-effort metadata
         log.warning("Socrata metadata for %s/%s failed: %r", domain, dataset_id, e)
         return None
-
-
-def socrata_updated_at(domain: str, dataset_id: str) -> str | None:
-    return _socrata_updated_at(domain, dataset_id, int(time.time() // 3600))
 
 
 def resolve(prov: Provenance, *, fetched: bool = True) -> dict[str, str | None]:

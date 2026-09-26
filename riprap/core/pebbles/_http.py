@@ -1,14 +1,11 @@
-"""HTTP fetch + TTL cache shared by URL-capable pebble adapters.
+"""URL fetch helpers for the declarative pebble adapters, on top of the
+shared client in riprap/core/http.py (caching, retries, timeouts).
 
-Three functions:
   fetch_url_text(url, *, cache_ttl_s, headers, timeout_s) -> str
   fetch_url_json(url, *, cache_ttl_s, headers, timeout_s) -> Any
-  post_url_json(url, body, *, headers, timeout_s) -> Any
+  post_url_json(url, body, *, headers, timeout_s) -> Any   (never cached)
 
-Cache is in-memory, keyed by (url, frozenset of headers). Entries expire
-after `cache_ttl_s` seconds. A TTL of 0 disables caching for that call.
-`post_url_json` is never cached — POST bodies vary per call by design
-(inference requests, not idempotent lookups).
+A `cache_ttl_s` of 0 disables caching for that call.
 
 Header values support `${ENV_VAR}` interpolation so manifests can declare
 auth tokens without baking secrets into YAML (the substitution happens
@@ -18,12 +15,9 @@ from __future__ import annotations
 
 import os
 import re
-import time
 from typing import Any
 
-import httpx
-
-_CACHE: dict[tuple, tuple[float, Any]] = {}
+from riprap.core import http
 
 _ENV_RE = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
 
@@ -37,58 +31,25 @@ def _interpolate_headers(headers: dict[str, str] | None) -> dict[str, str]:
     return out
 
 
-def _cache_key(url: str, headers: dict[str, str]) -> tuple:
-    return (url, frozenset(headers.items()))
-
-
 def fetch_url_text(url: str, *, cache_ttl_s: int = 300,
                    headers: dict[str, str] | None = None,
                    timeout_s: float = 10.0) -> str:
-    h = _interpolate_headers(headers)
-    key = _cache_key(url, h)
-    now = time.time()
-    if cache_ttl_s > 0:
-        hit = _CACHE.get(key)
-        if hit is not None and (now - hit[0]) < cache_ttl_s:
-            return hit[1]
-    with httpx.Client(timeout=timeout_s, follow_redirects=True) as c:
-        r = c.get(url, headers=h)
-        r.raise_for_status()
-        text = r.text
-    if cache_ttl_s > 0:
-        _CACHE[key] = (now, text)
-    return text
+    r = http.get(url, headers=_interpolate_headers(headers), timeout=timeout_s, ttl_s=cache_ttl_s)
+    r.raise_for_status()
+    return r.text
 
 
 def fetch_url_json(url: str, *, cache_ttl_s: int = 300,
                    headers: dict[str, str] | None = None,
                    timeout_s: float = 10.0) -> Any:
-    h = _interpolate_headers(headers)
-    key = _cache_key(url, h) + ("__json__",)
-    now = time.time()
-    if cache_ttl_s > 0:
-        hit = _CACHE.get(key)
-        if hit is not None and (now - hit[0]) < cache_ttl_s:
-            return hit[1]
-    with httpx.Client(timeout=timeout_s, follow_redirects=True) as c:
-        r = c.get(url, headers=h)
-        r.raise_for_status()
-        data = r.json()
-    if cache_ttl_s > 0:
-        _CACHE[key] = (now, data)
-    return data
+    r = http.get(url, headers=_interpolate_headers(headers), timeout=timeout_s, ttl_s=cache_ttl_s)
+    r.raise_for_status()
+    return r.json()
 
 
 def post_url_json(url: str, body: Any, *,
                   headers: dict[str, str] | None = None,
                   timeout_s: float = 60.0) -> Any:
-    h = _interpolate_headers(headers)
-    with httpx.Client(timeout=timeout_s) as c:
-        r = c.post(url, json=body, headers=h)
-        r.raise_for_status()
-        return r.json()
-
-
-def clear_cache() -> None:
-    """For tests."""
-    _CACHE.clear()
+    r = http.post(url, json=body, headers=_interpolate_headers(headers), timeout=timeout_s, ttl_s=0)
+    r.raise_for_status()
+    return r.json()

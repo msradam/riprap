@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any
 
-import httpx
+from riprap.core import http
 
 DOC_ID = "nws_alerts"
 CITATION = "NWS public alert API (api.weather.gov/alerts)"
@@ -30,7 +30,7 @@ def _is_flood_relevant(event_name: str) -> bool:
 
 
 def alerts_at(lat: float, lon: float) -> list[dict[str, Any]]:
-    r = httpx.get(
+    r = http.get(
         "https://api.weather.gov/alerts/active",
         params={"point": f"{lat:.4f},{lon:.4f}"},
         headers={"User-Agent": USER_AGENT, "Accept": "application/geo+json"},

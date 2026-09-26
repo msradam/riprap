@@ -1,0 +1,83 @@
+"""The one HTTP client every data adapter uses.
+
+  * timeouts: 5 s to connect, 20 s to read, unless a call asks for more;
+  * caching: hishel stores successful responses in a local SQLite file and
+    serves them for `ttl_s` seconds (default 600, 10 minutes, for live
+    sources) whatever the upstream cache headers say; POST bodies are part
+    of the key, so GraphQL queries cache per query;
+  * retries: stamina retries transport errors, 429 and 5xx with backoff
+    and jitter, 3 attempts within 30 s. 4xx responses are returned to the
+    caller, which decides what they mean.
+
+RIPRAP_HTTP_CACHE sets the cache file (default ~/.cache/riprap/http.sqlite);
+RIPRAP_HTTP_CACHE_TTL_S the default TTL; RIPRAP_HTTP_CACHE=off disables it.
+"""
+
+from __future__ import annotations
+
+import functools
+import os
+import sqlite3
+from pathlib import Path
+
+import hishel
+import httpx
+import stamina
+from hishel.httpx import SyncCacheTransport
+
+USER_AGENT = "Riprap/0.7 (civic flood-evidence tool; +https://github.com/msradam/riprap)"
+DEFAULT_TTL_S = float(os.environ.get("RIPRAP_HTTP_CACHE_TTL_S", "600"))
+TIMEOUT = httpx.Timeout(20.0, connect=5.0)
+
+
+class _OkOnly(hishel.BaseFilter[hishel.Response]):
+    def needs_body(self) -> bool:
+        return False
+
+    def apply(self, item: hishel.Response, body: bytes | None) -> bool:
+        return item.status_code == 200
+
+
+@functools.cache
+def client() -> httpx.Client:
+    setting = os.environ.get("RIPRAP_HTTP_CACHE", "")
+    transport: httpx.BaseTransport = httpx.HTTPTransport()
+    if setting.lower() != "off":
+        path = Path(setting or Path.home() / ".cache" / "riprap" / "http.sqlite")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # The Stones fan-out calls this client from many threads.
+        conn = sqlite3.connect(path, check_same_thread=False)
+        storage = hishel.SyncSqliteStorage(connection=conn, default_ttl=DEFAULT_TTL_S)
+        policy = hishel.FilterPolicy(response_filters=[_OkOnly()])
+        policy.use_body_key = True
+        transport = SyncCacheTransport(transport, storage=storage, policy=policy)
+    return httpx.Client(transport=transport, timeout=TIMEOUT, follow_redirects=True,
+                        headers={"User-Agent": USER_AGENT})
+
+
+def _retryable(exc: Exception) -> bool:
+    if isinstance(exc, httpx.HTTPStatusError):
+        return exc.response.status_code == 429 or exc.response.status_code >= 500
+    return isinstance(exc, httpx.TransportError)
+
+
+@stamina.retry(on=_retryable, attempts=3, timeout=30.0)
+def request(method: str, url: str, *, ttl_s: float | None = None, **kwargs) -> httpx.Response:
+    """Send a request through the shared client. `ttl_s` overrides the
+    cache lifetime for this call (0 disables caching for it)."""
+    extensions = dict(kwargs.pop("extensions", None) or {})
+    extensions["hishel_ttl"] = DEFAULT_TTL_S if ttl_s is None else ttl_s
+    if ttl_s == 0:
+        extensions["hishel_ttl"] = 0.001
+    resp = client().request(method, url, extensions=extensions, **kwargs)
+    if resp.status_code == 429 or resp.status_code >= 500:
+        resp.raise_for_status()
+    return resp
+
+
+def get(url: str, **kwargs) -> httpx.Response:
+    return request("GET", url, **kwargs)
+
+
+def post(url: str, **kwargs) -> httpx.Response:
+    return request("POST", url, **kwargs)

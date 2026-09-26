@@ -50,10 +50,11 @@ dependencies = [
     "shapely>=2.0,<3",
     "pyproj>=3.6,<4",
     "rasterio>=1.4,<2",
-    "geopy>=2.4,<3",
     "pandas>=2.2,<3",
     "numpy>=1.26,<3",
     "dataretrieval>=1.3,<2",
+    "hishel>=1.0,<2",
+    "stamina>=25,<27",
 ]
 
 [project.optional-dependencies]

@@ -22,10 +22,12 @@ from __future__ import annotations
 
 import logging
 import re
+import threading
+import time
 from dataclasses import dataclass
 from functools import lru_cache
 
-import httpx
+from riprap.core import http
 
 log = logging.getLogger("riprap.geocode")
 
@@ -84,7 +86,7 @@ class GeocodeHit:
 def geocode(text: str, limit: int = 5) -> list[GeocodeHit]:
     """NYC Geosearch primary."""
     try:
-        r = httpx.get(URL, params={"text": text, "size": limit}, timeout=5)
+        r = http.get(URL, params={"text": text, "size": limit}, timeout=5, ttl_s=86400)
         r.raise_for_status()
         feats = r.json().get("features", [])
         out = []
@@ -108,15 +110,25 @@ def geocode(text: str, limit: int = 5) -> list[GeocodeHit]:
         return []
 
 
-@lru_cache(maxsize=1)
-def _nominatim_call():
-    """One process-wide client and RateLimiter, so the 1 request/s policy
-    holds across requests and threads (geopy's limiter takes a lock)."""
-    from geopy.extra.rate_limiter import RateLimiter  # noqa: PLC0415
-    from geopy.geocoders import Nominatim  # noqa: PLC0415
+_NOMINATIM_LOCK = threading.Lock()
+_nominatim_last = 0.0
 
-    geocoder = Nominatim(user_agent=NOMINATIM_UA, timeout=10)
-    return RateLimiter(geocoder.geocode, min_delay_seconds=1.0, swallow_exceptions=False)
+
+def _nominatim_search(params: dict) -> list:
+    """One Nominatim search through the shared client. A process-wide lock
+    holds real requests to 1 per second (OSMF usage policy); cached
+    answers (kept a day) do not count against it."""
+    global _nominatim_last
+    with _NOMINATIM_LOCK:
+        wait = 1.0 - (time.monotonic() - _nominatim_last)
+        if wait > 0:
+            time.sleep(wait)
+        r = http.get(NOMINATIM_URL, params={**params, "format": "jsonv2"}, timeout=10,
+                     headers={"User-Agent": NOMINATIM_UA}, ttl_s=86400)
+        if not r.extensions.get("hishel_from_cache"):
+            _nominatim_last = time.monotonic()
+    r.raise_for_status()
+    return r.json()
 
 
 def geocode_nominatim(
@@ -125,10 +137,8 @@ def geocode_nominatim(
 ) -> GeocodeHit | None:
     """National OSM Nominatim fallback.
 
-    Uses geopy's Nominatim client, which enforces the OSM Nominatim
-    Usage Policy: a non-default User-Agent (required), and the 1 req/s
-    rate limit (we apply it explicitly via RateLimiter — geopy doesn't
-    rate-limit by default).
+    Follows the OSM Nominatim Usage Policy: an identifying User-Agent and
+    at most 1 request/s across the process (`_nominatim_search`).
     See https://operations.osmfoundation.org/policies/nominatim/
 
     `viewbox` (a list of two (lat, lon) corner points) plus `bounded=True`
@@ -145,24 +155,21 @@ def geocode_nominatim(
     See geocode_one, which detects a non-US signal in the query and
     reruns unrestricted specifically to catch this.
     """
-    geocode_call = _nominatim_call()
-    call_kwargs: dict = {
-        "addressdetails": True,
-        "exactly_one": True,
-    }
+    params: dict = {"q": text, "addressdetails": 1, "limit": 1}
     if country_codes is not None:
-        call_kwargs["country_codes"] = country_codes
+        params["countrycodes"] = country_codes
     if viewbox is not None:
-        call_kwargs["viewbox"] = viewbox
-        call_kwargs["bounded"] = bounded
+        (lat1, lon1), (lat2, lon2) = viewbox
+        params["viewbox"] = f"{lon1},{lat1},{lon2},{lat2}"
+        params["bounded"] = 1 if bounded else 0
     try:
-        location = geocode_call(text, **call_kwargs)
+        rows = _nominatim_search(params)
     except Exception as e:  # noqa: BLE001 — log + None per the rest of this module
         log.warning("Nominatim fetch failed: %r", e)
         return None
-    if location is None:
+    if not rows:
         return None
-    row = location.raw  # the same dict the JSON API returns
+    row = rows[0]
     addr = row.get("address") or {}
 
     # Try to map Nominatim borough/county back to NYC standard
@@ -181,8 +188,8 @@ def geocode_nominatim(
     return GeocodeHit(
         address=row.get("display_name") or text,
         borough=boro,
-        lat=location.latitude,
-        lon=location.longitude,
+        lat=float(row["lat"]),
+        lon=float(row["lon"]),
         bbl=None,  # Nominatim doesn't have BBLs
         bin=None,
         raw={"source": "nominatim", **row},
@@ -269,7 +276,7 @@ def _active_deployment_bbox() -> tuple[float, float, float, float] | None:
     try:
         from riprap.core.pebbles.deployments import deployment_by_name  # noqa: PLC0415
 
-        name = os.environ.get("RIPRAP_DEPLOYMENT", "").rstrip("/").split("/")[-1]
+        name = os.environ.get("RIPRAP_DEPLOYMENT", "nyc").rstrip("/").split("/")[-1]
         dep = deployment_by_name(name) if name else None
         return dep.bbox if dep else None
     except Exception:  # noqa: BLE001 — bias is best-effort

@@ -11,9 +11,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import geopandas as gpd
-import httpx
 
 from app.spatial import DATA, NYC_CRS
+from riprap.core import http
 
 URL = "https://data.ny.gov/api/geospatial/i9wp-a4ja?method=export&format=GeoJSON"
 LOCAL = DATA / "mta_entrances.geojson"
@@ -23,7 +23,7 @@ def _ensure_fixture() -> Path:
     if LOCAL.exists():
         return LOCAL
     print("downloading MTA Subway Entrances (one-time)...", flush=True)
-    r = httpx.get(URL, timeout=60)
+    r = http.get(URL, timeout=60)
     r.raise_for_status()
     LOCAL.write_text(r.text)
     return LOCAL

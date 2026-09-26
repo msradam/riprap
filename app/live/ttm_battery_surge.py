@@ -112,7 +112,7 @@ def _fetch_chunk(start: datetime, end: datetime, product: str):
     """
     import pandas as pd
 
-    import httpx
+    from riprap.core import http
     params = {
         "station": STATION_ID,
         "begin_date": start.strftime("%Y%m%d"),
@@ -125,7 +125,7 @@ def _fetch_chunk(start: datetime, end: datetime, product: str):
         "application": "riprap-nyc",
         "interval": "h",
     }
-    resp = httpx.get(NOAA_API, params=params, timeout=30)
+    resp = http.get(NOAA_API, params=params, timeout=30, ttl_s=3600)
     resp.raise_for_status()
     data = resp.json()
     key = "data" if "data" in data else "predictions"

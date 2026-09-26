@@ -17,7 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from math import asin, cos, radians, sin, sqrt
 
-import httpx
+from riprap.core import http
 
 DOC_ID = "noaa_tides"
 CITATION = "NOAA CO-OPS Tides & Currents (api.tidesandcurrents.noaa.gov)"
@@ -91,7 +91,7 @@ def _datum_for(station_id: str) -> str:
 
 
 def _fetch(station_id: str, product: str) -> dict:
-    r = httpx.get(URL, params={
+    r = http.get(URL, params={
         "date": "latest", "station": station_id, "product": product,
         "datum": _datum_for(station_id),
         "units": "english", "time_zone": "lst_ldt",

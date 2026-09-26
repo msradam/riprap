@@ -7,10 +7,10 @@ Hasura GraphQL endpoint, no auth, ~350 sensors. Used for:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
-import httpx
+from riprap.core import http
 
 URL = "https://api.floodnet.nyc/v1/graphql"
 DOC_ID = "floodnet"
@@ -39,7 +39,7 @@ class FloodEvent:
 
 
 def _gql(query: str, variables: dict[str, Any]) -> dict:
-    r = httpx.post(URL, json={"query": query, "variables": variables},
+    r = http.post(URL, json={"query": query, "variables": variables},
                    timeout=20)
     r.raise_for_status()
     j = r.json()
@@ -112,7 +112,7 @@ def flood_events_for(deployment_ids: list[str],
     if not deployment_ids:
         return []
     if since is None:
-        since = datetime.now(timezone.utc) - timedelta(days=365 * 3)
+        since = datetime.now(UTC) - timedelta(days=365 * 3)
     d = _gql(_EVENTS_Q, {
         "ids": deployment_ids,
         "since": since.isoformat(timespec="seconds").replace("+00:00", ""),

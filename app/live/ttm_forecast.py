@@ -18,7 +18,7 @@ import threading
 
 import numpy as np
 
-import httpx
+from riprap.core import http
 
 log = logging.getLogger("riprap.ttm_forecast")
 
@@ -168,7 +168,7 @@ def _fetch_311_flood_daily(lat: float, lon: float,
         f"within_circle(location, {lat}, {lon}, {radius_m})"
     )
     try:
-        r = httpx.get(NYC_311_URL,
+        r = http.get(NYC_311_URL,
                       params={"$select": "created_date",
                               "$where": where,
                               "$limit": "50000"},

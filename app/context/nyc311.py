@@ -7,9 +7,9 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-import httpx
+from riprap.core import http
 
 URL = "https://data.cityofnewyork.us/resource/erm2-nwe9.json"
 DOC_ID = "nyc311"
@@ -47,7 +47,7 @@ def complaints_near(lat: float, lon: float, radius_m: float = 200,
         # Socrata floating-timestamp: drop tz suffix
         ts = since.replace(tzinfo=None).isoformat(timespec="seconds")
         where += f" AND created_date >= '{ts}'"
-    r = httpx.get(URL, params={
+    r = http.get(URL, params={
         "$select": "unique_key, descriptor, created_date, incident_address, "
                    "status, latitude, longitude",
         "$where": where,
@@ -77,7 +77,7 @@ def complaints_near(lat: float, lon: float, radius_m: float = 200,
 
 def summary_for_point(lat: float, lon: float, radius_m: float = 200,
                       years: int = 5) -> dict:
-    since = datetime.now(timezone.utc) - timedelta(days=365 * years)
+    since = datetime.now(UTC) - timedelta(days=365 * years)
     cs = complaints_near(lat, lon, radius_m, since=since, limit=2000)
     return _summarize(cs, years=years, radius_m=radius_m)
 
@@ -104,7 +104,7 @@ def complaints_in_polygon(polygon, polygon_crs: str = "EPSG:4326",
     if since:
         ts = since.replace(tzinfo=None).isoformat(timespec="seconds")
         where += f" AND created_date >= '{ts}'"
-    r = httpx.get(URL, params={
+    r = http.get(URL, params={
         "$select": "unique_key, descriptor, created_date, incident_address, status",
         "$where": where,
         "$order": "created_date desc",
@@ -127,7 +127,7 @@ def summary_for_polygon(polygon, polygon_crs: str = "EPSG:4326",
                         years: int = 5) -> dict:
     """Polygon-mode aggregation: counts of flood-related 311 complaints
     inside the polygon over the trailing window."""
-    since = datetime.now(timezone.utc) - timedelta(days=365 * years)
+    since = datetime.now(UTC) - timedelta(days=365 * years)
     cs = complaints_in_polygon(polygon, polygon_crs=polygon_crs, since=since)
     return _summarize(cs, years=years, radius_m=None)
 
