@@ -1,6 +1,7 @@
 id: albany_flood_311
 type: live
 title: Albany flood-related service requests near this address
+answers: "flooding, drainage and sinkhole service requests within 800 m in Albany"
 stone: touchstone
 tier: empirical
 adapter: python_call

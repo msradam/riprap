@@ -137,6 +137,9 @@ class _PebbleBase(BaseModel):
 
     id: str = Field(..., pattern=r"^[a-z][a-z0-9_]*$")
     title: str
+    # One plain line saying what question this source answers; the
+    # planner reads it to choose which pebbles a question needs.
+    answers: str | None = None
     stone: str  # which Stone this pebble rolls up to
     # Model layers say whether their evaluation supports showing them as
     # evidence (production) or only as a labelled experiment.

@@ -1,6 +1,7 @@
 id: floodnet_forecast
 type: model
 title: Granite TTM r2 — flood-event recurrence at nearest FloodNet sensor
+answers: "experimental forecast of flood events at the nearest FloodNet sensor (no rainfall input)"
 stone: lodestone
 maturity: experimental
 tier: modeled

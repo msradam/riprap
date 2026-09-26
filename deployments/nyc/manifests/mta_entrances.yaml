@@ -1,6 +1,7 @@
 id: mta_entrances
 type: baked
 title: MTA subway/rail entrances exposed nearby
+answers: "subway entrances nearby and how many sit in the Sandy extent or the DEP 2080 scenario"
 stone: keystone
 tier: empirical
 adapter: python_call

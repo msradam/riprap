@@ -1,6 +1,7 @@
 id: epa_airnow
 type: live
 title: EPA AirNow — current AQI at this address
+answers: "current air quality index (AQI) at the nearest EPA AirNow station"
 stone: touchstone
 adapter: rest_json
 

@@ -33,3 +33,8 @@ def test_every_manifest_declares_its_vintage():
         prov = yaml.safe_load(manifest.read_text())["provenance"]
         assert "date_modified" in prov and "retrieved_at" in prov, manifest
         assert prov["retrieved_at"], f"{manifest}: retrieved_at must not be null"
+
+
+def test_every_manifest_says_what_it_answers():
+    for manifest in _MANIFESTS:
+        assert yaml.safe_load(manifest.read_text()).get("answers"), f"{manifest}: add an answers: line"

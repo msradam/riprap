@@ -80,6 +80,10 @@ _LIVE_RE = re.compile(r"\b(right now|currently|tonight|at the moment|live condit
 _DEVELOPMENT_RE = re.compile(r"\b(building|construction|permits?|development|projects? underway)\b",
                              re.IGNORECASE)
 _HOUSE_NUMBER_RE = re.compile(r"^\s*\d+(-\d+)?\s+\S")
+_OUT_OF_SCOPE_RE = re.compile(r"\b(should i (buy|rent|sell|move)|insurance (cost|premium|price|rate)"
+                              r"|cost me|sue|lawsuit|lawyer|mortgage)\b", re.IGNORECASE)
+_OTHER_HAZARD_RE = {"heat": re.compile(r"\b(heat island|heat wave|heat vulnerab|hot in the summer)", re.I),
+                    "air": re.compile(r"\b(air quality|aqi|air pollution|smog)\b", re.I)}
 
 
 def heuristic_plan(query: str) -> dict:
@@ -98,6 +102,15 @@ def heuristic_plan(query: str) -> dict:
     msg = _not_implemented_message(q)
     if msg:
         return {"intent": "not_implemented", "rationale": msg, "targets": []}
+    for hazard, pattern in _OTHER_HAZARD_RE.items():
+        if pattern.search(q):
+            return {"intent": "out_of_scope", "rationale": f"Heuristic match: {hazard} question.",
+                    "focus": {"hazard": hazard, "time_frame": "any", "assets": []},
+                    "targets": [{"type": "address", "text": _address_from_query(q)}]}
+    if _OUT_OF_SCOPE_RE.search(q):
+        return {"intent": "out_of_scope", "rationale": "Heuristic match: out of scope.",
+                "focus": {"hazard": "flood", "time_frame": "any", "assets": []},
+                "targets": [{"type": "address", "text": _address_from_query(q)}]}
     m = _COMPARE_RE.match(q)
     if m:
         a, b = (g for g in m.groups() if g)
@@ -298,3 +311,36 @@ def resolve_area(state: State) -> State:
                             polygon_wkt=t["geometry"].wkt, trace=trace)
     finally:
         rec["elapsed_s"] = round(time.time() - rec["started_at"], 2)
+
+
+@action(reads=["plan", "intent", "deployment", "lat", "lon", "trace"],
+        writes=["selected_pebbles", "consulted", "not_checked", "trace"])
+def select_sources(state: State) -> State:
+    """Decide which pebbles run (stones.select_pebbles) and record the
+    sources consulted and the ones not checked. Unchosen pebbles appear in
+    the trace as skipped, not failed."""
+    from riprap.core.burr.stones import pebbles_for, select_pebbles  # noqa: PLC0415
+    from riprap.core.pebbles.bridge import get_registry  # noqa: PLC0415
+
+    trace = list(state.get("trace", []))
+    registry = get_registry(state.get("deployment") or None)
+    plan = {**(state.get("plan") or {}), "intent": state.get("intent")}
+    selected = select_pebbles(plan, registry)
+    available = pebbles_for(state.get("deployment"), state.get("lat"), state.get("lon"),
+                            state.get("intent"))
+    if "policy_corpus" in registry.ids() and state.get("intent") not in ("neighborhood", "development_check",
+                                                                         "live_now"):
+        available.append("policy_corpus")
+
+    def entry(pid):
+        m = registry.get(pid).manifest
+        return {"id": pid, "title": m.title, "stone": m.stone}
+
+    consulted = [entry(p) for p in available if p in selected]
+    not_checked = [entry(p) for p in available if p not in selected]
+    for e in not_checked:
+        rec = trace_rec_for(e["id"])
+        rec.update(ok=True, result={"skipped": "not selected for this question"})
+        trace.append(rec)
+    return state.update(selected_pebbles=selected, consulted=consulted,
+                        not_checked=not_checked, trace=trace)

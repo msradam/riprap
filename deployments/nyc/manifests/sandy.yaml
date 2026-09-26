@@ -1,6 +1,7 @@
 id: sandy
 type: baked
 title: NYC Sandy Inundation Zone (2012 empirical extent)
+answers: "whether the point was inside the area Hurricane Sandy flooded in 2012"
 stone: cornerstone
 tier: empirical
 adapter: python_call

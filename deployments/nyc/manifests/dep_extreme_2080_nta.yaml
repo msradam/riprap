@@ -1,6 +1,7 @@
 id: dep_extreme_2080_nta
 type: baked
 title: DEP Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood
+answers: "share of the area modeled to flood in the DEP extreme rainstorm with 2080 sea level"
 stone: cornerstone
 tier: modeled
 adapter: python_call

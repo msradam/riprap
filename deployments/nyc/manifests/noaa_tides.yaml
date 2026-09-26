@@ -1,6 +1,7 @@
 id: noaa_tides
 type: live
 title: NOAA tide-gauge water level (nearest station)
+answers: "the latest harbor water level and surge at the nearest NOAA tide gauge, right now"
 stone: touchstone
 tier: empirical
 adapter: python_call

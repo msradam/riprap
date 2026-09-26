@@ -1,10 +1,12 @@
-"""Riprap query planner (LLM mode): route a natural-language query to an
-intent and its target place(s). The Burr app then runs the pebbles for
-that intent. No-LLM mode uses the regex planner in
-riprap/core/burr/intake.py instead.
+"""Riprap query planner (LLM mode): turn a natural-language question into
+a plan: intent, target place(s), the question and its focus, and the
+pebbles needed to answer it, chosen from the deployment's catalog by
+each manifest's `answers` line. `select_pebbles` (riprap/core/burr/
+stones.py) adds the always-run floor. No-LLM mode uses the regex planner
+in riprap/core/burr/intake.py and runs every pebble for the intent.
 
 Output is a single JSON object with a fixed schema (see PLAN_SCHEMA).
-The call passes PLAN_JSON_SCHEMA as `response_format`, so the model
+The call passes plan_schema() as `response_format`, so the model
 cannot emit malformed structure. A deterministic post-validator
 sanity-checks the plan against the supported intents.
 """
@@ -55,6 +57,13 @@ INTENTS = {
         "DOB construction permits inside it, cross-reference each project "
         "with Sandy + DEP flood layers, return a flagged-projects list."
     ),
+    "out_of_scope": (
+        "Use when the question asks for something Riprap does not provide: "
+        "advice on buying, renting or selling property, insurance prices, "
+        "legal advice, a prediction for a specific future day, or a hazard "
+        "other than flooding (heat, air quality, earthquakes). Still extract "
+        "the place as a target and set focus.hazard."
+    ),
     "compare": (
         "Use ONLY when the query explicitly compares TWO specific street "
         "ADDRESSES (e.g. 'compare 80 Pioneer St Brooklyn to 100 Gold St "
@@ -69,34 +78,42 @@ class Plan:
     intent: str
     targets: list[dict[str, str]]
     rationale: str
+    question: str = ""  # the question asked; "" when the input is only a place
+    focus: dict | None = None  # {hazard, time_frame, assets}
+    pebbles: list[str] | None = None  # sources chosen from the catalog
+    catalog: list[str] | None = None  # ids that were offered
 
 
-PLAN_SCHEMA_DESC = """Return JSON with exactly these keys:
+FOCUS_HAZARDS = ["flood", "heat", "air", "other"]
+FOCUS_TIMES = ["past", "now", "future", "any"]
+FOCUS_ASSETS = ["subway", "schools", "public_housing", "hospitals", "construction"]
 
-{
-  "intent": one of the intents above,
-  "targets": [
-    {"type": "address", "text": "<address text>"}    for single_address, compare, live_now
-    {"type": "nta",     "text": "<neighborhood>"}    for neighborhood, development_check
-    {"type": "borough", "text": "<borough>"}         for a whole borough
-    {"type": "nyc",     "text": "NYC"}               for live_now with no specific place
-  ],
-  "rationale": "<one short sentence>"
-}
 
-Rules:
-- Pick ONE intent.
-- compare: exactly two targets, both type "address".
-- Extract place names from the query text: "in Gowanus" gives {"type": "nta", "text": "Gowanus"}.
+PLAN_SCHEMA_DESC = """Return JSON with these keys:
+
+  intent    one of the intents above
+  targets   [{"type": "address", "text": ...}] for single_address, compare, live_now,
+            out_of_scope; [{"type": "nta", "text": ...}] for neighborhood and
+            development_check (a neighborhood name or a community district code such
+            as QN12); compare has exactly two address targets
+  question  the question being asked, in the user's words; "" when the input is only
+            an address or a place with no question
+  focus     hazard (flood, heat, air, other), time_frame (past, now, future, any), and
+            assets the question is about (subway, schools, public_housing, hospitals,
+            construction), or [] for none
+  pebbles   the few sources from the catalog needed to answer the question, usually
+            one to five; [] when question is ""
+  rationale one short sentence
 """
 
 
-SYSTEM_PROMPT = f"""You are Riprap's query planner. You read a flood-exposure question and decide which intent fits and which place or places it is about. You do not have any data.
+SYSTEM_PROMPT = f"""You are Riprap's query planner. You read a flood-exposure question, decide which intent fits, which place it is about, and which of the listed data sources are needed to answer it. You do not have any data yet.
 
 Intents:
 {chr(10).join(f"  - {k}: {v}" for k, v in INTENTS.items())}
 
-{PLAN_SCHEMA_DESC}"""
+{PLAN_SCHEMA_DESC}
+Choose sources whose description answers the question: history questions need past records, "right now" questions need live sources, scenario questions need the scenario layers, asset questions need that asset register. Use "point" sources for an address and "area" sources for a neighborhood or community district. Do not pick sources just in case."""
 
 
 # ---- Not-implemented short-circuits ----------------------------------------
@@ -153,23 +170,52 @@ def _not_implemented_message(query: str) -> str | None:
 
 # ---- Planner call ----------------------------------------------------------
 
-PLAN_JSON_SCHEMA = {
-    "type": "object",
-    "additionalProperties": False,
-    "required": ["intent", "targets", "rationale"],
-    "properties": {
-        "intent": {"type": "string", "enum": sorted(INTENTS)},
-        "targets": {"type": "array", "items": {
-            "type": "object", "additionalProperties": False, "required": ["type", "text"],
-            "properties": {"type": {"type": "string", "enum": ["address", "nta", "borough", "nyc"]},
-                           "text": {"type": "string"}},
-        }},
-        "rationale": {"type": "string"},
-    },
-}
+def plan_schema(pebble_ids: list[str]) -> dict:
+    """The plan's JSON schema; `pebbles` items are an enum of the ids the
+    catalog offered, so the decoder cannot produce any other id."""
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["intent", "targets", "question", "focus", "pebbles", "rationale"],
+        "properties": {
+            "intent": {"type": "string", "enum": sorted(INTENTS)},
+            "targets": {"type": "array", "items": {
+                "type": "object", "additionalProperties": False, "required": ["type", "text"],
+                "properties": {"type": {"type": "string", "enum": ["address", "nta", "borough", "nyc"]},
+                               "text": {"type": "string"}},
+            }},
+            "question": {"type": "string"},
+            "focus": {"type": "object", "additionalProperties": False,
+                      "required": ["hazard", "time_frame", "assets"],
+                      "properties": {
+                          "hazard": {"type": "string", "enum": FOCUS_HAZARDS},
+                          "time_frame": {"type": "string", "enum": FOCUS_TIMES},
+                          "assets": {"type": "array", "items": {"type": "string", "enum": FOCUS_ASSETS}},
+                      }},
+            "pebbles": {"type": "array", "items": {"type": "string", "enum": pebble_ids}},
+            "rationale": {"type": "string"},
+        },
+    }
 
 
-def plan(query: str, on_token=None, ledger: list | None = None) -> Plan:
+def catalog(registry) -> list[dict]:
+    """The sources the planner may choose from: id, stone, scope and the
+    manifest's one-line `answers`. No evidence, so the prompt stays short."""
+    return [{"id": p.id, "stone": p.stone,
+             "scope": "area" if p.manifest.spatial.scope == "polygon" else "point",
+             "answers": p.manifest.answers or p.manifest.title}
+            for p in sorted(registry.all(), key=lambda p: (p.stone, p.id)) if p.stone != "capstone"]
+
+
+def _catalog_registry():
+    import os  # noqa: PLC0415
+
+    from riprap.core.pebbles.bridge import get_registry  # noqa: PLC0415
+
+    return get_registry(os.environ.get("RIPRAP_DEPLOYMENT", "nyc").rstrip("/").split("/")[-1])
+
+
+def plan(query: str, on_token=None, ledger: list | None = None, registry=None) -> Plan:
     """Ask Granite 4.1 to plan a query. Returns a validated Plan.
 
     If on_token is provided, the planner runs in streaming mode and
@@ -184,20 +230,23 @@ def plan(query: str, on_token=None, ledger: list | None = None) -> Plan:
             on_token(json.dumps({"intent": "not_implemented", "message": msg}))
         return Plan(intent="not_implemented", targets=[], rationale=msg)
 
+    cat = catalog(registry or _catalog_registry())
+    lines = "\n".join(f"  {c['id']} ({c['stone']}, {c['scope']}): {c['answers']}" for c in cat)
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": SYSTEM_PROMPT + "\n\nData sources:\n" + lines},
         {"role": "user",   "content": query},
     ]
     from riprap.core import llm  # noqa: PLC0415
 
-    d, _model = llm.chat_json(messages, PLAN_JSON_SCHEMA, name="plan", ledger=ledger)
+    ids = [c["id"] for c in cat]
+    d, _model = llm.chat_json(messages, plan_schema(ids), name="plan", ledger=ledger)
     log.info("planner plan: %s", str(d)[:400])
     if on_token:
         on_token(json.dumps(d))
-    return _validate(d, raw_query=query)
+    return _validate(d, raw_query=query, catalog_ids=ids)
 
 
-def _validate(d: dict[str, Any], raw_query: str) -> Plan:  # TODO(cleanup): cc-grade-D (23)
+def _validate(d: dict[str, Any], raw_query: str, catalog_ids: list[str] | None = None) -> Plan:  # TODO(cleanup): cc-grade-D (23)
     """Defensive parse + sanitize. The model might pick an invalid intent
     or no usable target; fall back to single_address
     with the raw query as the address (the most common case)."""
@@ -233,4 +282,13 @@ def _validate(d: dict[str, Any], raw_query: str) -> Plan:  # TODO(cleanup): cc-g
             targets = [{"type": "nyc", "text": "NYC"}]
 
     rationale = (d.get("rationale") or "").strip()[:300] or "(no rationale provided)"
-    return Plan(intent=intent, targets=targets, rationale=rationale)
+    question = (d.get("question") or "").strip()
+    focus = d.get("focus") if isinstance(d.get("focus"), dict) else {}
+    focus = {"hazard": focus.get("hazard") if focus.get("hazard") in FOCUS_HAZARDS else "flood",
+             "time_frame": focus.get("time_frame") if focus.get("time_frame") in FOCUS_TIMES else "any",
+             "assets": [a for a in focus.get("assets") or [] if a in FOCUS_ASSETS]}
+    offered = set(catalog_ids or [])
+    # The schema enum already restricts ids; validate anyway.
+    pebbles = [p for p in dict.fromkeys(d.get("pebbles") or []) if p in offered]
+    return Plan(intent=intent, targets=targets, rationale=rationale, question=question,
+                focus=focus, pebbles=pebbles, catalog=catalog_ids)

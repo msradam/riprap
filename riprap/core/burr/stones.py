@@ -1,4 +1,5 @@
-"""The four data Stones as one parallel Burr fan-out.
+"""The four data Stones as one parallel Burr fan-out, over the pebbles
+`select_pebbles` chose for the question.
 
 Cornerstone, Touchstone, Keystone and Lodestone pebbles do not depend on
 each other, so a single `MapActions` runs every pebble for the query
@@ -31,6 +32,35 @@ from riprap.core.pebbles import load_registry
 
 DATA_STONES = ("cornerstone", "touchstone", "keystone", "lodestone")
 POLYGON_INTENTS = ("neighborhood", "development_check")
+
+# Always run for a question, whatever the planner chose: the regulatory
+# flood zone and the modeled flood layers a flood answer should never
+# skip. Geocoding always runs; it is not a pebble.
+FLOOR = {
+    "single_address": ("fema_nfhl", "sandy", "dep_moderate_2050"),
+    "compare": ("fema_nfhl", "sandy", "dep_moderate_2050"),
+    "live_now": ("nws_alerts",),
+    "neighborhood": ("sandy_nta", "dep_moderate_2050_nta"),
+    "development_check": ("sandy_nta", "dep_moderate_2050_nta", "dob_permits_nta"),
+}
+
+
+def select_pebbles(plan: dict | None, registry) -> list[str]:
+    """The pebbles to run for a plan, in registry order: the planner's
+    choice plus the intent's FLOOR. A bare place (no question), no-LLM
+    mode (no choice), or a plan made against another deployment's catalog
+    gets every pebble for the intent. One plain function so another
+    selector (a small classifier) can replace the planner's choice."""
+    plan = plan or {}
+    intent = plan.get("intent")
+    ids = [p.id for p in registry.all() if p.stone != "capstone" and _wants(p.manifest, intent)]
+    chosen = plan.get("pebbles")
+    if not plan.get("question") or chosen is None:
+        return ids
+    if not set(plan.get("catalog") or []).issuperset(ids):
+        return ids  # e.g. planned with the NYC catalog, routed to Chicago
+    keep = set(chosen) | set(FLOOR.get(intent, ()))
+    return [i for i in ids if i in keep]
 
 
 def _wants(manifest, intent: str | None) -> bool:
@@ -105,12 +135,20 @@ def _all_data_pebble_ids() -> list[str]:
     return sorted(ids)
 
 
+def _to_run(state) -> list[str]:
+    """Pebbles the fan-out runs: those covering the point, restricted to
+    the selection when there is one."""
+    ids = pebbles_for(state.get("deployment"), state.get("lat"), state.get("lon"), state.get("intent"))
+    selected = state.get("selected_pebbles")
+    return ids if selected is None else [i for i in ids if i in selected]
+
+
 class StonesAction(MapActions):
     """Every data-Stone pebble for the query, run concurrently."""
 
     @property
     def reads(self) -> list[str]:
-        return ["lat", "lon", "deployment", "intent", "polygon_wkt"]
+        return ["lat", "lon", "deployment", "intent", "polygon_wkt", "selected_pebbles"]
 
     @property
     def writes(self) -> list[str]:
@@ -119,8 +157,7 @@ class StonesAction(MapActions):
     def actions(self, state: State, inputs: dict[str, Any],  # noqa: ARG002 - Burr API
                 context: ApplicationContext) -> Generator[Any, None, None]:  # noqa: ARG002
         _import_ml_stacks()
-        for pid in pebbles_for(state.get("deployment"), state.get("lat"), state.get("lon"),
-                               state.get("intent")):
+        for pid in _to_run(state):
             yield pebble_action(pid)
 
     def state(self, state: State, inputs: dict[str, Any]) -> State:  # noqa: ARG002 - Burr API
@@ -133,12 +170,11 @@ class StonesAction(MapActions):
             for k in s.keys():
                 if k == "trace":
                     trace.extend(s["trace"])
-                elif k not in ("lat", "lon", "deployment", "intent", "polygon_wkt"):
+                elif k not in ("lat", "lon", "deployment", "intent", "polygon_wkt", "selected_pebbles"):
                     updates[k] = s[k]
         for declared in self.writes:
             if declared != "trace" and declared not in updates and state.get(declared) is None:
                 updates[declared] = None
-        order = {pid: i for i, pid in enumerate(pebbles_for(
-            state.get("deployment"), state.get("lat"), state.get("lon"), state.get("intent")))}
+        order = {pid: i for i, pid in enumerate(_to_run(state))}
         new = sorted(trace[len(state.get("trace", [])):], key=lambda r: order.get(r.get("step"), 999))
         return state.update(trace=[*state.get("trace", []), *new], **updates)

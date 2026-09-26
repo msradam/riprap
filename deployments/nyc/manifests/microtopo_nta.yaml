@@ -1,6 +1,7 @@
 id: microtopo_nta
 type: baked
 title: Neighborhood terrain from the USGS 3DEP DEM
+answers: "the area's terrain: median elevation and share of low-lying ground"
 stone: cornerstone
 tier: proxy
 adapter: python_call

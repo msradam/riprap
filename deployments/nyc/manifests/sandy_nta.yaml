@@ -1,6 +1,7 @@
 id: sandy_nta
 type: baked
 title: Share of the neighborhood inside the 2012 Sandy extent
+answers: "share of the area inside the 2012 Hurricane Sandy flood extent"
 stone: cornerstone
 tier: empirical
 adapter: python_call

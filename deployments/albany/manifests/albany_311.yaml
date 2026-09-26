@@ -1,6 +1,7 @@
 id: albany_311
 type: live
 title: Albany 311 (SeeClickFix) service requests near this address
+answers: "all SeeClickFix service requests within 300 m in Albany, any category"
 stone: touchstone
 adapter: python_call
 

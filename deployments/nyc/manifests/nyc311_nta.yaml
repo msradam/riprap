@@ -1,6 +1,7 @@
 id: nyc311_nta
 type: baked
 title: NYC 311 flood complaints inside the neighborhood
+answers: "flood-related 311 complaints inside the area over 3 years, by type"
 stone: touchstone
 tier: proxy
 adapter: python_call

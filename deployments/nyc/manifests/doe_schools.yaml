@@ -1,6 +1,7 @@
 id: doe_schools
 type: baked
 title: NYC DOE schools exposed nearby
+answers: "public schools nearby and how many sit in the Sandy extent or the DEP 2080 scenario"
 stone: keystone
 tier: empirical
 adapter: python_call

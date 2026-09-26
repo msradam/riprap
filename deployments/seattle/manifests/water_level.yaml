@@ -1,6 +1,7 @@
 id: water_level
 type: live
 title: Local water level — NOAA Seattle, WA (station 9447130)
+answers: "latest Puget Sound water level at the NOAA Seattle gauge"
 stone: touchstone
 adapter: python_call
 

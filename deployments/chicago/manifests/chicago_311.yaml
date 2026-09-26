@@ -1,6 +1,7 @@
 id: chicago_311
 type: live
 title: Chicago 311 service requests near this address
+answers: "all Chicago 311 service requests within 200 m, any category (not flood-filtered)"
 stone: touchstone
 adapter: socrata_records
 

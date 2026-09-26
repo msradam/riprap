@@ -1,6 +1,7 @@
 id: water_level
 type: live
 title: Local water level — NOAA Boston, MA (station 8443970)
+answers: "latest Boston Harbor water level at the NOAA gauge"
 stone: touchstone
 adapter: python_call
 

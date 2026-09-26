@@ -1,6 +1,7 @@
 id: boston_311
 type: live
 title: Boston 311 service requests near this address
+answers: "all Boston 311 service requests within 300 m, any category (not flood-filtered)"
 stone: touchstone
 adapter: ckan_records
 

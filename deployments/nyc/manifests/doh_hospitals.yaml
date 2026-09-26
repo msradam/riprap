@@ -1,6 +1,7 @@
 id: doh_hospitals
 type: baked
 title: NYC DOH hospitals exposed nearby
+answers: "hospitals nearby and how many sit in the Sandy extent or the DEP 2080 scenario"
 stone: keystone
 tier: empirical
 adapter: python_call

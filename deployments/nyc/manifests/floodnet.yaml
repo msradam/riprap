@@ -1,6 +1,7 @@
 id: floodnet
 type: live
 title: FloodNet ultrasonic depth sensors (NYC)
+answers: "street flooding recorded by nearby FloodNet sensors: event counts over 3 years and peak depth"
 stone: touchstone
 tier: empirical
 adapter: python_call

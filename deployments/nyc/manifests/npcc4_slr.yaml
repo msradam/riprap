@@ -1,6 +1,7 @@
 id: npcc4_slr
 type: baked
 title: NPCC4 (2024) sea-level rise projections
+answers: "projected sea level rise at the Battery for the 2050s and 2100 (NPCC4)"
 stone: lodestone
 tier: modeled
 adapter: python_call

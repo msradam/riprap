@@ -1,6 +1,7 @@
 id: ida_hwm
 type: baked
 title: Hurricane Ida 2021 — USGS high-water marks
+answers: "high-water marks USGS surveyed after Hurricane Ida (2021) near the point"
 stone: cornerstone
 tier: empirical
 adapter: baked_vector

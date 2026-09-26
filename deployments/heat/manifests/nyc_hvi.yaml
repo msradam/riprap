@@ -1,6 +1,7 @@
 id: nyc_hvi
 type: baked
 title: NYC Heat Vulnerability Index (NTA-level)
+answers: "the NYC heat vulnerability index ranking for the neighborhood"
 stone: cornerstone
 adapter: baked_vector
 

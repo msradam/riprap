@@ -35,6 +35,7 @@ from riprap.core.burr.intake import (
     plan_intent,
     resolve_area,
     select_deployment,
+    select_sources,
 )
 from riprap.core.burr.stones import POLYGON_INTENTS, StonesAction
 from riprap.core.burr.templated_reconciler import reconcile_templated
@@ -83,7 +84,8 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
 
             p = run_planner(query, ledger=calls)
             return {"intent": p.intent, "targets": p.targets, "rationale": p.rationale,
-                    "llm_calls": calls}
+                    "question": p.question, "focus": p.focus, "pebbles": p.pebbles,
+                    "catalog": p.catalog, "llm_calls": calls}
         except Exception as e:  # noqa: BLE001 - fall back to the regex planner
             log.warning("LLM planner failed (%s); using the heuristic planner", e)
     return heuristic_plan(query)
@@ -93,14 +95,15 @@ def build_app(query: str, plan: dict | None = None, *, step_queue=None, no_llm: 
     """One briefing run. With `plan` given (the SSE route plans first so
     it can show the plan), the graph starts at the intake step for that
     intent; otherwise it starts by planning."""
-    state = {"query": query, "trace": [], "nta": None, "polygon_wkt": None}
+    state = {"query": query, "trace": [], "nta": None, "polygon_wkt": None,
+             "selected_pebbles": None, "consulted": None, "not_checked": None}
     if plan is None:
         entry = "plan_intent"
     else:
         target = (plan.get("targets") or [{}])[0]
         state.update(plan=plan, intent=plan["intent"],
                      first_target=target.get("text") or target.get("address") or query)
-        entry = {"not_implemented": "reconcile"}.get(
+        entry = {"not_implemented": "reconcile", "out_of_scope": "reconcile"}.get(
             plan["intent"], "resolve_area" if plan["intent"] in POLYGON_INTENTS else "geocode_target")
     builder = (
         ApplicationBuilder()
@@ -112,18 +115,20 @@ def build_app(query: str, plan: dict | None = None, *, step_queue=None, no_llm: 
             geocode_target=geocode_target,
             resolve_area=resolve_area,
             select_deployment=select_deployment,
+            select_sources=select_sources,
             stones=StonesAction(),
             assemble_legacy_state=assemble_legacy_state,
             policy_corpus=step_policy_corpus,
             reconcile=_reconciler(no_llm),
         )
         .with_transitions(
-            ("plan_intent", "reconcile", expr("intent == 'not_implemented'")),
+            ("plan_intent", "reconcile", expr("intent in ('not_implemented', 'out_of_scope')")),
             ("plan_intent", "resolve_area", expr(f"intent in {POLYGON_INTENTS!r}")),
             ("plan_intent", "geocode_target"),
             ("resolve_area", "select_deployment"),
             ("geocode_target", "select_deployment"),
-            ("select_deployment", "stones"),
+            ("select_deployment", "select_sources"),
+            ("select_sources", "stones"),
             ("stones", "assemble_legacy_state"),
             ("assemble_legacy_state", "policy_corpus"),
             ("policy_corpus", "reconcile"),
@@ -138,7 +143,7 @@ def build_app(query: str, plan: dict | None = None, *, step_queue=None, no_llm: 
 
 
 _PIPELINE_KEYS = ("query", "intent", "plan", "geocode", "lat", "lon", "nta", "policy_corpus",
-                  "dep", "paragraph", "audit", "grounding", "citations")
+                  "dep", "paragraph", "audit", "grounding", "citations", "consulted", "not_checked")
 
 
 def _final(state) -> dict:
@@ -148,7 +153,8 @@ def _final(state) -> dict:
     dep = state.get("deployment")
     out["deployment"] = None if dep == "__none__" else dep
     for k in state.keys():
-        if k not in out and k not in ("trace", "first_target", "polygon_wkt", "deployment"):
+        if k not in out and k not in ("trace", "first_target", "polygon_wkt", "deployment",
+                                      "selected_pebbles"):
             v = state.get(k)
             if v is not None and not k.startswith("__"):
                 out[k] = v
@@ -163,7 +169,7 @@ def attach_disclosure_checks(out: dict) -> dict:
     from riprap.core.compliance import check_briefing
 
     paragraph = out.get("paragraph") or ""
-    if not paragraph or out.get("intent") == "not_implemented":
+    if not paragraph or out.get("intent") in ("not_implemented", "out_of_scope"):
         out["compliance"] = {"passed": False, "n_passed": 0, "n_total": 0, "failed": [],
                              "note": "no paragraph"}
         return out

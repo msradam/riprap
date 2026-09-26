@@ -1,6 +1,7 @@
 id: fema_nfhl
 type: live
 title: FEMA National Flood Hazard Layer — flood zone at this point
+answers: "the FEMA regulatory flood zone and FIRM panel at the point"
 stone: cornerstone
 tier: modeled
 adapter: python_call

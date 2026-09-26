@@ -1,6 +1,7 @@
 id: microtopo
 type: baked
 title: LiDAR / DEM-derived micro-topography
+answers: "ground elevation, local low points and height above the nearest drainage at the point"
 stone: cornerstone
 tier: proxy
 adapter: python_call

@@ -1,6 +1,7 @@
 id: fdny_firehouses
 type: baked
 title: FDNY firehouses near this address
+answers: "FDNY firehouses near the point (example bring-your-own-data source)"
 stone: keystone
 adapter: csv_points
 

@@ -1,6 +1,7 @@
 id: tree_canopy
 type: baked
 title: NYC tree canopy coverage near this address
+answers: "street trees counted near the address (2015 census)"
 stone: cornerstone
 adapter: baked_vector
 

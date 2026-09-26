@@ -1,6 +1,7 @@
 id: nws_obs
 type: live
 title: NWS hourly METAR observations (nearest station)
+answers: "the latest weather observation (temperature, recent rainfall) at the nearest NWS station, right now"
 stone: touchstone
 tier: empirical
 adapter: python_call

@@ -10,7 +10,8 @@ operations through curation, not mirroring (arxiv.org/html/2507.16044).
   get_district_summary(code)          the same for an NYC community district
   get_citation(deployment, doc_id)    provenance and vintage for one source
   nyc311_flood_requests(...)          311 flood requests near a point or in a district
-  get_briefing(address)               the full briefing; LLM claims when configured
+  plan_query(question, address)       how a question would be routed, without running it
+  get_briefing(address, question)     the briefing, answering the question when given
 
 Every tool except get_briefing works without an LLM. Run over stdio (for a
 local MCP client config) or streamable HTTP:
@@ -106,24 +107,63 @@ def nyc311_flood_requests(address: str | None = None, lat: float | None = None,
                           community_district=community_district, days=days)
 
 
+def _query(address: str, question: str | None) -> str:
+    if not question:
+        return address
+    return question if address.lower() in question.lower() else f"{question} ({address})"
+
+
 @mcp.tool()
-def get_briefing(address: str) -> dict:
-    """The full flood-exposure briefing for a US street address. With an
-    LLM endpoint configured, the prose is LLM claims each checked against
-    its cited sources (failed claims are listed under dropped_claims, not
-    shown); otherwise it is the evidence briefing."""
+def plan_query(question: str, address: str | None = None) -> dict:
+    """How Riprap would route a question, without running it: intent,
+    targets, the question and its focus, the pebbles the planner chose,
+    the always-run floor, and the final selection for the deployment the
+    place routes to. Uses the LLM planner when configured, else the regex
+    planner (which selects every pebble for the intent)."""
+    from app.geocode import geocode_one
+    from riprap.core.burr.app import plan_for
+    from riprap.core.burr.stones import FLOOR, select_pebbles
+    from riprap.core.pebbles.bridge import get_registry
+    from riprap.core.pebbles.deployments import pick_deployment
+
+    plan = plan_for(_query(address or "", question) if address else question)
+    target = (plan.get("targets") or [{}])[0].get("text") or question
+    hit = geocode_one(target) if plan["intent"] not in ("neighborhood", "development_check") else None
+    dep = pick_deployment(hit.lat, hit.lon) if hit else None
+    deployment = dep.name if dep else "nyc"
+    return {
+        "intent": plan["intent"], "targets": plan.get("targets"), "question": plan.get("question"),
+        "focus": plan.get("focus"), "chosen": plan.get("pebbles"),
+        "floor": list(FLOOR.get(plan["intent"], ())), "deployment": deployment,
+        "selected": select_pebbles(plan, get_registry(deployment)),
+        "rationale": plan.get("rationale"),
+    }
+
+
+@mcp.tool()
+def get_briefing(address: str, question: str | None = None) -> dict:
+    """The flood-exposure briefing for a US street address, optionally
+    answering a question about it ("Has this block flooded since Ida?").
+    With an LLM endpoint configured, the planner picks the sources the
+    question needs and the prose is LLM claims each checked against its
+    cited sources, opening with a direct answer (failed claims are listed
+    under dropped_claims, not shown); otherwise it is the evidence
+    briefing. `consulted` and `not_checked` list the sources."""
     from riprap.core.burr.app import run
 
-    out = run(address)
+    out = run(_query(address, question))
     g = out.get("grounding") or {}
     return {
         "address": address,
+        "question": question,
         "deployment": out.get("deployment"),
         "intent": out.get("intent"),
         "paragraph": out.get("paragraph"),
         "mode": g.get("tier"),
         "dropped_claims": g.get("dropped_claims") or [],
         "citations": out.get("citations") or {},
+        "consulted": out.get("consulted") or [],
+        "not_checked": out.get("not_checked") or [],
         "disclosure_checks": out.get("compliance"),
     }
 

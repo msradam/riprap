@@ -1,6 +1,7 @@
 id: nws_alerts
 type: live
 title: NWS active alerts (flood/coastal/wind)
+answers: "active National Weather Service flood, coastal and wind alerts at the point, right now"
 stone: lodestone
 tier: modeled
 adapter: python_call

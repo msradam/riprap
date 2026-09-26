@@ -1,6 +1,7 @@
 id: dep_moderate_current
 type: baked
 title: NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)
+answers: "whether the point is modeled to flood, and how deep, in the DEP moderate rainstorm with today's sea level"
 stone: cornerstone
 tier: modeled
 adapter: python_call

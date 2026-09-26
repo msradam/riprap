@@ -1,6 +1,7 @@
 id: sf_311
 type: live
 title: San Francisco 311 service requests near this address
+answers: "all San Francisco 311 service requests within 300 m, any category (not flood-filtered)"
 stone: touchstone
 adapter: socrata_records
 

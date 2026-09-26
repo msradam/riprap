@@ -1,6 +1,7 @@
 id: dep_moderate_2050_nta
 type: baked
 title: DEP Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood
+answers: "share of the area modeled to flood in the DEP moderate rainstorm with 2050 sea level"
 stone: cornerstone
 tier: modeled
 adapter: python_call

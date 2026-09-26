@@ -552,7 +552,9 @@ async def api_agent_stream(q: str):
                 out_q.put({"kind": "plan_token", "delta": "[heuristic planner, no LLM call]"})
             plan = plan_for(q)
             out_q.put({"kind": "plan", "intent": plan["intent"], "targets": plan.get("targets"),
-                       "specialists": [], "rationale": plan.get("rationale")})
+                       "question": plan.get("question"), "focus": plan.get("focus"),
+                       "pebbles": plan.get("pebbles"), "specialists": [],
+                       "rationale": plan.get("rationale")})
 
             def stream(query: str, sub_plan: dict, label: str | None = None) -> dict:
                 final: dict = {}

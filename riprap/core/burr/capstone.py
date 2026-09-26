@@ -44,7 +44,7 @@ def assemble_legacy_state(state: State) -> State:
 
 
 @action(
-    reads=["lat", "lon", "geocode", "sandy", "dep", "intent"],
+    reads=["lat", "lon", "geocode", "sandy", "dep", "intent", "selected_pebbles"],
     writes=["policy_corpus", "trace"],
 )
 def step_policy_corpus(state: State) -> State:
@@ -59,6 +59,9 @@ def step_policy_corpus(state: State) -> State:
 
     trace = list(state.get("trace", []))
     rec = trace_rec_for("policy_corpus")
+    selected = state.get("selected_pebbles")
+    if selected is not None and "policy_corpus" not in selected:
+        return state.update(policy_corpus=None, trace=trace)  # listed as not checked
     try:
         geo = state.get("geocode") or {}
 

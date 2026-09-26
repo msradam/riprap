@@ -1,6 +1,7 @@
 id: ttm_battery_surge
 type: model
 title: Granite TTM r2 Battery Surge — 96 h hourly nowcast (fine-tune)
+answers: "experimental 96-hour surge forecast at the Battery gauge (no weather input)"
 stone: lodestone
 maturity: experimental
 tier: modeled

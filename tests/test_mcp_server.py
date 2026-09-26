@@ -82,7 +82,7 @@ def test_server_imports_and_lists_tools():
 
     names = {t.name for t in asyncio.run(mcp.list_tools())}
     assert {"get_briefing", "list_sources", "get_citation", "get_evidence",
-            "get_district_summary", "nyc311_flood_requests"} <= names
+            "get_district_summary", "nyc311_flood_requests", "plan_query"} <= names
 
 
 def test_get_citation_never_returns_null_vintage(monkeypatch):

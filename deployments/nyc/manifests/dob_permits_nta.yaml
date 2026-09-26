@@ -1,6 +1,7 @@
 id: dob_permits_nta
 type: baked
 title: Active DOB construction permits inside the neighborhood
+answers: "active construction permits in the area and how many sit in Sandy or DEP flood extents"
 stone: keystone
 tier: empirical
 adapter: python_call
