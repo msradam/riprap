@@ -102,7 +102,7 @@ def sentence_for(value: Any, manifest) -> str | None:
     if not body:
         return None
     if manifest.maturity == "experimental" and not body.lower().startswith("experimental"):
-        body = f"Experimental: {body[0].lower()}{body[1:]}"
+        body = f"Experimental: {body}"
     return body if body[-1] in ".!?" else body + "."
 
 
@@ -153,7 +153,7 @@ def policy_passages(state, registry: Registry, limit: int = 3) -> list[Evidence]
     manifest = registry.get("policy_corpus").manifest
     out = []
     for hit in (value.get("rag_hits") or [])[:limit]:
-        text = " ".join((hit.get("text") or "").split())[:900]
+        text = " ".join((hit.get("text") or "").split())[:400]
         if text:
             out.append(Evidence(
                 doc_id=hit["doc_id"], pebble_id="policy_corpus", stone_id=manifest.stone,

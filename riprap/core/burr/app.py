@@ -34,7 +34,6 @@ from app.fsm import (
 from riprap.core.burr.capstone import (
     assemble_legacy_state,
     step_policy_corpus,
-    step_reconcile,
 )
 from riprap.core.burr.intake import (
     geocode_target,
@@ -52,20 +51,11 @@ from riprap.core.burr.templated_reconciler import reconcile_templated
 
 
 def _reconciler_tier() -> str:
-    """`llm` (default) or `no_llm`.
+    """`llm` when an OpenAI-compatible endpoint is configured, else
+    `no_llm` (see riprap/core/llm.py). Read per build, not at import."""
+    from riprap.core import llm
 
-    no-LLM mode disables ONLY the two Granite calls — the planner and
-    the reconciler. Specialist ML (Prithvi, TerraMind, TTM, GLiNER,
-    RAG embeddings) still runs unchanged: those are data producers,
-    not the prose layer. The briefing is synthesized deterministically
-    from each pebble's `narration.template`; the response carries
-    every probe value the UI needs.
-
-    Legacy value `templated` is accepted as an alias for `no_llm`.
-    """
-    import os
-    raw = os.environ.get("RIPRAP_RECONCILER_TIER", "llm").lower()
-    return "no_llm" if raw == "templated" else raw
+    return llm.tier()
 
 
 def _planner_action():
@@ -80,18 +70,12 @@ def _planner_action():
 
 
 def _capstone_actions() -> dict:
-    """Returns the right Capstone action set for the active tier.
+    """Both tiers run `step_policy_corpus` (retrieval + NER), then the
+    terminal `reconcile`: verified structured claims in LLM mode, the
+    manifest-template briefing in no-LLM mode."""
+    from riprap.core.burr.synthesis import reconcile_claims
 
-    Both tiers run `step_policy_corpus` — the text-mining pebble that
-    owns retrieval + NER in one Burr action (replaced step_rag +
-    step_gliner). Specialist ML still runs regardless of LLM mode.
-
-    Only the terminal `reconcile` differs:
-      - `llm`     — step_reconcile (Granite + Mellea grounded synthesis)
-      - `no_llm`  — reconcile_templated (deterministic prose from
-                    manifest narration templates)
-    """
-    reconciler = reconcile_templated if _reconciler_tier() == "no_llm" else step_reconcile
+    reconciler = reconcile_templated if _reconciler_tier() == "no_llm" else reconcile_claims
     return {"policy_corpus": step_policy_corpus, "reconcile": reconciler}
 
 

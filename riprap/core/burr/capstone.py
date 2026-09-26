@@ -1,28 +1,11 @@
-"""Capstone — final synthesis step.
+"""Capstone inputs: the DEP fan-in and the policy-corpus pebble.
 
-Three actions in sequence:
+  assemble_legacy_state -> fold the three DEP scenario pebbles into one
+                           `dep` dict (read by step_policy_corpus).
+  policy_corpus         -> retrieval + NER over the policy PDFs.
 
-  assemble_legacy_state → reshape the manifest-driven pebble state keys
-                          (`dep_extreme_2080`, `dep_moderate_2050`,
-                          `dep_moderate_current`) into the legacy compound
-                          `dep` dict the reconciler reads. Most pebble
-                          keys are already in the legacy shape after the
-                          shaper layer, so this is mostly the DEP fan-in.
-  policy_corpus         → step_policy_corpus, a text-mining pebble that
-                          owns retrieval + NER in one Burr action.
-                          Replaced the old step_rag + step_gliner pair
-                          from app.fsm — see the comment above
-                          step_policy_corpus below.
-  reconcile             → identity reuse of app.fsm.step_reconcile.
-                          Granite 4.1 + Mellea grounded rejection-sampling
-                          loop (the loop is INTERNAL to mellea_validator;
-                          the Burr layer just sees one streaming action).
-
-The Mellea reroll budget is configured by mellea_validator's
-`DEFAULT_LOOP_BUDGET`. Surfacing each reroll as a distinct Burr step
-would require lifting the loop out of mellea_validator — left as a
-future improvement; for now, the rejection-sampling attempts appear
-together as `n_attempts` in the trace.
+The terminal `reconcile` action is `synthesis.reconcile_claims` (LLM)
+or `templated_reconciler.reconcile_templated` (no LLM).
 """
 from __future__ import annotations
 
@@ -58,17 +41,6 @@ def assemble_legacy_state(state: State) -> State:
     rec["elapsed_s"] = round(time.time() - rec["started_at"], 2)
     trace.append(rec)
     return state.update(dep=dep, trace=trace)
-
-
-# The reconcile pipeline's Mellea-grounded Granite call lives in
-# app/fsm.step_reconcile; we reuse it as-is. The retrieval + NER stage
-# is now consolidated into one text-mining pebble (`policy_corpus`)
-# wired here as `step_policy_corpus`, replacing the old step_rag +
-# step_gliner pair. See `local_corpus_with_ner` adapter for the
-# pebble's internals.
-from burr.core import action  # noqa: E402
-
-from app.fsm import step_reconcile  # noqa: E402,F401
 
 
 @action(
@@ -151,4 +123,4 @@ def step_policy_corpus(state: State) -> State:
         rec["elapsed_s"] = round(time.time() - rec["started_at"], 4)
 
 
-__all__ = ["assemble_legacy_state", "step_policy_corpus", "step_reconcile"]
+__all__ = ["assemble_legacy_state", "step_policy_corpus"]

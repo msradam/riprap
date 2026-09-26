@@ -436,88 +436,19 @@ cards.
 
 ---
 
-## 6. Document-grounded reconciliation
+## 6. Grounded synthesis
 
-`app/reconcile.py` builds a list of OpenAI-style chat messages where
-each specialist's emission is its own message with a stable `doc_id`
-ride-along on the role. Granite 4.1's Ollama chat template recognises
-any `role: "document <doc_id>"` message and lifts it into a
-`<documents>` block, prepending IBM's official grounded-generation
-system message ("Write the response by strictly aligning with the
-facts in the provided documents").
+The full description is in [`GROUNDING.md`](GROUNDING.md). In short: the
+evidence is each pebble's manifest template filled from its value
+(`riprap/core/burr/evidence.py`). With no LLM configured, that evidence is
+the briefing. With an OpenAI-compatible endpoint configured, the model returns
+JSON claims under a per-request schema whose `doc_ids` enum is the documents
+actually passed in; code checks every cited id and every number against the
+cited documents, retries once with the failures listed, and drops what still
+fails into `dropped_claims`. Only surviving claims are rendered
+(`riprap/core/burr/synthesis.py`).
 
-Example packet for the Brighton Beach address (abbreviated):
-
-```python
-[
-    {"role": "system", "content": "<citation-discipline + 4-section skeleton>"},
-    {"role": "document sandy",            "content": "Address is INSIDE the 2012 Sandy zone. ..."},
-    {"role": "document dep_extreme_2080", "content": "Depth class 0.8-2.0 ft. ..."},
-    {"role": "document floodnet",         "content": "2 sensors; peak 14 cm. ..."},
-    {"role": "document nyc311",           "content": "11 flood complaints in 200 m. ..."},
-    {"role": "document microtopo",        "content": "Elev 2.36 m, HAND 0.7 m, TWI 11.3. ..."},
-    {"role": "document rag_npcc4",        "content": "<retrieved paragraph>"},
-    {"role": "user", "content": "Write the cited briefing now."},
-]
-```
-
-The four-section structure (`**Status.** / **Empirical evidence.** /
-**Modeled scenarios.** / **Policy context.**`) is enforced by the
-`EXTRA_SYSTEM_PROMPT`. Sections without supporting documents are
-omitted entirely.
-
-### 6.1 Two reconciler models
-
-- **`granite4.1:3b`** runs the planner and `live_now` (short outputs,
-  routing decisions). Always streamed.
-- **`granite4.1:8b`** runs the synthesis path for `single_address`,
-  `neighborhood`, and `development_check` (long outputs, dense
-  citations). Pre-warmed into VRAM in `entrypoint.sh` so the first
-  query doesn't pay the model-load tax. Both stay warm with
-  `OLLAMA_MAX_LOADED_MODELS=2` and `OLLAMA_KEEP_ALIVE=24h`.
-
-### 6.2 Grounding check with rerolls
-
-`app/mellea_validator.py` is a hand-written grounding check around the
-Granite call: generate, validate, reroll with feedback. It does not
-import the Mellea library despite the file name. The synthesis intents call
-`reconcile_strict_streaming(...)` which:
-
-1. **Streams** each generation attempt's tokens to the user (via the
-   FSM threadlocal `set_token_callback` for `single_address` or a
-   `progress_q` for the polygon intents).
-2. After each attempt, runs **four deterministic checks** on the
-   accumulated paragraph:
-   - **`numerics_grounded`**. Every non-trivial number in the output
-     appears verbatim in a source document.
-   - **`no_placeholder_tokens`**. Output contains no leaked
-     `[source]` / `<document>` template markup.
-   - **`citations_dense`**. Every non-trivial number has a
-     `[doc_id]` citation **somewhere in the same sentence** (sentence
-     boundaries: `. ` / `.\n` / end-of-text).
-   - **`citations_resolve`**. Cited `doc_id`s are a subset of the
-     input doc_ids.
-3. If any check fails, fires a `mellea_attempt` SSE event with the
-   failed-requirement names, then **rerolls** with a feedback prompt
-   that names the specific failing sentences (the model usually
-   responds well to surgical corrections). Loop budget: 3 attempts.
-
-The frontend renders an inline banner above the briefing. Amber on
-reroll (with the failed-req list), green on first-try pass. The final
-reconcile step in the trace shows the `passed: N/4 · rerolls: M`
-metadata for full audit transparency.
-
-### 6.3 Number recognition is identifier-aware
-
-The numeric guardrail uses `\b-?\d[\d,]*(?:\.\d+)?\b` so that
-identifier codes embedded in prose (`QN1206` NTA codes, `BBL
-3-00589-0003` parcels, `BIN`, `B12` community boards) are *not*
-treated as numeric claims demanding citation. This was the dominant
-false-positive in early probing; without it, almost every neighborhood
-briefing failed `citations_dense` because the opening sentence
-typically reads "*X (NTA QN1206) in Queens…*".
-
-### 6.4 Why no native Granite 4.x inline citations
+### 6.1 Why no native Granite 4.x inline citations
 
 We investigated using Granite's native `<|start_of_cite|>{document_id:
 X}fact<|end_of_cite|>` mode. **It's deprecated in 4.x.** Verified:

@@ -1,0 +1,130 @@
+{
+  "summary": {
+    "run_at": "2026-09-26T19:06Z",
+    "endpoints": [
+      {
+        "base_url": "http://localhost:11434/v1",
+        "model": "granite4:micro"
+      }
+    ],
+    "n_addresses": 10,
+    "claims_kept": 122,
+    "claims_dropped": 0,
+    "claims_retried": 0,
+    "addresses_needing_retry": 0,
+    "drop_reasons": {},
+    "retry_reasons": {}
+  },
+  "results": [
+    {
+      "address": "189 Atlantic Avenue, Brooklyn, NY",
+      "tier": "llm",
+      "model": "granite4:micro",
+      "attempts": 1,
+      "kept": 6,
+      "dropped": [],
+      "retried": [],
+      "fallback_reason": null,
+      "elapsed_s": 43.7
+    },
+    {
+      "address": "90-01 183rd Street, Queens, NY 11423",
+      "tier": "llm",
+      "model": "granite4:micro",
+      "attempts": 1,
+      "kept": 6,
+      "dropped": [],
+      "retried": [],
+      "fallback_reason": null,
+      "elapsed_s": 19.0
+    },
+    {
+      "address": "2017 East 17th Street, Brooklyn, NY 11229",
+      "tier": "llm",
+      "model": "granite4:micro",
+      "attempts": 1,
+      "kept": 16,
+      "dropped": [],
+      "retried": [],
+      "fallback_reason": null,
+      "elapsed_s": 42.4
+    },
+    {
+      "address": "80 Pioneer Street, Brooklyn, NY",
+      "tier": "llm",
+      "model": "granite4:micro",
+      "attempts": 1,
+      "kept": 8,
+      "dropped": [],
+      "retried": [],
+      "fallback_reason": null,
+      "elapsed_s": 30.4
+    },
+    {
+      "address": "400 Carroll Street, Brooklyn, NY",
+      "tier": "llm",
+      "model": "granite4:micro",
+      "attempts": 1,
+      "kept": 8,
+      "dropped": [],
+      "retried": [],
+      "fallback_reason": null,
+      "elapsed_s": 32.1
+    },
+    {
+      "address": "116-02 Rockaway Beach Boulevard, Queens, NY",
+      "tier": "llm",
+      "model": "granite4:micro",
+      "attempts": 1,
+      "kept": 17,
+      "dropped": [],
+      "retried": [],
+      "fallback_reason": null,
+      "elapsed_s": 57.5
+    },
+    {
+      "address": "801 Father Capodanno Boulevard, Staten Island, NY",
+      "tier": "llm",
+      "model": "granite4:micro",
+      "attempts": 1,
+      "kept": 17,
+      "dropped": [],
+      "retried": [],
+      "fallback_reason": null,
+      "elapsed_s": 56.4
+    },
+    {
+      "address": "560 Grand Street, Manhattan, NY",
+      "tier": "llm",
+      "model": "granite4:micro",
+      "attempts": 1,
+      "kept": 13,
+      "dropped": [],
+      "retried": [],
+      "fallback_reason": null,
+      "elapsed_s": 44.0
+    },
+    {
+      "address": "355 Food Center Drive, Bronx, NY",
+      "tier": "llm",
+      "model": "granite4:micro",
+      "attempts": 1,
+      "kept": 14,
+      "dropped": [],
+      "retried": [],
+      "fallback_reason": null,
+      "elapsed_s": 43.9
+    },
+    {
+      "address": "153-09 90th Avenue, Queens, NY",
+      "tier": "llm",
+      "model": "granite4:micro",
+      "attempts": 1,
+      "kept": 17,
+      "dropped": [],
+      "retried": [],
+      "fallback_reason": null,
+      "elapsed_s": 59.9
+    }
+  ]
+}

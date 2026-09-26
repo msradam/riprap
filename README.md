@@ -13,8 +13,10 @@
 
 ## Citation-grounded climate-exposure briefings, city by city.
 
-A multi-agent AI system that reads satellites, watches sensors, forecasts
-surges, and refuses to ship a sentence it cannot ground in a citation.
+Riprap gathers public flood evidence for an address and cites every
+sentence to its source. An optional LLM rewrites that evidence as claims;
+code checks each claim's citations and numbers and drops the ones that
+fail. See [`docs/GROUNDING.md`](docs/GROUNDING.md).
 
 ![Riprap flood-exposure briefing for DUMBO, Brooklyn](assets/screenshots/hero.png)
 
@@ -289,8 +291,8 @@ generalise; only the probes plugged into each Stone change.
 | **Capstone** | Citation-grounded synthesis | Same |
 
 The architectural commitments transfer unchanged: a Burr FSM that fans
-pebble manifests out per Stone, Granite-native `role="document"`
-reconciliation, a four-check grounding pass, SSE streaming to a SvelteKit
+pebble manifests out per Stone, manifest-rendered evidence, verified
+structured claims, SSE streaming to a SvelteKit
 map UI, every claim cited to its source. To port Riprap to a new city you
 write a deployment directory of manifests against local data and, for the
 satellite and time-series layers, retrain the EO and TTM fine-tunes on
@@ -342,11 +344,10 @@ Address ──► Granite 4.1 3B planner ──► Plan{intent, targets, special
                             │           │           │           │
                             └───────────┴─────┬─────┴───────────┘
                                               ▼
-                         build_documents() — Granite-native
-                         role="document <doc_id>" messages
+                     evidence: manifest templates filled from values
                                               ▼
-                  Capstone: Granite 4.1 8B + hand-written grounding check
-                  ──► 4-check grounding loop, surgical feedback rerolls
+                  Capstone: no-LLM evidence briefing, or JSON claims
+                  from any OpenAI-compatible model, verified in code
                                               ▼
                        Four-section briefing with [doc_id] citations
                                               ▼

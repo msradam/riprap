@@ -31,3 +31,9 @@ def test_skips_geosearch_without_nyc_place(monkeypatch):
         raise AssertionError("Geosearch must not be called")
     monkeypatch.setattr(g, "geocode", boom)
     assert g._geosearch_exact("257 Washington Ave, Albany NY") is None
+
+
+def test_rejects_hit_in_another_borough(monkeypatch):
+    monkeypatch.setattr(g, "geocode", lambda text, limit=1: [_hit("560", "GRAND STREET")])
+    # _hit is in Brooklyn; the query names Manhattan.
+    assert g._geosearch_exact("560 Grand Street, Manhattan, NY") is None

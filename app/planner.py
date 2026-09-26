@@ -7,28 +7,19 @@ The executor then runs only the relevant specialists, in parallel
 where dependencies permit.
 
 Output is a single JSON object with a fixed schema (see PLAN_SCHEMA).
-We use Ollama's `format='json'` constrained-decoding mode so Granite
-4.1 cannot emit malformed structure. A deterministic post-validator
+The call passes PLAN_JSON_SCHEMA as `response_format`, so the model
+cannot emit malformed structure. A deterministic post-validator
 sanity-checks the plan against the supported intents and specialists.
 """
 from __future__ import annotations
 
 import json
 import logging
-import os
 import re
 from dataclasses import dataclass
 from typing import Any
 
-from app import llm
-
 log = logging.getLogger("riprap.planner")
-
-# Routing is a small structured-output task; speed wins over depth here.
-# Pin to the 3b variant explicitly — even if a deployment pulls 8b for
-# reconciliation, the planner stays small to keep TTFB low.
-OLLAMA_MODEL = os.environ.get("RIPRAP_PLANNER_MODEL",
-                              os.environ.get("RIPRAP_OLLAMA_MODEL", "granite4.1:3b"))
 
 # ---- Plan schema -----------------------------------------------------------
 #
@@ -204,7 +195,23 @@ def _not_implemented_message(query: str) -> str | None:
 
 # ---- Planner call ----------------------------------------------------------
 
-def plan(query: str, model: str = OLLAMA_MODEL, on_token=None) -> Plan:
+PLAN_JSON_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["intent", "targets", "rationale"],
+    "properties": {
+        "intent": {"type": "string", "enum": sorted(INTENTS)},
+        "targets": {"type": "array", "items": {
+            "type": "object", "additionalProperties": False, "required": ["type", "text"],
+            "properties": {"type": {"type": "string", "enum": ["address", "nta", "borough", "nyc"]},
+                           "text": {"type": "string"}},
+        }},
+        "rationale": {"type": "string"},
+    },
+}
+
+
+def plan(query: str, on_token=None) -> Plan:
     """Ask Granite 4.1 to plan a query. Returns a validated Plan.
 
     If on_token is provided, the planner runs in streaming mode and
@@ -224,39 +231,12 @@ def plan(query: str, model: str = OLLAMA_MODEL, on_token=None) -> Plan:
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user",   "content": query},
     ]
-    # Cap output — the plan JSON is tiny; an uncapped model can spin
-    # forever in the rationale field and exhaust the stream timeout.
-    _opts = {"temperature": 0, "num_predict": 512}
-    if on_token is None:
-        resp = llm.chat(model=model, messages=messages,
-                           format="json", options=_opts)
-        raw = resp["message"]["content"].strip()
-    else:
-        chunks: list[str] = []
-        for chunk in llm.chat(model=model, messages=messages,
-                                 format="json", stream=True,
-                                 options=_opts):
-            delta = (chunk.get("message") or {}).get("content") or ""
-            if delta:
-                chunks.append(delta)
-                on_token(delta)
-        raw = "".join(chunks).strip()
-    log.info("planner raw: %s", raw[:400])
-    try:
-        d = json.loads(raw)
-    except json.JSONDecodeError:
-        # Model hit num_predict ceiling mid-JSON — try salvaging with a
-        # truncated-JSON repair: strip to last valid closing brace.
-        trimmed = raw
-        for i in range(len(raw) - 1, -1, -1):
-            if raw[i] == "}":
-                trimmed = raw[:i + 1]
-                break
-        try:
-            d = json.loads(trimmed)
-            log.warning("planner JSON repaired by trimming to last '}'")
-        except json.JSONDecodeError as e2:
-            raise ValueError(f"planner emitted non-JSON: {raw[:200]!r}") from e2
+    from riprap.core import llm  # noqa: PLC0415
+
+    d, _model = llm.chat_json(messages, PLAN_JSON_SCHEMA, name="plan")
+    log.info("planner plan: %s", str(d)[:400])
+    if on_token:
+        on_token(json.dumps(d))
     return _validate(d, raw_query=query)
 
 

@@ -400,8 +400,9 @@ def _geosearch_exact(text: str) -> GeocodeHit | None:
     """NYC Geosearch as the first resolver, but only when the match is
     unambiguous. Geosearch fuzzy-matches everything it is given (see
     geocode_one), so a hit is accepted only if the query names a NYC
-    borough, ZIP or 'New York, NY', and the hit's house number and street
-    both appear in the query. Anything else falls through to Nominatim."""
+    borough, ZIP or 'New York, NY', the hit's house number and street
+    both appear in the query, and the hit is in the borough the query
+    names (if any). Anything else falls through to Nominatim."""
     if not _NYC_PLACE_RE.search(text) or _looks_non_nyc(text):
         return None
     hits = geocode(text, limit=1)
@@ -413,6 +414,9 @@ def _geosearch_exact(text: str) -> GeocodeHit | None:
     query = f" {_norm_street(text)} "
     if not number or not street or f" {number} {street} " not in query:
         return None
+    named = _detect_borough(text)
+    if named and hit.borough and hit.borough.lower() != named.lower():
+        return None  # '560 Grand St, Manhattan' must not land in Brooklyn
     return hit
 
 

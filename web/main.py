@@ -116,6 +116,8 @@ _STEP_TO_STONE.update(
         "eo_chip_fetch": _stone_display("keystone"),
         "terramind_buildings": _stone_display("keystone"),
         "terramind_lulc": _stone_display("touchstone"),
+        "reconcile_claims": _stone_display("capstone"),
+        "reconcile_templated": _stone_display("capstone"),
         "reconcile_granite41": _stone_display("capstone"),
         "mellea_reconcile_address": _stone_display("capstone"),
         "reconcile_neighborhood": _stone_display("capstone"),
@@ -1169,9 +1171,6 @@ async def api_agent_stream(q: str):
     def runner():
         emissions.install(tracker)
         try:
-            import threading as _th
-
-            from app import llm as _llm
             from app.intents import development_check as i_dev
             from app.intents import live_now as i_live
             from app.intents import neighborhood as i_nbhd
@@ -1190,8 +1189,9 @@ async def api_agent_stream(q: str):
             # regardless of address. The heuristic planner defaults
             # to single_address, which then goes through the Burr
             # app with per-query deployment routing.
-            tier = os.environ.get("RIPRAP_RECONCILER_TIER", "llm").lower()
-            if tier in ("no_llm", "templated"):
+            from riprap.core import llm as _core_llm
+
+            if _core_llm.tier() == "no_llm":
                 p = Plan(
                     intent="single_address",
                     targets=[{"type": "address", "text": q}],
@@ -1202,18 +1202,6 @@ async def api_agent_stream(q: str):
             else:
                 p = run_planner(q, on_token=_on_plan_token)
 
-            def _warmup_llm():
-                try:
-                    _llm.chat(
-                        model="granite-8b",
-                        messages=[{"role": "user", "content": "hi"}],
-                        options={"num_predict": 1, "temperature": 0},
-                        stream=False,
-                    )
-                except Exception:
-                    pass
-
-            _th.Thread(target=_warmup_llm, daemon=True, name="riprap-warmup").start()
             out_q.put(
                 {
                     "kind": "plan",
