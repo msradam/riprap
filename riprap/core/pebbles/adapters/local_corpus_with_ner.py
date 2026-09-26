@@ -79,6 +79,9 @@ class LocalCorpusWithNERPebble(BasePebble):
         try:
             from app.rag import retrieve as rag_retrieve
             hits = rag_retrieve(q, k=k, min_score=min_score)
+        except ModuleNotFoundError:
+            return PebbleResult(pebble_id=self.id, value=None, offline=True,
+                                error="the ml extra is not installed (uv sync --extra ml)")
         except Exception as e:  # noqa: BLE001 — surface as offline
             return PebbleResult(
                 pebble_id=self.id, value=None, offline=True,

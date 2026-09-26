@@ -1,19 +1,19 @@
 """Granite Embedding 278M RAG over the NYC flood-resilience policy corpus.
 
-Specialists this powers:
-  step_rag — for any query (geo + intent), retrieve top-k relevant
-             policy paragraphs from HMP/NPCC4/DEP/MTA/NYCHA/Comptroller
-             and emit them as <document id="rag_*"> blocks.
+Powers the `policy_corpus` pebble: retrieve the top-k policy passages
+(DEP, NYCHA, Con Edison, MTA, Comptroller) for a query built from the
+other evidence.
 
-We chunk page-by-page with a soft target of ~600 chars per chunk, embed
-once at startup, and store a numpy matrix + FAISS L2 index in memory.
-The index is small (~1k chunks across 5 PDFs).
+Chunks (~700 chars, page by page) are embedded offline by
+scripts/build_rag_index.py into data/rag_index.npz. At runtime only the
+query is embedded, in process on CPU.
 """
 from __future__ import annotations
 
+import json
 import logging
-import os
 import re
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -102,189 +102,75 @@ def _chunks_from_pdf(path: Path, target_chars: int = 700) -> list[Chunk]:
     return out
 
 
+INDEX_PATH = Path(__file__).resolve().parent.parent / "data" / "rag_index.npz"
 _INDEX: dict | None = None
-_RERANKER = None  # lazy CrossEncoder
-
-# Reranker switch: when "1", retrieve() over-fetches K*5 candidates without
-# the per-doc dedup, scores them via the Granite Embedding Reranker R2
-# cross-encoder, then dedups to K. Falls back to the baseline ranker when
-# disabled. See experiments/03_granite_reranker/RESULTS.md for the
-# reasoning behind inverting dedup vs rerank.
-_RERANKER_ENABLE = os.environ.get("RIPRAP_RERANKER_ENABLE", "").lower() in ("1", "true", "yes")
-_RERANKER_MODEL_NAME = os.environ.get(
-    "RIPRAP_RERANKER_MODEL",
-    "ibm-granite/granite-embedding-reranker-english-r2",
-)
+_MODEL = None
+_MODEL_LOCK = threading.Lock()
 
 
-def _ensure_index():
-    global _INDEX
-    if _INDEX is not None:
-        return _INDEX
-
+def build_index(path: Path = INDEX_PATH) -> int:
+    """Offline: chunk the corpus PDFs, embed every chunk, write the matrix
+    and chunk metadata to one .npz. Run scripts/build_rag_index.py after
+    the corpus changes. Needs the `ml` extra."""
     chunks: list[Chunk] = []
     for f in sorted(CORPUS_DIR.glob("*.pdf")):
-        log.info("rag: chunking %s", f.name)
         chunks.extend(_chunks_from_pdf(f))
-    log.info("rag: %d chunks across %d files",
-             len(chunks), len(set(c.file for c in chunks)))
-    if not chunks:
-        _INDEX = {"chunks": [], "embs": None, "model": None}
-        return _INDEX
+    embs = _model().encode([c.text for c in chunks], batch_size=32, show_progress_bar=False,
+                           convert_to_numpy=True, normalize_embeddings=True)
+    meta = json.dumps([c.__dict__ for c in chunks])
+    np.savez_compressed(path, embs=embs.astype("float16"), chunks=np.array(meta),
+                        model=np.array(EMBED_MODEL_NAME))
+    return len(chunks)
 
-    texts = [c.text for c in chunks]
-    log.info("rag: embedding %d chunks", len(texts))
 
-    # v0.4.5 — try the remote ML backend first. Avoids loading
-    # sentence-transformers + the granite-embedding weights on a
-    # cpu-basic surface (HF Space). Falls back to local on
-    # RemoteUnreachable so dev laptops keep working with no env.
-    embs = None
-    model = None
-    try:
-        from app import inference as _inf
-        if _inf.remote_enabled():
-            log.info("rag: encoding via remote ML backend")
-            remote = _inf.granite_embed(texts, timeout=120.0)
-            if remote.get("ok"):
-                embs = np.asarray(remote["vectors"], dtype="float32")
-                # Per-query encodes will also route through remote;
-                # `model` stays None and `retrieve()` checks for it.
-    except _inf.RemoteUnreachable as e:
-        log.info("rag: remote unreachable (%s); local fallback", e)
-    except Exception:
-        log.exception("rag: remote encode failed; local fallback")
-
-    if embs is None:
-        from sentence_transformers import SentenceTransformer
-        log.info("rag: loading %s (local fallback)", EMBED_MODEL_NAME)
-        model = SentenceTransformer(EMBED_MODEL_NAME)
-        embs = model.encode(texts, batch_size=32, show_progress_bar=False,
-                             convert_to_numpy=True, normalize_embeddings=True)
-        embs = embs.astype("float32")
-
-    _INDEX = {"chunks": chunks, "embs": embs, "model": model}
-    log.info("rag: index ready (%s)", embs.shape)
+def _ensure_index() -> dict:
+    """Load the prebuilt index from disk. Missing file means no policy
+    retrieval (logged once), never a runtime re-embedding of the PDFs."""
+    global _INDEX
+    if _INDEX is None:
+        if not INDEX_PATH.exists():
+            log.warning("rag: %s missing; run scripts/build_rag_index.py", INDEX_PATH)
+            _INDEX = {"chunks": [], "embs": None}
+        else:
+            z = np.load(INDEX_PATH)
+            _INDEX = {"chunks": [Chunk(**c) for c in json.loads(str(z["chunks"]))],
+                      "embs": z["embs"].astype("float32")}
+            log.info("rag: loaded %d chunks from %s", len(_INDEX["chunks"]), INDEX_PATH.name)
     return _INDEX
 
 
-def _ensure_reranker():
-    """Lazy-load the cross-encoder. Returns None if disabled or load fails;
-    callers fall back to the baseline ranker silently."""
-    global _RERANKER
-    if not _RERANKER_ENABLE:
-        return None
-    if _RERANKER is not None:
-        return _RERANKER
-    try:
-        from sentence_transformers import CrossEncoder
-        log.info("rag: loading reranker %s", _RERANKER_MODEL_NAME)
-        _RERANKER = CrossEncoder(_RERANKER_MODEL_NAME)
-        log.info("rag: reranker ready")
-    except Exception:
-        log.exception("rag: reranker load failed; falling back to baseline")
-        _RERANKER = False  # sentinel: don't retry every call
-    return _RERANKER or None
+def _model():
+    """The query/corpus encoder, loaded once, in process, on CPU."""
+    global _MODEL
+    with _MODEL_LOCK:
+        if _MODEL is None:
+            from sentence_transformers import SentenceTransformer
+
+            _MODEL = SentenceTransformer(EMBED_MODEL_NAME, device="cpu")
+    return _MODEL
 
 
 def warm():
     _ensure_index()
-    _ensure_reranker()
 
 
 def retrieve(query: str, k: int = 4, min_score: float = 0.30) -> list[dict]:
+    """Top-k chunks by cosine similarity, at most one per document."""
     idx = _ensure_index()
     if idx["embs"] is None or not idx["chunks"]:
         return []
-
-    # v0.4.5 — encode query via remote when corpus was embedded remotely.
-    # `_ensure_index` leaves `model = None` when it took the remote
-    # path, so this branch handles both:
-    #   - model present  → local SentenceTransformer.encode (fast, in-mem)
-    #   - model is None  → POST to the remote ML backend, fallback to a
-    #                       one-shot local SentenceTransformer load if
-    #                       remote is down.
-    if idx["model"] is not None:
-        qv = idx["model"].encode([query], convert_to_numpy=True,
-                                  normalize_embeddings=True).astype("float32")
-    else:
-        qv = None
-        try:
-            from app import inference as _inf
-            if _inf.remote_enabled():
-                remote = _inf.granite_embed([query])
-                if remote.get("ok"):
-                    qv = np.asarray(remote["vectors"], dtype="float32")
-        except _inf.RemoteUnreachable as e:
-            log.info("rag: per-query encode remote unreachable (%s)", e)
-        if qv is None:
-            from sentence_transformers import SentenceTransformer
-            log.info("rag: cold-loading %s for per-query encode (remote down)",
-                     EMBED_MODEL_NAME)
-            local = SentenceTransformer(EMBED_MODEL_NAME)
-            qv = local.encode([query], convert_to_numpy=True,
-                              normalize_embeddings=True).astype("float32")
-            # Cache so subsequent queries don't re-load
-            idx["model"] = local
+    qv = _model().encode([query], convert_to_numpy=True,
+                         normalize_embeddings=True).astype("float32")
     sims = (idx["embs"] @ qv.T).ravel()
-
-    reranker = _ensure_reranker()
-    if reranker is not None:
-        # Over-fetch K*5 candidates (no per-doc dedup yet), rerank, then
-        # dedup to K. This keeps high-relevance chunks alive long enough
-        # for the cross-encoder to see them — the legacy path's
-        # dedup-before-rank threw them away.
-        cand_n = min(len(idx["chunks"]), max(k * 5, 20))
-        top_idx = np.argsort(-sims)[:cand_n]
-        candidates = [(int(i), idx["chunks"][int(i)],
-                       float(sims[int(i)])) for i in top_idx
-                      if float(sims[int(i)]) >= min_score]
-        if not candidates:
-            return []
-        pairs = [[query, c.text] for _, c, _ in candidates]
-        scores = reranker.predict(pairs)
-        ranked = sorted(zip(candidates, scores, strict=True),
-                        key=lambda x: float(x[1]), reverse=True)
-        out: list[dict] = []
-        seen_per_doc: dict[str, int] = {}
-        for (_i, c, retr_score), rerank_score in ranked:
-            if seen_per_doc.get(c.doc_id, 0) >= 1:
-                continue
-            seen_per_doc[c.doc_id] = 1
-            out.append({
-                "doc_id": c.doc_id,
-                "title": c.title,
-                "citation": c.citation,
-                "file": c.file,
-                "page": c.page,
-                "text": c.text,
-                "score": float(rerank_score),
-                "retriever_score": retr_score,
-            })
-            if len(out) >= k:
-                break
-        return out
-
-    # Baseline ranker (unchanged behaviour when reranker disabled)
-    top = np.argsort(-sims)[:k * 3]
-    out2: list[dict] = []
-    seen_per_doc2: dict[str, int] = {}
-    for i in top:
-        if sims[i] < min_score:
-            continue
+    out: list[dict] = []
+    seen: set[str] = set()
+    for i in np.argsort(-sims)[:k * 3]:
         c = idx["chunks"][i]
-        if seen_per_doc2.get(c.doc_id, 0) >= 1:
+        if sims[i] < min_score or c.doc_id in seen:
             continue
-        seen_per_doc2[c.doc_id] = 1
-        out2.append({
-            "doc_id": c.doc_id,
-            "title": c.title,
-            "citation": c.citation,
-            "file": c.file,
-            "page": c.page,
-            "text": c.text,
-            "score": float(sims[i]),
-        })
-        if len(out2) >= k:
+        seen.add(c.doc_id)
+        out.append({"doc_id": c.doc_id, "title": c.title, "citation": c.citation,
+                    "file": c.file, "page": c.page, "text": c.text, "score": float(sims[i])})
+        if len(out) >= k:
             break
-    return out2
+    return out

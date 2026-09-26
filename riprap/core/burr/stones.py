@@ -18,6 +18,7 @@ from the other evidence.
 """
 from __future__ import annotations
 
+import functools
 from collections.abc import Generator, Iterable
 from typing import Any
 
@@ -75,6 +76,19 @@ def pebbles_for(deployment: str | None, lat: float | None = None, lon: float | N
     return [p.id for p in pebbles]
 
 
+@functools.cache
+def _import_ml_stacks() -> None:
+    """Import transformers and tsfm_public once, on the thread that
+    starts the fan-out. Their lazy module loaders are not thread-safe on
+    first import ("cannot import name 'PreTrainedModel'"), and the TTM
+    pebbles run on worker threads. A no-op when they are not installed."""
+    try:
+        from transformers import PreTrainedModel  # noqa: F401
+        from tsfm_public import TinyTimeMixerForPrediction  # noqa: F401
+    except Exception:  # noqa: BLE001 - the ml extra is optional
+        pass
+
+
 def _all_data_pebble_ids() -> list[str]:
     """Union of data-Stone pebble ids across every deployment. Burr needs
     `writes` before any query arrives; the reducer fills keys the routed
@@ -104,6 +118,7 @@ class StonesAction(MapActions):
 
     def actions(self, state: State, inputs: dict[str, Any],  # noqa: ARG002 - Burr API
                 context: ApplicationContext) -> Generator[Any, None, None]:  # noqa: ARG002
+        _import_ml_stacks()
         for pid in pebbles_for(state.get("deployment"), state.get("lat"), state.get("lon"),
                                state.get("intent")):
             yield pebble_action(pid)

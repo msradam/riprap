@@ -39,6 +39,7 @@ from app.live.ttm_forecast import (
     _MODEL_LOAD_ERROR,
     DAILY_CONTEXT,
     DAILY_PREDICTION,
+    ML_MISSING,
     _run_ttm,
 )
 
@@ -105,6 +106,8 @@ def summary_for_point(lat: float, lon: float) -> dict:
     Returns a dict with `available: bool`. On success, includes the
     sensor identity, history summary, and forecast aggregates.
     """
+    if ML_MISSING:
+        return {"available": False, "reason": ML_MISSING}
     try:
         sensors = sensors_near(lat, lon, NEAREST_SENSOR_RADIUS_M)
     except Exception as e:

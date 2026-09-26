@@ -169,7 +169,7 @@ PLAN_JSON_SCHEMA = {
 }
 
 
-def plan(query: str, on_token=None) -> Plan:
+def plan(query: str, on_token=None, ledger: list | None = None) -> Plan:
     """Ask Granite 4.1 to plan a query. Returns a validated Plan.
 
     If on_token is provided, the planner runs in streaming mode and
@@ -190,7 +190,7 @@ def plan(query: str, on_token=None) -> Plan:
     ]
     from riprap.core import llm  # noqa: PLC0415
 
-    d, _model = llm.chat_json(messages, PLAN_JSON_SCHEMA, name="plan")
+    d, _model = llm.chat_json(messages, PLAN_JSON_SCHEMA, name="plan", ledger=ledger)
     log.info("planner plan: %s", str(d)[:400])
     if on_token:
         on_token(json.dumps(d))

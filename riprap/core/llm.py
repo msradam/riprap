@@ -57,22 +57,32 @@ class LLMUnavailable(RuntimeError):
 
 
 def chat_json(messages: list[dict], schema: dict, *, name: str = "output",
-              temperature: float = 0.0, timeout_s: float | None = None) -> tuple[dict, str]:
+              temperature: float = 0.0, timeout_s: float | None = None,
+              ledger: list | None = None) -> tuple[dict, str]:
     """One JSON-schema-constrained completion. Returns (parsed JSON, the
     model that answered). Tries each endpoint in order; raises
-    LLMUnavailable when none answers with valid JSON."""
+    LLMUnavailable when none answers with valid JSON. Each attempt is
+    appended to `ledger` (tokens, duration, energy status)."""
     from openai import OpenAI  # noqa: PLC0415
+
+    from app.emissions import measure_call  # noqa: PLC0415
 
     timeout_s = timeout_s or float(os.environ.get("RIPRAP_LLM_TIMEOUT_S", "180"))
     errors = []
     for ep in endpoints():
         try:
             client = OpenAI(base_url=ep.base_url, api_key=ep.api_key, timeout=timeout_s, max_retries=0)
-            resp = client.chat.completions.create(
-                model=ep.model, messages=messages, temperature=temperature,
-                response_format={"type": "json_schema",
-                                 "json_schema": {"name": name, "schema": schema, "strict": True}},
-            )
+            with measure_call(ep.base_url, ep.model) as rec:
+                if ledger is not None:
+                    ledger.append(rec)
+                resp = client.chat.completions.create(
+                    model=ep.model, messages=messages, temperature=temperature,
+                    response_format={"type": "json_schema",
+                                     "json_schema": {"name": name, "schema": schema, "strict": True}},
+                )
+                if resp.usage:
+                    rec.update(prompt_tokens=resp.usage.prompt_tokens,
+                               completion_tokens=resp.usage.completion_tokens)
             return json.loads(resp.choices[0].message.content or ""), ep.model
         except Exception as e:  # noqa: BLE001 - try the next endpoint, report all at the end
             log.warning("LLM endpoint %s (%s) failed: %r", ep.base_url, ep.model, e)

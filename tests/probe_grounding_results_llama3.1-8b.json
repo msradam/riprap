@@ -1,0 +1,290 @@
+{
+  "summary": {
+    "run_at": "2026-09-26T19:49Z",
+    "endpoints": [
+      {
+        "base_url": "http://localhost:11434/v1",
+        "model": "llama3.1:8b"
+      }
+    ],
+    "n_addresses": 10,
+    "claims_kept": 191,
+    "claims_dropped": 0,
+    "claims_retried": 37,
+    "addresses_needing_retry": 10,
+    "drop_reasons": {},
+    "retry_reasons": {
+      "numbers not found in the cited documents": 37
+    }
+  },
+  "results": [
+    {
+      "address": "189 Atlantic Avenue, Brooklyn, NY",
+      "tier": "llm",
+      "model": "llama3.1:8b",
+      "attempts": 2,
+      "kept": 16,
+      "dropped": [],
+      "retried": [
+        {
+          "text": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970203F, effective 2007.",
+          "reason": "numbers not found in the cited documents: 3604970203F"
+        }
+      ],
+      "fallback_reason": null,
+      "elapsed_s": 188.9
+    },
+    {
+      "address": "90-01 183rd Street, Queens, NY 11423",
+      "tier": "llm",
+      "model": "llama3.1:8b",
+      "attempts": 2,
+      "kept": 19,
+      "dropped": [],
+      "retried": [
+        {
+          "text": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007.",
+          "reason": "numbers not found in the cited documents: 3604970234F"
+        },
+        {
+          "text": "Experimental: satellite-detected surface water about 14 hours after Hurricane Ida (Sentinel-2, 2021-09-02): 0 water polygons within 500 m of this address, nearest 11174.7 m away.",
+          "reason": "numbers not found in the cited documents: 2021-09-02"
+        },
+        {
+          "text": "Latest METAR at JFK Airport, NY (7.8 km away): 17.0\u00b0C (obs 2026-09-26T18:50).",
+          "reason": "numbers not found in the cited documents: 2026-09-26T18:50"
+        },
+        {
+          "text": "Latest reading at Kings Point, NY: 5.9 ft above MLLW (+1.01 ft vs predicted tide), observed 2026-09-26 15:06.",
+          "reason": "numbers not found in the cited documents: 2026-09-26 15:06"
+        },
+        {
+          "text": "Nearest USGS stream gauge, Alley Creek Near Oakland Gardens NY (01302050, 5.7 km away): stage 1.24 ft, observed 2026-09-26 18:00 UTC.",
+          "reason": "numbers not found in the cited documents: 2026-09-26 18:00"
+        }
+      ],
+      "fallback_reason": null,
+      "elapsed_s": 258.1
+    },
+    {
+      "address": "2017 East 17th Street, Brooklyn, NY 11229",
+      "tier": "llm",
+      "model": "llama3.1:8b",
+      "attempts": 2,
+      "kept": 20,
+      "dropped": [],
+      "retried": [
+        {
+          "text": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970352F, effective 2007.",
+          "reason": "numbers not found in the cited documents: 3604970352F"
+        },
+        {
+          "text": "Experimental: satellite-detected surface water about 14 hours after Hurricane Ida (Sentinel-2, 2021-09-02): 0 water polygons within 500 m of this address.",
+          "reason": "numbers not found in the cited documents: 2021-09-02"
+        },
+        {
+          "text": "Latest METAR at JFK Airport, NY (15.6 km away): 17.0\u00b0C (obs 2026-09-26T18:50).",
+          "reason": "numbers not found in the cited documents: 2026-09-26T18:50"
+        },
+        {
+          "text": "Latest reading at The Battery, NY: 2.55 ft above MLLW (+2.26 ft vs predicted tide), observed 2026-09-26 15:06.",
+          "reason": "numbers not found in the cited documents: 2026-09-26 15:06"
+        },
+        {
+          "text": "NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m.",
+          "reason": "numbers not found in the cited documents: 2050s"
+        }
+      ],
+      "fallback_reason": null,
+      "elapsed_s": 216.3
+    },
+    {
+      "address": "80 Pioneer Street, Brooklyn, NY",
+      "tier": "llm",
+      "model": "llama3.1:8b",
+      "attempts": 2,
+      "kept": 19,
+      "dropped": [],
+      "retried": [
+        {
+          "text": "This address sits in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970192F, effective 2007.",
+          "reason": "numbers not found in the cited documents: 3604970192F"
+        },
+        {
+          "text": "Experimental: satellite-detected surface water about 14 hours after Hurricane Ida (Sentinel-2, 2021-09-02): 0 water polygons within 500 m of this address, nearest 4026.3 m away.",
+          "reason": "numbers not found in the cited documents: 2021-09-02"
+        },
+        {
+          "text": "Latest METAR at Central Park, NY (11.8 km away): 16.1\u00b0C, 7.9 mm precip in the last 6 hours (obs 2026-09-26T17:51).",
+          "reason": "numbers not found in the cited documents: 2026-09-26T17:51"
+        },
+        {
+          "text": "Latest reading at The Battery, NY: 2.52 ft above MLLW (+2.24 ft vs predicted tide), observed 2026-09-26 15:12.",
+          "reason": "numbers not found in the cited documents: 15:12, 2026-09-26"
+        },
+        {
+          "text": "NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m.",
+          "reason": "numbers not found in the cited documents: 2000-2004, 2050s"
+        }
+      ],
+      "fallback_reason": null,
+      "elapsed_s": 263.7
+    },
+    {
+      "address": "400 Carroll Street, Brooklyn, NY",
+      "tier": "llm",
+      "model": "llama3.1:8b",
+      "attempts": 2,
+      "kept": 23,
+      "dropped": [],
+      "retried": [
+        {
+          "text": "Latest reading at The Battery, NY: 2.55 ft above MLLW (+2.27 ft vs predicted tide), observed 2026-09-26 15:18.",
+          "reason": "numbers not found in the cited documents: 15:18"
+        }
+      ],
+      "fallback_reason": null,
+      "elapsed_s": 287.7
+    },
+    {
+      "address": "116-02 Rockaway Beach Boulevard, Queens, NY",
+      "tier": "llm",
+      "model": "llama3.1:8b",
+      "attempts": 2,
+      "kept": 18,
+      "dropped": [],
+      "retried": [
+        {
+          "text": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970379F, effective 2007.",
+          "reason": "numbers not found in the cited documents: 3604970379F"
+        },
+        {
+          "text": "Latest METAR at JFK Airport, NY (8.5 km away): 17.0\u00b0C (obs 2026-09-26T19:05).",
+          "reason": "numbers not found in the cited documents: 19:05"
+        },
+        {
+          "text": "Latest reading at Sandy Hook, NJ: 3.17 ft above MLLW (+2.81 ft vs predicted tide), observed 2026-09-26 15:18.",
+          "reason": "numbers not found in the cited documents: 15:18"
+        },
+        {
+          "text": "Nearest USGS stream gauge, Conselyeas Pond Tributary At Rosedale NY (01311810, 12.1 km away): stage 1.63 ft, discharge 35.9 ft\u00b3/s, observed 2026-09-26 18:00 UTC.",
+          "reason": "numbers not found in the cited documents: 18:00"
+        },
+        {
+          "text": "The Rockaway Line serves more than 100,000 residents of Broad Channel and the Rockaway Peninsula in addition to an estimated 1.7 million visitors.",
+          "reason": "numbers not found in the cited documents: million"
+        }
+      ],
+      "fallback_reason": null,
+      "elapsed_s": 251.9
+    },
+    {
+      "address": "801 Father Capodanno Boulevard, Staten Island, NY",
+      "tier": "llm",
+      "model": "llama3.1:8b",
+      "attempts": 2,
+      "kept": 19,
+      "dropped": [],
+      "retried": [
+        {
+          "text": "This address sits in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970329F, effective 2007.",
+          "reason": "numbers not found in the cited documents: 3604970329F"
+        },
+        {
+          "text": "Latest METAR at Newark Liberty, NJ (14.8 km away): 17.0\u00b0C (obs 2026-09-26T19:05).",
+          "reason": "numbers not found in the cited documents: 19"
+        }
+      ],
+      "fallback_reason": null,
+      "elapsed_s": 277.3
+    },
+    {
+      "address": "560 Grand Street, Manhattan, NY",
+      "tier": "llm",
+      "model": "llama3.1:8b",
+      "attempts": 2,
+      "kept": 18,
+      "dropped": [],
+      "retried": [
+        {
+          "text": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970203F, effective 2007.",
+          "reason": "numbers not found in the cited documents: 3604970203F"
+        },
+        {
+          "text": "Latest reading at The Battery, NY: 2.6 ft above MLLW (+2.3 ft vs predicted tide), observed 2026-09-26 15:30.",
+          "reason": "numbers not found in the cited documents: 15:30"
+        }
+      ],
+      "fallback_reason": null,
+      "elapsed_s": 224.0
+    },
+    {
+      "address": "355 Food Center Drive, Bronx, NY",
+      "tier": "llm",
+      "model": "llama3.1:8b",
+      "attempts": 2,
+      "kept": 17,
+      "dropped": [],
+      "retried": [
+        {
+          "text": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970111F, effective 2007.",
+          "reason": "numbers not found in the cited documents: 3604970111F"
+        },
+        {
+          "text": "Satellite-detected surface water about 14 hours after Hurricane Ida (Sentinel-2, 2021-09-02): 0 water polygons within 500 m of this address.",
+          "reason": "numbers not found in the cited documents: 2021-09-02"
+        },
+        {
+          "text": "Latest METAR at LaGuardia Airport, NY (3.2 km away): 17.0\u00b0C (obs 2026-09-26T19:20).",
+          "reason": "numbers not found in the cited documents: 2026-09-26T19:20"
+        },
+        {
+          "text": "Latest reading at Kings Point, NY: 5.06 ft above MLLW (+1.37 ft vs predicted tide), observed 2026-09-26 15:30.",
+          "reason": "numbers not found in the cited documents: 2026-09-26 15:30"
+        },
+        {
+          "text": "Nearest USGS stream gauge, Bronx River At Ny Botanical Garden At Bronx NY (01302020, 6.1 km away): stage 1.07 ft, discharge 139.0 ft\u00b3/s, observed 2026-09-26 18:30 UTC.",
+          "reason": "numbers not found in the cited documents: 2026-09-26 18:30"
+        },
+        {
+          "text": "NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m.",
+          "reason": "numbers not found in the cited documents: 2000-2004, 2050s"
+        }
+      ],
+      "fallback_reason": null,
+      "elapsed_s": 227.6
+    },
+    {
+      "address": "153-09 90th Avenue, Queens, NY",
+      "tier": "llm",
+      "model": "llama3.1:8b",
+      "attempts": 2,
+      "kept": 22,
+      "dropped": [],
+      "retried": [
+        {
+          "text": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970233F, effective 2007.",
+          "reason": "numbers not found in the cited documents: 3604970233F"
+        },
+        {
+          "text": "Latest METAR at JFK Airport, NY (7.3 km away): 17.0\u00b0C (obs 2026-09-26T19:25).",
+          "reason": "numbers not found in the cited documents: 19:25"
+        },
+        {
+          "text": "Latest reading at Kings Point, NY: 4.85 ft above MLLW (+1.41 ft vs predicted tide), observed 2026-09-26 15:36.",
+          "reason": "numbers not found in the cited documents: 15:36"
+        },
+        {
+          "text": "Nearest USGS stream gauge, Conselyeas Pond Tributary At Rosedale NY (01311810, 6.9 km away): stage 1.47 ft, discharge 28.5 ft\u00b3/s, observed 2026-09-26 19:00 UTC.",
+          "reason": "numbers not found in the cited documents: 19:00"
+        },
+        {
+          "text": "NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m.",
+          "reason": "numbers not found in the cited documents: 2050s"
+        }
+      ],
+      "fallback_reason": null,
+      "elapsed_s": 324.9
+    }
+  ]
+}

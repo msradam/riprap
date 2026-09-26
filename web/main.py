@@ -23,7 +23,6 @@ from fastapi.responses import (  # noqa: E402
 )
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 
-from app import emissions  # noqa: E402
 from app.context import floodnet  # noqa: E402
 from app.flood_layers import dep_stormwater, sandy_inundation  # noqa: E402
 from riprap.core.json_safe import to_json_safe as _to_json_safe  # noqa: E402
@@ -479,14 +478,7 @@ def api_agent(q: str):
     intent, return the full result. Used by MCP clients and scripts."""
     from riprap.core.burr.app import run as burr_run
 
-    tracker = emissions.Tracker()
-    emissions.install(tracker)
-    try:
-        out = burr_run(q)
-        out["emissions"] = tracker.summarize()
-        return JSONResponse(_to_json_safe(out))
-    finally:
-        emissions.install(None)
+    return JSONResponse(_to_json_safe(burr_run(q)))
 
 
 _BATCH_MAX_ADDRESSES = 25
@@ -533,16 +525,10 @@ async def api_agent_batch(request: Request) -> JSONResponse:
 
     results = []
     for addr in addresses:
-        tracker = emissions.Tracker()
-        emissions.install(tracker)
         try:
-            out = burr_run(addr)
-            out["emissions"] = tracker.summarize()
-            results.append(_to_json_safe(out))
+            results.append(_to_json_safe(burr_run(addr)))
         except Exception as e:  # noqa: BLE001
             results.append({"query": addr, "error": str(e)})
-        finally:
-            emissions.install(None)
 
     return JSONResponse({"results": results, "n": len(results)})
 
@@ -557,13 +543,10 @@ async def api_agent_stream(q: str):
 
     out_q: queue.Queue[dict] = queue.Queue()
 
-    tracker = emissions.Tracker()
-
     def runner():
-        emissions.install(tracker)
         try:
             from riprap.core import llm as core_llm
-            from riprap.core.burr.app import iter_steps, plan_for, run_compare
+            from riprap.core.burr.app import energy_summary, iter_steps, plan_for, run_compare
 
             if core_llm.tier() == "no_llm":
                 out_q.put({"kind": "plan_token", "delta": "[heuristic planner, no LLM call]"})
@@ -588,12 +571,11 @@ async def api_agent_stream(q: str):
                 final = run_compare(q, plan, runner=lambda qq, pp: stream(qq, pp, next(labels, None)))
             else:
                 final = stream(q, plan)
-            final["emissions"] = tracker.summarize()
+            final["emissions"] = energy_summary(final, plan)
             out_q.put({"kind": "final", **final})
         except Exception as e:
             out_q.put({"kind": "error", "err": str(e)})
         finally:
-            emissions.install(None)
             out_q.put({"kind": "_done"})
 
     async def event_stream():

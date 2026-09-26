@@ -1,8 +1,8 @@
 # Riprap self-host image (FastAPI + SvelteKit).
 #
-# Runs the evidence pipeline on CPU. It does not ship an LLM: point
-# RIPRAP_LLM_BASE_URL at an OpenAI-compatible endpoint, or set
-# RIPRAP_RECONCILER_TIER=no_llm for the evidence-only briefing.
+# Runs the evidence pipeline on CPU. It does not ship an LLM: without
+# settings it serves the no-LLM evidence briefing; set RIPRAP_LLM_BASE_URL
+# and RIPRAP_LLM_MODEL to use any OpenAI-compatible endpoint.
 # See .env.example and docs/DEPLOY.md.
 #
 # Build:    docker build -t riprap -f Dockerfile.app .
@@ -44,14 +44,15 @@ WORKDIR /app
 
 # Dependencies first so a code-only edit doesn't bust the layer cache.
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev --no-install-project
+# Core plus the `ml` extra (in-process TTM, embeddings, NER). torch comes
+# from the CPU wheel index on Linux (see [tool.uv.sources]).
+RUN uv sync --frozen --no-dev --extra ml --no-install-project
 
 # App code, manifests, fixtures and corpus.
 COPY app/ ./app/
 COPY riprap/ ./riprap/
 COPY deployments/ ./deployments/
 COPY web/__init__.py web/main.py ./web/
-COPY web/static/ ./web/static/
 COPY data/ ./data/
 COPY corpus/ ./corpus/
 

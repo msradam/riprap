@@ -1,345 +1,101 @@
-"""Per-query emissions tracker for inference calls.
+"""Energy and token ledger for the LLM calls in one briefing.
 
-Records every LLM and ML-inference call made during a single query and
-summarizes:
-  - wallclock duration per call
-  - prompt + completion tokens (LLM)
-  - energy in watt-hours, **measured from the active hardware when
-    available** — an NVIDIA L4 or AMD MI300X GPU via the inference
-    proxy's per-call `X-GPU-Power-W` / `X-GPU-Energy-J` headers (a
-    100 ms-cadence NVML sampler), or Apple Silicon via a local
-    `powermetrics` log (`RIPRAP_POWERMETRICS_LOG`, see `app/power_mac.py`).
-    Falls back to a duration × data-sheet-power estimate per `HARDWARE`
-    below when none of those is available (proxy unreachable / NVML
-    init failed / no fresh powermetrics log / call went to a backend
-    that doesn't surface power readings).
+Every call record says how its energy figure was obtained:
 
-Each call record carries a `measured: bool` flag indicating which path
-was used, so the UI can disclose. `summarize()` aggregates total Wh,
-total tokens, by-kind and by-hardware splits — no cloud comparison.
+  measured   Apple Silicon SoC energy read through zeus-apple-silicon
+             (the optional `energy` extra) for a call to a local
+             endpoint. It is whole-chip energy during the call, so it
+             includes other processes.
+  estimated  RIPRAP_ENERGY_WATTS (a sustained power you declare for the
+             local machine) times the call's duration, for a local
+             endpoint.
+  unknown    everything else. Hosted endpoints never get a figure: they
+             report no energy, and power times duration on shared
+             hardware would be invented.
 
-Thread propagation
-------------------
-The tracker is held in a thread-local. The dispatch layer
-(web/main.py) installs one per request; `app/fsm.py:iter_steps`
-captures and re-installs it on the FSM runner thread (mirroring the
-existing `_captured_token_cb` pattern). Worker threads spawned inside
-specialists (prithvi_live, eo_chip_cache) inherit nothing — those calls
-are silently dropped, which is acceptable: those specialists do <1 s of
-inference each and are off the hot path for the energy story.
+In-process CPU models (TTM, embeddings, NER) are not in the ledger. The
+2026-05 benchmark measured them at about 0.3% of a briefing's inference
+energy (docs/BENCHMARKS.md).
 """
 
 from __future__ import annotations
 
 import os
-import threading
+import time
+from contextlib import contextmanager
 from typing import Any
+from urllib.parse import urlparse
 
-# (label, fallback_sustained_power_w, source). Used only when the
-# proxy doesn't surface a real measurement (NVML disabled, backend
-# unreachable, local-fallback path). The fallback figure is a
-# conservative public-record estimate; the `measured: bool` flag on
-# each call record indicates whether the row used the fallback.
-HARDWARE: dict[str, tuple[str, float, str]] = {
-    "nvidia_l4": (
-        "NVIDIA L4",
-        60.0,
-        "NVIDIA L4 Tensor Core GPU data sheet (72 W TGP, Ada Lovelace, "
-        "24 GB); ~60 W sustained during transformer inference. The ML "
-        "specialist backend for the Modal deployment (msradam/"
-        "riprap-inference's modal_app.py). When the proxy is reachable "
-        "and NVML is initialized, real per-call power is read off the "
-        "device via nvmlDeviceGetPowerUsage and this fallback is unused.",
-    ),
-    "nvidia_a100": (
-        "NVIDIA A100",
-        250.0,
-        "NVIDIA A100 40GB data sheet (250 W TDP); ~250 W sustained "
-        "during vLLM generation. The LLM backend for the Modal "
-        "deployment (msradam/riprap-inference's modal_vllm_app.py). "
-        "When the proxy is reachable and NVML is initialized, real "
-        "per-call power is read off the device via nvmlDeviceGetPowerUsage "
-        "and this fallback is unused.",
-    ),
-    "amd_mi300x": (
-        "AMD MI300X",
-        600.0,
-        "AMD Instinct MI300X data sheet (750 W TDP); ~600 W sustained "
-        "during vLLM generation. Selected only when an operator deploys "
-        "against an MI300X droplet and sets RIPRAP_HARDWARE_LABEL=AMD "
-        "MI300X explicitly. The hackathon submission used to run on "
-        "this hardware; the droplet was decommissioned 2026-05-06.",
-    ),
-    "nvidia_t4": (
-        "NVIDIA T4",
-        50.0,
-        "NVIDIA T4 data sheet (70 W max); ~50 W sustained during transformer inference.",
-    ),
-    "apple_m": (
-        "Apple M-series",
-        20.0,
-        "ml.energy / community measurements: ~20 W package power "
-        "during Granite 4.1 q4_K_M inference on Apple M3/M4 (the "
-        "local-dev / Mac Mini path, no remote GPU proxy configured). "
-        "Used only when RIPRAP_POWERMETRICS_LOG isn't set or the tail "
-        "hasn't produced a fresh sample; when it has, app.power_mac "
-        "reads real Combined Power (CPU + GPU + ANE) off `powermetrics` "
-        "and this fallback is unused — see app/power_mac.py.",
-    ),
-    "cpu_server": (
-        "x86 CPU",
-        30.0,
-        "Typical sustained x86 server-core load (~30 W) for CPU-only inference fallbacks.",
-    ),
-}
+_LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1", "0.0.0.0", "ollama"}
 
 
-def hardware_for(remote_base_url: str) -> str:
-    """Classify hardware from an operator override plus whether a remote
-    endpoint is configured. Shared by llm.py (LLM calls) and inference.py
-    (ML specialist calls) so both agree on what counts as "local".
-
-    `remote_base_url` empty, or pointing at localhost/127.0.0.1 (the
-    Mac Mini's own Ollama / riprap-inference server), means Apple Silicon.
-    A *.modal.run URL for the riprap-vllm app is the A100 LLM backend
-    (msradam/riprap-inference's modal_vllm_app.py) — checked narrowly by
-    hostname, not just "riprap-vllm" in the URL, since the retired HF
-    Spaces vLLM deployment (msradam-riprap-vllm.hf.space) ran on an L4
-    and shares that substring. Any other remote URL is treated as the L4
-    ML specialist backend (modal_app.py) — the two remote GPU tiers
-    Riprap currently deploys to."""
-    override = (os.environ.get("RIPRAP_HARDWARE_LABEL") or "").lower()
-    if "mi300x" in override or "amd" in override:
-        return "amd_mi300x"
-    if "a100" in override:
-        return "nvidia_a100"
-    if "l4" in override:
-        return "nvidia_l4"
-    if "t4" in override:
-        return "nvidia_t4"
-    if "nvidia" in override:
-        return "nvidia_l4"
-    if "apple" in override or "m3" in override or "m4" in override:
-        return "apple_m"
-    is_local = (
-        not remote_base_url or "localhost" in remote_base_url or "127.0.0.1" in remote_base_url
-    )
-    if remote_base_url and not is_local:
-        is_modal_vllm = ".modal.run" in remote_base_url and "riprap-vllm" in remote_base_url
-        return "nvidia_a100" if is_modal_vllm else "nvidia_l4"
-    if os.environ.get("SPACE_ID") or os.environ.get("HF_SPACE_ID"):
-        return "nvidia_t4"
-    return "apple_m"
+def _is_local(base_url: str) -> bool:
+    return (urlparse(base_url).hostname or "") in _LOCAL_HOSTS
 
 
-def _wh(power_w: float, duration_s: float) -> float:
-    return power_w * max(duration_s, 0.0) / 3600.0
+def _zeus():
+    try:
+        from zeus_apple_silicon import AppleEnergyMonitor  # noqa: PLC0415
 
-
-class Tracker:
-    """Append-only call ledger for one query. Thread-safe."""
-
-    def __init__(self) -> None:
-        self.calls: list[dict[str, Any]] = []
-        self._lock = threading.Lock()
-
-    def _record(
-        self,
-        *,
-        base: dict[str, Any],
-        hardware: str,
-        duration_s: float,
-        joules_real: float | None,
-        power_w_real: float | None,
-    ) -> None:
-        """Shared body of record_llm / record_ml.
-
-        When `joules_real` is provided (NVML-derived from the proxy),
-        we use it directly and stamp `measured=True`. Otherwise we
-        fall back to the data-sheet sustained-power estimate.
-        """
-        hw_label, fallback_w, _src = HARDWARE.get(hardware, HARDWARE["cpu_server"])
-        if joules_real is not None and joules_real >= 0:
-            joules = float(joules_real)
-            wh = joules / 3600.0
-            measured = True
-            avg_w = (
-                (joules / duration_s)
-                if duration_s > 0
-                else (power_w_real if power_w_real is not None else fallback_w)
-            )
-        else:
-            avg_w = fallback_w
-            wh = _wh(avg_w, duration_s)
-            joules = wh * 3600.0
-            measured = False
-        record = {
-            **base,
-            "hardware": hardware,
-            "hardware_label": hw_label,
-            "power_w": round(avg_w, 2),
-            "duration_s": round(duration_s, 3),
-            "measured": measured,
-            "wh": round(wh, 5),
-            "joules": round(joules, 3),
-        }
-        with self._lock:
-            self.calls.append(record)
-
-    def record_llm(
-        self,
-        *,
-        model: str,
-        backend: str,
-        hardware: str,
-        prompt_tokens: int | None,
-        completion_tokens: int | None,
-        duration_s: float,
-        stream: bool = False,
-        joules_real: float | None = None,
-        power_w_real: float | None = None,
-    ) -> None:
-        total = None
-        if prompt_tokens is not None or completion_tokens is not None:
-            total = (prompt_tokens or 0) + (completion_tokens or 0)
-        self._record(
-            base={
-                "kind": "llm",
-                "model": model,
-                "backend": backend,
-                "prompt_tokens": prompt_tokens,
-                "completion_tokens": completion_tokens,
-                "total_tokens": total,
-                "stream": stream,
-            },
-            hardware=hardware,
-            duration_s=duration_s,
-            joules_real=joules_real,
-            power_w_real=power_w_real,
-        )
-
-    def record_ml(
-        self,
-        *,
-        endpoint: str,
-        backend: str,
-        hardware: str,
-        duration_s: float,
-        joules_real: float | None = None,
-        power_w_real: float | None = None,
-    ) -> None:
-        self._record(
-            base={
-                "kind": "ml",
-                "endpoint": endpoint,
-                "backend": backend,
-            },
-            hardware=hardware,
-            duration_s=duration_s,
-            joules_real=joules_real,
-            power_w_real=power_w_real,
-        )
-
-    def summarize(self) -> dict[str, Any]:
-        with self._lock:
-            calls = list(self.calls)
-        total_wh = sum(c["wh"] for c in calls)
-        total_dur = sum(c["duration_s"] for c in calls)
-        n_measured = sum(1 for c in calls if c.get("measured"))
-        prompt = sum((c.get("prompt_tokens") or 0) for c in calls if c["kind"] == "llm")
-        completion = sum((c.get("completion_tokens") or 0) for c in calls if c["kind"] == "llm")
-
-        by_kind: dict[str, dict[str, Any]] = {}
-        for c in calls:
-            slot = by_kind.setdefault(c["kind"], {"wh": 0.0, "n": 0, "duration_s": 0.0})
-            slot["wh"] += c["wh"]
-            slot["n"] += 1
-            slot["duration_s"] += c["duration_s"]
-        for slot in by_kind.values():
-            slot["wh"] = round(slot["wh"], 5)
-            slot["mwh"] = round(slot["wh"] * 1000, 2)
-            slot["duration_s"] = round(slot["duration_s"], 3)
-
-        by_hw: dict[str, dict[str, Any]] = {}
-        for c in calls:
-            slot = by_hw.setdefault(
-                c["hardware"],
-                {
-                    "label": c["hardware_label"],
-                    "wh": 0.0,
-                    "n": 0,
-                    "duration_s": 0.0,
-                },
-            )
-            slot["wh"] += c["wh"]
-            slot["n"] += 1
-            slot["duration_s"] += c["duration_s"]
-        for slot in by_hw.values():
-            slot["wh"] = round(slot["wh"], 5)
-            slot["mwh"] = round(slot["wh"] * 1000, 2)
-            slot["duration_s"] = round(slot["duration_s"], 3)
-
-        return {
-            "n_calls": len(calls),
-            "n_measured": n_measured,
-            "total_wh": round(total_wh, 5),
-            "total_mwh": round(total_wh * 1000, 2),
-            "total_joules": round(total_wh * 3600, 1),
-            "total_duration_s": round(total_dur, 3),
-            "tokens": {
-                "prompt": prompt or None,
-                "completion": completion or None,
-                "total": (prompt + completion) or None,
-            },
-            "by_kind": by_kind,
-            "by_hardware": by_hw,
-            "calls": calls,
-            "method": (
-                "Energy is read off the L4 GPU per call via "
-                "nvmlDeviceGetPowerUsage on the inference proxy "
-                "(X-GPU-Energy-J response header). Calls flagged "
-                "measured=false fall back to "
-                "(data-sheet sustained_power_w × duration_s ÷ 3600) "
-                "— see app/emissions.HARDWARE for sources. Tokens "
-                "are reported by the backend (LiteLLM usage) when "
-                "available, else estimated from response text length "
-                "(~4 chars/token)."
-            ),
-        }
-
-
-# Thread-local install. Calls made on threads without an installed
-# tracker hit a no-op stub — always safe to call active().record_*().
-_tl = threading.local()
-
-
-class _NullTracker:
-    def record_llm(self, **_kw: Any) -> None:
-        return None
-
-    def record_ml(self, **_kw: Any) -> None:
+        return AppleEnergyMonitor()
+    except Exception:  # noqa: BLE001 - the energy extra is optional
         return None
 
 
-_NULL = _NullTracker()
+@contextmanager
+def measure_call(base_url: str, model: str):
+    """Wrap one LLM call; yields the record to fill with token counts.
+    Energy fields are set on exit."""
+    rec: dict[str, Any] = {"kind": "llm", "model": model, "endpoint": urlparse(base_url).netloc,
+                           "prompt_tokens": None, "completion_tokens": None}
+    local = _is_local(base_url)
+    monitor = _zeus() if local else None
+    if monitor:
+        monitor.begin_window("llm")
+    t0 = time.time()
+    try:
+        yield rec
+    finally:
+        rec["duration_s"] = round(time.time() - t0, 3)
+        rec.update(energy_status="unknown", wh=None,
+                   energy_note="hosted endpoint: no energy reported" if not local
+                   else "no energy source configured")
+        if monitor:
+            m = monitor.end_window("llm")
+            mj = sum(v or 0 for v in (m.cpu_total_mj, m.gpu_mj, m.dram_mj, m.ane_mj))
+            # zeus-apple-silicon 1.1 reads 0 mJ of CPU energy on some chips
+            # (seen on an Apple M5); a zero CPU reading over a real call is
+            # a broken counter, not a free call.
+            if m.cpu_total_mj and rec["duration_s"] > 0.5:
+                rec.update(energy_status="measured", wh=round(mj / 3.6e6, 5),
+                           energy_note="Apple SoC energy (CPU+GPU+DRAM+ANE) during the call, "
+                                       "includes other processes")
+            else:
+                rec["energy_note"] = "energy counters returned no CPU energy on this chip"
+        watts = os.environ.get("RIPRAP_ENERGY_WATTS")
+        if local and rec["energy_status"] == "unknown" and watts:
+            rec.update(energy_status="estimated",
+                       wh=round(float(watts) * rec["duration_s"] / 3600, 5),
+                       energy_note=f"declared {watts} W times duration")
 
 
-def install(tracker: Tracker | None) -> None:
-    _tl.tracker = tracker
-
-
-def current() -> Tracker | None:
-    return getattr(_tl, "tracker", None)
-
-
-def active() -> Tracker | _NullTracker:
-    """Return the installed tracker for this thread, or a no-op stub.
-    Always safe to call in instrumentation hot paths."""
-    return getattr(_tl, "tracker", None) or _NULL
-
-
-def estimate_completion_tokens(text: str) -> int:
-    """Rough char/4 estimator used when the backend doesn't report usage
-    (e.g. streaming through Ollama, where LiteLLM's stream wrapper does
-    not always surface a final usage block)."""
-    return max(1, len(text) // 4)
+def summarize(calls: list[dict]) -> dict[str, Any]:
+    """Totals for a briefing. total_wh is reported only when every call
+    has a measured or estimated figure; otherwise it is None."""
+    known = [c for c in calls if c.get("wh") is not None]
+    statuses = sorted({c.get("energy_status", "unknown") for c in calls})
+    prompt = sum(c.get("prompt_tokens") or 0 for c in calls)
+    completion = sum(c.get("completion_tokens") or 0 for c in calls)
+    return {
+        "n_calls": len(calls),
+        "n_measured": sum(1 for c in calls if c.get("energy_status") == "measured"),
+        "energy_status": statuses[0] if len(statuses) == 1 else ("mixed" if statuses else "none"),
+        "total_wh": round(sum(c["wh"] for c in known), 5) if calls and len(known) == len(calls) else None,
+        "total_duration_s": round(sum(c.get("duration_s") or 0 for c in calls), 3),
+        "tokens": {"prompt": prompt or None, "completion": completion or None,
+                   "total": (prompt + completion) or None},
+        "calls": calls,
+        "method": ("Each LLM call is labelled measured (Apple SoC counters), estimated "
+                   "(declared watts times duration) or unknown; hosted endpoints are always "
+                   "unknown. See app/emissions.py."),
+    }

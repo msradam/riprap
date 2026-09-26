@@ -111,7 +111,9 @@ def verify(claims: list[dict], docs: list[Doc]) -> tuple[list[dict], list[dict]]
         else:
             evidence_numbers = [p[0] for n in numbers_in(" ".join(by_id[i].text for i in ids))
                                 if (p := _parse(n))]
-            stated = set(claim["numbers"]) | set(numbers_in(text))
+            # Listed "numbers" can be identifiers or dates ("3604970203F",
+            # "2021-09-02"); tokenize them exactly as the evidence is.
+            stated = set(numbers_in(text)) | {t for n in claim["numbers"] for t in numbers_in(n)}
             missing = sorted(n for n in stated
                              if n.lstrip("+-") not in _NOT_MEASUREMENTS
                              and not number_supported(n, evidence_numbers))
@@ -212,9 +214,9 @@ def synthesize(state) -> dict:
     schema = claims_schema(sorted({d.doc_id for d in docs}), sections)
     messages = [{"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": _user_prompt(docs, sections)}]
-    attempts, model, first_dropped = 0, None, []
+    attempts, model, first_dropped, calls = 0, None, [], []
     try:
-        out, model = llm.chat_json(messages, schema, name="claims")
+        out, model = llm.chat_json(messages, schema, name="claims", ledger=calls)
         attempts = 1
         kept, dropped = verify(out.get("claims") or [], docs)
         first_dropped = dropped
@@ -226,14 +228,15 @@ def synthesize(state) -> dict:
                  "\nReturn the full claim list again. Fix these claims using only numbers "
                  "that appear in their cited documents, or leave them out."},
             ]
-            out, model = llm.chat_json(messages, schema, name="claims")
+            out, model = llm.chat_json(messages, schema, name="claims", ledger=calls)
             attempts = 2
             kept, dropped = verify(out.get("claims") or [], docs)
     except llm.LLMUnavailable as e:
         paragraph, cites = compose_briefing(state)
         return {"paragraph": paragraph, "citations": cites,
                 "grounding": {"tier": "no_llm", "fallback_reason": f"LLM unavailable: {e}",
-                              "claims": [], "dropped_claims": [], "attempts": attempts}}
+                              "claims": [], "dropped_claims": [], "attempts": attempts,
+                              "llm_calls": calls}}
     cited = {i for c in kept for i in c["doc_ids"]}
     return {
         "paragraph": _render(kept, docs, sections),
@@ -241,7 +244,7 @@ def synthesize(state) -> dict:
         "grounding": {"tier": "llm", "model": model, "attempts": attempts,
                       "claims": kept, "dropped_claims": dropped,
                       "retried_claims": first_dropped if attempts == 2 else [],
-                      "n_kept": len(kept), "n_dropped": len(dropped)},
+                      "n_kept": len(kept), "n_dropped": len(dropped), "llm_calls": calls},
     }
 
 

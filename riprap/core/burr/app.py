@@ -74,13 +74,16 @@ def _reconciler():
 
 def plan_for(query: str) -> dict:
     """The plan a query gets: the LLM planner in LLM mode, the regex
-    planner otherwise (or when the LLM planner fails)."""
+    planner otherwise (or when the LLM planner fails). LLM calls are
+    listed under `llm_calls`."""
     if _tier() == "llm":
+        calls: list = []
         try:
             from app.planner import plan as run_planner
 
-            p = run_planner(query)
-            return {"intent": p.intent, "targets": p.targets, "rationale": p.rationale}
+            p = run_planner(query, ledger=calls)
+            return {"intent": p.intent, "targets": p.targets, "rationale": p.rationale,
+                    "llm_calls": calls}
         except Exception as e:  # noqa: BLE001 - fall back to the regex planner
             log.warning("LLM planner failed (%s); using the heuristic planner", e)
     return heuristic_plan(query)
@@ -199,14 +202,27 @@ def iter_steps(query: str, plan: dict | None = None):
         yield {"kind": "final", **_final(holder["state"])}
 
 
+def energy_summary(result: dict, plan: dict | None = None) -> dict:
+    """The energy/token ledger for a briefing: planner plus synthesis
+    LLM calls, each labelled measured, estimated or unknown."""
+    from app.emissions import summarize
+
+    calls = list((plan or {}).get("llm_calls") or [])
+    calls += (result.get("grounding") or {}).get("llm_calls") or []
+    return summarize(calls)
+
+
 def run(query: str, plan: dict | None = None) -> dict:
-    """Run to completion and return the result dict. Plans first, and
-    runs `compare` as two briefings."""
+    """Run to completion and return the result dict (with its energy
+    ledger). Plans first, and runs `compare` as two briefings."""
     plan = plan or plan_for(query)
     if plan["intent"] == "compare":
-        return run_compare(query, plan)
-    _, _, state = build_app(query, plan).run(halt_after=["reconcile"])
-    return _final(state)
+        out = run_compare(query, plan)
+    else:
+        _, _, state = build_app(query, plan).run(halt_after=["reconcile"])
+        out = _final(state)
+    out["emissions"] = energy_summary(out, plan)
+    return out
 
 
 def run_compare(query: str, plan: dict, runner=None) -> dict:
@@ -234,6 +250,8 @@ def run_compare(query: str, plan: dict, runner=None) -> dict:
                        for c in (res.get("grounding") or {}).get("claims", [])],
             "dropped_claims": [{**c, "place": lab} for lab, _, res in results
                                for c in (res.get("grounding") or {}).get("dropped_claims", [])],
+            "llm_calls": [c for _, _, res in results
+                          for c in (res.get("grounding") or {}).get("llm_calls", [])],
         },
         targets=[{"label": lab, "address": addr, "state": res} for lab, addr, res in results],
     )

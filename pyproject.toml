@@ -36,45 +36,50 @@ classifiers = [
     "Typing :: Typed",
 ]
 
+# Core: the evidence pipeline, the API and the MCP server. No torch.
 dependencies = [
-    # Web, streaming, agent tool surface
     "fastapi>=0.115,<1",
     "uvicorn>=0.32,<1",
     "httpx>=0.27,<1",
     "pydantic>=2.9,<3",
+    "pyyaml>=6,<7",
     "mcp>=2.2,<3",
     "apache-burr>=0.43,<1",
-    # Geo and data
+    "openai>=1.60,<3",
     "geopandas>=1.0,<2",
     "shapely>=2.0,<3",
     "pyproj>=3.6,<4",
     "rasterio>=1.4,<2",
     "geopy>=2.4,<3",
     "pandas>=2.2,<3",
-    "pyarrow>=18.0,<25",
     "numpy>=1.26,<3",
     "dataretrieval>=1.3,<2",
-    # PDF export (needs system pango and cairo)
-    "weasyprint>=68,<70",
-    # LLM client (replaced in a later phase)
-    "litellm>=1.83.14,<2",
-    # ML: embeddings, NER, TTM
-    "datasets>=3.0,<5",
-    "sentence-transformers>=3.3,<4",
-    "codecarbon>=2.5,<4",
-    "pypdf>=5.0,<7",
+]
+
+[project.optional-dependencies]
+# In-process CPU models: TTM forecasts, policy-corpus embeddings, NER.
+ml = [
+    "torch>=2.5,<3",
     "transformers>=4.55,<5",
     "huggingface_hub>=0.34,<1",
+    "sentence-transformers>=3.3,<4",
     "flair>=0.13.0,<0.16",
     "granite-tsfm>=0.3.0,<0.4",
-    # EO chip fetch
+    "pypdf>=5.0,<7",
+]
+# Batch earth-observation jobs (scripts/run_eo_batch.py), never per request.
+eo = [
+    "terratorch>=1.1,<2",
     "planetary-computer>=1.0,<2",
     "pystac-client>=0.7,<1",
     "rioxarray>=0.15,<1",
     "xarray>=2024.1",
-    "einops>=0.7,<1",
-    "openai>=1.60,<3",
+    "pyarrow>=18.0,<25",
 ]
+# Server-side PDF export (/api/print); needs system pango and cairo.
+pdf = ["weasyprint>=68,<70"]
+# Measured energy on Apple Silicon (IOReport, no sudo).
+energy = ["zeus-apple-silicon>=1.0,<2; sys_platform == 'darwin'"]
 
 [project.urls]
 Homepage      = "https://github.com/msradam/riprap"
@@ -139,6 +144,15 @@ ignore_decorators = ["@app.get", "@app.post", "@action"]
 #   engine    — _hardware_for() param sliced by docstring contract, not by body
 ignore_names = ["request", "query_id", "engine"]
 paths = ["app", "web", "scripts", "riprap"]
+
+# CPU-only torch wheels on Linux (Docker, CI) instead of the CUDA build.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

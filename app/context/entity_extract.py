@@ -13,9 +13,8 @@ governance umbrella (IBM, NASA, ESA) or human-labeled public-domain
 training data. No model in the stack was trained on closed-LLM-
 generated synthetic data.
 
-Output shape is identical to the previous GLiNER module so downstream
-code in `app/reconcile.py` and the FSM doesn't need to change. The
-five Riprap entity labels map onto OntoNotes types:
+It runs in process on CPU; there is no remote NER path. The five Riprap
+entity labels map onto OntoNotes types:
 
     nyc_location           ← GPE, LOC, FAC
     dollar_amount          ← MONEY
@@ -28,6 +27,7 @@ from __future__ import annotations
 import logging
 import os
 import re
+import threading
 from dataclasses import dataclass
 
 log = logging.getLogger("riprap.entity_extract")
@@ -72,7 +72,8 @@ ENABLE = os.environ.get("RIPRAP_NER_ENABLE",
                         os.environ.get("RIPRAP_GLINER_ENABLE", "1")
                         ).lower() in ("1", "true", "yes")
 
-_TAGGER = None  # lazy
+_TAGGER = None
+_TAGGER_LOCK = threading.Lock()
 
 
 @dataclass
@@ -90,7 +91,15 @@ def _ensure_tagger():
     if not ENABLE:
         return None
     if _TAGGER is not None:
-        return _TAGGER
+        return _TAGGER or None
+    with _TAGGER_LOCK:
+        return _load_tagger()
+
+
+def _load_tagger():
+    global _TAGGER
+    if _TAGGER is not None:
+        return _TAGGER or None
     try:
         from flair.models import SequenceTagger
         log.info("entity_extract: loading %s", MODEL_NAME)
@@ -162,26 +171,6 @@ def extract_for_chunk(text: str,
     extractions above the score threshold."""
     if not text:
         return []
-    # v0.4.5-era remote-inference path: if the ML specialist service
-    # is reachable, prefer it over local model load. The remote was
-    # GLiNER-based; with the swap to Flair it's a no-op until the
-    # remote is also migrated. Tolerate the remote returning nothing.
-    try:
-        from app import inference as _inf
-        if _inf.remote_enabled():
-            remote = _inf.gliner_extract(text, ENTITY_LABELS)
-            if remote.get("ok"):
-                # Remote already returns Riprap labels — pass through.
-                return [
-                    Extraction(label=e["label"], text=e["text"],
-                               score=float(e.get("score", 0)))
-                    for e in remote.get("entities", [])
-                    if e.get("score", 0) >= threshold
-                ]
-    except Exception:
-        # Remote path is best-effort; local Flair below is the canonical.
-        pass
-
     ents = _flair_predict(text) + _regex_augment(text)
     return [e for e in ents if e.score >= threshold]
 
@@ -190,14 +179,12 @@ def extract_for_rag_hits(hits: list[dict],
                          threshold: float = DEFAULT_THRESHOLD,
                          max_hits: int = 3) -> dict[str, dict]:
     """Run NER on the top-`max_hits` RAG hits. Returns a dict keyed by
-    short source id (e.g. "comptroller") with the structured payload
-    that the FSM stores into state["gliner"] and that
-    `reconcile.build_documents()` consumes.
-
-    State key remains `gliner` for backward compatibility with
-    downstream consumers (cardAdapter, reconciler citation chips,
-    audit logs). The implementation underneath is Flair/OntoNotes;
-    the name "gliner" is a historical artefact.
+    short source id (e.g. "comptroller"), stored under the
+    policy_corpus pebble's `entities`. Local Flair is the only NER model
+    Riprap uses, so results do not depend on where it runs. The label
+    mapping from OntoNotes is coarse (NORP becomes "agency", EVENT
+    becomes "infrastructure_project"), which is why entity tags are
+    labelled experimental.
     """
     out: dict[str, dict] = {}
     if not hits:

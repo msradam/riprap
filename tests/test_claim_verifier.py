@@ -43,6 +43,14 @@ def test_invented_number_is_dropped():
     assert "34" in dropped[0]["reason"]
 
 
+def test_identifiers_and_dates_in_numbers_field_are_tokenized():
+    docs = [Doc("fema_nfhl", "Hazard reader",
+                "Zone X, per NFHL FIRM panel 3604970203F, effective 2007, read 2026-09-26T18:50.", False)]
+    kept, dropped = verify([claim("Zone X, FIRM panel 3604970203F, effective 2007.", ["fema_nfhl"],
+                                  ["3604970203F", "2007", "2026-09-26T18:50"])], docs)
+    assert kept and not dropped
+
+
 def test_number_only_in_text_is_still_checked():
     # The model left `numbers` empty but the sentence states a number.
     kept, dropped = verify([claim("Elevation is 21 m.", ["microtopo"], [])], DOCS)

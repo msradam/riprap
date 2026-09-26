@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import logging
 import os
-import threading
 import time
 from datetime import datetime, timedelta
 from typing import Any
@@ -62,19 +61,16 @@ MIN_INTERESTING_RESIDUAL_M = float(
     os.environ.get("RIPRAP_TTM_BATTERY_MIN_INTERESTING_M", "0.3"))
 
 _MODEL = None
-_INIT_LOCK = threading.Lock()
 
 
 def _has_required_deps() -> tuple[bool, str | None]:
     missing: list[str] = []
-    for name in ("tsfm_public", "huggingface_hub", "torch", "requests",
-                 "pandas"):
-        try:
-            __import__(name)
-        except ImportError:
-            missing.append(name)
+    import importlib.util
+
+    missing = [n for n in ("tsfm_public", "huggingface_hub", "torch")
+               if importlib.util.find_spec(n) is None]
     if missing:
-        return False, ", ".join(missing)
+        return False, "the ml extra is not installed (uv sync --extra ml)"
     return True, None
 
 
@@ -88,7 +84,9 @@ def _ensure_model():
     global _MODEL
     if _MODEL is not None:
         return _MODEL
-    with _INIT_LOCK:
+    from app.live.ttm_forecast import MODEL_LOAD_LOCK
+
+    with MODEL_LOAD_LOCK:
         if _MODEL is not None:
             return _MODEL
         from huggingface_hub import snapshot_download
@@ -101,16 +99,7 @@ def _ensure_model():
         log.info("ttm_battery_surge: downloading %s", REPO)
         local_dir = snapshot_download(REPO)
         log.info("ttm_battery_surge: loading model from %s", local_dir)
-        model = TinyTimeMixerForPrediction.from_pretrained(local_dir).eval()
-        if DEVICE == "cuda":
-            try:
-                import torch
-                if torch.cuda.is_available():
-                    model = model.cuda()
-            except Exception:
-                log.exception("ttm_battery_surge: cuda move failed; "
-                              "staying on CPU")
-        _MODEL = model
+        _MODEL = TinyTimeMixerForPrediction.from_pretrained(local_dir).eval()
         return _MODEL
 
 
@@ -122,7 +111,8 @@ def _fetch_chunk(start: datetime, end: datetime, product: str):
     back in metres if `units=metric`.
     """
     import pandas as pd
-    import requests
+
+    import httpx
     params = {
         "station": STATION_ID,
         "begin_date": start.strftime("%Y%m%d"),
@@ -135,7 +125,7 @@ def _fetch_chunk(start: datetime, end: datetime, product: str):
         "application": "riprap-nyc",
         "interval": "h",
     }
-    resp = requests.get(NOAA_API, params=params, timeout=30)
+    resp = httpx.get(NOAA_API, params=params, timeout=30)
     resp.raise_for_status()
     data = resp.json()
     key = "data" if "data" in data else "predictions"
@@ -231,8 +221,9 @@ def _summarize(history_df, forecast_arr) -> dict[str, Any]:
         # future fine-tuned forecast pebble.
         "hf_model_card": f"huggingface.co/{REPO}",
         "rmse_m": 0.157,
-        "skill_vs_persistence": "-35% vs persistence",
-        "hardware_badge": "MI300X",
+        "skill_vs_persistence": ("35% lower RMSE than persistence, a weak baseline, on mostly "
+                                 "calm 2023-2024 test windows; not evaluated on storms or "
+                                 "against NOAA ETSS"),
         "spatial_note": f"regional · {STATION_NAME}, not point-of-query",
     }
 
@@ -245,6 +236,8 @@ def fetch(timeout_s: float = 60.0) -> dict[str, Any]:
         return {"available": False,
                 "reason": "RIPRAP_TTM_BATTERY_SURGE_ENABLE=0"}
 
+    if not _DEPS_OK:
+        return {"available": False, "reason": _DEPS_MISSING}
     t0 = time.time()
     try:
         df = _fetch_battery_history(CONTEXT_LENGTH)
@@ -258,47 +251,8 @@ def fetch(timeout_s: float = 60.0) -> dict[str, Any]:
 
         residuals = df["surge_residual_m"].to_numpy().astype("float32")
 
-        # v0.4.5 — try the remote service first. The remote handles its
-        # own model loading; if it's reachable we never need local
-        # tsfm_public, which lets a cpu-basic surface drop the
-        # granite-tsfm bake from the image. When the remote is configured
-        # but returns
-        # non-ok we surface the remote error rather than try a local
-        # load — the local code path can ModuleNotFoundError on transient
-        # transformers-registry races and that's a worse user signal.
         forecast = None
-        compute = "local"
-        remote_attempted = False
-        try:
-            from app import inference as _inf
-            if _inf.remote_enabled():
-                remote_attempted = True
-                remote = _inf.ttm_forecast(
-                    "fine_tune_battery", residuals.tolist(),
-                    context_length=CONTEXT_LENGTH,
-                    prediction_length=PREDICTION_LENGTH,
-                    cadence="h",
-                    timeout=timeout_s,
-                )
-                if remote.get("ok"):
-                    import numpy as np
-                    forecast = np.asarray(remote["forecast"], dtype="float32")
-                    compute = f"remote · {remote.get('device', 'gpu')}"
-                else:
-                    return {"available": False,
-                            "reason": f"remote ttm-forecast non-ok: "
-                                      f"{remote.get('error') or 'unknown'}",
-                            "elapsed_s": round(time.time() - t0, 2)}
-        except _inf.RemoteUnreachable as e:
-            log.info("ttm_battery_surge: remote unreachable (%s); local", e)
-        except Exception as e:
-            log.exception("ttm_battery_surge: remote call failed")
-            if remote_attempted:
-                return {"available": False,
-                        "reason": f"remote ttm-forecast error: "
-                                  f"{type(e).__name__}: {e}",
-                        "elapsed_s": round(time.time() - t0, 2)}
-
+        compute = "local CPU"
         if forecast is None:
             if not _DEPS_OK:
                 return {"available": False,
@@ -307,12 +261,6 @@ def fetch(timeout_s: float = 60.0) -> dict[str, Any]:
             import torch
             model = _ensure_model()
             past = torch.from_numpy(residuals).unsqueeze(0).unsqueeze(-1)
-            if DEVICE == "cuda":
-                try:
-                    if torch.cuda.is_available():
-                        past = past.cuda()
-                except Exception:
-                    log.exception("ttm_battery_surge: cuda move failed")
             with torch.no_grad():
                 out = model(past_values=past)
             forecast = out.prediction_outputs.squeeze(-1).squeeze(0).cpu().numpy()

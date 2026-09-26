@@ -12,10 +12,13 @@ Multivariate Time Series." NeurIPS 2024.
 """
 from __future__ import annotations
 
+import importlib.util
 import logging
+import threading
+
+import numpy as np
 
 import httpx
-import numpy as np
 
 log = logging.getLogger("riprap.ttm_forecast")
 
@@ -46,6 +49,14 @@ NYC_311_FLOOD_DESCRIPTORS = (
 
 _MODELS: dict[tuple[int, int], object] = {}
 _MODEL_LOAD_ERROR: str | None = None
+# One lock for every TTM load in the process (this module, floodnet_forecast
+# and ttm_battery_surge): the Stones fan-out runs pebbles on threads, and
+# transformers' lazy imports fail when two threads load models at once.
+MODEL_LOAD_LOCK = threading.Lock()
+# Set when the optional `ml` extra is absent; TTM pebbles then skip
+# before any network call.
+ML_MISSING = (None if importlib.util.find_spec("torch") and importlib.util.find_spec("tsfm_public")
+              else "the ml extra is not installed (uv sync --extra ml)")
 
 
 def _load_model(context_length: int = CONTEXT_LENGTH,
@@ -57,18 +68,25 @@ def _load_model(context_length: int = CONTEXT_LENGTH,
     key = (context_length, prediction_length)
     if key in _MODELS:
         return _MODELS[key]
+    with MODEL_LOAD_LOCK:
+        return _load_model_locked(key)
+
+
+def _load_model_locked(key: tuple[int, int]):
+    global _MODEL_LOAD_ERROR
+    context_length, prediction_length = key
+    if key in _MODELS:
+        return _MODELS[key]
     if _MODEL_LOAD_ERROR is not None:
+        return None
+    if ML_MISSING:
+        _MODEL_LOAD_ERROR = ML_MISSING
         return None
     try:
         import torch  # noqa: F401
 
-        # Force-import the registered class names BEFORE get_model so that
-        # transformers' lazy registry can resolve them by string. Without
-        # this, AutoModel-style dispatch raises
-        #   ModuleNotFoundError("Could not import module 'PreTrainedModel'")
-        # under the FSM worker thread (the lazy import path races with
-        # other model loads). See web/main.py startup for the same
-        # pre-import on the main thread.
+        # Import the registered class names before get_model so that
+        # transformers' lazy registry can resolve them by string.
         from transformers import PreTrainedModel  # noqa: F401
         from tsfm_public import TinyTimeMixerForPrediction  # noqa: F401
         from tsfm_public.toolkit.get_model import get_model
@@ -94,56 +112,14 @@ def _run_ttm(history: np.ndarray,
              context_length: int = CONTEXT_LENGTH,
              prediction_length: int = PREDICTION_LENGTH,
              cadence: str = "h") -> np.ndarray | None:
-    """Channel-wise standardize, run model, de-standardize. Returns a
-    `prediction_length`-step de-standardized forecast in input units.
-
-    v0.4.5 — tries the remote riprap-models service first; falls back
-    to the local in-process model on RemoteUnreachable. The
-    standardize / de-standardize math is owned by THIS function so the
-    remote service stays a thin "given a series, give me a forecast"
-    contract.
-    """
+    """Channel-wise standardize, run the in-process CPU model,
+    de-standardize. Returns a `prediction_length`-step forecast in input
+    units, or None when the model cannot load."""
     global _MODEL_LOAD_ERROR
     mu = float(history.mean())
     sigma = float(history.std() + 1e-6)
     normed = (history - mu) / sigma
 
-    # Try remote first. When remote is configured we bias HARD toward it:
-    # if the remote returns non-ok we surface that error rather than
-    # silently falling through to a local model load (which on cpu-basic
-    # surfaces would 502 with a cryptic transformers-internal
-    # ModuleNotFoundError). Local fallback is only used when the remote
-    # is unreachable (transport-level), which is what a degraded remote
-    # backend actually looks like.
-    remote_attempted = False
-    try:
-        from app import inference as _inf
-        if _inf.remote_enabled():
-            remote_attempted = True
-            remote = _inf.ttm_forecast(
-                "zero_shot_battery", normed.tolist(),
-                context_length=context_length,
-                prediction_length=prediction_length,
-                cadence=cadence,
-            )
-            if remote.get("ok"):
-                pred = np.asarray(remote["forecast"], dtype=np.float32)
-                return pred * sigma + mu
-            _MODEL_LOAD_ERROR = (
-                f"remote ttm-forecast returned non-ok: {remote.get('error') or remote}"
-            )
-            log.warning("TTM zero-shot: remote returned non-ok: %s", remote)
-            return None
-    except _inf.RemoteUnreachable as e:
-        log.info("TTM zero-shot: remote unreachable (%s); local fallback", e)
-    except Exception as e:
-        log.exception("TTM zero-shot remote call failed: %r", e)
-        if remote_attempted:
-            _MODEL_LOAD_ERROR = f"remote ttm-forecast errored: {type(e).__name__}: {e}"
-            return None
-
-    # Local fallback (only reached when remote isn't configured or is
-    # unreachable at the transport level).
     try:
         model = _load_model(context_length, prediction_length)
     except Exception as e:
@@ -232,6 +208,8 @@ def weekly_311_forecast_for_point(lat: float, lon: float,
 
     Designed not to raise. Returns `available: False` with a reason
     field on any failure path."""
+    if ML_MISSING:
+        return {"available": False, "reason": ML_MISSING}
     series = _fetch_311_flood_daily(lat, lon, radius_m=radius_m)
     if series is None:
         return {"available": False, "reason": "311 history fetch failed"}
