@@ -171,8 +171,9 @@ def summary_for_point(lat: float, lon: float,
     are nearby (silence over confabulation)."""
     near = _entrances_near(lat, lon, radius_m)
     if near.empty:
+        # None nearby is evidence too: the template reports zeros.
         return {"available": False,
-                "n_entrances": 0,
+                "n_entrances": 0, "n_inside_sandy_2012": 0, "n_in_dep_extreme_2080": 0,
                 "radius_m": radius_m,
                 "entrances": []}
 

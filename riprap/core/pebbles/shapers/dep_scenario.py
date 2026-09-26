@@ -6,9 +6,9 @@ expect a dict with the int class, a human-readable label, a citation
 naming the scenario, and a `narrative` the manifest's narration.template
 renders verbatim.
 
-Class 0 (outside this scenario) returns None so the templated card
-silently drops — matches the prior buildDep behaviour of only surfacing
-scenarios that actually flood at the address.
+Class 0 (outside this scenario) returns an "outside" record, because
+"not in the modeled extent" answers scenario questions. Only a missing
+reading returns None.
 """
 from __future__ import annotations
 
@@ -21,12 +21,9 @@ _DEPTH_CLASS_LABELS = {
 
 
 def shape(value, manifest) -> dict | None:
-    cls = int(value) if value is not None else 0
-    if cls <= 0:
-        # No flooding in this scenario — drop the card silently rather
-        # than render three "outside" cards per address. Matches the
-        # legacy buildDep filter (rows.length === 0 → null).
-        return None
+    if value is None:
+        return None  # no raster reading at all: offline, not "outside"
+    cls = max(int(value), 0)
     label = _DEPTH_CLASS_LABELS.get(cls, "outside")
     citation = (manifest.provenance.citation
                 or f"NYC DEP Stormwater Flood Map — {manifest.title}")
@@ -37,11 +34,13 @@ def shape(value, manifest) -> dict | None:
     title = manifest.title or ""
     paren_start = title.find("(")
     paren_end = title.rfind(")")
-    if paren_start >= 0 and paren_end > paren_start:
-        scenario_label = title[paren_start + 1:paren_end]
-        narrative = f"NYC DEP modeled flooding ({scenario_label}): {label}."
+    scenario = (f"the NYC DEP stormwater scenario ({title[paren_start + 1:paren_end]})"
+                if paren_start >= 0 and paren_end > paren_start else "the NYC DEP stormwater scenario")
+    if cls == 0:
+        # Outside the modeled extent is an answer, not missing data.
+        narrative = f"This address is outside the modeled flooding in {scenario}."
     else:
-        narrative = f"NYC DEP modeled flooding at this address: {label}."
+        narrative = f"{scenario[0].upper()}{scenario[1:]} models flooding at this address: {label}."
     return {
         "depth_class": cls,
         "depth_label": label,

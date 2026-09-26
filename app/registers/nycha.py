@@ -220,8 +220,9 @@ def summary_for_point(lat: float, lon: float,
     from app.registers._loader import nearest_n
     hits = nearest_n("nycha", lat, lon, radius_m, max_developments)
     if not hits:
+        # None nearby is evidence too: the template reports zeros.
         return {"available": False,
-                "n_developments": 0,
+                "n_developments": 0, "n_inside_sandy_2012": 0, "n_in_dep_extreme_2080": 0,
                 "radius_m": radius_m,
                 "developments": []}
 
