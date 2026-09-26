@@ -124,19 +124,24 @@ def score_arm(outdir: Path, questions: list[dict]) -> tuple[dict, list[dict]]:
         rec = json.loads(f.read_text())
         ran = set(rec["pebbles_run"])
         in_scope = q["kind"] not in ("out_of_scope", "not_covered")
+        asks = in_scope and q["kind"] != "bare_address"  # a question to answer
         body = rec.get("paragraph") or ""
         answer = _answer_text(rec)
         mentions = [(_mention_hits(item, answer + " " + body), item) for item in q["answer_should_mention"]]
+        answer_mentions = sum(_mention_hits(item, answer) for item in q["answer_should_mention"])
         refused = rec.get("intent") in ("out_of_scope", "not_implemented")
         rows.append({
             "id": q["id"], "kind": q["kind"],
             "must_run": len(q["must_run"]), "must_run_hit": len(set(q["must_run"]) & ran),
             "misses": sorted(set(q["must_run"]) - ran),
             "waste": len(set(q["irrelevant"]) & ran), "n_run": len(ran),
-            "answer_present": bool(answer) if in_scope else None,
+            "answer_present": bool(answer) if asks else None,
             "mention_hit": sum(h for h, _ in mentions), "mention_total": len(mentions),
+            "answer_mention_hit": answer_mentions,
             "mention_misses": [i for h, i in mentions if not h],
             "refusal_ok": refused if not in_scope else None,
+            "refused_in_scope": refused if in_scope else None,
+            "sections": re.findall(r"\*\*([A-Z][^*\n]*?)\.\*\*", body),
             "kept": len(rec["claims"]), "dropped": len(rec["dropped_claims"]),
             "drop_reasons": [d["reason"].split(":")[0] for d in rec["dropped_claims"]],
             "wall_s": rec["wall_s"], "planner_tokens": rec["planner_tokens"]["prompt"] + rec["planner_tokens"]["completion"],
@@ -160,8 +165,11 @@ def _summarize(rows: list[dict]) -> dict:
             "pebbles_per_q": round(statistics.mean(r["n_run"] for r in rs), 1) if rs else None,
             "answer_present": round(sum(ans) / len(ans), 3) if ans else None,
             "mention_rate": round(sum(r["mention_hit"] for r in rs) / mt, 3) if mt else None,
+            "answer_mention_rate": round(sum(r["answer_mention_hit"] for r in rs) / mt, 3) if mt else None,
             "refusals_ok": f"{sum(ref)}/{len(ref)}" if ref else None,
+            "refused_in_scope": sum(bool(r["refused_in_scope"]) for r in rs),
             "kept": sum(r["kept"] for r in rs), "dropped": sum(r["dropped"] for r in rs),
+            "drop_share": round(sum(r["dropped"] for r in rs) / max(1, sum(r["kept"] + r["dropped"] for r in rs)), 3),
             "median_wall_s": round(statistics.median(r["wall_s"] for r in rs), 1) if rs else None,
             "median_planner_tokens": statistics.median(r["planner_tokens"] for r in rs) if rs else None,
             "median_synthesis_tokens": statistics.median(r["synthesis_tokens"] for r in rs) if rs else None,
