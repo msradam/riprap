@@ -1,0 +1,72 @@
+[
+ {
+  "slug": "brooklyn-heights",
+  "neighborhood": "Brooklyn Heights, Brooklyn",
+  "address": "189 Atlantic Avenue, Brooklyn, NY",
+  "generated_at": "2026-09-26T20:11Z",
+  "mode": "no_llm"
+ },
+ {
+  "slug": "hollis",
+  "neighborhood": "Hollis, Queens",
+  "address": "90-01 183rd Street, Queens, NY 11423",
+  "generated_at": "2026-09-26T20:11Z",
+  "mode": "no_llm"
+ },
+ {
+  "slug": "homecrest",
+  "neighborhood": "Homecrest, Brooklyn",
+  "address": "2017 East 17th Street, Brooklyn, NY 11229",
+  "generated_at": "2026-09-26T20:11Z",
+  "mode": "no_llm"
+ },
+ {
+  "slug": "red-hook",
+  "neighborhood": "Red Hook, Brooklyn",
+  "address": "80 Pioneer Street, Brooklyn, NY",
+  "generated_at": "2026-09-26T20:11Z",
+  "mode": "no_llm"
+ },
+ {
+  "slug": "gowanus",
+  "neighborhood": "Gowanus, Brooklyn",
+  "address": "400 Carroll Street, Brooklyn, NY",
+  "generated_at": "2026-09-26T20:12Z",
+  "mode": "no_llm"
+ },
+ {
+  "slug": "rockaway-park",
+  "neighborhood": "Rockaway Park, Queens",
+  "address": "116-02 Rockaway Beach Boulevard, Queens, NY",
+  "generated_at": "2026-09-26T20:12Z",
+  "mode": "no_llm"
+ },
+ {
+  "slug": "midland-beach",
+  "neighborhood": "Midland Beach, Staten Island",
+  "address": "801 Father Capodanno Boulevard, Staten Island, NY",
+  "generated_at": "2026-09-26T20:12Z",
+  "mode": "no_llm"
+ },
+ {
+  "slug": "lower-east-side",
+  "neighborhood": "Lower East Side, Manhattan",
+  "address": "560 Grand Street, Manhattan, NY",
+  "generated_at": "2026-09-26T20:12Z",
+  "mode": "no_llm"
+ },
+ {
+  "slug": "hunts-point",
+  "neighborhood": "Hunts Point, Bronx",
+  "address": "355 Food Center Drive, Bronx, NY",
+  "generated_at": "2026-09-26T20:12Z",
+  "mode": "no_llm"
+ },
+ {
+  "slug": "jamaica",
+  "neighborhood": "Jamaica, Queens",
+  "address": "153-09 90th Avenue, Queens, NY",
+  "generated_at": "2026-09-26T20:12Z",
+  "mode": "no_llm"
+ }
+]
