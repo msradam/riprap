@@ -4,6 +4,11 @@
            one JSON per question:  question_eval.py run tests/question_eval/v2
     score  compare arms against tests/question_eval/questions.yaml:
            question_eval.py score tests/question_eval/v1 tests/question_eval/v2
+    review build the blind owner review pack (question_eval_review.html) and
+           its key (question_eval_key.json) at the repo root, both git-ignored:
+           question_eval.py review tests/question_eval/v1 tests/question_eval/v2
+    score-ratings  unblind the owner's exported ratings:
+           question_eval.py score-ratings ratings.json question_eval_key.json
 
 The same script runs both arms; it only reads `run()` output, so it works on
 the v1 code (refactor/mvp) and the v2 code (refactor/mvp-2). LLM settings come
@@ -196,6 +201,105 @@ def cmd_score(dirs: list[Path]) -> None:
     (dirs[-1].parent / "scores.json").write_text(json.dumps(report, indent=1, default=str))
 
 
+REVIEW_N = 20
+_PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Question eval review</title><style>
+body{font:15px/1.5 system-ui,sans-serif;max-width:1200px;margin:0 auto;padding:16px;background:#fff;color:#111}
+.q{border-top:2px solid #333;padding:12px 0 24px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.b{border:1px solid #bbb;padding:8px 12px;font-size:13px;overflow-wrap:anywhere}
+fieldset{border:0;padding:4px 0}@media(max-width:700px){.pair{grid-template-columns:1fr}}
+</style></head><body>
+<h1>Which briefing answers the question better?</h1>
+<p>Each question shows two briefings in random order. Answer both prompts for each question.
+Choices are saved in this browser. When done, press Export and send the file.</p>
+<p><button id="export">Export ratings (JSON)</button> <span id="count"></span></p>
+__ITEMS__
+<script>
+const KEY = "question_eval_ratings";
+let r = {}; try { r = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+const inputs = document.querySelectorAll("input[type=radio]");
+function count() { document.getElementById("count").textContent =
+  Object.values(r).filter(v => v.better && v.wrong).length + " of __N__ rated"; }
+inputs.forEach(i => {
+  if ((r[i.dataset.q] || {})[i.dataset.k] === i.value) i.checked = true;
+  i.addEventListener("change", () => {
+    (r[i.dataset.q] ||= {})[i.dataset.k] = i.value;
+    try { localStorage.setItem(KEY, JSON.stringify(r)); } catch (e) {}
+    count();
+  });
+});
+count();
+document.getElementById("export").onclick = () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(r, null, 1)], {type: "application/json"}));
+  a.download = "question_eval_ratings.json"; a.click();
+};
+</script></body></html>
+"""
+
+
+def _md(text: str) -> str:
+    import html
+
+    out = []
+    for para in (text or "").split("\n\n"):
+        para = html.escape(para.strip())
+        para = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", para).replace("\n", "<br>")
+        if para:
+            out.append(f"<p>{para}</p>")
+    return "".join(out)
+
+
+def _radios(qid: str, key: str, prompt: str, options: list[str]) -> str:
+    opts = " ".join(f'<label><input type="radio" name="{qid}_{key}" data-q="{qid}" data-k="{key}" '
+                    f'value="{o.lower()}"> {o}</label>' for o in options)
+    return f"<fieldset><legend>{prompt}</legend>{opts}</fieldset>"
+
+
+def cmd_review(a: Path, b: Path) -> None:
+    """Blind pack: REVIEW_N questions (every kind except bare addresses,
+    sampled with a fixed seed), arm order shuffled per question."""
+    import html
+    import random
+
+    rng = random.Random(20260926)
+    pool = [q for q in _load_questions() if q["kind"] != "bare_address"
+            and (a / f"{q['id']}.json").exists() and (b / f"{q['id']}.json").exists()]
+    picked = sorted(rng.sample(pool, min(REVIEW_N, len(pool))), key=lambda q: q["id"])
+    items, key = [], {}
+    for q in picked:
+        arms = [(a.name, a), (b.name, b)]
+        rng.shuffle(arms)
+        key[q["id"]] = {"left": arms[0][0], "right": arms[1][0]}
+        left, right = (json.loads((d / f"{q['id']}.json").read_text()).get("paragraph") for _, d in arms)
+        items.append(
+            f'<section class="q"><h2>{q["id"]}: {html.escape(q["question"])}</h2><div class="pair">'
+            f'<div class="b"><h3>Left</h3>{_md(left)}</div><div class="b"><h3>Right</h3>{_md(right)}</div></div>'
+            + _radios(q["id"], "better", "Which answers the question better?", ["Left", "Right", "Same"])
+            + _radios(q["id"], "wrong", "Is either one wrong?", ["Left", "Right", "Neither", "Both"])
+            + "</section>")
+    (ROOT / "question_eval_review.html").write_text(
+        _PAGE.replace("__ITEMS__", "\n".join(items)).replace("__N__", str(len(picked))))
+    (ROOT / "question_eval_key.json").write_text(json.dumps(key, indent=1) + "\n")
+    print(f"{len(picked)} questions -> question_eval_review.html, key -> question_eval_key.json")
+
+
+def cmd_score_ratings(ratings: Path, key: Path) -> None:
+    r, k = json.loads(ratings.read_text()), json.loads(key.read_text())
+    better, wrong = Counter(), Counter()
+    for qid, v in r.items():
+        side = k[qid]
+        b = v.get("better")
+        better[side[b] if b in ("left", "right") else b or "unrated"] += 1
+        w = v.get("wrong")
+        for arm in ([side[w]] if w in ("left", "right") else list(side.values()) if w == "both" else []):
+            wrong[arm] += 1
+    rated = sum(n for arm, n in better.items() if arm != "unrated")
+    print(json.dumps({"rated": rated, "of": len(k), "preferred": dict(better),
+                      "judged_wrong": dict(wrong)}, indent=1))
+
+
 if __name__ == "__main__":
     sys.path.insert(0, str(ROOT))
     cmd, *args = sys.argv[1:]
@@ -204,5 +308,9 @@ if __name__ == "__main__":
         cmd_run(Path(args[0]), only, os.environ.get("QE_SUFFIX", ""))
     elif cmd == "score":
         cmd_score([Path(a) for a in args])
+    elif cmd == "review":
+        cmd_review(Path(args[0]), Path(args[1]))
+    elif cmd == "score-ratings":
+        cmd_score_ratings(Path(args[0]), Path(args[1]))
     else:
         raise SystemExit(__doc__)

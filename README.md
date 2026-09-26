@@ -170,13 +170,15 @@ uv run python -m riprap.mcp.server            # stdio
 uv run python -m riprap.mcp.server --http     # streamable HTTP on :8765
 ```
 
-Tools: `list_sources`, `get_evidence`, `get_citation`, `nyc311_flood_requests`
-and `get_briefing`. All but `get_briefing` work without an LLM.
+Tools: `list_sources`, `get_evidence`, `get_district_summary`, `get_citation`,
+`nyc311_flood_requests`, `plan_query` and `get_briefing(address, question)`.
+All but `get_briefing` work without an LLM.
 
 ### Static gallery
 
-`scripts/build_gallery.py` precomputes briefings for ten NYC addresses into
-`web/sveltekit/src/lib/gallery/`; the SvelteKit build prerenders them at
+`scripts/build_gallery.py` precomputes briefings for ten NYC addresses (no-LLM
+mode) and four questions (LLM mode, stamped with model, quantization and date)
+into `web/sveltekit/src/lib/gallery/`; the SvelteKit build prerenders them at
 `/gallery` with no backend, so the gallery can be served from GitHub Pages.
 
 ### Other cities and your own data
@@ -261,7 +263,7 @@ recipes live under `experiments/`.
 ## Architecture
 
 ```
-query ──► plan (LLM planner, or regex heuristic in no-LLM mode)
+query ──► plan (LLM planner: intent, question, pebbles needed; regex heuristic in no-LLM mode)
              │
              ▼
    geocode_target (point intents) │ resolve_area (NTA or community district)
@@ -270,7 +272,10 @@ query ──► plan (LLM planner, or regex heuristic in no-LLM mode)
    select_deployment (bounding box → deployments/<city>/)
              │
              ▼
-   stones: one parallel MapActions fan-out over every pebble for the intent
+   select_sources (planner's pebbles + a floor; all of them for a bare address)
+             │
+             ▼
+   stones: one parallel MapActions fan-out over the selected pebbles
    (Cornerstone, Keystone, Touchstone, Lodestone)
              │
              ▼

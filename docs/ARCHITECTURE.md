@@ -149,8 +149,10 @@ hand-coded specialist list.
 query
   │
   ▼
-plan                LLM planner (app/planner.py) in LLM mode,
-  │                 regex heuristic (intake.heuristic_plan) in no-LLM mode
+plan                LLM planner (app/planner.py) in LLM mode: intent,
+  │                 targets, the question, its focus and the pebbles it
+  │                 needs (an enum of registry ids); regex heuristic
+  │                 (intake.heuristic_plan) in no-LLM mode
   ▼
 geocode_target      point intents: NYC Geosearch first, then Nominatim
   or                (1 request per second), plus BBL/BIN for NYC
@@ -161,9 +163,12 @@ resolve_area        neighbourhood intents: a 2020 NTA polygon, or a
 select_deployment   which deployments/<city>/ bounding box contains the
   │                 target (out of coverage falls back to federal pebbles)
   ▼
-stones              ONE parallel MapActions fan-out over every
-  │                 Cornerstone, Keystone, Touchstone and Lodestone pebble
-  │                 that fits the intent
+select_sources      stones.select_pebbles: the planner's choice plus a
+  │                 per-intent floor; every pebble for a bare place.
+  │                 Records `consulted` and `not_checked`
+  ▼
+stones              ONE parallel MapActions fan-out over the selected
+  │                 Cornerstone, Keystone, Touchstone and Lodestone pebbles
   ▼
 assemble_legacy_state   reshapes the DEP scenario values into one dict
   ▼
@@ -260,6 +265,12 @@ one LLM call (`app/planner.py`); in no-LLM mode it is a regex heuristic
 | `live_now` | "is it flooding now", "current alerts" | geocode, live point pebbles only |
 | `compare` | "A vs B" | two `single_address` runs, merged |
 | `not_implemented` | Retrospective, ranking, cross-city queries | Returns a rationale immediately |
+| `out_of_scope` | Buy, rent, insure, legal advice, a specific-day forecast, a hazard other than flooding | A fixed refusal text |
+
+With a question, only the planner's chosen pebbles and the intent's floor
+run (`riprap/core/burr/stones.py`, `FLOOR` and `select_pebbles`); the
+others are listed as not checked. The LLM briefing then opens with a
+verified answer section (docs/GROUNDING.md, "Questions").
 
 HTTP routes: `/api/agent` (JSON), `/api/agent/stream` (SSE),
 `/api/agent/batch` (up to 25 addresses), `/api/district/{code}`,
@@ -267,8 +278,8 @@ HTTP routes: `/api/agent` (JSON), `/api/agent/stream` (SSE),
 `/api/register/{asset_class}` and the `/api/layers/*` map layers. The
 MCP server (`riprap/mcp/server.py`) exposes `list_sources`,
 `get_evidence`, `get_district_summary`, `get_citation`,
-`nyc311_flood_requests` and `get_briefing`; all but `get_briefing` work
-without an LLM.
+`nyc311_flood_requests`, `plan_query` and `get_briefing(address,
+question)`; all but `get_briefing` work without an LLM.
 
 ---
 
