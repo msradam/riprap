@@ -29,6 +29,8 @@ trace_summary:
   p6h_mm: precip_last_6h_mm
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: National Weather Service (NOAA) — nearest METAR station
   source_url: https://api.weather.gov/
   license: U.S. Public Domain

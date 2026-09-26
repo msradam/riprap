@@ -23,6 +23,8 @@ trace_summary:
   n_in_dep_extreme_2080: n_in_dep_extreme_2080
 
 provenance:
+  date_modified: 2025-12-05
+  retrieved_at: 2026-05-07
   source_name: MTA — subway/rail entrances register
   source_url: https://data.ny.gov/Transportation/MTA-Subway-Entrances-and-Exits/i9wp-a4ja
   license: MTA Open Data Terms
@@ -30,6 +32,7 @@ provenance:
   citation: MTA subway/rail entrances, cross-referenced with Sandy 2012 + DEP extreme 2080.
 
 narration:
+  template: "{n_entrances} MTA subway entrances within {radius_m} m of this address: {n_inside_sandy_2012} inside the 2012 Sandy inundation extent and {n_in_dep_extreme_2080} inside the DEP extreme 2080 stormwater scenario."
   short: MTA subway / rail entrances within range of this address and their flood exposure.
 
 display:

@@ -23,6 +23,8 @@ trace_summary:
   n_in_dep_extreme_2080: n_in_dep_extreme_2080
 
 provenance:
+  date_modified: null
+  retrieved_at: 2026-05-01
   source_name: NYCHA developments register
   source_url: https://data.cityofnewyork.us/Housing-Development/NYCHA-Public-Housing-Developments/phvi-damg
   license: NYC Open Data Terms of Use
@@ -30,6 +32,7 @@ provenance:
   citation: NYCHA public housing developments, cross-referenced with Sandy 2012 + DEP extreme 2080.
 
 narration:
+  template: "{n_developments} NYCHA developments within {radius_m} m of this address: {n_inside_sandy_2012} inside the 2012 Sandy inundation extent and {n_in_dep_extreme_2080} inside the DEP extreme 2080 stormwater scenario."
   short: NYCHA public housing developments within range of this address and their flood exposure.
 
 display:

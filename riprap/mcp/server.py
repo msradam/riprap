@@ -108,22 +108,15 @@ def get_citation(deployment: str, doc_id: str) -> dict:
     pebble's `provenance.doc_id` first, falling back to its pebble id.
     """
     from riprap.core.pebbles import load_registry
+    from riprap.core.pebbles.vintage import citation
 
     root = _resolve_deployment_root(deployment)
     if root is None:
         return {"error": f"unknown deployment {deployment!r}"}
     registry = load_registry(root)
     for pebble in registry.all():
-        prov = pebble.manifest.provenance
-        if (prov.doc_id or pebble.id) == doc_id:
-            return {
-                "doc_id": doc_id,
-                "source": prov.source_name,
-                "title": prov.citation or pebble.manifest.title,
-                "url": prov.source_url,
-                "license": prov.license,
-                "vintage": prov.last_updated.isoformat() if prov.last_updated else None,
-            }
+        if (pebble.manifest.provenance.doc_id or pebble.id) == doc_id:
+            return citation(pebble.manifest, fetched=False)
     return {"error": f"no source with doc_id {doc_id!r} in deployment {deployment!r}"}
 
 

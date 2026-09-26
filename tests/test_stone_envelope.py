@@ -28,7 +28,7 @@ def test_step_to_stone_mapping_covers_known_steps():
             "terramind_synthesis", "eo_chip_fetch", "terramind_buildings",
             "floodnet", "nyc311", "nws_obs", "noaa_tides",
             "prithvi_eo_live", "terramind_lulc",
-            "nws_alerts", "ttm_forecast", "ttm_311_forecast",
+            "nws_alerts", "ttm_311_forecast",
             "floodnet_forecast", "ttm_battery_surge",
             "reconcile_granite41", "mellea_reconcile_address",
         )
@@ -56,7 +56,7 @@ def _replay(events: list[dict]) -> list[tuple[str, dict]]:
         "floodnet": "Touchstone", "nyc311": "Touchstone",
         "nws_obs": "Touchstone", "noaa_tides": "Touchstone",
         "prithvi_eo_live": "Touchstone", "terramind_lulc": "Touchstone",
-        "nws_alerts": "Lodestone", "ttm_forecast": "Lodestone",
+        "nws_alerts": "Lodestone",
         "ttm_311_forecast": "Lodestone", "floodnet_forecast": "Lodestone",
         "ttm_battery_surge": "Lodestone",
         "reconcile_granite41": "Capstone",
@@ -106,7 +106,7 @@ def test_envelope_around_full_pipeline():
         {"kind": "step", "step": "mta_entrance_exposure"},
         {"kind": "step", "step": "floodnet"},
         {"kind": "step", "step": "nyc311"},
-        {"kind": "step", "step": "ttm_forecast"},
+        {"kind": "step", "step": "ttm_311_forecast"},
         {"kind": "step", "step": "ttm_battery_surge"},
         {"kind": "step", "step": "rag_granite_embedding"},  # ancillary
         {"kind": "token", "delta": "**Status**"},

@@ -8,7 +8,7 @@ repair; these tests are the regression seal on the NYC 12/13 bug.
 
 from __future__ import annotations
 
-from riprap.core.burr.templated_reconciler import _cite_numeric_sentences
+from riprap.core.burr.evidence import cite as _cite_numeric_sentences
 from riprap.core.compliance.predicates import every_numeric_claim_cited
 
 

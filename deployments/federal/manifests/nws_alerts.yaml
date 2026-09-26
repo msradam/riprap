@@ -27,6 +27,8 @@ trace_summary:
   n_active: n_active
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: National Weather Service (NOAA) — active alerts at point
   source_url: https://api.weather.gov/
   license: U.S. Public Domain

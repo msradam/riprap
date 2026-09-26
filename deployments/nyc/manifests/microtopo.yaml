@@ -23,6 +23,8 @@ trace_summary:
   relief_m: basin_relief_m
 
 provenance:
+  date_modified: null
+  retrieved_at: 2026-07-11
   source_name: USGS 3DEP 30 m DEM (precomputed citywide GeoTIFF, WGS84)
   source_url: https://www.usgs.gov/3d-elevation-program
   license: USGS — public domain

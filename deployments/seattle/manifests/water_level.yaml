@@ -25,6 +25,8 @@ trace_summary:
   residual_ft: residual_ft
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: NOAA CO-OPS — water level (nearest station to Seattle)
   source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9447130
   license: U.S. Public Domain

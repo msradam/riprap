@@ -23,6 +23,8 @@ config:
   on_none: offline
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: SeeClickFix — Albany, NY service requests (public API)
   source_url: https://seeclickfix.com/albany
   license: SeeClickFix public API terms

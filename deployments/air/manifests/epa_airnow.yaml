@@ -19,6 +19,8 @@ config:
   timeout_s: 10
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: EPA AirNow — current AQI observations (free API)
   source_url: https://docs.airnowapi.org/
   license: U.S. Government — open

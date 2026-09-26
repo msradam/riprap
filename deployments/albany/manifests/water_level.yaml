@@ -26,6 +26,8 @@ trace_summary:
   residual_ft: residual_ft
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: NOAA CO-OPS — water level (nearest station to Albany)
   source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8518995
   license: U.S. Public Domain

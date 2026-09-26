@@ -1,33 +1,35 @@
-"""Three citation URLs in _DOC_META were confirmed 404 by live curl checks
-(2026-07-12): the DEP Stormwater dataset was retired and consolidated into
-a single collection page, NTA-map and NYCHA-Developments were both renamed.
-No network calls here — that would be flaky in CI — just a regression
-guard against the exact dead ids reappearing."""
+"""Citation URLs and vintages come from manifest provenance only.
+
+Five dataset ids were confirmed dead by live requests (the DEP Stormwater
+dataset was consolidated into one collection page, NTA-map and NYCHA were
+renamed, the city hospitals and HVI ids now 404). No network calls here,
+just a guard against the dead ids reappearing and against manifests
+shipping without a vintage."""
 from __future__ import annotations
 
 from pathlib import Path
 
-from app.reconcile import _DOC_META
+import yaml
 
 _DEAD_DATASET_IDS = ("d73m-mf6p", "d3qk-pfyz", "i9rv-hdr5", "u3ic-3hcp", "4xj4-2vap")
-_DEPLOYMENTS = Path(__file__).resolve().parent.parent / "deployments"
+_MANIFESTS = sorted((Path(__file__).resolve().parent.parent / "deployments").glob("*/manifests/*.yaml"))
 
 
 def test_no_manifest_cites_a_dead_dataset_id():
-    for manifest in _DEPLOYMENTS.glob("*/manifests/*.yaml"):
+    for manifest in _MANIFESTS:
         text = manifest.read_text()
         for dead in _DEAD_DATASET_IDS:
             assert dead not in text, f"{manifest} still points at retired dataset {dead}"
 
 
-def test_no_known_dead_dataset_ids():
-    for doc_id, meta in _DOC_META.items():
-        url = meta.get("url", "")
-        for dead in _DEAD_DATASET_IDS:
-            assert dead not in url, f"{doc_id} still points at retired dataset {dead}: {url}"
-
-
 def test_dep_tiers_point_at_the_current_collection():
-    for doc_id in ("dep_stormwater", "dep_moderate_current", "dep_extreme_2080",
-                   "dep_extreme_2080_nta", "dep_moderate_2050_nta", "dep_moderate_current_nta"):
-        assert "9i7c-xyvv" in _DOC_META[doc_id]["url"]
+    for manifest in _MANIFESTS:
+        if manifest.name.startswith("dep_"):
+            assert "9i7c-xyvv" in manifest.read_text()
+
+
+def test_every_manifest_declares_its_vintage():
+    for manifest in _MANIFESTS:
+        prov = yaml.safe_load(manifest.read_text())["provenance"]
+        assert "date_modified" in prov and "retrieved_at" in prov, manifest
+        assert prov["retrieved_at"], f"{manifest}: retrieved_at must not be null"

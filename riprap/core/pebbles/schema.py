@@ -15,20 +15,36 @@ pebble obeys regardless of type.
 """
 from __future__ import annotations
 
-from datetime import date
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
+
+# A vintage is an ISO date (or year / year-month) or "at_fetch": resolved
+# when the pebble runs, from Socrata metadata or the read time itself.
+# See riprap/core/pebbles/vintage.py.
+# YAML parses a bare 2024-07-03 as a date, so accept that too.
+Vintage = Annotated[
+    str,
+    BeforeValidator(lambda v: v.isoformat() if hasattr(v, "isoformat") else str(v)),
+    Field(pattern=r"^(at_fetch|\d{4}(-\d{2}(-\d{2})?)?)$"),
+]
 
 
 class Provenance(BaseModel):
-    """Where this data came from. Surfaces in the briefing as citation."""
+    """Where this data came from. Surfaces in the briefing as citation.
+
+    `date_modified` is the source's own vintage (schema.org dateModified):
+    the date of the version we hold, or null when that is unknown.
+    `retrieved_at` is when our copy was made (prov:generatedAtTime).
+    Shipped manifests declare both keys; tests enforce it.
+    """
     model_config = ConfigDict(extra="forbid")
 
     source_name: str
     source_url: str | None = None
     license: str | None = None
-    last_updated: date | None = None
+    date_modified: Vintage | None = None
+    retrieved_at: Vintage | None = None
     citation: str | None = None
     doc_id: str | None = None  # short slug used by RAG / citation chips
 
@@ -122,6 +138,9 @@ class _PebbleBase(BaseModel):
     id: str = Field(..., pattern=r"^[a-z][a-z0-9_]*$")
     title: str
     stone: str  # which Stone this pebble rolls up to
+    # Model layers say whether their evaluation supports showing them as
+    # evidence (production) or only as a labelled experiment.
+    maturity: Literal["production", "experimental"] = "production"
     tier: Tier | None = None  # epistemic tier (empirical/modeled/proxy/synthetic)
                               # Required for production deployments; defaults
                               # to None so existing manifests load without

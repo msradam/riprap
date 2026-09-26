@@ -31,6 +31,8 @@ config:
   cache_ttl_s: 86400
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: NYC DOHMH — Heat Vulnerability Index (NTA, 2018)
   source_url: https://data.cityofnewyork.us/Health/Heat-Vulnerability-Index-Rankings/4mhf-duep
   license: NYC Open Data Terms of Use

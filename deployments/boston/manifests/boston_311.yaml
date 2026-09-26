@@ -31,6 +31,8 @@ config:
   cache_ttl_s: 1800
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: Analyze Boston — 311 service requests (2026)
   source_url: https://data.boston.gov/dataset/311-service-requests
   license: Analyze Boston Terms of Use

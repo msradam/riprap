@@ -20,7 +20,7 @@ from app import emissions
 from app.context import npcc4_slr
 from app.geocode import geocode_one
 from app.rag import retrieve as rag_retrieve
-from app.reconcile import citations_from_docs, deployment_state_keys
+from app.reconcile import citations_from_docs
 from app.reconcile import reconcile as run_reconcile
 from app.registers import doe_schools as r_schools
 from app.registers import doh_hospitals as r_hospitals
@@ -1200,7 +1200,7 @@ _RECONCILE_READS = sorted({
     "rag", "gliner",
     # Routed-deployment keys: 'deployment' + every pebble id across
     # the shipped deployments, so non-NYC cities reach the Capstone.
-    *deployment_state_keys(),
+    *__import__('riprap.core.burr.evidence', fromlist=['all_pebble_ids']).all_pebble_ids(),
 })
 
 
@@ -1228,8 +1228,7 @@ def step_reconcile(state: State) -> State:
             "floodnet_forecast": state.get("floodnet_forecast"),
             "npcc4_slr": state.get("npcc4_slr"),
             "ttm_battery_surge": state.get("ttm_battery_surge"),
-            "rag": state.get("rag"),
-            "gliner": state.get("gliner"),
+            "policy_corpus": state.get("policy_corpus"),
             "prithvi_live": state.get("prithvi_live"),
             "terramind": state.get("terramind"),
             "terramind_lulc": state.get("terramind_lulc"),
@@ -1239,21 +1238,14 @@ def step_reconcile(state: State) -> State:
             "doe_schools": state.get("doe_schools"),
             "doh_hospitals": state.get("doh_hospitals"),
         }
-        for _k in deployment_state_keys():
+        for _k in _RECONCILE_READS:
             if _k not in snap:
                 snap[_k] = state.get(_k)
         if is_strict:
             from app.framing import augment_system_prompt
             from app.mellea_validator import DEFAULT_LOOP_BUDGET, reconcile_strict_streaming
-            from app.reconcile import (
-                EXTRA_SYSTEM_PROMPT,
-                build_documents,
-                routed_deployment_doc_ids,
-                trim_docs_to_plan,
-            )
+            from app.reconcile import EXTRA_SYSTEM_PROMPT, build_documents
             doc_msgs = build_documents(snap)
-            doc_msgs = trim_docs_to_plan(doc_msgs, _current_planned_specialists(),
-                                         extra_keep=routed_deployment_doc_ids(snap))
             if not doc_msgs:
                 para = "No grounded data available for this address."
                 audit = {"raw": para, "dropped": []}
@@ -1332,11 +1324,8 @@ def step_reconcile(state: State) -> State:
                 "dropped_sentences": len(audit["dropped"]),
             }
         # Build citation metadata list from whichever doc_msgs were used.
-        from app.reconcile import build_documents, routed_deployment_doc_ids, trim_docs_to_plan
-        _cite_msgs = build_documents(snap)
-        _cite_msgs = trim_docs_to_plan(_cite_msgs, _current_planned_specialists(),
-                                       extra_keep=routed_deployment_doc_ids(snap))
-        cite_list = citations_from_docs(_cite_msgs)
+        from app.reconcile import build_documents
+        cite_list = citations_from_docs(build_documents(snap))
         rec["ok"] = True
         return state.update(paragraph=para, audit=audit,
                             mellea=mellea_meta, citations=cite_list, trace=trace)

@@ -39,4 +39,12 @@ def get_projections() -> dict:
             str(pct): {"in": v, "m": _in_to_m(v)}
             for pct, v in pcts.items()
         }
+    p50, p90 = result["2050"]["50"], result["2050"]["90"]
+    q50, q90 = result["2100"]["50"], result["2100"]["90"]
+    result["narrative"] = (
+        f"NPCC4 (2024) projects sea-level rise at the Battery of {p50['m']} m "
+        f"({p50['in']} in) by the 2050s and {q50['m']} m ({q50['in']} in) by 2100 "
+        f"at the median, relative to 2000-2004; 90th percentile {p90['m']} m and "
+        f"{q90['m']} m."
+    )
     return result

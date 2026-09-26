@@ -71,3 +71,13 @@ def test_server_imports_and_lists_tools():
 
     names = {t.name for t in asyncio.run(mcp.list_tools())}
     assert {"get_briefing", "list_sources", "get_citation"} <= names
+
+
+def test_get_citation_never_returns_null_vintage(monkeypatch):
+    """Every shipped NYC source reports a vintage (source date, Socrata
+    metadata for live Socrata sources, or when our copy was retrieved)."""
+    monkeypatch.setattr("riprap.core.pebbles.vintage.socrata_updated_at",
+                        lambda domain, ds: "2026-09-26T01:38:37+0000")
+    for pebble in list_sources("nyc")["pebbles"]:
+        cite = get_citation("nyc", pebble["provenance"]["doc_id"])
+        assert cite["vintage"], cite

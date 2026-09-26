@@ -29,11 +29,13 @@ trace_summary:
   inside: __value__   # special: the whole pebble value (not a dict key)
 
 provenance:
+  date_modified: 2015-11-09
+  retrieved_at: 2026-07-11
   source_name: NYC Open Data — Sandy Inundation Zone
   source_url: https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/uyj8-7rv5
   license: NYC Open Data Terms of Use
   doc_id: sandy_inundation
-  citation: NYC Sandy Inundation Zone (NYC OpenData 5xsi-dfpx, empirical 2012 extent)
+  citation: NYC Sandy Inundation Zone (NYC OpenData uyj8-7rv5, empirical 2012 extent)
 
 narration:
   short: This address is within the empirical 2012 Hurricane Sandy inundation footprint.

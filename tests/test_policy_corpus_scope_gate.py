@@ -25,7 +25,7 @@ def test_skips_retrieval_when_no_geocode(monkeypatch):
     result = step_policy_corpus(state)
 
     assert calls == [], "RAG retrieval must not run with no geocode"
-    assert result["rag"] == []
+    assert result["policy_corpus"] is None
     assert result["policy_corpus"] is None
 
 
@@ -46,4 +46,4 @@ def test_runs_retrieval_when_geocode_present(monkeypatch):
     result = step_policy_corpus(state)
 
     assert len(calls) == 1, "RAG retrieval must still run for a real geocode"
-    assert result["rag"] == [{"doc_id": "rag_nycha"}]
+    assert result["policy_corpus"]["rag_hits"] == [{"doc_id": "rag_nycha"}]

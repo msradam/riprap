@@ -429,8 +429,8 @@ def iter_steps(query: str):
 _PIPELINE_KEYS = (
     "intent", "plan", "geocode", "lat", "lon", "deployment",
     "trace",
-    "rag", "gliner", "policy_corpus",
-    "paragraph", "audit", "mellea", "citations",
+    "policy_corpus",
+    "paragraph", "audit", "mellea", "grounding", "citations",
     "terramind", "eo_chip", "terramind_lulc", "terramind_buildings",
 )
 
@@ -532,7 +532,7 @@ def run(query: str) -> dict:
             for k in final.keys():
                 if k.startswith(("plan", "geocode", "intent", "trace",
                                  "lat", "lon", "deployment", "query",
-                                 "rag", "gliner", "paragraph", "audit",
+                                 "paragraph", "audit", "grounding",
                                  "mellea", "citations", "dep",
                                  "terramind", "eo_chip")):
                     continue
@@ -543,12 +543,11 @@ def run(query: str) -> dict:
         pass
 
     # Pipeline state keys the registry doesn't own. `dep` is the legacy
-    # compound assembled by assemble_legacy_state; `rag` / `gliner` are
-    # backward-compat mirrors of policy_corpus; chip-cluster keys come
+    # compound assembled by assemble_legacy_state; chip-cluster keys come
     # from app.fsm actions, not pebbles.
-    for k in ("dep", "rag", "gliner",
+    for k in ("dep", "policy_corpus",
               "terramind", "eo_chip", "terramind_lulc", "terramind_buildings",
-              "paragraph", "audit", "mellea", "citations"):
+              "paragraph", "audit", "mellea", "grounding", "citations"):
         out[k] = final.get(k)
     out["trace"] = final.get("trace", [])
 

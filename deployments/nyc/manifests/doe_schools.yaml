@@ -23,6 +23,8 @@ trace_summary:
   n_in_dep_extreme_2080: n_in_dep_extreme_2080
 
 provenance:
+  date_modified: 2019-09-11
+  retrieved_at: 2026-05-01
   source_name: NYC DOE — schools register
   source_url: https://data.cityofnewyork.us/Education/2019-2020-School-Locations/wg9x-4ke6
   license: NYC Open Data Terms of Use
@@ -30,6 +32,7 @@ provenance:
   citation: NYC DOE schools, cross-referenced with Sandy 2012 + DEP extreme 2080.
 
 narration:
+  template: "{n_schools} NYC DOE schools within {radius_m} m of this address: {n_inside_sandy_2012} inside the 2012 Sandy inundation extent and {n_in_dep_extreme_2080} inside the DEP extreme 2080 stormwater scenario."
   short: NYC DOE schools within range of this address and their flood exposure.
 
 display:

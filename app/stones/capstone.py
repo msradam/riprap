@@ -32,7 +32,6 @@ SOURCES: list[str] = []
 # Re-export the reconciler entrypoints under the Stone name so callers
 # can write `from app.stones import capstone; capstone.run(state)`.
 build_documents = _reconcile.build_documents
-trim_docs_to_plan = _reconcile.trim_docs_to_plan
 verify_paragraph = _reconcile.verify_paragraph
 run = _reconcile.reconcile
 EXTRA_SYSTEM_PROMPT = _reconcile.EXTRA_SYSTEM_PROMPT

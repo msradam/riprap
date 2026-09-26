@@ -2,6 +2,7 @@ id: ttm_battery_surge
 type: model
 title: Granite TTM r2 Battery Surge — 96 h hourly nowcast (fine-tune)
 stone: lodestone
+maturity: experimental
 tier: modeled
 adapter: python_call
 
@@ -24,6 +25,8 @@ trace_summary:
   interesting: interesting
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: msradam/Granite-TTM-r2-Battery-Surge (fine-tune on AMD MI300X)
   source_url: https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge
   license: Apache-2.0
@@ -33,6 +36,7 @@ provenance:
     trained on AMD MI300X). 96 h hourly Battery storm-surge nowcast.
 
 narration:
+  template: "Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of {forecast_peak_m} m at The Battery about {forecast_peak_hours_ahead} h ahead. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions."
   short: Granite TTM r2 fine-tune nowcast of Battery storm-surge over the next 96 hours.
 
 fallback:

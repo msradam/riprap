@@ -23,8 +23,10 @@ trace_summary:
   depth_class: depth_class
 
 provenance:
+  date_modified: 2024-07-03
+  retrieved_at: 2026-07-11
   source_name: NYC DEP Stormwater Flood Map — Moderate (2.13 in/hr, current SLR)
-  source_url: https://www.nyc.gov/site/dep/environment/stormwater-flood-maps.page
+  source_url: https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv
   license: NYC Open Data Terms of Use
   doc_id: dep_moderate_current
   citation: NYC DEP Stormwater Flood Map — Moderate (2.13 in/hr, current SLR)

@@ -30,6 +30,8 @@ trace_summary:
   discharge_cfs: discharge_cfs
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: USGS Water Data OGC API, latest continuous values
   source_url: https://api.waterdata.usgs.gov/ogcapi/v1/collections/latest-continuous
   license: U.S. Public Domain

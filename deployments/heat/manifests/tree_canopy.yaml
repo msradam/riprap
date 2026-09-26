@@ -29,6 +29,8 @@ config:
   cache_ttl_s: 604800   # 1 week — tree census doesn't move fast
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: NYC Forestry — 2015 Street Tree Census
   source_url: https://data.cityofnewyork.us/Environment/2015-Street-Tree-Census-Tree-Data/uvpi-gqnh
   license: NYC Open Data Terms of Use

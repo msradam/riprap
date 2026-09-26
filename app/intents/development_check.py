@@ -205,8 +205,6 @@ def run(plan, query: str, progress_q=None, strict: bool = False) -> dict[str, An
         try:
             from app.framing import augment_system_prompt
             from app.mellea_validator import DEFAULT_LOOP_BUDGET, reconcile_strict_streaming
-            from app.reconcile import trim_docs_to_plan as _trim
-            docs = _trim(docs, set(plan.specialists or []))
             def _on_token(delta: str, attempt_idx: int):
                 if progress_q is not None:
                     progress_q.put({"kind": "token", "delta": delta,

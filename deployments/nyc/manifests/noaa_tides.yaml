@@ -25,6 +25,8 @@ trace_summary:
   residual_ft: residual_ft
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: NOAA CO-OPS — tide gauge water level (nearest station)
   source_url: https://tidesandcurrents.noaa.gov/
   license: U.S. Public Domain

@@ -182,7 +182,7 @@ def test_build_documents_covers_non_nyc_deployment_pebbles():
     }
     docs = build_documents(state)
     doc_ids = {d["role"].split(" ", 1)[1] for d in docs if d["role"].startswith("document ")}
-    assert {"fema_nfhl", "usgs_gauges", "chicago_311", "geocode", "scope_note"} <= doc_ids, (
+    assert {"fema_nfhl", "usgs_gauges", "chicago_311"} <= doc_ids, (
         f"build_documents only produced {doc_ids} for a routed Chicago "
         f"query with real fema_nfhl/usgs_gauges/chicago_311 data present "
         f"in state — the reconciler would see nothing to cite."
@@ -215,66 +215,15 @@ def test_build_documents_keeps_two_311_variants_separate():
     assert "6" in by_id["albany_flood_311"] and "800" in by_id["albany_flood_311"]
 
 
-def test_deployment_state_keys_covers_every_shipped_pebble():
-    """step_reconcile's Burr reads=[...] must declare every pebble id
-    across every deployment, or a non-NYC deployment's pebbles never
-    reach state.get() inside the reconcile action at all. Regression
-    seal: this exact function was silently dropped by a bad `git
-    checkout` once already (2026-07-11) and broke every reconcile call
-    with an ImportError that no local test caught, because nothing
-    imported app.reconcile.deployment_state_keys directly."""
-    from app.reconcile import deployment_state_keys
-    keys = deployment_state_keys()
-    assert "deployment" in keys
+def test_all_pebble_ids_covers_every_shipped_pebble():
+    """Burr reconcile actions declare every pebble id across every
+    deployment as reads, or a non-NYC deployment's pebbles never reach
+    state.get() inside the action at all."""
+    from riprap.core.burr.evidence import all_pebble_ids
+    keys = all_pebble_ids()
     for pid in ("nyc311", "chicago_311", "boston_311", "sf_311",
                 "albany_311", "albany_flood_311", "fema_nfhl", "usgs_gauges"):
-        assert pid in keys, f"{pid!r} missing from deployment_state_keys()"
-
-
-def test_routed_deployment_doc_ids_matches_the_registry():
-    """routed_deployment_doc_ids(snap) must return exactly the routed
-    deployment's own pebble ids, not NYC's or another city's."""
-    from app.reconcile import routed_deployment_doc_ids
-
-    chicago_ids = routed_deployment_doc_ids({"deployment": "chicago"})
-    assert "chicago_311" in chicago_ids
-    assert "fema_nfhl" in chicago_ids  # federal, auto-merged
-    assert "nyc311" not in chicago_ids
-    assert "sandy" not in chicago_ids
-
-    assert routed_deployment_doc_ids({"deployment": "__none__"}) == set()
-    assert routed_deployment_doc_ids({}) == set()
-    assert routed_deployment_doc_ids({"deployment": "not_a_real_city"}) == set()
-
-
-def test_trim_docs_to_plan_keeps_extra_keep_ids():
-    """Without extra_keep, trim_docs_to_plan only knows NYC's pebble-id
-    shapes (PREFIXES_BY_SPECIALIST) — a non-NYC deployment's pebbles
-    (chicago_311, fema_nfhl, ...) don't match any prefix and get
-    silently dropped even when they're the only real data for that
-    query. extra_keep=routed_deployment_doc_ids(snap) is the fix."""
-    from app.reconcile import routed_deployment_doc_ids, trim_docs_to_plan
-
-    docs = [
-        {"role": "document geocode", "content": "x"},
-        {"role": "document chicago_311", "content": "x"},
-        {"role": "document fema_nfhl", "content": "x"},
-        {"role": "document sandy", "content": "x"},  # NYC-only
-    ]
-    extra_keep = routed_deployment_doc_ids({"deployment": "chicago"})
-
-    without = trim_docs_to_plan(docs, {"sandy"})
-    ids_without = {m["role"].split(" ", 1)[1] for m in without if m["role"].startswith("document ")}
-    assert "chicago_311" not in ids_without, (
-        "chicago_311 survived trimming without extra_keep — this test's "
-        "premise is wrong, re-check PREFIXES_BY_SPECIALIST."
-    )
-
-    with_keep = trim_docs_to_plan(docs, {"sandy"}, extra_keep=extra_keep)
-    ids_with = {m["role"].split(" ", 1)[1] for m in with_keep if m["role"].startswith("document ")}
-    assert "chicago_311" in ids_with
-    assert "fema_nfhl" in ids_with
-    assert "geocode" in ids_with  # ALWAYS_KEEP, unrelated to extra_keep
+        assert pid in keys, f"{pid!r} missing from all_pebble_ids()"
 
 
 def test_per_pebble_coverage_filter_conus_but_not_city():

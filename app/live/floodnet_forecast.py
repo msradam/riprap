@@ -30,7 +30,7 @@ from the existing `[floodnet]` event-history doc.
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import numpy as np
 
@@ -79,9 +79,9 @@ def _build_daily_event_series(
     """Pull flood events for one sensor over `days` days, return a
     daily binary series (1 if ≥1 flood event started that day, 0
     otherwise) plus the event count."""
-    since = datetime.now(timezone.utc) - timedelta(days=days + 2)
+    since = datetime.now(UTC) - timedelta(days=days + 2)
     events = flood_events_for([deployment_id], since=since)
-    end = datetime.now(timezone.utc).date()
+    end = datetime.now(UTC).date()
     start = end - timedelta(days=days - 1)
     by_day: dict[str, int] = {}
     for e in events:
@@ -155,11 +155,6 @@ def summary_for_point(lat: float, lon: float) -> dict:
     hist_total = int(history.sum())
     hist_recent_28d = float(history[-28:].sum())
 
-    # "Accelerating" if the next-28-days expected count materially
-    # exceeds the prior-28-days observed count.
-    accelerating = (hist_recent_28d > 0
-                    and fc28 > 1.5 * hist_recent_28d)
-
     return {
         "available": True,
         "doc_id": f"{DOC_ID_PREFIX}_{nearest.deployment_id}",
@@ -178,7 +173,6 @@ def summary_for_point(lat: float, lon: float) -> dict:
         "forecast_total_horizon_events": round(fc_total, 2),
         "forecast_peak_day_offset": fc_peak_offset,
         "forecast_peak_day_value": round(fc_peak_value, 3),
-        "accelerating": accelerating,
         "model": "granite-timeseries-ttm-r2",
         "citation": CITATION,
     }

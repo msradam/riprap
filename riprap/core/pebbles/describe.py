@@ -6,6 +6,7 @@ surfaces describe a deployment identically.
 from __future__ import annotations
 
 from riprap.core.pebbles.registry import Registry
+from riprap.core.pebbles.vintage import resolve
 from riprap.core.stones import StoneRegistry
 
 
@@ -38,6 +39,7 @@ def describe_deployment(stones_reg: StoneRegistry, pebble_reg: Registry) -> dict
                 "title": m.title,
                 "stone": m.stone,
                 "tier": m.tier,
+                "maturity": m.maturity,
                 "display": {
                     "order": m.display.order,
                     "kind": m.display.kind,
@@ -55,9 +57,7 @@ def describe_deployment(stones_reg: StoneRegistry, pebble_reg: Registry) -> dict
                     "license": m.provenance.license,
                     "citation": m.provenance.citation,
                     "doc_id": m.provenance.doc_id,
-                    "last_updated": (
-                        m.provenance.last_updated.isoformat() if m.provenance.last_updated else None
-                    ),
+                    **resolve(m.provenance, fetched=False),
                 },
                 "fallback": {
                     "on_offline": m.fallback.on_offline,

@@ -2,6 +2,7 @@ id: floodnet_forecast
 type: model
 title: Granite TTM r2 — flood-event recurrence at nearest FloodNet sensor
 stone: lodestone
+maturity: experimental
 tier: modeled
 adapter: python_call
 
@@ -22,9 +23,10 @@ trace_summary:
   distance_m: distance_from_query_m
   history_28d: history_recent_28d_events
   forecast_28d: forecast_28d_expected_events
-  accelerating: accelerating
 
 provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
   source_name: IBM Granite TimeSeries TTM r2 — FloodNet sensor event-recurrence forecast
   source_url: https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2
   license: Apache-2.0
@@ -34,6 +36,7 @@ provenance:
     daily flood-event counts at the nearest FloodNet ultrasonic depth sensor.
 
 narration:
+  template: "Experimental: the nearest FloodNet sensor ({sensor_name}, {distance_from_query_m} m away) recorded {history_total_events} flood events in the last {history_window_days} days; a zero-shot TTM forecast with no rainfall input expects {forecast_28d_expected_events} events in the next 28 days."
   short: 28-day forecast of flood-event recurrence at the nearest FloodNet sensor.
 
 fallback:

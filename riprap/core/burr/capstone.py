@@ -73,18 +73,13 @@ from app.fsm import step_reconcile  # noqa: E402,F401
 
 @action(
     reads=["lat", "lon", "geocode", "sandy", "dep", "intent"],
-    writes=["policy_corpus", "rag", "gliner", "trace"],
+    writes=["policy_corpus", "trace"],
 )
 def step_policy_corpus(state: State) -> State:
     """Run the policy_corpus pebble: retrieve + NER in one pebble call.
 
     Builds the search query from state (geocode + flood signals), then
-    delegates to the pebble registry. For backward compatibility with
-    `app.reconcile.build_documents`, the rag-hit list and entity dict
-    are mirrored into `state["rag"]` and `state["gliner"]` — the same
-    keys step_rag and step_gliner used to write. Future cleanup:
-    migrate build_documents to read state["policy_corpus"] directly
-    and drop the mirrors.
+    delegates to the pebble registry.
     """
     import time
 
@@ -110,7 +105,7 @@ def step_policy_corpus(state: State) -> State:
             rec["result"] = {"skipped": "no geocode — nothing to search policy documents about"}
             rec["elapsed_s"] = round(time.time() - rec["started_at"], 4)
             trace.append(rec)
-            return state.update(policy_corpus=None, rag=[], gliner={}, trace=trace)
+            return state.update(policy_corpus=None, trace=trace)
 
         sandy = state.get("sandy")
         dep = state.get("dep") or {}
@@ -140,26 +135,18 @@ def step_policy_corpus(state: State) -> State:
             rec["ok"] = False
             rec["err"] = err or "policy_corpus unavailable"
             trace.append(rec)
-            return state.update(policy_corpus=None, rag=[], gliner={}, trace=trace)
+            return state.update(policy_corpus=None, trace=trace)
 
         rec["ok"] = True
         rec["result"] = trace_summary
         trace.append(rec)
 
-        # Backward-compat mirrors so app.reconcile.build_documents
-        # (which still reads state["rag"] and state["gliner"]) sees
-        # the same shapes the deleted step_rag + step_gliner wrote.
-        return state.update(
-            policy_corpus=value,
-            rag=value.get("rag_hits", []),
-            gliner=value.get("entities", {}),
-            trace=trace,
-        )
+        return state.update(policy_corpus=value, trace=trace)
     except Exception as e:  # noqa: BLE001
         rec["ok"] = False
         rec["err"] = str(e)
         trace.append(rec)
-        return state.update(policy_corpus=None, rag=[], gliner={}, trace=trace)
+        return state.update(policy_corpus=None, trace=trace)
     finally:
         rec["elapsed_s"] = round(time.time() - rec["started_at"], 4)
 
