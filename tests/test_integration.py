@@ -1,28 +1,12 @@
-"""End-to-end integration tests for the post-Phase-1/2/3 FSM.
+"""End-to-end tests against a running server (skipped without one).
 
-Hits `/api/agent/stream` over SSE and asserts on the resulting trace
-+ briefing for the three NYC test addresses (Brighton Beach, Hollis,
-Hunts Point). Designed to be the regression gate for the new
-specialists (Prithvi live, GLiNER, Granite Reranker R2).
+Hits `/api/agent/stream` over SSE for three NYC addresses (Brighton
+Beach, Hollis, Hunts Point) and checks the trace, the cited paragraph
+and the grounding record. Works in either mode: no-LLM by default, LLM
+claims when the server has RIPRAP_LLM_BASE_URL and RIPRAP_LLM_MODEL.
 
-Setup:
-    Server must be running on RIPRAP_TEST_BASE (default
-    http://127.0.0.1:7860). Tests assume the server was started with:
-      RIPRAP_RERANKER_ENABLE=1
-      RIPRAP_GLINER_ENABLE=1
-      RIPRAP_PRITHVI_LIVE_ENABLE=1
-    (defaults match these except the reranker flag.)
-
-Backend parameterization:
-    `RIPRAP_TEST_BACKENDS=ollama` (default) or
-    `RIPRAP_TEST_BACKENDS=ollama,vllm` to run the full matrix. We
-    don't flip the server's backend per test — instead the test
-    suite is run twice with different RIPRAP_LLM_PRIMARY env on the
-    server side, and asserts on the active backend via /api/backend.
-
-Usage:
-    .venv/bin/uvicorn web.main:app --port 7860 &  # in another shell
-    .venv/bin/pytest tests/test_integration.py -v
+    uv run uvicorn web.main:app --port 7860 &
+    uv run pytest tests/test_integration.py -v
 """
 
 from __future__ import annotations
@@ -50,14 +34,7 @@ def _server_up() -> bool:
 
 
 pytestmark = pytest.mark.skipif(not _server_up(), reason=f"no Riprap server at {BASE}")
-# Heavy specialists (prithvi_live, terramind) are only added to the FSM
-# when RIPRAP_HEAVY_SPECIALISTS=1 or RIPRAP_ML_BASE_URL is set.  Tests
-# that assert these steps fired must skip when the gate is off.
-_HEAVY_SPECIALISTS = os.environ.get("RIPRAP_HEAVY_SPECIALISTS", "").lower() in (
-    "1", "true", "yes"
-) or bool(os.environ.get("RIPRAP_ML_BASE_URL", "").strip())
 TIMEOUT_S = float(os.environ.get("RIPRAP_TEST_TIMEOUT", "300"))
-
 
 @dataclass
 class StreamResult:
@@ -125,24 +102,22 @@ ADDRESSES = [
 
 
 # Steps every linear single_address run must hit, regardless of intent.
-# prithvi_eo_live is only in the FSM when _HEAVY_SPECIALISTS is True,
-# so it's excluded from this list and tested separately.
+# Steps every NYC single-address run reports (ok or not). The reconcile
+# step is reconcile_templated (no LLM) or reconcile_claims (LLM).
 EXPECTED_STEPS = [
     "geocode",
-    "sandy_inundation",
-    "dep_stormwater",
+    "select_deployment",
+    "sandy",
+    "dep_extreme_2080",
     "floodnet",
     "nyc311",
     "noaa_tides",
     "nws_alerts",
     "nws_obs",
-    "ttm_forecast",
-    "microtopo_lidar",
-    "ida_hwm_2021",
-    "prithvi_eo_v2",
-    "rag_granite_embedding",
-    "gliner_extract",          # Phase 2 integration
-    # reconcile step name varies by strict mode; not asserted here
+    "microtopo",
+    "ida_hwm",
+    "prithvi_water",
+    "policy_corpus",
 ]
 
 
@@ -156,10 +131,11 @@ def backend_info() -> dict:
 
 
 def test_backend_endpoint_reachable(backend_info):
-    assert "primary" in backend_info
-    assert backend_info.get("reachable") is True, (
-        f"Active LLM backend is not reachable: {backend_info}"
-    )
+    assert backend_info.get("tier") in ("llm", "no_llm")
+    if backend_info["tier"] == "llm":
+        assert backend_info.get("reachable") is True, (
+            f"Configured LLM endpoint is not reachable: {backend_info}"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -220,78 +196,16 @@ def test_paragraph_has_citations(streamed: StreamResult):
     )
 
 
-def test_mellea_passes_or_acceptable_rerolls(streamed: StreamResult):
+def test_grounding_reported(streamed: StreamResult):
+    """Every final carries a grounding record; in LLM mode, dropped
+    claims never appear in the paragraph."""
     if streamed.final is None:
         pytest.skip("no final event")
-    mellea = streamed.final.get("mellea") or {}
-    if not mellea:
-        pytest.skip("non-strict mode (no mellea metadata)")
-    passed = len(mellea.get("requirements_passed") or [])
-    total = mellea.get("requirements_total") or 4
-    assert passed >= total - 1, (
-        f"Mellea passed only {passed}/{total}: "
-        f"failed={mellea.get('requirements_failed')}, "
-        f"rerolls={mellea.get('rerolls')}"
-    )
-
-
-# ---------------------------------------------------------------------------
-# Phase-specific assertions
-# ---------------------------------------------------------------------------
-
-def test_phase1_prithvi_live_step(streamed: StreamResult):
-    """Live water specialist must fire as a trace step. We don't assert
-    `ok=True` — STAC can time out, no recent low-cloud scene may exist
-    — only that the step ran and recorded its outcome."""
-    if streamed.plan and streamed.plan.get("intent") != "single_address":
-        pytest.skip("non-linear FSM")
-    if not _HEAVY_SPECIALISTS:
-        pytest.skip("RIPRAP_HEAVY_SPECIALISTS not enabled — prithvi_eo_live not in FSM")
-    found = [e for e in streamed.events
-             if e[0] == "step" and e[1].get("step") == "prithvi_eo_live"]
-    assert found, "step_prithvi_live did not fire"
-
-
-def test_phase2_gliner_extract_step(streamed: StreamResult):
-    """GLiNER specialist runs and either extracts entities or no-ops."""
-    if streamed.plan and streamed.plan.get("intent") != "single_address":
-        pytest.skip("non-linear FSM")
-    found = [e for e in streamed.events
-             if e[0] == "step" and e[1].get("step") == "gliner_extract"]
-    assert found, "gliner_extract step did not fire"
-    payload = found[0][1]
-    assert payload.get("ok") is True, (
-        f"gliner_extract failed: {payload.get('err')}"
-    )
-
-
-def test_phase3_reranker_takes_effect_when_enabled():
-    """If RIPRAP_RERANKER_ENABLE was set when the server started, the
-    rag step's hits should carry a `retriever_score` field (only the
-    rerank path adds it). Otherwise the test skips — we assert
-    the *capability*, not its mandatory presence."""
-    # Run a one-off query and inspect the rag step result.
-    res = _stream("100 Gold St Manhattan")
-    rag_step = next((p for n, p in res.events
-                     if n == "step" and p.get("step") == "rag_granite_embedding"),
-                    None)
-    if rag_step is None:
-        pytest.skip("no rag step in stream")
-    # The reranker enrichment shows up in the doc messages reaching the
-    # reconciler, not in the rag step's own result blob, so this test
-    # checks instead that the briefing has at most one [rag_<source>]
-    # citation per source — the dedup-after-rerank guarantee.
-    if res.final is None:
-        pytest.skip("no final paragraph")
-    import re
-    cites = re.findall(r"\[(rag_[a-z0-9_]+)\]", res.final.get("paragraph", ""))
-    counts: dict[str, int] = {}
-    for c in cites:
-        counts[c] = counts.get(c, 0) + 1
-    over = [c for c, n in counts.items() if n > 4]  # generous; same-doc
-    assert not over, (
-        f"unexpected citation flooding from one rag source: {counts}"
-    )
+    g = streamed.final.get("grounding") or {}
+    assert g.get("tier") in ("llm", "no_llm")
+    para = streamed.final.get("paragraph", "")
+    for d in g.get("dropped_claims") or []:
+        assert d["text"] not in para, f"dropped claim rendered: {d}"
 
 
 # ---------------------------------------------------------------------------
