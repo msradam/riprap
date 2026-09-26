@@ -1,199 +1,62 @@
-# Per-query inference energy ledger
+# Per-call inference energy ledger
 
-Riprap surfaces the energy and token cost of every inference call it
-makes during a briefing. The numbers are **measured**, not data-sheet
-estimates: off the GPU via NVML when a remote inference proxy is
-reachable (L4 for ML specialists, A100 for the LLM), or off Apple
-Silicon via `powermetrics` on a Mac Mini / local-dev deployment.
+`app/emissions.py` records every LLM call a briefing makes: model,
+endpoint, prompt and completion tokens, duration, and an energy figure
+with a label that says how it was obtained. No-LLM briefings make no LLM
+calls, so their ledger is empty.
 
-```
-5 Stones · 21 fired · 11 evidence cards · 14.0s wall-clock · ✓ 1.4 Wh / 6.9K tok inference
-```
+## Energy status
 
-The chip on the Findings status row reports total energy (Wh) plus
-total tokens. The leading icon discloses how the number was derived:
+| Status | When | How the figure is obtained |
+|---|---|---|
+| `measured` | Local endpoint on Apple Silicon, with the `energy` extra installed (`uv sync --extra energy`) | zeus-apple-silicon reads the SoC energy counters (CPU, GPU, DRAM, ANE) for the call's window. No sudo. It is whole-chip energy, so it includes other processes. |
+| `estimated` | Local endpoint with `RIPRAP_ENERGY_WATTS` set | Declared watts times the call's duration. |
+| `unknown` | Everything else | No figure. |
 
-| Icon | Meaning |
+A local endpoint is one whose host is `localhost`, `127.0.0.1`, `::1`,
+`0.0.0.0` or `ollama`. Hosted endpoints are always `unknown`: they report
+no energy, and power times duration on shared hardware would be invented.
+Riprap reports no per-query figure for them.
+
+zeus-apple-silicon 1.1.0 reads 0 mJ of CPU energy on an Apple M5. A call
+longer than half a second with a zero CPU reading is treated as a broken
+counter, and the call falls back to `estimated` (if `RIPRAP_ENERGY_WATTS`
+is set) or `unknown`.
+
+## Where it appears
+
+Every result carries an `emissions` block (`riprap/core/burr/app.py`,
+`energy_summary`), also sent on the SSE `final` event:
+
+| Field | Meaning |
 |---|---|
-| `✓` | All recorded calls came back with a real NVML reading from the GPU |
-| `◐` | Some calls measured, others fell back to the data-sheet estimate |
-| `~` | All calls used the data-sheet estimate (proxy unreachable, NVML disabled, or local-only run) |
+| `n_calls`, `n_measured` | LLM calls in the briefing, and how many were measured |
+| `energy_status` | One status if all calls share it, otherwise `mixed`; `none` when there were no calls |
+| `total_wh` | Sum of the calls' Wh, only when every call has a measured or estimated figure; otherwise `null` |
+| `tokens` | Prompt, completion and total tokens |
+| `calls` | The per-call records, each with `energy_status`, `wh` and an `energy_note` |
 
-Hover the chip for the full breakdown — call count, hardware, prompt
-vs completion split, and the method.
+In-process CPU models (TTM, Granite Embedding, Flair NER) are not in the
+ledger. On the retired GPU stack they were about 0.3% of a briefing's
+inference energy.
 
----
+## Historical numbers
 
-## What's measured vs. what's estimated
-
-| Field | Source |
-|---|---|
-| `duration_s` | Real wallclock on the client side (`time.monotonic` around each call) |
-| `prompt_tokens`, `completion_tokens` | Reported by the model server (LiteLLM `usage` block) for non-stream LLM calls |
-| `completion_tokens` (streaming) | Estimated as `len(response_text) / 4` when the backend doesn't surface a final usage block (Ollama path) |
-| `power_w` | **Measured** — `nvmlDeviceGetPowerUsage` on the GPU inference backend, mean of two reads bracketing each call |
-| `wh`, `joules` | `power_w × duration_s` (when `measured: true`) or `data-sheet_W × duration_s` (when `measured: false`) |
-
-Each call record on the ledger carries a `measured: bool` flag plus
-the exact `power_w` value used so a reviewer can audit any row.
-
----
-
-## How the measurement works
-
-Two remote GPU backends, both from companion repo
-`msradam/riprap-inference`: an L4 for the ML specialists
-(`server.py`) and an A100 for Granite 4.1 via vLLM (`modal_vllm_app.py`
-+ `vllm_proxy.py`). Both use the same NVML instrumentation
-(`power.py`), lazily initialised on first use.
-
-```
-power.py::NVMLPowerMiddleware / read_power_w   (in msradam/riprap-inference)
-  ├── NVML init on first call, single GPU device handle
-  ├── brackets each request with two nvmlDeviceGetPowerUsage reads, averaged
-  └── degrades to no-op if NVML init fails
-```
-
-For the ML specialist path, `NVMLPowerMiddleware` wraps every LitServe
-response with headers:
-
-```
-X-GPU-Power-W      mean draw in watts (average of the pre/post reads)
-X-GPU-Energy-J     energy in joules over the window
-X-GPU-Duration-S   forwarded-call duration in seconds
-```
-
-`app/inference.py::_post()` reads those headers off the response and
-forwards them into `emissions.Tracker.record_ml`. The tracker stamps
-`measured=True` and uses the exact joule value.
-
-For the LLM client path (`app/llm.py::chat()`) we route through
-LiteLLM, which doesn't surface response headers. So instead the
-client brackets the call with two GETs to `/v1/power`:
-
-```python
-p0 = _sample_gpu_power_w()                # ~50 ms, returns 1 s avg
-t0 = time.monotonic()
-resp = _router.completion(...)            # the actual LLM call
-duration_s = time.monotonic() - t0
-p1 = _sample_gpu_power_w()                # ~50 ms, returns 1 s avg
-avg = (p0 + p1) / 2
-```
-
-`avg` is the average power during the call; `avg × duration_s`
-gives joules. The tracker records `power_w_real=avg`,
-`joules_real=avg×duration_s`, and `measured=True`.
-
-### Apple Silicon (Mac Mini / local dev)
-
-There's no NVML equivalent on macOS, and the tool that reads real
-package power — `powermetrics` — needs root, so the app process
-can't shell out to it per call. Instead an operator starts it once,
-continuously, as its own root process:
-
-```bash
-scripts/mac_powermetrics_start.sh   # sudo powermetrics -i 200 \
-                                     #   --samplers cpu_power,gpu_power,ane_power \
-                                     #   -o /tmp/riprap-powermetrics.log
-export RIPRAP_POWERMETRICS_LOG=/tmp/riprap-powermetrics.log
-```
-
-`app/power_mac.py` tails that log from an unprivileged background
-thread, parsing each sample's `Combined Power (CPU + GPU + ANE)`
-line, and exposes `read_instant_w()` — the latest reading, or `None`
-if the log has gone stale (sampler died — treated as "no
-measurement," never a frozen number). Both `app/llm.py` (LLM calls)
-and `app/inference.py` (ML specialist calls) bracket their call the
-same before/after way the remote-GPU path does, via the shared
-`power_mac.avg_w(p0, p1)` helper, and fall back to the `apple_m`
-data-sheet estimate only when the sampler isn't running.
-
-Verified end-to-end on a Mac Mini (M-series, 2026-07-11): a full
-briefing — planner + reconciler LLM calls plus every specialist ML
-call — came back `measured: true` on 4/4 calls, 3–7 W range,
-11.58 mWh total for the query.
-
----
-
-## Hardware profiles (`app/emissions.HARDWARE`)
-
-The fallback path uses a sustained-power figure from the hardware
-data sheet when no real measurement is available:
-
-| Key | Label | Sustained W | Source |
-|---|---|---|---|
-| `nvidia_l4` | NVIDIA L4 | 60 | L4 data sheet (72 W TGP, Ada Lovelace) — ML specialist backend |
-| `nvidia_a100` | NVIDIA A100 | 250 | A100 40GB data sheet (250 W TDP) — LLM (vLLM) backend |
-| `amd_mi300x` | AMD MI300X | 600 | MI300X data sheet (750 W TDP); used when `RIPRAP_HARDWARE_LABEL=AMD MI300X` |
-| `nvidia_t4` | NVIDIA T4 | 50 | T4 data sheet (70 W max) |
-| `apple_m` | Apple M-series | 20 | ml.energy / community measurements — used only when `RIPRAP_POWERMETRICS_LOG` isn't set or has gone stale; see the Apple Silicon section above for the real-measurement path |
-| `cpu_server` | x86 CPU | 30 | Typical sustained server-core load |
-
-The fallback only fires when neither a real GPU proxy nor a fresh
-`powermetrics` sample is available (unreachable proxy, NVML init
-failed, sampler not running, or the call streamed — we currently
-don't measure streamed LLM calls precisely; they bracket-sample as
-best-effort).
-
----
-
-## End-to-end shape
-
-```
-Riprap app (FastAPI + SvelteKit) — any deployment target
-   │
-   │  Tracker installed per-query in web/main.py:
-   │  install(Tracker())
-   │
-   ├── planner       — app/llm.py::chat
-   │                   ├─ GET /v1/power  (bracket-start)
-   │                   ├─ POST /v1/chat/completions
-   │                   └─ GET /v1/power  (bracket-end)
-   │
-   ├── FSM specialists — app/inference.py::_post
-   │                     POST /v1/{prithvi-pluvial, terramind, ...}
-   │                     ← X-GPU-Power-W, X-GPU-Energy-J headers
-   │
-   └── reconciler    — app/llm.py::chat (Mellea-validated)
-                       same bracket pattern as planner
-                  │
-                  ▼
-       Tracker.summarize() → emissions block on /api/agent/stream final
-                  │
-                  ▼
-       SvelteKit RunHealthStrip — chip rendered with measured-icon
-```
-
----
+[`BENCHMARKS.md`](BENCHMARKS.md) reports 1.3 to 1.6 Wh per briefing. Those
+figures came from the retired Modal/L4 stack on 2026-05-09 (Granite 4.1
+8B on vLLM, NVML sampling through a proxy) and are historical. The NVML
+proxy headers, the `/v1/power` bracket sampling and the
+`sudo powermetrics` log reader that earlier versions of this page
+described are removed.
 
 ## Verifying
 
-`scripts/probe_addresses.py` runs an end-to-end address query
-against a running deployment (local, Docker, Modal, or Mac Mini) and
-asserts all five Stones fire, no specialist returns a dep-regression
-string, and the final `emissions` block carries non-zero tokens with
-the hardware key you expect for that deployment.
+Run a briefing against a local Ollama endpoint with the `energy` extra
+installed, or with `RIPRAP_ENERGY_WATTS` set, and read the `emissions`
+block:
 
 ```bash
-PYTHONPATH=. uv run python scripts/probe_addresses.py --base http://localhost:7860
+RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 RIPRAP_LLM_MODEL=granite4:micro \
+  uv run python -c "from riprap.core.burr.app import run; import json; \
+print(json.dumps(run('189 Atlantic Avenue, Brooklyn, NY')['emissions'], indent=2, default=str))"
 ```
-
-The first call after a cold start (Modal container boot, or a
-freshly-restarted local server warming Ollama + RAG) pays a
-one-time compile/load penalty; warm queries land far lower — see
-`docs/BENCHMARKS.md` for measured numbers per deployment.
-
----
-
-## Why this matters
-
-Inference cost is usually invisible. AI tools that publish a
-"green" or "low-energy" claim mostly cite a vendor data sheet or a
-research mean. Riprap reports the actual joules drawn off the
-device under the load of a single user query — auditable down to
-the row.
-
-The raw ledger is shipped on the SSE `final` event under
-`emissions.calls`, so any consumer (dashboard, billing model,
-reproducibility check) can reuse the data without round-tripping
-back through Riprap.

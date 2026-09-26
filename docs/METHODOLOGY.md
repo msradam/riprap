@@ -1,9 +1,10 @@
 # Riprap scoring methodology
 
-> Riprap produces a **flood-exposure tier (1–4) per NYC address**, not
-> a calibrated damage probability. The tier is a deterministic
-> literature-grounded composite of public-data signals; the language
-> model writes the citing prose around it but does not score.
+> Riprap's offline register builders assign a **flood-exposure tier
+> (1 to 4) per NYC asset**, not a calibrated damage probability. The tier
+> is a deterministic, literature-grounded composite of public-data
+> signals. No language model scores anything, and the live briefing does
+> not compute or show a tier.
 
 ## 1. Why this design
 
@@ -16,7 +17,8 @@ uncalibrated, with documented LLM-as-judge pathologies (Zheng et al.
 planner can argue with**.
 
 The tier is computed in `app/score.py` and only by the offline register
-builders. The live briefing does not compute or show it.
+builders (`scripts/build_*_register.py`, served at
+`/api/register/{asset_class}`).
 
 ## 2. Methodology pedigree
 
@@ -93,7 +95,7 @@ Mix of binary observed-extent flags and banded count signals:
 | Sandy 2012 inundation      | 1.00 + **floor** | NYC OD `5xsi-dfpx`; NYC HMP 2024 |
 | USGS Ida HWM within 100 m  | 1.00 + **floor** | USGS STN Event 312 |
 | USGS Ida HWM within 800 m  | 0.50   | USGS STN Event 312 |
-| Prithvi-EO 2.0 surface water after Ida (experimental) | 0.75   | Jakubik et al., 2025 (NASA/IBM Prithvi-EO 2.0); semi-empirical |
+| Prithvi-EO 2.0 surface water after Ida (experimental) | 0.75   | Jakubik et al., 2025 (NASA/IBM Prithvi-EO 2.0). Experimental layer that mostly shows marsh, shoreline and park water |
 | 311 complaint count band   | 0.75   | NYC OD `erm2-nwe9`; NYC 311-as-flood-proxy literature |
 | FloodNet trigger (3 yr)    | 0.75   | FloodNet NYC; NPCC4 Ch.3 references |
 
@@ -151,10 +153,9 @@ event occurrence is time-varying. Mixing the two would produce a tier
 that flickers every six minutes and that residents could interpret as
 neither "is my building exposed?" nor "is it flooding right now?".
 
-Live signals are surfaced separately in the UI as a **"Current
-conditions"** badge, with their own provenance (NOAA station ID, NWS
-alert URL, ASOS station code), and they expire on their own cadence.
-Static tier is unaffected.
+Live signals appear separately in the briefing, with their own
+provenance (NOAA station ID, NWS alert URL, ASOS station code), and they
+expire on their own cadence. The static tier is unaffected.
 
 This mirrors how First Street separates Flood Factor (static, 30-yr
 horizon) from event-day Flood Lab products, and how Fathom separates
@@ -183,12 +184,11 @@ It **is**:
   has a rationale; the floor rule has a stated motivation; the tier
   breakpoints are documented above.
 - Forkable: a researcher who disagrees with any weight can edit
-  `app/score.py` and rerun. The UI methodology panel makes this
-  invitation explicit.
+  `app/score.py` and rerun.
 
 ## 8. Caveats foregrounded in UI copy
 
-These appear next to the tier badge and in the methodology disclosure:
+Anyone publishing a tier should carry these caveats with it:
 
 > **Riprap tiers are not flood-damage probabilities.** They reflect
 > publicly-documented exposure indicators only.

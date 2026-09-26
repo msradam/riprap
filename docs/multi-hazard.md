@@ -1,4 +1,4 @@
-# Multi-hazard experiment — does Riprap generalize?
+# Multi-hazard experiment: does Riprap generalize?
 
 **Yes.** The Riprap architecture is hazard-agnostic. The same code that
 serves the flood briefing (pebble registry, Burr graph, Stone fan-out,
@@ -31,7 +31,7 @@ Switch deployments via env var:
 RIPRAP_DEPLOYMENT=deployments/heat \
 RIPRAP_BRIEFING_SCOPE=heat-exposure \
 RIPRAP_RECONCILER_TIER=no_llm \
-  .venv/bin/python -c "import riprap.core.burr.app as a; print(a.run('189 Atlantic Ave, Brooklyn')['paragraph'])"
+  uv run python -c "import riprap.core.burr.app as a; print(a.run('189 Atlantic Ave, Brooklyn')['paragraph'])"
 ```
 
 ## Result — heat deployment (6 pebbles, no LLM)
@@ -93,7 +93,7 @@ Almost nothing. The architectural moves that made this work:
 5. **`RIPRAP_BRIEFING_SCOPE` env var** lets each deployment override
    the scope-declaration wording in the opening sentence
    ("automated flood-exposure briefing" vs "automated heat-exposure
-   briefing"). Trivial knob; preserves ASTM 4.1 compliance.
+   briefing"). A small knob that keeps the ASTM 4.1 scope-declaration check passing.
 
 ## What still varies per hazard
 
@@ -121,9 +121,8 @@ Each deployment needs:
 | `rest_json` adapter | Hazard-agnostic — env-var auth, JSON path extraction |
 | `python_call` adapter | Hazard-agnostic — wraps any Python function |
 | `noaa_tides` | Flood-only — tides are a flood signal |
-| Prithvi-EO 2.0 | Could fine-tune for thermal anomalies (heat) or smoke plumes (air) — same model family |
-| TerraMind LULC | Cross-hazard — land-use mix matters for all of heat / flood / air |
-| TTM time-series | Cross-hazard — same forecasting backbone, different feature signals |
+| Prithvi-EO 2.0 | Offline batch only (`scripts/run_eo_batch.py`), trained for water. Thermal anomalies or smoke plumes would need a new fine-tune |
+| TTM time-series | Cross-hazard: same forecasting backbone, different input series |
 
 The 23 flood pebbles aren't ported wholesale. But the **adapters** are.
 A new hazard means writing 5-10 hazard-specific manifests and pointing
@@ -142,18 +141,16 @@ not weeks.
   key (`RIPRAP_AIRNOW_API_KEY` env var). Free key, but a real
   deployment needs to obtain and configure it.
 
-- TerraMind and Prithvi are pre-trained for satellite-derived
-  geospatial features (water segmentation, LULC, buildings, biomass).
-  They could be **fine-tuned** for thermal-anomaly or smoke-plume
-  segmentation — that's a separate fine-tuning exercise, not just a
-  manifest edit. Until that happens, those model pebbles return their
-  flood-trained outputs.
+- Prithvi runs only as an offline batch job and is trained for water.
+  Thermal-anomaly or smoke-plume segmentation would be a separate
+  fine-tuning exercise, not a manifest edit. TerraMind is not used by
+  the app.
 
 - TTM is a generic time-series forecaster. The flood deployment uses
   it for tide-gauge surge and 311-complaint counts. Heat would use it
   for daily-max-temperature series; air would use it for AQI history.
-  Same model, different input series — needs a new pebble per series
-  but the manifest pattern is identical.
+  Same model, different input series: each series needs its own
+  pebble, with the same manifest pattern.
 
 ## The bigger claim this experiment supports
 

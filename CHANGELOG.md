@@ -4,6 +4,63 @@ All notable changes to Riprap. The hackathon submission tag is
 `v0.5.0` (build 2026-05-07); subsequent dates record polish work
 that landed on the hackathon-period production deploys.
 
+## [Unreleased] (MVP refactor)
+
+- One orchestrator: the Burr app in `riprap/core/burr/app.py` now runs
+  every intent (`single_address`, `neighborhood`, `development_check`,
+  `live_now`, `compare`, `not_implemented`) with one parallel fan-out
+  over the intent's pebbles. `app/fsm.py`, `app/intents/`, `app/stones/`
+  and `app/reconcile.py` are removed.
+- No-LLM mode is the default: every pebble value is rendered through its
+  manifest `narration.template` (`riprap/core/burr/evidence.py`) and
+  printed as the briefing.
+- LLM mode talks to any OpenAI-compatible endpoint through the `openai`
+  client (`RIPRAP_LLM_BASE_URL`, `RIPRAP_LLM_MODEL`, optional fallback).
+  The model returns JSON claims; code checks citations and numbers,
+  retries once and drops what fails (`docs/GROUNDING.md`). LiteLLM,
+  Mellea and the reroll banners are removed.
+- Neighbourhood intents accept a community district code such as `QN12`
+  (the union of its NTAs). New `/api/district/{code}` and
+  `/api/nyc311/flood_requests` routes; `/api/stream`, `/api/compare` and
+  the debug endpoints are removed.
+- MCP server rebuilt on the official `mcp` SDK with `list_sources`,
+  `get_evidence`, `get_district_summary`, `get_citation`,
+  `nyc311_flood_requests` and `get_briefing`. All but `get_briefing` work
+  without an LLM.
+- Static gallery: `scripts/build_gallery.py` precomputes ten NYC
+  briefings that SvelteKit prerenders at `/gallery` with no backend, for
+  GitHub Pages (`BASE_PATH`).
+- Provenance comes only from manifests. Every provenance block has
+  `date_modified` and `retrieved_at`, and every manifest has
+  `maturity: production` or `maturity: experimental`.
+- Experimental labels on `prithvi_water` (now "satellite-detected surface
+  water after Ida", with no inside or outside verdict),
+  `ttm_311_forecast`, `floodnet_forecast`, `ttm_battery_surge` and
+  `policy_corpus`. The zero-shot `ttm_forecast` pebble is deleted and
+  `prithvi_live` is removed from the app.
+- The remote ML server (`app/inference.py`, `services/riprap-models`,
+  `inference/`, `load/triton-local`) and all per-request Prithvi and
+  TerraMind code are removed. TTM, Granite Embedding (query only) and
+  Flair NER run in process on CPU; GLiNER is gone. Earth observation
+  runs as a batch job (`scripts/run_eo_batch.py`).
+- Light install: `uv sync` is the core with no torch. Extras: `ml`, `eo`,
+  `pdf`, `energy`. The Makefile and `web/static` are removed.
+- One HTTP client (`riprap/core/http.py`, httpx with hishel caching and
+  stamina retries) for every adapter, including Nominatim with a 1
+  request per second gate; geopy is removed. USGS gauges use the OGC API.
+  FloodNet TLS verification is on. Dataset IDs fixed for HVI, NYCHA and
+  NYS DOH hospitals.
+- Energy ledger labels each LLM call measured (zeus-apple-silicon on a
+  local endpoint), estimated (`RIPRAP_ENERGY_WATTS`) or unknown; hosted
+  endpoints are always unknown. The NVML proxy headers and the sudo
+  `powermetrics` path are removed, and `docs/BENCHMARKS.md` is marked
+  historical.
+- The `compliance` substring checks are described as disclosure checks,
+  never a quality score.
+- Docker: `Dockerfile.app` installs core plus `ml`; `docker-compose.yml`
+  has the app and an optional `local-llm` Ollama profile. Modal is
+  optional. Burr tracking is opt-in (`RIPRAP_BURR_TRACKING=1`).
+
 ## [Unreleased] — 2026-07-10 (Albany deployment)
 
 ### Fixed

@@ -5,23 +5,25 @@ you're new; jump directly if you know what you need.
 
 | Doc | Purpose |
 |---|---|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Full system shape: Burr FSM, Five-Stone taxonomy, Granite + Mellea synthesis path, SvelteKit + FastAPI surface. Start here. |
-| [METHODOLOGY.md](METHODOLOGY.md) | How each Stone scores exposure — joins, thresholds, citation provenance, edge-case handling. |
-| [DEPLOY.md](DEPLOY.md) | Three ways to run Riprap end to end — Modal (scale-to-zero cloud), Mac Mini (fully local, real measured power), docker-compose (self-host). |
-| [briefing-standards.md](briefing-standards.md) | The trust contract for every briefing (FEMA, IPCC, TCFD, ASTM, AP Stylebook, SPJ rules) and which of the 13 disclosure checks (caveat-phrase substring tests) covers each. |
-| [EMISSIONS.md](EMISSIONS.md) | Per-query energy ledger — NVML (remote GPU) and `powermetrics` (Apple Silicon) sampling, response contract, `app/emissions.py` tracker, measured-vs-estimated semantics. |
-| [BENCHMARKS.md](BENCHMARKS.md) | Live measurements on the canonical four addresses: Stone-fire counts, latency, energy, token totals. |
-| [RESEARCH.md](RESEARCH.md) | Landscape research — what existing flood-risk tools do and how Riprap diverges. |
-| [multi-city.md](multi-city.md) | Six-city sweep (NYC + Chicago + Seattle + SF + Boston + Albany) — proof the framework generalises across the US Socrata + CKAN ecosystems with zero code changes. |
-| [PORT-YOUR-CITY.md](PORT-YOUR-CITY.md) | Step-by-step walkthrough for adding your jurisdiction, using the Boston port as the worked example. The natural follow-on from multi-city.md. |
-| [byod.md](byod.md) | Bring Your Own Data — `.riprap/` auto-discovery + `RIPRAP_EXTRA_MANIFESTS` env var. Drop a manifest, get a pebble. Worked example with real FDNY data. |
-| [multi-hazard.md](multi-hazard.md) | Hazard-agnostic deployments — `deployments/heat/`, `deployments/air/` reuse the same Stones taxonomy. |
-| [VERIFICATION.md](VERIFICATION.md) | Dated snapshot (2026-05-16) of a deterministic verification pass — sweep results, pytest, lint, BYOD evidence. Historical record, not a live status page; see the CI badge and `docs/BENCHMARKS.md` for current numbers. |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Full system shape: the one Burr app, Five-Stone taxonomy, evidence and verified-claim synthesis, SvelteKit + FastAPI + MCP surface. Start here. |
+| [GROUNDING.md](GROUNDING.md) | How a briefing is grounded: manifest-rendered evidence, no-LLM mode, LLM claims verified in code, what is not checked. |
+| [METHODOLOGY.md](METHODOLOGY.md) | The deterministic exposure tier used by the offline register builders: sub-indices, weights, floor rule, references. |
+| [DEPLOY.md](DEPLOY.md) | Running Riprap: local with no LLM, local with an LLM, Docker, and an optional GPU LLM endpoint on Modal. |
+| [briefing-standards.md](briefing-standards.md) | The FEMA, IPCC, TCFD, ASTM, AP Stylebook and SPJ rules behind the 13 disclosure checks (caveat-phrase substring tests, not a quality score). |
+| [EMISSIONS.md](EMISSIONS.md) | Per-call energy ledger in `app/emissions.py`: measured, estimated or unknown, and why hosted endpoints get no figure. |
+| [BENCHMARKS.md](BENCHMARKS.md) | Historical: latency and energy on four addresses from the retired Modal/L4 stack (2026-05-09). |
+| [RESEARCH.md](RESEARCH.md) | Research notes: what existing flood-risk tools do and how Riprap differs. |
+| [multi-city.md](multi-city.md) | Six deployments (NYC plus experimental Chicago, Seattle, SF, Boston, Albany) on Socrata, CKAN and SeeClickFix, with their limits. |
+| [PORT-YOUR-CITY.md](PORT-YOUR-CITY.md) | Step-by-step walkthrough for adding your jurisdiction, using the Boston port as the worked example. |
+| [byod.md](byod.md) | Bring Your Own Data: `.riprap/` auto-discovery and the `RIPRAP_EXTRA_MANIFESTS` env var. Worked example with real FDNY data. |
+| [multi-hazard.md](multi-hazard.md) | Heat and air-quality scaffolds (`deployments/heat/`, `deployments/air/`) on the same Stones taxonomy. |
+| [demo.md](demo.md) | Demo script for the flood, heat and air deployments. |
+| [VERIFICATION.md](VERIFICATION.md) | Historical snapshot (2026-05-16) of a deterministic verification pass: sweep results, pytest, lint, BYOD evidence. See the CI badge for current status. |
 
 Top-level docs that complement these:
 
-- [`README.md`](../README.md) — project overview, quickstart, Five Stones, fine-tunes, citations.
-- [`CONTRIBUTING.md`](../CONTRIBUTING.md) — dev setup, probe scripts, PR flow.
-- [`CHANGELOG.md`](../CHANGELOG.md) — version history (`v0.5.0` = hackathon submission).
-- [`SECURITY.md`](../SECURITY.md) — vulnerability disclosure.
-- [`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md) — Contributor Covenant 2.1.
+- [`README.md`](../README.md): project overview, quickstart, Five Stones, models, citations.
+- [`CONTRIBUTING.md`](../CONTRIBUTING.md): dev setup, probe scripts, PR flow.
+- [`CHANGELOG.md`](../CHANGELOG.md): version history (`v0.5.0` is the hackathon submission).
+- [`SECURITY.md`](../SECURITY.md): vulnerability disclosure.
+- [`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md): Contributor Covenant 2.1.

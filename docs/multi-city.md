@@ -1,4 +1,4 @@
-# Multi-city — proof Riprap generalises across the US open-data ecosystem
+# Multi-city: Riprap across the US open-data ecosystem
 
 Six deployments, one codebase, three 311-platform paths (Socrata,
 CKAN, SeeClickFix). Adding a city is a directory of YAML.
@@ -31,7 +31,7 @@ Sweep run via `scripts/probe_cities_smoke.py` (6 deployments, no-LLM tier,
 real upstream APIs):
 
 ```
-DEPLOYMENT          ADDRESS                                           COMPLIANCE  CITY PEBBLE   WALL
+DEPLOYMENT          ADDRESS                                           DISCLOSURE  CITY PEBBLE   WALL
 ─────────────────   ──────────────────────────────────────────────    ──────────  ────────────  ──────
 nyc                 189 Atlantic Ave, Brooklyn                        13/13 ✓     nyc311=26     123 s
 chicago             233 S Wacker Dr, Chicago, IL                      13/13 ✓     chicago_311=200  2.9 s
@@ -43,22 +43,23 @@ albany              24 Eagle St, Albany, NY 12207                     13/13 ✓ 
                                                                                                  6/6 PASS
 ```
 
-The COMPLIANCE column is the 13 disclosure checks: substring tests for
+The DISCLOSURE column is the 13 disclosure checks: substring tests for
 caveat phrases drawn from FEMA, IPCC AR6, TCFD, ASTM E1527-21, EPA/CDC
 CERC, AP Stylebook and SPJ Code of Ethics guidance. A 13/13 means the
 required phrases are present. It says nothing about briefing quality or
 whether the city data is flood-relevant (`chicago_311=200` and
 `sf_311=200` are the query limit on unfiltered 311 feeds).
 
-NYC is slow because it pulls the full ML specialist suite (TerraMind,
-Prithvi, TTM). The other five deployments are sub-6 s because they're
-federal + Socrata/CKAN/SeeClickFix only — adding ML pebbles is a
-manifest, not a code change.
+The NYC time was recorded when NYC still called remote ML models
+(TerraMind, live Prithvi) that the app no longer uses. NYC still runs the
+most pebbles, including the in-process TTM, embedding and NER models. The
+other five deployments are under 7 s because they run federal and
+Socrata/CKAN/SeeClickFix pebbles only.
 
 Reproduce:
 
 ```bash
-.venv/bin/python scripts/probe_cities_smoke.py http://127.0.0.1:7860
+uv run python scripts/probe_cities_smoke.py http://127.0.0.1:7860
 # PASS on every city line expected; exits non-zero if any fail.
 ```
 
@@ -66,7 +67,7 @@ Reproduce:
 
 ```bash
 RIPRAP_DEPLOYMENT=deployments/sf RIPRAP_RECONCILER_TIER=no_llm \
-.venv/bin/python -c "
+uv run python -c "
 import riprap.core.burr.app as a
 r = a.run('1 Dr Carlton B Goodlett Pl, San Francisco, CA')
 print(r['paragraph'])

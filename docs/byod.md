@@ -1,4 +1,4 @@
-# BYOD — Bring Your Own Data
+# BYOD: Bring Your Own Data
 
 Riprap's deployments are directories of YAML. **BYOD** lets you layer
 your own pebbles on top of any base deployment without forking the repo,
@@ -12,14 +12,14 @@ your data alongside the city defaults.
 # Option 1 — drop into ./.riprap/ in your CWD
 mkdir -p .riprap && cp examples/byod/fdny_firehouses.{yaml,csv} .riprap/
 RIPRAP_DEPLOYMENT=deployments/nyc RIPRAP_RECONCILER_TIER=no_llm \
-  .venv/bin/python -c "import riprap.core.burr.app as a; \
+  uv run python -c "import riprap.core.burr.app as a; \
     print(a.run('189 Atlantic Ave, Brooklyn, NY')['fdny_firehouses'])"
 
 # Option 2 — point an env var at a directory (or single YAML)
 RIPRAP_DEPLOYMENT=deployments/nyc \
 RIPRAP_EXTRA_MANIFESTS=examples/byod \
 RIPRAP_RECONCILER_TIER=no_llm \
-  .venv/bin/python -c "import riprap.core.burr.app as a; \
+  uv run python -c "import riprap.core.burr.app as a; \
     print(a.run('189 Atlantic Ave, Brooklyn, NY')['fdny_firehouses'])"
 ```
 
@@ -100,7 +100,7 @@ fdny_firehouses populated: True
   radius_m: 1500
   aggregations: {'n_firehouses_in_radius': 4.0}
   nearest: Engine 224 @ 274 Hicks Street (454.1 m, Brooklyn Heights-Cobble Hill)
-Compliance: 13 / 13 ✓
+Disclosure checks: 13 / 13
 ```
 
 **2. NYC deployment, 80 Pioneer Street, Red Hook — via `.riprap/`**
@@ -109,7 +109,7 @@ Compliance: 13 / 13 ✓
 fdny_firehouses populated: True
   n_within_radius: 2
   nearest: Battalion 32 / Engine 202 / Ladder 101
-Compliance: 13 / 13 ✓
+Disclosure checks: 13 / 13
 ```
 
 **3. Boston deployment, 1 City Hall Square — same BYOD pebble, cross-deployment**
@@ -119,7 +119,7 @@ fdny_firehouses populated: True
   n_within_radius (FDNY in Boston area): 0    # correct — NYC-only CSV
   nearest distance: 282.4 km                  # correct — Manhattan from Boston
 boston_311 n_records: 396                     # Boston-native pebble still flows
-Compliance: 13 / 13 ✓
+Disclosure checks: 13 / 13
 ```
 
 The same BYOD pebble layers cleanly on every base deployment. Spatial
@@ -161,8 +161,8 @@ EOF
 #   shadows base deployment manifest
 ```
 
-Use sparingly. Overrides break the disclosure checks if your replacement
-returns a shape the checks don't recognise.
+Use sparingly. The override's `provenance` block replaces the base
+pebble's, so citations then point at your source.
 
 ## See also
 

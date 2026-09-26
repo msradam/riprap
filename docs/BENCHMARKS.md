@@ -1,12 +1,19 @@
 # Benchmarks
 
-Live measurements collected against the lablab demo Space (`lablab-ai-amd-developer-hackathon-riprap-nyc.hf.space`) on **2026-05-09**, running the canonical four-address verification set defined in `scripts/probe_addresses.py` (`DEFAULT_ADDRESSES`). Inference served from `msradam/riprap-vllm` on a single NVIDIA L4 (24 GB, Ada Lovelace, 72 W TGP).
+> **Historical.** Every number on this page comes from the retired
+> Modal/L4 stack on 2026-05-09 and cannot be reproduced with the current
+> code. That stack ran a Granite 4.1 8B reconciler with Mellea rerolls, a
+> remote LitServe ML server (Prithvi live, TerraMind, zero-shot TTM,
+> GLiNER) and NVML power sampling. All of those are removed. The app now
+> runs no per-request earth-observation models, and hosted LLM endpoints
+> get no energy figure ([`EMISSIONS.md`](EMISSIONS.md)). The page is kept
+> as a record of what that stack cost.
 
-**Not reproducible against that Space today** — it's a frozen post-hackathon demo running data probes only, with inferencing disabled (see `docs/ARCHITECTURE.md` §12.1). To reproduce these numbers, run `scripts/probe_addresses.py` against a Modal or Mac Mini deployment with live inference (see `docs/DEPLOY.md`) instead.
-
-Every per-call energy figure is **measured off the device** via `nvmlDeviceGetPowerUsage` (remote GPU) or `powermetrics` (Apple Silicon) — see [`docs/EMISSIONS.md`](EMISSIONS.md) for the pipeline. The reproducer is `scripts/probe_addresses.py`; raw output in `outputs/probe_addresses.csv` / the `--json` flag's target.
-
-vLLM was warm before the run (CUDA-graph compile already paid). The first call after a cold restart pays an additional ~120 s penalty — see "Cold-start" below.
+Measurements collected against the lablab demo Space on 2026-05-09,
+running the four-address set in `scripts/probe_addresses.py`
+(`DEFAULT_ADDRESSES`). Inference was served from `msradam/riprap-vllm` on
+one NVIDIA L4 (24 GB, 72 W TGP), with per-call energy read through
+`nvmlDeviceGetPowerUsage`. vLLM was warm before the run.
 
 ---
 
@@ -173,8 +180,8 @@ The reconciler dominates per-query energy by a factor of ~200×. On a typical ad
 
 | Source | Share of total Wh (median across queries) |
 |---|---|
-| Granite 4.1 8B FP8 (planner + reconciler + Mellea attempts) | ~99.6 % |
-| All 8–11 ML inference calls (Prithvi · TerraMind LoRAs · TTM r2 · Embedding · GLiNER) | ~0.4 % |
+| Granite 4.1 8B FP8 (planner + reconciler + Mellea attempts) | ~99.7 % |
+| All 8 to 11 ML inference calls (Prithvi · TerraMind LoRAs · TTM r2 · Embedding · GLiNER) | ~0.3 % |
 
 Cloud reference (Epoch AI, 2025): a typical GPT-4o-class query draws ~0.3 Wh. Riprap on the L4 lands in the ~1.3–1.6 Wh range — higher than that reference because Riprap's reconciler reads ~3K tokens of grounded documents per query and Mellea adds 0.5–1 reroll worth of decodes on average. Trading energy for citations is the explicit design choice.
 
@@ -194,13 +201,8 @@ service, not a benchmark artifact.
 
 ## Reproducing
 
-```bash
-PYTHONPATH=. uv run python scripts/probe_addresses.py \
-    --base http://127.0.0.1:7860 \
-    --timeout 300 \
-    --json outputs/benchmarks.json
-```
-
-The full ledger (every per-call power_w, joules, hardware, model, prompt/completion split) lives in the `--json` output after a run — it also asserts all five Stones fire and flags any dep-regression string, so it doubles as the pre-deploy CI check.
-
-For verification of any single row in this document, the `final` SSE event from `/api/agent/stream?q=<query>` carries the full `emissions.calls[]` array directly.
+These figures cannot be reproduced: the GPU stack and its NVML proxy are
+gone. `scripts/probe_addresses.py --base http://127.0.0.1:7860` still runs
+the four addresses against a current server and reports latency and the
+`emissions` block, which for a local endpoint is measured, estimated or
+unknown as described in [`EMISSIONS.md`](EMISSIONS.md).

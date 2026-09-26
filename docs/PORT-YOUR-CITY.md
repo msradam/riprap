@@ -1,4 +1,4 @@
-# Port your city — a worked walkthrough
+# Port your city: a worked walkthrough
 
 > NYC is the reference deployment for an open civic-tech framework.
 > Adding your jurisdiction is a directory of YAML, not a fork.
@@ -139,7 +139,9 @@ config:
   cache_ttl_s: 1800
 
 provenance:
-  source_name: <City> Open Data — 311 (<resource-id>)
+  date_modified: at_fetch           # live Socrata sources resolve this from the metadata API
+  retrieved_at: at_fetch
+  source_name: <City> Open Data, 311 (<resource-id>)
   source_url: https://data.<city>.gov/d/<resource-id>
   license: <portal's stated license>
   doc_id: <city>_311
@@ -176,8 +178,15 @@ config:
 ```
 
 The CKAN adapter does bbox SQL push-down on the lat/lon columns and
-then haversine-refines in Python — works for any CKAN datastore with
-numeric lat/lon columns.
+then haversine-refines in Python, so it works for any CKAN datastore
+with numeric lat/lon columns. Give it the same `provenance` and
+`narration` blocks as the Socrata example.
+
+Citations, source URLs and vintages come only from the manifest's
+`provenance` block, so fill it in fully. A manifest is
+`maturity: production` unless it says `maturity: experimental`; mark a
+pebble experimental when its output needs a caveat, and its sentence
+will start with "Experimental:".
 
 ## Step 5 — Adjust the NOAA station (optional)
 
@@ -201,7 +210,7 @@ nearest station at <https://tidesandcurrents.noaa.gov/>. Examples:
 
 ```bash
 RIPRAP_DEPLOYMENT=deployments/<your-city> RIPRAP_RECONCILER_TIER=no_llm \
-.venv/bin/python -c "
+uv run python -c "
 import riprap.core.burr.app as a
 r = a.run('<your test address>')
 print(r['paragraph'])
@@ -211,7 +220,9 @@ print('compliance:', r['compliance'])
 
 Expected: a Markdown paragraph with **Live Observer.**, **Projector.**,
 etc. headers, citations like `[<city>_311]` and `[nws_obs]`, and
-`compliance: {'passed': True, 'n_passed': 13, 'n_total': 13, ...}`.
+`compliance: {'passed': True, 'n_passed': 13, 'n_total': 13, ...}`. The
+`compliance` key holds the disclosure checks; the name is kept for API
+compatibility and it is not a quality score.
 
 Add your city to the sweep:
 
@@ -229,7 +240,7 @@ Add your city to the sweep:
 Then:
 
 ```bash
-.venv/bin/python scripts/probe_cities_smoke.py
+uv run python scripts/probe_cities_smoke.py
 # Look for: PASS on every city line, exit code 0
 ```
 
@@ -250,32 +261,36 @@ ship the deployment.
 
 ## Common gotchas
 
-**Geocoder picks the wrong place.** Riprap's geocoder has a fast-path
-for NYC addresses (NYC Geosearch) and a fallback (OSM Nominatim) for
-everything else. The fallback is triggered by a regex in
+**Geocoder picks the wrong place.** Riprap's geocoder tries NYC
+Geosearch first for exact NYC matches and OSM Nominatim (rate limited to
+1 request per second) for everything else. The fallback is triggered by a regex in
 `app/geocode.py:_NON_NYC_HINT_RE` matching state codes + major city
 names. If your address gets fuzzy-matched to a Brooklyn street, add
 your state code or city name to that regex.
 
-**Compliance fails.** Read the `failed` list:
+**A disclosure check fails.** Read the `failed` list:
 
 ```bash
 RIPRAP_DEPLOYMENT=deployments/<city> RIPRAP_RECONCILER_TIER=no_llm \
-.venv/bin/python -c "
+uv run python -c "
 import riprap.core.burr.app as a
 r = a.run('<addr>')
 print(r['compliance']['failed'])
 "
 ```
 
-Each entry names the predicate. Common ones:
+Each entry names the check (`riprap/core/compliance/predicates.py`).
+Common ones:
 
-- `every_pebble_has_provenance` — make sure your manifest has a
-  `provenance:` block with at least `source_name`.
-- `every_pebble_has_narration` — `narration.short` is the minimum.
-- `compliance_failed_pebbles_have_fallback` — set
-  `fallback.on_offline: skip` (the default) so the briefing still
-  emits when your upstream is down.
+- `every_numeric_claim_cited`: a sentence with a number has no
+  `[doc_id]`. Check that the pebble has a `provenance.doc_id`.
+- `scope_declaration_present`: set `RIPRAP_BRIEFING_SCOPE` if your
+  deployment is not a flood briefing.
+- `firm_citation_has_vintage`: a FEMA map is cited without its effective
+  date.
+- `data_gap_disclosed_when_probe_offline`: set
+  `fallback.on_offline: skip` (the default) so the briefing still emits
+  and discloses the gap when your upstream is down.
 
 **Spatial field returns 0 records.** Curl the dataset directly with a
 hand-picked `within_circle` (Socrata) or `BETWEEN` (CKAN) to confirm
@@ -289,7 +304,7 @@ you want the latter.
   data on top of any existing deployment, without forking.
 - [`docs/multi-city.md`](multi-city.md) — current city roster +
   the framework claim.
-- [`docs/VERIFICATION.md`](VERIFICATION.md) — what's verified
-  deterministically against the current branch.
+- [`docs/VERIFICATION.md`](VERIFICATION.md): a dated snapshot of a
+  deterministic verification pass.
 - [`examples/byod/`](../examples/byod/) — real-data BYOD walkthrough
   using NYC FDNY firehouses (`hc8x-tcnd`).

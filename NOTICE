@@ -15,21 +15,24 @@ Riprap incorporates and depends on third-party open-source software,
 foundation models, and public-record datasets. Each retains its own
 upstream licence; the list below records attribution where required.
 
-Foundation models (Apache 2.0 unless noted):
-  - IBM Granite 4.1 (granite4.1:8b, granite4.1:3b)
+Models used by the application (each under its upstream licence):
   - IBM Granite Embedding 278M (granite-embedding-278m-multilingual)
   - IBM Granite TimeSeries TTM r2 (granite-timeseries-ttm-r2)
-  - NASA / IBM Prithvi-EO 2.0
-  - IBM / ESA TerraMind 1.0
+  - Flair NER (flair/ner-english-ontonotes-fast)
+  - NASA / IBM Prithvi-EO 2.0 (offline batch jobs only)
+  - Optional: any LLM behind an OpenAI-compatible endpoint the operator
+    configures, for example IBM Granite 4 (granite4:micro, Granite 4.1).
+    No LLM weights ship with Riprap.
 
 NYC-specialised fine-tunes published by this project (Apache 2.0):
-  - msradam/TerraMind-NYC-Adapters (LULC, Buildings, TiM LoRA family)
-  - msradam/Prithvi-EO-2.0-NYC-Pluvial
-  - msradam/Granite-TTM-r2-Battery-Surge
+  - msradam/Granite-TTM-r2-Battery-Surge (used by the app, experimental)
+  - msradam/Prithvi-EO-2.0-NYC-Pluvial (offline batch only, experimental)
+  - msradam/TerraMind-NYC-Adapters (LULC, Buildings, TiM LoRA family;
+    built on IBM / ESA TerraMind 1.0; not used by the app)
 
 Public-record data sources contacted at runtime (no commercial APIs):
-  See the "Data sources" table in README.md and the licence map in
-  ARCHITECTURE.md for hosting agency, access terms, and vintage.
+  See the "Data sources" table in README.md. Each pebble manifest's
+  provenance block records its source's licence, URL and vintage.
 
 Logo attribution:
   The Riprap dam mark is derived from "Dam" by Chintuza, via the
@@ -49,10 +52,10 @@ language models. All output was reviewed and accepted by Adam Rahman, who
 takes responsibility for the resulting code, claims, and reproducibility
 guarantees made by this project.
 
-The Riprap system orchestrates third-party foundation models (IBM Granite
-4.1, IBM Granite Embedding 278M, NASA-IBM Prithvi-EO 2.0, IBM Granite TTM r2,
-IBM-ESA TerraMind 1.0) at inference time. It does not generate model
-weights. The NYC fine-tunes referenced by this system are trained
+The Riprap system runs third-party models (IBM Granite Embedding 278M,
+IBM Granite TTM r2, Flair NER) at inference time, reads precomputed
+NASA-IBM Prithvi-EO 2.0 outputs, and optionally calls an operator-chosen
+LLM endpoint. It does not generate model weights. The NYC fine-tunes referenced by this system are trained
 separately and documented at github.com/msradam/riprap-models.
 
 This repository's initial commit consolidates work developed across many

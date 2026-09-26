@@ -1,12 +1,18 @@
-# Verification — 2026-05-16
+# Verification, 2026-05-16
 
-Snapshot of what's been verified deterministically against the
-`pebble-refactor` branch.
+> **Historical snapshot.** This records a verification pass against the
+> `pebble-refactor` branch on 2026-05-16. Several things it mentions are
+> gone: `_run_compare` in `web/main.py` (compare now runs inside the Burr
+> app), the "All routing targets exhausted" LiteLLM error, the remote ML
+> models (TerraMind, live Prithvi) and `requirements.txt` (dependencies
+> are in `pyproject.toml` and `uv.lock`). The "13/13" column counts the
+> disclosure checks: substring tests for caveat phrases, not a quality
+> score. See the CI badge for current status.
 
 ## Sweep (5 cities × real APIs, no-LLM tier)
 
 ```
-DEPLOYMENT          ADDRESS                                           COMPLIANCE  CITY PEBBLE       WALL
+DEPLOYMENT          ADDRESS                                           DISCLOSURE  CITY PEBBLE       WALL
 ─────────────────   ──────────────────────────────────────────────    ──────────  ────────────────  ──────
 nyc                 189 Atlantic Ave, Brooklyn                        13/13 ✓     nyc311=29         101 s
 chicago             233 S Wacker Dr, Chicago, IL                      13/13 ✓     chicago_311=200   1.2 s
@@ -76,9 +82,9 @@ Modal apps.
 
 | Loading path | Deployment | Address | Result |
 |---|---|---|---|
-| `RIPRAP_EXTRA_MANIFESTS=examples/byod` | NYC | 189 Atlantic Ave | 4 in 1.5 km radius, nearest Engine 224 @ 274 Hicks (454 m), 13/13 compliance |
-| `cp into ./.riprap/ && cd ./.riprap/..` | NYC | 80 Pioneer St, Red Hook | 2 in 1.5 km, nearest Battalion 32/Engine 202/Ladder 101, 13/13 compliance |
-| `RIPRAP_EXTRA_MANIFESTS=examples/byod` | Boston | 1 City Hall Square | 0 in radius (correct — NYC-only CSV), nearest 282 km away in Manhattan, Boston-native pebbles still flow (`boston_311=396`), 13/13 compliance |
+| `RIPRAP_EXTRA_MANIFESTS=examples/byod` | NYC | 189 Atlantic Ave | 4 in 1.5 km radius, nearest Engine 224 @ 274 Hicks (454 m), 13/13 disclosure checks |
+| `cp into ./.riprap/ && cd ./.riprap/..` | NYC | 80 Pioneer St, Red Hook | 2 in 1.5 km, nearest Battalion 32/Engine 202/Ladder 101, 13/13 disclosure checks |
+| `RIPRAP_EXTRA_MANIFESTS=examples/byod` | Boston | 1 City Hall Square | 0 in radius (correct: NYC-only CSV), nearest 282 km away in Manhattan, Boston-native pebbles still flow (`boston_311=396`), 13/13 disclosure checks |
 
 ## Adapters in the registry
 

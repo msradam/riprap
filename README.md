@@ -191,263 +191,215 @@ data on top with [`docs/byod.md`](docs/byod.md) and add a city with
 ## How Riprap works: the Five Stones
 
 Behind every briefing, a couple dozen atomic data probes (**pebbles**)
-fan out across NYC datasets, satellite imagery, sensors, and forecasts.
-Each pebble is one YAML manifest plus a small adapter; the framework
-loads them from a deployment directory and groups them into five legible
-roles, the **Five Stones**:
+fan out across public datasets, sensors and forecasts. Each pebble is one
+YAML manifest plus a small adapter; the framework loads them from a
+deployment directory and groups them into five roles, the **Five Stones**:
 
 > **Cornerstone** remembers. **Keystone** tallies. **Touchstone**
 > watches. **Lodestone** projects. **Capstone** writes it all down with
 > citations.
 
-| Stone | Role | What fires |
+| Stone | Role | NYC pebbles |
 |---|---|---|
-| **Cornerstone** | The Hazard Reader. What the ground remembers. | Sandy 2012 inundation extent, NYC DEP stormwater scenarios, 2021 Ida USGS high-water marks, Prithvi-EO satellite-detected surface water after Ida (experimental), USGS 3DEP DEM + HAND/TWI |
-| **Keystone** | The Asset Register. What's exposed. | MTA subway entrances, NYCHA developments, NYC DOE schools, NYS DOH hospitals, **TerraMind-NYC Buildings LoRA** |
-| **Touchstone** | The Live Observer. Current state of the city. | FloodNet ultrasonic depth sensors, NYC 311 flood complaints, NWS hourly METAR, NOAA tide-gauge water levels, **Prithvi-EO 2.0 NYC-Pluvial v2** (live pass off by default, experimental), **TerraMind-NYC LULC LoRA** |
-| **Lodestone** | The Projector. What's coming. | NWS public flood alerts, per-address 311 weekly forecast (experimental), FloodNet sensor recurrence forecast (experimental), **Granite-TTM-r2-Battery-Surge fine-tune** (96 h hourly horizon, experimental) |
-| **Capstone** | The Synthesiser. Citation-grounded briefing. | Granite 4.1 + a hand-written grounding check |
+| **Cornerstone** | What the ground remembers | Sandy 2012 inundation extent, NYC DEP stormwater scenarios, FEMA NFHL zone, 2021 Ida USGS high-water marks, satellite-detected surface water after Ida (experimental), USGS 3DEP DEM with HAND and TWI |
+| **Keystone** | What is exposed | MTA subway entrances, NYCHA developments, NYC DOE schools, NYS DOH hospitals |
+| **Touchstone** | Current state of the city | FloodNet depth sensors, NYC 311 flood complaints, NWS hourly observations, NOAA tide-gauge water levels, USGS stream gauges |
+| **Lodestone** | What is coming | NWS flood alerts, NPCC4 sea-level projections, 311 weekly forecast (experimental), FloodNet recurrence forecast (experimental), Battery surge forecast (experimental) |
+| **Capstone** | The briefing | The evidence sentences as written (no-LLM mode), or JSON claims from any OpenAI-compatible model with citations and numbers checked in code |
 
-Each Stone fans its pebbles out in parallel as a Burr `MapActions` group;
-the Capstone then reconciles their documents into one cited briefing.
-Adding a data source is a new manifest in the deployment directory, not a
-code change.
+One Burr application runs every intent. All pebbles for the intent fan out
+in one parallel `MapActions` group; the Capstone then turns their evidence
+into one cited briefing. Adding a data source is a new manifest in the
+deployment directory, not a code change.
 
 ---
 
 ## The Five Stones beyond NYC
 
-The Five Stones taxonomy is a city-agnostic template for any
-flood-vulnerable region with the right data scaffolding. The five roles
-generalise; only the probes plugged into each Stone change.
+The Five Stones are a city-agnostic template. The five roles stay the
+same; only the pebbles plugged into each Stone change.
 
 | Stone | Role | What you replace |
 |---|---|---|
 | **Cornerstone** | Hazard memory | Local historical inundation extents, regional DEM, regulatory floodplain maps |
-| **Keystone** | Asset registers | The transit, housing, education, and healthcare polygons your jurisdiction publishes |
+| **Keystone** | Asset registers | The transit, housing, education and healthcare layers your jurisdiction publishes |
 | **Touchstone** | Live observation | Whatever live sensors and complaint streams the city or region exposes (FloodNet has analogues in Houston, Boston, Miami) |
-| **Lodestone** | Forecasts | Local NWS forecast office output, regional surge or hydrologic models, time-series fine-tunes for your tide gauge |
+| **Lodestone** | Forecasts | Local NWS forecast office output, regional surge or hydrologic models |
 | **Capstone** | Citation-grounded synthesis | Same |
 
-The architectural commitments transfer unchanged: a Burr FSM that fans
-pebble manifests out per Stone, manifest-rendered evidence, verified
-structured claims, SSE streaming to a SvelteKit
-map UI, every claim cited to its source. To port Riprap to a new city you
-write a deployment directory of manifests against local data and, for the
-satellite and time-series layers, retrain the EO and TTM fine-tunes on
-your jurisdiction's imagery and gauges. The agentic shell stays the same.
-See [`docs/PORT-YOUR-CITY.md`](docs/PORT-YOUR-CITY.md).
+What transfers unchanged: one Burr graph that fans pebble manifests out in
+parallel, evidence rendered from manifest templates, verified structured
+claims when an LLM is configured, and every sentence cited to its source.
+To port Riprap to a new city you write a deployment directory of manifests
+against local data. See [`docs/PORT-YOUR-CITY.md`](docs/PORT-YOUR-CITY.md).
 
 ---
 
-## NYC-specialised foundation models (Apache 2.0)
+## Models
 
-Three NYC-specific fine-tunes built on AMD Instinct MI300X via AMD
-Developer Cloud, published under permissive licence.
+Every model is optional. Without the `ml` extra the model pebbles skip
+themselves and the briefing is built from the data pebbles alone. The
+table lists what the app runs today and what each evaluation supports.
 
-**[`msradam/TerraMind-NYC-Adapters`](https://huggingface.co/msradam/TerraMind-NYC-Adapters).**
-LoRA family on TerraMind 1.0 base. LULC mIoU 0.5866 (+6.13 pp over
-full-FT baseline), TiM 0.6023, Buildings 0.5511. Trained in around 18
-minutes on a single MI300X.
+| Model | Where it runs | Maturity | What the evidence supports |
+|---|---|---|---|
+| [`msradam/Granite-TTM-r2-Battery-Surge`](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge) | `ttm_battery_surge` pebble, in process on CPU | Experimental | Test MAE 0.1091 m on held-out Battery gauge data, 41% better than persistence and 25% better than zero-shot TTM. It forecasts the surge residual only, has no wind or pressure input, and its briefing sentence points readers to NOAA ETSS or the Stevens Flood Advisory System for storm decisions. |
+| Granite TimeSeries TTM r2 (base) | `ttm_311_forecast` and `floodnet_forecast` pebbles, in process on CPU | Experimental | Indicative forecasts of 311 complaint volume and FloodNet event recurrence. No held-out evaluation is published. |
+| Granite Embedding 278M | `policy_corpus` pebble, query embedding only (the corpus index is built offline by `scripts/build_rag_index.py`) | Experimental | Retrieves passages from five NYC agency PDFs. Retrieval quality is not scored. |
+| Flair NER (`flair/ner-english-ontonotes-fast`) | `policy_corpus` pebble, in process on CPU | Experimental | Coarse entity tags (agency, date, amount, place) on the retrieved passages. |
+| Prithvi-EO 2.0 | Offline only: the baked Ida layer behind `prithvi_water`, and `scripts/run_eo_batch.py` | Experimental | Satellite-detected surface water after Ida. It mostly shows marsh, shoreline and park water, gives no inside or outside verdict for an address, and says nothing about street or basement flooding. |
+| [`msradam/Prithvi-EO-2.0-NYC-Pluvial`](https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial) | Default checkpoint for `scripts/run_eo_batch.py`; not used by the app at runtime | Experimental | Test IoU 0.598, but the labels are the base model's own Ida polygons (self-distillation) and the random split shares parent scenes, so this measures agreement with pseudo-labels, not flood detection. |
+| [`msradam/TerraMind-NYC-Adapters`](https://huggingface.co/msradam/TerraMind-NYC-Adapters) | Not used by the app | Research artifact | LoRA family on TerraMind 1.0. Reported mIoU: LULC 0.5866, TiM 0.6023, Buildings 0.5511. |
+| Any OpenAI-compatible LLM | Optional, external endpoint | Production path, with claims checked in code | On ten gallery addresses, `granite4:micro` kept 122 claims and dropped 0; `llama3.1:8b` kept 191 and dropped 0 (`tests/probe_grounding_results*.json`). Only citations and numbers are checked ([`docs/GROUNDING.md`](docs/GROUNDING.md)). |
 
-**[`msradam/Prithvi-EO-2.0-NYC-Pluvial`](https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial).**
-NYC pluvial-flood fine-tune of Prithvi-EO 2.0. Test IoU is 0.598, but
-the labels are the base model's own Ida polygons (self-distillation) and
-the random split shares parent scenes, so this measures agreement with
-pseudo-labels, not flood detection. The Sen1Floods11 base was never
-scored on this test set. Lovász-Softmax loss with copy-paste
-augmentation.
-
-**[`msradam/Granite-TTM-r2-Battery-Surge`](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge).**
-NYC Battery storm-surge nowcast fine-tune of Granite TimeSeries TTM r2.
-Test MAE 0.1091 m, 41% better than persistence and 25% better than
-zero-shot.
-
-All three are loaded at runtime by their respective FSM probes in
-`app/context/` and `app/live/`. Reproduction recipes live under
-`experiments/18..21/`.
+The three `msradam/*` fine-tunes were trained on AMD Instinct MI300X via
+AMD Developer Cloud and are published under Apache 2.0. Reproduction
+recipes live under `experiments/`.
 
 ---
 
 ## Architecture
 
 ```
-Address ──► Granite 4.1 3B planner ──► Plan{intent, targets, specialists}
-                                                  │
-                                                  ▼
-                  Five-Stone Burr FSM (manifest pebbles, MapActions fan-out)
-                            ┌───────────┬───────────┬───────────┬──────────┐
-                            ▼           ▼           ▼           ▼          ▼
-                       Cornerstone  Keystone   Touchstone   Lodestone  (cont.)
-                       (hazard)    (assets)    (live)       (forecast)
-                            │           │           │           │
-                            └───────────┴─────┬─────┴───────────┘
-                                              ▼
-                     evidence: manifest templates filled from values
-                                              ▼
-                  Capstone: no-LLM evidence briefing, or JSON claims
-                  from any OpenAI-compatible model, verified in code
-                                              ▼
-                       Four-section briefing with [doc_id] citations
-                                              ▼
-                       SSE stream → SvelteKit UI (briefing, trace, map)
+query ──► plan (LLM planner, or regex heuristic in no-LLM mode)
+             │
+             ▼
+   geocode_target (point intents) │ resolve_area (NTA or community district)
+             │
+             ▼
+   select_deployment (bounding box → deployments/<city>/)
+             │
+             ▼
+   stones: one parallel MapActions fan-out over every pebble for the intent
+   (Cornerstone, Keystone, Touchstone, Lodestone)
+             │
+             ▼
+   assemble_legacy_state ──► policy_corpus ──► reconcile
+             │
+             ▼
+   evidence from manifest templates ──► no-LLM briefing, or verified JSON claims
+             │
+             ▼
+   cited briefing + disclosure checks + energy ledger ──► JSON, SSE, MCP
 ```
 
-The runtime is the manifest-driven framework under `riprap/core/`. A
-deployment is a directory of YAML pebble manifests plus a `stones.yaml`;
-the registry loads them and the Burr app fans each Stone's pebbles out in
-parallel. Adding a data source, or a whole new city, is configuration,
-not code. The legacy `app/` modules remain for the register and
-multi-intent paths the framework has not yet absorbed.
+`riprap/core/burr/app.py` is the only orchestrator. It handles every
+intent (`single_address`, `neighborhood`, `development_check`, `live_now`,
+`compare`, `not_implemented`); `compare` is two `single_address` runs
+merged. Point intents run pebbles with `spatial.scope: point`,
+`neighborhood` and `development_check` run the polygon pebbles, and
+`live_now` runs only the live point pebbles. Burr tracking is off unless
+`RIPRAP_BURR_TRACKING=1`.
 
-LLM inference is dispatched through `app/llm.py`, a LiteLLM Router shim
-with two backends: **Ollama** (local dev, CPU) and **vLLM**
-(OpenAI-compatible, on Modal or a cloud GPU). Same `chat()` signature in
-both directions; vLLM is primary when configured, Ollama is the
-auto-failover.
-
-Specialist ML inference (Prithvi-EO, TerraMind, TTM, GLiNER, Granite
-Embedding) goes over HTTP to a bearer-authenticated proxy, which stamps
-real GPU/Apple-Silicon power readings onto every response (see the
-energy section below). The specialist server is
-[`msradam/riprap-inference`](https://github.com/msradam/riprap-inference)
-(LitServe) — one codebase, deployable to Modal (scale-to-zero, $0 idle)
-or run natively on a Mac Mini / Apple Silicon for MPS access. Granite
-4.1 via vLLM is the same repo's second Modal app (its own GPU tier,
-its own image); any other OpenAI-compatible vLLM endpoint works too.
-See `docs/DEPLOY.md` for every combination.
+Every public source goes through one HTTP client (`riprap/core/http.py`:
+httpx with hishel caching and stamina retries). NYC Geosearch is tried
+first for NYC addresses and Nominatim (rate limited to 1 request per
+second) for everything else.
 
 Source-of-truth pointers:
 
-- `riprap/core/pebbles/`: the pebble framework — manifest schema,
-  registry, and the adapters / shapers that normalize each source.
-- `riprap/core/burr/`: the Burr application — intake, per-Stone
-  `MapActions` fan-out, and the reconciler tiers (`llm` / `no_llm`).
-- `deployments/<city>/`: the manifests, `stones.yaml`, data, and corpus
-  that define one deployment.
-- `riprap/core/compliance/`: disclosure checks (substring tests for
-  required caveat phrases), run per briefing. They do not measure quality.
-- `web/main.py`: FastAPI + SSE. The stream emits
-  `plan / step / token / mellea_attempt / final` events plus the
-  `stone_start / stone_done` envelope around each Stone group.
-- `riprap/mcp/server.py`: MCP server (`python -m riprap.mcp.server`) —
-  lets an agent call Riprap as a tool: `get_briefing`, `list_sources`,
-  `get_citation`.
-- `web/sveltekit/`: primary UI (SvelteKit + adapter-static).
-- `app/llm.py`: LiteLLM Router shim (Ollama / vLLM).
-- `app/emissions.py`: per-query Tracker + hardware profiles. Records
-  every LLM and ML inference call with `measured: bool`.
+| Path | What it is |
+|---|---|
+| `riprap/core/pebbles/` | Manifest schema, registry, adapters and shapers |
+| `riprap/core/burr/` | The Burr app, evidence rendering (`evidence.py`) and claim verification (`synthesis.py`) |
+| `riprap/core/http.py` | Shared cached HTTP client with retries |
+| `riprap/core/compliance/` | Disclosure checks: substring tests for required caveat phrases. They do not measure quality. |
+| `deployments/<city>/` | Manifests, `stones.yaml`, data and corpus for one deployment |
+| `app/` | Pebble implementations (`context/`, `flood_layers/`, `live/`, `assets/`, `areas/`), planner, geocoder, energy ledger |
+| `web/main.py` | FastAPI: `/api/agent`, `/api/agent/stream` (SSE), `/api/district/{code}`, `/api/nyc311/flood_requests`, layer endpoints |
+| `riprap/mcp/server.py` | MCP server (stdio or `--http`) |
+| `web/sveltekit/` | UI and static gallery (adapter-static, build committed) |
 
-For the long-form architecture document, see
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Methodology and
-civil-engineering framing in [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
-Lit review in [`docs/RESEARCH.md`](docs/RESEARCH.md). Deploy topology in
-[`docs/DEPLOY.md`](docs/DEPLOY.md). Live measurements (wall-clock, real
-NVML energy, grounding-check pass rate) in
-[`docs/BENCHMARKS.md`](docs/BENCHMARKS.md).
+Long form in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Grounding in
+[`docs/GROUNDING.md`](docs/GROUNDING.md). Methodology and civil-engineering
+framing in [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md). Literature review
+in [`docs/RESEARCH.md`](docs/RESEARCH.md). Deployment in
+[`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 ---
 
-## Inference energy — measured, not estimated
+## Inference energy
 
-Riprap reports the energy and token cost of every inference call it
-makes during a briefing. The status row on the Findings region
-displays a single chip:
+`app/emissions.py` records every LLM call in a briefing with its tokens,
+duration and an energy status:
 
-```
-✓ 1.4 Wh / 6.9K tok inference
-```
+| Status | When |
+|---|---|
+| measured | Local endpoint on Apple Silicon with the `energy` extra (zeus-apple-silicon). Whole-chip energy during the call, so it includes other processes. |
+| estimated | Local endpoint with `RIPRAP_ENERGY_WATTS` set: declared watts times duration. |
+| unknown | Everything else. Hosted endpoints are always unknown and no per-query figure is reported for them. |
 
-The `✓` icon means every recorded call came back with a real reading
-off the inference GPU via `nvmlDeviceGetPowerUsage`. The proxy
-runs a 100 ms-cadence NVML sampler and stamps
-`X-GPU-Power-W` / `X-GPU-Energy-J` on every response; the LLM client
-brackets each completion with two GETs to `/v1/power` because LiteLLM
-hides response headers. When the proxy is unreachable, the chip
-shows `~` or `◐` and the row falls back to a data-sheet sustained-
-power estimate.
-
-Per-call records carry `prompt_tokens`, `completion_tokens`,
-`duration_s`, `power_w`, `joules`, and a `measured: bool` flag. The
-full ledger is shipped on the SSE `final` event under
-`emissions.calls`, so any consumer (dashboard, billing model,
-reproducibility check) can reuse the data.
-
-Detailed pipeline + verification recipe in
+zeus-apple-silicon 1.1.0 reads 0 mJ of CPU energy on an Apple M5; those
+readings are rejected and the call is marked unknown. The ledger is the
+`emissions` block of every result. In-process CPU models are not in it.
+The numbers in [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) come from the
+retired GPU stack and are historical. Details in
 [`docs/EMISSIONS.md`](docs/EMISSIONS.md).
 
 ---
 
 ## Data sources
 
-Riprap contacts only public-record federal, state, and city sources at
-runtime. No commercial APIs, no proprietary scores, no opaque
-aggregators.
+Riprap contacts only public-record federal, state and city sources at
+runtime. No commercial APIs, no proprietary scores. Source URLs, licences,
+`date_modified` and `retrieved_at` for each come from the pebble's manifest
+`provenance` block; `list_sources` on the MCP server prints them.
 
 | Source | Hosting agency | Used for |
 |---|---|---|
-| Hurricane Sandy 2012 inundation zone | NYC OTI / NOAA Office for Coastal Management | Cornerstone hazard memory |
-| NYC DEP Stormwater Flood Maps | NYC Department of Environmental Protection | DEP modeled-scenario layers |
-| Hurricane Ida 2021 USGS high-water marks | USGS Short-Term Network | Empirical validation points |
-| FloodNet ultrasonic sensor network | NYU CUSP / FloodNet | Historical flood-event log (labeled events, peak depths) |
-| NYC 311 flood complaints | NYC Open Data | Empirical complaint history |
-| NOAA tide gauge, The Battery | NOAA CO-OPS | Live tide and surge level |
-| NWS METAR | National Weather Service | Hourly precipitation |
-| NWS public flood alerts | National Weather Service | Active warnings and watches |
-| MTA subway entrances | MTA / NYC Open Data | Transit asset register |
-| NYCHA developments | NYC Housing Authority | Public-housing exposure |
-| NYC DOE schools | NYC Department of Education | Education-asset exposure |
-| NYS DOH hospitals | New York State Department of Health | Critical-facility exposure |
-| USGS 3DEP 1 m DEM | USGS National Map | HAND / TWI microtopography |
-| NYC DOB filings | NYC Department of Buildings | Development-check intent |
-| NPCC4 SLR projections | NYC Mayor's Office of Climate & Environmental Justice | Policy-context corpus (RAG) |
-| Sentinel-2 MSI imagery | ESA / Copernicus | Prithvi + TerraMind inputs |
-
-The full data licence map and vintage table is enumerated in
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+| Hurricane Sandy 2012 inundation zone | NYC OTI / NOAA Office for Coastal Management | Hazard memory |
+| NYC DEP Stormwater Flood Maps | NYC Department of Environmental Protection | Modeled scenarios |
+| FEMA National Flood Hazard Layer | FEMA | Regulatory flood zone |
+| Hurricane Ida 2021 USGS high-water marks | USGS Short-Term Network | Empirical points |
+| FloodNet ultrasonic sensor network | NYU CUSP / FloodNet | Flood-event log |
+| NYC 311 flood complaints | NYC Open Data | Complaint history |
+| NOAA tide gauge, The Battery | NOAA CO-OPS | Tide and surge level |
+| USGS stream gauges | USGS Water Data (OGC API) | Live stage |
+| NWS observations and alerts | National Weather Service | Precipitation, active warnings |
+| MTA subway entrances | MTA / NYC Open Data | Transit assets |
+| NYCHA developments | NYC Housing Authority (`phvi-damg`) | Public housing |
+| NYC DOE schools | NYC Department of Education | Schools |
+| NYS DOH hospitals | New York State Department of Health (`vn5v-hh5r`) | Hospitals |
+| USGS 3DEP 1 m DEM | USGS National Map | HAND and TWI |
+| NYC DOB permits | NYC Department of Buildings | `development_check` intent |
+| NPCC4 sea-level projections and agency PDFs | NYC Panel on Climate Change, NYC agencies | Policy context |
+| Sentinel-2 MSI imagery | ESA / Copernicus | Offline Prithvi layers |
 
 ---
 
 ## Repository structure
 
 ```
-riprap/core/               The manifest-driven framework (current runtime)
+riprap/core/               The framework
 ├── pebbles/               Pebble schema, registry, adapters, shapers
-├── burr/                  Burr app: intake, per-Stone MapActions, reconcilers
-└── compliance/            Disclosure checks (caveat-phrase substring tests)
+├── burr/                  Burr app, evidence, claim verification
+├── compliance/            Disclosure checks (caveat-phrase substring tests)
+└── http.py                Shared cached HTTP client
 
-riprap/mcp/                MCP server — Riprap as an agent-callable tool
+riprap/mcp/                MCP server
 
 deployments/               One directory per deployment
 ├── nyc/                   Reference: manifests, stones.yaml, data, corpus
-└── chicago, seattle, sf, boston, …    Same shape, different city
+├── federal/               Pebbles every US deployment shares
+└── chicago, seattle, sf, boston, albany, heat, air
 
-app/                       Legacy modules still used by register + intent paths
-├── llm.py                 LiteLLM Router shim (Ollama / vLLM)
-├── emissions.py           Per-query energy + token ledger (real NVML)
-└── geocode.py, registers/, intents/, context/, flood_layers/, live/
+app/                       Pebble implementations, planner, geocoder,
+                           energy ledger, PDF export, register builder
 
 web/                       FastAPI + SvelteKit
-├── main.py                FastAPI app, SSE streaming, layer endpoints
-└── sveltekit/             Primary UI (adapter-static; build committed)
+├── main.py                FastAPI app, SSE stream, layer endpoints
+└── sveltekit/             UI and static gallery (build committed)
 
-modal/                     Modal deploy of this app (CPU, scale-to-zero)
-scripts/                   Probes, register builders, deploy commands
-experiments/               Reproduction recipes for the three NYC fine-tunes
-docs/                      ARCHITECTURE · DEPLOY · multi-city · PORT-YOUR-CITY · …
-tests/                     pytest (pebbles, stones, routing) + vitest (UI)
+modal/                     Optional Modal host for the app (CPU)
+scripts/                   Gallery, RAG index, EO batch, probes, register builders
+experiments/               Reproduction recipes for the NYC fine-tunes
+docs/                      See docs/INDEX.md
+tests/                     pytest + vitest
 ```
 
-The GPU/ML-specialist inference stack lives in a separate repo,
-[`msradam/riprap-inference`](https://github.com/msradam/riprap-inference)
-(LitServe specialists + Granite 4.1 via vLLM, deployable to Modal as
-two apps, or a Mac Mini). `inference/` and `services/riprap-models/`
-in this repo are lighter self-host sidecars that predate it — see
-`docs/DEPLOY.md`.
-
-[`CONTRIBUTING.md`](CONTRIBUTING.md) covers dev setup, the probe
-scripts, and house style. [`CHANGELOG.md`](CHANGELOG.md) tracks
-changes since the v0.5.0 hackathon submission.
+[`CONTRIBUTING.md`](CONTRIBUTING.md) covers dev setup and house style.
+[`CHANGELOG.md`](CHANGELOG.md) tracks changes since the v0.5.0 hackathon
+submission.
 
 ---
 
@@ -472,18 +424,16 @@ If you reference Riprap in academic or professional work:
 
 Apache 2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
 
-The three NYC-specialised fine-tunes above are also Apache 2.0;
-underlying upstream models retain their own permissive licences (see
-each `MODEL_CARD.md`). Public-record data sources retain their own
-access terms; the licence map is in
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+The three NYC fine-tunes above are also Apache 2.0; upstream models keep
+their own permissive licences (see each model card). Public-record data
+sources keep their own access terms, recorded in each manifest's
+`provenance.license`.
 
 ---
 
 ## Acknowledgments
 
-- **AMD Developer Cloud**, MI300X compute that made the three Apache-2.0
-  NYC fine-tunes feasible.
+- **AMD Developer Cloud**, MI300X compute for the three NYC fine-tunes.
 - **AMD × lablab.ai Developer Hackathon**, the venue.
 - **IBM Research**, Granite 4.1, Granite Embedding 278M, Granite TTM r2,
   and the rest of the open-source Granite ecosystem.

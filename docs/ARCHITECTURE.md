@@ -1,42 +1,23 @@
 # Riprap architecture
 
-> **Update, July 2026.** The MI300X DigitalOcean droplet that hosted
-> the original AMD-judging deploy was decommissioned 2026-05-06. Post-
-> hackathon, HF Spaces serve the deterministic data probes only
-> (inferencing disabled); live inference now runs on Modal — specialists
-> and Granite 4.1 (vLLM) both via companion repo `msradam/riprap-inference`
-> (two scale-to-zero apps), or your own OpenAI-compatible vLLM endpoint —
-> or fully locally on a Mac Mini (same `riprap-inference` codebase, run
-> natively) with real Apple Silicon power measurement.
-> The MI300X language preserved elsewhere in this document remains
-> accurate for the original AMD-judging deploy, reproducible against
-> your own AMD GPU box via `docker-compose --profile with-models` +
-> `RIPRAP_HARDWARE_LABEL=AMD MI300X`. Current deployment topology and
-> commands live in [`docs/DEPLOY.md`](DEPLOY.md); the emissions ledger
-> — including the Mac Mini `powermetrics` path — is documented in
-> [`docs/EMISSIONS.md`](EMISSIONS.md).
-
-> **What it is.** A web tool that takes an address and produces a
-> short, citation-grounded **climate-exposure briefing** — a paragraph
-> of evidence where every numeric claim links back to the specific
-> dataset, agency report, or model output it came from. NYC/flood is
-> the production-grade reference deployment (this document describes
-> it end to end); the same architecture ships five more city
-> deployments (see [`docs/multi-city.md`](multi-city.md)) and, as a
-> proven experiment, heat- and air-quality hazards on top of the same
-> pebble/Stone framework (see [`docs/multi-hazard.md`](multi-hazard.md)).
+> **What it is.** A web tool that takes an address, a neighbourhood or a
+> community district and produces a short, citation-grounded
+> **climate-exposure briefing**: evidence where every sentence links back
+> to the dataset, agency report or model output it came from. NYC/flood is
+> the reference deployment (this document describes it end to end); the
+> same code runs five experimental city deployments (see
+> [`docs/multi-city.md`](multi-city.md)) and heat and air-quality
+> scaffolds (see [`docs/multi-hazard.md`](multi-hazard.md)).
 >
-> **Who it's for.** Urban planners, journalists on deadline, NYCEM
-> grant writers filing FEMA BRIC sub-applications, agency capital
-> planners, researchers under FOIL/IRB constraints. Not consumers
-> shopping for flood insurance.
+> **Who it's for.** Urban planners, journalists on deadline, NYCEM grant
+> writers filing FEMA BRIC sub-applications, agency capital planners,
+> researchers under FOIL/IRB constraints. Not consumers shopping for flood
+> insurance.
 >
-> **Why local foundation models.** A newsroom with FOIL'd documents
-> can't paste them into a vendor LLM. We run Granite 4.1 (3 B-param
-> chat model), Granite Embedding 278M (RAG), Prithvi-EO 2.0 (300 M-param
-> Earth-observation model, offline pre-compute) and Granite TimeSeries
-> TTM r2 (1.5 M-param forecaster) inside one container. No
-> vendor LLM is contacted at runtime.
+> **How it runs.** One CPU process with no GPU and no keys. By default the
+> briefing is the evidence itself, with no language model. An LLM is
+> optional and is any OpenAI-compatible endpoint you point it at, local or
+> hosted. Deployment shapes are in [`docs/DEPLOY.md`](DEPLOY.md).
 
 ---
 
@@ -98,7 +79,7 @@ distinction matters for how much weight to give it:
   civic engagement as well as flooding; terrain says nothing about
   drainage capacity.
 
-Riprap surfaces all three classes. The score weights them in that
+Riprap surfaces all three classes. The offline register tier weights them in that
 order (empirical > modeled > proxy), with empirical hits granted a
 **floor rule**. See [§5](#5-the-scoring-rubric).
 
@@ -121,279 +102,182 @@ Neither is a flood prediction; both are exposure indicators that say
 
 ---
 
-## 2. What Riprap actually produces
+## 2. What Riprap produces
 
-For a given address (or any of five intents; see [§4](#4-five-planner-intents)),
-Riprap returns:
+For a query in any of the intents in [§4](#4-intents), Riprap returns:
 
-1. **A 4-section briefing paragraph** synthesised by Granite 4.1 with
-   `[doc_id]` citations after every numeric claim. Sections:
-   *Status*, *Empirical evidence*, *Modeled scenarios*, *Policy
-   context*. A section is omitted entirely if no pebble fired for
-   it (silence-over-confabulation contract).
-2. **Evidence cards**. One per fired pebble, with the raw values
-   and a link to the source dataset.
-3. **Map overlay**. The address pinned, with the empirical and
-   modeled flood extents that overlap it.
-4. **Live "right now" signals**. Active NWS flood alerts, current
-   tide residual at the nearest gauge, recent precipitation at the
-   nearest ASOS, and an experimental Granite TTM forecast of the surge
-   residual.
-5. **Disclosure checks**. 13 substring tests for required caveat
-   phrases drawn from FEMA, IPCC AR6, TCFD, ASTM E1527-21, AP Stylebook
-   and SPJ guidance (see `riprap/core/compliance/`), run against the
-   rendered paragraph and attached to every response. A pass means the
-   phrases are present; it is not a measure of briefing quality.
+1. **A briefing** with one section per Stone that has evidence. In no-LLM
+   mode it is the evidence sentences themselves; in LLM mode it is the
+   claims that survived verification. Every sentence carries `[doc_id]`
+   citations. A section with no evidence is left out.
+2. **Evidence cards.** One per pebble that returned a value, with the raw
+   values and a link to the source dataset.
+3. **Map overlay.** The address or area, with the empirical and modeled
+   flood extents that overlap it.
+4. **Provenance.** Source name, URL, licence, `date_modified` and
+   `retrieved_at` for every cited document, read from the pebble's
+   manifest. Pebbles marked `maturity: experimental` say so in their
+   sentence.
+5. **Disclosure checks.** 13 substring tests for required caveat phrases
+   drawn from FEMA, IPCC AR6, TCFD, ASTM E1527-21, AP Stylebook and SPJ
+   guidance (`riprap/core/compliance/predicates.py`), run against the
+   rendered briefing and attached to every response under the key
+   `compliance`. A pass means the phrases are present. It is not a
+   measure of briefing quality.
+6. **Energy ledger.** Tokens, duration and an energy status for each LLM
+   call (`emissions`; see [`EMISSIONS.md`](EMISSIONS.md)).
 
-**The deterministic tier 1–4 rubric** ([§5](#5-the-scoring-rubric),
-`app/score.py`) still exists and is still exactly what it says —
-empirical-floor-weighted, published, not LLM-computed — but it is not
-part of the live single-query response today. Its live callers are the
-offline bulk register builders (`scripts/build_*_register.py`, the
-`/register/{schools,nycha,mta_entrances}` browsable pages), which tier
-thousands of assets to decide which get a full reconciled paragraph
-vs. a bare listing. §5 documents the rubric itself; if you're looking
-for where a single query's tier appears in the JSON response, it
-doesn't — that's the gap between this section's older framing and
-the current wiring.
-
-The full output is a JSON blob with all specialist outputs preserved,
-so a journalist or planner can audit every number that appears in the
-prose.
+The deterministic tier 1 to 4 rubric ([§5](#5-the-scoring-rubric),
+`app/score.py`) is not part of the live response. Its callers are the
+offline register builders (`scripts/build_*_register.py`), whose output
+is served at `/api/register/{asset_class}`.
 
 ---
 
-## 3. The manifest-driven pebble framework, and how a query actually flows
+## 3. How a query flows
 
-Riprap is a **state machine**, a Burr Application (DAGWorks). Two
-generations of that state machine currently coexist in this codebase:
+`riprap/core/burr/app.py` is the only orchestrator: one Burr application
+for every intent. A deployment (`deployments/<city>/`) is a directory of
+YAML **pebble** manifests plus a `stones.yaml`. Each pebble declares its
+`stone`, its `spatial.scope` (`point` or polygon), its `coverage`, its
+data source, its narration template and its provenance. There is no
+hand-coded specialist list.
 
-- **`riprap/core/burr/app.py`** — the current, manifest-driven runtime.
-  A deployment (`deployments/<city>/`) is a directory of YAML **pebble**
-  manifests plus a `stones.yaml`. Each pebble declares its own `stone`
-  (which of the Five Stones it belongs to), `coverage` (the bbox it's
-  eligible to fire in), data source, and citation metadata — no
-  hand-coded specialist list. This is the path a `single_address` query
-  takes by default (`RIPRAP_USE_BURR_APP=1`, the default — see
-  [§12](#12-deployment)), and it's what makes adding a city or a hazard
-  a directory of YAML rather than a code change (see
-  [`docs/multi-city.md`](multi-city.md), [`docs/multi-hazard.md`](multi-hazard.md)).
-- **`app/fsm.py`** — the original linear FSM this replaced for
-  `single_address`. It's not dead: `riprap/core/burr/capstone.py`
-  reuses its `step_reconcile` action as-is (the grounding-checked Granite
-  call), and it's still the full execution path for the other four
-  intents — `neighborhood`, `development_check`, `live_now`, and
-  `compare` each have their own orchestration module under
-  `app/intents/` that calls point/polygon-scoped specialist functions
-  directly, not the pebble registry. `RIPRAP_USE_BURR_APP=0` also
-  falls `single_address` back to this path entirely, for regression
-  testing against the pebble-framework path.
-
-This section describes the `single_address` pebble-framework path in
-detail, since it's both the default and the architecture the rest of
-this codebase is migrating toward.
-
-### 3.0 The shape of a query
+### 3.0 The graph
 
 ```
-            ┌───────────────────────────────┐
-  query ──► │ plan_intent (Granite 4.1:3b)  │  free text → {intent, targets, specialists}
-            └───────────────┬───────────────┘
-                            ▼
-            ┌───────────────────────────────┐
-            │ geocode_target (Nominatim,     │  target text → lat, lon
-            │ NYC Geosearch enrichment)      │  (+ BBL/BIN for NYC pebbles)
-            └───────────────┬───────────────┘
-                            ▼
-            ┌───────────────────────────────┐
-            │ select_deployment              │  (lat, lon) → which deployments/<city>/
-            └───────────────┬───────────────┘  bbox contains this point (or none)
-                            ▼
-       ┌───────────────────────────────────────────────────────────┐
-       │   STONE FAN-OUT — MapActions parallel over 4 of the 5       │
-       │   Stones (Capstone follows below). Each Stone reads the     │
-       │   deployment's pebble registry at call time and fans out    │
-       │   to every pebble tagged with that stone whose `coverage`   │
-       │   contains the point.                                       │
-       │                                                              │
-       │   Cornerstone (hazard memory) │ Touchstone (live observation)│
-       │   Lodestone (forecasts)       │ Keystone (assets)            │
-       └──────────────────────────┬───────────────────────────────────┘
-                                    ▼
-                     ┌──────────────────────────────┐
-                     │ assemble_legacy_state          │  reshapes the 3 DEP-scenario
-                     └───────────────┬────────────────┘  pebble values into one dict
-                                    ▼
-                     ┌──────────────────────────────┐
-                     │ step_policy_corpus             │  retrieval + NER in one pebble
-                     └───────────────┬────────────────┘  (Granite Embedding 278M + GLiNER)
-                                    ▼
-                     ┌──────────────────────────────┐
-                     │ step_reconcile (from app.fsm)  │  Granite 4.1 + grounding
-                     │ reads every fired pebble's      │  check with rerolls
-                     │ "document" and writes the       │  (up to loop_budget attempts)
-                     │ 4-section cited paragraph       │
-                     └───────────────┬────────────────┘
-                                    ▼
-                     cited briefing + evidence cards + map
-                     + 13 disclosure checks
+query
+  │
+  ▼
+plan                LLM planner (app/planner.py) in LLM mode,
+  │                 regex heuristic (intake.heuristic_plan) in no-LLM mode
+  ▼
+geocode_target      point intents: NYC Geosearch first, then Nominatim
+  or                (1 request per second), plus BBL/BIN for NYC
+resolve_area        neighbourhood intents: a 2020 NTA polygon, or a
+  │                 community district code such as QN12 as the union
+  │                 of its NTAs
+  ▼
+select_deployment   which deployments/<city>/ bounding box contains the
+  │                 target (out of coverage falls back to federal pebbles)
+  ▼
+stones              ONE parallel MapActions fan-out over every
+  │                 Cornerstone, Keystone, Touchstone and Lodestone pebble
+  │                 that fits the intent
+  ▼
+assemble_legacy_state   reshapes the DEP scenario values into one dict
+  ▼
+policy_corpus       Granite Embedding query + Flair NER over the corpus
+  ▼
+reconcile           evidence from manifest templates, then the no-LLM
+                    briefing or verified LLM claims; disclosure checks
 ```
 
-If geocoding fails or no deployment covers the resolved point, the
-Stones still run (each pebble degrades to its `no coords` /
-`no deployment` trace record) and the reconciler produces an honest
-"couldn't locate this" or "outside coverage" briefing instead of
-silently guessing — see `app/geocode.py` and `riprap/core/burr/intake.py`
-for the specific decline logic (Nominatim-primary resolution, an
-explicit non-US decline path, and a deployment-registry-based "this
-query names a different Riprap deployment's city" check).
+Which pebbles run depends on the intent. Point intents run pebbles with
+`spatial.scope: point`. `neighborhood` and `development_check` run the
+polygon pebbles (`sandy_nta`, `dep_extreme_2080_nta`,
+`dep_moderate_2050_nta`, `dep_moderate_current_nta`, `nyc311_nta`,
+`microtopo_nta`, `dob_permits_nta`). `live_now` runs only the
+`type: live` point pebbles. `compare` is two `single_address` runs merged
+(`run_compare`).
 
-Each Stone's fan-out and each of the three Capstone steps
-(`assemble_legacy_state`, `step_policy_corpus`, `step_reconcile`) are
-Burr actions with their own trace record (timing, ok/err, a small
-result summary) that streams to the frontend live as `step` SSE events.
+If geocoding fails or no deployment covers the point, the pebbles degrade
+to a trace record saying why, and the briefing says the place could not
+be located or is outside coverage instead of guessing. The decline logic
+(an explicit non-US path and a "this names another deployment's city"
+check) is in `app/geocode.py` and `riprap/core/burr/intake.py`.
 
-### 3.1 What every pebble does, plain language
+Each step and each pebble writes a trace record (timing, ok or error, a
+short result summary) that streams to the UI as `step` events on
+`/api/agent/stream`. Burr's own tracking UI is off unless
+`RIPRAP_BURR_TRACKING=1`.
 
-The NYC deployment's registry (`deployments/nyc/manifests/`) currently
-carries 23 pebbles: 19 NYC manifests plus 4 federal ones (`fema_nfhl`,
-`nws_alerts`, `nws_obs`, `usgs_gauges`). `prithvi_live` is off by
-default. Every other deployment has its own, smaller, experimental set
-(see [`docs/multi-city.md`](multi-city.md) for the per-city pebble
-counts and [`docs/multi-hazard.md`](multi-hazard.md) for heat/air).
-`geocode` and `reconcile` below aren't pebbles — they're the two fixed
-framework steps that bracket the Stone fan-out (§3.0).
+### 3.1 NYC pebbles, plain language
 
-| Pebble | Plain-language description | Tier |
+The NYC deployment has 19 point pebbles in `deployments/nyc/manifests/`,
+the 7 polygon pebbles listed above, and 4 federal pebbles from
+`deployments/federal/` (`fema_nfhl`, `nws_alerts`, `nws_obs`,
+`usgs_gauges`). Other deployments have their own, smaller, experimental
+sets (see [`docs/multi-city.md`](multi-city.md) and
+[`docs/multi-hazard.md`](multi-hazard.md)).
+
+| Pebble | Plain-language description | Evidence class |
 |---|---|---|
-| **geocode** *(framework, not a pebble)* | Resolve the query text to (lat, lon). Nominatim resolves any US address; when the point falls inside NYC, NYC DCP Geosearch additionally enriches the hit with BBL/BIN identifiers the NYC-specific pebbles below need. | n/a |
-| **sandy** | Did the address get flooded by Hurricane Sandy in 2012? Point-in-polygon over the official NYC Sandy Inundation Zone. | empirical |
-| **fema_nfhl** | FEMA's National Flood Hazard Layer effective flood zone at this point. | modeled |
-| **dep_moderate_current**, **dep_moderate_2050**, **dep_extreme_2080** | Three modeled NYC DEP stormwater scenarios — current SLR baseline, 2050 moderate, 2080 extreme. Each reports a depth class at this point. | modeled |
-| **ida_hwm** | USGS Hurricane Ida 2021 high-water marks near this address — actual measured water heights surveyed after the storm. | empirical |
-| **prithvi_water** | Satellite-detected surface water after Ida (experimental). Prithvi-EO 2.0 on a pass about 14 hours after the heaviest rain; it mostly shows marsh, shoreline and park water and says nothing about street or basement flooding (offline pre-compute; instant at request time). | modeled |
-| **microtopo** | LiDAR/DEM-derived micro-topography at the point: elevation percentile, HAND, TWI, basin relief. | proxy |
-| **policy_corpus** | Granite Embedding 278M retrieves the most-relevant passages from 5 NYC agency PDFs, and GLiNER extracts typed entities (agency, dollar amount, date, location) from them — one pebble owning retrieval + NER, replacing the older separate rag/gliner_extract steps. | empirical |
-| **mta_entrances**, **nycha_developments**, **doe_schools**, **doh_hospitals** | MTA subway/rail entrances, NYCHA developments, NYC DOE schools, and NYS DOH hospitals within range of this address, and their flood exposure. | empirical |
-| **nws_alerts** *(live)* | Currently active NWS alerts (flood/coastal/wind) intersecting this address. | modeled |
-| **ttm_battery_surge** *(live, experimental)* | Granite-TTM-r2-Battery-Surge, a fine-tuned nowcast of Battery storm-surge over the next 96 hours. | modeled |
-| **ttm_311_forecast** *(live, experimental)* | 4-week forecast of NYC 311 flood-complaint volume at this address. | modeled |
-| **floodnet_forecast** *(live, experimental)* | 28-day forecast of flood-event recurrence at the nearest FloodNet sensor. | modeled |
-| **npcc4_slr** | NYC Panel on Climate Change (2024) sea-level rise projections at the Battery. | modeled |
-| **floodnet** *(live)* | FloodNet ultrasonic depth sensors near this address and their historical flood events. | empirical |
-| **nyc311** *(live)* | NYC 311 flood-related complaints filed near this address over the past 5 years. | proxy |
-| **nws_obs** *(live)* | Most recent NWS hourly observation at the nearest METAR station. | empirical |
-| **noaa_tides** *(live)* | Recent NOAA tide-gauge water-level reading — observed level, predicted astronomical tide, and the **residual** (≈ surge) — at the nearest station. | empirical |
-| **usgs_gauges** *(live)* | Live stage at the nearest USGS stream gauge. | empirical |
-| **prithvi_live** *(live, off by default, experimental)* | Live Sentinel-2 water segmentation around this address (Prithvi-EO 2.0 NYC-Pluvial fine-tune). | modeled |
-| **terramind_lulc**, **terramind_buildings** *(live, not yet manifest-driven)* | TerraMind land-cover and building-footprint synthesis over a fresh EO chip. Still an `app/fsm.py` step rather than a pebble manifest — one of the pieces README's "legacy `app/` modules... the framework has not yet absorbed" refers to. | modeled |
-| **reconcile** *(framework, not a pebble)* | Granite 4.1 reads every fired pebble's "document" and writes the 4-section cited briefing paragraph. A hand-written grounding check validates the invariants in `app/mellea_validator.py`'s module docstring; up to `loop_budget` attempts. See [§6](#6-document-grounded-reconciliation). | LLM synthesis |
+| **sandy** | Did Hurricane Sandy flood this address in 2012? Point-in-polygon over the NYC Sandy Inundation Zone. | empirical |
+| **fema_nfhl** | FEMA National Flood Hazard Layer effective zone at this point, with the FIRM panel vintage. | modeled |
+| **dep_moderate_current**, **dep_moderate_2050**, **dep_extreme_2080** | Three NYC DEP stormwater scenarios. Each reports a depth class at this point. | modeled |
+| **ida_hwm** | USGS Hurricane Ida 2021 high-water marks near this address. | empirical |
+| **prithvi_water** *(experimental)* | Satellite-detected surface water after Ida: Prithvi-EO 2.0 polygons from a pass about 14 hours after the heaviest rain, baked offline. It mostly shows marsh, shoreline and park water, gives no inside or outside verdict for the address, and says nothing about street or basement flooding. | modeled |
+| **microtopo** | Elevation percentile, HAND, TWI and basin relief from the USGS 3DEP DEM. | proxy |
+| **policy_corpus** *(experimental)* | Granite Embedding 278M retrieves passages from five NYC agency PDFs; Flair NER adds coarse entity tags. | policy context |
+| **mta_entrances**, **nycha_developments**, **doe_schools**, **doh_hospitals** | Transit entrances, public housing, schools and hospitals within range, and their flood exposure. | empirical |
+| **nws_alerts** *(live)* | Active NWS alerts intersecting this address. | modeled |
+| **ttm_battery_surge** *(live, experimental)* | Granite TTM r2 fine-tuned on Battery gauge history, forecasting the surge residual over the next 96 hours. No wind or pressure input. | modeled |
+| **ttm_311_forecast** *(live, experimental)* | Forecast of weekly NYC 311 flood-complaint volume near this address. | modeled |
+| **floodnet_forecast** *(live, experimental)* | Forecast of flood-event recurrence at the nearest FloodNet sensor. | modeled |
+| **npcc4_slr** | NPCC4 (2024) sea-level rise projections at the Battery. | modeled |
+| **floodnet** *(live)* | FloodNet depth sensors near this address and their flood events. | empirical |
+| **nyc311** *(live)* | NYC 311 flood-related complaints near this address over the past 5 years. | proxy |
+| **nws_obs** *(live)* | Latest NWS hourly observation at the nearest station. | empirical |
+| **noaa_tides** *(live)* | Latest NOAA water level, predicted tide and the residual (roughly the surge) at the nearest station. | empirical |
+| **usgs_gauges** *(live)* | Live stage at the nearest USGS stream gauge (OGC API). | empirical |
 
 ### 3.2 Worked example: 2940 Brighton 3rd St, Brooklyn
 
-To make the pipeline concrete, here's what fires for a Brighton Beach
-address:
+Values from a May 2026 run, to show what the pebbles return:
 
-| Pebble | What it returns |
+| Pebble | What it returned |
 |---|---|
-| geocode    | `(40.5780, -73.9617)`, BBL `3-08660-0001`, Brooklyn |
-| sandy      | **YES**. Inside the 2012 Sandy Inundation Zone |
-| dep_moderate_2050, dep_extreme_2080 | `dep_moderate_2050`: depth 0.4-0.8 ft; `dep_extreme_2080`: depth 0.8-2.0 ft |
-| floodnet   | 2 sensors within 600 m; 1 trigger event in last 3 yr (peak 14 cm) |
-| nyc311     | 11 flood-related complaints in 200 m, 5-yr window |
-| noaa_tides | Sandy Hook gauge, +0.49 ft residual *(today's reading)* |
+| geocode | `(40.5780, -73.9617)`, BBL `3-08660-0001`, Brooklyn |
+| sandy | Inside the 2012 Sandy Inundation Zone |
+| dep_moderate_2050, dep_extreme_2080 | depth 0.4 to 0.8 ft; depth 0.8 to 2.0 ft |
+| floodnet | 2 sensors within 600 m; 1 event in the last 3 years (peak 14 cm) |
+| nyc311 | 11 flood-related complaints within 200 m, 5-year window |
+| noaa_tides | +0.49 ft residual at the time of the run |
 | nws_alerts | 0 active alerts |
-| nws_obs    | KJFK ASOS, no recent precipitation |
-| microtopo  | Elevation 2.36 m, HAND 0.7 m, TWI 11.3, percentile 8 (very low) |
-| ida_hwm    | 0 USGS HWMs within 800 m (Ida hit Queens hardest, not Brighton) |
-| prithvi_water | Inside the satellite-detected surface water after Ida (experimental)? **NO** |
-| policy_corpus | Top hits: NPCC4 Ch.3 (coastal), MTA Resilience (Coney Island D-train), Comptroller |
-| reconcile  | (see below) |
+| microtopo | Elevation 2.36 m, HAND 0.7 m, TWI 11.3, percentile 8 |
+| ida_hwm | 0 high-water marks within 800 m |
+| policy_corpus | NPCC4 Ch. 3, MTA resilience roadmap, Comptroller report |
 
-(An offline register build would additionally tier this address 1
-"High exposure" under the empirical-floor rubric — [§5](#5-the-scoring-rubric)
-— but that tier isn't part of this live response; see [§2](#2-what-riprap-actually-produces).)
-
-The reconciler then writes:
-
-```
-**Status.** This Brighton Beach address sits **inside the 2012 Sandy
-Inundation Zone** [sandy], on relatively low ground with HAND of 0.7 m
-[microtopo].
-
-**Empirical evidence.** NYC 311 records show **11 flood-related
-complaints** within 200 m over the last 5 years [nyc311]; 2 FloodNet
-sensors are within 600 m and one logged a 14 cm event in the last 3
-years [floodnet].
-
-**Modeled scenarios.** The address sits inside **DEP Moderate-2050**
-with depth class 0.4-0.8 ft and **DEP Extreme-2080** with depth class
-0.8-2.0 ft [dep_moderate_2050][dep_extreme_2080].
-
-**Policy context.** The **MTA Climate Resilience Roadmap** flags the
-nearby Coney Island D-train infrastructure for coastal-flood exposure
-[rag_mta].
-```
-
-Note what *didn't* fire: no Ida HWM doc (Ida didn't flood here), no
-Prithvi doc (not inside the post-Ida surface-water layer), no NWS
-alerts (clear day). The reconciler never
-saw those headers and didn't invent them.
+In no-LLM mode each of these becomes one sentence from its manifest
+template, cited to its `doc_id` and grouped under its Stone. Pebbles that
+returned nothing (no Ida marks, no alerts) print nothing, so the briefing
+never mentions them.
 
 ---
 
-## 4. Five planner intents
+## 4. Intents
 
-The planner (`app/planner.py`) classifies every free-text query into one of
-five intents before anything else runs. This happens in a single Granite
-4.1 call that streams its JSON output to the client as `plan_token` events.
+The planner classifies every query into one intent. In LLM mode this is
+one LLM call (`app/planner.py`); in no-LLM mode it is a regex heuristic
+(`riprap/core/burr/intake.py`).
 
-| Intent                | Triggered by                                  | Execution path                         |
-|-----------------------|-----------------------------------------------|----------------------------------|
-| `single_address`      | Fully-qualified street address                | The manifest-driven pebble framework by default (§3): geocode → Five-Stone fan-out → policy_corpus → reconcile. Falls back to the legacy linear `app/fsm.py` FSM when `RIPRAP_USE_BURR_APP=0`. |
-| `neighborhood`        | NTA name, borough name, bare zip              | `app/intents/neighborhood.py` — its own orchestration, NTA-polygon-scoped specialist calls (not the pebble registry) |
-| `compare`             | "A vs B", "compare X to Y"                   | Two sequential single_address runs; merged two-column paragraph |
-| `development_check`   | "what's being built at X", "is Y risky"       | `app/intents/development_check.py` — DOB filings + flood layers, own orchestration |
-| `live_now`            | "is it flooding now", "current alerts"        | `app/intents/live_now.py` — live-only specialists (tides, alerts, obs), non-strict reconcile (no Mellea) |
-| `not_implemented`     | Retrospective, ranking, cross-city queries    | Returns rationale immediately |
+| Intent | Triggered by | What runs |
+|---|---|---|
+| `single_address` | A street address | geocode, all point pebbles |
+| `neighborhood` | An NTA name, borough or community district code (e.g. `QN12`) | resolve_area, polygon pebbles |
+| `development_check` | "what's being built at X" | resolve_area, polygon pebbles including DOB permits |
+| `live_now` | "is it flooding now", "current alerts" | geocode, live point pebbles only |
+| `compare` | "A vs B" | two `single_address` runs, merged |
+| `not_implemented` | Retrospective, ranking, cross-city queries | Returns a rationale immediately |
 
-`neighborhood`, `development_check`, and `live_now` each have their own
-orchestration module under `app/intents/` — they call point/polygon-scoped
-specialist functions directly and don't go through the pebble registry
-that `single_address` uses by default. This is the concrete shape of the
-"legacy `app/` modules remain for... multi-intent paths the framework
-has not yet absorbed" note in the top-level README.
-
-### Compare intent detail
-
-`_run_compare()` in `web/main.py` executes the full `single_address`
-path sequentially for each target, then merges the two paragraphs under
-`## PLACE A: …` / `## PLACE B: …` headers separated by `---`. The
-`CompareBriefing.svelte` component renders this as a two-column layout with
-a "Key differences" delta bar above. During streaming the tokens are rendered
-in a single column (sequential); the two-column layout appears when the
-`final` event lands.
-
-**Registered routes**
-
-| Path                                      | Serves |
-|-------------------------------------------|--------|
-| `/`                                       | SvelteKit landing + live query UI |
-| `/api/agent/stream?q=…`                   | SSE stream — planner + all intent paths |
-| `/register/{schools,nycha,mta_entrances}` | Pre-computed bulk register browser |
-| `/legacy`, `/single`, `/compare`, `/register/*` | Legacy custom-element bundle (compatibility) |
-
-Registers are pre-computed because running 1,900 reconciler calls at request
-time is a non-starter; the register build runs offline
-(`scripts/build_*_register.py`) and results are loaded from
-`data/registers/*.json` at boot.
+HTTP routes: `/api/agent` (JSON), `/api/agent/stream` (SSE),
+`/api/agent/batch` (up to 25 addresses), `/api/district/{code}`,
+`/api/nyc311/flood_requests`, `/api/print` (PDF, needs the `pdf` extra),
+`/api/register/{asset_class}` and the `/api/layers/*` map layers. The
+MCP server (`riprap/mcp/server.py`) exposes `list_sources`,
+`get_evidence`, `get_district_summary`, `get_citation`,
+`nyc311_flood_requests` and `get_briefing`; all but `get_briefing` work
+without an LLM.
 
 ---
 
 ## 5. The scoring rubric
 
-This is the part of the system that produces the tier 1–4. It is
+This is the part of the system that produces the tier 1 to 4. It is
 **deterministic, published, and not done by the language model**.
+It is used only by the offline register builders; the live briefing
+does not compute or show a tier.
 See `METHODOLOGY.md` for the full citation list; here's the
 high-level structure.
 
@@ -409,7 +293,7 @@ indices, equal-weighted within each group, normalized to [0, 1]:
 | **Hydrological**| Terrain-based exposure (HAND, TWI, percentile, relief)   | HAND (Nobre 2011); TWI half-weighted (urban DEM noise) |
 | **Empirical**   | Did flooding actually happen here (Sandy, Ida HWMs, 311) | Sandy + HWM<100m → also trigger floor |
 
-The **composite** is the sum of the three sub-indices (range 0–3).
+The **composite** is the sum of the three sub-indices (range 0 to 3).
 Tier breakpoints: ≥1.5 → Tier 1, ≥1.0 → Tier 2, ≥0.5 → Tier 3, >0 →
 Tier 4, 0 → Tier 0.
 
@@ -423,7 +307,7 @@ This recovers the *important* multiplicative behaviour Balica 2012
 argues for (empirical observations should not be cancelled by
 terrain or modeled scenarios) without giving up additive transparency.
 The 100 m radius is chosen because USGS HWM positional uncertainty is
-typically 5–30 m. 100 m gives ~3σ headroom for a confident "this
+typically 5 to 30 m. 100 m gives ~3σ headroom for a confident "this
 address was inundated" signal.
 
 ### 5.3 Live signals stay out
@@ -441,142 +325,127 @@ cards.
 The full description is in [`GROUNDING.md`](GROUNDING.md). In short: the
 evidence is each pebble's manifest template filled from its value
 (`riprap/core/burr/evidence.py`). With no LLM configured, that evidence is
-the briefing. With an OpenAI-compatible endpoint configured, the model returns
-JSON claims under a per-request schema whose `doc_ids` enum is the documents
-actually passed in; code checks every cited id and every number against the
-cited documents, retries once with the failures listed, and drops what still
-fails into `dropped_claims`. Only surviving claims are rendered
-(`riprap/core/burr/synthesis.py`).
+the briefing. With an OpenAI-compatible endpoint configured
+(`RIPRAP_LLM_BASE_URL`, `RIPRAP_LLM_MODEL`, optional fallback endpoint),
+the model returns JSON claims under a per-request schema whose `doc_ids`
+enum is the documents actually passed in; code checks every cited id and
+every number against the cited documents, retries once with the failures
+listed, and drops what still fails into `dropped_claims`. Only surviving
+claims are rendered (`riprap/core/burr/synthesis.py`).
 
-### 6.1 Why no native Granite 4.x inline citations
+On the ten gallery addresses, `granite4:micro` kept 122 claims and dropped
+0 (`tests/probe_grounding_results.json`); `llama3.1:8b` kept 191 and
+dropped 0, with 37 retries, all caused by a verifier bug since fixed
+(`tests/probe_grounding_results_llama3.1-8b.json`).
 
-We investigated using Granite's native `<|start_of_cite|>{document_id:
-X}fact<|end_of_cite|>` mode. **It's deprecated in 4.x.** Verified:
+### 6.1 Why not Granite's native inline citations
 
-- The official Ollama chat template for `granite4.x` has no citation
-  branch (the 3.3 / 4.0-preview templates did).
-- `granite_common` ships only `granite3/granite32` and
-  `granite3/granite33` subdirs. No 4.x equivalent.
-- `granite-io` has only `granite_3_2/` and `granite_3_3/` processor
-  dirs.
-
-The base 4.1 weights still contain the cite tokens (training residue),
-so the model emits them as real tokens when nudged. But only as an
-end-of-response list, not inline in prose. IBM's published 4.x
-grounding path is a separate **Citation Generation LoRA** (built on
-`granite-4.0-micro`, not 4.1) requiring HF transformers + LoRA
-loading, which our Ollama path does not support. So our hand-rolled
-`[doc_id]` regex + reroll **is** the right pattern for our setup
-(Granite 4.1 via Ollama, inline placement).
+We looked at Granite's native `<|start_of_cite|>` mode. It is deprecated
+in 4.x: the Ollama chat template for `granite4.x` has no citation branch,
+and `granite_common` and `granite-io` ship processors only for 3.2 and
+3.3. IBM's 4.x grounding path is a separate Citation Generation LoRA that
+needs HF transformers and LoRA loading, which a generic OpenAI-compatible
+endpoint does not offer. Schema-constrained JSON claims with a code-side
+check work with any model and any endpoint.
 
 ---
 
-## 7. The four foundation models
+## 7. Models
 
-| Model | Params | Runtime | Role |
-|-------|--------|---------|------|
-| **Granite 4.1 :3b alias**   | 8 B†   | Ollama or vLLM (AMD MI300X)          | Planner (intent + specialist routing) + `live_now` reconciler. †Production alias `RIPRAP_OLLAMA_3B_TAG=granite4.1:8b` — planner runs 8b in production. Same knob, opposite direction, on a memory-constrained box: `docs/DEPLOY.md`'s "Memory-constrained boxes" section remaps it to a real 1B tag instead. |
-| **Granite 4.1 :8b**         | 8 B    | Ollama or vLLM (AMD MI300X)          | Synthesis reconciler for `single_address`, `neighborhood`, `development_check`, `compare`. Validated by a hand-written grounding check (4 requirements + reroll). |
-| **Granite Embedding 278M**  | 278 M  | sentence-transformers (CPU)          | RAG retrieval over 5 policy PDFs at query time.    |
-| **Prithvi-EO 2.0**          | 300 M  | TerraTorch (offline pre-compute)     | NYC-Pluvial fine-tune; satellite-detected surface water after Ida (experimental), baked into `data/`. Fine-tune: `msradam/Prithvi-EO-2.0-NYC-Pluvial`. |
-| **Granite TimeSeries TTM r2** | 1.5 M | granite-tsfm (CPU)                  | Experimental forecasts: Battery surge residual (fine-tune `msradam/Granite-TTM-r2-Battery-Surge`), per-address 311 volume, FloodNet recurrence. |
-| **GLiNER medium-v2.1**      | ~200 M | gliner (CPU)                         | Named-entity extraction over RAG hits (locations, agencies, dates, infrastructure). `urchade/gliner_medium-v2.1`. |
+| Model | Params | Runtime | Role | Maturity |
+|---|---|---|---|---|
+| Any OpenAI-compatible LLM (e.g. `granite4:micro`, Granite 4.1 8B) | varies | External endpoint | Planner and claim writer, LLM mode only | Optional |
+| Granite TimeSeries TTM r2 | 1.5 M | granite-tsfm, in process on CPU | `ttm_battery_surge` (fine-tune `msradam/Granite-TTM-r2-Battery-Surge`), `ttm_311_forecast`, `floodnet_forecast` | Experimental |
+| Granite Embedding 278M | 278 M | sentence-transformers, in process on CPU | Embeds the query for `policy_corpus`; the corpus index is built offline by `scripts/build_rag_index.py` into `data/rag_index.npz` | Experimental |
+| Flair NER (`flair/ner-english-ontonotes-fast`) | about 150 MB | flair, in process on CPU | Coarse entity tags on retrieved passages | Experimental |
+| Prithvi-EO 2.0 (`msradam/Prithvi-EO-2.0-NYC-Pluvial` by default) | 300 M | TerraTorch, batch only (`eo` extra) | `scripts/run_eo_batch.py`; the app reads only the baked Ida polygons | Experimental |
 
-**Granite 4.1 ≠ Granite Time Series.** Granite 4.1 is IBM's chat-LLM
-family. Granite TimeSeries TTM is a separate IBM Research product
-line (Ekambaram et al. 2024, NeurIPS). Both happen to share the
-"Granite" brand but have different architectures, training data, and
-authors.
+The in-process models need the `ml` extra; without it their pebbles skip
+themselves. TerraMind and the NYC TerraMind adapters are not used by the
+app. See the README's Models section for what each evaluation supports.
 
-**LiteLLM Router.** All LLM calls go through `app/llm.py`, a ~250-line
-shim over a LiteLLM Router. Two backends are wired: `RIPRAP_LLM_PRIMARY=ollama`
-(local + HF Space default) and `RIPRAP_LLM_PRIMARY=vllm` (AMD MI300X demo
-path, auto-fails over to Ollama). The shim normalizes role names and
-citation-token format so the rest of the codebase is backend-agnostic.
+**Granite 4.1 is not Granite TimeSeries.** Granite 4.1 is IBM's chat LLM
+family. Granite TimeSeries TTM is a separate IBM Research model line
+(Ekambaram et al. 2024). They share a brand, not an architecture.
 
-### 7.1 Why Prithvi runs offline
+### 7.1 Earth observation runs as a batch job
 
-Prithvi-EO 2.0 with TerraTorch needs a GPU and minutes per HLS tile.
-We segmented Hurricane Ida 2021 once (pre: 2021-08-25, post:
-2021-09-02, a pass about 14 hours after the heaviest rain), filtered the output (>30 000 sqft to
-drop noise, <1 km² to drop tidal artifacts) into **166 polygons**
-baked into `data/prithvi_ida_2021.geojson`. The runtime FSM does a
-point-in-polygon test, not fresh inference. The layer is labelled
-satellite-detected surface water after Ida (experimental): it mostly
-shows marsh, shoreline and park water and says nothing about street
-or basement flooding. Live Prithvi (`prithvi_live`) is off by default
-and experimental.
+Prithvi-EO 2.0 needs a GPU or minutes of CPU per tile, so it never runs
+per request. The Ida layer was segmented once (pre 2021-08-25, post
+2021-09-02, a pass about 14 hours after the heaviest rain) and filtered
+into 166 polygons in `data/prithvi_ida_2021.geojson`; `prithvi_water`
+reads them.
 
-### 7.2 Why TTM r2 runs live
+`scripts/run_eo_batch.py` is the repeatable version: it picks the least
+cloudy Sentinel-2 L2A scene within 48 hours after a rain date, masks water
+already present in a pre-event scene, and writes a Cloud Optimized GeoTIFF
+plus a per-NTA GeoParquet summary. The app does not read those outputs
+yet. Street and basement flooding usually drains within hours and cannot
+be seen at 10 to 20 m, so an empty result is not evidence of no flooding.
 
-TTM r2 is **1.5 M params**. Vastly smaller than Prithvi or Granite
-4.1. Inference is millisecond-scale even on CPU. Three pebbles use it,
-all experimental: the Battery surge fine-tune (`ttm_battery_surge`),
-the per-address 311 forecast and the FloodNet recurrence forecast. The
-surge forecast covers only the residual, not the astronomical tide
-(NOAA already publishes that exactly).
+### 7.2 TTM runs in process
+
+TTM r2 is small enough to run in milliseconds on CPU, so its three
+pebbles run inside the request. All three are experimental. The surge
+forecast covers only the residual, not the astronomical tide (NOAA
+already publishes that), and its sentence tells readers to use NOAA ETSS
+or the Stevens Flood Advisory System for storm decisions.
 
 ---
 
-## 8. Live signals separation
+## 8. Live signals
 
-Live pebbles (`noaa_tides`, `nws_alerts`, `nws_obs`, `ttm_battery_surge` and
-the rest of the Touchstone/Lodestone Stones — §3.1) are fundamentally
-different from the static Cornerstone layers and are handled
-separately:
+Live pebbles (`noaa_tides`, `nws_alerts`, `nws_obs`, `usgs_gauges`,
+`floodnet`, `nyc311` and the TTM forecasts) are handled apart from the
+static Cornerstone layers:
 
-- **Surface**: in evidence cards and a "Right now" section in the UI.
-- **Score**: explicitly excluded from the tier rubric (§5) — a live
-  reading changing between two runs of the register builder
-  shouldn't retier an asset that hasn't actually changed hazard class.
-- **Cadence**: NOAA tides update every 6 min; NWS alerts on push;
-  NWS obs ~hourly; TTM is computed per query (cheap).
-- **Failure mode**: graceful. If NOAA times out, no `noaa_tides`
-  doc is emitted; the reconciler simply doesn't see it.
-
-This mirrors how First Street separates Flood Factor (static, 30-yr)
-from event-day Flood Lab products, and how Fathom separates Global
-Flood Map from real-time intelligence.
+- They appear as evidence cards and a "Right now" section in the UI.
+- They are excluded from the register tier rubric (§5): a live reading
+  changing between two register builds should not retier an asset whose
+  hazard class has not changed.
+- Their HTTP responses are cached for 10 minutes by default; NOAA tides
+  update every 6 minutes, NWS observations roughly hourly.
+- They fail quietly. If NOAA times out, no `noaa_tides` evidence is
+  emitted and the briefing does not mention it.
 
 ---
 
-## 9. Repository layout
+## 9. Data access and provenance
 
-The repo root is `riprap/` (this document used to say `riprap-nyc/` —
-that was the frozen HF Space's name, not the repo's). See README's
-"Repository structure" section for the current top-level tree; it's
-kept there rather than duplicated here, since a second copy is a
-second place to go stale.
+Every adapter fetches through `riprap/core/http.py`: one httpx client with
+hishel caching (SQLite, 10 minutes by default for live sources,
+`RIPRAP_HTTP_CACHE_TTL_S`) and stamina retries. Nominatim goes through the
+same client with a 1 request per second gate. USGS gauges use the OGC API
+via `dataretrieval`. FloodNet TLS verification is on.
 
-Two things worth calling out that aren't obvious from a file listing
-alone:
-
-- **`riprap/core/`** is the manifest-driven framework Section 3
-  describes — `pebbles/` (registry, schema, adapters, shapers),
-  `burr/` (the current Application: intake, per-Stone `MapActions`,
-  capstone), `compliance/` (the 13 disclosure checks: caveat-phrase substring tests).
-  `riprap/mcp/` exposes Riprap as an MCP tool (`get_briefing`,
-  `list_sources`, `get_citation`) on top of the same framework.
-- **`app/`** predates that framework and still does real work: the
-  original linear FSM (`fsm.py`, whose `step_reconcile` action
-  `riprap/core/burr/capstone.py` reuses directly), the planner, the
-  four `intents/` orchestration modules (`neighborhood.py`,
-  `development_check.py`, `live_now.py`, and `single_address.py`'s
-  `RIPRAP_USE_BURR_APP=0` fallback path), and every specialist data
-  probe under `context/`, `flood_layers/`, `live/`, `assets/` — the
-  actual Python functions a pebble manifest's `config.module` /
-  `config.function` points at. Adding a pebble to a manifest usually
-  doesn't mean writing new Python; it means pointing a manifest at one
-  of these existing functions, or a new one shaped the same way.
-- **`deployments/<city>/`** is a directory of pebble manifests +
-  `stones.yaml` + (for NYC) the geospatial fixtures and policy corpus
-  the manifests reference. `deployments/nyc/` is the reference
-  deployment this whole document is written against.
+Provenance comes only from manifests. Every manifest `provenance` block
+has `date_modified` and `retrieved_at`; live sources use `at_fetch`, and
+live Socrata sources resolve `date_modified` from the Socrata metadata
+API. Each manifest also carries `maturity: production` or
+`maturity: experimental`.
 
 ---
 
+## 10. Repository layout
 
-## 10. Honest scope (what Riprap does NOT do)
+The top-level tree is in the README's "Repository structure" section.
+Three things a file listing does not make obvious:
+
+- **`riprap/core/`** is the framework: `pebbles/` (registry, schema,
+  adapters, shapers), `burr/` (the app, intake, evidence, synthesis),
+  `compliance/` (the 13 disclosure checks) and `http.py`.
+- **`app/`** holds the Python functions that `python_call` manifests
+  point at (`context/`, `flood_layers/`, `live/`, `assets/`, `areas/`),
+  plus the planner, geocoder, energy ledger, PDF export and register
+  builder. Adding a pebble usually means pointing a manifest at an
+  existing function or a new one shaped the same way.
+- **`deployments/<city>/`** is a directory of manifests, `stones.yaml`
+  and, for NYC, the geospatial fixtures and policy corpus the manifests
+  reference.
+
+---
+
+## 11. Honest scope (what Riprap does NOT do)
 
 - **Not a damage probability.** Riprap is exposure triage. We have no
   labeled flood-damage outcomes (claim records, insurance loss data),
@@ -588,110 +457,64 @@ alone:
   type, electrical hardening, drainage condition), social capacity,
   and financial absorption are out of scope.
 - **No sub-surface flooding.** Optical satellites can't see basement
-  apartments or subway entrances. The dominant Hurricane Ida damage
-  mode in NYC. Prithvi correctly emits no polygons for Hollis or
-  Carroll Gardens. That silence is a feature, not a bug.
+  apartments or subway entrances, the dominant Hurricane Ida damage
+  mode in NYC. Prithvi emits no polygons for Hollis or Carroll
+  Gardens, and that absence says nothing about whether they flooded.
 - **Vintage-bounded.** FEMA NFHL is years stale; DEP Stormwater Maps
-  are 2021; corpus PDFs are point-in-time. All vintages are cited in
-  the methodology panel.
+  are 2021; corpus PDFs are point-in-time. Each cited document carries
+  its manifest's `date_modified`.
 - **Public infrastructure only.** ConEd substations, water-supply
   components, and other adversarially-sensitive registers are not
   published. NYC OD has the same redaction posture; we follow it.
 
 ---
 
-## 11. Why local foundation models
+## 12. Why local models
 
 1. **Data governance.** A newsroom with FOIL'd documents, an agency
    capital planner with internal data, or a researcher under IRB
-   constraints can't paste organization context into a vendor LLM.
-   All four models run inside this container; the org boundary
-   holds. Public NYC and USGS services receive resolved address
-   coordinates only; no LLM vendor does.
-2. **Inference energy.** [BENCHMARKS.md](BENCHMARKS.md) measured
-   1.3 to 1.6 Wh per briefing on the Granite 4.1 8B path on one L4
-   GPU. That figure is specific to that hardware and runtime. Hosted
-   inference endpoints report no energy, so there is no per-query
-   figure for them.
+   constraints can't paste organization context into a vendor LLM. The
+   no-LLM mode contacts no model at all, and LLM mode works against a
+   local endpoint such as Ollama. Public NYC and federal services receive
+   resolved coordinates only.
+2. **Inference energy.** A local endpoint can report a measured or
+   estimated figure per call; a hosted endpoint reports none, so Riprap
+   shows no per-query figure for it ([`EMISSIONS.md`](EMISSIONS.md)). The
+   1.3 to 1.6 Wh per briefing in [`BENCHMARKS.md`](BENCHMARKS.md) came
+   from the retired GPU stack and is historical.
 3. **Reproducibility.** Apache-2.0 stack end to end; no commercial
    licenses required to reproduce the system.
 
 ---
 
-## 12. Deployment
+## 13. Deployment
 
-### 12.1 Production topology (current)
+See [`DEPLOY.md`](DEPLOY.md): local with no LLM, local with an LLM,
+Docker (`Dockerfile.app` installs core plus `ml`; `docker-compose.yml` has
+the app and an optional `local-llm` Ollama profile), and an optional GPU
+LLM endpoint on Modal.
 
-Three live deployment shapes — full instructions in
-[`docs/DEPLOY.md`](DEPLOY.md):
-
-- **Modal** (scale-to-zero cloud GPU) — companion repo
-  `msradam/riprap-inference` deploys two apps: the ML specialists
-  (same codebase as the Mac Mini path below, GPU=L4) and Granite 4.1
-  via vLLM (GPU=A100, its own image since vLLM pins its own torch).
-  `modal/riprap_frontend.py` in this repo serves the app. $0 idle,
-  roughly a minute or two cold start on a warm Volume.
-- **Mac Mini / Apple Silicon** (fully local, no cloud) — Ollama-served
-  Granite 4.1 + `riprap-inference`'s specialists run natively on one
-  box, with real measured power via `powermetrics` (`app/power_mac.py`).
-- **docker-compose** (self-host, any Linux box) — `Dockerfile.app` +
-  an optional bundled-Ollama or GPU-specialist profile.
-
-**HF Space** `lablab-ai-amd-developer-hackathon/riprap-nyc` (cpu-basic)
-is a legacy, frozen demo: it serves the FastAPI + SvelteKit UI and
-every deterministic data probe, but inferencing is disabled — no GPU
-backend is wired to it.
-
-<details>
-<summary>Historical: the original AMD-judging deploy (MI300X droplet, decommissioned 2026-05-06)</summary>
-
-The hackathon submission ran the HF Space against a separate AMD
-MI300X droplet (vLLM + `services/riprap-models/` containers over
-HTTP, `RIPRAP_LLM_BASE_URL` / `RIPRAP_ML_BASE_URL` pointed at it).
-Verified warm query times on that setup (2026-05-06 probe):
-
-- `single_address`: 5–12 s (4/4 Mellea, 0–2 rerolls)
-- `neighborhood`: 3–5 s
-- `compare` (two sequential legs): ~15 s
-
-Cold-start after container restart: ~30 s for vLLM kernel JIT compile
-+ prefix cache warmup. Reproducible against your own AMD GPU box via
-`docker-compose --profile with-models` — see `docs/DEPLOY.md`.
-
-</details>
-
-### 12.2 Local development
+Local development:
 
 ```bash
-uv venv --python 3.12
-source .venv/bin/activate
-uv pip install -r requirements.txt
-ollama pull granite4.1:3b
-ollama pull granite4.1:8b
-uvicorn web.main:app --reload --port 8000
+git lfs install && git lfs pull
+uv sync --extra ml
+uv run uvicorn web.main:app --reload --port 7860
 
-# Frontend (only when changing components)
-cd web/sveltekit && npm install && npm run build
+# Frontend, only when changing components
+cd web/sveltekit && pnpm install && pnpm run build
 ```
 
-The fixtures in `data/` and the policy PDFs in `corpus/` are LFS-
-tracked. Granite Embedding and TTM download on first query.
-
-### 12.3 Diagnostic probes
-
-```bash
-# Drive the live stream N times, dump per-attempt Mellea outcomes:
-.venv/bin/python scripts/probe_mellea.py --query "Hollis" --runs 5
-# Output: outputs/probe_*.csv with per-attempt pass/fail, paragraph,
-#         elapsed time, reroll count.
-```
+The HF Space `lablab-ai-amd-developer-hackathon/riprap-nyc` is the frozen
+May 2026 hackathon build with inference disabled.
 
 ---
 
-## 13. License
+## 14. License
 
-Apache-2.0. All foundation models (Granite 4.1, Granite Embedding,
-Prithvi-EO 2.0, Granite TimeSeries TTM r2) and all input datasets
-(NYC OpenData, USGS, NOAA, NWS, FloodNet NYC, NASA/MS Planetary
-Computer for HLS Sentinel-2) are public. Visual idiom adapted from
+Apache-2.0. The foundation models Riprap uses (Granite Embedding,
+Granite TimeSeries TTM r2, Prithvi-EO 2.0) are Apache-2.0, and the input
+datasets (NYC Open Data, USGS, NOAA, NWS, FloodNet NYC, Sentinel-2 via
+Microsoft Planetary Computer) are public; each manifest records its
+source's licence. Visual idiom adapted from
 [NYC Planning Labs](https://planninglabs.nyc/).
