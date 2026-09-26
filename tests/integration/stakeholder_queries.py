@@ -60,21 +60,21 @@ QUERIES: list[dict[str, Any]] = [
     # --- ANCHORED (verbatim from RESEARCH.md) ---
     {
         "id": "01", "slug": "resident-pioneer",
-        "query": "I'm thinking about renting an apartment at 80 Pioneer Street, Brooklyn. Should I worry?",
-        "persona": "Resident / homebuyer (Pioneer)",
+        "query": "What flood evidence is on record for 80 Pioneer Street, Brooklyn?",
+        "persona": "Resilience analyst (Pioneer)",
         "question_type": "habitability_decision",
         "expected_intent": "single_address",
         "anchor": "verbatim",
-        "notes": "FloodHelpNY swap-in. Red Hook canonical Sandy turf.",
+        "notes": "Red Hook canonical Sandy turf.",
     },
     {
         "id": "02", "slug": "attorney-gold",
-        "query": "Does 100 Gold Street, Manhattan need to disclose flood risk under RPL §462(2)?",
-        "persona": "Real-estate attorney (Gold)",
+        "query": "What public flood records exist for 100 Gold Street, Manhattan?",
+        "persona": "Resilience analyst, negative control (Gold)",
         "question_type": "legal_disclosure",
         "expected_intent": "single_address",
         "anchor": "verbatim",
-        "notes": "Negative-control on Sandy. Disclosure framing is the test.",
+        "notes": "Negative-control on Sandy.",
     },
     {
         "id": "03", "slug": "planner-hollis",
@@ -88,7 +88,7 @@ QUERIES: list[dict[str, Any]] = [
     {
         "id": "04", "slug": "underwriter-houston",
         "query": "442 East Houston Street, Manhattan",
-        "persona": "Insurance underwriter (Houston)",
+        "persona": "Resilience analyst, audit-chain review (Houston)",
         "question_type": "underwriting",
         "expected_intent": "single_address",
         "anchor": "verbatim",
@@ -116,12 +116,12 @@ QUERIES: list[dict[str, Any]] = [
     # --- ADAPTED VARIATIONS (same shape, different addresses) ---
     {
         "id": "07", "slug": "resident-grand-disclosure",
-        "query": "I just got a lease for 504 Grand Street, Lower East Side. The landlord says no flood history. Is that true?",
-        "persona": "Resident, disclosure-suspicion (Grand)",
+        "query": "504 Grand Street, Lower East Side is reported to have no flood history. What do the public records show?",
+        "persona": "Analyst checking a no-flood-history claim (Grand)",
         "question_type": "habitability_decision",
         "expected_intent": "single_address",
         "anchor": "adapted",
-        "notes": "Tests whether the briefing engages the user's premise (landlord said X) head-on.",
+        "notes": "Tests whether the briefing engages the query's premise (no flood history) head-on.",
     },
     {
         "id": "08", "slug": "planner-hammels",

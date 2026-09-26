@@ -15,8 +15,8 @@ extraction, RAG sentence-transformer embeddings — those are data
 producers, not the prose layer, so they populate state and the
 dashboards regardless of LLM mode.
 
-Every claim is citation-grounded by construction. All 13 compliance
-predicates pass.
+Every claim is citation-grounded by construction. All 13 disclosure
+checks (caveat-phrase substring tests) pass.
 
 ```bash
 git clone https://github.com/msradam/riprap.git
@@ -147,13 +147,13 @@ Triton elsewhere and wants one model-serving API across the fleet.**
 | Already running Triton in production, want one API | C (Triton + Granite 3B) |
 | Cluster of Pis sharing one LLM | B/C with one host running Ollama or Triton |
 
-## Per-shape compliance scores
+## Per-shape disclosure-check scores
 
-All three shapes ship with the briefing-standards predicates wired in
+All three shapes ship with the disclosure checks wired in
 (see `docs/briefing-standards.md`). Measurements from a single run on
 `189 Atlantic Ave, Brooklyn` (laptop, M3 Pro, Ollama):
 
-| Shape | Compliance | Briefing wall-time | Prose quality |
+| Shape | Disclosure checks | Briefing wall-time | Prose quality |
 |---|---|---|---|
 | A — no-LLM mode                | **13 / 13** | ~60 s | Standard address info, slot-filled, every claim cited |
 | B — Granite 8B-q3 / Ollama     | 12 / 13      | ~80 s | Analytic; misses one citation density check |
@@ -163,15 +163,15 @@ All three shapes ship with the briefing-standards predicates wired in
 **The 3B-LLM-tier deserves a real caveat.** It produces analytic content
 (matched 8B's depth on the parts it covered) but consistently failed
 the scope-declaration, automation-disclosure, and informational-
-disclaimer predicates that the 8B model and the templated tier both
+disclaimer checks that the 8B model and the templated tier both
 pass. Smaller models follow long multi-part prompt instructions less
 reliably.
 
 **Pi recommendation:** start with **Shape A (templated)** — it's the
-only configuration that guarantees the compliance bar on a Pi today.
-Move to Shape B only when prompt-tuning + the Mellea-compliance
-integration (see TODO in `riprap/core/compliance/__init__.py`) closes
-the 3B → 13/13 gap reliably.
+only configuration that reliably includes every required disclosure
+phrase on a Pi today. Move to Shape B only when prompt-tuning (see TODO
+in `riprap/core/compliance/__init__.py`) closes the 3B disclosure-check
+gap reliably.
 
 ## Open hardware testing
 

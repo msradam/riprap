@@ -1,8 +1,8 @@
 # Multi-hazard experiment — does Riprap generalize?
 
 **Yes.** The Riprap architecture is hazard-agnostic. The same code that
-serves the flood briefing — pebble registry, Burr graph, Stone fan-out,
-templated reconciler, compliance predicates, frontend — produces a
+serves the flood briefing (pebble registry, Burr graph, Stone fan-out,
+templated reconciler, disclosure checks, frontend) produces a
 heat-exposure briefing or an air-quality briefing when you point it at
 a different `deployments/<hazard>/` directory.
 
@@ -15,9 +15,9 @@ Drop two new deployment directories alongside `deployments/nyc/`
 
 ```
 deployments/
-  nyc/        — flood (25 pebbles, full production stack)
-  heat/       — heat (6 pebbles, scaffold)
-  air/        — air quality (5 pebbles, scaffold)
+  nyc/        flood (23 pebbles, full production stack)
+  heat/       heat (6 pebbles, scaffold)
+  air/        air quality (5 pebbles, scaffold)
 ```
 
 Each carries:
@@ -59,10 +59,10 @@ condition, or compliance with specific zoning rules. Where a probe
 was offline at run time, the relevant section omits that signal.
 ```
 
-**Compliance: 13/13.** Section headings (`Heat Hazard Reader`,
+**Disclosure checks: 13/13.** Section headings (`Heat Hazard Reader`,
 `Live Observer`, `Projector`) come from the heat deployment's
 `stones.yaml` taglines. Citations point at heat-specific doc_ids.
-Same templated reconciler, same compliance predicates as the flood
+Same templated reconciler, same disclosure checks as the flood
 deployment.
 
 ## What had to change
@@ -84,10 +84,11 @@ Almost nothing. The architectural moves that made this work:
    Section headings derive from `stones.yaml` taglines. One commit;
    no Pi/flood regression.
 
-4. **Compliance predicates are hazard-neutral.** The 13 predicates
-   (FEMA, IPCC, TCFD, ASTM, EPA/CDC, AP, SPJ) enforce briefing-quality
-   rules that apply to any data-backed civic-tech writeup, not flood-
-   specific tropes. Same 13/13 bar across deployments.
+4. **Disclosure checks are hazard-neutral.** The 13 checks are
+   substring tests for caveat phrases (drawn from FEMA, IPCC, TCFD,
+   ASTM, EPA/CDC, AP, SPJ guidance) that apply to any data-backed
+   civic-tech writeup. They confirm the phrases are present, not that
+   the briefing is good.
 
 5. **`RIPRAP_BRIEFING_SCOPE` env var** lets each deployment override
    the scope-declaration wording in the opening sentence
@@ -124,7 +125,7 @@ Each deployment needs:
 | TerraMind LULC | Cross-hazard — land-use mix matters for all of heat / flood / air |
 | TTM time-series | Cross-hazard — same forecasting backbone, different feature signals |
 
-The 25 flood pebbles aren't ported wholesale. But the **adapters** are.
+The 23 flood pebbles aren't ported wholesale. But the **adapters** are.
 A new hazard means writing 5-10 hazard-specific manifests and pointing
 the existing adapters at new data sources. Hours of work per hazard,
 not weeks.

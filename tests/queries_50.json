@@ -1,9 +1,9 @@
 [
   {
     "id": "q001",
-    "query": "I'm thinking about renting an apartment at 80 Pioneer Street, Brooklyn. Should I worry?",
+    "query": "What flood evidence is on record for 80 Pioneer Street, Brooklyn?",
     "intent": "address",
-    "persona": "Renter evaluating a move to Red Hook \u2014 canonical Sandy turf",
+    "persona": "Resilience analyst reviewing a Red Hook address (canonical Sandy turf)",
     "borough": "Brooklyn",
     "expected_specialists": [
       "sandy_inundation",
@@ -45,7 +45,7 @@
     "id": "q003",
     "query": "Compare 80 Pioneer Street Brooklyn to 100 Gold Street Manhattan",
     "intent": "compare",
-    "persona": "Real-estate attorney comparing a Sandy-zone lease to a lower-risk mid-Manhattan address",
+    "persona": "Resilience analyst comparing a Sandy-zone address to a lower-risk mid-Manhattan address",
     "borough": "multi",
     "expected_specialists": [
       "sandy_inundation",
@@ -78,7 +78,7 @@
     "id": "q005",
     "query": "100 Gold Street, Manhattan",
     "intent": "address",
-    "persona": "Insurance underwriter checking flood exposure for a Financial District property",
+    "persona": "Resilience analyst checking flood exposure for a Financial District property",
     "borough": "Manhattan",
     "expected_specialists": [
       "nyc311",
@@ -110,7 +110,7 @@
     "id": "q007",
     "query": "2940 Brighton 3rd St, Brooklyn",
     "intent": "address",
-    "persona": "Resident in a flood-prone coastal area checking risk before lease renewal",
+    "persona": "Coastal resilience analyst reviewing a flood-prone Brighton Beach address",
     "borough": "Brooklyn",
     "expected_specialists": [
       "sandy_inundation",
@@ -219,9 +219,9 @@
   },
   {
     "id": "q014",
-    "query": "Should I worry about flooding at 520 West 145th Street in Manhattan?",
+    "query": "What flood evidence exists for 520 West 145th Street in Manhattan?",
     "intent": "address",
-    "persona": "Resident in Washington Heights evaluating apartment flood risk",
+    "persona": "Resilience analyst reviewing a Washington Heights address",
     "borough": "Manhattan",
     "expected_specialists": [
       "nyc311",
@@ -284,7 +284,7 @@
     "id": "q018",
     "query": "Compare 750 Baychester Avenue Bronx to 150 Riverside Drive Manhattan",
     "intent": "compare",
-    "persona": "Insurance underwriter comparing two river-adjacent properties",
+    "persona": "Resilience analyst comparing two river-adjacent properties",
     "borough": "multi",
     "expected_specialists": [
       "nyc311",
@@ -406,7 +406,7 @@
     "id": "q026",
     "query": "What's the storm surge risk for 157-11 Rockaway Beach Blvd, Queens?",
     "intent": "address",
-    "persona": "Resident in Far Rockaway evaluating whether to elevate their home",
+    "persona": "Coastal resilience analyst reviewing Far Rockaway surge exposure",
     "borough": "Queens",
     "expected_specialists": [
       "sandy_inundation",
@@ -438,7 +438,7 @@
     "id": "q028",
     "query": "Is 160 Conover Street in Red Hook still considered a flood zone?",
     "intent": "address",
-    "persona": "Renter who lived through Sandy 2012 now returning to Red Hook",
+    "persona": "Community board member checking Red Hook flood-zone status after Sandy 2012",
     "borough": "Brooklyn",
     "expected_specialists": [
       "sandy_inundation",
@@ -455,7 +455,7 @@
     "id": "q029",
     "query": "Compare 160 Conover Street Red Hook to 300 Flatbush Avenue Brooklyn",
     "intent": "compare",
-    "persona": "Property insurance underwriter comparing two Brooklyn addresses for flood premium",
+    "persona": "Resilience analyst comparing two Brooklyn addresses",
     "borough": "Brooklyn",
     "expected_specialists": [
       "sandy_inundation",
@@ -574,7 +574,7 @@
     "id": "q037",
     "query": "How at risk is 111 8th Avenue Manhattan from a 100-year storm?",
     "intent": "address",
-    "persona": "Insurance underwriter evaluating a large Chelsea tech campus for flood coverage",
+    "persona": "Facilities resilience analyst evaluating a large Chelsea tech campus",
     "borough": "Manhattan",
     "expected_specialists": [
       "nyc311",
@@ -591,7 +591,7 @@
     "id": "q038",
     "query": "Compare 157-11 Rockaway Beach Blvd Queens to 100 Gold Street Manhattan",
     "intent": "compare",
-    "persona": "FEMA insurance analyst comparing a high-risk coastal address to a low-risk Manhattan baseline",
+    "persona": "FEMA mitigation analyst comparing a high-risk coastal address to a low-risk Manhattan baseline",
     "borough": "multi",
     "expected_specialists": [
       "sandy_inundation",

@@ -422,7 +422,7 @@ def _render_html(payload: dict[str, Any], doc_hash: str) -> str:
     <dl>
       <dt>Document hash</dt><dd class="hash">{_e(doc_hash)}</dd>
       <dt>Reconciler</dt><dd>IBM Granite 4.1 (Apache 2.0)</dd>
-      <dt>Grounding</dt><dd>Mellea rejection sampling, {_e(str(mellea_attempts))} attempt(s)</dd>
+      <dt>Grounding</dt><dd>claims checked against cited sources, {_e(str(mellea_attempts))} attempt(s)</dd>
       <dt>Mellea passed</dt><dd>{mellea_passed}</dd>
       <dt>Mellea failed</dt><dd>{mellea_failed}</dd>
     </dl>

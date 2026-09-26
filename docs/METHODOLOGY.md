@@ -15,9 +15,8 @@ uncalibrated, with documented LLM-as-judge pathologies (Zheng et al.
 2023; Wang et al. 2024). The honest middle: **a deterministic rubric a
 planner can argue with**.
 
-The tier is computed in `app/score.py` and mirrored in `web/static/app.js`.
-Both implementations are kept in sync; the Python side is authoritative
-for register builds and CLI exports.
+The tier is computed in `app/score.py` and only by the offline register
+builders. The live briefing does not compute or show it.
 
 ## 2. Methodology pedigree
 
@@ -94,7 +93,7 @@ Mix of binary observed-extent flags and banded count signals:
 | Sandy 2012 inundation      | 1.00 + **floor** | NYC OD `5xsi-dfpx`; NYC HMP 2024 |
 | USGS Ida HWM within 100 m  | 1.00 + **floor** | USGS STN Event 312 |
 | USGS Ida HWM within 800 m  | 0.50   | USGS STN Event 312 |
-| Prithvi-EO 2.0 Ida polygon | 0.75   | Jakubik et al., 2025 (NASA/IBM Prithvi-EO 2.0); semi-empirical |
+| Prithvi-EO 2.0 surface water after Ida (experimental) | 0.75   | Jakubik et al., 2025 (NASA/IBM Prithvi-EO 2.0); semi-empirical |
 | 311 complaint count band   | 0.75   | NYC OD `erm2-nwe9`; NYC 311-as-flood-proxy literature |
 | FloodNet trigger (3 yr)    | 0.75   | FloodNet NYC; NPCC4 Ch.3 references |
 

@@ -24,9 +24,11 @@ For a deployment with live inference, see the Quickstart below (Modal,
 a Mac Mini, or docker-compose).
 
 > **Now an open-source civic-tech framework.** NYC is the reference
-> deployment. Six live deployments share the same code (NYC, Chicago,
-> Seattle, San Francisco, Boston, Albany) — adding your city is a directory of
-> YAML, not a fork.
+> deployment. Five more deployments (Chicago, Seattle, San Francisco,
+> Boston, Albany) share the same code and are experimental: they have only
+> the federal pebbles plus a 311 feed and/or a water-level gauge, and the
+> Chicago, SF and Boston 311 feeds are not flood-filtered (a reported "200"
+> is the query limit). Adding your city is a directory of YAML, not a fork.
 >
 > - **[`docs/multi-city.md`](docs/multi-city.md)** — six cities, three
 >   311-platform paths (Socrata, CKAN, SeeClickFix), one codebase.
@@ -37,7 +39,7 @@ a Mac Mini, or docker-compose).
 > - **[`docs/multi-hazard.md`](docs/multi-hazard.md)** — the same Five
 >   Stones produce a heat-exposure or air-quality briefing from a
 >   `deployments/heat/` or `deployments/air/` directory. Flood/NYC is
->   the production-grade deployment (22 pebbles); heat and air are
+>   the production-grade deployment (23 pebbles); heat and air are
 >   working scaffolds (3-4 pebbles) proving the architecture
 >   generalizes past flood.
 
@@ -80,8 +82,8 @@ substitute for a licensed professional.
   collapses that into one URL with a citation trail you can hand to
   a client.
 - A Phase I ESA preparer adding a **Business Environmental Risk
-  addendum** under ASTM E1527-21. The compliance-audit predicates
-  are well-aimed at that scope.
+  addendum** under ASTM E1527-21. The disclosure checks look for the
+  caveat phrases that scope expects.
 - An investigative journalist or civic researcher who needs
   *defensible*, primary-source-linked numbers about flood-zone
   exposure, asset proximity, or 311 patterns.
@@ -216,9 +218,11 @@ RIPRAP_LLM_API_KEY=<token> \
 
 ### 4. Run with your city's data
 
-Riprap ships with six working deployments (`deployments/{nyc,chicago,
-seattle,sf,boston,albany}/`). Each is a directory of YAML pebble manifests plus
-a `stones.yaml`. Switch deployments with one env var:
+Riprap ships with six deployments (`deployments/{nyc,chicago,
+seattle,sf,boston,albany}/`). NYC is the reference; the other five are
+experimental (see [`docs/multi-city.md`](docs/multi-city.md)). Each is a
+directory of YAML pebble manifests plus a `stones.yaml`. Switch deployments
+with one env var:
 
 ```bash
 # Brief 233 S Wacker Dr, Chicago — no code changes, real upstream data
@@ -257,11 +261,11 @@ roles, the **Five Stones**:
 
 | Stone | Role | What fires |
 |---|---|---|
-| **Cornerstone** | The Hazard Reader. What the ground remembers. | Sandy 2012 inundation extent, NYC DEP stormwater scenarios, 2021 Ida USGS high-water marks, baked Prithvi-EO Ida-attributable polygons, USGS 3DEP DEM + HAND/TWI |
+| **Cornerstone** | The Hazard Reader. What the ground remembers. | Sandy 2012 inundation extent, NYC DEP stormwater scenarios, 2021 Ida USGS high-water marks, Prithvi-EO satellite-detected surface water after Ida (experimental), USGS 3DEP DEM + HAND/TWI |
 | **Keystone** | The Asset Register. What's exposed. | MTA subway entrances, NYCHA developments, NYC DOE schools, NYS DOH hospitals, **TerraMind-NYC Buildings LoRA** |
-| **Touchstone** | The Live Observer. Current state of the city. | FloodNet ultrasonic depth sensors, NYC 311 flood complaints, NWS hourly METAR, NOAA tide-gauge water levels, **Prithvi-EO 2.0 NYC-Pluvial v2**, **TerraMind-NYC LULC LoRA** |
-| **Lodestone** | The Projector. What's coming. | NWS public flood alerts, Granite TTM r2 surge nowcast (zero-shot, 6-min cadence, 9.6 h horizon), per-address 311 weekly forecast, FloodNet sensor recurrence forecast, **Granite-TTM-r2-Battery-Surge fine-tune** (96 h hourly horizon) |
-| **Capstone** | The Synthesiser. Citation-grounded briefing. | Granite 4.1 + Mellea rejection sampling |
+| **Touchstone** | The Live Observer. Current state of the city. | FloodNet ultrasonic depth sensors, NYC 311 flood complaints, NWS hourly METAR, NOAA tide-gauge water levels, **Prithvi-EO 2.0 NYC-Pluvial v2** (live pass off by default, experimental), **TerraMind-NYC LULC LoRA** |
+| **Lodestone** | The Projector. What's coming. | NWS public flood alerts, per-address 311 weekly forecast (experimental), FloodNet sensor recurrence forecast (experimental), **Granite-TTM-r2-Battery-Surge fine-tune** (96 h hourly horizon, experimental) |
+| **Capstone** | The Synthesiser. Citation-grounded briefing. | Granite 4.1 + a hand-written grounding check |
 
 Each Stone fans its pebbles out in parallel as a Burr `MapActions` group;
 the Capstone then reconciles their documents into one cited briefing.
@@ -286,7 +290,7 @@ generalise; only the probes plugged into each Stone change.
 
 The architectural commitments transfer unchanged: a Burr FSM that fans
 pebble manifests out per Stone, Granite-native `role="document"`
-reconciliation, Mellea four-check grounding, SSE streaming to a SvelteKit
+reconciliation, a four-check grounding pass, SSE streaming to a SvelteKit
 map UI, every claim cited to its source. To port Riprap to a new city you
 write a deployment directory of manifests against local data and, for the
 satellite and time-series layers, retrain the EO and TTM fine-tunes on
@@ -306,9 +310,12 @@ full-FT baseline), TiM 0.6023, Buildings 0.5511. Trained in around 18
 minutes on a single MI300X.
 
 **[`msradam/Prithvi-EO-2.0-NYC-Pluvial`](https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial).**
-NYC pluvial-flood fine-tune of Prithvi-EO 2.0. Test flood IoU 0.5979 vs
-0.10 on the Sen1Floods11 base, a 6× lift. Lovász-Softmax loss with
-copy-paste augmentation.
+NYC pluvial-flood fine-tune of Prithvi-EO 2.0. Test IoU is 0.598, but
+the labels are the base model's own Ida polygons (self-distillation) and
+the random split shares parent scenes, so this measures agreement with
+pseudo-labels, not flood detection. The Sen1Floods11 base was never
+scored on this test set. Lovász-Softmax loss with copy-paste
+augmentation.
 
 **[`msradam/Granite-TTM-r2-Battery-Surge`](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge).**
 NYC Battery storm-surge nowcast fine-tune of Granite TimeSeries TTM r2.
@@ -338,7 +345,7 @@ Address ──► Granite 4.1 3B planner ──► Plan{intent, targets, special
                          build_documents() — Granite-native
                          role="document <doc_id>" messages
                                               ▼
-                  Capstone: Granite 4.1 8B + Mellea rejection sampling
+                  Capstone: Granite 4.1 8B + hand-written grounding check
                   ──► 4-check grounding loop, surgical feedback rerolls
                                               ▼
                        Four-section briefing with [doc_id] citations
@@ -378,7 +385,8 @@ Source-of-truth pointers:
   `MapActions` fan-out, and the reconciler tiers (`llm` / `no_llm`).
 - `deployments/<city>/`: the manifests, `stones.yaml`, data, and corpus
   that define one deployment.
-- `riprap/core/compliance/`: briefing-quality predicates audited per run.
+- `riprap/core/compliance/`: disclosure checks (substring tests for
+  required caveat phrases), run per briefing. They do not measure quality.
 - `web/main.py`: FastAPI + SSE. The stream emits
   `plan / step / token / mellea_attempt / final` events plus the
   `stone_start / stone_done` envelope around each Stone group.
@@ -395,7 +403,7 @@ For the long-form architecture document, see
 civil-engineering framing in [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
 Lit review in [`docs/RESEARCH.md`](docs/RESEARCH.md). Deploy topology in
 [`docs/DEPLOY.md`](docs/DEPLOY.md). Live measurements (wall-clock, real
-NVML energy, Mellea grounding pass-rate) in
+NVML energy, grounding-check pass rate) in
 [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md).
 
 ---
@@ -466,7 +474,7 @@ The full data licence map and vintage table is enumerated in
 riprap/core/               The manifest-driven framework (current runtime)
 ├── pebbles/               Pebble schema, registry, adapters, shapers
 ├── burr/                  Burr app: intake, per-Stone MapActions, reconcilers
-└── compliance/            Briefing-quality predicates (FEMA / IPCC / TCFD / …)
+└── compliance/            Disclosure checks (caveat-phrase substring tests)
 
 riprap/mcp/                MCP server — Riprap as an agent-callable tool
 
@@ -538,7 +546,7 @@ access terms; the licence map is in
   NYC fine-tunes feasible.
 - **AMD × lablab.ai Developer Hackathon**, the venue.
 - **IBM Research**, Granite 4.1, Granite Embedding 278M, Granite TTM r2,
-  Mellea, and the rest of the open-source Granite ecosystem.
+  and the rest of the open-source Granite ecosystem.
 - **NASA / IBM Prithvi-EO 2.0** and **IBM / ESA TerraMind 1.0**, the
   geospatial foundation models behind the NYC fine-tunes.
 - **NYU CUSP / FloodNet**, the public sensor network whose data Riprap

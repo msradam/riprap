@@ -122,7 +122,7 @@ export RIPRAP_OLLAMA_8B_TAG=granite4.1:3b            # summarizer (the other 3 i
 ~3.5 GB resident instead of ~8 GB. The 1B model shares the same Granite
 chat template (`document <id>`-role grounding included), so citation
 grounding still works — verified live: `live_now` and `neighborhood`
-both still hit 12-13/13 on the briefing-standards compliance predicates
+both still hit 12-13/13 on the disclosure checks (caveat-phrase tests)
 after the swap, with `neighborhood`'s one non-13/13 case being a
 pre-existing, unrelated gap (`projection_has_horizon`, TCFD 3.2) it has
 regardless of model tier.

@@ -67,7 +67,8 @@ Drove `http://127.0.0.1:8765/` with `189 Atlantic Avenue, Brooklyn`:
   within 800m`, etc.)
 
 The full LLM happy-path needs `RIPRAP_LLM_BASE_URL` pointing at a live
-Granite 4.1 endpoint. Tested separately when the RunPod pod is warm.
+Granite 4.1 endpoint. Tested separately against the `msradam/riprap-inference`
+Modal apps.
 
 ## BYOD demonstration (NYC + Boston deployments)
 
@@ -103,12 +104,11 @@ checked-in `requirements.txt`.
 - `ibm-granite/granite-4.1-8b` — reconciler LLM
 - `ibm-granite/granite-embedding-278m-multilingual` — RAG embedding
 - `ibm-granite/granite-timeseries-ttm-r2` (+ Riprap fine-tunes) — TTM forecasts
-- `ibm-nasa-geospatial/Prithvi-EO-2.0-NYC-Pluvial` — satellite flood segmentation
+- `msradam/Prithvi-EO-2.0-NYC-Pluvial`: satellite water segmentation (experimental)
 - `msradam/TerraMind-NYC-Adapters` — LULC / buildings via LoRA on TerraMind v1
 - `flair/ner-english-ontonotes-large` — typed entity extraction (replaced GLiNER)
 
 **Verified-at:**
-- `mellea==0.3.x` (rejection-sampling reconciler)
 - `burr==0.32.x` (Application + MapActions)
 - `transformers>=4.45`, `sentence-transformers>=5.0`
 - `torch==2.5.1` (CPU on local; CUDA on remote)
@@ -117,7 +117,8 @@ checked-in `requirements.txt`.
 **Per-deployment data sources (citation manifests in
 `deployments/<city>/manifests/*.yaml`):**
 - NYC: 23 pebbles; Sandy 2012 extent, NYC DEP stormwater scenarios,
-  Ida HWMs, Prithvi-EO Ida polygons, USGS 3DEP DEM + HAND/TWI,
+  Ida HWMs, Prithvi-EO satellite-detected surface water after Ida
+  (experimental), USGS 3DEP DEM + HAND/TWI,
   FloodNet, NYC 311 (`erm2-nwe9`), NWS METAR + alerts, NOAA Battery
   (8518750), NPCC4 (`doi:10.1111/nyas.15116`), MTA / NYCHA / DOE / DOH
   registers, policy corpus (Comptroller, DEP, ConEd, MTA, NYCHA PDFs)
@@ -128,13 +129,9 @@ checked-in `requirements.txt`.
 
 ## Known follow-ups
 
-- **LLM happy-path UI smoke against a cloud GPU backend** — verified
-  locally on M3 via Ollama + Triton-on-Docker. Cloud-GPU bring-up
-  runbook lives in the companion `msradam/riprap-triton` repo.
-- **Triton bring-up runbook** — the local-Docker rig at
-  `load/triton-local/` doubles as the canonical bring-up reference for
-  fixing `riprap-triton/scripts/runpod_triton_setup.sh` (missing
-  `python3.12-venv`, numpy<2 pin).
+- **LLM happy-path UI smoke against a cloud GPU backend**: verified
+  locally on M3 via Ollama. Cloud inference runs on the two Modal apps
+  in the companion `msradam/riprap-inference` repo.
 - **`app/context/*.py` → proper pebble adapters** — currently called via
   `python_call`. Moving each to a typed adapter would close the
   "manifests, not code" loop fully.

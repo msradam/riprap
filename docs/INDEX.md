@@ -9,7 +9,7 @@ you're new; jump directly if you know what you need.
 | [METHODOLOGY.md](METHODOLOGY.md) | How each Stone scores exposure — joins, thresholds, citation provenance, edge-case handling. |
 | [DEPLOY.md](DEPLOY.md) | Three ways to run Riprap end to end — Modal (scale-to-zero cloud), Mac Mini (fully local, real measured power), docker-compose (self-host). |
 | [deployment-pi.md](deployment-pi.md) | Raspberry Pi deployment, three shapes from a no-LLM Pi Zero 2 W up to full LLM + specialist ML on a Pi 5. |
-| [briefing-standards.md](briefing-standards.md) | The trust contract enforced on every briefing — FEMA, IPCC, TCFD, ASTM, AP Stylebook, SPJ rules, and which of the 13 compliance predicates enforces each. |
+| [briefing-standards.md](briefing-standards.md) | The trust contract for every briefing (FEMA, IPCC, TCFD, ASTM, AP Stylebook, SPJ rules) and which of the 13 disclosure checks (caveat-phrase substring tests) covers each. |
 | [EMISSIONS.md](EMISSIONS.md) | Per-query energy ledger — NVML (remote GPU) and `powermetrics` (Apple Silicon) sampling, response contract, `app/emissions.py` tracker, measured-vs-estimated semantics. |
 | [BENCHMARKS.md](BENCHMARKS.md) | Live measurements on the canonical four addresses: Stone-fire counts, latency, energy, token totals. |
 | [RESEARCH.md](RESEARCH.md) | Landscape research — what existing flood-risk tools do and how Riprap diverges. |

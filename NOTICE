@@ -16,10 +16,9 @@ foundation models, and public-record datasets. Each retains its own
 upstream licence; the list below records attribution where required.
 
 Foundation models (Apache 2.0 unless noted):
-  - IBM Granite 4.1 (granite-4.1-h-tiny, granite-4.1-h-small)
+  - IBM Granite 4.1 (granite4.1:8b, granite4.1:3b)
   - IBM Granite Embedding 278M (granite-embedding-278m-multilingual)
   - IBM Granite TimeSeries TTM r2 (granite-timeseries-ttm-r2)
-  - IBM Mellea (rejection-sampling validator)
   - NASA / IBM Prithvi-EO 2.0
   - IBM / ESA TerraMind 1.0
 

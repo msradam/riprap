@@ -1,7 +1,7 @@
 # Riprap MVP demo — flood, heat, air
 
 The "open-source climate briefing tool" MVP, in three deployments. Same
-code, same Burr graph, same compliance predicates, same web UI. Three
+code, same Burr graph, same disclosure checks, same web UI. Three
 hazards, three `deployments/` directories, no per-hazard code branches
 in the pebble/Stone/reconciler pipeline — see "Known gaps in the MVP"
 below for the one known exception (`/api/agent/stream`'s SSE path).
@@ -9,17 +9,19 @@ below for the one known exception (`/api/agent/stream`'s SSE path).
 ## What the demo shows
 
 1. **Flood briefing** at an NYC address — the production deployment.
-   25 pebbles across Cornerstone / Touchstone / Lodestone / Keystone,
-   13/13 compliance, LLM tier or templated tier.
+   23 pebbles across Cornerstone / Touchstone / Lodestone / Keystone,
+   13/13 disclosure checks, LLM tier or templated tier.
 2. **Heat briefing** at the same address — `deployments/heat/`.
    NYC HVI + NYC Forestry + NWS observations + NWS alerts. Same UI,
    different stones-yaml taglines drive different section headings.
 3. **Air-quality briefing** at the same address — `deployments/air/`.
    NWS air alerts + (optional) EPA AirNow. Same UI again.
 
-Each is a real run end-to-end. Each passes 13/13 briefing-standards
-compliance predicates sourced from FEMA, IPCC AR6, TCFD, ASTM E1527-21,
-EPA/CDC CERC, AP Stylebook, SPJ Code of Ethics.
+Each is a real run end-to-end. Each passes the 13 disclosure checks:
+substring tests for caveat phrases drawn from FEMA, IPCC AR6, TCFD,
+ASTM E1527-21, EPA/CDC CERC, AP Stylebook and SPJ Code of Ethics
+guidance. A pass means the phrases are present, not that the briefing
+is good.
 
 ## Setup
 
@@ -53,8 +55,8 @@ curl "http://127.0.0.1:8765/api/agent?q=189%20Atlantic%20Ave%2C%20Brooklyn" \
   | jq '{intent, compliance, paragraph_chars: (.paragraph | length)}'
 ```
 
-What lands: 22 pebbles fire, four-section briefing (Status / Empirical
-evidence / Modeled scenarios / Live signals), 13/13 compliance.
+What lands: 23 pebbles fire, four-section briefing (Status / Empirical
+evidence / Modeled scenarios / Live signals), 13/13 disclosure checks.
 
 ### 2. No-LLM mode — same briefing, no Granite calls
 
@@ -71,9 +73,9 @@ curl "http://127.0.0.1:8765/api/agent?q=189%20Atlantic%20Ave%2C%20Brooklyn" \
   | jq '{compliance, paragraph}'
 ```
 
-Same compliance score (13/13). Briefing is templated prose
-synthesized from each pebble's `narration.template` — no Granite,
-no Mellea. Specialist ML (Prithvi, TerraMind, TTM, GLiNER, RAG
+Same disclosure-check score (13/13). Briefing is templated prose
+synthesized from each pebble's `narration.template`, with no Granite
+and no grounding-check rerolls. Specialist ML (Prithvi, TerraMind, TTM, GLiNER, RAG
 embeddings) still runs.
 
 ### 3. Heat deployment — same code, different YAML directory
@@ -119,7 +121,7 @@ condition, or compliance with specific zoning rules. Where a probe
 was offline at run time, the relevant section omits that signal.
 ```
 
-13/13 compliance. Section headings (`Heat Hazard Reader`, `Live Observer`,
+13/13 disclosure checks. Section headings (`Heat Hazard Reader`, `Live Observer`,
 `Projector`) auto-derived from `deployments/heat/stones.yaml`.
 
 ### 4. Air-quality deployment — third hazard, same architecture
@@ -160,12 +162,13 @@ the `epa_airnow` pebble adds live AQI / PM2.5 / ozone for the address's
 - **Architecture is hazard-agnostic.** Three deployments produce three
   briefings from one codebase. Adding a new hazard = a new
   `deployments/<hazard>/` directory.
-- **Briefings are professional-grade.** All three pass 13 predicates
-  sourced from FEMA / IPCC / TCFD / ASTM / EPA / AP / SPJ. The
-  compliance audit ships in every response.
-- **Two reconciler tiers ship side by side.** `llm` runs Granite +
-  Mellea grounded rejection sampling; `no_llm` runs templated synthesis
-  with no Granite calls — same compliance bar, same UI, sub-second
+- **Disclosures are present.** All three pass the 13 disclosure checks
+  (caveat-phrase substring tests drawn from FEMA / IPCC / TCFD / ASTM /
+  EPA / AP / SPJ). The check result ships in every response. It is not
+  a quality score.
+- **Two reconciler tiers ship side by side.** `llm` runs Granite plus a
+  hand-written grounding check with rerolls; `no_llm` runs templated
+  synthesis with no Granite calls, the same disclosure checks, same UI, sub-second
   prose, civic-tech audit clean.
 - **Specialist ML stays on a clean lineage.** Granite (IBM, ISO/IEC
   42001:2023), Prithvi-EO 2.0 (NASA/IBM, public-domain HLS), TerraMind

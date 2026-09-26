@@ -8,7 +8,7 @@ risk communication, and data journalism — they are not invented.
 
 The predicates derived from these rules live in
 `riprap/core/compliance/predicates.py`. Each rule is tagged:
-**YES** = text-pattern detectable as a Mellea requirement;
+**YES** = text-pattern detectable as a substring check;
 **PARTIAL** = detectable with a structured-data check or NLI;
 **NO** = requires editorial review.
 

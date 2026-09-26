@@ -29,8 +29,9 @@ deployments/<city>/
     └── <city>_311.yaml      # your city's 311 / equivalent service-request feed
 ```
 
-Four pebbles is enough to clear the 13-predicate compliance audit on
-every city we've shipped. Add more for your local hazard signals
+Four pebbles is enough to pass the 13 disclosure checks (caveat-phrase
+substring tests) on every city we've shipped. Passing them says the
+briefing carries its caveats, not that it is useful. Add more for your local hazard signals
 (historical inundation, regulatory floodplain, asset registers, etc.) —
 those depend on what your jurisdiction publishes.
 
@@ -77,7 +78,7 @@ If the spatial field is missing, you have two options:
 1. **Different dataset** — many cities publish multiple 311 exports;
    one might have a `Point`-typed geo column even if another doesn't.
 2. **Skip the 311 pebble** — Seattle ships with federal pebbles only,
-   and still passes 13/13 compliance.
+   and still passes the 13/13 disclosure checks.
 
 ## Step 2 — Scaffold the deployment directory
 
@@ -235,7 +236,8 @@ Then:
 ## Step 7 — Open a PR
 
 The PR template asks for the address you tested against and the
-compliance result. If you got 13/13 from the probe, you're done.
+disclosure-check result. If you got 13/13 from the probe, the caveats are in
+place; check the briefing content by hand too.
 
 If you can also include:
 

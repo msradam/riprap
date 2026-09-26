@@ -35,7 +35,7 @@
 > can't paste them into a vendor LLM. We run Granite 4.1 (3 B-param
 > chat model), Granite Embedding 278M (RAG), Prithvi-EO 2.0 (300 M-param
 > Earth-observation model, offline pre-compute) and Granite TimeSeries
-> TTM r2 (1.5 M-param zero-shot forecaster) inside one container. No
+> TTM r2 (1.5 M-param forecaster) inside one container. No
 > vendor LLM is contacted at runtime.
 
 ---
@@ -137,12 +137,13 @@ Riprap returns:
    modeled flood extents that overlap it.
 4. **Live "right now" signals**. Active NWS flood alerts, current
    tide residual at the nearest gauge, recent precipitation at the
-   nearest ASOS, and a Granite TTM short-horizon forecast of the surge
+   nearest ASOS, and an experimental Granite TTM forecast of the surge
    residual.
-5. **A compliance audit**. The 13 briefing-standards predicates
-   (FEMA / IPCC AR6 / TCFD / ASTM E1527-21 / AP Stylebook / SPJ — see
-   `riprap/core/compliance/`) evaluated against the actual rendered
-   paragraph, attached to every response.
+5. **Disclosure checks**. 13 substring tests for required caveat
+   phrases drawn from FEMA, IPCC AR6, TCFD, ASTM E1527-21, AP Stylebook
+   and SPJ guidance (see `riprap/core/compliance/`), run against the
+   rendered paragraph and attached to every response. A pass means the
+   phrases are present; it is not a measure of briefing quality.
 
 **The deterministic tier 1–4 rubric** ([§5](#5-the-scoring-rubric),
 `app/score.py`) still exists and is still exactly what it says —
@@ -179,7 +180,7 @@ generations of that state machine currently coexist in this codebase:
   [`docs/multi-city.md`](multi-city.md), [`docs/multi-hazard.md`](multi-hazard.md)).
 - **`app/fsm.py`** — the original linear FSM this replaced for
   `single_address`. It's not dead: `riprap/core/burr/capstone.py`
-  reuses its `step_reconcile` action as-is (the Mellea-grounded Granite
+  reuses its `step_reconcile` action as-is (the grounding-checked Granite
   call), and it's still the full execution path for the other four
   intents — `neighborhood`, `development_check`, `live_now`, and
   `compare` each have their own orchestration module under
@@ -228,14 +229,14 @@ this codebase is migrating toward.
                      └───────────────┬────────────────┘  (Granite Embedding 278M + GLiNER)
                                     ▼
                      ┌──────────────────────────────┐
-                     │ step_reconcile (from app.fsm)  │  Granite 4.1 + Mellea
-                     │ reads every fired pebble's      │  rejection-sampling loop
+                     │ step_reconcile (from app.fsm)  │  Granite 4.1 + grounding
+                     │ reads every fired pebble's      │  check with rerolls
                      │ "document" and writes the       │  (up to loop_budget attempts)
                      │ 4-section cited paragraph       │
                      └───────────────┬────────────────┘
                                     ▼
                      cited briefing + evidence cards + map
-                     + 13-predicate compliance audit
+                     + 13 disclosure checks
 ```
 
 If geocoding fails or no deployment covers the resolved point, the
@@ -255,9 +256,11 @@ result summary) that streams to the frontend live as `step` SSE events.
 ### 3.1 What every pebble does, plain language
 
 The NYC deployment's registry (`deployments/nyc/manifests/`) currently
-carries 25 pebbles. Every other deployment has its own, smaller set —
-see [`docs/multi-city.md`](multi-city.md) for the per-city pebble
-counts and [`docs/multi-hazard.md`](multi-hazard.md) for heat/air.
+carries 23 pebbles: 19 NYC manifests plus 4 federal ones (`fema_nfhl`,
+`nws_alerts`, `nws_obs`, `usgs_gauges`). `prithvi_live` is off by
+default. Every other deployment has its own, smaller, experimental set
+(see [`docs/multi-city.md`](multi-city.md) for the per-city pebble
+counts and [`docs/multi-hazard.md`](multi-hazard.md) for heat/air).
 `geocode` and `reconcile` below aren't pebbles — they're the two fixed
 framework steps that bracket the Stone fan-out (§3.0).
 
@@ -268,24 +271,23 @@ framework steps that bracket the Stone fan-out (§3.0).
 | **fema_nfhl** | FEMA's National Flood Hazard Layer effective flood zone at this point. | modeled |
 | **dep_moderate_current**, **dep_moderate_2050**, **dep_extreme_2080** | Three modeled NYC DEP stormwater scenarios — current SLR baseline, 2050 moderate, 2080 extreme. Each reports a depth class at this point. | modeled |
 | **ida_hwm** | USGS Hurricane Ida 2021 high-water marks near this address — actual measured water heights surveyed after the storm. | empirical |
-| **prithvi_water** | Prithvi-EO 2.0-derived Hurricane Ida pre/post flood inundation polygons (offline pre-compute; instant at request time). | modeled |
+| **prithvi_water** | Satellite-detected surface water after Ida (experimental). Prithvi-EO 2.0 on a pass about 14 hours after the heaviest rain; it mostly shows marsh, shoreline and park water and says nothing about street or basement flooding (offline pre-compute; instant at request time). | modeled |
 | **microtopo** | LiDAR/DEM-derived micro-topography at the point: elevation percentile, HAND, TWI, basin relief. | proxy |
 | **policy_corpus** | Granite Embedding 278M retrieves the most-relevant passages from 5 NYC agency PDFs, and GLiNER extracts typed entities (agency, dollar amount, date, location) from them — one pebble owning retrieval + NER, replacing the older separate rag/gliner_extract steps. | empirical |
 | **mta_entrances**, **nycha_developments**, **doe_schools**, **doh_hospitals** | MTA subway/rail entrances, NYCHA developments, NYC DOE schools, and NYS DOH hospitals within range of this address, and their flood exposure. | empirical |
 | **nws_alerts** *(live)* | Currently active NWS alerts (flood/coastal/wind) intersecting this address. | modeled |
-| **ttm_forecast** *(live)* | Granite TTM r2 zero-shot forecast of the Battery storm-surge residual, 9.6-hour horizon at 6-minute cadence. | modeled |
-| **ttm_battery_surge** *(live)* | Granite-TTM-r2-Battery-Surge — a fine-tuned nowcast of Battery storm-surge over the next 96 hours. | modeled |
-| **ttm_311_forecast** *(live)* | 4-week forecast of NYC 311 flood-complaint volume at this address. | modeled |
-| **floodnet_forecast** *(live)* | 28-day forecast of flood-event recurrence at the nearest FloodNet sensor. | modeled |
+| **ttm_battery_surge** *(live, experimental)* | Granite-TTM-r2-Battery-Surge, a fine-tuned nowcast of Battery storm-surge over the next 96 hours. | modeled |
+| **ttm_311_forecast** *(live, experimental)* | 4-week forecast of NYC 311 flood-complaint volume at this address. | modeled |
+| **floodnet_forecast** *(live, experimental)* | 28-day forecast of flood-event recurrence at the nearest FloodNet sensor. | modeled |
 | **npcc4_slr** | NYC Panel on Climate Change (2024) sea-level rise projections at the Battery. | modeled |
 | **floodnet** *(live)* | FloodNet ultrasonic depth sensors near this address and their historical flood events. | empirical |
 | **nyc311** *(live)* | NYC 311 flood-related complaints filed near this address over the past 5 years. | proxy |
 | **nws_obs** *(live)* | Most recent NWS hourly observation at the nearest METAR station. | empirical |
 | **noaa_tides** *(live)* | Recent NOAA tide-gauge water-level reading — observed level, predicted astronomical tide, and the **residual** (≈ surge) — at the nearest station. | empirical |
 | **usgs_gauges** *(live)* | Live stage at the nearest USGS stream gauge. | empirical |
-| **prithvi_live** *(live)* | Live Sentinel-2 water segmentation around this address (Prithvi-EO 2.0 NYC-Pluvial fine-tune). | modeled |
+| **prithvi_live** *(live, off by default, experimental)* | Live Sentinel-2 water segmentation around this address (Prithvi-EO 2.0 NYC-Pluvial fine-tune). | modeled |
 | **terramind_lulc**, **terramind_buildings** *(live, not yet manifest-driven)* | TerraMind land-cover and building-footprint synthesis over a fresh EO chip. Still an `app/fsm.py` step rather than a pebble manifest — one of the pieces README's "legacy `app/` modules... the framework has not yet absorbed" refers to. | modeled |
-| **reconcile** *(framework, not a pebble)* | Granite 4.1 reads every fired pebble's "document" and writes the 4-section cited briefing paragraph. Mellea rejection-sampling validates the invariants in `app/mellea_validator.py`'s module docstring; up to `loop_budget` attempts. See [§6](#6-document-grounded-reconciliation). | LLM synthesis |
+| **reconcile** *(framework, not a pebble)* | Granite 4.1 reads every fired pebble's "document" and writes the 4-section cited briefing paragraph. A hand-written grounding check validates the invariants in `app/mellea_validator.py`'s module docstring; up to `loop_budget` attempts. See [§6](#6-document-grounded-reconciliation). | LLM synthesis |
 
 ### 3.2 Worked example: 2940 Brighton 3rd St, Brooklyn
 
@@ -302,10 +304,9 @@ address:
 | noaa_tides | Sandy Hook gauge, +0.49 ft residual *(today's reading)* |
 | nws_alerts | 0 active alerts |
 | nws_obs    | KJFK ASOS, no recent precipitation |
-| ttm_forecast | Forecast peak residual +0.6 ft in 4.2 h *(today's run)* |
 | microtopo  | Elevation 2.36 m, HAND 0.7 m, TWI 11.3, percentile 8 (very low) |
 | ida_hwm    | 0 USGS HWMs within 800 m (Ida hit Queens hardest, not Brighton) |
-| prithvi_water | Inside an Ida-attributable polygon? **NO** (Ida was pluvial-inland) |
+| prithvi_water | Inside the satellite-detected surface water after Ida (experimental)? **NO** |
 | policy_corpus | Top hits: NPCC4 Ch.3 (coastal), MTA Resilience (Coney Island D-train), Comptroller |
 | reconcile  | (see below) |
 
@@ -335,8 +336,8 @@ nearby Coney Island D-train infrastructure for coastal-flood exposure
 ```
 
 Note what *didn't* fire: no Ida HWM doc (Ida didn't flood here), no
-Prithvi doc (no Ida-attributable polygon), no NWS alerts (clear day),
-no TTM doc (forecast residual under threshold). The reconciler never
+Prithvi doc (not inside the post-Ida surface-water layer), no NWS
+alerts (clear day). The reconciler never
 saw those headers and didn't invent them.
 
 ---
@@ -472,14 +473,14 @@ omitted entirely.
 - **`granite4.1:8b`** runs the synthesis path for `single_address`,
   `neighborhood`, and `development_check` (long outputs, dense
   citations). Pre-warmed into VRAM in `entrypoint.sh` so the first
-  query doesn't pay the model-load tax. Both fit warm on the T4 with
+  query doesn't pay the model-load tax. Both stay warm with
   `OLLAMA_MAX_LOADED_MODELS=2` and `OLLAMA_KEEP_ALIVE=24h`.
 
-### 6.2 Mellea-validated rejection sampling
+### 6.2 Grounding check with rerolls
 
-`app/mellea_validator.py` wraps the Granite-via-Ollama call in IBM
-Research's [Mellea](https://github.com/generative-computing/mellea)
-framework. Instruct, validate, repair. The synthesis intents call
+`app/mellea_validator.py` is a hand-written grounding check around the
+Granite call: generate, validate, reroll with feedback. It does not
+import the Mellea library despite the file name. The synthesis intents call
 `reconcile_strict_streaming(...)` which:
 
 1. **Streams** each generation attempt's tokens to the user (via the
@@ -533,8 +534,7 @@ so the model emits them as real tokens when nudged. But only as an
 end-of-response list, not inline in prose. IBM's published 4.x
 grounding path is a separate **Citation Generation LoRA** (built on
 `granite-4.0-micro`, not 4.1) requiring HF transformers + LoRA
-loading. Mellea's `OllamaBackend` explicitly raises
-`NotImplementedError` for activated LoRAs. So our hand-rolled
+loading, which our Ollama path does not support. So our hand-rolled
 `[doc_id]` regex + reroll **is** the right pattern for our setup
 (Granite 4.1 via Ollama, inline placement).
 
@@ -545,10 +545,10 @@ loading. Mellea's `OllamaBackend` explicitly raises
 | Model | Params | Runtime | Role |
 |-------|--------|---------|------|
 | **Granite 4.1 :3b alias**   | 8 B†   | Ollama or vLLM (AMD MI300X)          | Planner (intent + specialist routing) + `live_now` reconciler. †Production alias `RIPRAP_OLLAMA_3B_TAG=granite4.1:8b` — planner runs 8b in production. Same knob, opposite direction, on a memory-constrained box: `docs/DEPLOY.md`'s "Memory-constrained boxes" section remaps it to a real 1B tag instead. |
-| **Granite 4.1 :8b**         | 8 B    | Ollama or vLLM (AMD MI300X)          | Synthesis reconciler for `single_address`, `neighborhood`, `development_check`, `compare`. Validated by Mellea (4 grounding requirements + reroll). |
+| **Granite 4.1 :8b**         | 8 B    | Ollama or vLLM (AMD MI300X)          | Synthesis reconciler for `single_address`, `neighborhood`, `development_check`, `compare`. Validated by a hand-written grounding check (4 requirements + reroll). |
 | **Granite Embedding 278M**  | 278 M  | sentence-transformers (CPU)          | RAG retrieval over 5 policy PDFs at query time.    |
-| **Prithvi-EO 2.0**          | 300 M  | TerraTorch (offline pre-compute)     | NYC-Pluvial fine-tune; segmented Hurricane Ida 2021 pre/post Sentinel-2 polygons baked into `data/`. Fine-tune: `msradam/Prithvi-EO-2.0-NYC-Pluvial`. |
-| **Granite TimeSeries TTM r2** | 1.5 M | granite-tsfm (CPU)                  | Zero-shot forecast of the Battery surge residual, ~9.6 h horizon. Fine-tune: `msradam/Granite-TTM-r2-Battery-Surge`. |
+| **Prithvi-EO 2.0**          | 300 M  | TerraTorch (offline pre-compute)     | NYC-Pluvial fine-tune; satellite-detected surface water after Ida (experimental), baked into `data/`. Fine-tune: `msradam/Prithvi-EO-2.0-NYC-Pluvial`. |
+| **Granite TimeSeries TTM r2** | 1.5 M | granite-tsfm (CPU)                  | Experimental forecasts: Battery surge residual (fine-tune `msradam/Granite-TTM-r2-Battery-Surge`), per-address 311 volume, FloodNet recurrence. |
 | **GLiNER medium-v2.1**      | ~200 M | gliner (CPU)                         | Named-entity extraction over RAG hits (locations, agencies, dates, infrastructure). `urchade/gliner_medium-v2.1`. |
 
 **Granite 4.1 ≠ Granite Time Series.** Granite 4.1 is IBM's chat-LLM
@@ -567,26 +567,29 @@ citation-token format so the rest of the codebase is backend-agnostic.
 
 Prithvi-EO 2.0 with TerraTorch needs a GPU and minutes per HLS tile.
 We segmented Hurricane Ida 2021 once (pre: 2021-08-25, post:
-2021-09-02 ~12 h after peak), filtered the output (>30 000 sqft to
+2021-09-02, a pass about 14 hours after the heaviest rain), filtered the output (>30 000 sqft to
 drop noise, <1 km² to drop tidal artifacts) into **166 polygons**
 baked into `data/prithvi_ida_2021.geojson`. The runtime FSM does a
-point-in-polygon test, not fresh inference. This is honest about
-where foundation models earn their keep: **once, to produce a
-defensible event-level signal. Not per request**.
+point-in-polygon test, not fresh inference. The layer is labelled
+satellite-detected surface water after Ida (experimental): it mostly
+shows marsh, shoreline and park water and says nothing about street
+or basement flooding. Live Prithvi (`prithvi_live`) is off by default
+and experimental.
 
 ### 7.2 Why TTM r2 runs live
 
 TTM r2 is **1.5 M params**. Vastly smaller than Prithvi or Granite
-4.1. Inference is millisecond-scale even on CPU. It forecasts only
-the residual (surge component) at the Battery, which complements the
-NOAA snapshot specialist; it does **not** try to forecast the
-astronomical tide (NOAA already publishes that exactly).
+4.1. Inference is millisecond-scale even on CPU. Three pebbles use it,
+all experimental: the Battery surge fine-tune (`ttm_battery_surge`),
+the per-address 311 forecast and the FloodNet recurrence forecast. The
+surge forecast covers only the residual, not the astronomical tide
+(NOAA already publishes that exactly).
 
 ---
 
 ## 8. Live signals separation
 
-Live pebbles (`noaa_tides`, `nws_alerts`, `nws_obs`, `ttm_forecast` and
+Live pebbles (`noaa_tides`, `nws_alerts`, `nws_obs`, `ttm_battery_surge` and
 the rest of the Touchstone/Lodestone Stones — §3.1) are fundamentally
 different from the static Cornerstone layers and are handled
 separately:
@@ -620,7 +623,7 @@ alone:
 - **`riprap/core/`** is the manifest-driven framework Section 3
   describes — `pebbles/` (registry, schema, adapters, shapers),
   `burr/` (the current Application: intake, per-Stone `MapActions`,
-  capstone), `compliance/` (the 13 briefing-standards predicates).
+  capstone), `compliance/` (the 13 disclosure checks: caveat-phrase substring tests).
   `riprap/mcp/` exposes Riprap as an MCP tool (`get_briefing`,
   `list_sources`, `get_citation`) on top of the same framework.
 - **`app/`** predates that framework and still does real work: the
@@ -674,12 +677,11 @@ alone:
    All four models run inside this container; the org boundary
    holds. Public NYC and USGS services receive resolved address
    coordinates only; no LLM vendor does.
-2. **Inference energy.** Granite 4.1 :3b draws roughly **0.03 Wh per
-   query** vs an estimated **~0.3 Wh per query** for GPT-4o-class
-   frontier models ([Epoch AI, 2025](https://epoch.ai/gradient-updates/how-much-energy-does-chatgpt-use)).
-   Order of magnitude lower per-query inference energy. The
-   methodology panel reports a per-query Wh estimate so users can
-   verify.
+2. **Inference energy.** [BENCHMARKS.md](BENCHMARKS.md) measured
+   1.3 to 1.6 Wh per briefing on the Granite 4.1 8B path on one L4
+   GPU. That figure is specific to that hardware and runtime. Hosted
+   inference endpoints report no energy, so there is no per-query
+   figure for them.
 3. **Reproducibility.** Apache-2.0 stack end to end; no commercial
    licenses required to reproduce the system.
 

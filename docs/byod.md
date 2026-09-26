@@ -161,8 +161,8 @@ EOF
 #   shadows base deployment manifest
 ```
 
-Use sparingly — overrides break the compliance audit if your replacement
-returns a shape the predicates don't recognise.
+Use sparingly. Overrides break the disclosure checks if your replacement
+returns a shape the checks don't recognise.
 
 ## See also
 

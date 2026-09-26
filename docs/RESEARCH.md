@@ -11,8 +11,8 @@ re-using any specific figure.
 
 A citation-grounded LLM that writes audit-quality flood-exposure
 briefings for NYC addresses by fusing live, historical, modeled, and
-projected data sources. Mellea rejection sampling refuses to publish
-a numeric claim it can't cite. The output isn't a score. It's a
+projected data sources. A hand-written grounding check rerolls any
+draft with a numeric claim it can't cite. The output isn't a score. It's a
 four-section prose briefing with `[doc_id]` citations on every
 numeric assertion, where each `doc_id` resolves to one specific
 dataset (Sandy 2012 zone, NYC DEP scenario, USGS HWM, Sentinel-2
@@ -93,8 +93,8 @@ which dataset. None expose the audit trail.
 
 - **Flood-LLM** (Brisbane, MDPI Sustainability 2026). Multi-source
   LLM for property-level flood risk, validated on Brisbane against
-  official labels. Academic, not deployed; no Mellea-style citation
-  discipline; no live signals.
+  official labels. Academic, not deployed; no claim-level citation
+  check; no live signals.
 - **GIS-Integrated Flood LLM** (Tandfonline 2024). LLM constrained
   by a flood knowledge graph plus GIS interaction. Research artefact.
 - **FloodLense** (arXiv 2024). UNet/RDN/ViT plus LLM for satellite
@@ -127,7 +127,7 @@ Ranked by visibility in a 3-minute demo:
    (LLM) plus a sibling ROCm container (probes). All Apache-2.0.
    This is the AMD hackathon track's preferred narrative: open
    models, open infra, open data, real GPU acceleration.
-5. **Mellea grounding receipts.** The four checks
+5. **Grounding receipts.** The four hand-written grounding checks
    (`numerics_grounded`, `no_placeholder_tokens`, `citations_dense`,
    `citations_resolve`) are the audit. The meta card surfaces "4/4
    grounding checks passed, 1 reroll". That's audit credibility no
@@ -141,13 +141,13 @@ Ranked by visibility in a 3-minute demo:
 
 ## Stakeholder demos to craft
 
-Six concrete personas, each with a query that exercises a different
+Four concrete personas, each with a query that exercises a different
 part of the system. These are the demo arcs to rehearse.
 
-### 1. Resident / homebuyer (the FloodHelpNY swap-in)
+### 1. Resilience analyst: single address
 
-> *"I'm thinking about renting an apartment at 80 Pioneer Street,
->  Brooklyn. Should I worry?"*
+> *"What flood evidence is on record for 80 Pioneer Street,
+>  Brooklyn?"*
 
 **Demo arc.** Type the address. Watch the planner classify
 `single_address`, then 19 step events fire across the four data
@@ -157,29 +157,11 @@ on a specific date, Ida 2021 HWM 130 m away, microtopo HAND 3.81 m
 plus TWI 14.79 (very high saturation propensity). Footer shows 7+
 named primary sources.
 
-**Demo hook.** "Compare what we just generated to First Street's
-number-and-bar-chart for the same address. Which would you trust to
-make a $4,000/month decision?"
+**Demo hook.** Open the provenance trace: every Stone row, doc_id,
+source URL, vintage and tier glyph. Compare that to a single vendor
+score for the same address.
 
-### 2. Real-estate attorney / disclosure compliance
-
-> *"Does 100 Gold Street, Manhattan need to disclose flood risk
->  under RPL §462(2)?"*
-
-**Demo arc.** Same single_address path. Briefing produces a citable
-narrative covering FEMA designation, prior flood claims (where
-present), terrain, recent complaints. Mellea grounding check is the
-qualifier: "this prose is grounded against four invariants and
-passed 4/4."
-
-**Demo hook.** New York's March-2024 amended Property Condition
-Disclosure Statement requires sellers to disclose flood history and
-FEMA-floodplain status. RPL §231-b requires every residential lease
-to disclose prior flood damage. Riprap is the citable narrative
-tool. Show how the briefing maps line-by-line to the disclosure
-requirements.
-
-### 3. NYC OEM / DEP planner
+### 2. NYC OEM / DEP planner
 
 > *"Hollis, Queens"*
 
@@ -196,22 +178,7 @@ NTA evidence. Pair with the EJNYC Flood Vulnerability Index for the
 EJ-spending overlay (35%-to-disadvantaged-communities legal
 mandate).
 
-### 4. Insurance underwriter / actuary
-
-> *"442 East Houston Street, Manhattan"*
-
-**Demo arc.** Same as resident demo, but emphasize the **provenance
-trace** UI. Every Stone row, every doc_id, every source URL,
-vintage, and tier glyph.
-
-**Demo hook.** When an underwriter writes a risk memo, the audit
-chain matters. First Street's "we used a proprietary catastrophe
-model" doesn't survive a regulator review the way "we used FEMA
-Sandy 2012 polygon, NYC DEP 2021 stormwater scenario, USGS Ida HWM
-Event 312, NOAA gauge 8518750, NWS station KNYC, Granite TTM r2
-fine-tune (test MAE 0.1091 m vs 0.1467 zero-shot, citable)" does.
-
-### 5. Climate journalist / advocacy
+### 3. Climate journalist / advocacy
 
 > *"Coney Island, Brooklyn"*
 
@@ -225,7 +192,7 @@ Every claim in a Riprap briefing is reproducible. Anyone can paste
 the same query and get a near-identical narrative. The journalist
 can publish the briefing as the methods section.
 
-### 6. Architect / developer
+### 4. Architect / developer
 
 > *"What are they building in Gowanus and is it risky"*
 
@@ -286,7 +253,7 @@ Ten bets, ordered roughly from most-buildable to most-speculative.
    "underserved plus underwater". The most underfunded high-exposure
    neighborhoods.
 10. **Court testimony / expert witness.** Citable, reproducible
-    flood narrative as a court exhibit. The Mellea passes-record
+    flood narrative as a court exhibit. The grounding-check record
     plus provenance trace are the kind of artefact a regulator or
     judge can audit. Especially relevant after the December-2025
     Zillow controversy created public discussion of climate-data
@@ -327,7 +294,7 @@ Ten bets, ordered roughly from most-buildable to most-speculative.
 
 Concrete polish items the research surfaces, ranked by demo value:
 
-1. **Sample-query pills on landing.** Six clickable pills below the
+1. **Sample-query pills on landing.** Four clickable pills below the
    search bar, one per persona above. Let the audience demo
    themselves.
 2. **A "What this is" bar at the top of the landing.** Three lines:

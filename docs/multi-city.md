@@ -1,13 +1,21 @@
 # Multi-city — proof Riprap generalises across the US open-data ecosystem
 
-Six working deployments, one codebase, three 311-platform paths (Socrata,
+Six deployments, one codebase, three 311-platform paths (Socrata,
 CKAN, SeeClickFix). Adding a city is a directory of YAML.
+
+> **Experimental outside NYC.** Chicago, Seattle, San Francisco, Boston
+> and Albany are experimental. Each has only the four federal pebbles
+> plus a 311 feed and/or a water-level gauge. The Chicago, SF and Boston
+> 311 feeds are not flood-filtered: they count every service request in
+> the radius, and a reported "200" is the query limit, not a flood
+> signal. NYC (23 pebbles) is the only deployment with local hazard,
+> asset and forecast layers.
 
 ## Cities live
 
 | Deployment | Pebbles | 311 data | Platform | Tide/water |
 |---|---|---|---|---|
-| `nyc/` | 25 | NYC Open Data `erm2-nwe9` | Socrata | NOAA Battery 8518750 |
+| `nyc/` | 23 | NYC Open Data `erm2-nwe9` | Socrata | NOAA Battery 8518750 |
 | `chicago/` | 6 | Chicago Data Portal `v6vf-nfxy` | Socrata | NOAA Calumet Harbor 9087044 |
 | `seattle/` | 5 | *(skipped — see below)* | — | NOAA auto-resolves to Puget Sound |
 | `sf/` | 6 | DataSF `vw6y-z8j6` (`point` field) | Socrata | NOAA SF Bay auto-resolves |
@@ -35,8 +43,12 @@ albany              24 Eagle St, Albany, NY 12207                     13/13 ✓ 
                                                                                                  6/6 PASS
 ```
 
-Every briefing passes the same 13 predicates derived from FEMA, IPCC AR6,
-TCFD, ASTM E1527-21, EPA/CDC CERC, AP Stylebook, SPJ Code of Ethics.
+The COMPLIANCE column is the 13 disclosure checks: substring tests for
+caveat phrases drawn from FEMA, IPCC AR6, TCFD, ASTM E1527-21, EPA/CDC
+CERC, AP Stylebook and SPJ Code of Ethics guidance. A 13/13 means the
+required phrases are present. It says nothing about briefing quality or
+whether the city data is flood-relevant (`chicago_311=200` and
+`sf_311=200` are the query limit on unfiltered 311 feeds).
 
 NYC is slow because it pulls the full ML specialist suite (TerraMind,
 Prithvi, TTM). The other five deployments are sub-6 s because they're
@@ -163,13 +175,13 @@ across NYC and Boston deployments.
 
 > Riprap is an open-source climate briefing tool. Deployments are
 > directories of YAML pointing at place-specific data sources. **NYC**
-> is the reference (25 pebbles). **Chicago, Seattle, San Francisco**
-> prove the framework generalises across the Socrata ecosystem; **Boston**
-> proves it generalises across platforms entirely, via a CKAN adapter
-> that uses bbox SQL push-down + haversine refine; **Albany** proves it
-> works even for cities with no open-data portal at all, via the
-> SeeClickFix public API. Same code, real working data, same 13/13
-> compliance bar. Adding **DC, LA, Austin, Houston, San Diego, or
+> is the reference (23 pebbles). **Chicago, Seattle, San Francisco**
+> show the framework runs on the Socrata ecosystem; **Boston** runs on a
+> CKAN adapter that uses bbox SQL push-down + haversine refine; **Albany**
+> runs with no open-data portal at all, via the SeeClickFix public API.
+> All five are experimental: federal pebbles plus a 311 feed and/or a
+> water-level gauge, with unfiltered 311 counts in Chicago, SF and
+> Boston. Adding **DC, LA, Austin, Houston, San Diego, or
 > Atlanta** (Socrata), **Philadelphia, Toronto, EU portals** (CKAN), or
 > any of the hundreds of SeeClickFix cities is a directory of YAML.
 
