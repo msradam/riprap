@@ -34,8 +34,9 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app
 
 # curl for healthchecks. GDAL, GEOS and PROJ come bundled in the
-# rasterio, pyogrio, shapely and pyproj wheels.
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
+# rasterio, pyogrio, shapely and pyproj wheels; the rasterio wheel still
+# links the system libexpat.
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates libexpat1 \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=ghcr.io/astral-sh/uv:0.12 /uv /usr/local/bin/uv
 
