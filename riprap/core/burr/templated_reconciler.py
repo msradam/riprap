@@ -51,7 +51,10 @@ NON_SCOPE_FOOTER = (
 
 def compose_briefing(state) -> tuple[str, dict[str, dict]]:
     """One section per Stone (stones.yaml order), one cited sentence per
-    pebble with a value. Returns (paragraph, citations by doc_id)."""
+    pebble with a value. Returns (paragraph, citations by doc_id). A
+    not_implemented query gets the planner's explanation instead."""
+    if state.get("intent") == "not_implemented":
+        return (state.get("plan") or {}).get("rationale") or "Riprap cannot answer this query.", {}
     stones, registry = evidence.load(state.get("deployment"))
     items = evidence.collect(state, stones, registry)
     sections = [_scope_header()]

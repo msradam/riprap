@@ -31,5 +31,5 @@ stones:
   - id: capstone
     name: Capstone
     tagline: The Synthesiser
-    description: Writes the cited briefing — Granite 4.1 + Mellea grounding check.
+    description: Writes the cited briefing from the evidence, with or without an LLM.
     order: 5

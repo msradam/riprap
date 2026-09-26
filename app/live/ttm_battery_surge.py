@@ -221,7 +221,7 @@ def _summarize(history_df, forecast_arr) -> dict[str, Any]:
                               if history_recent is not None else None),
         "history_peak_abs_m": (round(history_peak_abs, 3)
                                 if history_peak_abs is not None else None),
-        "forecast_peak_m": round(peak, 3),
+        "forecast_peak_m": round(peak, 2),
         "forecast_peak_hours_ahead": peak_h_ahead,
         "forecast_peak_time_utc": peak_time.isoformat(timespec="minutes"),
         "forecast_array_m": [round(float(v), 4) for v in fc.tolist()],

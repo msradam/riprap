@@ -13,6 +13,17 @@ from riprap.core.pebbles.deployments import (
 )
 
 
+def _pebbles_for(stone: str, deployment: str, lat=None, lon=None) -> list[str]:
+    """Pebble ids of one Stone that the fan-out runs for a point query."""
+    from riprap.core.burr.stones import pebbles_for
+    from riprap.core.pebbles.bridge import get_registry
+
+    reg = get_registry(deployment)
+    return [pid for pid in pebbles_for(deployment, lat, lon, "single_address")
+            if reg.get(pid).stone == stone]
+
+
+
 def test_all_shipped_cities_have_a_coverage_bbox():
     """Every place-routed deployment declares a bbox + city. Heat/air
     deployments are hazard-routed and intentionally bbox-less."""
@@ -71,7 +82,6 @@ def test_deployment_by_name_lookup():
 def test_stones_pebbles_for_filters_by_deployment():
     """The Stone fan-out function returns only the active deployment's
     pebbles — the regression seal on the data-leak fix."""
-    from riprap.core.burr.stones import _pebbles_for
 
     boston_cornerstone = set(_pebbles_for("cornerstone", "boston"))
     nyc_cornerstone = set(_pebbles_for("cornerstone", "nyc"))
@@ -92,7 +102,6 @@ def test_pebbles_for_none_sentinel_returns_federal_only():
     city-specific ones (sandy, dep_*, nyc311) are dropped, but the
     federal pebbles (nws_obs, nws_alerts) that resolve any CONUS
     lat/lon still fire so the briefing has something to report."""
-    from riprap.core.burr.stones import _pebbles_for
     # cornerstone has fema_nfhl from the federal manifest.
     assert _pebbles_for("cornerstone", "__none__") == ["fema_nfhl"]
     # touchstone has nws_obs + usgs_gauges from the federal manifests.
@@ -106,7 +115,6 @@ def test_federal_pebbles_auto_merge_into_every_city():
     into every spatially-routed deployment. No city should re-declare
     them (deduped); every city should still fan out federal pebbles
     when fed CONUS coords."""
-    from riprap.core.burr.stones import _pebbles_for
 
     for city, lat, lon in [
         ("nyc",     40.7128, -74.0060),
@@ -145,7 +153,6 @@ def test_per_pebble_coverage_filter_out_of_conus():
     """A point outside CONUS (e.g. Tokyo) fires zero pebbles even when
     we point at a known deployment — the per-pebble coverage filter
     catches global queries that bypassed the deployment router."""
-    from riprap.core.burr.stones import _pebbles_for
     # Tokyo — outside CONUS, outside every city bbox.
     assert _pebbles_for("touchstone", "nyc", lat=35.6762, lon=139.6503) == []
     assert _pebbles_for("lodestone", "nyc", lat=35.6762, lon=139.6503) == []
@@ -162,7 +169,7 @@ def test_build_documents_covers_non_nyc_deployment_pebbles():
     all 5 non-NYC cities on 2026-07-11 (a `git checkout` had also wiped
     the routed_deployment_doc_ids / trim_docs_to_plan extra_keep fix in
     the same incident, masking this deeper bug until both were fixed)."""
-    from app.reconcile import build_documents
+    from riprap.core.burr.synthesis import _documents as build_documents
 
     state = {
         "deployment": "chicago",
@@ -180,8 +187,8 @@ def test_build_documents_covers_non_nyc_deployment_pebbles():
             "top_by_sr_type": [{"value": "Graffiti Removal Request", "count": 53}],
         },
     }
-    docs = build_documents(state)
-    doc_ids = {d["role"].split(" ", 1)[1] for d in docs if d["role"].startswith("document ")}
+    docs, _, _ = build_documents(state)
+    doc_ids = {d.doc_id for d in docs}
     assert {"fema_nfhl", "usgs_gauges", "chicago_311"} <= doc_ids, (
         f"build_documents only produced {doc_ids} for a routed Chicago "
         f"query with real fema_nfhl/usgs_gauges/chicago_311 data present "
@@ -189,8 +196,8 @@ def test_build_documents_covers_non_nyc_deployment_pebbles():
     )
     # The 311 document must actually carry the record count, not just
     # exist — a present-but-empty document is as useless as a missing one.
-    doc_311 = next(d for d in docs if d["role"] == "document chicago_311")
-    assert "200" in doc_311["content"]
+    doc_311 = next(d for d in docs if d.doc_id == "chicago_311")
+    assert "200" in doc_311.text
 
 
 def test_build_documents_keeps_two_311_variants_separate():
@@ -200,7 +207,7 @@ def test_build_documents_keeps_two_311_variants_separate():
     counts to a single doc_id, misrepresenting a 300 m-radius total as
     part of the 800 m-radius flood-specific query. Two separate documents
     is what lets the model (or an auditor) tell them apart at all."""
-    from app.reconcile import build_documents
+    from riprap.core.burr.synthesis import _documents as build_documents
 
     state = {
         "deployment": "albany",
@@ -208,8 +215,8 @@ def test_build_documents_keeps_two_311_variants_separate():
         "albany_311": {"n_records": 62, "radius_m": 300},
         "albany_flood_311": {"n_records": 6, "radius_m": 800},
     }
-    docs = build_documents(state)
-    by_id = {d["role"].split(" ", 1)[1]: d["content"] for d in docs}
+    docs, _, _ = build_documents(state)
+    by_id = {d.doc_id: d.text for d in docs}
     assert "albany_311" in by_id and "albany_flood_311" in by_id
     assert "62" in by_id["albany_311"] and "300" in by_id["albany_311"]
     assert "6" in by_id["albany_flood_311"] and "800" in by_id["albany_flood_311"]
@@ -229,7 +236,6 @@ def test_all_pebble_ids_covers_every_shipped_pebble():
 def test_per_pebble_coverage_filter_conus_but_not_city():
     """A point inside CONUS but outside every city bbox still gets
     federal pebbles (NWS Alerts works for Albuquerque too)."""
-    from riprap.core.burr.stones import _pebbles_for
     abq = _pebbles_for("touchstone", "nyc", lat=35.0844, lon=-106.6504)
     assert "nws_obs" in abq, (
         "Albuquerque is in CONUS — NWS METAR observations should fire."

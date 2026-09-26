@@ -1,0 +1,40 @@
+id: microtopo_nta
+type: baked
+title: Neighborhood terrain from the USGS 3DEP DEM
+stone: cornerstone
+tier: proxy
+adapter: python_call
+
+# Neighbourhood (polygon) evidence: runs for neighborhood and
+# development_check queries against the resolved NTA polygon.
+spatial:
+  scope: polygon
+  crs: EPSG:4326
+
+config:
+  module: app.areas.nta_evidence
+  function: terrain
+  args:
+    - {source: polygon_4326}
+  on_none: offline
+
+provenance:
+  date_modified: null
+  retrieved_at: 2026-07-11
+  source_name: USGS 3DEP 30 m DEM with derived HAND and TWI rasters
+  source_url: https://www.usgs.gov/3d-elevation-program
+  license: U.S. Public Domain
+  doc_id: microtopo_nta
+  citation: USGS 3DEP DEM, HAND and TWI aggregated over the neighborhood polygon
+
+narration:
+  short: Terrain summary for this neighborhood.
+  template: "{narrative}"
+
+display:
+  order: 50
+  kind: text
+  icon: "⛰️"
+
+fallback:
+  on_offline: skip

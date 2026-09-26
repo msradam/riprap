@@ -1,15 +1,12 @@
-"""Riprap query planner — Granite 4.1 routes a natural-language query
-to one of several intents and selects which specialists to invoke.
-
-This is the agentic kernel: instead of running every specialist on
-every query, the planner reads the query and emits a structured plan.
-The executor then runs only the relevant specialists, in parallel
-where dependencies permit.
+"""Riprap query planner (LLM mode): route a natural-language query to an
+intent and its target place(s). The Burr app then runs the pebbles for
+that intent. No-LLM mode uses the regex planner in
+riprap/core/burr/intake.py instead.
 
 Output is a single JSON object with a fixed schema (see PLAN_SCHEMA).
 The call passes PLAN_JSON_SCHEMA as `response_format`, so the model
 cannot emit malformed structure. A deterministic post-validator
-sanity-checks the plan against the supported intents and specialists.
+sanity-checks the plan against the supported intents.
 """
 from __future__ import annotations
 
@@ -24,7 +21,7 @@ log = logging.getLogger("riprap.planner")
 # ---- Plan schema -----------------------------------------------------------
 #
 # The set of intents Riprap currently supports. Every plan picks exactly
-# one; the executor maps intent → action graph in app/intents/.
+# one; riprap/core/burr/app.py maps the intent to its graph branch.
 
 INTENTS = {
     "single_address": (
@@ -42,12 +39,12 @@ INTENTS = {
         "specific street address (e.g. 'Brighton Beach', 'Carroll "
         "Gardens', 'Brooklyn', 'is Red Hook at risk?', 'show me Hollis "
         "flooding'). Skip geocoding; resolve to NTA polygon(s) and run "
-        "polygon-level specialists."
+        "polygon-level evidence."
     ),
     "live_now": (
         "User asked about CURRENT CONDITIONS in NYC (e.g. 'is there "
         "flooding right now', 'what's the surge tonight'). Skip historic "
-        "and modeled specialists; focus on live-data specialists."
+        "and modeled layers; focus on live sources."
     ),
     "development_check": (
         "User asked about CURRENT/IN-PROGRESS CONSTRUCTION OR DEVELOPMENT "
@@ -63,82 +60,43 @@ INTENTS = {
         "ADDRESSES (e.g. 'compare 80 Pioneer St Brooklyn to 100 Gold St "
         "Manhattan', 'which is riskier: X or Y?', 'X vs Y flood risk'). "
         "Extract BOTH full street addresses into targets as two separate "
-        "{type: 'address', text: ...} objects. Run the full single-address "
-        "specialist suite for each."
+        "{type: 'address', text: ...} objects."
     ),
 }
-
-SPECIALISTS = {
-    # name: (description, which intents may invoke it)
-    "geocode":       ("Resolve address text to lat/lon via NYC DCP Geosearch.",     ["single_address", "compare"]),
-    "nta_resolve":   ("Resolve a neighborhood or borough name to NTA polygon(s).",  ["neighborhood"]),
-    "sandy":         ("2012 Sandy inundation extent (point-in-polygon or % of NTA).", ["single_address", "neighborhood", "compare"]),
-    "dep_stormwater":("DEP Stormwater Maps — 3 modeled scenarios.",                ["single_address", "neighborhood", "compare"]),
-    "floodnet":      ("Live FloodNet ultrasonic sensors + trigger history.",      ["single_address", "neighborhood", "live_now", "compare"]),
-    "nyc311":        ("NYC 311 flood-related complaints in buffer or polygon.",    ["single_address", "neighborhood", "compare"]),
-    "noaa_tides":    ("Live NOAA Battery / Kings Pt / Sandy Hook water level.",   ["single_address", "neighborhood", "live_now", "compare"]),
-    "nws_alerts":    ("Live NWS active flood-relevant alerts at point.",           ["single_address", "neighborhood", "live_now", "compare"]),
-    "npcc4_slr":     ("NPCC4 (2024) sea-level rise projections at the Battery — 2050/2100 low/mid/high/extreme.", ["single_address", "neighborhood", "compare"]),
-    "nws_obs":       ("Live NWS hourly precip from nearest ASOS station.",         ["single_address", "neighborhood", "live_now", "compare"]),
-    "ttm_forecast":  ("Granite TTM r2 surge-residual nowcast at the Battery.",     ["single_address", "neighborhood", "live_now", "compare"]),
-    "microtopo":     ("LiDAR-derived terrain (HAND, TWI, percentile) at point or aggregated over polygon.", ["single_address", "neighborhood", "compare"]),
-    "ida_hwm":       ("USGS Hurricane Ida 2021 high-water marks proximity.",       ["single_address", "neighborhood", "compare"]),
-    "prithvi":       ("Prithvi-EO 2.0 Hurricane Ida 2021 satellite flood polygons.", ["single_address", "neighborhood", "compare"]),
-    "rag":           ("Retrieve relevant agency-report passages over the policy corpus.", ["single_address", "neighborhood", "development_check", "compare"]),
-    "dob_permits":   ("Active NYC DOB construction permits inside a polygon, each cross-referenced with Sandy + DEP flood scenarios. Use for 'what are they building' / 'projects in progress' queries.", ["development_check"]),
-}
-
 
 @dataclass
 class Plan:
     intent: str
     targets: list[dict[str, str]]
-    specialists: list[str]
     rationale: str
 
 
-PLAN_SCHEMA_DESC = """The output JSON must have exactly these keys:
+PLAN_SCHEMA_DESC = """Return JSON with exactly these keys:
 
 {
-  "intent": one of [single_address, neighborhood, live_now, development_check],
+  "intent": one of the intents above,
   "targets": [
-    // one or more target objects, each with:
-    //   {"type": "address", "text": "<address text>"}    when intent=single_address
-    //   {"type": "nta",     "text": "<neighborhood>"}    when intent=neighborhood
-    //   {"type": "borough", "text": "<borough>"}         when intent=neighborhood (boro-wide)
-    //   {"type": "nyc",     "text": "NYC"}               when intent=live_now (no specific place)
+    {"type": "address", "text": "<address text>"}    for single_address, compare, live_now
+    {"type": "nta",     "text": "<neighborhood>"}    for neighborhood, development_check
+    {"type": "borough", "text": "<borough>"}         for a whole borough
+    {"type": "nyc",     "text": "NYC"}               for live_now with no specific place
   ],
-  "specialists": [list of specialist names from the SPECIALISTS catalog the executor should run],
-  "rationale": "<one sentence: why this intent + this set of specialists>"
+  "rationale": "<one short sentence>"
 }
 
-Hard rules:
-- Pick ONE intent only.
-- Specialists must be drawn from the catalog and must be applicable to the chosen intent.
-- For intent=single_address: ALWAYS include "geocode". Typically include all static + live specialists.
-- For intent=neighborhood: ALWAYS include "nta_resolve". Skip "geocode". Include polygon-capable specialists.
-- For intent=live_now: ONLY live specialists. Skip historic/modeled (sandy, dep_*, ida_hwm, prithvi).
-- For intent=development_check: ALWAYS include "nta_resolve" AND "dob_permits". Sandy + DEP are also useful so the model can compare project locations to flood layers.
-- For intent=compare: ALWAYS include "geocode". Extract BOTH street addresses into targets — the executor runs the full specialist suite once per address. Targets must be exactly 2 items, both type="address".
-- IMPORTANT — TARGETS: extract neighborhood/borough names directly from the query text. If the query says "in Gowanus", "what about Brighton Beach", "around Carroll Gardens", etc., the target MUST be {"type": "nta", "text": "<the place name>"}. Use {"type": "nyc"} ONLY when the query mentions NYC as a whole and no specific place. Failing to extract a place name will cause the executor to give up — be explicit.
-- "targets" is a list because the user may name multiple places (e.g. "compare Brighton Beach and Coney Island").
-- "rationale" is one short sentence — what your reasoning was.
+Rules:
+- Pick ONE intent.
+- compare: exactly two targets, both type "address".
+- Extract place names from the query text: "in Gowanus" gives {"type": "nta", "text": "Gowanus"}.
 """
 
 
-SYSTEM_PROMPT = f"""You are Riprap's query planner. You read a user's natural-language flood-risk query and emit a structured execution plan.
+SYSTEM_PROMPT = f"""You are Riprap's query planner. You read a flood-exposure question and decide which intent fits and which place or places it is about. You do not have any data.
 
-You do NOT have access to any data. You only decide which intent fits the query and which specialists are relevant. Another component (the executor) will run the specialists.
-
-Available intents:
+Intents:
 {chr(10).join(f"  - {k}: {v}" for k, v in INTENTS.items())}
 
-Available specialists (and which intents they apply to):
-{chr(10).join(f"  - {name}: {desc} (intents: {', '.join(intents)})" for name, (desc, intents) in SPECIALISTS.items())}
-
-{PLAN_SCHEMA_DESC}
-
-Output ONLY the JSON object. No commentary, no markdown. The "rationale" field MUST be ONE SHORT SENTENCE (under 20 words). Stop immediately after the closing brace."""
+{PLAN_SCHEMA_DESC}"""
 
 
 # ---- Not-implemented short-circuits ----------------------------------------
@@ -224,8 +182,7 @@ def plan(query: str, on_token=None) -> Plan:
         log.info("planner: short-circuit not_implemented for query %r", query[:80])
         if on_token:
             on_token(json.dumps({"intent": "not_implemented", "message": msg}))
-        return Plan(intent="not_implemented", targets=[],
-                    specialists=[], rationale=msg)
+        return Plan(intent="not_implemented", targets=[], rationale=msg)
 
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
@@ -242,7 +199,7 @@ def plan(query: str, on_token=None) -> Plan:
 
 def _validate(d: dict[str, Any], raw_query: str) -> Plan:  # TODO(cleanup): cc-grade-D (23)
     """Defensive parse + sanitize. The model might pick an invalid intent
-    or a specialist that isn't applicable; fall back to single_address
+    or no usable target; fall back to single_address
     with the raw query as the address (the most common case)."""
     intent = d.get("intent")
     if intent not in INTENTS:
@@ -275,52 +232,5 @@ def _validate(d: dict[str, Any], raw_query: str) -> Plan:  # TODO(cleanup): cc-g
         else:
             targets = [{"type": "nyc", "text": "NYC"}]
 
-    raw_specialists = d.get("specialists") or []
-    specialists: list[str] = []
-    for s in raw_specialists:
-        if isinstance(s, str) and s in SPECIALISTS:
-            _, applicable = SPECIALISTS[s]
-            if intent in applicable:
-                specialists.append(s)
-    # Enforce a floor: each intent has canonical specialists that should
-    # always run. The planner picks ADDITIONS; we ensure the minimum.
-    required = _required_specialists(intent)
-    added = [s for s in required if s not in specialists]
-    if added:
-        log.info("planner missed required %s for intent=%s; adding", added, intent)
-        specialists = list(dict.fromkeys(specialists + required))
-    if not specialists:
-        specialists = _default_specialists(intent)
-
     rationale = (d.get("rationale") or "").strip()[:300] or "(no rationale provided)"
-    return Plan(intent=intent, targets=targets, specialists=specialists, rationale=rationale)
-
-
-def _required_specialists(intent: str) -> list[str]:
-    """Floor: specialists that are ALWAYS run for an intent regardless of
-    what the planner emitted. Captures load-bearing signals the planner
-    sometimes forgets (sandy / dep for neighborhood; geocode for address)."""
-    if intent == "single_address":
-        return ["geocode", "sandy", "dep_stormwater", "microtopo"]
-    if intent == "neighborhood":
-        return ["nta_resolve", "sandy", "dep_stormwater", "nyc311"]
-    if intent == "live_now":
-        return ["nws_alerts", "noaa_tides"]
-    if intent == "development_check":
-        return ["nta_resolve", "dob_permits", "sandy", "dep_stormwater"]
-    if intent == "compare":
-        return ["geocode", "sandy", "dep_stormwater", "microtopo"]
-    return []
-
-
-def _default_specialists(intent: str) -> list[str]:
-    if intent in ("single_address", "compare"):
-        return ["geocode", "sandy", "dep_stormwater", "floodnet", "nyc311",
-                "noaa_tides", "nws_alerts", "nws_obs", "ttm_forecast",
-                "microtopo", "ida_hwm", "prithvi", "rag"]
-    if intent == "neighborhood":
-        return ["nta_resolve", "sandy", "dep_stormwater", "nyc311",
-                "microtopo", "rag"]
-    if intent == "live_now":
-        return ["noaa_tides", "nws_alerts", "nws_obs", "ttm_forecast", "floodnet"]
-    return []
+    return Plan(intent=intent, targets=targets, rationale=rationale)

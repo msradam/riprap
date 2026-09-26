@@ -20,9 +20,8 @@ from riprap.core.pebbles.bridge import fetch_pebble
 
 
 def trace_rec_for(step_name: str) -> dict[str, Any]:
-    """Create an in-flight trace record. Mirrors app/fsm.py:_make_rec so the
-    SSE consumers (web/main.py and the SvelteKit cardAdapter) don't need to
-    change."""
+    """An in-flight trace record, the shape the SSE stream and the
+    SvelteKit trace UI read."""
     return {
         "step": step_name,
         "ok": None,
@@ -44,7 +43,7 @@ def pebble_action(pebble_id: str):
     what the cardAdapter expects (`state["sandy"]`, `state["floodnet"]`,
     etc.).
     """
-    @action(reads=["lat", "lon", "deployment"], writes=[pebble_id, "trace"])
+    @action(reads=["lat", "lon", "deployment", "polygon_wkt"], writes=[pebble_id, "trace"])
     def _step(state: State) -> State:
         trace = list(state.get("trace", []))
         rec = trace_rec_for(pebble_id)
@@ -65,6 +64,7 @@ def pebble_action(pebble_id: str):
             deployment = state.get("deployment")
             value, trace_summary, err = fetch_pebble(
                 pebble_id, lat, lon, deployment=deployment,
+                geometry_wkt=state.get("polygon_wkt"),
             )
             if value is None:
                 rec["ok"] = False

@@ -73,7 +73,8 @@ def get_registry(deployment: str | None = None) -> Registry:
 
 def fetch_pebble(pebble_id: str, lat: float, lon: float,
                  extras: dict | None = None,
-                 deployment: str | None = None) -> tuple[Any, dict, str | None]:
+                 deployment: str | None = None,
+                 geometry_wkt: str | None = None) -> tuple[Any, dict, str | None]:
     """Run one pebble. Return (value_dict_for_state, trace_summary, err_msg).
 
     `value_dict_for_state` is None if the pebble was offline or errored.
@@ -92,7 +93,8 @@ def fetch_pebble(pebble_id: str, lat: float, lon: float,
     """
     reg = get_registry(deployment)
     pebble = reg.get(pebble_id)
-    result = pebble.fetch(SpatialQuery(lat=lat, lon=lon, extras=extras or {}))
+    result = pebble.fetch(SpatialQuery(lat=lat, lon=lon, geometry_wkt=geometry_wkt,
+                                       extras=extras or {}))
 
     if result.error is not None or result.value is None:
         return None, {}, result.error or "no value"

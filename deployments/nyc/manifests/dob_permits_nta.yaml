@@ -1,0 +1,40 @@
+id: dob_permits_nta
+type: baked
+title: Active DOB construction permits inside the neighborhood
+stone: keystone
+tier: empirical
+adapter: python_call
+
+# Neighbourhood (polygon) evidence: runs for neighborhood and
+# development_check queries against the resolved NTA polygon.
+spatial:
+  scope: polygon
+  crs: EPSG:4326
+
+config:
+  module: app.areas.nta_evidence
+  function: permits
+  args:
+    - {source: polygon_4326}
+  on_none: offline
+
+provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
+  source_name: NYC DOB Permit Issuance (NYC Open Data)
+  source_url: https://data.cityofnewyork.us/Housing-Development/DOB-Permit-Issuance/ipu4-2q9a
+  license: NYC Open Data Terms of Use
+  doc_id: dob_permits_nta
+  citation: NYC DOB permits issued inside the neighborhood, cross-referenced with Sandy 2012 and DEP scenarios
+
+narration:
+  short: Active construction permits inside this neighborhood and their flood exposure.
+  template: "{narrative}"
+
+display:
+  order: 30
+  kind: text
+  icon: "🏗️"
+
+fallback:
+  on_offline: skip

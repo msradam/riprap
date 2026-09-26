@@ -139,3 +139,6 @@ ignore_decorators = ["@app.get", "@app.post", "@action"]
 #   engine    — _hardware_for() param sliced by docstring contract, not by body
 ignore_names = ["request", "query_id", "engine"]
 paths = ["app", "web", "scripts", "riprap"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

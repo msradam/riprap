@@ -15,25 +15,22 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_step_to_stone_mapping_covers_known_steps():
     # The mapping is built at import from the NYC deployment's pebble
-    # manifests + legacy step aliases. Force the NYC deployment so the
+    # manifests plus the Capstone steps. Force the NYC deployment so the
     # set is deterministic regardless of how the harness invokes us.
     os.environ["RIPRAP_DEPLOYMENT"] = "deployments/nyc"
     from web.main import _STEP_TO_STONE
     missing = [
         step for step in (
-            "sandy_inundation", "dep_stormwater", "ida_hwm_2021",
-            "prithvi_eo_v2", "microtopo_lidar",
-            "mta_entrance_exposure", "nycha_development_exposure",
-            "doe_school_exposure", "doh_hospital_exposure",
-            "terramind_synthesis", "eo_chip_fetch", "terramind_buildings",
+            "sandy", "dep_extreme_2080", "ida_hwm", "prithvi_water", "microtopo",
+            "mta_entrances", "nycha_developments", "doe_schools", "doh_hospitals",
             "floodnet", "nyc311", "nws_obs", "noaa_tides",
-            "prithvi_eo_live", "terramind_lulc",
-            "nws_alerts", "ttm_311_forecast",
-            "floodnet_forecast", "ttm_battery_surge",
-            "reconcile_granite41", "mellea_reconcile_address",
+            "nws_alerts", "ttm_311_forecast", "floodnet_forecast", "ttm_battery_surge",
+            "sandy_nta", "nyc311_nta", "dob_permits_nta",
+            "policy_corpus", "reconcile_claims", "reconcile_templated",
         )
         if step not in _STEP_TO_STONE
     ]
+    assert _STEP_TO_STONE["policy_corpus"] == "Capstone"
     assert not missing, f"_STEP_TO_STONE missing step mappings: {missing}"
 
 

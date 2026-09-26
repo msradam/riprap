@@ -20,13 +20,10 @@ jobs:
         uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
-      # The riprap/ package + my new scripts/tests/load surface should
-      # always lint clean. Pre-session app/* legacy code has known noise
-      # we don't want to gate PRs on; tighten that scope as it lands.
-      - run: uvx ruff check riprap/ scripts/probe_cities_smoke.py tests/test_byod_load.py tests/test_stone_envelope.py load/triton-local/ app/geocode.py
+      - run: uvx ruff check riprap/ web/main.py app/geocode.py app/planner.py app/areas/ tests/
 
   tests:
-    name: tests (pebble framework + BYOD)
+    name: tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -39,18 +36,16 @@ jobs:
         run: uv sync --frozen
 
       - name: Import smoke test
+        run: uv run python -c "from riprap.core.burr import app; from riprap.mcp import server; from web import main"
         env:
-          PYTHONPATH: .
-        run: |
-          uv run python -c "from app import fsm, llm, inference, emissions; from web import main"
+          RIPRAP_SKIP_WARM: "1"
 
-      # Framework + BYOD tests — fast, no network, no LLM.
-      - name: Pebble framework + BYOD tests
+      # Every test that needs no network, LLM or running server. The
+      # integration suite skips itself without a server.
+      - name: Tests
+        run: uv run pytest -q
         env:
-          PYTHONPATH: .
-        run: |
-          uv run pytest -q tests/test_stones.py tests/test_compare_shape.py \
-            tests/test_stone_envelope.py tests/test_byod_load.py
+          RIPRAP_SKIP_WARM: "1"
 
   # A fully offline probe_cities_smoke.py run would be ideal here, but
   # the current script hits real upstream APIs (NWS, Socrata, CKAN,

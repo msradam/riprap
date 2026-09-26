@@ -1,0 +1,40 @@
+id: sandy_nta
+type: baked
+title: Share of the neighborhood inside the 2012 Sandy extent
+stone: cornerstone
+tier: empirical
+adapter: python_call
+
+# Neighbourhood (polygon) evidence: runs for neighborhood and
+# development_check queries against the resolved NTA polygon.
+spatial:
+  scope: polygon
+  crs: EPSG:4326
+
+config:
+  module: app.areas.nta_evidence
+  function: sandy
+  args:
+    - {source: polygon_4326}
+  on_none: offline
+
+provenance:
+  date_modified: 2015-11-09
+  retrieved_at: 2026-07-11
+  source_name: NYC Open Data, Sandy Inundation Zone
+  source_url: https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/uyj8-7rv5
+  license: NYC Open Data Terms of Use
+  doc_id: sandy_nta
+  citation: NYC Sandy Inundation Zone (uyj8-7rv5), share of the neighborhood inside the 2012 extent
+
+narration:
+  short: Share of this neighborhood inside the 2012 Sandy inundation extent.
+  template: "{narrative}"
+
+display:
+  order: 10
+  kind: text
+  icon: "🌊"
+
+fallback:
+  on_offline: skip

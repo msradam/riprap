@@ -38,6 +38,18 @@ from dataclasses import dataclass
 import pytest
 
 BASE = os.environ.get("RIPRAP_TEST_BASE", "http://127.0.0.1:7860")
+
+
+def _server_up() -> bool:
+    import urllib.request
+    try:
+        urllib.request.urlopen(f"{BASE}/api/deployment", timeout=2)
+        return True
+    except Exception:
+        return False
+
+
+pytestmark = pytest.mark.skipif(not _server_up(), reason=f"no Riprap server at {BASE}")
 # Heavy specialists (prithvi_live, terramind) are only added to the FSM
 # when RIPRAP_HEAVY_SPECIALISTS=1 or RIPRAP_ML_BASE_URL is set.  Tests
 # that assert these steps fired must skip when the gate is off.

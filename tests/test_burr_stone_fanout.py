@@ -1,52 +1,44 @@
-"""Smoke test for the Burr Stone fan-out.
-
-Builds a minimal Application that runs `CornerstoneAction` once and
-verifies all the cornerstone pebbles populate their state keys + the
-trace contains one record per pebble.
-"""
+"""Smoke test for the Burr Stones fan-out: one MapActions runs every
+data-Stone pebble for the intent, and point pebbles never run for a
+neighbourhood (polygon) query."""
 from __future__ import annotations
 
 from burr.core import ApplicationBuilder, State, action
 
-from riprap.core.burr.stones import CornerstoneAction
+from riprap.core.burr.stones import StonesAction, pebbles_for
 
 
-@action(reads=[], writes=["lat", "lon", "trace"])
+@action(reads=[], writes=["lat", "lon", "deployment", "intent", "polygon_wkt", "trace"])
 def _seed(state: State) -> State:
-    return state.update(lat=40.7100, lon=-73.9800, trace=[])
+    return state.update(lat=40.7100, lon=-73.9800, deployment="nyc", intent="single_address",
+                        polygon_wkt=None, trace=[])
 
 
-def test_cornerstone_fans_out_all_pebbles():
-    cornerstone = CornerstoneAction()
-    cornerstone_writes = cornerstone.writes  # snapshot before assembly
-
+def test_point_intent_fans_out_baked_pebbles(monkeypatch):
+    # Keep it offline: run only the file-backed pebbles.
+    only = {"sandy", "ida_hwm", "microtopo"}
+    monkeypatch.setattr("riprap.core.burr.stones.pebbles_for",
+                        lambda *a, **k: [p for p in pebbles_for(*a, **k) if p in only])
     app = (
         ApplicationBuilder()
-        .with_actions(seed=_seed, cornerstone=cornerstone)
-        .with_transitions(("seed", "cornerstone"))
+        .with_actions(seed=_seed, stones=StonesAction())
+        .with_transitions(("seed", "stones"))
         .with_entrypoint("seed")
         .with_state(trace=[])
         .build()
     )
-    _, _, final = app.run(halt_after=["cornerstone"])
-
-    # Every cornerstone pebble wrote its state key.
-    for k in cornerstone_writes:
-        if k == "trace":
-            continue
-        assert k in final, f"cornerstone did not write state key {k!r}"
-
-    # At least the file-backed pebbles should have produced non-None
-    # values for an NYC address. (ida_hwm and sandy use baked data.)
-    # Sandy now uses the boolean_zone shaper → dict {inside, ...} not bare bool.
+    _, _, final = app.run(halt_after=["stones"])
     assert isinstance(final["sandy"], dict) and "inside" in final["sandy"]
-    assert final["ida_hwm"] is not None and isinstance(final["ida_hwm"], dict)
-    assert final["microtopo"] is not None and isinstance(final["microtopo"], dict)
+    assert isinstance(final["ida_hwm"], dict)
+    assert isinstance(final["microtopo"], dict)
+    assert {t["step"] for t in final["trace"]} == only
 
-    # Trace recorded one rec per pebble.
-    trace = final["trace"]
-    pebble_recs = [t for t in trace if t.get("step", "").startswith("dep_")
-                   or t.get("step") in ("sandy", "ida_hwm", "microtopo",
-                                        "prithvi_water")]
-    # We expect 7 cornerstone pebbles: sandy, dep×3, ida_hwm, prithvi_water, microtopo
-    assert len(pebble_recs) >= 5  # tolerate a flaky single probe; the bulk should land
+
+def test_intent_selects_point_or_polygon_pebbles():
+    point = pebbles_for("nyc", 40.71, -73.98, "single_address")
+    polygon = pebbles_for("nyc", 40.71, -73.98, "neighborhood")
+    live = pebbles_for("nyc", 40.71, -73.98, "live_now")
+    assert "sandy" in point and "sandy_nta" not in point
+    assert "sandy_nta" in polygon and "sandy" not in polygon
+    assert "policy_corpus" not in point + polygon
+    assert "nyc311" in live and "sandy" not in live

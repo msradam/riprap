@@ -26,7 +26,6 @@ from fastapi.staticfiles import StaticFiles  # noqa: E402
 from app import emissions  # noqa: E402
 from app.context import floodnet  # noqa: E402
 from app.flood_layers import dep_stormwater, sandy_inundation  # noqa: E402
-from app.fsm import iter_steps  # noqa: E402
 from riprap.core.json_safe import to_json_safe as _to_json_safe  # noqa: E402
 from riprap.core.pebbles import load_registry as _load_pebbles  # noqa: E402
 from riprap.core.stones import load_stones as _load_stones  # noqa: E402
@@ -64,20 +63,9 @@ _STONE_META: dict[str, dict] = {
 }
 
 
-# Map FSM trace step name -> Stone display name.
-#
-# Built in two layers:
-#   1. From the pebble registry — every pebble contributes (pebble.id ->
-#      Stone.name) automatically. Add new pebble manifests, this map grows
-#      itself. No code edits needed.
-#   2. Explicit overrides for FSM steps that DON'T have manifests yet
-#      (NTA aggregates, asset-class exposures, terramind synthesis, the
-#      eo_chip cluster, reconciler variants) and for legacy trace aliases
-#      (ida_hwm_2021 -> ida_hwm pebble, prithvi_eo_v2 -> prithvi_water, etc.).
-#
-# Steps not present in this map don't open a Stone boundary — they're
-# orientation / policy infrastructure shared across Stones (geocode,
-# rag_granite_embedding, gliner_extract, nta_resolve and friends).
+# Map trace step name -> Stone display name. Every pebble contributes
+# (pebble.id -> Stone.name) from the registry; steps not in the map
+# (geocode, nta_resolve, select_deployment) open no Stone boundary.
 def _stone_display(stone_id: str) -> str:
     return _STONES.get(stone_id).name
 
@@ -85,57 +73,22 @@ def _stone_display(stone_id: str) -> str:
 _STEP_TO_STONE: dict[str, str] = {
     pebble.id: _stone_display(pebble.stone) for pebble in _PEBBLES.all()
 }
-# Legacy trace-name aliases (the FSM still emits these older labels for
-# some steps). Each maps to the same stone as its modern pebble id.
+# Steps that are not data pebbles. policy_corpus is a manifest pebble but
+# runs in the Capstone, after the data Stones.
 _STEP_TO_STONE.update(
     {
-        "sandy_inundation": _stone_display("cornerstone"),
-        "ida_hwm_2021": _stone_display("cornerstone"),
-        "prithvi_eo_v2": _stone_display("cornerstone"),
-        "microtopo_lidar": _stone_display("cornerstone"),
-        "dep_stormwater": _stone_display("cornerstone"),
-        "prithvi_eo_live": _stone_display("touchstone"),
-    }
-)
-# FSM steps that don't have manifests yet (chip-dependent cluster, NTA
-# aggregates, asset-class exposures, terramind synthesis, reconciler).
-# These shrink as more pebbles get ported.
-_STEP_TO_STONE.update(
-    {
-        "sandy_nta": _stone_display("cornerstone"),
-        "dep_extreme_2080_nta": _stone_display("cornerstone"),
-        "dep_moderate_2050_nta": _stone_display("cornerstone"),
-        "dep_moderate_current_nta": _stone_display("cornerstone"),
-        "microtopo_nta": _stone_display("cornerstone"),
-        "nyc311_nta": _stone_display("touchstone"),
-        "mta_entrance_exposure": _stone_display("keystone"),
-        "nycha_development_exposure": _stone_display("keystone"),
-        "doe_school_exposure": _stone_display("keystone"),
-        "doh_hospital_exposure": _stone_display("keystone"),
-        "terramind_synthesis": _stone_display("keystone"),
-        "eo_chip_fetch": _stone_display("keystone"),
-        "terramind_buildings": _stone_display("keystone"),
-        "terramind_lulc": _stone_display("touchstone"),
+        "policy_corpus": _stone_display("capstone"),
         "reconcile_claims": _stone_display("capstone"),
         "reconcile_templated": _stone_display("capstone"),
-        "reconcile_granite41": _stone_display("capstone"),
-        "mellea_reconcile_address": _stone_display("capstone"),
-        "reconcile_neighborhood": _stone_display("capstone"),
-        "reconcile_development": _stone_display("capstone"),
-        "reconcile_live_now": _stone_display("capstone"),
     }
 )
 
 ROOT = Path(__file__).resolve().parent
-STATIC = ROOT / "static"
 SVELTEKIT_BUILD = ROOT / "sveltekit" / "build"
 
 app = FastAPI(title="Riprap")
-app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
-# SvelteKit static build (adapter-static). Serves the new design-system UI
-# from / and /q/<query>. The legacy custom-element pages remain at
-# /legacy, /single, /compare, /register/* for as long as they're useful.
+# SvelteKit static build (adapter-static), served from / and /q/<query>.
 if SVELTEKIT_BUILD.exists():
     app.mount("/_app", StaticFiles(directory=SVELTEKIT_BUILD / "_app"), name="sveltekit_assets")
 
@@ -269,249 +222,21 @@ def _warm_caches():
         import traceback
 
         traceback.print_exc()
-    # Pre-import the heavy EO/ML stacks on the main thread so the
-    # parallel-fanout workers don't race each other on first
-    # import (sklearn's "partially initialized module" surfaces as a
-    # spurious ImportError when terratorch / tsfm_public both pull
-    # sklearn concurrently from worker threads).
-    # Warm the Ollama LLM models so the first user query doesn't pay a
-    # cold-load penalty (~70 s for the 3B planner, ~12 s for the 8B
-    # reconciler at Q4_K_M). Sets keep_alive to 24 h so they stay
-    # resident across queries. Both calls use num_ctx that matches the
-    # production call sites (Mellea's 4096), so Ollama's KV cache is
-    # pre-allocated at the right size and the first reconcile doesn't
-    # pay an extra grow-and-reinit cost.
-    if os.environ.get("RIPRAP_SKIP_LLM_WARM", "").lower() not in ("1", "true", "yes"):
-        print("[startup] warming Ollama models (granite4.1:3b + 8b)...", flush=True)
-        try:
-            import httpx as _httpx
-
-            base = os.environ.get(
-                "OLLAMA_BASE_URL",
-                os.environ.get("OLLAMA_HOST", "http://localhost:11434"),
-            )
-            if not base.startswith("http"):
-                base = "http://" + base
-            keep_alive = os.environ.get("OLLAMA_KEEP_ALIVE", "24h")
-            num_ctx = int(os.environ.get("RIPRAP_MELLEA_NUM_CTX", "4096"))
-            for tag in (
-                os.environ.get("RIPRAP_OLLAMA_3B_TAG", "granite4.1:3b"),
-                os.environ.get("RIPRAP_OLLAMA_8B_TAG", "granite4.1:8b"),
-            ):
-                try:
-                    r = _httpx.post(
-                        base.rstrip("/") + "/api/generate",
-                        json={
-                            "model": tag,
-                            "prompt": "hi",
-                            "stream": False,
-                            "keep_alive": keep_alive,
-                            "options": {"num_ctx": num_ctx, "num_predict": 1},
-                        },
-                        timeout=180,
-                    )
-                    if r.status_code == 200:
-                        load_s = r.json().get("load_duration", 0) / 1e9
-                        print(
-                            f"[startup]   {tag} loaded "
-                            f"(load_duration={load_s:.1f}s, "
-                            f"keep_alive={keep_alive}, num_ctx={num_ctx})",
-                            flush=True,
-                        )
-                    else:
-                        print(f"[startup]   {tag} warm failed ({r.status_code})", flush=True)
-                except Exception as warm_err:
-                    print(f"[startup]   {tag} warm failed: {warm_err}", flush=True)
-        except Exception as e:
-            print(f"[startup] LLM warm skipped: {e}", flush=True)
-    print("[startup] pre-importing terratorch + tsfm_public + transformers...", flush=True)
+    # Import the in-process model stacks on the main thread before any
+    # worker thread does: transformers' lazy module loader races under
+    # concurrent first imports ("Could not import module
+    # 'PreTrainedModel'"). Modules whose deps are not installed no-op.
     try:
-        import sklearn  # noqa: F401  prime sklearn first
-        import terratorch  # noqa: F401
-        import tsfm_public  # noqa: F401
-
-        # Transformers does lazy-loading via __getattr__; touching
-        # PreTrainedModel forces the lazy-init to complete on the main
-        # thread. Otherwise FSM worker threads race the lazy loader and
-        # surface ModuleNotFoundError("Could not import module
-        # 'PreTrainedModel'") under load.
         from transformers import PreTrainedModel  # noqa: F401
-
-        # tsfm_public's TinyTimeMixerForPrediction import path triggers
-        # the granite-tsfm side of the lazy chain — pre-warm here too.
         from tsfm_public import TinyTimeMixerForPrediction  # noqa: F401
-        from tsfm_public.toolkit.get_model import get_model  # noqa: F401
-    except Exception as e:
-        print(f"[startup] heavy-EO pre-import skipped: {e}", flush=True)
-    # Force-import every specialist module that does heavy ML at runtime
-    # so its module-level deps probe + lazy transformers chain runs on
-    # the main thread, deterministic order, before any FSM worker fans
-    # out. Modules whose deps genuinely aren't installed will set their
-    # own `_DEPS_OK = False` here and gracefully no-op at request time;
-    # what we're avoiding is the "_DEPS_OK = False because of an import
-    # race" failure mode that fired on the live PS-188 query.
-    for mod_path in (
-        "app.live.ttm_forecast",
-        "app.live.ttm_battery_surge",
-        "app.live.floodnet_forecast",
-        "app.context.gliner_extract",
-        "app.context.terramind_nyc",
-        "app.context.eo_chip_cache",
-        "app.flood_layers.prithvi_live",
-    ):
+    except Exception as e:  # noqa: BLE001
+        print(f"[startup] ML pre-import skipped: {e}", flush=True)
+    for mod_path in ("app.live.ttm_forecast", "app.live.ttm_battery_surge",
+                     "app.live.floodnet_forecast", "app.context.entity_extract"):
         try:
             __import__(mod_path)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"[startup] {mod_path} pre-import skipped: {type(e).__name__}: {e}", flush=True)
-    # Warm the TerraMind specialist so first per-query call is just
-    # the diffusion (~3 s), not model load (~30 s). No-ops if deps
-    # are missing on this deployment.
-    try:
-        from app.context import terramind_synthesis
-
-        terramind_synthesis.warm()
-        print("[startup] TerraMind ready", flush=True)
-    except Exception as e:
-        print(f"[startup] TerraMind warm skipped: {e}", flush=True)
-
-
-@app.get("/api/debug/eo")
-def api_debug_eo():
-    """Diagnostic for the EO toolchain (Phase 1 + Phase 4) on HF Spaces.
-
-    Surfaces sys.path, PYTHONPATH, and per-module import status so we
-    can tell whether terratorch is actually findable from inside the
-    uvicorn process. Used to debug why the runtime --target install
-    appears to succeed in the entrypoint but isn't visible to the
-    FSM specialists at request time.
-    """
-    import os
-    import sys
-    import traceback
-    from pathlib import Path
-
-    out = {
-        "python_executable": sys.executable,
-        "python_version": sys.version,
-        "PYTHONPATH": os.environ.get("PYTHONPATH"),
-        "PYTHONNOUSERSITE": os.environ.get("PYTHONNOUSERSITE"),
-        "HOME": os.environ.get("HOME"),
-        "sys.path": sys.path,
-    }
-    eo_dir = Path(os.environ.get("HOME", "/home/user")) / ".eo-pkgs"
-    out["eo_dir"] = str(eo_dir)
-    out["eo_dir_exists"] = eo_dir.exists()
-    if eo_dir.exists():
-        out["eo_dir_contents"] = sorted(p.name for p in eo_dir.iterdir())[:50]
-    out["modules"] = {}
-    for name in (
-        "terratorch",
-        "einops",
-        "diffusers",
-        "timm",
-        "rasterio",
-        "planetary_computer",
-        "pystac_client",
-    ):
-        try:
-            mod = __import__(name)
-            out["modules"][name] = {"ok": True, "file": getattr(mod, "__file__", "?")}
-        except Exception as e:
-            out["modules"][name] = {
-                "ok": False,
-                "err": f"{type(e).__name__}: {e}",
-                "tb": traceback.format_exc().splitlines()[-3:],
-            }
-    return JSONResponse(out)
-
-
-@app.get("/api/debug/vllm-direct")
-def api_debug_vllm_direct():
-    """Direct diagnostic: calls vLLM with a reconciler-style request,
-    bypassing LiteLLM Router, to surface the raw HTTP status and error."""
-
-    import httpx
-
-    vllm_base = os.environ.get("RIPRAP_LLM_BASE_URL", "").rstrip("/")
-    vllm_key = os.environ.get("RIPRAP_LLM_API_KEY", "") or "EMPTY"
-    if not vllm_base:
-        return JSONResponse({"error": "RIPRAP_LLM_BASE_URL not set"}, status_code=400)
-
-    model_name = os.environ.get("RIPRAP_LLM_VLLM_8B_NAME", "granite4.1:3b")
-
-    # Two payloads: minimal (sanity check) and full-load (context overflow test).
-    # Generate a realistic 14-doc payload that approximates what the reconciler sends.
-    _FILLER_DOC = (
-        "Source: NYC OEM Sandy 2012 inundation. "
-        "This location is within the Sandy 2012 inundation zone, "
-        "which experienced flood depths of 1–4 ft. "
-        "FEMA Flood Zone AE. BFE 12 ft NAVD88."
-    )
-    full_docs = [{"doc_id": f"doc_{i}", "text": f"[doc_{i}] " + _FILLER_DOC} for i in range(14)]
-    _LONG_SYSTEM = (
-        "Write a flood-exposure briefing for an NYC address. "
-        "Use ONLY the facts in the provided documents. "
-        "Every sentence that contains a number MUST include a citation tag. "
-        "Output the four sections: Status, History, Forecast, and Risk. "
-        "Valid document IDs: " + ", ".join(f"doc_{i}" for i in range(14)) + "."
-    ) * 3  # ~500 tokens
-
-    payloads = {
-        "minimal": {
-            "model": model_name,
-            "messages": [
-                {"role": "system", "content": "You are a flood risk analyst."},
-                {"role": "user", "content": "Write the cited paragraph now."},
-            ],
-            "max_tokens": 64,
-            "temperature": 0,
-            "stream": False,
-            "chat_template_kwargs": {
-                "documents": [
-                    {"doc_id": "noaa_tides", "text": "Tide: 4.14 ft MLLW."},
-                    {"doc_id": "microtopo", "text": "Elevation: 1.37 m."},
-                ]
-            },
-        },
-        "full_load": {
-            "model": model_name,
-            "messages": [
-                {"role": "system", "content": _LONG_SYSTEM},
-                {"role": "user", "content": "Write the cited paragraph now."},
-            ],
-            "max_tokens": 512,
-            "temperature": 0,
-            "stream": False,
-            "chat_template_kwargs": {"documents": full_docs},
-        },
-    }
-    results = {}
-    for name, payload in payloads.items():
-        try:
-            with httpx.Client(timeout=30.0) as c:
-                r = c.post(
-                    f"{vllm_base}/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {vllm_key}",
-                        "Content-Type": "application/json",
-                    },
-                    json=payload,
-                )
-            try:
-                body = r.json()
-            except Exception:
-                body = r.text[:300]
-            results[name] = {"status": r.status_code, "body_snippet": str(body)[:400]}
-        except Exception as e:
-            results[name] = {"error": str(e)}
-
-    return JSONResponse(
-        {
-            "model": model_name,
-            "vllm_base": vllm_base,
-            "results": results,
-        }
-    )
 
 
 def _stones_pebbles_for_deployment(deployment_name: str | None):
@@ -662,38 +387,21 @@ async def api_print(request: Request) -> Response:
 
 @app.get("/api/backend")
 async def api_backend():
-    """Live LLM-backend descriptor for the UI's hardware badge.
-
-    Returns the configured primary (vLLM/AMD or Ollama/local), plus a
-    quick reachability ping so the badge can show whether the primary is
-    actually answering or whether the Router is on the fallback path.
-    """
+    """LLM mode for the UI badge: `no_llm`, or the configured endpoints and
+    whether the first one answers. No secrets."""
     import httpx
 
-    from app import llm
+    from riprap.core import llm
 
-    info = llm.backend_info()
-    reachable = None
-    try:
-        if info["primary"] in ("vllm", "mlx") and info["vllm_base_url"]:
-            url = info["vllm_base_url"].rstrip("/") + "/models"
+    info = llm.describe()
+    info["reachable"] = None
+    if info["endpoints"]:
+        try:
             async with httpx.AsyncClient(timeout=2.5) as client:
-                r = await client.get(url, headers={"Authorization": "Bearer ping"})
-            # vLLM and mlx_lm.server both return 200 on /v1/models when
-            # reachable; vLLM may return 401 with --api-key set. Either
-            # proves the server is up. Anything else = unreachable.
-            reachable = r.status_code in (200, 401)
-        else:
-            url = info["ollama_base_url"].rstrip("/") + "/api/tags"
-            async with httpx.AsyncClient(timeout=2.5) as client:
-                r = await client.get(url)
-            reachable = r.status_code == 200
-    except Exception:
-        reachable = False
-    info["reachable"] = reachable
-    info["effective_engine"] = (
-        info["engine"] if reachable else (info.get("fallback_engine") or "offline")
-    )
+                r = await client.get(info["endpoints"][0]["base_url"] + "/models")
+            info["reachable"] = r.status_code in (200, 401)
+        except Exception:
+            info["reachable"] = False
     return JSONResponse(info)
 
 
@@ -748,13 +456,6 @@ def print_page(query_id: str):  # noqa: ARG001 — captured by the SPA router
     return JSONResponse({"error": "sveltekit build not present"}, status_code=503)
 
 
-# Legacy custom-element bundle routes (/legacy, /single, /compare, /agent,
-# /report, /register/*) were retired in v0.4.5 — the SvelteKit UI fully
-# subsumes them. Static assets at /static/* still mount in case anything
-# external embeds them, but the page-level routes are gone. Hitting them
-# now returns the framework default 404.
-
-
 @app.get("/api/register/{asset_class}")
 def api_register(asset_class: str):
     """Return a pre-computed asset-class register."""
@@ -772,255 +473,16 @@ def api_register(asset_class: str):
     )
 
 
-@app.get("/api/compare")
-async def compare_stream(a: str, b: str, request: Request):
-    """Two parallel FSM runs, results returned as a single SSE stream.
-    Each event is tagged with side="a" or side="b" so the client can
-    route updates to the correct panel."""
-    import asyncio
-    import queue
-
-    from app.fsm import iter_steps
-
-    def gen_for_side(side: str, q_text: str, out_q):
-        try:
-            for ev in iter_steps(q_text):
-                ev["side"] = side
-                out_q.put(ev)
-        except Exception as e:
-            out_q.put({"side": side, "kind": "error", "err": str(e)})
-        out_q.put({"side": side, "kind": "_done"})
-
-    out_q: queue.Queue[dict] = queue.Queue()
-
-    def kick():
-        # run both sides in parallel threads — each Burr Application owns
-        # its own state so this is safe, and Ollama with NUM_PARALLEL=2
-        # serves both reconcile calls concurrently.
-        loop = asyncio.get_event_loop()
-        loop.run_in_executor(_SSE_EXECUTOR, gen_for_side, "a", a, out_q)
-        loop.run_in_executor(_SSE_EXECUTOR, gen_for_side, "b", b, out_q)
-
-    async def event_stream():
-        kick()
-        yield f"event: hello\ndata: {json.dumps({'a': a, 'b': b})}\n\n"
-        done = 0
-        while done < 2:
-            try:
-                ev = await asyncio.to_thread(out_q.get, True, 1.0)
-            except Exception:
-                continue
-            if ev.get("kind") == "_done":
-                done += 1
-                continue
-            if ev.get("kind") == "step":
-                yield f"event: step\ndata: {json.dumps(ev, default=str)}\n\n"
-            elif ev.get("kind") == "final":
-                yield f"event: final\ndata: {json.dumps(ev, default=str)}\n\n"
-            elif ev.get("kind") == "error":
-                yield f"event: error\ndata: {json.dumps(ev)}\n\n"
-        yield "event: done\ndata: {}\n\n"
-
-    return StreamingResponse(
-        event_stream(),
-        media_type="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-    )
-
-
-@app.get("/api/stream")
-async def stream(q: str, request: Request):
-    """Server-sent-events stream: each FSM action yields one event."""
-
-    def gen():
-        try:
-            yield f"event: hello\ndata: {json.dumps({'query': q})}\n\n"
-            for ev in iter_steps(q):
-                if ev["kind"] == "step":
-                    yield f"event: step\ndata: {json.dumps(ev, default=str)}\n\n"
-                else:
-                    yield f"event: final\ndata: {json.dumps(ev, default=str)}\n\n"
-            yield "event: done\ndata: {}\n\n"
-        except Exception as e:
-            yield f"event: error\ndata: {json.dumps({'err': str(e)})}\n\n"
-
-    return StreamingResponse(
-        gen(),
-        media_type="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-    )
-
-
-def _run_compare(p, raw_query: str, out_q, i_addr) -> dict:
-    """Run the compare intent: execute the full single_address specialist
-    suite sequentially for each target, then merge the two paragraphs into
-    one Markdown document clearly labelled PLACE A and PLACE B.
-
-    Sequential execution is required because the FSM uses thread-local hooks
-    (set_strict_mode, set_token_callback) — concurrent runs on the same
-    thread would corrupt the hooks. See app/intents/single_address.py.
-
-    Step events from each target are forwarded to out_q tagged with a
-    `target_label` key so the trace UI can optionally group them, but the
-    existing trace UI ignores unknown keys gracefully."""
-    from app.intents import neighborhood as i_nbhd
-    from app.planner import Plan
-
-    addr_targets = [t for t in p.targets if t.get("type") in ("address", "nta")]
-    if len(addr_targets) < 2:
-        # Fallback: only one (or zero) address extracted — run as single_address
-        return i_addr.run(p, raw_query, progress_q=out_q, strict=True)
-
-    results = []
-    for idx, target in enumerate(addr_targets[:2]):
-        label = "PLACE A" if idx == 0 else "PLACE B"
-        addr_text = target["text"]
-
-        if out_q is not None:
-            # Wrap out_q to tag step events with the target label so the
-            # trace UI can optionally group them; token/mellea_attempt pass
-            # through untagged so the SvelteKit briefing buffer works.
-            # Bind loop vars on the instance, not via closure (closure would
-            # late-bind across iterations).
-            class _TaggedQ:
-                def __init__(self, q, lab):
-                    self._q = q
-                    self._label = lab
-
-                def put(self, ev):
-                    if ev.get("kind") == "step":
-                        self._q.put({**ev, "target_label": self._label})
-                    else:
-                        self._q.put(ev)
-
-            effective_q = _TaggedQ(out_q, label)
-        else:
-            effective_q = None
-
-        if target.get("type") == "nta":
-            sub_plan = Plan(
-                intent="neighborhood",
-                targets=[{"type": "nta", "text": addr_text}],
-                specialists=p.specialists,
-                rationale=p.rationale,
-            )
-            result = i_nbhd.run(sub_plan, addr_text, progress_q=effective_q, strict=True)
-        else:
-            sub_plan = Plan(
-                intent="single_address",
-                targets=[{"type": "address", "text": addr_text}],
-                specialists=p.specialists,
-                rationale=p.rationale,
-            )
-            result = i_addr.run(sub_plan, addr_text, progress_q=effective_q, strict=True)
-        results.append((label, addr_text, result))
-
-    # Merge: produce one paragraph with both place sections.
-    parts = []
-    for label, addr_text, res in results:
-        para = (res.get("paragraph") or "").strip()
-        parts.append(f"## {label}: {addr_text}\n\n{para}")
-    merged_paragraph = "\n\n---\n\n".join(parts)
-
-    # Combine Mellea metadata: sum attempts, union passed/failed.
-    def _merge_mellea(a, b):
-        def _lst(m, k):
-            return m.get(k) or []
-
-        return {
-            "rerolls": (a.get("rerolls") or 0) + (b.get("rerolls") or 0),
-            "n_attempts": (a.get("n_attempts") or 0) + (b.get("n_attempts") or 0),
-            "requirements_passed": list(
-                set(_lst(a, "requirements_passed")) & set(_lst(b, "requirements_passed"))
-            ),
-            "requirements_failed": list(
-                set(_lst(a, "requirements_failed") + _lst(b, "requirements_failed"))
-            ),
-            "requirements_total": max(
-                a.get("requirements_total") or 0, b.get("requirements_total") or 0
-            ),
-        }
-
-    mellea_a = results[0][2].get("mellea") or {}
-    mellea_b = results[1][2].get("mellea") or {}
-
-    # Spread Place A's full specialist state into the return dict so
-    # adaptFinalToFindings can build evidence cards (TTM, TerraMind, Prithvi,
-    # Sandy, etc.) from the higher-risk location.  Place B's live-state data
-    # is available via targets[].state for future per-location card rendering.
-    # Without this, _run_compare returned only paragraph/mellea/intent/targets
-    # and all fine-tuned model cards were silently suppressed (state keys
-    # missing → card builders returned null).
-    out = {**results[0][2]}
-    out.update(
-        {
-            "paragraph": merged_paragraph,
-            "mellea": _merge_mellea(mellea_a, mellea_b),
-            "intent": "compare",
-            "targets": [
-                {"label": lbl, "address": addr, "state": res} for lbl, addr, res in results
-            ],
-            "tier": results[0][2].get("tier"),
-        }
-    )
-    return out
-
-
 @app.get("/api/agent")
 def api_agent(q: str):
-    """Agentic endpoint: take a natural-language query, plan it via
-    Granite 4.1, dispatch to the appropriate intent module, return the
-    full result as JSON.
+    """One briefing as JSON: plan (LLM or regex), run the Burr app for the
+    intent, return the full result. Used by MCP clients and scripts."""
+    from riprap.core.burr.app import run as burr_run
 
-    Two runtime paths:
-      RIPRAP_USE_BURR_APP=1 (default) — runs the new manifest-driven
-        Burr Application (intake → 4 stones in parallel → capstone).
-        See `riprap/core/burr/app.py`.
-      RIPRAP_USE_BURR_APP=0 — falls back to the legacy intent dispatch
-        (app/intents/single_address.py etc.). Use during migration
-        validation if a regression appears.
-    """
-    use_burr = os.environ.get("RIPRAP_USE_BURR_APP", "1").lower() in ("1", "true", "yes")
     tracker = emissions.Tracker()
     emissions.install(tracker)
     try:
-        if use_burr:
-            from riprap.core.burr.app import run as burr_run
-
-            out = burr_run(q)
-        else:
-            from app.intents import development_check as i_dev
-            from app.intents import live_now as i_live
-            from app.intents import neighborhood as i_nbhd
-            from app.intents import single_address as i_addr
-            from app.planner import plan as run_planner
-
-            p = run_planner(q)
-            if p.intent == "not_implemented":
-                return JSONResponse(
-                    {
-                        "paragraph": p.rationale,
-                        "mellea": {
-                            "rerolls": 0,
-                            "n_attempts": 0,
-                            "requirements_passed": [],
-                            "requirements_failed": [],
-                            "requirements_total": 0,
-                        },
-                        "status": "not_implemented",
-                        "emissions": tracker.summarize(),
-                    }
-                )
-            if p.intent == "compare":
-                out = _run_compare(p, q, None, i_addr)
-            elif p.intent == "development_check":
-                out = i_dev.run(p, q, strict=True)
-            elif p.intent == "neighborhood":
-                out = i_nbhd.run(p, q, strict=True)
-            elif p.intent == "live_now":
-                out = i_live.run(p, q)
-            else:
-                out = i_addr.run(p, q, strict=True)
+        out = burr_run(q)
         out["emissions"] = tracker.summarize()
         return JSONResponse(_to_json_safe(out))
     finally:
@@ -1085,82 +547,11 @@ async def api_agent_batch(request: Request) -> JSONResponse:
     return JSONResponse({"results": results, "n": len(results)})
 
 
-def _run_burr_single_address(plan, query: str, out_q) -> dict:
-    """SSE-streaming single_address path through the new Burr Application.
-
-    Mirrors `app.intents.single_address.run`'s contract:
-      - pushes {kind: step | token | mellea_attempt} to `out_q`
-      - returns a final dict with `intent`, `plan`, and all pebble values
-        + the cited paragraph.
-
-    The threadlocal token / mellea-attempt callbacks installed here are
-    snapshotted by `iter_steps_from_plan`'s worker thread, so reconcile
-    streams Granite tokens out live exactly like the legacy path.
-    """
-    from app.fsm import (
-        set_mellea_attempt_callback,
-        set_planned_specialists,
-        set_planner_intent,
-        set_strict_mode,
-        set_token_callback,
-        set_user_query,
-    )
-    from riprap.core.burr.app import iter_steps_from_plan
-
-    set_strict_mode(True)
-    set_planned_specialists(plan.specialists or [])
-    set_user_query(query)
-    set_planner_intent(plan.intent)
-
-    def _on_token(delta: str, attempt_idx: int = 0):
-        out_q.put({"kind": "token", "delta": delta, "attempt": attempt_idx + 1})
-
-    def _on_mellea_attempt(attempt_idx, passed, failed):
-        out_q.put(
-            {"kind": "mellea_attempt", "attempt": attempt_idx, "passed": passed, "failed": failed}
-        )
-
-    set_token_callback(_on_token)
-    set_mellea_attempt_callback(_on_mellea_attempt)
-
-    first_target = ""
-    if plan.targets:
-        t0 = plan.targets[0]
-        first_target = t0.get("text") or t0.get("address") or ""
-
-    plan_dict = {
-        "intent": plan.intent,
-        "targets": plan.targets,
-        "specialists": plan.specialists,
-        "rationale": plan.rationale,
-    }
-
-    try:
-        final = None
-        for ev in iter_steps_from_plan(query, plan_dict, plan.intent, first_target):
-            if ev["kind"] == "step":
-                out_q.put({"kind": "step", **ev})
-            else:
-                final = ev
-        out = {**(final or {}), "trace": []}
-    finally:
-        set_token_callback(None)
-        set_mellea_attempt_callback(None)
-        set_strict_mode(False)
-        set_planned_specialists(None)
-        set_user_query(None)
-        set_planner_intent(None)
-
-    out["intent"] = "single_address"
-    out["plan"] = plan_dict
-    return out
-
-
 @app.get("/api/agent/stream")
 async def api_agent_stream(q: str):
-    """SSE: emit `plan` once the planner finishes, then a `step` event per
-    finalized specialist, then `final` with the full result. The intent
-    runs in a thread; we marshal events through a queue."""
+    """SSE: `plan` once the planner finishes, a `step` event per finished
+    pebble or pipeline step, then `final` with the full result. The run
+    happens on a worker thread; events cross over through a queue."""
     import asyncio
     import queue
 
@@ -1171,82 +562,33 @@ async def api_agent_stream(q: str):
     def runner():
         emissions.install(tracker)
         try:
-            from app.intents import development_check as i_dev
-            from app.intents import live_now as i_live
-            from app.intents import neighborhood as i_nbhd
-            from app.intents import single_address as i_addr
-            from app.planner import Plan
-            from app.planner import plan as run_planner
+            from riprap.core import llm as core_llm
+            from riprap.core.burr.app import iter_steps, plan_for, run_compare
 
-            def _on_plan_token(delta: str):
-                out_q.put({"kind": "plan_token", "delta": delta})
+            if core_llm.tier() == "no_llm":
+                out_q.put({"kind": "plan_token", "delta": "[heuristic planner, no LLM call]"})
+            plan = plan_for(q)
+            out_q.put({"kind": "plan", "intent": plan["intent"], "targets": plan.get("targets"),
+                       "specialists": [], "rationale": plan.get("rationale")})
 
-            # Honor RIPRAP_RECONCILER_TIER=no_llm for planning too.
-            # Without this, the SSE path always calls Granite via
-            # Ollama, which classified question-form queries like
-            # "What is the flood risk in Brooklyn?" as neighborhood
-            # intent — routing to the NYC-only legacy code path
-            # regardless of address. The heuristic planner defaults
-            # to single_address, which then goes through the Burr
-            # app with per-query deployment routing.
-            from riprap.core import llm as _core_llm
+            def stream(query: str, sub_plan: dict, label: str | None = None) -> dict:
+                final: dict = {}
+                for ev in iter_steps(query, sub_plan):
+                    if ev["kind"] == "final":
+                        final = ev
+                    elif label and ev["kind"] == "step":
+                        out_q.put({**ev, "target_label": label})
+                    else:
+                        out_q.put(ev)
+                final.pop("kind", None)
+                return final
 
-            if _core_llm.tier() == "no_llm":
-                p = Plan(
-                    intent="single_address",
-                    targets=[{"type": "address", "text": q}],
-                    specialists=[],
-                    rationale="Heuristic match: single_address (no-LLM planner).",
-                )
-                out_q.put({"kind": "plan_token", "delta": "[heuristic planner — no LLM call]"})
+            if plan["intent"] == "compare":
+                labels = iter(("PLACE A", "PLACE B"))
+                final = run_compare(q, plan, runner=lambda qq, pp: stream(qq, pp, next(labels, None)))
             else:
-                p = run_planner(q, on_token=_on_plan_token)
-
-            out_q.put(
-                {
-                    "kind": "plan",
-                    "intent": p.intent,
-                    "targets": p.targets,
-                    "specialists": p.specialists,
-                    "rationale": p.rationale,
-                }
-            )
-            if p.intent == "not_implemented":
-                final = {
-                    "paragraph": p.rationale,
-                    "mellea": {
-                        "rerolls": 0,
-                        "n_attempts": 0,
-                        "requirements_passed": [],
-                        "requirements_failed": [],
-                        "requirements_total": 0,
-                    },
-                    "status": "not_implemented",
-                }
-            elif p.intent == "compare":
-                final = _run_compare(p, q, out_q, i_addr)
-            elif p.intent == "development_check":
-                final = i_dev.run(p, q, progress_q=out_q, strict=True)
-            elif p.intent == "neighborhood":
-                final = i_nbhd.run(p, q, progress_q=out_q, strict=True)
-            elif p.intent == "live_now":
-                final = i_live.run(p, q, progress_q=out_q)
-            else:
-                # single_address path. RIPRAP_USE_BURR_APP=1 (default)
-                # routes through the new manifest-driven Burr Application
-                # with parallel Stone fan-out. Falls back to the legacy
-                # linear FSM via the intent module when the flag is off.
-                if os.environ.get("RIPRAP_USE_BURR_APP", "1").lower() in ("1", "true", "yes"):
-                    final = _run_burr_single_address(p, q, out_q)
-                else:
-                    final = i_addr.run(p, q, progress_q=out_q, strict=True)
+                final = stream(q, plan)
             final["emissions"] = tracker.summarize()
-            # Every intent's `final` dict converges here — the one place
-            # that can run the 13 briefing-standards predicates against
-            # every response regardless of which intent produced it.
-            from riprap.core.burr.app import _attach_compliance_audit
-
-            final = _attach_compliance_audit(final)
             out_q.put({"kind": "final", **final})
         except Exception as e:
             out_q.put({"kind": "error", "err": str(e)})
@@ -1352,19 +694,10 @@ async def api_agent_stream(q: str):
 
 @app.get("/api/agent/plan")
 def api_agent_plan(q: str):
-    """Just the plan, no execution. Useful for showing the agent's routing
-    decision before running specialists."""
-    from app.planner import plan as run_planner
+    """Just the plan (intent and targets), no execution."""
+    from riprap.core.burr.app import plan_for
 
-    p = run_planner(q)
-    return JSONResponse(
-        {
-            "intent": p.intent,
-            "targets": p.targets,
-            "specialists": p.specialists,
-            "rationale": p.rationale,
-        }
-    )
+    return JSONResponse(plan_for(q))
 
 
 @app.get("/api/layers/nta")

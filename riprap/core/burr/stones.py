@@ -1,16 +1,20 @@
-"""Stone fan-out actions via Burr `MapActions`.
+"""The four data Stones as one parallel Burr fan-out.
 
-Each Stone (Cornerstone / Touchstone / Lodestone / Keystone) is a single
-parent action in the top-level Application that fans out to its pebbles
-in parallel, then reduces results back into one state.
+Cornerstone, Touchstone, Keystone and Lodestone pebbles do not depend on
+each other, so a single `MapActions` runs every pebble for the query
+concurrently (Burr's thread pool) and reduces the results back into one
+state. The Stone a pebble belongs to is still its manifest's `stone:`
+field; the UI and the briefing group by it.
 
-The set of pebbles a Stone fans out to is read at call time from the
-manifest registry — no hand-coded lists. Drop a YAML manifest with
-`stone: cornerstone` and the next briefing run picks it up.
+Which pebbles run depends on the intent:
 
-Capstone is **not** a MapActions — it's a sequential rag+reconcile+mellea
-loop with its own iterate() halt condition, modelled as a sub-Application
-(see capstone.py).
+  single_address, compare   point pebbles
+  live_now                  point pebbles of `type: live`
+  neighborhood,
+  development_check         polygon pebbles (spatial.scope: polygon)
+
+`policy_corpus` is excluded here; the Capstone runs it with a query built
+from the other evidence.
 """
 from __future__ import annotations
 
@@ -24,189 +28,102 @@ from burr.core.parallelism import MapActions
 from riprap.core.burr.pebble import pebble_action
 from riprap.core.pebbles import load_registry
 
+DATA_STONES = ("cornerstone", "touchstone", "keystone", "lodestone")
+POLYGON_INTENTS = ("neighborhood", "development_check")
 
-def _pebbles_for(
-    stone_id: str,
-    deployment: str | None = None,
-    lat: float | None = None,
-    lon: float | None = None,
-) -> list[str]:
-    """Pebble ids for a stone, ordered by display.order (UI-friendly).
 
-    Two-stage filter:
-      1. Load the deployment's registry (which auto-merges federal pebbles).
-      2. Per-pebble: keep only pebbles whose `coverage` contains the
-         query point. Pebbles without a `coverage` block inherit their
-         deployment's bbox (back-compat).
+def _wants(manifest, intent: str | None) -> bool:
+    scope = "polygon" if intent in POLYGON_INTENTS else "point"
+    if manifest.spatial.scope != scope:
+        return False
+    return intent != "live_now" or manifest.type == "live"
 
-    `deployment` is a deployment directory name (e.g. `'boston'`) or a
-    path. When None, falls back to `RIPRAP_DEPLOYMENT` env var.
-    Sentinel `"__none__"` (set by `select_deployment` when no deployment
-    covers the geocoded point) returns [].
-    """
+
+def pebbles_for(deployment: str | None, lat: float | None = None, lon: float | None = None,
+                intent: str | None = None) -> list[str]:
+    """Pebble ids to run for a query, in Stone then display order.
+
+    `deployment` is a deployment name, or "__none__" when no city covers
+    the point (federal pebbles still run). Pebbles whose `coverage` does
+    not contain the point are skipped."""
     import os
     from pathlib import Path
 
-    from riprap.core.pebbles.deployments import deployment_by_name  # noqa: PLC0415
+    from riprap.core.pebbles.deployments import deployment_by_name
+
     if deployment == "__none__":
-        # Out-of-coverage of every spatially-routed deployment. We
-        # should still fire FEDERAL pebbles (NWS alerts, NWS obs) for
-        # any in-CONUS point — those are national in scope and the
-        # user expects an "active alerts" surface even in Albuquerque.
-        # The per-pebble `fires_at` filter below catches out-of-CONUS
-        # points (e.g. Tokyo) regardless.
         deployment = "federal"
     if deployment is None:
         deployment = os.environ.get("RIPRAP_DEPLOYMENT", "deployments/nyc")
-    # Resolve: short name like 'nyc' → repo deployments/nyc; otherwise
-    # treat as a path (env var legacy form `deployments/nyc`).
     dep = deployment_by_name(deployment)
     if dep is not None:
-        p = dep.root
-        deployment_bbox = dep.bbox
+        root, bbox = dep.root, dep.bbox
     else:
-        p = Path(deployment)
-        if not p.is_absolute():
-            p = Path(__file__).resolve().parent.parent.parent.parent / deployment
-        deployment_bbox = None
-    if not p.exists() or not (p / "manifests").is_dir():
+        root, bbox = Path(deployment), None
+        if not root.is_absolute():
+            root = Path(__file__).resolve().parent.parent.parent.parent / deployment
+    if not (root / "manifests").is_dir():
         return []
-    reg = load_registry(p)
-    pebbles = [pb for pb in reg.all() if pb.stone == stone_id]
-
-    # Per-pebble coverage filter. Skip when we have no coords — the
-    # union-of-writes path needs a complete list (it's lat/lon-blind),
-    # and the empty-fan-out case is already handled by the __none__
-    # sentinel above.
+    order = {s: i for i, s in enumerate(DATA_STONES)}
+    pebbles = [p for p in load_registry(root).all()
+               if p.stone in order and p.id != "policy_corpus" and _wants(p.manifest, intent)]
     if lat is not None and lon is not None:
-        pebbles = [pb for pb in pebbles if pb.fires_at(lat, lon, deployment_bbox)]
-
-    pebbles.sort(key=lambda pb: (
-        pb.manifest.display.order if pb.manifest.display.order is not None else 999,
-        pb.id,
-    ))
-    return [pb.id for pb in pebbles]
+        pebbles = [p for p in pebbles if p.fires_at(lat, lon, bbox)]
+    pebbles.sort(key=lambda p: (order[p.stone],
+                                p.manifest.display.order if p.manifest.display.order is not None else 999,
+                                p.id))
+    return [p.id for p in pebbles]
 
 
-def _all_pebbles_for_stone(stone_id: str) -> list[str]:
-    """Union of pebble ids for this stone across every spatially-routed
-    deployment (i.e. those that declare a `coverage.bbox` in stones.yaml).
+def _all_data_pebble_ids() -> list[str]:
+    """Union of data-Stone pebble ids across every deployment. Burr needs
+    `writes` before any query arrives; the reducer fills keys the routed
+    deployment did not run with None."""
+    from riprap.core.pebbles.deployments import discover_deployments
 
-    Hazard-only deployments (heat, air) don't bbox-route — they're
-    selected via the `RIPRAP_DEPLOYMENT` env var and never collide with
-    place-based routing — so they're excluded from the union to keep
-    the declared writes set tight.
-
-    `writes` is read once at graph-build time, before any query lands,
-    so it can't depend on the per-query deployment. The reducer fills
-    any union-declared key that the active deployment didn't write with
-    None so Burr's write-validation passes.
-
-    Federal pebbles get auto-merged into every city deployment by
-    `load_registry`, so the per-deployment listings already include
-    them — no separate federal pass needed."""
-    from riprap.core.pebbles.deployments import discover_deployments  # noqa: PLC0415
-    seen: set[str] = set()
+    ids: set[str] = set()
     for dep in discover_deployments():
-        if dep.bbox is None:
+        try:
+            reg = load_registry(dep.root)
+        except Exception:  # noqa: BLE001 - one malformed deployment must not break the rest
             continue
-        # lat/lon omitted → no per-pebble filter; the union spans
-        # everything that COULD fire for this stone, regardless of
-        # geocoded point. Coverage filtering happens at run time.
-        seen.update(_pebbles_for(stone_id, dep.name))
-    # Stable order keeps debug output reproducible.
-    return sorted(seen)
+        ids.update(p.id for p in reg.all() if p.stone in DATA_STONES and p.id != "policy_corpus")
+    return sorted(ids)
 
 
-class _StoneMapActions(MapActions):
-    """Common base — concrete Stone classes set `stone_id` + `state_keys`.
-
-    `state_keys` is the list of pebble-state-keys this Stone writes,
-    declared to Burr via the `writes` property so transitions can chain
-    on a single Stone action.
-    """
-    stone_id: str = ""
+class StonesAction(MapActions):
+    """Every data-Stone pebble for the query, run concurrently."""
 
     @property
     def reads(self) -> list[str]:
-        return ["lat", "lon", "deployment"]
+        return ["lat", "lon", "deployment", "intent", "polygon_wkt"]
 
     @property
     def writes(self) -> list[str]:
-        # Union across deployments — see `_all_pebbles_for_stone`. The
-        # per-query deployment subset is chosen at run time inside
-        # `actions()`; unused pebble keys stay unset in state.
-        return [*_all_pebbles_for_stone(self.stone_id), "trace"]
+        return [*_all_data_pebble_ids(), "trace"]
 
-    def actions(
-        self,
-        state: State,
-        inputs: dict[str, Any],  # noqa: ARG002 — Burr API signature
-        context: ApplicationContext,  # noqa: ARG002 — Burr API signature
-    ) -> Generator[Any, None, None]:
-        # The pebble_action factory sets __name__ = f"pebble_{pid}", which
-        # Burr picks up as the action name (no with_name() needed since
-        # @action returns a plain function, not an Action object).
-        deployment = state.get("deployment")
-        lat = state.get("lat")
-        lon = state.get("lon")
-        for pid in _pebbles_for(self.stone_id, deployment, lat=lat, lon=lon):
+    def actions(self, state: State, inputs: dict[str, Any],  # noqa: ARG002 - Burr API
+                context: ApplicationContext) -> Generator[Any, None, None]:  # noqa: ARG002
+        for pid in pebbles_for(state.get("deployment"), state.get("lat"), state.get("lon"),
+                               state.get("intent")):
             yield pebble_action(pid)
 
-    def state(self, state: State, inputs: dict[str, Any]) -> State:  # noqa: ARG002 — Burr API signature
-        # Each fan-out task starts with the same parent state slice:
-        # lat, lon, and an empty trace (each task adds its own rec; the
-        # reduce merges them back).
+    def state(self, state: State, inputs: dict[str, Any]) -> State:  # noqa: ARG002 - Burr API
         return state.update(trace=[])
 
-    def reduce(
-        self,
-        state: State,
-        states: Iterable[State],
-    ) -> State:
-        """Merge each pebble's value + trace record back into one state."""
-        accumulated_trace = list(state.get("trace", []))
+    def reduce(self, state: State, states: Iterable[State]) -> State:
+        trace = list(state.get("trace", []))
         updates: dict[str, Any] = {}
         for s in states:
-            # Each sub-state wrote its own pebble_id and a single-entry trace.
             for k in s.keys():
                 if k == "trace":
-                    accumulated_trace.extend(s["trace"])
-                else:
-                    # Only copy the keys this sub-task wrote — its own
-                    # pebble key. Sub-state inherits the parent's read
-                    # keys (lat/lon, deployment) unchanged; we don't
-                    # want to write those back.
-                    if k in ("lat", "lon", "deployment"):
-                        continue
+                    trace.extend(s["trace"])
+                elif k not in ("lat", "lon", "deployment", "intent", "polygon_wkt"):
                     updates[k] = s[k]
-        # Burr validates every declared `write` is present after reduce.
-        # `writes` is the union across spatially-routed deployments; if
-        # this run's deployment doesn't include a pebble, fill it with
-        # None so the validator is satisfied.
         for declared in self.writes:
-            if declared == "trace":
-                continue
-            if declared not in updates and state.get(declared) is None:
+            if declared != "trace" and declared not in updates and state.get(declared) is None:
                 updates[declared] = None
-        return state.update(trace=accumulated_trace, **updates)
-
-
-class CornerstoneAction(_StoneMapActions):
-    """What NYC's ground remembers about flooding — hazard + history."""
-    stone_id = "cornerstone"
-
-
-class TouchstoneAction(_StoneMapActions):
-    """The current state of the city's flood signals + live EO."""
-    stone_id = "touchstone"
-
-
-class LodestoneAction(_StoneMapActions):
-    """Alerts + surge + recurrence forecasts (what's coming)."""
-    stone_id = "lodestone"
-
-
-class KeystoneAction(_StoneMapActions):
-    """Exposed public assets + built fabric (what's at risk)."""
-    stone_id = "keystone"
+        order = {pid: i for i, pid in enumerate(pebbles_for(
+            state.get("deployment"), state.get("lat"), state.get("lon"), state.get("intent")))}
+        new = sorted(trace[len(state.get("trace", [])):], key=lambda r: order.get(r.get("step"), 999))
+        return state.update(trace=[*state.get("trace", []), *new], **updates)

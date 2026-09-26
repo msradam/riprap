@@ -1,34 +1,16 @@
-"""Burr layer — first-class state machine on top of the pebble registry.
+"""Burr layer: the briefing state machine on top of the pebble registry.
 
-The runtime is composed of (conceptual graph shape — see riprap/core/burr/app.py
-for the literal action names and wiring):
+  intake     plan (LLM or regex) -> geocode (point) or resolve_area (NTA)
+  routing    select_deployment by bounding box
+  stones     one parallel fan-out over every Cornerstone, Touchstone,
+             Keystone and Lodestone pebble for the intent
+  capstone   policy_corpus, then reconcile (verified LLM claims or the
+             no-LLM evidence briefing)
 
-  intake       (planner + geocode; sets query, intent, lat, lon)
-       ↓
-  cornerstone  (MapActions: parallel fan-out over Cornerstone pebbles)
-  touchstone   (MapActions: ditto for Touchstone)
-  lodestone    (MapActions: ditto for Lodestone)
-  keystone     (MapActions: ditto for Keystone)
-       ↓
-  capstone     (policy_corpus + reconcile + Mellea iterate)
-
-Each Stone's pebble actions are generated at call time from the
-manifest registry — there is no per-pebble @action boilerplate.
-Adding a pebble in YAML automatically extends the Stone's fan-out.
+See riprap/core/burr/app.py for the wiring. Pebble actions are generated
+from the manifest registry; adding a YAML manifest extends the fan-out.
 """
 from riprap.core.burr.pebble import pebble_action, trace_rec_for
-from riprap.core.burr.stones import (
-    CornerstoneAction,
-    KeystoneAction,
-    LodestoneAction,
-    TouchstoneAction,
-)
+from riprap.core.burr.stones import StonesAction
 
-__all__ = [
-    "pebble_action",
-    "trace_rec_for",
-    "CornerstoneAction",
-    "TouchstoneAction",
-    "LodestoneAction",
-    "KeystoneAction",
-]
+__all__ = ["pebble_action", "trace_rec_for", "StonesAction"]

@@ -200,6 +200,10 @@ def synthesize(state) -> dict:
     """Run the claim loop. Returns paragraph, citations and a `grounding`
     record (kept claims, dropped claims with reasons, attempts, model).
     Falls back to the no-LLM briefing when no endpoint answers."""
+    if state.get("intent") == "not_implemented":
+        paragraph, _ = compose_briefing(state)
+        return {"paragraph": paragraph, "citations": {},
+                "grounding": {"tier": "llm", "claims": [], "dropped_claims": [], "attempts": 0}}
     docs, items, _ = _documents(state)
     if not docs:
         return {"paragraph": "No grounded data available for this address.", "citations": {},

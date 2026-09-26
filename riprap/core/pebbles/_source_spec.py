@@ -6,6 +6,7 @@ arguments (Python call kwargs, HTTP request bodies) from a SpatialQuery.
   {source: radius_m}   query.radius_m
   {source: pt_2263}    shapely.Point in EPSG:2263
   {source: pt_4326}    shapely.Point in EPSG:4326
+  {source: polygon_4326} shapely polygon from query.geometry_wkt (WGS84)
   {source: query}      the full SpatialQuery object
   {const: 800}         literal value
   "plain string"        passed through unchanged (not a dict)
@@ -47,6 +48,9 @@ def resolve_source_spec(spec: Any, query: SpatialQuery) -> Any:
         return _build_pt_2263(query.lat, query.lon)
     if src == "pt_4326":
         return _build_pt_4326(query.lat, query.lon)
+    if src == "polygon_4326":
+        from shapely import wkt  # noqa: PLC0415
+        return wkt.loads(query.geometry_wkt)
     if src == "query":
         return query
     raise ValueError(f"unknown source {src!r}")
