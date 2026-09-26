@@ -201,7 +201,7 @@ def _warm_caches():
             print("[startup] hospitals geojson loaded", flush=True)
         except Exception as _e:
             print(f"[startup] register warm failed (non-fatal): {_e}", flush=True)
-    print("[startup] warming RAG (Granite Embedding 278M + 5 PDFs)...", flush=True)
+    print("[startup] loading the policy-corpus index...", flush=True)
     # RAG warm loads sentence-transformers, which on some HF Space rebuilds
     # has hit transformers-lazy-import edge cases (CodeCarbonCallback). The
     # Space *must* start even if RAG fails — the FSM still works without

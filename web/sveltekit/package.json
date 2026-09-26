@@ -10,7 +10,7 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --output human-verbose --fail-on-warnings false",
     "check:types": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:lint": "eslint .",
-    "test": "vitest run",
+    "test": "svelte-kit sync && vitest run",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:e2e": "playwright test --grep-invert @demo",
