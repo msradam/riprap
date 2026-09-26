@@ -1,0 +1,316 @@
+# Question set for the v1 / v2 evaluation (refactor 2).
+#
+# Every entry is author-written: drafted by the refactor author from the
+# gallery targets and the NYC pebble registry, not collected from users.
+#
+# Fields:
+#   kind                   one of the eight kinds in refactor_2.md
+#   expected_intent        single_address | neighborhood | live_now | out_of_scope
+#   must_run               pebbles a competent analyst would need; missing one is a failure
+#   irrelevant             pebbles that are waste for this question (not a failure)
+#   answer_should_mention  facts the answer or body should contain; each item is a list of
+#                          acceptable strings (case-insensitive substring match, any one counts)
+#
+# Facts come from the no-LLM gallery run of 2026-09-26 (web/sveltekit/src/lib/gallery/)
+# and the district summaries for QN12 and BK15. Live sources (alerts, sensors, gauges)
+# change between runs, so their items name the source, not a value.
+
+- id: q01
+  kind: bare_address
+  author: author-written
+  target: hollis
+  question: "90-01 183rd Street, Queens, NY 11423"
+  expected_intent: single_address
+  must_run: [sandy, fema_nfhl, dep_extreme_2080, dep_moderate_2050, dep_moderate_current, ida_hwm, nyc311, floodnet]
+  irrelevant: []
+  answer_should_mention: [["outside"], ["zone x"], ["high-water mark", "high water mark"]]
+
+- id: q02
+  kind: bare_address
+  author: author-written
+  target: homecrest
+  question: "2017 East 17th Street, Brooklyn, NY 11229"
+  expected_intent: single_address
+  must_run: [sandy, fema_nfhl, dep_extreme_2080, dep_moderate_2050, dep_moderate_current, ida_hwm, nyc311, floodnet]
+  irrelevant: []
+  answer_should_mention: [["outside"], ["zone x"]]
+
+- id: q03
+  kind: bare_address
+  author: author-written
+  target: red-hook
+  question: "80 Pioneer Street, Brooklyn, NY"
+  expected_intent: single_address
+  must_run: [sandy, fema_nfhl, dep_extreme_2080, dep_moderate_2050, dep_moderate_current, ida_hwm, nyc311, floodnet]
+  irrelevant: []
+  answer_should_mention: [["within", "inside"], ["ae"]]
+
+- id: q04
+  kind: bare_address
+  author: author-written
+  target: lower-east-side
+  question: "560 Grand Street, Manhattan, NY"
+  expected_intent: single_address
+  must_run: [sandy, fema_nfhl, dep_extreme_2080, dep_moderate_2050, dep_moderate_current, ida_hwm, nyc311, floodnet]
+  irrelevant: []
+  answer_should_mention: [["zone x"], ["nycha"]]
+
+- id: q05
+  kind: flood_history
+  author: author-written
+  target: hollis
+  question: "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?"
+  expected_intent: single_address
+  must_run: [ida_hwm, nyc311, floodnet]
+  irrelevant: [npcc4_slr, ttm_battery_surge, noaa_tides, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["high-water mark", "high water mark"], ["311"], ["floodnet", "sensor"]]
+
+- id: q06
+  kind: flood_history
+  author: author-written
+  target: red-hook
+  question: "Was 80 Pioneer Street in Red Hook inside the area Hurricane Sandy flooded in 2012?"
+  expected_intent: single_address
+  must_run: [sandy]
+  irrelevant: [nws_obs, nws_alerts, noaa_tides, usgs_gauges, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, npcc4_slr]
+  answer_should_mention: [["within", "inside"]]
+
+- id: q07
+  kind: flood_history
+  author: author-written
+  target: gowanus
+  question: "What flood events have been recorded near 400 Carroll Street, Brooklyn?"
+  expected_intent: single_address
+  must_run: [ida_hwm, nyc311, floodnet, sandy]
+  irrelevant: [npcc4_slr, ttm_battery_surge, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["high-water mark", "high water mark"], ["floodnet", "sensor"], ["311"]]
+
+- id: q08
+  kind: flood_history
+  author: author-written
+  target: midland-beach
+  question: "Did Hurricane Sandy flood 801 Father Capodanno Boulevard, Staten Island?"
+  expected_intent: single_address
+  must_run: [sandy]
+  irrelevant: [nws_obs, usgs_gauges, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, doe_schools, mta_entrances]
+  answer_should_mention: [["within", "inside"]]
+
+- id: q09
+  kind: flood_history
+  author: author-written
+  target: homecrest
+  question: "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?"
+  expected_intent: single_address
+  must_run: [nyc311]
+  irrelevant: [npcc4_slr, ttm_battery_surge, noaa_tides, usgs_gauges, doh_hospitals, mta_entrances, prithvi_water]
+  answer_should_mention: [["311"], ["complaint"]]
+
+- id: q10
+  kind: right_now
+  author: author-written
+  target: red-hook
+  question: "Is there flooding near 80 Pioneer Street, Brooklyn right now?"
+  expected_intent: live_now
+  must_run: [nws_alerts, floodnet]
+  irrelevant: [npcc4_slr, prithvi_water, ida_hwm, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["alert"], ["floodnet", "sensor"]]
+
+- id: q11
+  kind: right_now
+  author: author-written
+  target: rockaway-park
+  question: "Are there any active flood or coastal alerts at 116-02 Rockaway Beach Boulevard right now?"
+  expected_intent: live_now
+  must_run: [nws_alerts]
+  irrelevant: [npcc4_slr, prithvi_water, ida_hwm, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["alert"]]
+
+- id: q12
+  kind: right_now
+  author: author-written
+  target: hollis
+  question: "Is it raining hard near 90-01 183rd Street, Queens at the moment?"
+  expected_intent: live_now
+  must_run: [nws_obs]
+  irrelevant: [npcc4_slr, prithvi_water, ida_hwm, sandy, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["precip", "rain", "metar", "observation"]]
+
+- id: q13
+  kind: right_now
+  author: author-written
+  target: lower-east-side
+  question: "What is the water level in New York Harbor near 560 Grand Street, Manhattan right now?"
+  expected_intent: live_now
+  must_run: [noaa_tides]
+  irrelevant: [npcc4_slr, prithvi_water, ida_hwm, sandy, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments, nyc311]
+  answer_should_mention: [["mllw", "water level", "ft above"]]
+
+- id: q14
+  kind: future
+  author: author-written
+  target: gowanus
+  question: "What does the 2050 stormwater scenario show at 400 Carroll Street, Brooklyn?"
+  expected_intent: single_address
+  must_run: [dep_moderate_2050]
+  irrelevant: [nws_obs, nws_alerts, noaa_tides, usgs_gauges, floodnet, doe_schools, doh_hospitals]
+  answer_should_mention: [["2050"], ["deep contiguous", "4 ft", "deep"]]
+
+- id: q15
+  kind: future
+  author: author-written
+  target: homecrest
+  question: "Is 2017 East 17th Street, Brooklyn in any of the DEP stormwater flood scenarios?"
+  expected_intent: single_address
+  must_run: [dep_extreme_2080, dep_moderate_2050, dep_moderate_current]
+  irrelevant: [nws_obs, nws_alerts, noaa_tides, usgs_gauges, floodnet, doh_hospitals]
+  answer_should_mention: [["outside", "not in", "not within", "no dep"]]
+
+- id: q16
+  kind: future
+  author: author-written
+  target: rockaway-park
+  question: "How much sea level rise is projected at the Battery by 2050, and what does that mean for 116-02 Rockaway Beach Boulevard?"
+  expected_intent: single_address
+  must_run: [npcc4_slr]
+  irrelevant: [nws_obs, usgs_gauges, doe_schools, doh_hospitals, mta_entrances, nyc311]
+  answer_should_mention: [["0.38"], ["2050"]]
+
+- id: q17
+  kind: future
+  author: author-written
+  target: midland-beach
+  question: "What do the future stormwater scenarios show near 801 Father Capodanno Boulevard, Staten Island?"
+  expected_intent: single_address
+  must_run: [dep_extreme_2080, dep_moderate_2050, dep_moderate_current]
+  irrelevant: [nws_obs, nws_alerts, noaa_tides, usgs_gauges, floodnet, doe_schools]
+  answer_should_mention: [["outside", "not in", "not within", "no dep"]]
+
+- id: q18
+  kind: asset
+  author: author-written
+  target: hollis
+  question: "Are the subway entrances near 90-01 183rd Street, Queens in a flood scenario?"
+  expected_intent: single_address
+  must_run: [mta_entrances]
+  irrelevant: [nws_obs, noaa_tides, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, doe_schools, doh_hospitals, nycha_developments]
+  answer_should_mention: [["8"], ["2080", "extreme"]]
+
+- id: q19
+  kind: asset
+  author: author-written
+  target: lower-east-side
+  question: "Are the NYCHA developments near 560 Grand Street, Manhattan exposed to flooding?"
+  expected_intent: single_address
+  must_run: [nycha_developments]
+  irrelevant: [nws_obs, noaa_tides, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, doe_schools, doh_hospitals, mta_entrances]
+  answer_should_mention: [["5"], ["nycha"]]
+
+- id: q20
+  kind: asset
+  author: author-written
+  target: rockaway-park
+  question: "Are the schools near 116-02 Rockaway Beach Boulevard exposed to flooding?"
+  expected_intent: single_address
+  must_run: [doe_schools]
+  irrelevant: [nws_obs, noaa_tides, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["4"], ["school"]]
+
+- id: q21
+  kind: asset
+  author: author-written
+  target: hunts-point
+  question: "Are any hospitals near 355 Food Center Drive, Bronx in a flood zone?"
+  expected_intent: single_address
+  must_run: [doh_hospitals]
+  irrelevant: [nws_obs, noaa_tides, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, doe_schools, mta_entrances, nycha_developments]
+  answer_should_mention: [["0 hospitals", "no hospitals", "none", "no hospital"]]
+
+- id: q22
+  kind: asset
+  author: author-written
+  target: red-hook
+  question: "Which public housing near 80 Pioneer Street, Brooklyn was inside the Sandy flood extent?"
+  expected_intent: single_address
+  must_run: [nycha_developments]
+  irrelevant: [nws_obs, noaa_tides, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, doe_schools, doh_hospitals, mta_entrances]
+  answer_should_mention: [["2"], ["nycha"], ["sandy"]]
+
+- id: q23
+  kind: district
+  author: author-written
+  target: QN12
+  question: "How many street flooding complaints has community district QN12 had?"
+  expected_intent: neighborhood
+  must_run: [nyc311_nta]
+  irrelevant: [dob_permits_nta, microtopo_nta]
+  answer_should_mention: [["complaint"], ["311"]]
+
+- id: q24
+  kind: district
+  author: author-written
+  target: BK15
+  question: "What share of community district BK15 was inside the area Sandy flooded?"
+  expected_intent: neighborhood
+  must_run: [sandy_nta]
+  irrelevant: [dob_permits_nta, nyc311_nta]
+  answer_should_mention: [["38.5"]]
+
+- id: q25
+  kind: district
+  author: author-written
+  target: QN12
+  question: "How much of community district QN12 is in the DEP extreme stormwater scenario?"
+  expected_intent: neighborhood
+  must_run: [dep_extreme_2080_nta]
+  irrelevant: [dob_permits_nta, sandy_nta]
+  answer_should_mention: [["16.4"]]
+
+- id: q26
+  kind: out_of_scope
+  author: author-written
+  target: homecrest
+  question: "Should I buy the house at 2017 East 17th Street, Brooklyn?"
+  expected_intent: out_of_scope
+  must_run: []
+  irrelevant: []
+  answer_should_mention: [["cannot", "can't", "not able", "outside", "does not", "not a substitute"]]
+
+- id: q27
+  kind: out_of_scope
+  author: author-written
+  target: red-hook
+  question: "What will flood insurance cost me at 80 Pioneer Street, Brooklyn?"
+  expected_intent: out_of_scope
+  must_run: []
+  irrelevant: []
+  answer_should_mention: [["cannot", "can't", "not able", "outside", "does not", "not a substitute"]]
+
+- id: q28
+  kind: out_of_scope
+  author: author-written
+  target: hollis
+  question: "Can I sue the city because my basement at 90-01 183rd Street, Queens flooded?"
+  expected_intent: out_of_scope
+  must_run: []
+  irrelevant: []
+  answer_should_mention: [["cannot", "can't", "not able", "outside", "does not", "not a substitute"]]
+
+- id: q29
+  kind: not_covered
+  author: author-written
+  target: lower-east-side
+  question: "Is 560 Grand Street, Manhattan a heat island in the summer?"
+  expected_intent: out_of_scope
+  must_run: []
+  irrelevant: []
+  answer_should_mention: [["heat"], ["not cover", "does not cover", "not available", "cannot", "only covers", "flood"]]
+
+- id: q30
+  kind: not_covered
+  author: author-written
+  target: hunts-point
+  question: "What is the air quality near 355 Food Center Drive, Bronx today?"
+  expected_intent: out_of_scope
+  must_run: []
+  irrelevant: []
+  answer_should_mention: [["air"], ["not cover", "does not cover", "not available", "cannot", "only covers", "flood"]]
