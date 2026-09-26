@@ -39,7 +39,7 @@ provenance:
     MTA Resilience Plan (2025), NYCHA "Lessons from Sandy".
 
 narration:
-  template: "Policy passages retrieved from the NYC flood-policy corpus for this address: {n_hits} (embedding retrieval; entity tags are experimental)."
+  template: "Policy passages retrieved from the NYC flood-policy corpus for this place: {n_hits} (embedding retrieval; entity tags are experimental)."
   short: NYC flood-policy passages and typed entities (agency, dollar amount, date, location) extracted from agency reports relevant to this address.
 
 display:

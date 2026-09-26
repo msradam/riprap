@@ -20,10 +20,9 @@ fail. See [`docs/GROUNDING.md`](docs/GROUNDING.md).
 
 ![Riprap flood-exposure briefing for DUMBO, Brooklyn](assets/screenshots/hero.png)
 
-Original hackathon demo (frozen at the AMD build, data probes only —
-inferencing disabled): <https://lablab-ai-amd-developer-hackathon-riprap-nyc.hf.space>.
-For a deployment with live inference, see the Quickstart below (Modal,
-a Mac Mini, or docker-compose).
+Run it locally with one command (see the Quickstart). The original
+hackathon demo is frozen at its May 2026 build with inference disabled:
+<https://lablab-ai-amd-developer-hackathon-riprap-nyc.hf.space>.
 
 > **Now an open-source civic-tech framework.** NYC is the reference
 > deployment. Five more deployments (Chicago, Seattle, San Francisco,
@@ -124,128 +123,68 @@ citation.
 
 ## Quickstart
 
-Four ways to use Riprap, in increasing order of self-host. Any option
-that clones the repo needs [Git LFS](https://git-lfs.com) first —
-`data/` and `corpus/` are LFS-tracked, and a clone without it silently
-checks out small pointer files instead of the real data, then the app
-crashes on startup trying to parse one as GeoJSON:
+You need [uv](https://docs.astral.sh/uv/) and [Git LFS](https://git-lfs.com)
+(`data/` and `corpus/` are LFS files; without it the clone has pointer files
+and the app cannot load its layers). No GPU and no API keys.
 
 ```bash
-brew install git-lfs && git lfs install   # once per machine
+git clone https://github.com/msradam/riprap && cd riprap
+git lfs install && git lfs pull
+uv sync --extra ml
+uv run uvicorn web.main:app --port 7860
 ```
 
-(Already cloned without it? `git lfs pull` inside the repo fetches the
-real files retroactively.)
+Open <http://localhost:7860> and type an NYC address. You get the no-LLM
+evidence briefing: one cited sentence per data source, grouped by Stone.
+`uv sync` without `--extra ml` is the light core (no torch, about 290 MB);
+the in-process forecasts and policy retrieval then skip themselves.
 
-### 1. Try the original hackathon demo
+The same briefing from the command line:
 
-<https://lablab-ai-amd-developer-hackathon-riprap-nyc.hf.space>
+```bash
+uv run python -c "from riprap.core.burr.app import run; print(run('189 Atlantic Avenue, Brooklyn, NY')['paragraph'])"
+```
 
-This is the original AMD hackathon build, frozen at its May 2026 commit.
-It runs the full SvelteKit shell and every deterministic data probe
-(Sandy, DEP, NOAA, FloodNet, 311, NPCC4, and the rest). The GPU half is
-offline there, so the Granite reconciler returns a graceful "inference
-offline" shape in place of the LLM-written prose. Methodology, evidence
-cards, and citations all still render.
+### LLM synthesis (optional)
 
-For the full LLM and specialist path, run the inference stack yourself.
-Three options — see [`docs/DEPLOY.md`](docs/DEPLOY.md) for the full
-walkthrough of each:
+Point Riprap at any OpenAI-compatible endpoint. With local
+[Ollama](https://ollama.com):
 
-- **Modal (scale-to-zero, recommended).** `modal deploy` two apps from
-  [`msradam/riprap-inference`](https://github.com/msradam/riprap-inference)
-  — the ML specialists (the same LitServe backend the Mac Mini path
-  below runs natively) and Granite 4.1 via vLLM, each its own
-  scale-to-zero app since they run on different GPU tiers. Both cost
-  nothing while idle and wake on the first request; a warm query
-  returns a full cited briefing in about a minute. See `docs/DEPLOY.md`
-  for the full setup.
-- **Mac Mini / Apple Silicon, fully local.** No cloud, no GPU rental —
-  Ollama-served Granite 4.1 plus every ML specialist run on one box,
-  with real measured power draw via `powermetrics` instead of a
-  data-sheet estimate. This is the reference "clone it and it just
-  works" deployment.
-- **Local Ollama** (`granite4.1:8b` pulled), for CPU-only development
-  with no GPU at all.
+```bash
+ollama pull granite4:micro
+RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 RIPRAP_LLM_MODEL=granite4:micro \
+  uv run uvicorn web.main:app --port 7860
+```
 
-The three NYC fine-tunes were trained on an AMD Instinct MI300X via the
-AMD Developer Cloud; `RIPRAP_HARDWARE_LABEL="AMD MI300X"` swaps the
-energy ledger back to MI300X figures if you deploy to your own AMD GPU
-box (`docker-compose --profile with-models`). See
+The model rewrites the evidence as JSON claims. Code checks every claim's
+citations and numbers against the documents it cites, retries once, and
+drops what still fails; dropped claims are listed, never shown as part of
+the briefing ([`docs/GROUNDING.md`](docs/GROUNDING.md)). Other deployment
+shapes (Docker, a GPU endpoint on Modal) are in
 [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
-### 2. Run locally with Docker
+### MCP server
 
 ```bash
-git clone https://github.com/msradam/riprap
-cd riprap
-cp .env.example .env
-# edit .env to point RIPRAP_LLM_BASE_URL / RIPRAP_ML_BASE_URL at
-# a Modal deployment or your own self-hosted instance
-docker compose up
+uv run python -m riprap.mcp.server            # stdio
+uv run python -m riprap.mcp.server --http     # streamable HTTP on :8765
 ```
 
-Visit `http://localhost:7860`.
+Tools: `list_sources`, `get_evidence`, `get_citation`, `nyc311_flood_requests`
+and `get_briefing`. All but `get_briefing` work without an LLM.
 
-The GPU inference half lives in a companion repo,
-[`msradam/riprap-inference`](https://github.com/msradam/riprap-inference)
-— ML specialists and Granite 4.1 (vLLM), deployable to Modal (as two
-apps) or run natively on a Mac Mini, same codebase either way (or point
-at any other OpenAI-compatible vLLM endpoint). Point this app at them
-via `RIPRAP_LLM_BASE_URL` / `RIPRAP_ML_BASE_URL`. See
-[`docs/DEPLOY.md`](docs/DEPLOY.md) for every deployment shape.
+### Static gallery
 
-### 3. Develop
+`scripts/build_gallery.py` precomputes briefings for ten NYC addresses into
+`web/sveltekit/src/lib/gallery/`; the SvelteKit build prerenders them at
+`/gallery` with no backend, so the gallery can be served from GitHub Pages.
 
-```bash
-# Python 3.12 venv via uv
-uv sync
+### Other cities and your own data
 
-# SvelteKit frontend (committed pre-built; only rebuild if sources change)
-cd web/sveltekit && pnpm install --frozen-lockfile && pnpm build && cd ../..
-
-# Local server (Ollama primary)
-.venv/bin/uvicorn web.main:app --host 127.0.0.1 --port 7860
-
-# Local server pointed at a remote GPU backend (Modal, or your own
-# vLLM box), vLLM primary with Ollama fallback
-RIPRAP_LLM_PRIMARY=vllm \
-RIPRAP_LLM_BASE_URL=<your backend's OpenAI-compatible URL> \
-RIPRAP_LLM_API_KEY=<token> \
-.venv/bin/uvicorn web.main:app --host 127.0.0.1 --port 7860
-
-# End-to-end address suite (5 NYC addresses, intent-aware checks)
-.venv/bin/python scripts/probe_addresses.py
-```
-
-### 4. Run with your city's data
-
-Riprap ships with six deployments (`deployments/{nyc,chicago,
-seattle,sf,boston,albany}/`). NYC is the reference; the other five are
-experimental (see [`docs/multi-city.md`](docs/multi-city.md)). Each is a
-directory of YAML pebble manifests plus a `stones.yaml`. Switch deployments
-with one env var:
-
-```bash
-# Brief 233 S Wacker Dr, Chicago — no code changes, real upstream data
-RIPRAP_DEPLOYMENT=deployments/chicago RIPRAP_RECONCILER_TIER=no_llm \
-.venv/bin/python -c "import riprap.core.burr.app as a; \
-  print(a.run('233 S Wacker Dr, Chicago, IL')['paragraph'])"
-```
-
-Layer your own data on top of any deployment via [`docs/byod.md`](docs/byod.md):
-
-```bash
-# .riprap/ in your CWD is auto-discovered
-mkdir -p .riprap && cp examples/byod/fdny_firehouses.{yaml,csv} .riprap/
-
-# Same effect via env var (a colon-separated list of dirs or yaml files)
-RIPRAP_EXTRA_MANIFESTS=examples/byod \
-RIPRAP_DEPLOYMENT=deployments/nyc \
-.venv/bin/uvicorn web.main:app --port 7860
-```
-
-Add your own city: see [`docs/PORT-YOUR-CITY.md`](docs/PORT-YOUR-CITY.md).
+Deployments are directories of YAML manifests (`deployments/<city>/`). A
+query routes to the deployment whose bounding box contains it. Layer your own
+data on top with [`docs/byod.md`](docs/byod.md) and add a city with
+[`docs/PORT-YOUR-CITY.md`](docs/PORT-YOUR-CITY.md).
 
 ---
 

@@ -5,6 +5,7 @@ descriptor, not complaint_type) within a buffer.
 """
 from __future__ import annotations
 
+import re
 from collections import Counter
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -184,4 +185,60 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None) -> dict:
                          if top_descriptor else "all flood-related descriptors"),
         "narrative": narrative,
         "histogram": list(by_year_sorted.values()) or [],
+    }
+
+
+_BORO_BY_PREFIX = {"MN": "MANHATTAN", "BX": "BRONX", "BK": "BROOKLYN", "QN": "QUEENS",
+                   "SI": "STATEN ISLAND"}
+
+
+def community_board(code: str) -> str | None:
+    """'QN12' or 'qn 12' -> '12 QUEENS', the 311 dataset's community_board value."""
+    m = re.fullmatch(r"\s*(MN|BX|BK|QN|SI)\s*0?(\d{1,2})\s*", code.upper())
+    return f"{int(m.group(2)):02d} {_BORO_BY_PREFIX[m.group(1)]}" if m else None
+
+
+def flood_requests(*, lat: float | None = None, lon: float | None = None,
+                   radius_m: float = 200, community_district: str | None = None,
+                   days: int = 365) -> dict:
+    """Flood-related 311 requests near a point or inside a community
+    district over the last `days`: exact counts by descriptor and by month
+    (grouped server-side, so no row cap) and the ten most recent."""
+    since = (datetime.now(UTC) - timedelta(days=days)).replace(tzinfo=None)
+    where = f"{_DESC_CLAUSE} AND created_date >= '{since.isoformat(timespec='seconds')}'"
+    if community_district:
+        board = community_board(community_district)
+        if board is None:
+            return {"error": f"not a community district code like QN12: {community_district!r}"}
+        where += f" AND community_board = '{board}'"
+        area = {"community_district": community_district.upper().replace(" ", ""),
+                "community_board": board}
+    elif lat is not None and lon is not None:
+        where += f" AND within_circle(location, {lat}, {lon}, {radius_m})"
+        area = {"lat": lat, "lon": lon, "radius_m": radius_m}
+    else:
+        return {"error": "give lat and lon, or a community district"}
+    def query(**params) -> list:
+        r = http.get(URL, params={"$where": where, **params}, timeout=60)
+        r.raise_for_status()
+        return r.json()
+
+    by_desc = query(**{"$select": "descriptor, count(*) AS n", "$group": "descriptor",
+                       "$order": "n DESC"})
+    by_month = query(**{"$select": "date_trunc_ym(created_date) AS month, count(*) AS n",
+                        "$group": "month", "$order": "month"})
+    recent = query(**{"$select": "descriptor, created_date, incident_address, status",
+                      "$order": "created_date DESC", "$limit": "10"})
+    return {
+        **area,
+        "days": days,
+        "n": sum(int(row["n"]) for row in by_desc),
+        "by_descriptor": {row.get("descriptor"): int(row["n"]) for row in by_desc},
+        "by_month": {row["month"][:7]: int(row["n"]) for row in by_month},
+        "most_recent": [{"date": (row.get("created_date") or "")[:10],
+                         "descriptor": row.get("descriptor"),
+                         "address": row.get("incident_address"),
+                         "status": row.get("status")} for row in recent],
+        "source": CITATION,
+        "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     }

@@ -1,25 +1,22 @@
-"""Riprap MCP server — exposes Riprap as three agent-callable tools
-instead of a full 1:1 wrap of the HTTP API.
+"""Riprap MCP server: a small set of agent-callable tools, not a 1:1 wrap
+of the HTTP API.
 
 Deliberately small surface. An audit of 116 production MCP servers found
 the well-designed ones expose a median of ~19% of the wrapped API's
-operations through curation, not mirroring (arxiv.org/html/2507.16044);
-Riprap's HTTP surface has ~20 routes (layer tiles, SSE streams, PDF
-render, debug endpoints) that make no sense as a single agent tool call.
-These three do:
+operations through curation, not mirroring (arxiv.org/html/2507.16044).
 
-  get_briefing(address)            run a full cited flood briefing
-  list_sources(deployment)         the stones + pebbles a deployment fires
-  get_citation(deployment, doc_id) provenance for one cited source
+  list_sources(deployment)            the stones and pebbles a deployment runs
+  get_evidence(address)               cited evidence for an address, no LLM
+  get_district_summary(code)          the same for an NYC community district
+  get_citation(deployment, doc_id)    provenance and vintage for one source
+  nyc311_flood_requests(...)          311 flood requests near a point or in a district
+  get_briefing(address)               the full briefing; LLM claims when configured
 
-Run standalone (stdio transport, for Claude Desktop / any local MCP
-client config)::
+Every tool except get_briefing works without an LLM. Run over stdio (for a
+local MCP client config) or streamable HTTP:
 
-    .venv/bin/python -m riprap.mcp.server
-
-Or as a network service (streamable-http, for a remote agent)::
-
-    .venv/bin/python -m riprap.mcp.server --http --port 8765
+    uv run python -m riprap.mcp.server
+    uv run python -m riprap.mcp.server --http --port 8765
 """
 
 from __future__ import annotations
@@ -32,36 +29,102 @@ mcp = MCPServer(
     "riprap",
     instructions=(
         "Riprap composes public-record flood data (FEMA, NOAA, USGS, NWS, "
-        "city 311) into a citation-grounded flood-exposure briefing for a "
-        "US street address. Every numeric claim in a briefing carries an "
-        "inline [doc_id] citation resolvable via get_citation. Riprap is "
-        "an informational reference dossier, not a FEMA flood zone "
-        "determination, a professional engineering opinion, or a "
-        "substitute for the NFIP appeal process."
+        "NYC 311, NYC DEP, FloodNet) into cited evidence for a US street "
+        "address. Every evidence sentence carries a doc_id resolvable via "
+        "get_citation. Sentences marked 'Experimental:' come from model "
+        "layers without an evaluation that supports them as evidence. Riprap "
+        "is an informational reference, not a FEMA flood zone determination, "
+        "a professional engineering opinion, or a substitute for the NFIP "
+        "appeal process."
     ),
 )
 
 
+def _evidence_payload(out: dict) -> dict:
+    from riprap.core.burr import evidence
+
+    stones, registry = evidence.load(out.get("deployment") or "nyc")
+    items = evidence.collect(out, stones, registry)
+    heading = {s.id: s.name for s in stones.all()}
+    return {
+        "place": (out.get("geocode") or {}).get("address"),
+        "lat": out.get("lat"),
+        "lon": out.get("lon"),
+        "deployment": out.get("deployment"),
+        "intent": out.get("intent"),
+        "evidence": [{"doc_id": e.doc_id, "stone": heading.get(e.stone_id, e.stone_id),
+                      "text": e.text, "maturity": e.maturity} for e in items],
+        "citations": out.get("citations") or {},
+    }
+
+
+@mcp.tool()
+def get_evidence(address: str) -> dict:
+    """Cited flood evidence for a US street address, without an LLM.
+
+    Geocodes the address, routes it to the deployment covering it, runs
+    every data source for that place and returns one entry per source
+    that had data: {doc_id, stone, text, maturity}, plus citations with
+    source URL and vintage. Deterministic: the text is each source's
+    manifest template filled from the fetched values.
+    """
+    from riprap.core.burr.app import run
+
+    return _evidence_payload(run(address, no_llm=True))
+
+
+@mcp.tool()
+def get_district_summary(community_district: str) -> dict:
+    """The same evidence for an NYC community district, such as QN12
+    (Jamaica, St. Albans, Hollis) or BK15 (Sheepshead Bay, Homecrest):
+    shares of the district in the Sandy and DEP extents, terrain, 311 flood
+    complaints and DOB permits, without an LLM."""
+    from riprap.core.burr.app import district_summary
+
+    return _evidence_payload(district_summary(community_district, no_llm=True))
+
+
+@mcp.tool()
+def nyc311_flood_requests(address: str | None = None, lat: float | None = None,
+                          lon: float | None = None, radius_m: float = 200,
+                          community_district: str | None = None, days: int = 365) -> dict:
+    """Flood-related NYC 311 requests (street flooding, sewer backup, catch
+    basin, manhole overflow) over the last `days`, either within `radius_m`
+    of a point (give lat/lon or an address) or inside a community district
+    (e.g. QN12). Returns exact counts by descriptor and by month and the
+    ten most recent requests. Source: NYC Open Data erm2-nwe9."""
+    from app.context.nyc311 import flood_requests
+
+    if address and (lat is None or lon is None) and not community_district:
+        from app.geocode import geocode_one
+
+        hit = geocode_one(address)
+        if hit is None:
+            return {"error": f"could not geocode {address!r}"}
+        lat, lon = hit.lat, hit.lon
+    return flood_requests(lat=lat, lon=lon, radius_m=radius_m,
+                          community_district=community_district, days=days)
+
+
 @mcp.tool()
 def get_briefing(address: str) -> dict:
-    """Run a full flood-exposure briefing for a US street address.
+    """The full flood-exposure briefing for a US street address. With an
+    LLM endpoint configured, the prose is LLM claims each checked against
+    its cited sources (failed claims are listed under dropped_claims, not
+    shown); otherwise it is the evidence briefing."""
+    from riprap.core.burr.app import run
 
-    Returns the cited prose plus a structured citation list and the
-    deterministic compliance-predicate summary. Deployment routing is
-    automatic — the address is geocoded and matched to whichever shipped
-    deployment's bounding box contains it (nyc, chicago, seattle, sf,
-    boston, albany, ...); no deployment argument needed.
-    """
-    from riprap.core.burr.app import run as _run_briefing
-
-    out = _run_briefing(address)
+    out = run(address)
+    g = out.get("grounding") or {}
     return {
         "address": address,
         "deployment": out.get("deployment"),
         "intent": out.get("intent"),
         "paragraph": out.get("paragraph"),
-        "citations": out.get("citations") or [],
-        "compliance": out.get("compliance"),
+        "mode": g.get("tier"),
+        "dropped_claims": g.get("dropped_claims") or [],
+        "citations": out.get("citations") or {},
+        "disclosure_checks": out.get("compliance"),
     }
 
 
@@ -83,7 +146,8 @@ def _resolve_deployment_root(deployment: str):
 @mcp.tool()
 def list_sources(deployment: str = "nyc") -> dict:
     """List the stones (role groups) and pebbles (data sources) a Riprap
-    deployment fires, with each source's provenance and citation doc_id.
+    deployment runs, with each source's provenance, vintage, citation
+    doc_id and maturity (production or experimental).
 
     `deployment` is a shipped deployment directory name (nyc, chicago,
     seattle, sf, boston, albany, ...).
@@ -100,12 +164,10 @@ def list_sources(deployment: str = "nyc") -> dict:
 
 @mcp.tool()
 def get_citation(deployment: str, doc_id: str) -> dict:
-    """Resolve one [doc_id] citation from a briefing to its source
-    provenance: publisher, URL, license, and data vintage.
-
-    `doc_id` is the bracketed id a briefing sentence cites, e.g. the
-    `[nyc311]` in "34 complaints filed within 200 m [nyc311]." Matches a
-    pebble's `provenance.doc_id` first, falling back to its pebble id.
+    """Resolve one doc_id to its source: publisher, URL, license, the
+    source's own date_modified, when our copy was retrieved, and a
+    `vintage` display string. Live Socrata sources report their current
+    dataUpdatedAt; other live sources report "live".
     """
     from riprap.core.pebbles import load_registry
     from riprap.core.pebbles.vintage import citation

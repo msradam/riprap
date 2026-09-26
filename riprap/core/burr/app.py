@@ -66,17 +66,17 @@ def _tier() -> str:
     return llm.tier()
 
 
-def _reconciler():
+def _reconciler(no_llm: bool = False):
     from riprap.core.burr.synthesis import reconcile_claims
 
-    return reconcile_templated if _tier() == "no_llm" else reconcile_claims
+    return reconcile_templated if no_llm or _tier() == "no_llm" else reconcile_claims
 
 
-def plan_for(query: str) -> dict:
+def plan_for(query: str, *, no_llm: bool = False) -> dict:
     """The plan a query gets: the LLM planner in LLM mode, the regex
     planner otherwise (or when the LLM planner fails). LLM calls are
     listed under `llm_calls`."""
-    if _tier() == "llm":
+    if _tier() == "llm" and not no_llm:
         calls: list = []
         try:
             from app.planner import plan as run_planner
@@ -89,7 +89,7 @@ def plan_for(query: str) -> dict:
     return heuristic_plan(query)
 
 
-def build_app(query: str, plan: dict | None = None, *, step_queue=None):
+def build_app(query: str, plan: dict | None = None, *, step_queue=None, no_llm: bool = False):
     """One briefing run. With `plan` given (the SSE route plans first so
     it can show the plan), the graph starts at the intake step for that
     intent; otherwise it starts by planning."""
@@ -108,14 +108,14 @@ def build_app(query: str, plan: dict | None = None, *, step_queue=None):
         .with_entrypoint(entry)
         .with_hooks(StepEventHook(step_queue))
         .with_actions(
-            plan_intent=plan_intent if _tier() == "llm" else plan_heuristic,
+            plan_intent=plan_intent if _tier() == "llm" and not no_llm else plan_heuristic,
             geocode_target=geocode_target,
             resolve_area=resolve_area,
             select_deployment=select_deployment,
             stones=StonesAction(),
             assemble_legacy_state=assemble_legacy_state,
             policy_corpus=step_policy_corpus,
-            reconcile=_reconciler(),
+            reconcile=_reconciler(no_llm),
         )
         .with_transitions(
             ("plan_intent", "reconcile", expr("intent == 'not_implemented'")),
@@ -202,6 +202,14 @@ def iter_steps(query: str, plan: dict | None = None):
         yield {"kind": "final", **_final(holder["state"])}
 
 
+def district_summary(code: str, *, no_llm: bool = False) -> dict:
+    """The neighbourhood evidence for a community district (QN12, BK06),
+    run over the union of the district's NTAs."""
+    plan = {"intent": "neighborhood", "targets": [{"type": "nta", "text": code}],
+            "rationale": f"Community district summary: {code}."}
+    return run(f"Community district {code}", plan, no_llm=no_llm)
+
+
 def energy_summary(result: dict, plan: dict | None = None) -> dict:
     """The energy/token ledger for a briefing: planner plus synthesis
     LLM calls, each labelled measured, estimated or unknown."""
@@ -212,14 +220,15 @@ def energy_summary(result: dict, plan: dict | None = None) -> dict:
     return summarize(calls)
 
 
-def run(query: str, plan: dict | None = None) -> dict:
+def run(query: str, plan: dict | None = None, *, no_llm: bool = False) -> dict:
     """Run to completion and return the result dict (with its energy
-    ledger). Plans first, and runs `compare` as two briefings."""
-    plan = plan or plan_for(query)
+    ledger). Plans first, and runs `compare` as two briefings.
+    `no_llm=True` forces the evidence briefing even with an endpoint set."""
+    plan = plan or plan_for(query, no_llm=no_llm)
     if plan["intent"] == "compare":
-        out = run_compare(query, plan)
+        out = run_compare(query, plan, runner=lambda q, p: run(q, p, no_llm=no_llm))
     else:
-        _, _, state = build_app(query, plan).run(halt_after=["reconcile"])
+        _, _, state = build_app(query, plan, no_llm=no_llm).run(halt_after=["reconcile"])
         out = _final(state)
     out["emissions"] = energy_summary(out, plan)
     return out

@@ -86,6 +86,18 @@ def by_code(code: str) -> dict | None:
     return _row_to_dict(hit.iloc[0])
 
 
+def by_district(code: str) -> dict | None:
+    """A community district (CDTA 2020 code such as 'QN12') as one area:
+    the union of its NTAs, shaped like an NTA match."""
+    code = re.sub(r"\s+", "", code or "").upper()
+    g = load()
+    hit = g[g["cdta2020"] == code]
+    if hit.empty:
+        return None
+    return {"nta_code": code, "nta_name": hit.iloc[0]["cdtaname"], "borough": hit.iloc[0]["boroname"],
+            "cdta": hit.iloc[0]["cdtaname"], "geometry": hit.geometry.union_all()}
+
+
 def _row_to_dict(row) -> dict:
     return {
         "nta_code":  row["nta2020"],

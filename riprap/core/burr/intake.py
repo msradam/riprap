@@ -266,7 +266,9 @@ def geocode_target(state: State) -> State:
 @action(reads=["first_target", "query"],
         writes=["geocode", "lat", "lon", "nta", "polygon_wkt", "trace"])
 def resolve_area(state: State) -> State:
-    """Neighbourhood intents: resolve the target to a 2020 NTA polygon.
+    """Neighbourhood intents: resolve the target to a 2020 NTA polygon, or
+    to a community district (a CDTA code such as QN12, the union of its
+    NTAs).
     Writes the polygon (WKT, WGS84) for polygon-scope pebbles and its
     centroid as lat/lon for deployment routing and the map."""
     from app.areas import nta  # noqa: PLC0415
@@ -275,7 +277,10 @@ def resolve_area(state: State) -> State:
     rec = trace_rec_for("nta_resolve")
     target = (state.get("first_target") or "").strip()
     try:
-        matches = (nta.resolve(target) if target else []) or nta.resolve_from_text(state.get("query") or "")
+        district = nta.by_district(target) if re.fullmatch(r"\s*(MN|BX|BK|QN|SI)\s*\d{2}\s*", target,
+                                                               re.IGNORECASE) else None
+        matches = ([district] if district else []) or (nta.resolve(target) if target else []) \
+            or nta.resolve_from_text(state.get("query") or "")
         if not matches:
             rec["ok"], rec["err"] = False, f"no neighborhood matches {target!r}"
             trace.append(rec)

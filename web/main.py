@@ -674,6 +674,27 @@ async def api_agent_stream(q: str):
     )
 
 
+@app.get("/api/district/{code}")
+def api_district(code: str, no_llm: bool = False):
+    """Evidence summary for an NYC community district (QN12, BK15): the
+    neighbourhood pipeline over the union of the district's NTAs."""
+    from riprap.core.burr.app import district_summary
+
+    return JSONResponse(_to_json_safe(district_summary(code, no_llm=no_llm)))
+
+
+@app.get("/api/nyc311/flood_requests")
+def api_nyc311_flood_requests(lat: float | None = None, lon: float | None = None,
+                              radius_m: float = 200, community_district: str | None = None,
+                              days: int = 365):
+    """Flood-related 311 requests near a point or inside a community district."""
+    from app.context.nyc311 import flood_requests
+
+    out = flood_requests(lat=lat, lon=lon, radius_m=radius_m,
+                         community_district=community_district, days=days)
+    return JSONResponse(out, status_code=400 if "error" in out else 200)
+
+
 @app.get("/api/agent/plan")
 def api_agent_plan(q: str):
     """Just the plan (intent and targets), no execution."""
