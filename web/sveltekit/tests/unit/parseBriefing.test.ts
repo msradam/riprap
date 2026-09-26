@@ -52,3 +52,17 @@ describe('parseBriefing — bold markdown', () => {
     expect(text).toContain('No emphasis in this sentence at all.');
   });
 });
+
+describe('parseBriefing: answer section', () => {
+  it('recognises **Answer.** as the first section with its citations', () => {
+    const { blocks, citations } = parseBriefing(
+      'Scope line.\n\n**Answer.**\nIda high-water marks were recorded nearby [ida_hwm].\n\n**Status.** Fine [sandy].'
+    );
+    const heads = blocks.filter((b) => b.kind === 'head');
+    expect(heads.map((h) => (h.kind === 'head' ? [h.n, h.label] : []))).toEqual([
+      ['00', 'Answer'],
+      ['01', 'Status']
+    ]);
+    expect(citations.ida_hwm).toBeDefined();
+  });
+});

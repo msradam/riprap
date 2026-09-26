@@ -10,15 +10,8 @@
   interface Props { children: Snippet; }
   let { children }: Props = $props();
 
-  let query = $derived.by(() => {
-    const id = page.params.queryId;
-    if (!id) return null;
-    try {
-      return decodeURIComponent(id);
-    } catch {
-      return id;
-    }
-  });
+  // Route params arrive decoded; no second decodeURIComponent.
+  let query = $derived(page.params.queryId || null);
 
   // The landing at / and the print artifact at /print/<id> both bring
   // their own chrome, so the layout's AppHeader / AppFooter sit out

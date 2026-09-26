@@ -14,11 +14,13 @@ export interface GalleryIndexEntry {
   address: string;
   generated_at: string;
   mode: 'llm' | 'no_llm' | string;
+  question?: string | null;
+  model?: string | null;
+  quantization?: string | null;
 }
 
 export interface GalleryEntry extends GalleryIndexEntry {
   riprap_commit: string;
-  model: string | null;
   deployment: Deployment;
   pebbles: PebbleManifestResponse;
   final: FinalResult;
@@ -46,4 +48,13 @@ export function modeLabel(mode: string, model?: string | null): string {
   if (mode === 'llm') return model ? `LLM: ${model}` : 'LLM';
   if (mode === 'no_llm') return 'Evidence briefing (no LLM)';
   return mode;
+}
+
+/** "Generated with <model> (<quant>) on <date>" for LLM entries, else null.
+ *  The quantization tag is dropped from the model name when it repeats it. */
+export function llmStamp(e: GalleryIndexEntry): string | null {
+  if (e.mode !== 'llm' || !e.model) return null;
+  const q = e.quantization;
+  const model = q && e.model.endsWith(`:${q}`) ? e.model.slice(0, -(q.length + 1)) : e.model;
+  return `Generated with ${model}${q ? ` (${q})` : ''} on ${e.generated_at.slice(0, 10)}`;
 }

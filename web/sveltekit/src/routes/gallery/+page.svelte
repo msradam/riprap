@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { formatGeneratedAt, modeLabel } from '$lib/client/gallery';
+  import { formatGeneratedAt, llmStamp, modeLabel } from '$lib/client/gallery';
   import type { PageProps } from './$types';
 
   let { data }: PageProps = $props();
@@ -34,8 +34,11 @@
               <div class="citation-title">
                 <a href="{resolve('/gallery/[slug]', { slug: e.slug })}/">{e.address}</a>
               </div>
+              {#if e.question}
+                <div class="citation-title">Question: {e.question}</div>
+              {/if}
               <div class="citation-meta">
-                <span>{modeLabel(e.mode)}</span>
+                <span>{llmStamp(e) ?? modeLabel(e.mode)}</span>
               </div>
             </div>
           </li>

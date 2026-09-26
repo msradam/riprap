@@ -21,6 +21,18 @@ export interface PlanInfo {
   targets?: unknown;
   specialists?: string[];
   rationale?: string;
+  /** The user's question; empty for a bare address. */
+  question?: string;
+  focus?: { hazard?: string | null; time?: string | null; asset?: string | null };
+  /** Pebble ids the planner chose to run. */
+  pebbles?: string[];
+}
+
+/** A source in `final.consulted` / `final.not_checked`. */
+export interface SourceRef {
+  id: string;
+  title: string;
+  stone?: string;
 }
 
 export interface StepEvent {
@@ -72,6 +84,8 @@ export interface Grounding {
   dropped_claims?: DroppedClaim[];
   retried_claims?: GroundedClaim[];
   fallback_reason?: string;
+  question?: string;
+  answered?: boolean;
 }
 
 /** Substring checks for required disclosure phrases. Not a quality score. */
@@ -97,6 +111,10 @@ export interface FinalResult {
   targets?: Array<{ label: string; address: string }>;
   /** Per-call emissions ledger from app/emissions.py. Optional. */
   emissions?: EmissionsSummary;
+  /** Sources that ran for this query. */
+  consulted?: SourceRef[];
+  /** Sources available here but not run for this question. */
+  not_checked?: SourceRef[];
 }
 
 /** Normalise `final.citations` (object keyed by doc_id, or legacy array). */

@@ -1,6 +1,7 @@
 /**
  * Parse the streaming markdown produced by the Granite reconciler into the
- * four-section briefing IA the design system expects.
+ * briefing IA the design system expects: an optional **Answer.** section
+ * (question queries) followed by the four place-level sections.
  *
  * The reconciler's prompt (app/reconcile.py:EXTRA_SYSTEM_PROMPT) enforces
  * **bold-stop** section heads, one per line:
@@ -20,7 +21,10 @@
 import type { BriefingBlock, Citation, ClaimPart } from '$lib/types/claim';
 import { tierForDocId, type Tier } from '$lib/types/tier';
 
+// `answer` opens a question briefing (the direct answer, before the
+// place-level sections). Numbered 00 so the four legacy heads keep theirs.
 const CANONICAL_SECTIONS: Array<{ key: string; label: string; n: string; tier?: Tier; aliases: string[] }> = [
+  { key: 'answer', label: 'Answer', n: '00', aliases: ['answer'] },
   { key: 'status', label: 'Status', n: '01', aliases: ['status'] },
   { key: 'empirical', label: 'Empirical evidence', n: '02', tier: 'empirical', aliases: ['empirical evidence', 'empirical'] },
   { key: 'modeled', label: 'Modeled scenarios', n: '03', tier: 'modeled', aliases: ['modeled scenarios', 'modeled'] },

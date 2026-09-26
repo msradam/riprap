@@ -11,6 +11,7 @@
   import FindingsRegion from '$lib/components/findings/FindingsRegion.svelte';
   import type { Density, ProvenanceMode } from '$lib/types/card';
   import type { RunState } from '$lib/client/runState.svelte';
+  import type { SourceRef } from '$lib/client/agentStream';
   import { briefingState } from '$lib/stores/briefingState.svelte';
   import { browser } from '$app/environment';
   import { page } from '$app/state';
@@ -39,11 +40,27 @@
   let grounding = $derived(run.finalResult?.grounding);
   let blocks = $derived(run.briefing.blocks);
   let citations = $derived(run.briefing.citations);
+  let question = $derived(run.plan?.question || grounding?.question || '');
+  let consulted = $derived(run.finalResult?.consulted ?? []);
+  let notChecked = $derived(run.finalResult?.not_checked ?? []);
 
   function handleFindingsCite() {
     document.getElementById('region-cites')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 </script>
+
+{#snippet sourceList(label: string, items: SourceRef[])}
+  {#if items.length}
+    <details class="region-head-meta grounding-line">
+      <summary>{label} ({items.length})</summary>
+      <ul>
+        {#each items as s (s.id)}
+          <li>{s.title}</li>
+        {/each}
+      </ul>
+    </details>
+  {/if}
+{/snippet}
 
 <section class="hero-band">
   <div class="hero-band-inner">
@@ -57,6 +74,9 @@
           <span class="brief-h1-addr">{queryText}</span>
         </h1>
         {@render notice?.()}
+        {#if question}
+          <p class="grounding-line">Question: {question}</p>
+        {/if}
 
         {#if run.errorState}
           <ErrorCard state={run.errorState} />
@@ -110,6 +130,9 @@
               {/if}
             </div>
           {/if}
+
+          {@render sourceList('Sources consulted', consulted)}
+          {@render sourceList('Not checked', notChecked)}
 
           <DroppedClaims claims={grounding?.dropped_claims} />
         {/if}

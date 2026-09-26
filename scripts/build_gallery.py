@@ -4,8 +4,14 @@ The SvelteKit app prerenders /gallery and /gallery/<slug> from these
 files, so the gallery needs no backend (GitHub Pages).
 
     uv run python scripts/build_gallery.py          # no-LLM briefings
-    RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 RIPRAP_LLM_MODEL=granite4:micro \\
-        uv run python scripts/build_gallery.py      # LLM claims, verified
+    GALLERY_ONLY=hollis-since-ida,homecrest-311 \\
+    RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 \\
+    RIPRAP_LLM_MODEL=hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M \\
+        uv run python scripts/build_gallery.py      # question entries, LLM claims
+
+Entries with a `question` run the question (LLM mode answers it); the
+rest run the bare address. GALLERY_ONLY rebuilds just those slugs and
+keeps every other file and index entry as it is.
 
 Each file carries the full result (the same shape as the SSE `final`
 event, trace included), the deployment's stones and pebbles as
@@ -15,6 +21,7 @@ event, trace included), the deployment's stones and pebbles as
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import time
@@ -24,6 +31,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 OUT = ROOT / "web" / "sveltekit" / "src" / "lib" / "gallery"
+
+
+def _quant(model: str | None) -> str | None:
+    """'hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M' -> 'Q4_K_M'."""
+    return model.rsplit(":", 1)[1] if model and ":" in model else None
 
 
 def main() -> int:
@@ -39,27 +51,37 @@ def main() -> int:
                             capture_output=True, text=True).stdout.strip() or None
     OUT.mkdir(parents=True, exist_ok=True)
     addresses = json.loads((ROOT / "scripts" / "gallery_addresses.json").read_text())
+    only = set(filter(None, os.environ.get("GALLERY_ONLY", "").split(",")))
+    old_index = {e["slug"]: e for e in json.loads((OUT / "index.json").read_text())} \
+        if only and (OUT / "index.json").exists() else {}
     index = []
     for a in addresses:
+        if only and a["slug"] not in only:
+            if a["slug"] in old_index:
+                index.append(old_index[a["slug"]])
+            continue
         t0 = time.time()
-        final = run(a["address"])
+        final = run(a.get("question") or a["address"])
         dep = deployment_by_name(final.get("deployment") or "nyc")
         stones = load_stones(dep.root)
         entry = {
             "slug": a["slug"],
             "neighborhood": a["neighborhood"],
             "address": a["address"],
+            "question": a.get("question"),
             "generated_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%MZ"),
             "riprap_commit": commit,
             "mode": (final.get("grounding") or {}).get("tier") or llm.tier(),
             "model": (final.get("grounding") or {}).get("model"),
+            "quantization": _quant((final.get("grounding") or {}).get("model")),
             "deployment": {"name": dep.name, "city": stones.city, "hazard": stones.hazard},
             "pebbles": describe_deployment(stones, load_registry(dep.root)),
             "final": to_json_safe(final),
         }
         (OUT / f"{a['slug']}.json").write_text(json.dumps(entry, indent=1) + "\n")
         g = final.get("grounding") or {}
-        index.append({k: entry[k] for k in ("slug", "neighborhood", "address", "generated_at", "mode")})
+        index.append({k: entry[k] for k in ("slug", "neighborhood", "address", "question",
+                                            "generated_at", "mode", "model", "quantization")})
         print(f"{a['slug']:18s} {entry['mode']:7s} kept={len(g.get('claims') or [])} "
               f"dropped={len(g.get('dropped_claims') or [])} {time.time() - t0:.1f}s", flush=True)
     (OUT / "index.json").write_text(json.dumps(index, indent=1) + "\n")

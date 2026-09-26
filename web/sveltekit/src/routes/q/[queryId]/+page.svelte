@@ -13,9 +13,9 @@
   } from '$lib/client/mapLayers';
 
   let queryId = $derived(page.params.queryId ?? '');
-  let queryText = $derived.by(() => {
-    try { return decodeURIComponent(queryId); } catch { return queryId; }
-  });
+  // SvelteKit already decodes route params; decoding again would rewrite
+  // a question that contains a literal "%20" or similar.
+  let queryText = $derived(queryId);
 
   const run = new RunState();
   // True once the SSE `deployment` event has fired, i.e. the pebble
