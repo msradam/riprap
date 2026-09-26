@@ -5,7 +5,7 @@
  * The manifest is the single source of truth for:
  *   - stone mapping (pebble.stone)
  *   - card header chrome (provenance.source_name → source pill,
- *     provenance.last_updated → vintage, manifest.title → title,
+ *     provenance.date_modified → vintage, manifest.title → title,
  *     provenance.doc_id → doc-id chip, provenance.citation → cites)
  *   - map-layer hint (display.map_layer)
  *   - templated card variant for BYOD pebbles (display.kind)
@@ -33,6 +33,11 @@ export interface PebbleManifest {
   stone: StoneKey;
   /** Epistemic tier — drives the EMP/MOD/PRX/SYN chip on the card. */
   tier: 'empirical' | 'modeled' | 'proxy' | 'synthetic' | null;
+  /** 'experimental' pebbles get a visible badge on their card. */
+  maturity?: 'production' | 'experimental';
+  /** 'polygon' pebbles run for neighborhood queries, 'point' for
+   *  address queries. Missing means 'point'. */
+  scope?: 'point' | 'polygon';
   display: {
     order: number | null;
     kind: 'text' | 'stat' | 'list' | 'chart' | 'map_only';
@@ -53,7 +58,8 @@ export interface PebbleManifest {
     license: string | null;
     citation: string | null;
     doc_id: string | null;
-    last_updated: string | null;
+    date_modified?: string | null;
+    retrieved_at?: string | null;
   };
   fallback: {
     on_offline: 'skip' | 'stub' | 'error';
@@ -150,22 +156,29 @@ class PebbleManifestStore {
       const data: PebbleManifestResponse = await r.json();
       // And re-check once more after the body read for the same reason.
       if (name === null && this.lockedForQuery) return;
-      const byId: Record<string, PebbleManifest> = {};
-      const byStone: Record<string, PebbleManifest[]> = {};
-      for (const p of data.pebbles) {
-        byId[p.id] = p;
-        (byStone[p.stone] ||= []).push(p);
-      }
-      this.byId = byId;
-      this.stones = [...data.stones].sort((a, b) => a.order - b.order);
-      this.byStone = byStone;
-      this.loaded = true;
-      this.loadedFor = name;
-      this.error = null;
+      this.setFromResponse(data, name);
     } catch (e) {
       this.error = String(e);
       // Leave partial state alone — stale > broken.
     }
+  }
+
+  /** Install a manifest without fetching. Used by the fetch path and by
+   *  the static gallery, which ships the manifest inside its JSON. */
+  setFromResponse(data: PebbleManifestResponse, name: string | null): void {
+    this.lockedForQuery = name !== null;
+    const byId: Record<string, PebbleManifest> = {};
+    const byStone: Record<string, PebbleManifest[]> = {};
+    for (const p of data.pebbles) {
+      byId[p.id] = p;
+      (byStone[p.stone] ||= []).push(p);
+    }
+    this.byId = byId;
+    this.stones = [...data.stones].sort((a, b) => a.order - b.order);
+    this.byStone = byStone;
+    this.loaded = true;
+    this.loadedFor = name;
+    this.error = null;
   }
 
   /** Lookup with fallback to undefined for unknown ids. */

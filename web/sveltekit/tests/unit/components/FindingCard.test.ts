@@ -40,7 +40,7 @@ const VARIANTS_WITH_FIXTURES: { variant: CardVariant; props: Partial<Card> }[] =
   { variant: 'timeseries',   props: { timeseries: { hours: 96, peak: { x: 38, y: 47 }, peakLabel: 'storm peak' } } },
   { variant: 'forecast',     props: { forecastBands: [{ year: 2050, low: 0.3, mid: 0.5, high: 1.2 }] } },
   { variant: 'register',     props: { /* RegisterBody reads from a separate data path, smoke only */ } },
-  { variant: 'meta',         props: { body: 'Mellea reroll · 0' } },
+  { variant: 'meta',         props: { body: 'mode · evidence briefing (no LLM)' } },
 ];
 
 describe('FindingCard renders every CardVariant without crashing', () => {
@@ -66,9 +66,9 @@ describe('FindingCard header chrome', () => {
       const { container } = render(FindingCard, {
         props: { card: card('headline', { tier, headline: 'x', sub: 'y' }) },
       });
-      // The root element renders as either <article> or <button>
-      // depending on mapLayer presence; with mapLayer:null it's <article>.
-      expect(container.querySelector('article, button')).not.toBeNull();
+      // The root element renders as <article>, or a role=button div when
+      // mapLayer is set; with mapLayer:null it's <article>.
+      expect(container.querySelector('article, [role="button"]')).not.toBeNull();
     }
   });
 
@@ -88,14 +88,17 @@ describe('FindingCard header chrome', () => {
 });
 
 describe('FindingCard interactive map-link affordance', () => {
-  it('renders as <button> when card.mapLayer is set (keyboard-interactive)', () => {
+  it('renders as a focusable role=button div when card.mapLayer is set', () => {
     const { container } = render(FindingCard, {
-      props: { card: card('headline', { headline: 'x', sub: 'y', mapLayer: 'noaa' }) },
+      props: { card: card('headline', { headline: 'x', sub: 'y', mapLayer: 'noaa', citeId: 'noaa' }) },
     });
-    // svelte:element this={interactive ? 'button' : 'article'} — a
-    // <button> is implicitly focusable, no tabindex needed.
-    expect(container.querySelector('button')).not.toBeNull();
+    const root = container.querySelector('.fc');
+    expect(root?.tagName).toBe('DIV');
+    expect(root?.getAttribute('role')).toBe('button');
+    expect(root?.getAttribute('tabindex')).toBe('0');
     expect(container.querySelector('article')).toBeNull();
+    // The cite <button> is not nested inside another <button>.
+    expect(container.querySelector('button button')).toBeNull();
   });
 
   it('renders as <article> when card.mapLayer is null (non-interactive)', () => {

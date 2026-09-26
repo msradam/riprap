@@ -3,8 +3,12 @@
   import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
   import { citations as cstore } from '$lib/stores/citations.svelte';
 
-  interface Props { citations: Record<string, Citation>; }
-  let { citations }: Props = $props();
+  interface Props {
+    citations: Record<string, Citation>;
+    /** Precomputed gallery page: sources were read at generation time. */
+    snapshot?: boolean;
+  }
+  let { citations, snapshot = false }: Props = $props();
 
   let entries = $derived(Object.values(citations).sort((a, b) => a.n - b.n));
 </script>
@@ -12,7 +16,7 @@
 <aside class="citation-drawer" aria-label="Citations">
   <div class="citation-drawer-head">
     <span class="section-label">Citations · {entries.length}</span>
-    <span class="citation-drawer-meta">live · primary sources</span>
+    <span class="citation-drawer-meta">{snapshot ? 'snapshot' : 'live'} · primary sources</span>
   </div>
   <ol class="citation-list">
     {#each entries as c (c.id)}
@@ -26,6 +30,7 @@
           <div class="citation-line-1">
             <TierGlyph tier={c.tier} size={10} color="var(--tier-{c.tier})" />
             <span class="citation-source">{c.source}</span>
+            {#if c.maturity === 'experimental'}<span class="exp-badge">Experimental</span>{/if}
             <span class="citation-vintage">v. {c.vintage}</span>
           </div>
           <div class="citation-title">

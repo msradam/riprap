@@ -43,7 +43,8 @@
     if (card.citeId) onCite?.(card.citeId);
   }
   function handleKey(e: KeyboardEvent) {
-    if (!interactive) return;
+    // Ignore keys bubbling up from the footer's cite button.
+    if (!interactive || e.target !== e.currentTarget) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onLink?.(card.mapLayer ?? null);
@@ -51,10 +52,13 @@
   }
 </script>
 
+<!-- Interactive cards are a focusable div, not a <button>: the footer
+     holds its own cite <button>, and nested buttons are invalid HTML
+     that breaks hydration on prerendered pages. -->
 <svelte:element
-  this={interactive ? 'button' : 'article'}
-  type={interactive ? 'button' : undefined}
+  this={interactive ? 'div' : 'article'}
   role={interactive ? 'button' : 'article'}
+  tabindex={interactive ? 0 : undefined}
   class="fc fc-{card.variant} fc-tier-{card.tier}"
   class:is-compact={density === 'compact'}
   class:is-linked={isLinked}
@@ -73,7 +77,10 @@
       <TierGlyph tier={card.tier} size={11} color="var(--tier-{card.tier})" />
       <span class="fc-head-source-label" title={card.agency}>{card.source}</span>
     </div>
-    <span class="fc-head-vintage">v. {card.vintage}</span>
+    <span class="fc-head-meta">
+      {#if card.experimental}<span class="exp-badge">Experimental</span>{/if}
+      <span class="fc-head-vintage">v. {card.vintage}</span>
+    </span>
   </header>
 
   <h4 id={`fc-${card.id}-title`} class="fc-title">{card.title}</h4>
@@ -110,8 +117,8 @@
     transition: background-color 200ms ease, border-color 200ms ease, outline-color 200ms ease;
     outline: 0 solid transparent;
     outline-offset: 0;
-    /* When the article is rendered as a button (interactive cards), strip
-       the default browser button chrome so it looks like the article. */
+    /* Reset inherited text styles so interactive (div role=button) and
+       static (article) cards look the same. */
     color: inherit;
     text-align: left;
     font: inherit;
@@ -158,6 +165,11 @@
   }
   .fc-head-source-label {
     cursor: help;
+  }
+  .fc-head-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
   }
   .fc-head-vintage {
     font-family: var(--font-mono);

@@ -11,7 +11,7 @@
  * itself a contract.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, type RenderResult } from '@testing-library/svelte';
+import { render } from '@testing-library/svelte';
 import type { Component } from 'svelte';
 import { resetStores, seedForCity } from './helpers/stores';
 import { BOSTON } from './fixtures/cities';
@@ -38,7 +38,6 @@ import MapLegend from '$lib/components/map/MapLegend.svelte';
 // States
 import ErrorCard from '$lib/components/states/ErrorCard.svelte';
 import SkeletonBriefing from '$lib/components/states/SkeletonBriefing.svelte';
-import RerollBanner from '$lib/components/states/RerollBanner.svelte';
 // Trace
 import TraceUI from '$lib/components/trace/TraceUI.svelte';
 import StatusGlyph from '$lib/components/trace/StatusGlyph.svelte';
@@ -51,9 +50,7 @@ import SeverityMark from '$lib/components/glyphs/SeverityMark.svelte';
 
 import type { FindingsData, StoneTrace, StoneKey } from '$lib/types/card';
 
-const emptyStone = (s: StoneKey): StoneTrace => ({
-  stone: s, members: [], fired: 0, silent_by_design: 0, errored: 0, ms: 0,
-});
+const emptyStone = (s: StoneKey): StoneTrace => ({ key: s, members: [] });
 
 const EMPTY_FINDINGS: FindingsData = {
   cards: [],
@@ -105,8 +102,6 @@ const CASES: SmokeCase[] = [
   { name: 'ErrorCard',         Component: ErrorCard,
     props: { state: 'geocoder' } },
   { name: 'SkeletonBriefing',  Component: SkeletonBriefing,  props: {} },
-  { name: 'RerollBanner',      Component: RerollBanner,
-    props: { attempt: 1, attemptMax: 3 } },
 
   // Trace
   { name: 'TraceUI',           Component: TraceUI,
@@ -144,7 +139,7 @@ describe('Universal smoke: every shipped component mounts under happy-dom', () =
   it.each(CASES.map((c) => [c.name, c] as const))(
     '%s mounts without throwing',
     (_name, c) => {
-      let result: RenderResult<Component<any>> | null = null;  // eslint-disable-line @typescript-eslint/no-explicit-any
+      let result = null as { container: HTMLElement } | null;
       expect(() => {
         result = render(c.Component, { props: c.props });
       }).not.toThrow();

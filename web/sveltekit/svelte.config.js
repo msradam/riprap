@@ -8,12 +8,15 @@ const config = {
     adapter: adapter({
       pages: 'build',
       assets: 'build',
-      fallback: '200.html',
+      // 404.html is the SPA fallback GitHub Pages serves for unknown paths.
+      // `pnpm build` copies it to 200.html for the FastAPI server (web/main.py).
+      fallback: '404.html',
       precompress: false,
       strict: false
     }),
     paths: {
-      base: ''
+      // Set BASE_PATH=/repo-name to build for a GitHub Pages project site.
+      base: process.env.BASE_PATH ?? ''
     },
     alias: {
       $lib: 'src/lib'

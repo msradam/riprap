@@ -10,6 +10,8 @@ export interface Citation {
   url: string;
   vintage: string;
   retrieved: string;
+  /** 'experimental' layers get a visible badge in the citation list. */
+  maturity?: 'production' | 'experimental';
 }
 
 export interface ClaimPart {

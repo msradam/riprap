@@ -22,7 +22,7 @@
     { name: 'Keystone',    role: 'the asset register', tag: "what's exposed",                sources: 'Transit entrances · public housing · schools · hospitals · whatever asset registers a jurisdiction publishes',  tint: 'var(--stone-keystone)' },
     { name: 'Touchstone',  role: 'the live observer',  tag: "what's happening now",          sources: 'Street-flood sensor history · 311 service requests · NWS hourly observations · NOAA tide gauges',              tint: 'var(--stone-touchstone)' },
     { name: 'Lodestone',   role: 'the projector',      tag: "what's coming",                 sources: 'Sea-level rise projections · time-series surge forecasts · 311 recurrence forecasts · NWS active alerts',         tint: 'var(--stone-lodestone)' },
-    { name: 'Capstone',    role: 'the synthesizer',    tag: 'writes the cited briefing',     sources: 'IBM Granite 4.1 reconciler · Mellea rejection sampling · 13-predicate compliance audit',                          tint: 'var(--stone-capstone)' },
+    { name: 'Capstone',    role: 'the synthesizer',    tag: 'writes the cited briefing',     sources: 'Evidence briefing, or LLM claims verified against their sources · disclosure checks',                             tint: 'var(--stone-capstone)' },
   ];
 </script>
 

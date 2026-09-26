@@ -48,7 +48,7 @@ function manifest(
     provenance: {
       source_name: opts.provenance?.source_name ?? id,
       source_url: null, license: null,
-      citation: null, doc_id: id, last_updated: null,
+      citation: null, doc_id: id, date_modified: null,
     },
     fallback: { on_offline: 'skip', message: null },
   };
@@ -70,10 +70,8 @@ export const NYC_MANIFEST: PebbleManifest[] = [
   manifest('nyc311', 'touchstone'),
   manifest('nws_obs', 'touchstone'),
   manifest('noaa_tides', 'touchstone'),
-  manifest('prithvi_live', 'touchstone'),
   // Lodestone
   manifest('nws_alerts', 'lodestone'),
-  manifest('ttm_forecast', 'lodestone'),
   manifest('ttm_battery_surge', 'lodestone'),
   manifest('ttm_311_forecast', 'lodestone'),
   manifest('floodnet_forecast', 'lodestone'),
@@ -96,10 +94,10 @@ export const BOSTON_MANIFEST: PebbleManifest[] = [
 /** Pebble-id sets we assert against — the bug-fix seal: a Boston
  *  render must contain only Boston ids and no NYC-only ids. */
 export const NYC_ONLY_IDS = new Set([
-  'sandy', 'ida_hwm', 'prithvi_water', 'prithvi_live',
+  'sandy', 'ida_hwm', 'prithvi_water',
   'microtopo', 'floodnet', 'nyc311', 'noaa_tides',
   'mta_entrances', 'nycha_developments', 'doe_schools', 'doh_hospitals',
-  'ttm_forecast', 'ttm_311_forecast', 'ttm_battery_surge',
+  'ttm_311_forecast', 'ttm_battery_surge',
   'floodnet_forecast', 'npcc4_slr',
   'dep_extreme_2080', 'dep_moderate_2050', 'dep_moderate_current',
 ]);
@@ -121,7 +119,7 @@ export const BOSTON_FINAL = {
   water_level: { station_id: '8443970', observed_ft_mllw: 5.2, distance_km: 1.8 },
   nws_alerts:  { n_active: 0, alerts: [] },
   citations: [],
-  mellea: { passed: [], failed: [], attempts: 0 },
+  grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
 };
 
 /** A trimmed NYC `/api/agent` response — Coney Island shape (sandy=true). */
@@ -141,7 +139,7 @@ export const NYC_FINAL = {
   dep_moderate_2050: { depth_label: 'outside', depth_class: 0 },
   dep_moderate_current: { depth_label: 'outside', depth_class: 0 },
   microtopo: { aoi_max_m: 4.2, aoi_min_m: 0.1, basin_relief_m: 0.9 },
-  prithvi_water: { inside_water_polygon: false, n_polygons_within_500m: 0 },
+  prithvi_water: { n_polygons_within_500m: 0 },
   floodnet: { n_sensors: 2, n_flood_events_3y: 7 },
   nyc311: { n: 12, by_descriptor: {} },
   nws_obs: { station_id: 'KJFK', precip_last_hour_mm: 0 },
@@ -152,5 +150,5 @@ export const NYC_FINAL = {
   doe_schools: { n_schools: 0, schools: [] },
   doh_hospitals: { n_hospitals: 0, hospitals: [] },
   citations: [],
-  mellea: { passed: [], failed: [], attempts: 0 },
+  grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
 };

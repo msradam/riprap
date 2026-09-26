@@ -23,8 +23,6 @@
   .plan-details,
   .plan-stream,
   .app-header-query-edit,
-  .reroll-banner,
-  .reroll-prev,
   .skeleton-brief {
     display: none !important;
   }

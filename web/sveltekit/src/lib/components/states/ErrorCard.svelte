@@ -73,9 +73,9 @@
     },
     grounding: {
       eyebrow: 'Grounding failure',
-      headline: "Briefing prose couldn't be composed within citation constraints.",
+      headline: 'No written claim passed verification against its cited sources.',
       body:
-        'Mellea rejected all reroll attempts. The underlying evidence is fine — only the prose composition failed. Download the structured evidence below, or contact support.',
+        'The model wrote claims, but each one failed the check against its cited sources, so no briefing prose is shown. The underlying evidence is fine: the evidence cards below come straight from the sources.',
       tier: 'modeled',
       defaultActions: ['Download evidence (JSON)', 'Contact support', 'Try again']
     },
@@ -83,7 +83,7 @@
       eyebrow: 'Backend unavailable',
       headline: 'Inference backend did not respond.',
       body:
-        "The configured inference backend didn't respond within the routing budget. This usually clears within a few minutes during a deploy window. The hardware-pill in the header reflects the current state.",
+        "The configured inference backend didn't respond within the routing budget. This usually clears within a few minutes during a deploy window.",
       tier: 'proxy',
       defaultActions: ['Retry now', 'Switch backend']
     }

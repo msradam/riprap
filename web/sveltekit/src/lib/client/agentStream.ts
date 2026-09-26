@@ -3,21 +3,16 @@
  *
  * The FastAPI backend emits these events:
  *   hello            { query }
- *   plan_token       { delta }                             planner JSON, token-by-token
- *   plan             { intent, targets, specialists, ... } planner finished
- *   step             { step, ok, started_at, elapsed_s, result?, err? }
- *   token            { delta, attempt? }                   reconciler tokens (the briefing)
- *   mellea_attempt   { attempt, passed, failed }
- *   final            { paragraph, mellea, audit, tier, score, ... }
+ *   plan_token       { delta }                     planner JSON, token-by-token
+ *   plan             { intent, targets, rationale } planner finished
+ *   deployment       { name, city, state }          routed deployment
+ *   step             { step, ok, elapsed_s, result?, err?, target_label? }
+ *   stone_start / stone_done                        Stone boundaries (unused here)
+ *   final            { paragraph, grounding, citations, compliance, ... }
  *   error            { err }
  *   done             {}
  *
- * The handoff component contract talks about `token` (with section/claimId)
- * and `claim` boundary events. We don't ask the backend to emit those —
- * instead this client parses the streaming markdown into the four-section
- * Briefing structure, infers tier per claim from cited doc-id family
- * prefixes (see tierForDocId), and emits sentence-buffered chunks to a
- * subscriber for accessible aria-live updates.
+ * The briefing is not streamed: it arrives whole in `final`.
  */
 import type { Tier } from '$lib/types/tier';
 
@@ -33,76 +28,111 @@ export interface StepEvent {
   ok: boolean;
   elapsed_s?: number;
   result?: unknown;
-  err?: string;
+  err?: string | null;
   tier?: Tier | null;
   claims?: number;
   /** Present on compare-intent step events: "PLACE A" or "PLACE B". */
   target_label?: string;
 }
 
-export interface MelleaAttempt {
-  attempt: number;
-  passed: string[];
+export type Maturity = 'production' | 'experimental';
+
+export interface CitationMeta {
+  doc_id: string;
+  source?: string;
+  title?: string;
+  url?: string;
+  license?: string;
+  date_modified?: string;
+  retrieved_at?: string;
+  vintage?: string;
+  maturity?: Maturity;
+}
+
+export interface GroundedClaim {
+  section: string;
+  text: string;
+  doc_ids: string[];
+  numbers: string[];
+  place?: string;
+}
+
+export interface DroppedClaim extends GroundedClaim {
+  reason: string;
+}
+
+/** How the briefing was produced. `llm`: model-written claims checked
+ *  against their cited sources (failures land in dropped_claims).
+ *  `no_llm`: evidence briefing built directly from pebble values. */
+export interface Grounding {
+  tier: 'llm' | 'no_llm';
+  model?: string;
+  attempts?: number;
+  claims?: GroundedClaim[];
+  dropped_claims?: DroppedClaim[];
+  retried_claims?: GroundedClaim[];
+  fallback_reason?: string;
+}
+
+/** Substring checks for required disclosure phrases. Not a quality score. */
+export interface ComplianceChecks {
+  passed: boolean;
+  n_passed: number;
+  n_total: number;
   failed: string[];
 }
 
 export interface FinalResult {
   paragraph: string;
-  mellea?: { passed: string[]; failed: string[]; attempts: number };
+  grounding?: Grounding;
+  /** Keyed by doc_id. Legacy backends sent an array; handle both. */
+  citations?: Record<string, CitationMeta> | CitationMeta[];
+  compliance?: ComplianceChecks;
   audit?: unknown;
-  tier?: string;
-  score?: number;
-  citations?: Array<{ doc_id: string; source?: string; title?: string; url?: string; vintage?: string }>;
-  /** Present when intent === "compare". */
   intent?: string;
+  plan?: PlanInfo;
+  nta?: { nta_code: string; nta_name: string; borough: string; bbox: number[] } | null;
+  trace?: StepEvent[];
+  /** Present when intent === "compare". */
   targets?: Array<{ label: string; address: string }>;
-  /** Per-call emissions ledger from app/emissions.py. Optional —
-   *  older backends + the not_implemented short-circuit may omit it. */
+  /** Per-call emissions ledger from app/emissions.py. Optional. */
   emissions?: EmissionsSummary;
 }
 
-export interface EmissionsCall {
-  kind: 'llm' | 'ml';
-  model?: string;
-  endpoint?: string;
-  backend: string;
-  hardware: string;
-  hardware_label: string;
-  /** Power figure used for this row's energy. When measured=true this is
-   *  the NVML-derived avg watts; otherwise it's the data-sheet fallback. */
-  power_w: number;
-  duration_s: number;
-  /** True when joules came from a real NVML read on the inference proxy
-   *  (X-GPU-Energy-J header for ML / bracket-sampled /v1/power for LLM).
-   *  False = data-sheet × duration estimate. */
-  measured: boolean;
-  prompt_tokens?: number | null;
-  completion_tokens?: number | null;
-  total_tokens?: number | null;
-  stream?: boolean;
-  wh: number;
-  joules: number;
+/** Normalise `final.citations` (object keyed by doc_id, or legacy array). */
+export function citationList(c: FinalResult['citations']): CitationMeta[] {
+  if (!c) return [];
+  return Array.isArray(c) ? c : Object.values(c);
 }
 
+/** How an energy figure was obtained. Hosted endpoints are always
+ *  'unknown'; 'none' means no inference calls were made. */
+export type EnergyStatus = 'measured' | 'estimated' | 'unknown' | 'mixed' | 'none';
+
+export interface EmissionsCall {
+  kind: string;
+  model?: string;
+  endpoint?: string;
+  prompt_tokens?: number | null;
+  completion_tokens?: number | null;
+  duration_s?: number;
+  energy_status?: EnergyStatus;
+  wh?: number | null;
+  energy_note?: string;
+}
+
+/** Per-query inference ledger from app/emissions.py. Every field is
+ *  optional because older gallery JSON may predate this shape.
+ *  `total_wh` is null unless every call has a figure. */
 export interface EmissionsSummary {
-  n_calls: number;
-  /** Number of calls whose joules came from a real GPU power read. */
-  n_measured: number;
-  total_wh: number;
-  total_mwh: number;
-  total_joules: number;
-  total_duration_s: number;
-  tokens: {
-    prompt?: number | null;
-    completion?: number | null;
-    total?: number | null;
-  };
-  by_kind: Record<string, { wh: number; mwh: number; n: number; duration_s: number }>;
-  by_hardware: Record<string, {
-    label: string; wh: number; mwh: number; n: number; duration_s: number;
-  }>;
-  calls: EmissionsCall[];
-  method: string;
+  n_calls?: number;
+  n_measured?: number;
+  energy_status?: EnergyStatus;
+  total_wh?: number | null;
+  total_duration_s?: number;
+  tokens?: { prompt?: number | null; completion?: number | null; total?: number | null };
+  calls?: EmissionsCall[];
+  method?: string;
 }
 
 export interface AgentStreamHandlers {
@@ -110,13 +140,6 @@ export interface AgentStreamHandlers {
   onPlanToken?: (delta: string) => void;
   onPlan?: (plan: PlanInfo) => void;
   onStep?: (s: StepEvent) => void;
-  /** Raw token, before sentence buffering. */
-  onToken?: (delta: string, attempt: number | undefined) => void;
-  /** Sentence-flushed chunk, safe for aria-live. */
-  onSentence?: (sentence: string, attempt: number | undefined) => void;
-  /** Fired when the reconciler restarts (a Mellea reroll wipes the buffer). */
-  onAttemptStart?: (attempt: number) => void;
-  onMelleaAttempt?: (m: MelleaAttempt) => void;
   onFinal?: (f: FinalResult) => void;
   onError?: (err: string) => void;
   onDone?: () => void;
@@ -136,24 +159,6 @@ export function openAgentStream(query: string, handlers: AgentStreamHandlers): A
   const url = `/api/agent/stream?q=${encodeURIComponent(query)}`;
   const es = new EventSource(url);
 
-  let sentenceBuf = '';
-  let currentAttempt: number | undefined;
-  const SENT_END = /([.?!])(\s|$)/;
-
-  function flushSentences(force = false) {
-    let m: RegExpExecArray | null;
-    while ((m = SENT_END.exec(sentenceBuf))) {
-      const end = m.index + m[1].length + (m[2] ? m[2].length : 0);
-      const sentence = sentenceBuf.slice(0, end).trim();
-      sentenceBuf = sentenceBuf.slice(end);
-      if (sentence) handlers.onSentence?.(sentence, currentAttempt);
-    }
-    if (force && sentenceBuf.trim()) {
-      handlers.onSentence?.(sentenceBuf.trim(), currentAttempt);
-      sentenceBuf = '';
-    }
-  }
-
   function on<T>(name: string, fn: (data: T) => void) {
     es.addEventListener(name, (e) => {
       try {
@@ -170,29 +175,13 @@ export function openAgentStream(query: string, handlers: AgentStreamHandlers): A
   on<{ name: string | null; city?: string | null; state?: string | null }>(
     'deployment', (d) => handlers.onDeployment?.(d));
   on<StepEvent>('step', (d) => handlers.onStep?.(d));
-  on<{ delta: string; attempt?: number }>('token', (d) => {
-    if (d.attempt !== currentAttempt) {
-      currentAttempt = d.attempt;
-      sentenceBuf = '';
-      handlers.onAttemptStart?.(d.attempt ?? 1);
-    }
-    handlers.onToken?.(d.delta, d.attempt);
-    sentenceBuf += d.delta;
-    flushSentences(false);
-  });
-  on<MelleaAttempt>('mellea_attempt', (d) => handlers.onMelleaAttempt?.(d));
-  on<FinalResult>('final', (d) => {
-    flushSentences(true);
-    handlers.onFinal?.(d);
-  });
+  on<FinalResult>('final', (d) => handlers.onFinal?.(d));
   on<{ err: string }>('error', (d) => handlers.onError?.(d.err));
   es.addEventListener('done', () => {
-    flushSentences(true);
     handlers.onDone?.();
     es.close();
   });
   es.addEventListener('error', () => {
-    flushSentences(true);
     handlers.onError?.('SSE connection error');
     es.close();
   });

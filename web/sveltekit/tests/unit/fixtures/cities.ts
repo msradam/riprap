@@ -64,7 +64,7 @@ function pebble(
     provenance: {
       source_name: opts.provenance?.source_name ?? id,
       source_url: null, license: null,
-      citation: null, doc_id: id, last_updated: null,
+      citation: null, doc_id: id, date_modified: null,
     },
     fallback: { on_offline: 'skip', message: null },
   };
@@ -86,7 +86,7 @@ export const NYC: CityFixture = {
       touchstone:  "Watches the current state of the city's flood signals and EO.",
       keystone:    "Counts the public assets and built fabric exposed to the hazards.",
       lodestone:   "Projects what's coming — alerts, surge, and recurrence forecasts.",
-      capstone:    "Writes the cited briefing — Granite 4.1 + Mellea rejection sampling.",
+      capstone:    "Writes the cited briefing, with or without an LLM.",
     }),
     pebbles: [
       pebble('sandy',                'cornerstone', { map_layer: true,  title: 'NYC Sandy Inundation Zone (2012 empirical extent)' }),
@@ -101,9 +101,7 @@ export const NYC: CityFixture = {
       pebble('nyc311',               'touchstone',  { map_layer: true,  tier: 'proxy' }),
       pebble('nws_obs',              'touchstone'),
       pebble('noaa_tides',           'touchstone'),
-      pebble('prithvi_live',         'touchstone',  { map_layer: true,  tier: 'modeled' }),
       pebble('nws_alerts',           'lodestone',   { tier: 'modeled' }),
-      pebble('ttm_forecast',         'lodestone',   { tier: 'modeled' }),
       pebble('ttm_battery_surge',    'lodestone',   { tier: 'modeled' }),
       pebble('ttm_311_forecast',     'lodestone',   { tier: 'modeled' }),
       pebble('floodnet_forecast',    'lodestone',   { tier: 'modeled' }),
@@ -128,17 +126,15 @@ export const NYC: CityFixture = {
     dep_moderate_2050: { depth_label: 'outside', depth_class: 0 },
     dep_moderate_current: { depth_label: 'outside', depth_class: 0 },
     microtopo: { aoi_max_m: 4.2, basin_relief_m: 0.9 },
-    prithvi_water: { inside_water_polygon: false },
+    prithvi_water: { n_polygons_within_500m: 0 },
     floodnet: { n_sensors: 2, n_flood_events_3y: 7 },
     nyc311: { n: 29 },
     nws_obs: { station_id: 'KJFK', precip_last_hour_mm: 0 },
     noaa_tides: { station_id: '8518750', station_name: 'The Battery, NY',
                   observed_ft_mllw: 4.5, distance_km: 0.8 },
-    prithvi_live: { ok: true, skipped: false },
     nws_alerts: { n_active: 0, alerts: [] },
-    ttm_forecast: { available: true, forecast_peak_ft: 5.1 },
     ttm_battery_surge: { available: true },
-    ttm_311_forecast: { accelerating: false, available: true },
+    ttm_311_forecast: { available: true },
     floodnet_forecast: { available: true },
     npcc4_slr: { '2050': 12, '2100': 24, available: true },
     mta_entrances: { n_ada_accessible: 1 },
@@ -146,7 +142,7 @@ export const NYC: CityFixture = {
     doe_schools: { n_schools: 0 },
     doh_hospitals: { n_hospitals: 0 },
     citations: [],
-    mellea: { passed: [], failed: [], attempts: 0 },
+    grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
   },
 };
 
@@ -164,7 +160,7 @@ export const BOSTON: CityFixture = {
       touchstone:  "Watches current flood signals — Boston 311 cases, NWS Boston/Norton, Boston Harbor tide observations.",
       keystone:    "Counts public assets exposed — BPS schools, City of Boston facilities, hospitals.",
       lodestone:   "Projects what's coming — NWS Boston/Norton forecasts, NOAA SLR Viewer for Boston Harbor.",
-      capstone:    "Writes the cited briefing — Granite 4.1 + Mellea grounding check.",
+      capstone:    "Writes the cited briefing, with or without an LLM.",
     }),
     pebbles: [
       pebble('boston_311',  'touchstone', { map_layer: true,  tier: 'proxy',
@@ -190,7 +186,7 @@ export const BOSTON: CityFixture = {
                    residual_ft: 1.11, distance_km: 0.7 },
     nws_alerts:  { n_active: 0, alerts: [] },
     citations: [],
-    mellea: { passed: [], failed: [], attempts: 0 },
+    grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
   },
 };
 
@@ -206,7 +202,7 @@ export const CHICAGO: CityFixture = {
       touchstone:  "Watches the current state of the city's flood signals — Chicago 311 flood complaints, Lake Michigan tide gauge, NWS observations.",
       keystone:    "Counts public assets exposed — CHA developments, CPS schools, hospitals — and their accessibility from this address.",
       lodestone:   "Projects what's coming — NWS forecasts, Great Lakes water-level projections, FEMA scenario maps.",
-      capstone:    "Writes the cited flood-exposure briefing — Granite 4.1 + Mellea grounding check.",
+      capstone:    "Writes the cited briefing, with or without an LLM.",
     }),
     pebbles: [
       pebble('chicago_311',               'touchstone', { map_layer: true, tier: 'proxy',
@@ -230,7 +226,7 @@ export const CHICAGO: CityFixture = {
     lake_michigan_water_level: { station_id: '9087044', distance_km: 18.1 },
     nws_alerts:                { n_active: 0 },
     citations: [],
-    mellea: { passed: [], failed: [], attempts: 0 },
+    grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
   },
 };
 
@@ -246,7 +242,7 @@ export const SEATTLE: CityFixture = {
       touchstone:  "Watches current flood signals — Seattle CSR (Find It Fix It), NWS Seattle, Puget Sound water levels.",
       keystone:    "Counts public assets exposed — Seattle Public Schools, King County libraries, hospitals.",
       lodestone:   "Projects what's coming — NWS Pacific Northwest forecasts, NOAA Puget Sound projections.",
-      capstone:    "Writes the cited briefing — Granite 4.1 + Mellea grounding check.",
+      capstone:    "Writes the cited briefing, with or without an LLM.",
     }),
     pebbles: [
       pebble('water_level', 'touchstone', { tier: 'empirical',
@@ -267,7 +263,7 @@ export const SEATTLE: CityFixture = {
     nws_obs:     { station_id: 'KBFI', distance_km: 4.5 },
     nws_alerts:  { n_active: 0 },
     citations: [],
-    mellea: { passed: [], failed: [], attempts: 0 },
+    grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
   },
 };
 
@@ -283,7 +279,7 @@ export const SF: CityFixture = {
       touchstone:  "Watches current flood signals — SF311 cases, NWS Bay Area, SF Bay tide observations.",
       keystone:    "Counts public assets exposed — SFUSD schools, City and County of SF public assets, hospitals.",
       lodestone:   "Projects what's coming — NWS Bay Area forecasts, NOAA SLR Viewer for SF Bay.",
-      capstone:    "Writes the cited briefing — Granite 4.1 + Mellea grounding check.",
+      capstone:    "Writes the cited briefing, with or without an LLM.",
     }),
     pebbles: [
       pebble('sf_311',     'touchstone', { map_layer: true, tier: 'proxy',
@@ -307,7 +303,7 @@ export const SF: CityFixture = {
     water_level: { station_id: '9414290', distance_km: 5.1 },
     nws_alerts:  { n_active: 0 },
     citations: [],
-    mellea: { passed: [], failed: [], attempts: 0 },
+    grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
   },
 };
 
@@ -330,7 +326,7 @@ export const ELSEWHERE: CityFixture = {
     lon: -106.6504,
     deployment: null,
     citations: [],
-    mellea: { passed: [], failed: [], attempts: 0 },
+    grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
   },
 };
 

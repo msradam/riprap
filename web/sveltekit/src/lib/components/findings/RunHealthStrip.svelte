@@ -4,8 +4,9 @@
 
   /** Top-of-Findings status row. Mirrors findings.jsx RunHealth44:
    *  Stones · functions fired · evidence cards · wall-clock · silent /
-   *  warn / error chips when nonzero. Also surfaces a compact emissions
-   *  chip (mWh + tokens) when the backend reports a per-call ledger. */
+   *  warn / error chips when nonzero. Also surfaces a compact inference
+   *  chip (labelled energy or "energy unknown", plus tokens) when the run
+   *  made inference calls. */
   interface Props {
     cards: Card[];
     stones: StoneTrace[];
@@ -34,53 +35,38 @@
     ? '—'
     : wallSeconds < 1 ? `${Math.round(wallSeconds * 1000)}ms` : `${wallSeconds.toFixed(1)}s`);
 
-  // Format emissions: prefer mWh under 100, else Wh; tokens with K-suffix.
+  // Inference energy. A figure is shown only when the backend supplied
+  // total_wh AND labelled how it was obtained; otherwise "energy unknown".
+  // Never derived from tokens, durations or hardware data sheets here.
+  const LABELLED = new Set(['measured', 'estimated', 'mixed']);
+  let emCalls = $derived(emissions?.n_calls ?? 0);
   let emEnergy = $derived.by(() => {
-    if (!emissions || emissions.total_wh === 0) return null;
-    const wh = emissions.total_wh;
-    if (wh < 0.1) return `${emissions.total_mwh.toFixed(1)} mWh`;
-    return `${wh.toFixed(2)} Wh`;
+    const wh = emissions?.total_wh;
+    const status = emissions?.energy_status;
+    if (typeof wh !== 'number' || !Number.isFinite(wh) || !status || !LABELLED.has(status)) {
+      return 'energy unknown';
+    }
+    const figure = wh < 0.1 ? `${(wh * 1000).toFixed(1)} mWh` : `${wh.toFixed(2)} Wh`;
+    return `${figure} (${status})`;
   });
   let emTokens = $derived.by(() => {
     const t = emissions?.tokens?.total;
     if (!t) return null;
     return t >= 1000 ? `${(t / 1000).toFixed(1)}K tok` : `${t} tok`;
   });
-  let emHardware = $derived.by(() => {
-    if (!emissions) return null;
-    const labels = Object.values(emissions.by_hardware).map(h => h.label);
-    return labels.length === 1 ? labels[0] : labels.join(' + ');
-  });
-  // Fraction of calls that came back with a real NVML reading (vs.
-  // data-sheet fallback). Surfaced as a small ✓ / ~ badge so the
-  // viewer can tell whether the number is measured or estimated.
-  let emMeasuredFrac = $derived(
-    emissions && emissions.n_calls > 0
-      ? (emissions.n_measured ?? 0) / emissions.n_calls
-      : 0
-  );
-  let emMeasuredIcon = $derived(
-    emEnergy == null
-      ? ''
-      : emMeasuredFrac >= 0.9
-        ? '✓'           // all (or nearly all) calls measured on GPU
-        : emMeasuredFrac > 0
-          ? '◐'         // partial coverage
-          : '~'         // pure data-sheet estimate
-  );
   let emTooltip = $derived.by(() => {
     if (!emissions) return '';
-    const measuredLine = emissions.n_measured != null
-      ? `${emissions.n_measured}/${emissions.n_calls} calls measured on GPU (others use data-sheet estimate)`
-      : '';
-    const lines = [
-      `${emissions.n_calls} inference calls — ${emissions.total_joules} J total`,
-      emHardware ? `Hardware: ${emHardware}` : '',
-      measuredLine,
-      emissions.tokens.total ? `Tokens: ${emissions.tokens.prompt ?? 0} prompt + ${emissions.tokens.completion ?? 0} completion` : '',
-      emissions.method,
-    ].filter(Boolean);
-    return lines.join('\n');
+    const calls = (emissions.calls ?? []).map((c) => {
+      const e = typeof c.wh === 'number' ? `${c.wh} Wh (${c.energy_status ?? 'unlabelled'})` : 'energy unknown';
+      return `${c.model ?? c.kind}: ${e}${c.energy_note ? `. ${c.energy_note}` : ''}`;
+    });
+    const tok = emissions.tokens;
+    return [
+      `${emCalls} inference call${emCalls === 1 ? '' : 's'}`,
+      ...calls,
+      tok?.total ? `Tokens: ${tok.prompt ?? 0} prompt + ${tok.completion ?? 0} completion` : '',
+      emissions.method ?? '',
+    ].filter(Boolean).join('\n');
   });
 </script>
 
@@ -114,10 +100,9 @@
   {/if}
   <span class="rh-sep">·</span>
   <span class="rh-item rh-total"><strong>{total}</strong> registered</span>
-  {#if emEnergy}
+  {#if emCalls > 0}
     <span class="rh-sep">·</span>
     <span class="rh-item rh-em" title={emTooltip}>
-      <span class="rh-em-icon" aria-hidden="true">{emMeasuredIcon}</span>
       <strong>{emEnergy}</strong> inference
       {#if emTokens}<span class="rh-em-tok">/ {emTokens}</span>{/if}
     </span>
@@ -156,9 +141,4 @@
   }
   .rh-em strong { color: var(--ink); }
   .rh-em-tok { margin-left: 4px; opacity: 0.75; }
-  .rh-em-icon {
-    margin-right: 4px;
-    font-size: 10px;
-    color: var(--ink-tertiary);
-  }
 </style>

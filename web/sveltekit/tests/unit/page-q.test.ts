@@ -198,7 +198,7 @@ describe('/q/[queryId] no-deployment (out-of-coverage) lifecycle', () => {
     es.emit('deployment', { name: '__none__', city: null, state: null });
     es.emit('final', { paragraph: 'Out of coverage briefing.',
                        intent: 'single_address',
-                       mellea: { passed: [], failed: [], attempts: 0 },
+                       grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
                        citations: [] });
     es.emit('done', {});
 

@@ -51,9 +51,9 @@ export interface ParseResult {
 export function citationFromMeta(
   n: number,
   docId: string,
-  meta?: Partial<Pick<Citation, 'source' | 'title' | 'url' | 'vintage' | 'retrieved'>>
+  meta?: Partial<Pick<Citation, 'source' | 'title' | 'url' | 'vintage' | 'retrieved' | 'maturity'>>
 ): Citation {
-  // Most live-API pebbles don't have a baked `last_updated` date in
+  // Most live-API pebbles don't have a baked `date_modified` in
   // their manifest because the data IS live — the timestamp is the
   // moment of fetch. When vintage is null/blank, fall back to "live"
   // so the citation chip reads "v. live" instead of "v." (which
@@ -71,6 +71,7 @@ export function citationFromMeta(
     url: meta?.url ?? '',
     vintage: meta?.vintage || 'live',
     retrieved: meta?.retrieved || today,
+    maturity: meta?.maturity,
   };
 }
 
@@ -175,13 +176,14 @@ export function parseBriefing(
   SECTION_HEAD_RE.lastIndex = 0;
   while ((m = SECTION_HEAD_RE.exec(markdown))) {
     if (m[2] !== undefined) {
-      // **Heading.** form
+      // **Heading.** form. Canonical legacy heads keep their fixed number;
+      // any other head (Stone taglines such as "Hazard Reader", "Out of
+      // scope") is numbered by position.
       const sec = findSection(m[2]);
-      if (!sec) continue;
       indices.push({
-        num: sec.n,
-        label: sec.label,
-        tier: sec.tier,
+        num: sec?.n ?? String(indices.length + 1).padStart(2, '0'),
+        label: sec?.label ?? m[2].trim(),
+        tier: sec?.tier,
         start: m.index + m[1].length,
         bodyStart: m.index + m[0].length
       });
@@ -201,8 +203,25 @@ export function parseBriefing(
     }
   }
 
-  // Pre-section preamble. Don't render — the reconciler doesn't emit one and
-  // we don't want a stray HTML escape of the bold-marker prefix to flash.
+  // Pre-section preamble (the scope sentence). Rendered as a plain
+  // paragraph with no heading; it carries required disclosure wording.
+  const pushProse = (text: string) => {
+    for (const para of text.split(/\n\s*\n/)) {
+      const flat = para.replace(/\s+/g, ' ').trim();
+      if (!flat) continue;
+      const parts: ClaimPart[] = [];
+      for (const s of splitSentences(flat)) {
+        parts.push(...parseSentenceParts(s, cites, registerCite));
+        parts.push({ text: ' ' });
+      }
+      while (parts.length && parts[parts.length - 1].text.trim() === '' && !parts[parts.length - 1].tier) {
+        parts.pop();
+      }
+      if (parts.length) blocks.push({ kind: 'prose', parts });
+    }
+  };
+  if (indices.length) pushProse(markdown.slice(0, indices[0].start));
+
   for (let i = 0; i < indices.length; i++) {
     const sec = indices[i];
     const next = indices[i + 1];
@@ -217,21 +236,7 @@ export function parseBriefing(
       title: sec.titleExtra
     });
 
-    for (const para of body.split(/\n\s*\n/)) {
-      const flat = para.replace(/\s+/g, ' ').trim();
-      if (!flat) continue;
-
-      const sentences = splitSentences(flat);
-      const parts: ClaimPart[] = [];
-      for (const s of sentences) {
-        parts.push(...parseSentenceParts(s, cites, registerCite));
-        parts.push({ text: ' ' });
-      }
-      while (parts.length && parts[parts.length - 1].text.trim() === '' && !parts[parts.length - 1].tier) {
-        parts.pop();
-      }
-      if (parts.length) blocks.push({ kind: 'prose', parts });
-    }
+    pushProse(body);
   }
 
   // Fallback: if the model hasn't emitted any recognised section head yet

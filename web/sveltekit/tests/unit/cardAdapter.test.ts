@@ -169,3 +169,31 @@ describe('adaptFinalToFindings — per-query scaffold seal', () => {
     expect(leaked).toEqual([]);
   });
 });
+
+describe('card scaffold is filtered by pebble scope and intent', () => {
+  const point = { ...NYC_MANIFEST[0], id: 'pt_pebble', scope: 'point' as const };
+  const legacy = { ...NYC_MANIFEST[0], id: 'legacy_pebble', scope: undefined };
+  const poly = { ...NYC_MANIFEST[0], id: 'poly_pebble', scope: 'polygon' as const };
+  const ids = (intent: string) => {
+    seedManifest(STONES, [point, legacy, poly]);
+    return adaptFinalToFindings({ paragraph: '', intent }, null, undefined, false)
+      .cards.map((c) => c.id).filter((id) => id.includes('pebble'));
+  };
+
+  it('address intents show point pebbles only (missing scope counts as point)', () => {
+    for (const intent of ['single_address', 'live_now', 'compare']) {
+      const got = ids(intent);
+      expect(got.some((id) => id.includes('pt_pebble'))).toBe(true);
+      expect(got.some((id) => id.includes('legacy_pebble'))).toBe(true);
+      expect(got.some((id) => id.includes('poly_pebble'))).toBe(false);
+    }
+  });
+
+  it('neighborhood and development_check show polygon pebbles only', () => {
+    for (const intent of ['neighborhood', 'development_check']) {
+      const got = ids(intent);
+      expect(got.some((id) => id.includes('poly_pebble'))).toBe(true);
+      expect(got.some((id) => id.includes('pt_pebble') || id.includes('legacy_pebble'))).toBe(false);
+    }
+  });
+});

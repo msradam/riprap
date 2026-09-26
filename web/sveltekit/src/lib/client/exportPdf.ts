@@ -60,11 +60,6 @@ function snapshotToPrintPayload(snap: PrintSnapshot): Record<string, unknown> {
     paragraph: reconstructParagraph(snap.blocks, snap.citations),
     plan: { intent: snap.intent ?? 'single_address' },
     citations,
-    mellea: {
-      attempts: snap.attempts ?? 1,
-      passed: [],
-      failed: [],
-    },
     // emissions optional — the briefingState snapshot doesn't carry it
     // today; the route will simply skip the energy ledger section.
   };

@@ -47,6 +47,13 @@ class DeploymentStore {
     }
   }
 
+  /** Set the deployment without fetching (static gallery snapshots). */
+  setStatic(d: Deployment): void {
+    this.lockedForQuery = true;
+    this.current = d;
+    this.loaded = true;
+  }
+
   /** Update the chip to reflect the deployment that was actually
    *  routed-to for the current query — called by the /q/[queryId] SSE
    *  handler when the backend emits the `deployment` event. Fetches

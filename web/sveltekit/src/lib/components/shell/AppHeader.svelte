@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state';
+  import { resolve } from '$app/paths';
   import { briefingState } from '$lib/stores/briefingState.svelte';
   import { deployment } from '$lib/stores/deployment.svelte';
   import { exportBriefingPdf, ExportPdfError } from '$lib/client/exportPdf';
@@ -9,13 +10,15 @@
   interface Props {
     query?: string | null;
     onResetCold?: () => void;
+    /** Static snapshot pages (gallery): no /api/* calls, no PDF export. */
+    offline?: boolean;
   }
-  let { query = null, onResetCold }: Props = $props();
+  let { query = null, onResetCold, offline = false }: Props = $props();
 
   // Fetch the active-deployment descriptor on mount; cheap, cached
   // by the store, returns hazard + city pulled from stones.yaml.
   $effect(() => {
-    if (typeof window !== 'undefined' && !deployment.loaded) {
+    if (!offline && !deployment.loaded) {
       void deployment.load();
     }
   });
@@ -60,7 +63,7 @@
 <header class="app-header no-print" data-screen-label="App header">
   <div class="app-header-inner">
     <div class="app-header-left">
-      <a href="/" class="riprap-wordmark" aria-label="Riprap — home"><RipMark size={20} />riprap</a>
+      <a href={resolve('/')} class="riprap-wordmark" aria-label="Riprap home"><RipMark size={20} />riprap</a>
       <span class="app-header-sep">/</span>
       <span class="app-header-context">{hazardText}</span>
       {#if cityText}
@@ -83,7 +86,7 @@
     </div>
     <div class="app-header-right">
       <a class="app-header-link" href="#methodology">methodology</a>
-      {#if briefingState.ready}
+      {#if briefingState.ready && !offline}
         <button
           type="button"
           class="app-header-link app-header-link-button"

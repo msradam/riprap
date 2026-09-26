@@ -67,11 +67,11 @@ export function tierForStep(step: string): Tier | null {
       s === 'plan' || s === 'compose' || s === 'reconcile' || s === 'stream') return null;
   if (s === 'sandy' || s === 'sandy_inundation' || s === 'floodnet' ||
       s === 'ida_hwm' || s === 'noaa_tides' || s === 'nws_obs' ||
-      s === 'prithvi_eo_v2' || s === 'prithvi_eo_live' ||
+      s === 'prithvi_eo_v2' ||
       s === 'mta_entrance_exposure' || s === 'mta_entrances' ||
       s === 'nycha_developments' || s === 'doe_school_exposure' ||
       s === 'doe_schools' || s === 'doh_hospital_exposure' || s === 'doh_hospitals') return 'empirical';
-  if (s === 'dep' || s === 'dep_stormwater' || s === 'ttm_forecast' ||
+  if (s === 'dep' || s === 'dep_stormwater' ||
       s === 'ttm_311_forecast' || s === 'floodnet_forecast' ||
       s === 'nws_alerts' || s === 'prithvi_water') return 'modeled';
   if (s === 'nyc311' || s === 'microtopo' || s === 'microtopo_lidar' ||

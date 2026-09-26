@@ -3,8 +3,7 @@
 
   /** v0.4.5 — live status pill for the AppHeader.
    *
-   *  Tracks pipeline phase + active step + fired-count + reconcile
-   *  attempt so a user staring at a half-rendered briefing knows what's
+   *  Tracks pipeline phase + active step + fired-count so a user staring at a half-rendered briefing knows what's
    *  actually being crunched. Reads from the briefingState rune store
    *  which q/[queryId]/+page.svelte writes into from SSE callbacks.
    *
@@ -26,19 +25,11 @@
     noaa_tides: 'NOAA tides',
     nws_alerts: 'NWS alerts',
     nws_obs: 'NWS hourly obs',
-    ttm_forecast: 'TTM r2 surge (zero-shot)',
     ttm_311_forecast: 'TTM r2 weekly 311',
     ttm_battery_surge: 'TTM Battery (NYC fine-tune)',
     floodnet_forecast: 'FloodNet recurrence forecast',
     ida_hwm_2021: 'Ida 2021 HWMs',
-    // Two distinct Prithvi specialists with different compute profiles:
-    //   prithvi_eo_v2   — static spatial join against the baked Ida 2021
-    //                     polygons in data/prithvi_ida_2021.geojson. No
-    //                     model inference; sub-100ms even on cold cache.
-    //   prithvi_eo_live — live Sentinel-2 fetch + Prithvi-NYC-Pluvial
-    //                     forward pass. The actual ML run.
-    prithvi_eo_v2: 'Ida 2021 polygons (baked lookup)',
-    prithvi_eo_live: 'Prithvi-NYC-Pluvial v2 segmentation',
+    prithvi_water: 'Ida surface water (experimental)',
     microtopo_lidar: 'LiDAR microtopo',
     mta_entrance_exposure: 'MTA entrances',
     nycha_development_exposure: 'NYCHA developments',
@@ -61,9 +52,6 @@
       case 'planning':    return 'planning intent';
       case 'specialists': return 'gathering evidence';
       case 'reconciling': return 'reconciling';
-      case 'streaming':   return briefingState.attempt > 1
-                                  ? `writing (reroll ${briefingState.attempt - 1})`
-                                  : 'writing briefing';
       case 'error':       return 'error';
       default:            return '';
     }

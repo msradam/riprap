@@ -35,7 +35,7 @@ describe('StatusPill visibility per phase', () => {
     expect(container.querySelector('.status')).toBeNull();
   });
 
-  it.each(['planning', 'specialists', 'reconciling', 'streaming', 'error'] as const)(
+  it.each(['planning', 'specialists', 'reconciling', 'error'] as const)(
     'visible when phase=%s',
     (phase) => {
       briefingState.phase = phase;
@@ -57,13 +57,6 @@ describe('StatusPill content per phase', () => {
     expect(text).toContain('gathering evidence');
     expect(text).toContain('FloodNet sensors');
     expect(text).toContain('8/11');
-  });
-
-  it('phase=streaming with attempt=2 → "writing (reroll 1)"', () => {
-    briefingState.phase = 'streaming';
-    briefingState.attempt = 2;
-    const { container } = render(StatusPill);
-    expect(container.textContent ?? '').toContain('reroll 1');
   });
 
   it('phase=error → red border + error message', () => {

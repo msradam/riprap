@@ -133,6 +133,9 @@ export type Card = {
    *  / preview cards). Always implied true for tier=synthetic. */
   illustrative?: boolean;
 
+  /** The pebble behind this card is marked experimental in its manifest. */
+  experimental?: boolean;
+
   /** Optional spatial-index callout (e.g. "regional · The Battery, not
    *  point-of-query") rendered next to the body sub. */
   spatialNote?: string;

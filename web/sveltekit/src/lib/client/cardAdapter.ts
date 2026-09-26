@@ -20,7 +20,7 @@ import type {
   Card, CardVariant, FindingsData, StoneKey, StoneMember, StoneTrace
 } from '$lib/types/card';
 import type { TraceNode, TraceStatus } from '$lib/types/trace';
-import type { FinalResult } from '$lib/client/agentStream';
+import { citationList, type FinalResult } from '$lib/client/agentStream';
 import { pebbleManifest, type PebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 
 /** Reasonable defaults — when the FSM doesn't supply a vintage, fall
@@ -100,14 +100,13 @@ const _LEGACY_STEP_TO_STONE: Record<string, StoneKey> = {
   terramind_lulc: 'touchstone',
   eo_chip_fetch: 'keystone',
   prithvi_eo_v2: 'cornerstone',
-  prithvi_eo_live: 'touchstone',
   // Capstone reconciler variants
   reconcile_granite41: 'capstone',
   reconcile_neighborhood: 'capstone',
   reconcile_development: 'capstone',
   reconcile_live_now: 'capstone',
-  mellea_reconcile_address: 'capstone',
-  mellea_grounding: 'capstone',
+  reconcile_templated: 'capstone',
+  reconcile_claims: 'capstone',
   rag_granite_embedding: 'capstone',
   gliner_extract: 'capstone',
 };
@@ -307,7 +306,6 @@ function buildTerramindLulc(state: Final): Card | null {
 type ForecastValue = {
   available?: boolean;
   interesting?: boolean;
-  accelerating?: boolean;
   // Surge — zero-shot (ft / minutes) and fine-tune (m / hours).
   forecast_peak_ft?: number;
   forecast_peak_minutes_ahead?: number;
@@ -332,9 +330,8 @@ type ForecastValue = {
 function buildTimeseriesForecast(m: PebbleManifest, value: unknown): Card | null {
   const t = value as ForecastValue | null;
   if (!t || !t.available) return null;
-  // `interesting` is the explicit-hide gate (surge floor); `accelerating`
-  // is informational only. If neither is present, default to showing the
-  // card — every available forecast should surface.
+  // `interesting` is the explicit-hide gate (surge floor). If absent,
+  // default to showing the card: every available forecast should surface.
   if (t.interesting === false) return null;
   // Detect unit from which fields the adapter populated. Each branch is
   // its own pebble-family contract:
@@ -400,7 +397,7 @@ function buildTimeseriesForecast(m: PebbleManifest, value: unknown): Card | null
     id: `fsm-${m.id.replace(/_/g, '-')}`,
     stone: m.stone, tier, variant,
     source, agency: m.provenance.source_name,
-    vintage: m.provenance.last_updated?.toString() ?? RIPRAP_VINTAGE,
+    vintage: m.provenance.date_modified?.toString() ?? RIPRAP_VINTAGE,
     title: m.title,
     timeseries,
     headline,
@@ -577,7 +574,7 @@ function buildHistogramCard(m: PebbleManifest, value: unknown): Card | null {
     id: `fsm-${m.id.replace(/_/g, '-')}`,
     stone: m.stone, tier, variant: 'histogram',
     source, agency: m.provenance.source_name,
-    vintage: m.provenance.last_updated?.toString() ?? RIPRAP_VINTAGE,
+    vintage: m.provenance.date_modified?.toString() ?? RIPRAP_VINTAGE,
     title: m.title,
     headline,
     subhead: t.subhead_text,
@@ -596,7 +593,7 @@ function buildHistogramCard(m: PebbleManifest, value: unknown): Card | null {
 // and emit a normalized value shape:
 //   { headline_value, subhead_text, narrative, raster_kind, illustrative,
 //     ok?: bool }
-// All raster pebbles (prithvi_water, prithvi_live, future flood-mask
+// All raster pebbles (prithvi_water, future flood-mask
 // models) flow through here — no per-pebble id check.
 type RasterValue = {
   ok?: boolean;
@@ -628,7 +625,7 @@ function buildRasterCard(m: PebbleManifest, value: unknown): Card | null {
     id: `fsm-${m.id.replace(/_/g, '-')}`,
     stone: m.stone, tier, variant,
     source, agency: m.provenance.source_name,
-    vintage: m.provenance.last_updated?.toString() ?? RIPRAP_VINTAGE,
+    vintage: m.provenance.date_modified?.toString() ?? RIPRAP_VINTAGE,
     title: m.title,
     rasterKind: (t.raster_kind ?? 'prithvi') as 'prithvi' | 'buildings' | 'lulc',
     headline,
@@ -642,164 +639,35 @@ function buildRasterCard(m: PebbleManifest, value: unknown): Card | null {
   };
 }
 
-// ── Neighborhood NTA card builders ────────────────────────────────────────────
-
-function buildSandyNta(state: Final): Card | null {
-  const s = obj(state.sandy_nta);
-  if (!s) return null;
-  const frac = num(s.fraction) ?? 0;
-  const areaKm2 = num(s.polygon_area_m2) != null
-    ? ((s.polygon_area_m2 as number) / 1e6).toFixed(2)
-    : null;
-  return {
-    id: 'nta-sandy',
-    stone: 'cornerstone', tier: 'empirical', variant: 'scalars',
-    source: 'NYC OEM', agency: 'NYC OEM / FEMA · Sandy 2012 inundation zone',
-    vintage: '2012-10-29',
-    title: 'Hurricane Sandy 2012 inundation — NTA coverage',
-    scalars: [
-      { value: `${(frac * 100).toFixed(1)}%`, label: 'area inundated' },
-      ...(areaKm2 ? [{ value: `${areaKm2} km²`, label: 'NTA area' }] : []),
-    ],
-    sub: frac > 0
-      ? `${(frac * 100).toFixed(1)}% of this NTA was empirically inundated by Sandy (2012). Point data unavailable for neighborhood-mode queries.`
-      : 'NTA boundary was outside the empirical 2012 Sandy inundation extent.',
-    docId: 'sandy_nta', citeId: 'sandy_nta',
-  };
-}
-
-function buildDepNta(state: Final): Card | null {
-  const d = obj(state.dep_nta);
-  if (!d) return null;
-  const rows: (string | number)[][] = [];
-  for (const [scen, info] of Object.entries(d)) {
-    const i = obj(info as unknown);
-    if (!i) continue;
-    const frac = num(i.fraction_any) ?? 0;
-    if (frac <= 0) continue;
-    const label = str(i.label) ?? scen;
-    rows.push([label.replace(/DEP (Extreme|Moderate) Stormwater \(.*?\)\s*/i, '$1').trim(),
-               `${(frac * 100).toFixed(1)}%`, 'fraction flooded']);
-  }
-  if (!rows.length) return null;
-  return {
-    id: 'nta-dep',
-    stone: 'cornerstone', tier: 'modeled', variant: 'tabular',
-    source: 'NYC DEP', agency: 'NYC Department of Environmental Protection · Stormwater Flood Maps',
-    vintage: '2021',
-    title: 'DEP stormwater flood scenarios — NTA coverage',
-    columns: ['scenario', '% NTA flooded', 'metric'],
-    rows,
-    sub: `${rows.length} scenario${rows.length === 1 ? '' : 's'} show modeled inundation across this NTA.`,
-    docId: 'dep_stormwater', citeId: 'dep_nta',
-  };
-}
-
-function buildNyc311Nta(state: Final): Card | null {
-  const s = obj(state.nyc311_nta);
-  if (!s) return null;
-  const n = num(s.n) ?? 0;
-  if (n <= 0) return null;
-  const years = num(s.years) ?? 3;
-  const desc = s.by_descriptor && typeof s.by_descriptor === 'object'
-    ? Object.entries(s.by_descriptor as Record<string, unknown>)
-        .map(([k, v]) => [k.replace(/ \(.*\)$/, ''), v as number, ''])
-        .slice(0, 4)
-    : [];
-  return {
-    id: 'nta-311',
-    stone: 'touchstone', tier: 'proxy', variant: 'tabular',
-    source: 'NYC 311', agency: 'NYC 311 Service Requests · flood-relevant descriptors',
-    vintage: RIPRAP_VINTAGE,
-    title: `NYC 311 flood complaints — ${n.toLocaleString()} in ${years} yr`,
-    columns: ['complaint type', 'count', ''],
-    rows: desc as (string | number)[][],
-    sub: `${n.toLocaleString()} flood-related 311 service requests in this NTA over the past ${years} years.`,
-    docId: 'nyc311_nta', citeId: 'nyc311_nta',
-  };
-}
-
-function buildMicrotopoNta(state: Final): Card | null {
-  const m = obj(state.microtopo_nta);
-  if (!m) return null;
-  const elev = num(m.elev_median_m);
-  if (elev == null) return null;
-  const scalars = [
-    { value: `${elev.toFixed(1)} m`, label: 'median elevation' },
-  ];
-  if (num(m.hand_median_m) != null)
-    scalars.push({ value: `${(m.hand_median_m as number).toFixed(1)} m`, label: 'median HAND' });
-  if (num(m.twi_median) != null)
-    scalars.push({ value: `${(m.twi_median as number).toFixed(1)}`, label: 'median TWI' });
-  if (num(m.frac_hand_lt1) != null)
-    scalars.push({ value: `${((m.frac_hand_lt1 as number) * 100).toFixed(0)}%`, label: 'cells HAND < 1 m' });
-  return {
-    id: 'nta-microtopo',
-    stone: 'cornerstone', tier: 'proxy', variant: 'scalars',
-    source: 'USGS 3DEP', agency: 'USGS 3DEP DEM (LiDAR-derived) · NTA polygon aggregate',
-    vintage: '2018',
-    title: 'Microtopography — NTA aggregate',
-    scalars,
-    sub: 'Aggregated over all DEM cells within the NTA boundary. HAND < 1 m = very close to drainage channel.',
-    docId: 'microtopo_nta', citeId: 'microtopo_nta',
-  };
-}
-
 function buildCapstoneMeta(final: FinalResult, wallSeconds?: number): Card {
-  // v0.4.5 §2 — wire the four metrics to the reconciler's actual state.
-  // The FSM emits `mellea` as `{ rerolls, n_attempts, requirements_passed,
-  // requirements_failed, requirements_total }` (the mellea_validator
-  // shape). Earlier UI types used `{ passed, failed, attempts }`; we
-  // accept both so cards keep rendering across backend versions.
-  const m = (final.mellea ?? {}) as Record<string, unknown>;
-  // The templated reconciler (no-LLM tier) emits tier='templated' +
-  // n_attempts=0 + empty requirements lists. Mellea grounding doesn't
-  // run at all in that mode, so "0/4 passed grounding checks" reads
-  // like a failure when it's actually "no LLM, no grounding loop".
-  const isTemplated = (m.tier === 'templated');
-  const passedArr = Array.isArray(m.requirements_passed)
-    ? (m.requirements_passed as unknown[])
-    : Array.isArray(m.passed) ? (m.passed as unknown[]) : [];
-  const failedArr = Array.isArray(m.requirements_failed)
-    ? (m.requirements_failed as unknown[])
-    : Array.isArray(m.failed) ? (m.failed as unknown[]) : [];
-  const passed = passedArr.length;
-  const failed = failedArr.length;
-  const totalChecks = (typeof m.requirements_total === 'number'
-    ? (m.requirements_total as number)
-    : (passed + failed)) || 4;
-  const attempts = (typeof m.n_attempts === 'number'
-    ? (m.n_attempts as number)
-    : (typeof m.attempts === 'number' ? (m.attempts as number) : 0));
-  const rerollsField = typeof m.rerolls === 'number' ? (m.rerolls as number) : null;
-  const rerolls = rerollsField ?? Math.max(0, attempts - 1);
-  // final.citations may be a Record<docId, citation> in templated tier
-  // or an Array in LLM tier; length accordingly.
-  const citesContainer = final.citations as unknown;
-  const cites = Array.isArray(citesContainer)
-    ? citesContainer.length
-    : (citesContainer && typeof citesContainer === 'object'
-        ? Object.keys(citesContainer as Record<string, unknown>).length : 0);
+  // How the briefing was produced, read from final.grounding and
+  // final.compliance. `compliance` is a set of substring checks for
+  // required disclosure phrases, not a quality score.
+  const g = final.grounding;
+  const isLlm = g?.tier === 'llm';
+  const kept = g?.claims?.length ?? 0;
+  const dropped = g?.dropped_claims?.length ?? 0;
+  const c = final.compliance;
+  const cites = citationList(final.citations).length;
   return {
     id: 'fsm-capstone-meta',
     stone: 'capstone', tier: 'modeled', variant: 'meta',
-    source: isTemplated ? 'Templated' : 'Mellea',
-    agency: isTemplated
-      ? 'Capstone synthesis · templated tier (no LLM, no grounding loop)'
-      : 'Capstone synthesis · Granite 4.1 + Mellea grounding check',
+    source: isLlm ? 'LLM' : 'No LLM',
+    agency: isLlm
+      ? `Capstone synthesis · ${g?.model ?? 'LLM'} · claims checked against cited sources`
+      : 'Capstone synthesis · evidence briefing built from source values (no LLM)',
     vintage: RIPRAP_VINTAGE,
-    title: 'Briefing reconciliation',
+    title: 'How this briefing was written',
     metaRows: [
-      { k: isTemplated ? 'tier' : 'mellea reroll',
-        v: isTemplated ? 'templated · deterministic'
-                       : `${rerolls} reroll${rerolls === 1 ? '' : 's'}` },
-      { k: 'grounding checks',
-        v: isTemplated ? 'n/a — no LLM loop'
-                       : `${passed}/${totalChecks} passed` },
+      { k: 'mode', v: isLlm ? `LLM${g?.model ? `: ${g.model}` : ''}` : 'evidence briefing (no LLM)' },
+      { k: 'claims checked', v: isLlm ? `${kept} kept, ${dropped} dropped` : 'n/a (no LLM)' },
+      { k: 'disclosure checks', v: c ? `${c.n_passed}/${c.n_total} present` : '—' },
       { k: 'citations resolved', v: `${cites}` },
-      { k: 'wall-clock',         v: wallSeconds != null ? `${wallSeconds.toFixed(1)} s` : '—' },
+      { k: 'wall-clock', v: wallSeconds != null ? `${wallSeconds.toFixed(1)} s` : '—' },
     ],
-    sub: 'Capstone produces prose, not cards. This meta-card is the integrity-narration UI for the entire pipeline.',
+    sub: g?.fallback_reason
+      ? `The LLM was unavailable (${g.fallback_reason}), so the evidence briefing is shown.`
+      : 'Capstone writes prose, not cards. This card records how the briefing was produced.',
     docId: 'capstone',
   };
 }
@@ -852,13 +720,24 @@ const SPECIAL_BUILT_IDS = new Set<string>([
   // (manifest narration.template + adapter {narrative} field).
   // Touchstone
   // nyc311 dispatched via buildHistogramCard (display.variant: histogram).
-  // Lodestone — all four forecast pebbles (ttm_forecast, ttm_battery_surge,
-  // ttm_311_forecast, floodnet_forecast) now flow through the type-keyed
+  // Lodestone: the forecast pebbles (ttm_battery_surge, ttm_311_forecast,
+  // floodnet_forecast) now flow through the type-keyed
   // buildTimeseriesForecast renderer below (display.variant + value shape).
   // Keystone — the four register pebbles now dispatch via
   // buildRegisterComposite (multi-pebble, variant: register). Drop
   // from this set so they participate in the type-keyed dispatch.
 ]);
+
+/** Intents that run polygon (neighborhood) pebbles instead of point ones. */
+const POLYGON_INTENTS = new Set(['neighborhood', 'development_check']);
+
+/** True when a pebble belongs to the given intent's card scaffold. Keeps
+ *  neighborhood-only pebbles off address pages (and vice versa) instead
+ *  of rendering them as "No data" cards. */
+export function pebbleInScope(m: PebbleManifest, intent: string | null | undefined): boolean {
+  const want = intent && POLYGON_INTENTS.has(intent) ? 'polygon' : 'point';
+  return (m.scope ?? 'point') === want;
+}
 
 function buildTemplated(m: PebbleManifest, value: unknown): Card | null {
   // The manifest's `display.variant` is an explicit per-pebble override
@@ -878,7 +757,7 @@ function buildTemplated(m: PebbleManifest, value: unknown): Card | null {
              : m.type === 'live'  ? 'empirical'
              : 'empirical';
   const source = m.provenance.source_name.split(/[—-]/)[0].trim();
-  const vintage = m.provenance.last_updated ?? RIPRAP_VINTAGE;
+  const vintage = m.provenance.date_modified ?? RIPRAP_VINTAGE;
   const base: Card = {
     id: `pebble-${m.id}`,
     stone: m.stone,
@@ -1120,46 +999,12 @@ export function adaptFinalToFindings(
   hasFinal: boolean = true,
 ): FindingsData {
   const f = (final ?? {}) as Final;
-  const geocode = obj(f.geocode);
-  const isNeighborhood = str(f.intent) === 'neighborhood';
+  // Neighborhood evidence (sandy_nta, dep_*_nta, nyc311_nta, microtopo_nta,
+  // dob_permits_nta) and every other pebble render through the manifest
+  // loop below; only non-manifest outputs keep a curated builder.
   const cards: (Card | null)[] = [
-    // Cornerstone
-    // sandy now flows through the templated path via its manifest's
-    // narration.template + the `boolean_zone` shaper. Neighborhood
-    // intent still uses a curated builder for now — that path
-    // (app/intents/neighborhood.py) is NYC-specific by design.
-    isNeighborhood ? buildSandyNta(f) : null,
-    // DEP stormwater: address path goes through the templated loop
-    // (3 manifests, each emits {narrative} via the dep_scenario
-    // shaper); neighborhood path keeps the NYC-specific composite
-    // builder.
-    isNeighborhood ? buildDepNta(f) : null,
-    // ida_hwm now flows through the templated headline path
-    // (manifest narration.template + ida_hwm shaper's {narrative}).
-    // prithvi_water + prithvi_live dispatch via buildRasterCard in the
-    // templated loop below (display.variant: raster / raster-pred).
-    // microtopo: address path now flows through templated scalars
-    // (Microtopo dataclass emits {narrative}); NTA path stays curated.
-    isNeighborhood ? buildMicrotopoNta(f) : null,
-    // Keystone
-    // registers (mta_entrances, nycha_developments, doe_schools,
-    // doh_hospitals) dispatch via buildRegisterComposite in the
-    // templated loop below (multi-pebble dispatch on variant: register).
     buildTerramindBuildings(f),
-    // Touchstone
-    // floodnet now flows through the templated scalars path
-    // (n_sensors + n_flood_events_3y + {narrative} from the adapter).
-    // nyc311 (address path) dispatches via buildHistogramCard in the
-    // templated loop below (display.variant: histogram); NTA path
-    // stays curated for now.
-    isNeighborhood ? buildNyc311Nta(f) : null,
-    // nws_obs, noaa_tides flow through the templated path now
-    // (each pebble's adapter emits a {narrative} the manifest's
-    // narration.template renders verbatim).
     buildTerramindLulc(f),
-    // Lodestone — nws_alerts also migrated to templated path.
-    // ttm_forecast + ttm_battery_surge dispatch via buildTimeseriesForecast
-    // in the templated loop below (display.variant: timeseries[-ft]).
     // Capstone (only once we have something to summarise)
     hasFinal ? buildCapstoneMeta((final ?? { paragraph: '' }) as FinalResult, wallSeconds) : null,
   ];
@@ -1171,22 +1016,28 @@ export function adaptFinalToFindings(
   // appear here automatically.
   const templatedCards: Card[] = [];
   const handledIds = new Set<string>();
+  const intent = str(f.intent);
+  const inScope = (stoneId: string) =>
+    (pebbleManifest.byStone[stoneId] ?? []).filter((m) => pebbleInScope(m, intent));
   for (const stone of pebbleManifest.stones) {
     // Multi-pebble composite dispatch: collect all variant: register
     // pebbles in this stone, render once via buildRegisterComposite.
     // Each register pebble is marked handled so the per-pebble loop
     // below skips it.
-    const registerMs = (pebbleManifest.byStone[stone.id] ?? [])
+    const registerMs = inScope(stone.id)
       .filter(m => m.display.variant === 'register'
                    && !SPECIAL_BUILT_IDS.has(m.id));
     if (registerMs.length) {
       const composite = buildRegisterComposite(registerMs, f);
-      if (composite) templatedCards.push(composite);
+      if (composite) {
+        composite.experimental = registerMs.some((m) => m.maturity === 'experimental');
+        templatedCards.push(composite);
+      }
       for (const m of registerMs) handledIds.add(m.id);
     }
     // Per-pebble loop — single-pebble bespoke variants + the generic
     // templated fallback. Type-keyed dispatch by display.variant.
-    for (const m of pebbleManifest.byStone[stone.id] ?? []) {
+    for (const m of inScope(stone.id)) {
       if (SPECIAL_BUILT_IDS.has(m.id) || handledIds.has(m.id)) continue;
       const value = (f as Record<string, unknown>)[m.id];
       let card: Card | null = null;
@@ -1198,7 +1049,7 @@ export function adaptFinalToFindings(
         card = buildHistogramCard(m, value);
       }
       if (!card) card = buildTemplated(m, value);
-      if (card) templatedCards.push(card);
+      if (card) templatedCards.push({ ...card, experimental: m.maturity === 'experimental' });
     }
   }
 
@@ -1232,13 +1083,11 @@ export function applyStepEventToLiveState(
     noaa_tides: 'noaa_tides',
     nws_alerts: 'nws_alerts',
     nws_obs: 'nws_obs',
-    ttm_forecast: 'ttm_forecast',
     ttm_311_forecast: 'ttm_311_forecast',
     ttm_battery_surge: 'ttm_battery_surge',
     floodnet_forecast: 'floodnet_forecast',
     ida_hwm_2021: 'ida_hwm',
     prithvi_eo_v2: 'prithvi_water',
-    prithvi_eo_live: 'prithvi_live',
     microtopo_lidar: 'microtopo',
     mta_entrance_exposure: 'mta_entrances',
     nycha_development_exposure: 'nycha_developments',
@@ -1251,9 +1100,9 @@ export function applyStepEventToLiveState(
     geocode: 'geocode',
     // Neighborhood NTA chain
     sandy_nta: 'sandy_nta',
-    dep_extreme_2080_nta: 'dep_nta',
-    dep_moderate_2050_nta: 'dep_nta',
-    dep_moderate_current_nta: 'dep_nta',
+    dep_extreme_2080_nta: 'dep_extreme_2080_nta',
+    dep_moderate_2050_nta: 'dep_moderate_2050_nta',
+    dep_moderate_current_nta: 'dep_moderate_current_nta',
     nyc311_nta: 'nyc311_nta',
     microtopo_nta: 'microtopo_nta',
   };

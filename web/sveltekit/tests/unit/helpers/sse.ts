@@ -116,7 +116,7 @@ export async function scriptCityRun(
   es.emit('final', {
     paragraph: spec.paragraph,
     intent: 'single_address',
-    mellea: { passed: [], failed: [], attempts: 0 },
+    grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
     citations: [],
   });
   es.emit('done', {});

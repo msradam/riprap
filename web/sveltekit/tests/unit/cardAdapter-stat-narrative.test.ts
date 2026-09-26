@@ -66,7 +66,7 @@ const SANDY_MANIFEST: PebbleManifest = {
   provenance: {
     source_name: 'NYC Open Data — Sandy Inundation Zone',
     source_url: null, license: null,
-    citation: 'NYC Sandy Inundation Zone', doc_id: 'sandy_inundation', last_updated: null,
+    citation: 'NYC Sandy Inundation Zone', doc_id: 'sandy_inundation', date_modified: null,
   },
   fallback: { on_offline: 'skip', message: 'Sandy raster + GeoJSON both unavailable.' },
 };
@@ -142,7 +142,7 @@ const POLICY_CORPUS_MANIFEST: PebbleManifest = {
   provenance: {
     source_name: 'NYC flood-policy corpus',
     source_url: null, license: null,
-    citation: 'NYC flood-policy corpus', doc_id: 'policy_corpus', last_updated: null,
+    citation: 'NYC flood-policy corpus', doc_id: 'policy_corpus', date_modified: null,
   },
   fallback: { on_offline: 'skip', message: 'Policy-corpus index unavailable (RAG embeddings or NER model offline).' },
 };

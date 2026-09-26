@@ -45,6 +45,7 @@ export default defineConfig({
       '$app/state': resolve(__dirname, 'src/.tests-shim/app/state.svelte.ts'),
       '$app/environment': resolve(__dirname, 'src/.tests-shim/app/environment.svelte.ts'),
       '$app/navigation': resolve(__dirname, 'src/.tests-shim/app/navigation.ts'),
+      '$app/paths': resolve(__dirname, 'src/.tests-shim/app/paths.ts'),
       '$app/stores': resolve(__dirname, 'src/.tests-shim/app/state.svelte.ts'),
       $app: resolve(__dirname, 'src/.tests-shim/app'),
       // happy-dom has no canvas; maplibre-gl crashes. Stub at the

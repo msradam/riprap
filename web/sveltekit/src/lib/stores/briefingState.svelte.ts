@@ -19,7 +19,6 @@ export interface PrintSnapshot {
   blocks: BriefingBlock[];
   citations: Record<string, Citation>;
   generatedAt: string;
-  attempts: number | null;
 }
 
 /** Coarse pipeline phase, surfaced in the AppHeader status indicator
@@ -29,8 +28,7 @@ export type RunPhase =
   | 'idle'
   | 'planning'      // planner JSON is streaming
   | 'specialists'   // FSM is firing data Stones (cornerstone → lodestone)
-  | 'reconciling'   // Granite + Mellea is composing the briefing
-  | 'streaming'     // first reconcile token has arrived; paragraph is materialising
+  | 'reconciling'   // Capstone is composing the briefing (arrives whole in `final`)
   | 'done'
   | 'error';
 
@@ -49,8 +47,6 @@ class BriefingState {
   /** Total specialists registered for this run. Set when the planner
    *  resolves an intent or when the FSM trace settles. */
   totalSpecialists = $state(0);
-  /** Mellea attempt counter (1-indexed once tokens start streaming). */
-  attempt = $state(0);
   /** Last error message — shown in the header status when phase = error. */
   errorMessage = $state<string | null>(null);
 
@@ -60,7 +56,6 @@ class BriefingState {
     this.activeStep = null;
     this.firedCount = 0;
     this.totalSpecialists = 0;
-    this.attempt = 0;
     this.errorMessage = null;
   }
 

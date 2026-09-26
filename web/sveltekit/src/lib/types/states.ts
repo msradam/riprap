@@ -6,8 +6,8 @@ export type AssetKind = 'subway' | 'nycha' | 'school' | 'hospital';
 export type ErrorKey = 'geocoder' | 'all-silent' | 'grounding' | 'backend';
 
 // Refusal classification was considered (Granite Guardian, then a
-// planner-level shim) and dropped. Mellea rejection sampling enforces
-// grounding integrity; cold-start framing handles audience scoping.
+// planner-level shim) and dropped. Grounding is enforced by checking
+// each written claim against its cited sources (see final.grounding).
 // See experiments/06_granite_guardian/RESULTS.md for the decision record.
 
 export interface RegisterRow {

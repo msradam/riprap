@@ -64,8 +64,6 @@
       <div class="print-sub">
         intent <strong>{snapshot.intent ?? 'briefing'}</strong>
         · {snapshot.specialists} specialists
-        · {snapshot.attempts ?? 1} reconcile{(snapshot.attempts ?? 1) === 1 ? '' : 's'}
-        · grounded by Mellea rejection sampling
       </div>
     </header>
 
@@ -101,7 +99,8 @@
 
     <footer class="print-foot">
       Generated {dateLine} ·
-      Riprap is grounded by Mellea rejection sampling over IBM Granite 4.1.
+      Riprap briefings are built from cited source values, or written by an LLM
+      with each claim checked against its cited sources.
       Numbers without bracketed citations are not present in source documents.
     </footer>
   </article>

@@ -5,11 +5,12 @@
   import AppFooter from '$lib/components/shell/AppFooter.svelte';
   import SkipLinks from '$lib/components/shell/SkipLinks.svelte';
   import { page } from '$app/state';
+  import { resolve } from '$app/paths';
 
   interface Props { children: Snippet; }
   let { children }: Props = $props();
 
-  let query = $derived(() => {
+  let query = $derived.by(() => {
     const id = page.params.queryId;
     if (!id) return null;
     try {
@@ -22,14 +23,16 @@
   // The landing at / and the print artifact at /print/<id> both bring
   // their own chrome, so the layout's AppHeader / AppFooter sit out
   // for those. Briefings at /q/<id> still get the app chrome.
-  let isPrint = $derived(page.url.pathname.startsWith('/print/'));
-  let isLanding = $derived(page.url.pathname === '/');
+  let isPrint = $derived(page.route.id?.startsWith('/print/') ?? false);
+  let isLanding = $derived(page.route.id === '/');
   let chromeFree = $derived(isPrint || isLanding);
+  // Gallery pages are static snapshots: the header must not call /api/*.
+  let isGallery = $derived(page.route.id?.startsWith('/gallery') ?? false);
 </script>
 
 {#if !chromeFree}
   <SkipLinks />
-  <AppHeader query={query()} onResetCold={() => (window.location.href = '/')} />
+  <AppHeader {query} offline={isGallery} onResetCold={() => (window.location.href = resolve('/'))} />
 {/if}
 <main>{@render children()}</main>
 {#if !chromeFree}

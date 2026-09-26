@@ -40,6 +40,9 @@ def describe_deployment(stones_reg: StoneRegistry, pebble_reg: Registry) -> dict
                 "stone": m.stone,
                 "tier": m.tier,
                 "maturity": m.maturity,
+                # point pebbles run for address intents, polygon pebbles
+                # for neighborhood / development intents.
+                "scope": m.spatial.scope,
                 "display": {
                     "order": m.display.order,
                     "kind": m.display.kind,

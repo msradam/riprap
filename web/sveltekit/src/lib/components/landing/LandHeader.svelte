@@ -3,6 +3,7 @@
    *  Subtly different from the in-app AppHeader so the marketing surface
    *  reads as a separate page. */
   import RipMark from '$lib/components/shell/RipMark.svelte';
+  import { resolve } from '$app/paths';
 </script>
 
 <header class="land-header">
@@ -12,6 +13,7 @@
   <nav class="land-header-nav">
     <a href="#methodology">Methodology</a>
     <a href="#sources">Sources</a>
+    <a href="{resolve('/gallery')}/">Gallery</a>
   </nav>
 </header>
 

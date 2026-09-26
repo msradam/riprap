@@ -114,7 +114,7 @@ function isPebbleIdMapKey(line: string): boolean {
   // Matches `  nycXXX: 'value'` or `  nycha_developments: 'value'`
   // or `  ttm_battery_surge: 'TTM Battery (NYC fine-tune)'`
   // — these are pebble-id → short-label maps in StatusPill.
-  return /^\s*(nyc311|nycha_\w+|ttm_battery_surge|prithvi_eo_live|nycha_development_exposure)\s*:/i.test(line);
+  return /^\s*(nyc311|nycha_\w+|ttm_battery_surge|nycha_development_exposure)\s*:/i.test(line);
 }
 
 interface Leak {

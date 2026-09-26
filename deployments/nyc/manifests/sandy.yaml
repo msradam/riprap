@@ -38,7 +38,7 @@ provenance:
   citation: NYC Sandy Inundation Zone (NYC OpenData uyj8-7rv5, empirical 2012 extent)
 
 narration:
-  short: This address is within the empirical 2012 Hurricane Sandy inundation footprint.
+  short: The 2012 Hurricane Sandy inundation extent (NYC OEM) at this address.
   template: This address {inside_phrasing} the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).
 
 fallback:

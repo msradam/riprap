@@ -123,8 +123,8 @@
     },
     {
       id: 'grm-meta', stone: 'capstone', tier: 'modeled', variant: 'meta',
-      source: 'Mellea', agency: 'spec', vintage: 'spec',
-      title: 'Capstone reconciliation',
+      source: 'LLM', agency: 'spec', vintage: 'spec',
+      title: 'How this briefing was written',
       metaRows: [
         { k: 'claims', v: '12 / 12 grounded' },
         { k: 'tier mix', v: 'EMP 5 · MOD 4 · PRX 2 · SYN 1' },
