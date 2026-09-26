@@ -1,0 +1,264 @@
+{
+ "id": "q05",
+ "kind": "flood_history",
+ "question": "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?",
+ "error": null,
+ "wall_s": 187.2,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "90-01 183rd Street, Queens"
+   }
+  ],
+  "rationale": "The query specifies a specific street address in Queens, asking about historic flooding since Hurricane Ida."
+ },
+ "pebbles_run": [
+  "dep_extreme_2080",
+  "dep_moderate_2050",
+  "dep_moderate_current",
+  "doe_schools",
+  "doh_hospitals",
+  "fema_nfhl",
+  "floodnet",
+  "floodnet_forecast",
+  "ida_hwm",
+  "microtopo",
+  "mta_entrances",
+  "noaa_tides",
+  "npcc4_slr",
+  "nws_alerts",
+  "nws_obs",
+  "nyc311",
+  "nycha_developments",
+  "policy_corpus",
+  "prithvi_water",
+  "sandy",
+  "ttm_311_forecast",
+  "ttm_battery_surge",
+  "usgs_gauges"
+ ],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 665,
+  "completion": 69,
+  "seconds": 9.53,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 1339,
+  "completion": 1573,
+  "seconds": 172.96,
+  "n_calls": 1
+ },
+ "n_documents": 20,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "Hazard Reader",
+   "text": "This address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",
+   "doc_ids": [
+    "sandy_inundation"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007.",
+   "doc_ids": [
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "USGS surveyed 2 Hurricane Ida high-water mark(s) within 800 m of this address; the highest observed water elevation was 48.2 ft (up to 0.76 ft above ground).",
+   "doc_ids": [
+    "ida_hwm"
+   ],
+   "numbers": [
+    "2",
+    "48.2",
+    "0.76"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "Experimental: satellite-detected surface water about 14 hours after Hurricane Ida (Sentinel-2, 2021-09-02): 0 water polygons within 500 m of this address, nearest 11174.7 m away.",
+   "doc_ids": [
+    "prithvi_water"
+   ],
+   "numbers": [
+    "0",
+    "11174.7"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "Elevation 14.87 m; this point sits at the 29.1th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 0.0 m above nearest drainage; TWI 11.78. Local basin relief: 35.02 m.",
+   "doc_ids": [
+    "microtopo"
+   ],
+   "numbers": [
+    "14.87",
+    "29.1",
+    "0.0",
+    "11.78",
+    "35.02"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 1 (embedding retrieval; entity tags are experimental).",
+   "doc_ids": [
+    "policy_corpus"
+   ],
+   "numbers": [
+    "1"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "2 FloodNet community sensor(s) within 600 m have logged 14 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 1172 mm.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "2",
+    "14",
+    "1172"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "82 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years. Most common descriptor: Sewer Backup (Use Comments) (SA).",
+   "doc_ids": [
+    "nyc311"
+   ],
+   "numbers": [
+    "82"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Latest reading at Kings Point, NY: 2.67 ft above MLLW (+2.63 ft vs predicted tide), observed 2026-09-26 18:06.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "2.67",
+    "2.63"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Nearest USGS stream gauge, Alley Creek Near Oakland Gardens NY (01302050, 5.7 km away): stage 0.35 ft, observed 2026-09-26 21:00 UTC.",
+   "doc_ids": [
+    "usgs_gauges"
+   ],
+   "numbers": [
+    "0.35"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "8 MTA subway entrances within 800 m of this address: 0 inside the 2012 Sandy inundation extent and 8 inside the DEP extreme stormwater scenario (2080 sea-level rise).",
+   "doc_ids": [
+    "mta_entrance_exposure"
+   ],
+   "numbers": [
+    "8",
+    "0",
+    "8"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "1 NYCHA developments within 2000 m of this address: 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise).",
+   "doc_ids": [
+    "nycha_development_exposure"
+   ],
+   "numbers": [
+    "1",
+    "0",
+    "1"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "1 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise).",
+   "doc_ids": [
+    "doh_hospital_exposure"
+   ],
+   "numbers": [
+    "1",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "3 active NWS alerts at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor), Rip Current Statement (Moderate).",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Projector",
+   "text": "Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.46 m at The Battery about 8 h ahead. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions.",
+   "doc_ids": [
+    "ttm_battery_surge"
+   ],
+   "numbers": [
+    "0.46"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "Experimental: 34 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.34 per week for the next 96 days.",
+   "doc_ids": [
+    "ttm_311_forecast"
+   ],
+   "numbers": [
+    "34",
+    "0.34",
+    "96"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "Experimental: the nearest FloodNet sensor (Q - 183rd St/90th Ave, 21.5 m away) recorded 6 flood events in the last 512 days; a zero-shot TTM forecast with no rainfall input expects 0.47 events in the next 28 days.",
+   "doc_ids": [
+    "floodnet_forecast"
+   ],
+   "numbers": [
+    "6",
+    "0.47",
+    "28"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m.",
+   "doc_ids": [
+    "npcc4_slr"
+   ],
+   "numbers": [
+    "0.38",
+    "0.79",
+    "0.74",
+    "1.65"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Hazard Reader.**\nThis address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007 [fema_nfhl]. USGS surveyed 2 Hurricane Ida high-water mark(s) within 800 m of this address; the highest observed water elevation was 48.2 ft (up to 0.76 ft above ground) [ida_hwm]. Experimental: satellite-detected surface water about 14 hours after Hurricane Ida (Sentinel-2, 2021-09-02): 0 water polygons within 500 m of this address, nearest 11174.7 m away [prithvi_water]. Elevation 14.87 m; this point sits at the 29.1th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 0.0 m above nearest drainage; TWI 11.78. Local basin relief: 35.02 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 1 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\n2 FloodNet community sensor(s) within 600 m have logged 14 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 1172 mm [floodnet]. 82 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years. Most common descriptor: Sewer Backup (Use Comments) (SA) [nyc311]. Latest reading at Kings Point, NY: 2.67 ft above MLLW (+2.63 ft vs predicted tide), observed 2026-09-26 18:06 [noaa_tides]. Nearest USGS stream gauge, Alley Creek Near Oakland Gardens NY (01302050, 5.7 km away): stage 0.35 ft, observed 2026-09-26 21:00 UTC [usgs_gauges].\n\n**Asset Register.**\n8 MTA subway entrances within 800 m of this address: 0 inside the 2012 Sandy inundation extent and 8 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 1 NYCHA developments within 2000 m of this address: 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 1 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\n3 active NWS alerts at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor), Rip Current Statement (Moderate) [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.46 m at The Battery about 8 h ahead. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions [ttm_battery_surge]. Experimental: 34 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.34 per week for the next 96 days [ttm_311_forecast]. Experimental: the nearest FloodNet sensor (Q - 183rd St/90th Ave, 21.5 m away) recorded 6 flood events in the last 512 days; a zero-shot TTM forecast with no rainfall input expects 0.47 events in the next 28 days [floodnet_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Policy context.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

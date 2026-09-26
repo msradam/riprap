@@ -1,0 +1,199 @@
+{
+ "id": "q08",
+ "kind": "flood_history",
+ "question": "Did Hurricane Sandy flood 801 Father Capodanno Boulevard, Staten Island?",
+ "error": null,
+ "wall_s": 120.2,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "801 Father Capodanno Boulevard, Staten Island"
+   }
+  ],
+  "rationale": "The query specifies a specific street address in Staten Island, requiring a point-level flood exposure check for Hurricane Sandy."
+ },
+ "pebbles_run": [
+  "dep_extreme_2080",
+  "dep_moderate_2050",
+  "dep_moderate_current",
+  "doe_schools",
+  "doh_hospitals",
+  "fema_nfhl",
+  "floodnet",
+  "floodnet_forecast",
+  "ida_hwm",
+  "microtopo",
+  "mta_entrances",
+  "noaa_tides",
+  "npcc4_slr",
+  "nws_alerts",
+  "nws_obs",
+  "nyc311",
+  "nycha_developments",
+  "policy_corpus",
+  "prithvi_water",
+  "sandy",
+  "ttm_311_forecast",
+  "ttm_battery_surge",
+  "usgs_gauges"
+ ],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 660,
+  "completion": 72,
+  "seconds": 7.91,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 1369,
+  "completion": 1065,
+  "seconds": 106.11,
+  "n_calls": 1
+ },
+ "n_documents": 20,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "Hazard Reader",
+   "text": "This address is mapped within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) and is modeled to be in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970329F, effective 2007.",
+   "doc_ids": [
+    "sandy_inundation",
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "No Hurricane Ida high-water marks were surveyed within 800 meters of this address; the nearest USGS-surveyed mark is 3861 meters away.",
+   "doc_ids": [
+    "ida_hwm"
+   ],
+   "numbers": [
+    "3861"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "Experimental: satellite-detected surface water about 14 hours after Hurricane Ida showed 0 water polygons within 500 meters of this address, with the nearest polygon 709.0 meters away.",
+   "doc_ids": [
+    "prithvi_water"
+   ],
+   "numbers": [
+    "0",
+    "709.0"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Two FloodNet community sensors within 600 meters have logged 37 above-curb flood events in the last 3 years, with a peak depth recorded of 408 mm.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "2",
+    "37",
+    "408"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Seven NYC 311 flood-related complaints were filed within 200 meters of this location in the last 5 years, with the most common descriptor being Sewer Backup (Use Comments) (SA).",
+   "doc_ids": [
+    "nyc311"
+   ],
+   "numbers": [
+    "7"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The nearest USGS stream gauge, Richmond Creek At Lighthouse Ave At Richmond NY (01376534, 5.0 km away), recorded a stage of 1.06 feet at 2026-09-26 20:45 UTC.",
+   "doc_ids": [
+    "usgs_gauges"
+   ],
+   "numbers": [
+    "1.06",
+    "5.0"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "Three NYC DOE schools within 1500 meters of this address are inside the 2012 Sandy inundation extent, and zero are inside the DEP extreme stormwater scenario for 2080 sea-level rise.",
+   "doc_ids": [
+    "doe_school_exposure"
+   ],
+   "numbers": [
+    "3",
+    "0"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "Two hospitals within 3000 meters of this address are inside the 2012 Sandy inundation extent, and zero are inside the DEP extreme stormwater scenario for 2080 sea-level rise.",
+   "doc_ids": [
+    "doh_hospital_exposure"
+   ],
+   "numbers": [
+    "2",
+    "0"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "A TTM model forecasts a peak surge residual of 0.53 meters at The Battery about 9 hours ahead, and projects about 0.03 flood-related 311 complaints per week within 200 meters for the next 96 days.",
+   "doc_ids": [
+    "ttm_battery_surge",
+    "ttm_311_forecast"
+   ],
+   "numbers": [
+    "0.53",
+    "0.03",
+    "96"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "The nearest FloodNet sensor recorded 18 flood events in the last 512 days; a zero-shot TTM forecast expects 0.12 events in the next 28 days.",
+   "doc_ids": [
+    "floodnet_forecast"
+   ],
+   "numbers": [
+    "18",
+    "0.12",
+    "28"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "NPCC4 projects a sea-level rise of 0.38 meters (15 inches) by the 2050s and 0.79 meters (31 inches) by 2100 at the Battery, with a 90th percentile of 0.74 meters and 1.65 meters.",
+   "doc_ids": [
+    "npcc4_slr"
+   ],
+   "numbers": [
+    "0.38",
+    "0.79",
+    "0.74",
+    "1.65"
+   ]
+  },
+  {
+   "section": "Policy context",
+   "text": "Lessons Learned from Hurricane Sandy in NYCHA and the NYC DEP Wastewater Resiliency Plan (2013) both highlight the significant impacts of Hurricane Sandy on New York City's infrastructure and the need for proactive planning for climate change impacts.",
+   "doc_ids": [
+    "rag_nycha",
+    "rag_dep_2013"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Hazard Reader.**\nThis address is mapped within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) and is modeled to be in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970329F, effective 2007 [sandy_inundation][fema_nfhl]. No Hurricane Ida high-water marks were surveyed within 800 meters of this address; the nearest USGS-surveyed mark is 3861 meters away [ida_hwm]. Experimental: satellite-detected surface water about 14 hours after Hurricane Ida showed 0 water polygons within 500 meters of this address, with the nearest polygon 709.0 meters away [prithvi_water].\n\n**Live Observer.**\nTwo FloodNet community sensors within 600 meters have logged 37 above-curb flood events in the last 3 years, with a peak depth recorded of 408 mm [floodnet]. Seven NYC 311 flood-related complaints were filed within 200 meters of this location in the last 5 years, with the most common descriptor being Sewer Backup (Use Comments) (SA) [nyc311]. The nearest USGS stream gauge, Richmond Creek At Lighthouse Ave At Richmond NY (01376534, 5.0 km away), recorded a stage of 1.06 feet at 2026-09-26 20:45 UTC [usgs_gauges].\n\n**Asset Register.**\nThree NYC DOE schools within 1500 meters of this address are inside the 2012 Sandy inundation extent, and zero are inside the DEP extreme stormwater scenario for 2080 sea-level rise [doe_school_exposure]. Two hospitals within 3000 meters of this address are inside the 2012 Sandy inundation extent, and zero are inside the DEP extreme stormwater scenario for 2080 sea-level rise [doh_hospital_exposure].\n\n**Projector.**\nExperimental: A TTM model forecasts a peak surge residual of 0.53 meters at The Battery about 9 hours ahead, and projects about 0.03 flood-related 311 complaints per week within 200 meters for the next 96 days [ttm_battery_surge][ttm_311_forecast]. Experimental: The nearest FloodNet sensor recorded 18 flood events in the last 512 days; a zero-shot TTM forecast expects 0.12 events in the next 28 days [floodnet_forecast]. NPCC4 projects a sea-level rise of 0.38 meters (15 inches) by the 2050s and 0.79 meters (31 inches) by 2100 at the Battery, with a 90th percentile of 0.74 meters and 1.65 meters [npcc4_slr].\n\n**Policy context.**\nLessons Learned from Hurricane Sandy in NYCHA and the NYC DEP Wastewater Resiliency Plan (2013) both highlight the significant impacts of Hurricane Sandy on New York City's infrastructure and the need for proactive planning for climate change impacts [rag_nycha][rag_dep_2013].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

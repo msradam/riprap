@@ -1,0 +1,191 @@
+{
+ "id": "q05",
+ "kind": "flood_history",
+ "question": "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?",
+ "error": null,
+ "wall_s": 114.6,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "90-01 183rd Street, Queens"
+   }
+  ],
+  "rationale": "The query specifies a specific street address in Queens, asking about historic flooding since Hurricane Ida."
+ },
+ "pebbles_run": [
+  "dep_extreme_2080",
+  "dep_moderate_2050",
+  "dep_moderate_current",
+  "doe_schools",
+  "doh_hospitals",
+  "fema_nfhl",
+  "floodnet",
+  "floodnet_forecast",
+  "ida_hwm",
+  "microtopo",
+  "mta_entrances",
+  "noaa_tides",
+  "npcc4_slr",
+  "nws_alerts",
+  "nws_obs",
+  "nyc311",
+  "nycha_developments",
+  "policy_corpus",
+  "prithvi_water",
+  "sandy",
+  "ttm_311_forecast",
+  "ttm_battery_surge",
+  "usgs_gauges"
+ ],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 665,
+  "completion": 69,
+  "seconds": 7.51,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 1339,
+  "completion": 959,
+  "seconds": 101.53,
+  "n_calls": 1
+ },
+ "n_documents": 20,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "Hazard Reader",
+   "text": "This address is mapped within FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007.",
+   "doc_ids": [
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "USGS recorded two Hurricane Ida high-water marks within 800 meters of this address, with the highest observed water elevation at 48.2 feet, up to 0.76 feet above ground.",
+   "doc_ids": [
+    "ida_hwm"
+   ],
+   "numbers": [
+    "2",
+    "48.2",
+    "0.76"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "Experimental: Satellite-detected surface water about 14 hours after Hurricane Ida showed no water polygons within 500 meters of this address, with the nearest water feature 11,174.7 meters away.",
+   "doc_ids": [
+    "prithvi_water"
+   ],
+   "numbers": [
+    "0",
+    "11,174.7"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Two FloodNet community sensors within 600 meters have logged 14 above-curb flood events in the last three years, with a peak depth recorded of 1172 millimeters.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "2",
+    "14",
+    "1172"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Eighty-two NYC 311 flood-related complaints have been filed within 200 meters of this location in the last five years, with the most common descriptor being Sewer Backup (Use Comments).",
+   "doc_ids": [
+    "nyc311"
+   ],
+   "numbers": [
+    "82"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The nearest USGS stream gauge, Alley Creek Near Oakland Gardens NY (01302050, 5.7 kilometers away), reported a stage of 0.36 feet as of 2026-09-26 20:00 UTC.",
+   "doc_ids": [
+    "usgs_gauges"
+   ],
+   "numbers": [
+    "0.36"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "NPCC4 (2024) projects a sea-level rise of 0.38 meters (15 inches) by the 2050s and 0.79 meters (31 inches) by 2100 at the Battery, relative to 2000-2004, with a 90th percentile of 0.74 meters and 1.65 meters.",
+   "doc_ids": [
+    "npcc4_slr"
+   ],
+   "numbers": [
+    "0.38",
+    "0.79",
+    "0.74",
+    "1.65"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "Experimental: A TTM model forecasts a peak surge residual of 0.53 meters at The Battery about nine hours ahead.",
+   "doc_ids": [
+    "ttm_battery_surge"
+   ],
+   "numbers": [
+    "0.53"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "Experimental: A zero-shot TTM forecast projects about 0.34 flood-related 311 complaints per week within 200 meters for the next 96 days.",
+   "doc_ids": [
+    "ttm_311_forecast"
+   ],
+   "numbers": [
+    "0.34",
+    "96"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "Experimental: The nearest FloodNet sensor expects 0.47 flood events within the next 28 days.",
+   "doc_ids": [
+    "floodnet_forecast"
+   ],
+   "numbers": [
+    "0.47",
+    "28"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "One NYCHA development within 2000 meters of this address is modeled to be inside the DEP extreme stormwater scenario for 2080 sea-level rise, but outside the 2012 Sandy inundation extent.",
+   "doc_ids": [
+    "nycha_development_exposure"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Policy context",
+   "text": "Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place total 1 (embedding retrieval; entity tags are experimental).",
+   "doc_ids": [
+    "policy_corpus"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Hazard Reader.**\nThis address is mapped within FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007 [fema_nfhl]. USGS recorded two Hurricane Ida high-water marks within 800 meters of this address, with the highest observed water elevation at 48.2 feet, up to 0.76 feet above ground [ida_hwm]. Experimental: Satellite-detected surface water about 14 hours after Hurricane Ida showed no water polygons within 500 meters of this address, with the nearest water feature 11,174.7 meters away [prithvi_water].\n\n**Live Observer.**\nTwo FloodNet community sensors within 600 meters have logged 14 above-curb flood events in the last three years, with a peak depth recorded of 1172 millimeters [floodnet]. Eighty-two NYC 311 flood-related complaints have been filed within 200 meters of this location in the last five years, with the most common descriptor being Sewer Backup (Use Comments) [nyc311]. The nearest USGS stream gauge, Alley Creek Near Oakland Gardens NY (01302050, 5.7 kilometers away), reported a stage of 0.36 feet as of 2026-09-26 20:00 UTC [usgs_gauges].\n\n**Asset Register.**\nOne NYCHA development within 2000 meters of this address is modeled to be inside the DEP extreme stormwater scenario for 2080 sea-level rise, but outside the 2012 Sandy inundation extent [nycha_development_exposure].\n\n**Projector.**\nNPCC4 (2024) projects a sea-level rise of 0.38 meters (15 inches) by the 2050s and 0.79 meters (31 inches) by 2100 at the Battery, relative to 2000-2004, with a 90th percentile of 0.74 meters and 1.65 meters [npcc4_slr]. Experimental: A TTM model forecasts a peak surge residual of 0.53 meters at The Battery about nine hours ahead [ttm_battery_surge]. Experimental: A zero-shot TTM forecast projects about 0.34 flood-related 311 complaints per week within 200 meters for the next 96 days [ttm_311_forecast]. Experimental: The nearest FloodNet sensor expects 0.47 flood events within the next 28 days [floodnet_forecast].\n\n**Policy context.**\nExperimental: Policy passages retrieved from the NYC flood-policy corpus for this place total 1 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

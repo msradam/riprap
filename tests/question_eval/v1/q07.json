@@ -1,0 +1,166 @@
+{
+ "id": "q07",
+ "kind": "flood_history",
+ "question": "What flood events have been recorded near 400 Carroll Street, Brooklyn?",
+ "error": null,
+ "wall_s": 94.7,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "400 Carroll Street, Brooklyn"
+   }
+  ],
+  "rationale": "The query specifies a specific street address, requiring geocoding to a single locatable point for flood event lookup."
+ },
+ "pebbles_run": [
+  "dep_extreme_2080",
+  "dep_moderate_2050",
+  "dep_moderate_current",
+  "doe_schools",
+  "doh_hospitals",
+  "fema_nfhl",
+  "floodnet",
+  "floodnet_forecast",
+  "ida_hwm",
+  "microtopo",
+  "mta_entrances",
+  "noaa_tides",
+  "npcc4_slr",
+  "nws_alerts",
+  "nws_obs",
+  "nyc311",
+  "nycha_developments",
+  "policy_corpus",
+  "prithvi_water",
+  "sandy",
+  "ttm_311_forecast",
+  "ttm_battery_surge",
+  "usgs_gauges"
+ ],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 659,
+  "completion": 69,
+  "seconds": 8.36,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 1538,
+  "completion": 804,
+  "seconds": 79.6,
+  "n_calls": 1
+ },
+ "n_documents": 22,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "Hazard Reader",
+   "text": "This address is mapped within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) and is modeled to experience deep contiguous flooding (>4 ft) under NYC DEP scenarios for 2050 and 2080 sea-level rise (2.13 in/hr and 3.66 in/hr, respectively).",
+   "doc_ids": [
+    "sandy_inundation",
+    "dep_moderate_2050",
+    "dep_extreme_2080"
+   ],
+   "numbers": [
+    "4",
+    "2.13",
+    "3.66",
+    "4"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "USGS recorded 10 Hurricane Ida high-water marks within 800 m of this address, with the highest observed water elevation reaching 30.6 ft, which is up to 2.32 ft above ground.",
+   "doc_ids": [
+    "ida_hwm"
+   ],
+   "numbers": [
+    "10",
+    "30.6",
+    "2.32"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "Experimental: Satellite detection 14 hours after Hurricane Ida showed no water polygons within 500 m of this address, with the nearest water feature 5027.6 m away, primarily marsh, shoreline, and park water; street and basement flooding had drained.",
+   "doc_ids": [
+    "prithvi_water"
+   ],
+   "numbers": [
+    "14",
+    "5027.6"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "Within 800 m of this address, 8 MTA subway entrances are located, with 0 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario for 2080 sea-level rise.",
+   "doc_ids": [
+    "mta_entrance_exposure"
+   ],
+   "numbers": [
+    "8",
+    "0",
+    "3"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "Within 2000 m of this address, 2 NYCHA developments are located, both inside the 2012 Sandy inundation extent and none inside the DEP extreme stormwater scenario for 2080 sea-level rise.",
+   "doc_ids": [
+    "nycha_development_exposure"
+   ],
+   "numbers": [
+    "2",
+    "2",
+    "0"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "Experimental: A TTM model forecasts a peak surge residual of 0.53 m at The Battery about 9 hours ahead, and projects approximately 0.06 flood-related 311 complaints per week within 200 m for the next 96 days.",
+   "doc_ids": [
+    "ttm_battery_surge",
+    "ttm_311_forecast"
+   ],
+   "numbers": [
+    "0.53",
+    "0.06",
+    "9",
+    "96"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "NPCC4 projects a median sea-level rise of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the Battery, with 90th percentile projections of 0.74 m and 1.65 m, respectively.",
+   "doc_ids": [
+    "npcc4_slr"
+   ],
+   "numbers": [
+    "0.38",
+    "0.79",
+    "0.74",
+    "1.65"
+   ]
+  },
+  {
+   "section": "Policy context",
+   "text": "Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place total 3, with entity tags noted as experimental.",
+   "doc_ids": [
+    "policy_corpus"
+   ],
+   "numbers": [
+    "3"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Hazard Reader.**\nThis address is mapped within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) and is modeled to experience deep contiguous flooding (>4 ft) under NYC DEP scenarios for 2050 and 2080 sea-level rise (2.13 in/hr and 3.66 in/hr, respectively) [sandy_inundation][dep_moderate_2050][dep_extreme_2080]. USGS recorded 10 Hurricane Ida high-water marks within 800 m of this address, with the highest observed water elevation reaching 30.6 ft, which is up to 2.32 ft above ground [ida_hwm]. Experimental: Satellite detection 14 hours after Hurricane Ida showed no water polygons within 500 m of this address, with the nearest water feature 5027.6 m away, primarily marsh, shoreline, and park water; street and basement flooding had drained [prithvi_water].\n\n**Live Observer.**\nNo grounded evidence for this section.\n\n**Asset Register.**\nWithin 800 m of this address, 8 MTA subway entrances are located, with 0 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario for 2080 sea-level rise [mta_entrance_exposure]. Within 2000 m of this address, 2 NYCHA developments are located, both inside the 2012 Sandy inundation extent and none inside the DEP extreme stormwater scenario for 2080 sea-level rise [nycha_development_exposure].\n\n**Projector.**\nExperimental: A TTM model forecasts a peak surge residual of 0.53 m at The Battery about 9 hours ahead, and projects approximately 0.06 flood-related 311 complaints per week within 200 m for the next 96 days [ttm_battery_surge][ttm_311_forecast]. NPCC4 projects a median sea-level rise of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the Battery, with 90th percentile projections of 0.74 m and 1.65 m, respectively [npcc4_slr].\n\n**Policy context.**\nExperimental: Policy passages retrieved from the NYC flood-policy corpus for this place total 3, with entity tags noted as experimental [policy_corpus].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

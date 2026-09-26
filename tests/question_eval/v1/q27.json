@@ -1,0 +1,244 @@
+{
+ "id": "q27",
+ "kind": "out_of_scope",
+ "question": "What will flood insurance cost me at 80 Pioneer Street, Brooklyn?",
+ "error": null,
+ "wall_s": 241.3,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "80 Pioneer Street, Brooklyn"
+   }
+  ],
+  "rationale": "The query specifies a specific street address in Brooklyn, requiring a locatable point for flood insurance cost estimation."
+ },
+ "pebbles_run": [
+  "dep_extreme_2080",
+  "dep_moderate_2050",
+  "dep_moderate_current",
+  "doe_schools",
+  "doh_hospitals",
+  "fema_nfhl",
+  "floodnet",
+  "floodnet_forecast",
+  "ida_hwm",
+  "microtopo",
+  "mta_entrances",
+  "noaa_tides",
+  "npcc4_slr",
+  "nws_alerts",
+  "nws_obs",
+  "nyc311",
+  "nycha_developments",
+  "policy_corpus",
+  "prithvi_water",
+  "sandy",
+  "ttm_311_forecast",
+  "ttm_battery_surge",
+  "usgs_gauges"
+ ],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 659,
+  "completion": 67,
+  "seconds": 8.48,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 3766,
+  "completion": 2493,
+  "seconds": 228.62,
+  "n_calls": 2
+ },
+ "n_documents": 18,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 2,
+ "claims": [
+  {
+   "section": "Hazard Reader",
+   "text": "This address is mapped within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) and is modeled to be in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970192F, effective 2007.",
+   "doc_ids": [
+    "sandy_inundation",
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "USGS recorded one Hurricane Ida high-water mark within 800 meters of this address, with the highest observed water elevation at 4.2 feet (up to 0.3 feet above ground).",
+   "doc_ids": [
+    "ida_hwm"
+   ],
+   "numbers": [
+    "1",
+    "4.2",
+    "0.3"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "Experimental: Satellite-detected surface water about 14 hours after Hurricane Ida (Sentinel-2, 2021-09-02) found no water polygons within 500 meters of this address, with the nearest water 4026.3 meters away.",
+   "doc_ids": [
+    "prithvi_water"
+   ],
+   "numbers": [
+    "0",
+    "4026.3"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Six FloodNet community sensors within 600 meters have logged nine above-curb flood events in the last three years, with a peak depth recorded of 89 millimeters.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "6",
+    "9",
+    "89"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Sixty NYC 311 flood-related complaints have been filed within 200 meters of this location in the last five years, with the most common descriptor being Catch Basin Clogged/Flooding (Use Comments).",
+   "doc_ids": [
+    "nyc311"
+   ],
+   "numbers": [
+    "60"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest reading at The Battery, NY, shows a water level of 4.97 feet above Mean Lower Low Water, which is 2.21 feet higher than the predicted tide, observed on 2026-09-26 at 18:00.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "4.97",
+    "2.21",
+    "18:00"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "Two NYCHA developments within 2000 meters of this address are inside the 2012 Sandy inundation extent, and none are inside the DEP extreme stormwater scenario for 2080 sea-level rise.",
+   "doc_ids": [
+    "nycha_development_exposure"
+   ],
+   "numbers": [
+    "2",
+    "0"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "Two NYC DOE schools within 1500 meters of this address are inside the 2012 Sandy inundation extent, and none are inside the DEP extreme stormwater scenario for 2080 sea-level rise.",
+   "doc_ids": [
+    "doe_school_exposure"
+   ],
+   "numbers": [
+    "2",
+    "0"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "Two hospitals within 3000 meters of this address are outside both the 2012 Sandy inundation extent and the DEP extreme stormwater scenario for 2080 sea-level rise.",
+   "doc_ids": [
+    "doh_hospital_exposure"
+   ],
+   "numbers": [
+    "0",
+    "0"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "Three active NWS alerts are present at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor), and Rip Current Statement (Moderate).",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Projector",
+   "text": "Experimental: A TTM model forecasts a peak surge residual of 0.53 meters at The Battery about nine hours ahead, based on Battery gauge history with no wind or pressure input.",
+   "doc_ids": [
+    "ttm_battery_surge"
+   ],
+   "numbers": [
+    "0.53",
+    "9"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "Experimental: A zero-shot TTM forecast with no rainfall input projects about 0.02 flood-related 311 complaints per week for the next 96 days, based on six complaints within 200 meters over the last 512 days.",
+   "doc_ids": [
+    "ttm_311_forecast"
+   ],
+   "numbers": [
+    "0.02",
+    "96"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "NPCC4 (2024) projects a sea-level rise at the Battery of 0.38 meters (15 inches) by the 2050s and 0.79 meters (31 inches) by 2100 at the median, with a 90th percentile of 0.74 meters and 1.65 meters.",
+   "doc_ids": [
+    "npcc4_slr"
+   ],
+   "numbers": [
+    "0.38",
+    "0.79",
+    "0.74",
+    "1.65"
+   ]
+  },
+  {
+   "section": "Policy context",
+   "text": "Experimental: The policy corpus for this place retrieved one passage (embedding retrieval; entity tags are experimental) discussing flood resilience at NYCHA following Hurricane Sandy.",
+   "doc_ids": [
+    "policy_corpus"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [
+  {
+   "section": "Live Observer",
+   "text": "The latest METAR at Central Park, NY (11.8 kilometers away) reports 15.0\u00b0C and 0.8 millimeters of precipitation in the last hour, observed on 2026-09-26 at 20:51.",
+   "doc_ids": [
+    "nws_obs"
+   ],
+   "numbers": [
+    "15.0",
+    "0.8"
+   ],
+   "reason": "numbers not found in the cited documents: 20"
+  }
+ ],
+ "retried_claims": [
+  {
+   "section": "Live Observer",
+   "text": "The latest METAR at Central Park, NY (11.8 kilometers away) reports 15.0\u00b0C and 0.8 millimeters of precipitation in the last hour, observed on 2026-09-26 at 20:51.",
+   "doc_ids": [
+    "nws_obs"
+   ],
+   "numbers": [
+    "15.0",
+    "0.8",
+    "20:51"
+   ],
+   "reason": "numbers not found in the cited documents: 20"
+  }
+ ],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Hazard Reader.**\nThis address is mapped within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) and is modeled to be in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970192F, effective 2007 [sandy_inundation][fema_nfhl]. USGS recorded one Hurricane Ida high-water mark within 800 meters of this address, with the highest observed water elevation at 4.2 feet (up to 0.3 feet above ground) [ida_hwm]. Experimental: Satellite-detected surface water about 14 hours after Hurricane Ida (Sentinel-2, 2021-09-02) found no water polygons within 500 meters of this address, with the nearest water 4026.3 meters away [prithvi_water].\n\n**Live Observer.**\nSix FloodNet community sensors within 600 meters have logged nine above-curb flood events in the last three years, with a peak depth recorded of 89 millimeters [floodnet]. Sixty NYC 311 flood-related complaints have been filed within 200 meters of this location in the last five years, with the most common descriptor being Catch Basin Clogged/Flooding (Use Comments) [nyc311]. The latest reading at The Battery, NY, shows a water level of 4.97 feet above Mean Lower Low Water, which is 2.21 feet higher than the predicted tide, observed on 2026-09-26 at 18:00 [noaa_tides].\n\n**Asset Register.**\nTwo NYCHA developments within 2000 meters of this address are inside the 2012 Sandy inundation extent, and none are inside the DEP extreme stormwater scenario for 2080 sea-level rise [nycha_development_exposure]. Two NYC DOE schools within 1500 meters of this address are inside the 2012 Sandy inundation extent, and none are inside the DEP extreme stormwater scenario for 2080 sea-level rise [doe_school_exposure]. Two hospitals within 3000 meters of this address are outside both the 2012 Sandy inundation extent and the DEP extreme stormwater scenario for 2080 sea-level rise [doh_hospital_exposure].\n\n**Projector.**\nThree active NWS alerts are present at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor), and Rip Current Statement (Moderate) [nws_alerts]. Experimental: A TTM model forecasts a peak surge residual of 0.53 meters at The Battery about nine hours ahead, based on Battery gauge history with no wind or pressure input [ttm_battery_surge]. Experimental: A zero-shot TTM forecast with no rainfall input projects about 0.02 flood-related 311 complaints per week for the next 96 days, based on six complaints within 200 meters over the last 512 days [ttm_311_forecast]. NPCC4 (2024) projects a sea-level rise at the Battery of 0.38 meters (15 inches) by the 2050s and 0.79 meters (31 inches) by 2100 at the median, with a 90th percentile of 0.74 meters and 1.65 meters [npcc4_slr].\n\n**Policy context.**\nExperimental: The policy corpus for this place retrieved one passage (embedding retrieval; entity tags are experimental) discussing flood resilience at NYCHA following Hurricane Sandy [policy_corpus].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

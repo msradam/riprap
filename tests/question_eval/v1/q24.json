@@ -1,0 +1,151 @@
+{
+ "id": "q24",
+ "kind": "district",
+ "question": "What share of community district BK15 was inside the area Sandy flooded?",
+ "error": null,
+ "wall_s": 95.4,
+ "intent": "neighborhood",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "neighborhood",
+  "targets": [
+   {
+    "type": "nta",
+    "text": "BK15"
+   }
+  ],
+  "rationale": "The query asks about the proportion of Community District BK15 that experienced flooding during Hurricane Sandy, requiring a neighborhood-level analysis."
+ },
+ "pebbles_run": [
+  "dep_extreme_2080_nta",
+  "dep_moderate_2050_nta",
+  "dep_moderate_current_nta",
+  "dob_permits_nta",
+  "microtopo_nta",
+  "nyc311_nta",
+  "policy_corpus",
+  "sandy_nta"
+ ],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 659,
+  "completion": 60,
+  "seconds": 5.69,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 1096,
+  "completion": 774,
+  "seconds": 69.47,
+  "n_calls": 1
+ },
+ "n_documents": 11,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "Hazard Reader",
+   "text": "38.5% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 11.67 km\u00b2).",
+   "doc_ids": [
+    "sandy_nta"
+   ],
+   "numbers": [
+    "38.5",
+    "11.67"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "23.1% of this area is modeled to flood under DEP Extreme Stormwater (3.66 in/hr, 2080 SLR).",
+   "doc_ids": [
+    "dep_extreme_2080_nta"
+   ],
+   "numbers": [
+    "23.1"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "1.8% of this area is modeled to flood under DEP Moderate Stormwater (2.13 in/hr, 2050 SLR).",
+   "doc_ids": [
+    "dep_moderate_2050_nta"
+   ],
+   "numbers": [
+    "1.8"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "0.7% of this area is modeled to flood under DEP Moderate Stormwater (2.13 in/hr, current SLR).",
+   "doc_ids": [
+    "dep_moderate_current_nta"
+   ],
+   "numbers": [
+    "0.7"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "49.4% of the area sits less than 1 m above the nearest drainage (HAND).",
+   "doc_ids": [
+    "microtopo_nta"
+   ],
+   "numbers": [
+    "49.4"
+   ]
+  },
+  {
+   "section": "Policy context",
+   "text": "Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 3.",
+   "doc_ids": [
+    "policy_corpus"
+   ],
+   "numbers": [
+    "3"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "1530 NYC 311 flood-related complaints were filed inside this area in the last 3 years.",
+   "doc_ids": [
+    "nyc311_nta"
+   ],
+   "numbers": [
+    "1530"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "60 active NYC DOB construction permits inside this area since 2025-04-04: 22 inside the 2012 Sandy extent and 24 inside at least one DEP stormwater scenario.",
+   "doc_ids": [
+    "dob_permits_nta"
+   ],
+   "numbers": [
+    "60",
+    "22",
+    "24"
+   ]
+  },
+  {
+   "section": "Policy context",
+   "text": "This stretch of 4 Avenue Brooklyn is served by five stations that have been impacted by heavy rainfall and is prone to chronic flooding.",
+   "doc_ids": [
+    "rag_mta"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Policy context",
+   "text": "Flood Resilience at NYCHA includes sites such as ASTORIA BARUCH BEACH 41ST STREET, CAMPOS PLAZA II, CAREY GARDENS, CARLTON MANOR, CONEY ISLAND (SITE 8), CONEY ISLAND HOUSES, CONEY ISLAND IB, CONEY ISLAND 4&5, EAST RIVER GOWANUS, GRAVESEND HABER HAMMEL, ISAACS, LA GUARDIA, LAVANBURG HOMES, LINCOLN HO.",
+   "doc_ids": [
+    "rag_nycha"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Hazard Reader.**\n38.5% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 11.67 km\u00b2) [sandy_nta]. 23.1% of this area is modeled to flood under DEP Extreme Stormwater (3.66 in/hr, 2080 SLR) [dep_extreme_2080_nta]. 1.8% of this area is modeled to flood under DEP Moderate Stormwater (2.13 in/hr, 2050 SLR) [dep_moderate_2050_nta]. 0.7% of this area is modeled to flood under DEP Moderate Stormwater (2.13 in/hr, current SLR) [dep_moderate_current_nta]. 49.4% of the area sits less than 1 m above the nearest drainage (HAND) [microtopo_nta].\n\n**Live Observer.**\n1530 NYC 311 flood-related complaints were filed inside this area in the last 3 years [nyc311_nta].\n\n**Asset Register.**\n60 active NYC DOB construction permits inside this area since 2025-04-04: 22 inside the 2012 Sandy extent and 24 inside at least one DEP stormwater scenario [dob_permits_nta].\n\n**Policy context.**\nExperimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 3 [policy_corpus]. This stretch of 4 Avenue Brooklyn is served by five stations that have been impacted by heavy rainfall and is prone to chronic flooding [rag_mta]. Flood Resilience at NYCHA includes sites such as ASTORIA BARUCH BEACH 41ST STREET, CAMPOS PLAZA II, CAREY GARDENS, CARLTON MANOR, CONEY ISLAND (SITE 8), CONEY ISLAND HOUSES, CONEY ISLAND IB, CONEY ISLAND 4&5, EAST RIVER GOWANUS, GRAVESEND HABER HAMMEL, ISAACS, LA GUARDIA, LAVANBURG HOMES, LINCOLN HO [rag_nycha].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

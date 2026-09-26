@@ -1,0 +1,127 @@
+{
+ "id": "q12",
+ "kind": "right_now",
+ "question": "Is it raining hard near 90-01 183rd Street, Queens at the moment?",
+ "error": null,
+ "wall_s": 98.0,
+ "intent": "live_now",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "live_now",
+  "targets": [
+   {
+    "type": "address",
+    "text": "90-01 183rd Street, Queens"
+   }
+  ],
+  "rationale": "The query asks about current conditions at a specific street address."
+ },
+ "pebbles_run": [
+  "fema_nfhl",
+  "floodnet",
+  "noaa_tides",
+  "nws_alerts",
+  "nws_obs",
+  "nyc311",
+  "policy_corpus",
+  "usgs_gauges"
+ ],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 664,
+  "completion": 57,
+  "seconds": 8.25,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 846,
+  "completion": 746,
+  "seconds": 84.8,
+  "n_calls": 1
+ },
+ "n_documents": 10,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "Hazard Reader",
+   "text": "This address is mapped within FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007.",
+   "doc_ids": [
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Live Observer",
+   "text": "2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years, with a peak depth recorded of 1172 mm.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "2",
+    "14",
+    "1172"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "82 NYC 311 flood-related complaints were filed within 200 m of this location in the last 5 years, with the most common descriptor being Sewer Backup (Use Comments) (SA).",
+   "doc_ids": [
+    "nyc311"
+   ],
+   "numbers": [
+    "82"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest NOAA tide reading at Kings Point, NY, observed on 2026-09-26 at 18:18, shows a height of 2.62 ft above Mean Lower Low Water (MLLW), which is +2.63 ft versus the predicted tide.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "2.62",
+    "2.63"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The nearest USGS stream gauge, Alley Creek Near Oakland Gardens NY (01302050, 5.7 km away), recorded a stage of 0.35 ft at 2026-09-26 21:00 UTC.",
+   "doc_ids": [
+    "usgs_gauges"
+   ],
+   "numbers": [
+    "0.35"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "There are 3 active NWS alerts at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor), and Rip Current Statement (Moderate).",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Policy context",
+   "text": "The NYC Comptroller\u2019s report \u2018Is NYC Ready for Rain?\u2019 (2024), page 38, includes an attachment from the MTA\u2019s Ophelia After-Action Report dated October 2023, which addresses the 9/29 Flash Flood Event.",
+   "doc_ids": [
+    "rag_comptroller"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Policy context",
+   "text": "The NYCHA Flood Resilience report (page 74) details lessons learned from the Hurricane Sandy Disaster Recovery Program, specifically for sites such as ASTORIA, BARUCH, BEACH 41ST STREET, CAMPOS PLAZA II, CAREY GARDENS, CARLTON MANOR, CONEY ISLAND (SITE 8), CONEY ISLAND HOUSES, CONEY ISLAND IB, CONEY ISLAND 4&5, EAST RIVER, GOWANUS, GRAVESEND HOMES, HABER, HAMMEL, ISAACS, LA GUARDIA, LAVANBURG HOMES, and LINCOLN.",
+   "doc_ids": [
+    "rag_nycha"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Hazard Reader.**\nThis address is mapped within FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007 [fema_nfhl].\n\n**Live Observer.**\n2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years, with a peak depth recorded of 1172 mm [floodnet]. 82 NYC 311 flood-related complaints were filed within 200 m of this location in the last 5 years, with the most common descriptor being Sewer Backup (Use Comments) (SA) [nyc311]. The latest NOAA tide reading at Kings Point, NY, observed on 2026-09-26 at 18:18, shows a height of 2.62 ft above Mean Lower Low Water (MLLW), which is +2.63 ft versus the predicted tide [noaa_tides]. The nearest USGS stream gauge, Alley Creek Near Oakland Gardens NY (01302050, 5.7 km away), recorded a stage of 0.35 ft at 2026-09-26 21:00 UTC [usgs_gauges].\n\n**Projector.**\nThere are 3 active NWS alerts at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor), and Rip Current Statement (Moderate) [nws_alerts].\n\n**Policy context.**\nThe NYC Comptroller\u2019s report \u2018Is NYC Ready for Rain?\u2019 (2024), page 38, includes an attachment from the MTA\u2019s Ophelia After-Action Report dated October 2023, which addresses the 9/29 Flash Flood Event [rag_comptroller]. The NYCHA Flood Resilience report (page 74) details lessons learned from the Hurricane Sandy Disaster Recovery Program, specifically for sites such as ASTORIA, BARUCH, BEACH 41ST STREET, CAMPOS PLAZA II, CAREY GARDENS, CARLTON MANOR, CONEY ISLAND (SITE 8), CONEY ISLAND HOUSES, CONEY ISLAND IB, CONEY ISLAND 4&5, EAST RIVER, GOWANUS, GRAVESEND HOMES, HABER, HAMMEL, ISAACS, LA GUARDIA, LAVANBURG HOMES, and LINCOLN [rag_nycha].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

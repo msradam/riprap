@@ -1,0 +1,200 @@
+{
+ "id": "q16",
+ "kind": "future",
+ "question": "How much sea level rise is projected at the Battery by 2050, and what does that mean for 116-02 Rockaway Beach Boulevard?",
+ "error": null,
+ "wall_s": 128.1,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "116-02 Rockaway Beach Boulevard"
+   }
+  ],
+  "rationale": "The query asks about projected sea level rise at a specific address in Rockaway Beach, Queens."
+ },
+ "pebbles_run": [
+  "dep_extreme_2080",
+  "dep_moderate_2050",
+  "dep_moderate_current",
+  "doe_schools",
+  "doh_hospitals",
+  "fema_nfhl",
+  "floodnet",
+  "floodnet_forecast",
+  "ida_hwm",
+  "microtopo",
+  "mta_entrances",
+  "noaa_tides",
+  "npcc4_slr",
+  "nws_alerts",
+  "nws_obs",
+  "nyc311",
+  "nycha_developments",
+  "policy_corpus",
+  "prithvi_water",
+  "sandy",
+  "ttm_311_forecast",
+  "ttm_battery_surge",
+  "usgs_gauges"
+ ],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 675,
+  "completion": 62,
+  "seconds": 7.72,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 1334,
+  "completion": 1089,
+  "seconds": 115.13,
+  "n_calls": 1
+ },
+ "n_documents": 19,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "Hazard Reader",
+   "text": "This address is mapped within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) and is modeled to be inside FEMA flood zone X, per NFHL FIRM panel 3604970379F, effective 2007.",
+   "doc_ids": [
+    "sandy_inundation",
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "No Hurricane Ida high-water marks were surveyed within 800 meters of this address; the nearest USGS-surveyed mark is 11,126 meters away.",
+   "doc_ids": [
+    "ida_hwm"
+   ],
+   "numbers": [
+    "800",
+    "11126"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "Experimental: satellite-detected surface water about 14 hours after Hurricane Ida showed no water polygons within 500 meters of this address; the nearest water polygon is 2,776.1 meters away and is primarily marsh, shoreline, and park water.",
+   "doc_ids": [
+    "prithvi_water"
+   ],
+   "numbers": [
+    "14",
+    "500",
+    "2776.1"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "No FloodNet sensors are deployed within 600 meters of this address, and 36 NYC 311 flood-related complaints were filed within 200 meters in the last five years, with the most common descriptor being Sewer Backup (Use Comments).",
+   "doc_ids": [
+    "floodnet",
+    "nyc311"
+   ],
+   "numbers": [
+    "600",
+    "200",
+    "36"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest reading at Sandy Hook, NJ, shows a tide of 5.43 feet above mean lower low water, observed at 2026-09-26 17:36.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "5.43"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The nearest USGS stream gauge, Conselyeas Pond Tributary At Rosedale NY, recorded a stage of 1.07 feet and a discharge of 13.7 cubic feet per second at 2026-09-26 21:00 UTC.",
+   "doc_ids": [
+    "usgs_gauges"
+   ],
+   "numbers": [
+    "1.07",
+    "13.7"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "Within 800 meters of this address, there is 1 MTA subway entrance inside the 2012 Sandy inundation extent and another inside the DEP extreme stormwater scenario (2080 sea-level rise). Within 1500 meters, there are 4 NYC DOE schools, all inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario.",
+   "doc_ids": [
+    "mta_entrance_exposure",
+    "doe_school_exposure"
+   ],
+   "numbers": [
+    "1",
+    "800",
+    "1500",
+    "4",
+    "3"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "Three active NWS alerts are present at this point: a Coastal Flood Warning (Severe), a High Surf Advisory (Minor), and a Rip Current Statement (Moderate).",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Projector",
+   "text": "Experimental: a TTM model forecasts a peak surge residual of 0.53 meters at The Battery about nine hours ahead, with no wind or pressure input.",
+   "doc_ids": [
+    "ttm_battery_surge"
+   ],
+   "numbers": [
+    "0.53",
+    "9"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "Experimental: a zero-shot TTM forecast projects about 0.04 flood-related 311 complaints per week within 200 meters for the next 96 days, based on six complaints within the last 512 days.",
+   "doc_ids": [
+    "ttm_311_forecast"
+   ],
+   "numbers": [
+    "0.04",
+    "200",
+    "96"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "NPCC4 projects a sea-level rise of 0.38 meters (15 inches) by the 2050s and 0.79 meters (31 inches) by 2100 at the Battery, with a 90th percentile of 0.74 meters and 1.65 meters.",
+   "doc_ids": [
+    "npcc4_slr"
+   ],
+   "numbers": [
+    "0.38",
+    "0.79",
+    "0.74",
+    "1.65"
+   ]
+  },
+  {
+   "section": "Policy context",
+   "text": "Experimental: policy passages retrieved from the NYC flood-policy corpus for this place total 2, with entity tags being experimental.",
+   "doc_ids": [
+    "policy_corpus"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Hazard Reader.**\nThis address is mapped within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) and is modeled to be inside FEMA flood zone X, per NFHL FIRM panel 3604970379F, effective 2007 [sandy_inundation][fema_nfhl]. No Hurricane Ida high-water marks were surveyed within 800 meters of this address; the nearest USGS-surveyed mark is 11,126 meters away [ida_hwm]. Experimental: satellite-detected surface water about 14 hours after Hurricane Ida showed no water polygons within 500 meters of this address; the nearest water polygon is 2,776.1 meters away and is primarily marsh, shoreline, and park water [prithvi_water].\n\n**Live Observer.**\nNo FloodNet sensors are deployed within 600 meters of this address, and 36 NYC 311 flood-related complaints were filed within 200 meters in the last five years, with the most common descriptor being Sewer Backup (Use Comments) [floodnet][nyc311]. The latest reading at Sandy Hook, NJ, shows a tide of 5.43 feet above mean lower low water, observed at 2026-09-26 17:36 [noaa_tides]. The nearest USGS stream gauge, Conselyeas Pond Tributary At Rosedale NY, recorded a stage of 1.07 feet and a discharge of 13.7 cubic feet per second at 2026-09-26 21:00 UTC [usgs_gauges].\n\n**Asset Register.**\nWithin 800 meters of this address, there is 1 MTA subway entrance inside the 2012 Sandy inundation extent and another inside the DEP extreme stormwater scenario (2080 sea-level rise). Within 1500 meters, there are 4 NYC DOE schools, all inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario [mta_entrance_exposure][doe_school_exposure].\n\n**Projector.**\nThree active NWS alerts are present at this point: a Coastal Flood Warning (Severe), a High Surf Advisory (Minor), and a Rip Current Statement (Moderate) [nws_alerts]. Experimental: a TTM model forecasts a peak surge residual of 0.53 meters at The Battery about nine hours ahead, with no wind or pressure input [ttm_battery_surge]. Experimental: a zero-shot TTM forecast projects about 0.04 flood-related 311 complaints per week within 200 meters for the next 96 days, based on six complaints within the last 512 days [ttm_311_forecast]. NPCC4 projects a sea-level rise of 0.38 meters (15 inches) by the 2050s and 0.79 meters (31 inches) by 2100 at the Battery, with a 90th percentile of 0.74 meters and 1.65 meters [npcc4_slr].\n\n**Policy context.**\nExperimental: policy passages retrieved from the NYC flood-policy corpus for this place total 2, with entity tags being experimental [policy_corpus].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

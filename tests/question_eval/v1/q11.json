@@ -1,0 +1,131 @@
+{
+ "id": "q11",
+ "kind": "right_now",
+ "question": "Are there any active flood or coastal alerts at 116-02 Rockaway Beach Boulevard right now?",
+ "error": null,
+ "wall_s": 74.2,
+ "intent": "live_now",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "live_now",
+  "targets": [
+   {
+    "type": "address",
+    "text": "116-02 Rockaway Beach Boulevard"
+   }
+  ],
+  "rationale": "The query asks for current flood or coastal alerts at a specific address, indicating a live conditions check."
+ },
+ "pebbles_run": [
+  "fema_nfhl",
+  "floodnet",
+  "noaa_tides",
+  "nws_alerts",
+  "nws_obs",
+  "nyc311",
+  "policy_corpus",
+  "usgs_gauges"
+ ],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 665,
+  "completion": 63,
+  "seconds": 5.34,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 962,
+  "completion": 786,
+  "seconds": 62.88,
+  "n_calls": 1
+ },
+ "n_documents": 11,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "Hazard Reader",
+   "text": "This address is mapped within FEMA flood zone X, per NFHL FIRM panel 3604970379F, effective 2007.",
+   "doc_ids": [
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Live Observer",
+   "text": "No FloodNet sensors are deployed within 600 meters of this address.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Live Observer",
+   "text": "Thirty-six NYC 311 flood-related complaints were filed within 200 meters of this location in the last five years, with the most common descriptor being Sewer Backup (Use Comments) (SA).",
+   "doc_ids": [
+    "nyc311"
+   ],
+   "numbers": [
+    "36"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest reading at Sandy Hook, NJ, shows a tide of 5.18 feet above mean lower low water, observed at 2026-09-26 17:24.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "5.18"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The nearest USGS stream gauge, Conselyeas Pond Tributary At Rosedale NY (01311810, 12.1 km away), recorded a stage of 1.07 feet and a discharge of 13.7 cubic feet per second, observed at 2026-09-26 21:00 UTC.",
+   "doc_ids": [
+    "usgs_gauges"
+   ],
+   "numbers": [
+    "1.07",
+    "13.7"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "There are three active NWS alerts at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor), and Rip Current Statement (Moderate).",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Policy context",
+   "text": "The Ophelia After-Action Report from the MTA, dated October 2023, addresses the response to the Comptroller\u2019s Request for Information on the 9/29 Flash Flood Event, specifically on page 38, Attachment B Exhibit 2D.",
+   "doc_ids": [
+    "rag_comptroller"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Policy context",
+   "text": "Flood Resilience at NYCHA, as detailed on page 74 of the document, outlines lessons learned through the Hurricane Sandy Disaster Recovery Program, focusing on sites such as ASTORIA, BARUCH, BEACH 41ST STREET, CAMPOS PLAZA II, CAREY GARDENS, CARLTON MANOR, CONEY ISLAND (SITE 8), CONEY ISLAND HOUSES, CONEY ISLAND IB, CONEY ISLAND 4&5, EAST RIVER, GOWANUS, GRAVESEND HOMES, LA GUARDIA, and LAVANBURG HOMES.",
+   "doc_ids": [
+    "rag_nycha"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Policy context",
+   "text": "The MTA Climate Resilience Roadmap, updated in October 2025, identifies a stretch of 4 Avenue Brooklyn served by five stations impacted by heavy rainfall, highlighting the need for city action due to chronic flooding in the Gowanus neighborhood.",
+   "doc_ids": [
+    "rag_mta"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Hazard Reader.**\nThis address is mapped within FEMA flood zone X, per NFHL FIRM panel 3604970379F, effective 2007 [fema_nfhl].\n\n**Live Observer.**\nNo FloodNet sensors are deployed within 600 meters of this address [floodnet]. Thirty-six NYC 311 flood-related complaints were filed within 200 meters of this location in the last five years, with the most common descriptor being Sewer Backup (Use Comments) (SA) [nyc311]. The latest reading at Sandy Hook, NJ, shows a tide of 5.18 feet above mean lower low water, observed at 2026-09-26 17:24 [noaa_tides]. The nearest USGS stream gauge, Conselyeas Pond Tributary At Rosedale NY (01311810, 12.1 km away), recorded a stage of 1.07 feet and a discharge of 13.7 cubic feet per second, observed at 2026-09-26 21:00 UTC [usgs_gauges].\n\n**Projector.**\nThere are three active NWS alerts at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor), and Rip Current Statement (Moderate) [nws_alerts].\n\n**Policy context.**\nThe Ophelia After-Action Report from the MTA, dated October 2023, addresses the response to the Comptroller\u2019s Request for Information on the 9/29 Flash Flood Event, specifically on page 38, Attachment B Exhibit 2D [rag_comptroller]. Flood Resilience at NYCHA, as detailed on page 74 of the document, outlines lessons learned through the Hurricane Sandy Disaster Recovery Program, focusing on sites such as ASTORIA, BARUCH, BEACH 41ST STREET, CAMPOS PLAZA II, CAREY GARDENS, CARLTON MANOR, CONEY ISLAND (SITE 8), CONEY ISLAND HOUSES, CONEY ISLAND IB, CONEY ISLAND 4&5, EAST RIVER, GOWANUS, GRAVESEND HOMES, LA GUARDIA, and LAVANBURG HOMES [rag_nycha]. The MTA Climate Resilience Roadmap, updated in October 2025, identifies a stretch of 4 Avenue Brooklyn served by five stations impacted by heavy rainfall, highlighting the need for city action due to chronic flooding in the Gowanus neighborhood [rag_mta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

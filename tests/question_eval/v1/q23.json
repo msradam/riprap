@@ -1,0 +1,47 @@
+{
+ "id": "q23",
+ "kind": "district",
+ "question": "How many street flooding complaints has community district QN12 had?",
+ "error": null,
+ "wall_s": 10.4,
+ "intent": "single_address",
+ "deployment": null,
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "QN12"
+   }
+  ],
+  "rationale": "QN12 is a community district identifier, which corresponds to a specific locatable point (the Queens community district) and thus fits the 'single_address' intent."
+ },
+ "pebbles_run": [
+  "fema_nfhl",
+  "nws_alerts",
+  "nws_obs",
+  "usgs_gauges"
+ ],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 658,
+  "completion": 75,
+  "seconds": 8.26,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 0,
+  "completion": 0,
+  "seconds": 0,
+  "n_calls": 0
+ },
+ "n_documents": 0,
+ "tier": "llm",
+ "model": null,
+ "attempts": 0,
+ "claims": [],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "No grounded data available for this address."
+}

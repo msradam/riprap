@@ -1,0 +1,126 @@
+{
+ "id": "q30",
+ "kind": "not_covered",
+ "question": "What is the air quality near 355 Food Center Drive, Bronx today?",
+ "error": null,
+ "wall_s": 62.3,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "355 Food Center Drive, Bronx"
+   }
+  ],
+  "rationale": "The query specifies a specific street address in the Bronx, requiring location-based air quality information."
+ },
+ "pebbles_run": [
+  "dep_extreme_2080",
+  "dep_moderate_2050",
+  "dep_moderate_current",
+  "doe_schools",
+  "doh_hospitals",
+  "fema_nfhl",
+  "floodnet",
+  "floodnet_forecast",
+  "ida_hwm",
+  "microtopo",
+  "mta_entrances",
+  "noaa_tides",
+  "npcc4_slr",
+  "nws_alerts",
+  "nws_obs",
+  "nyc311",
+  "nycha_developments",
+  "policy_corpus",
+  "prithvi_water",
+  "sandy",
+  "ttm_311_forecast",
+  "ttm_battery_surge",
+  "usgs_gauges"
+ ],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 660,
+  "completion": 65,
+  "seconds": 9.02,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 1138,
+  "completion": 526,
+  "seconds": 49.46,
+  "n_calls": 1
+ },
+ "n_documents": 17,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "Hazard Reader",
+   "text": "This address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",
+   "doc_ids": [
+    "sandy_inundation"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970111F, effective 2007.",
+   "doc_ids": [
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address. Nearest USGS-surveyed mark: Near intersection of Fteley Ave. and Story Ave., in basement of 43rd NYC Police Precinct, Soundview, Bronx (1700 m away).",
+   "doc_ids": [
+    "ida_hwm"
+   ],
+   "numbers": [
+    "800",
+    "1700"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "Experimental: satellite-detected surface water about 14 hours after Hurricane Ida (Sentinel-2, 2021-09-02): 0 water polygons within 500 m of this address, nearest 22406.8 m away. Most are marsh, shoreline and park water; street and basement flooding had drained by then and is not visible in this layer.",
+   "doc_ids": [
+    "prithvi_water"
+   ],
+   "numbers": [
+    "0",
+    "22406.8"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "Elevation 5.32 m; this point sits at the 56.2th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 5.32 m above nearest drainage; TWI 10.84. Local basin relief: 6.59 m.",
+   "doc_ids": [
+    "microtopo"
+   ],
+   "numbers": [
+    "5.32",
+    "56.2",
+    "10.84",
+    "6.59"
+   ]
+  },
+  {
+   "section": "Policy context",
+   "text": "Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 1 (embedding retrieval; entity tags are experimental).",
+   "doc_ids": [
+    "policy_corpus"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Hazard Reader.**\nThis address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970111F, effective 2007 [fema_nfhl]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address. Nearest USGS-surveyed mark: Near intersection of Fteley Ave. and Story Ave., in basement of 43rd NYC Police Precinct, Soundview, Bronx (1700 m away) [ida_hwm]. Experimental: satellite-detected surface water about 14 hours after Hurricane Ida (Sentinel-2, 2021-09-02): 0 water polygons within 500 m of this address, nearest 22406.8 m away. Most are marsh, shoreline and park water; street and basement flooding had drained by then and is not visible in this layer [prithvi_water]. Elevation 5.32 m; this point sits at the 56.2th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 5.32 m above nearest drainage; TWI 10.84. Local basin relief: 6.59 m [microtopo].\n\n**Live Observer.**\nNo grounded evidence for this section.\n\n**Projector.**\nNo grounded evidence for this section.\n\n**Policy context.**\nExperimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 1 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}
