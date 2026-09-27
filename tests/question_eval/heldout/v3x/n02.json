@@ -1,0 +1,177 @@
+{
+ "id": "n02",
+ "kind": "right_now",
+ "question": "Is it raining near 79-01 Broadway, Queens right now?",
+ "error": null,
+ "wall_s": 34.3,
+ "intent": "live_now",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "live_now",
+  "targets": [
+   {
+    "type": "address",
+    "text": "79-01 Broadway, Queens"
+   }
+  ],
+  "rationale": "To determine current rain conditions at the specified address, we need live weather observations and any nearby flood sensor data.",
+  "question": "Is it raining near 79-01 Broadway, Queens right now?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "now",
+   "assets": []
+  },
+  "pebbles": [
+   "nws_obs",
+   "floodnet",
+   "noaa_tides"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "floodnet",
+  "noaa_tides",
+  "nws_alerts",
+  "nws_obs"
+ ],
+ "consulted": [
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1739,
+  "completion": 131,
+  "seconds": 8.9,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 567,
+  "completion": 337,
+  "seconds": 22.59,
+  "n_calls": 1
+ },
+ "n_documents": 4,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "Live Observer",
+   "text": "A Coastal Flood Warning (Severe) is active at 79-01 Broadway, Queens, indicating potential flooding conditions in the area right now.",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Live Observer",
+   "text": "FloodNet sensors within 600 meters have recorded 1 above-curb flood event in the past 3 years, with a peak depth of 14 mm.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "1",
+    "14"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest METAR observation at LaGuardia Airport, 3.9 km away, reports a temperature of 15.0\u00b0C as of 2026-09-27T02:35.",
+   "doc_ids": [
+    "nws_obs"
+   ],
+   "numbers": [
+    "15.0"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest tide reading at The Battery, NY, shows 6.54 ft above Mean Lower Low Water, observed at 2026-09-26 22:48, with a variance of +2.03 ft versus the predicted tide.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "6.54",
+    "2.03"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThe sources consulted do not answer this question directly. Here is what they show.\n\n**Live Observer.**\nA Coastal Flood Warning (Severe) is active at 79-01 Broadway, Queens, indicating potential flooding conditions in the area right now [nws_alerts]. FloodNet sensors within 600 meters have recorded 1 above-curb flood event in the past 3 years, with a peak depth of 14 mm [floodnet]. The latest METAR observation at LaGuardia Airport, 3.9 km away, reports a temperature of 15.0\u00b0C as of 2026-09-27T02:35 [nws_obs]. The latest tide reading at The Battery, NY, shows 6.54 ft above Mean Lower Low Water, observed at 2026-09-26 22:48, with a variance of +2.03 ft versus the predicted tide [noaa_tides].\n\n**Projector.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+ "documents": {
+  "floodnet": "2 FloodNet community sensor(s) within 600 m have logged 1 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 14 mm.",
+  "nws_obs": "Latest METAR at LaGuardia Airport, NY (3.9 km away): 15.0\u00b0C (obs 2026-09-27T02:35).",
+  "noaa_tides": "Latest reading at The Battery, NY: 6.54 ft above MLLW (+2.03 ft vs predicted tide), observed 2026-09-26 22:48.",
+  "nws_alerts": "1 active NWS alert at this point: Coastal Flood Warning (Severe)."
+ },
+ "answer_mode": "extractive",
+ "answer_lead": "cannot_answer",
+ "answer_flags": []
+}

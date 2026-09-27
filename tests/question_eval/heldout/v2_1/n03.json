@@ -1,0 +1,163 @@
+{
+ "id": "n03",
+ "kind": "right_now",
+ "question": "What is the water level in the harbor near 200 Water Street, Manhattan right now?",
+ "error": null,
+ "wall_s": 28.3,
+ "intent": "live_now",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "live_now",
+  "targets": [
+   {
+    "type": "address",
+    "text": "200 Water Street, Manhattan"
+   }
+  ],
+  "rationale": "The question asks for the current harbor water level near a specific address, requiring a live tide gauge source.",
+  "question": "What is the water level in the harbor near 200 Water Street, Manhattan right now?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "now",
+   "assets": []
+  },
+  "pebbles": [
+   "noaa_tides"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "noaa_tides",
+  "nws_alerts"
+ ],
+ "consulted": [
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1743,
+  "completion": 118,
+  "seconds": 8.35,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 411,
+  "completion": 258,
+  "seconds": 16.97,
+  "n_calls": 1
+ },
+ "n_documents": 2,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "The water level at the harbor near 200 Water Street, Manhattan is currently 6.54 feet above Mean Lower Low Water (MLLW).",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "6.54",
+    "MLLW"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest tide observation at The Battery, NY, recorded on 2026-09-26 at 22:48, shows a water level of 6.54 ft above MLLW, which is 2.03 ft higher than the predicted tide.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "6.54",
+    "2.03",
+    "22:48",
+    "2026-09-26"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "There are currently two active National Weather Service alerts for this location: a Coastal Flood Warning classified as Severe and a Coastal Flood Advisory classified as Minor.",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThe water level at the harbor near 200 Water Street, Manhattan is currently 6.54 feet above Mean Lower Low Water (MLLW) [noaa_tides].\n\n**Live Observer.**\nThe latest tide observation at The Battery, NY, recorded on 2026-09-26 at 22:48, shows a water level of 6.54 ft above MLLW, which is 2.03 ft higher than the predicted tide [noaa_tides].\n\n**Projector.**\nThere are currently two active National Weather Service alerts for this location: a Coastal Flood Warning classified as Severe and a Coastal Flood Advisory classified as Minor [nws_alerts].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+ "documents": {
+  "noaa_tides": "Latest reading at The Battery, NY: 6.54 ft above MLLW (+2.03 ft vs predicted tide), observed 2026-09-26 22:48.",
+  "nws_alerts": "2 active NWS alerts at this point: Coastal Flood Warning (Severe), Coastal Flood Advisory (Minor)."
+ },
+ "answer_mode": null,
+ "answer_lead": null,
+ "answer_flags": []
+}

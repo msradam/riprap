@@ -1,0 +1,252 @@
+{
+ "id": "h05",
+ "kind": "flood_history",
+ "question": "What past floods have been recorded near 1000 Richmond Terrace, Staten Island?",
+ "error": null,
+ "wall_s": 30.4,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "1000 Richmond Terrace, Staten Island"
+   }
+  ],
+  "rationale": "To determine past flood events near a specific address, we need historic flood data (Sandy, FEMA zones), local elevation (microtopo), high-water marks from Hurricane Ida, and any recorded 311 flood complaints.",
+  "question": "What past floods have been recorded near 1000 Richmond Terrace, Staten Island?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "past",
+   "assets": []
+  },
+  "pebbles": [
+   "sandy",
+   "fema_nfhl",
+   "microtopo",
+   "ida_hwm",
+   "nyc311"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_moderate_2050",
+  "fema_nfhl",
+  "floodnet",
+  "ida_hwm",
+  "microtopo",
+  "nyc311",
+  "sandy"
+ ],
+ "consulted": [
+  {
+   "id": "sandy",
+   "title": "NYC Sandy Inundation Zone (2012 empirical extent)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "ida_hwm",
+   "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo",
+   "title": "LiDAR / DEM-derived micro-topography",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "dep_extreme_2080",
+   "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "prithvi_water",
+   "title": "Satellite-detected surface water after Hurricane Ida (experimental)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  },
+  {
+   "id": "mta_entrances",
+   "title": "MTA subway/rail entrances exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nycha_developments",
+   "title": "NYCHA developments exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doe_schools",
+   "title": "NYC DOE schools exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doh_hospitals",
+   "title": "NYC DOH hospitals exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_battery_surge",
+   "title": "Granite TTM r2 Battery Surge \u2014 96 h hourly nowcast (fine-tune)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_311_forecast",
+   "title": "Granite TTM r2 \u2014 weekly 311 flood-complaint forecast at this address",
+   "stone": "lodestone"
+  },
+  {
+   "id": "floodnet_forecast",
+   "title": "Granite TTM r2 \u2014 flood-event recurrence at nearest FloodNet sensor",
+   "stone": "lodestone"
+  },
+  {
+   "id": "npcc4_slr",
+   "title": "NPCC4 (2024) sea-level rise projections",
+   "stone": "lodestone"
+  },
+  {
+   "id": "policy_corpus",
+   "title": "NYC flood-policy corpus \u2014 agency reports + plans",
+   "stone": "cornerstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1741,
+  "completion": 174,
+  "seconds": 11.87,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 750,
+  "completion": 220,
+  "seconds": 15.48,
+  "n_calls": 1
+ },
+ "n_documents": 7,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 meters of 1000 Richmond Terrace, Staten Island.",
+   "doc_ids": [
+    "ida_hwm"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "answer",
+   "text": "Three FloodNet community sensors within 600 meters of 1000 Richmond Terrace, Staten Island have logged 29 above-curb flood events in the last 3 years.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "3",
+    "29"
+   ]
+  },
+  {
+   "section": "answer",
+   "text": "Two NYC 311 flood-related complaints were filed within 200 meters of 1000 Richmond Terrace, Staten Island in the last 5 years, with the most common descriptor being Sewer Backup (Use Comments) (SA).",
+   "doc_ids": [
+    "nyc311"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nNo Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 meters of 1000 Richmond Terrace, Staten Island [ida_hwm]. Three FloodNet community sensors within 600 meters of 1000 Richmond Terrace, Staten Island have logged 29 above-curb flood events in the last 3 years [floodnet]. Two NYC 311 flood-related complaints were filed within 200 meters of 1000 Richmond Terrace, Staten Island in the last 5 years, with the most common descriptor being Sewer Backup (Use Comments) (SA) [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+ "documents": {
+  "sandy_inundation": "This address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",
+  "fema_nfhl": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970188F, effective 2007.",
+  "dep_moderate_2050": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR).",
+  "ida_hwm": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address. Nearest USGS-surveyed mark: Taylor St., between Cary Ave. and Castleon Ave., West Brighton, Staten Island (2202 m away).",
+  "microtopo": "Elevation 11.61 m; this point sits at the 54.6th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 12.84 m above nearest drainage; TWI 6.33. Local basin relief: 50.34 m.",
+  "floodnet": "3 FloodNet community sensor(s) within 600 m have logged 29 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 300 mm.",
+  "nyc311": "2 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years. Most common descriptor: Sewer Backup (Use Comments) (SA)."
+ },
+ "answer_mode": "guarded",
+ "answer_lead": null,
+ "answer_flags": []
+}

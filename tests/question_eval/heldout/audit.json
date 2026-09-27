@@ -1,0 +1,142 @@
+{
+ "v2_1": {
+  "questions_with_answer": 18,
+  "answer_hits": {
+   "absence": 1,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 2,
+   "datum": 0
+  },
+  "answer_total": 3,
+  "answer_questions_flagged": 2,
+  "all_claim_hits": {
+   "absence": 1,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 2,
+   "datum": 2
+  },
+  "hits": [
+   {
+    "id": "a04",
+    "section": "answer",
+    "class": "absence",
+    "reason": "states an absence, but sandy_inundation reports a result",
+    "text": "No hospitals within 3000 meters of 200 Water Street, Manhattan are mapped within the 2012 Hurricane Sandy inundation footprint or the NYC DEP extreme stormwater scenario for 2080 sea-level rise."
+   },
+   {
+    "id": "a04",
+    "section": "answer",
+    "class": "dropped_count",
+    "reason": "omits the figure from doh_hospital_exposure (3)",
+    "text": "No hospitals within 3000 meters of 200 Water Street, Manhattan are mapped within the 2012 Hurricane Sandy inundation footprint or the NYC DEP extreme stormwater scenario for 2080 sea-level rise. The address is located in FEMA flood zone AE, indicating a Special Flood Hazard Area."
+   },
+   {
+    "id": "n01",
+    "section": "answer",
+    "class": "dropped_count",
+    "reason": "omits the figure from nws_alerts (3)",
+    "text": "There is a Coastal Flood Warning in effect for 1310 Surf Avenue, Brooklyn right now."
+   },
+   {
+    "id": "o02",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 2.31 m; this point sits at the 39.9th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.54 m above nearest drainage; TWI 8.63. Local basin relief: 21.29 m."
+   },
+   {
+    "id": "o02",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 2.31 m; this point sits at the 39.9th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.54 m above nearest drainage; TWI 8.63. Local basin relief: 21.29 m."
+   }
+  ]
+ },
+ "v3g": {
+  "questions_with_answer": 18,
+  "answer_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 2,
+   "datum": 0
+  },
+  "answer_total": 2,
+  "answer_questions_flagged": 2,
+  "all_claim_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 2,
+   "datum": 2
+  },
+  "hits": [
+   {
+    "id": "a04",
+    "section": "answer",
+    "class": "dropped_count",
+    "reason": "omits the figure from doh_hospital_exposure (3)",
+    "text": "No hospitals within 3000 meters of 200 Water Street, Manhattan are mapped within the NYC DEP extreme stormwater scenario for 2080 sea-level rise."
+   },
+   {
+    "id": "h01",
+    "section": "answer",
+    "class": "dropped_count",
+    "reason": "omits the figure from ida_hwm (67)",
+    "text": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 meters of 79-01 Broadway, Queens; the nearest surveyed mark was 1126 meters away."
+   },
+   {
+    "id": "o02",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 2.31 m; this point sits at the 39.9th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.54 m above nearest drainage; TWI 8.63. Local basin relief: 21.29 m."
+   },
+   {
+    "id": "o02",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 2.31 m; this point sits at the 39.9th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.54 m above nearest drainage; TWI 8.63. Local basin relief: 21.29 m."
+   }
+  ]
+ },
+ "v3x": {
+  "questions_with_answer": 17,
+  "answer_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 0,
+   "datum": 0
+  },
+  "answer_total": 0,
+  "answer_questions_flagged": 0,
+  "all_claim_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 0,
+   "datum": 2
+  },
+  "hits": [
+   {
+    "id": "o02",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 2.31 m; this point sits at the 39.9th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.54 m above nearest drainage; TWI 8.63. Local basin relief: 21.29 m."
+   },
+   {
+    "id": "o02",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 2.31 m; this point sits at the 39.9th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.54 m above nearest drainage; TWI 8.63. Local basin relief: 21.29 m."
+   }
+  ]
+ }
+}

@@ -1,0 +1,141 @@
+{
+ "id": "d01",
+ "kind": "district",
+ "question": "What share of community district QN04 is inside the DEP 2050 stormwater scenario?",
+ "error": null,
+ "wall_s": 19.9,
+ "intent": "neighborhood",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "neighborhood",
+  "targets": [
+   {
+    "type": "nta",
+    "text": "QN04"
+   }
+  ],
+  "rationale": "The question asks for the proportion of area within community district QN04 modeled to flood under the DEP moderate rainstorm scenario for 2050 sea level, which is provided by the dep_moderate_2050_nta source.",
+  "question": "What share of community district QN04 is inside the DEP 2050 stormwater scenario?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "future",
+   "assets": []
+  },
+  "pebbles": [
+   "dep_moderate_2050_nta"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_moderate_2050_nta",
+  "sandy_nta"
+ ],
+ "consulted": [
+  {
+   "id": "sandy_nta",
+   "title": "Share of the neighborhood inside the 2012 Sandy extent",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050_nta",
+   "title": "DEP Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "dep_extreme_2080_nta",
+   "title": "DEP Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current_nta",
+   "title": "DEP Moderate (2.13 in/hr, current sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo_nta",
+   "title": "Neighborhood terrain from the USGS 3DEP DEM",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311_nta",
+   "title": "NYC 311 flood complaints inside the neighborhood",
+   "stone": "touchstone"
+  },
+  {
+   "id": "dob_permits_nta",
+   "title": "Active DOB construction permits inside the neighborhood",
+   "stone": "keystone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1745,
+  "completion": 155,
+  "seconds": 10.86,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 448,
+  "completion": 79,
+  "seconds": 5.69,
+  "n_calls": 1
+ },
+ "n_documents": 2,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "3.1% of community district QN04 is modeled to be inside the DEP 2050 stormwater scenario.",
+   "doc_ids": [
+    "dep_moderate_2050_nta"
+   ],
+   "numbers": [
+    "3.1"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n3.1% of community district QN04 is modeled to be inside the DEP 2050 stormwater scenario [dep_moderate_2050_nta].\n\n**Hazard Reader.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+ "documents": {
+  "sandy_nta": "0.0% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 6.14 km\u00b2).",
+  "dep_moderate_2050_nta": "DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.1% of this area is modeled to flood (2.1% nuisance, over 4 in to 1 ft; 1.1% 1 to 4 ft; 0.0% over 4 ft)."
+ },
+ "answer_mode": null,
+ "answer_lead": null,
+ "answer_flags": []
+}

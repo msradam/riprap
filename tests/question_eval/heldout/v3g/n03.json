@@ -1,0 +1,179 @@
+{
+ "id": "n03",
+ "kind": "right_now",
+ "question": "What is the water level in the harbor near 200 Water Street, Manhattan right now?",
+ "error": null,
+ "wall_s": 33.4,
+ "intent": "live_now",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "live_now",
+  "targets": [
+   {
+    "type": "address",
+    "text": "200 Water Street, Manhattan"
+   }
+  ],
+  "rationale": "The question asks for the current harbor water level near a specific address, requiring a live tide gauge source.",
+  "question": "What is the water level in the harbor near 200 Water Street, Manhattan right now?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "now",
+   "assets": []
+  },
+  "pebbles": [
+   "noaa_tides"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "floodnet",
+  "noaa_tides",
+  "nws_alerts",
+  "nws_obs"
+ ],
+ "consulted": [
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1743,
+  "completion": 118,
+  "seconds": 7.99,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 612,
+  "completion": 333,
+  "seconds": 22.68,
+  "n_calls": 1
+ },
+ "n_documents": 4,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "The water level at the harbor near 200 Water Street, Manhattan right now is 6.54 feet above Mean Lower Low Water (MLLW).",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "6.54",
+    "MLLW"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "FloodNet sensors within 600 meters have recorded 2 above-curb flood events in the past 3 years, with a peak depth of 148 mm.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "2",
+    "148"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest METAR observation at Central Park, about 8.5 km away, reports a temperature of 13.9\u00b0C and 1.0 mm of precipitation in the last hour (observation time 2026-09-27T01:51).",
+   "doc_ids": [
+    "nws_obs"
+   ],
+   "numbers": [
+    "13.9",
+    "1.0",
+    "2026-09-27T01:51"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "There are 2 active NWS alerts for this location: a Coastal Flood Warning (Severe) and a Coastal Flood Advisory (Minor).",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": [
+    "2"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThe water level at the harbor near 200 Water Street, Manhattan right now is 6.54 feet above Mean Lower Low Water (MLLW) [noaa_tides].\n\n**Live Observer.**\nFloodNet sensors within 600 meters have recorded 2 above-curb flood events in the past 3 years, with a peak depth of 148 mm [floodnet]. The latest METAR observation at Central Park, about 8.5 km away, reports a temperature of 13.9\u00b0C and 1.0 mm of precipitation in the last hour (observation time 2026-09-27T01:51) [nws_obs].\n\n**Projector.**\nThere are 2 active NWS alerts for this location: a Coastal Flood Warning (Severe) and a Coastal Flood Advisory (Minor) [nws_alerts].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+ "documents": {
+  "floodnet": "1 FloodNet community sensor(s) within 600 m have logged 2 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 148 mm.",
+  "nws_obs": "Latest METAR at Central Park, NY (8.5 km away): 13.9\u00b0C, 1.0 mm precip in the last hour (obs 2026-09-27T01:51).",
+  "noaa_tides": "Latest reading at The Battery, NY: 6.54 ft above MLLW (+2.03 ft vs predicted tide), observed 2026-09-26 22:48.",
+  "nws_alerts": "2 active NWS alerts at this point: Coastal Flood Warning (Severe), Coastal Flood Advisory (Minor)."
+ },
+ "answer_mode": "guarded",
+ "answer_lead": null,
+ "answer_flags": []
+}
