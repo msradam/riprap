@@ -57,6 +57,11 @@ def audit_record(rec: dict, question: str, docs: dict[str, str]) -> list[dict]:
         for cls, reason in ac.check_claim(c["text"], c.get("doc_ids") or [], docs):
             hits.append({"id": rec["id"], "section": c["section"], "class": cls, "reason": reason,
                          "text": c["text"]})
+    if rec.get("answer_lead"):  # extractive: the facts are verbatim, so check the lead
+        facts = [c["doc_ids"][0] for c in answer if c.get("doc_ids")]
+        for cls, reason in ac.check_lead(rec["answer_lead"], facts, question, docs):
+            hits.append({"id": rec["id"], "section": "answer", "class": cls, "reason": reason,
+                         "text": f"{rec['answer_lead']}: {', '.join(facts)}"})
     for cls, reason in ac.check_answer([c["text"] for c in answer], question, docs):
         hits.append({"id": rec["id"], "section": "answer", "class": cls, "reason": reason,
                      "text": " ".join(c["text"] for c in answer)})

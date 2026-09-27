@@ -109,7 +109,8 @@ def cmd_run(outdir: Path, only: list[str] | None = None, suffix: str = "") -> No
             "retried_claims": g.get("retried_claims") or [],
             "paragraph": out.get("paragraph"),
             "documents": _doc_texts(out) if out else {},
-            "answer_mode": g.get("answer_mode"),
+            "answer_mode": g.get("answer_mode"), "answer_lead": g.get("answer_lead"),
+            "answer_flags": g.get("answer_flags") or [],
         }
         (outdir / f"{q['id']}{suffix}.json").write_text(json.dumps(rec, indent=1, default=str))
         print(f"{q['id']}{suffix} {q['kind']:13s} {str(rec['intent']):16s} pebbles={len(rec['pebbles_run']):2d} "

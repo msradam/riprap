@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from burr.core import State, action
 
 from riprap.core import llm
-from riprap.core.burr import evidence
+from riprap.core.burr import answer_checks, evidence
 from riprap.core.burr.templated_reconciler import NON_SCOPE_FOOTER, _scope_header, compose_briefing
 
 log = logging.getLogger("riprap.synthesis")
@@ -117,7 +117,8 @@ def verify(claims: list[dict], docs: list[Doc], extra_sections: tuple[str, ...] 
                                 if (p := _parse(n))]
             # Listed "numbers" can be identifiers or dates ("3604970203F",
             # "2021-09-02"); tokenize them exactly as the evidence is.
-            stated = set(numbers_in(text)) | {t for n in claim["numbers"] for t in numbers_in(n)}
+            stated = (set(numbers_in(answer_checks.words_to_digits(text)))
+                      | {t for n in claim["numbers"] for t in numbers_in(n)})
             missing = sorted(n for n in stated
                              if n.lstrip("+-") not in _NOT_MEASUREMENTS and n not in exempt
                              and not number_supported(n, evidence_numbers))
@@ -163,6 +164,50 @@ Rules:
 - Never say a place "will flood", is "safe", or has "no risk". Say "is mapped within", "was recorded", "is modeled to".
 """
 
+EXTRACTIVE_RULES = """
+A question was asked. Do not write claims in section "answer". Instead fill "answer": "lead" is one of yes, no, partly, count, cannot_answer, and "facts" lists the ids of one to four documents that support the lead, most relevant first. The reader sees a fixed phrase for the lead followed by those documents' text, word for word. Use "no" only when the facts report an absence (outside, none, zero). Use "partly" when some but not all of what was asked about is affected. Use "count" when the question asks how many or how much. Use "cannot_answer" with no facts when the documents do not answer the question. Then write the other sections as usual.
+"""
+GUARD_RULES = """
+Answer claims are also checked in code. Do not say no, none or not when a cited document reports something. Do not write "all", "both" or "the <things> are" when a document counts fewer inside than in total; give the count ("3 of 5"). Do not join two documents with "which means", "indicating" or "therefore", and do not state a warning or forecast as something happening. State an elevation with its datum. Include the count or value that answers the question.
+"""
+LEADS = ("yes", "no", "partly", "count", "cannot_answer")
+# ponytail: one module constant; refactor 3 phase 6 sets it by measurement.
+DEFAULT_ANSWER_MODE = "guarded"
+
+
+def answer_mode() -> str:
+    """RIPRAP_ANSWER_MODE: 'guarded' (model-written answer claims, checked
+    by answer_checks) or 'extractive' (a lead plus template sentences)."""
+    import os
+
+    mode = os.environ.get("RIPRAP_ANSWER_MODE", DEFAULT_ANSWER_MODE).strip().lower()
+    return mode if mode in ("guarded", "extractive") else DEFAULT_ANSWER_MODE
+
+
+def _guard(kept: list[dict], dropped: list[dict], texts: dict[str, str],
+           question: str) -> tuple[list[dict], list[dict], list[str]]:
+    """Guarded mode: an answer claim failing an answer check is dropped with
+    the reason. An omitted count asks for a retry but drops nothing (the
+    claims that were written are still true)."""
+    out = []
+    for c in kept:
+        hits = answer_checks.check_claim(c["text"], c["doc_ids"], texts) if c["section"] == ANSWER_SECTION else []
+        if hits:
+            dropped = [*dropped, {**c, "reason": "answer check: " + "; ".join(f"{k}: {r}" for k, r in hits)}]
+        else:
+            out.append(c)
+    notes = [f"the answer {r}" for _, r in answer_checks.check_answer(
+        [c["text"] for c in out if c["section"] == ANSWER_SECTION], question, texts)]
+    return out, dropped, notes
+
+
+def _extract(out: dict, question: str, texts: dict[str, str]) -> tuple[str, list[str], list[tuple[str, str]]]:
+    a = out.get("answer") or {}
+    lead = a.get("lead") if a.get("lead") in LEADS else "cannot_answer"
+    facts = [f for f in dict.fromkeys(a.get("facts") or []) if f in texts]
+    return lead, facts, answer_checks.check_lead(lead, facts, question, texts)
+LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:"}
+
 ANSWER_RULES = """
 A question was asked. First write one to three claims in section "answer" that answer it directly, using only the documents, with the same citation and number rules. Lead with the fact that answers the question. If the documents do not contain the answer, write no "answer" claims; do not guess. Then write the other sections as usual.
 """
@@ -194,7 +239,8 @@ def _user_prompt(docs: list[Doc], sections: list[str], question: str = "", focus
     return "Documents, grouped by section:\n\n" + "\n".join(lines) + "\nReturn the claims as JSON."
 
 
-def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: str = "") -> str:
+def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: str = "",
+            lead: str = "") -> str:
     """Scope header, then the answer (when a question was asked), then one
     section per Stone that ran, then the footer. Only verified claims."""
     experimental = {d.doc_id for d in docs if d.experimental}
@@ -212,12 +258,13 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
 
     parts = [_scope_header()]
     if question:
-        parts.append("**Answer.**\n" + (sentences(ANSWER_SECTION) or CANNOT_ANSWER))
+        body = sentences(ANSWER_SECTION)
+        parts.append("**Answer.**\n" + ((f"{lead} " if lead else "") + body if body else CANNOT_ANSWER))
     in_answer = {i for c in kept if c["section"] == ANSWER_SECTION for i in c["doc_ids"]}
     for sec in sections:
         body = sentences(sec)
-        if not body and question and {d.doc_id for d in docs if d.section == sec} <= in_answer:
-            continue  # this section's evidence is already stated in the answer
+        if not body and question and {d.doc_id for d in docs if d.section == sec} & in_answer:
+            continue  # the answer covers this Stone; an empty section would only say so
         parts.append(f"**{sec}.**\n" + (body or NO_EVIDENCE_LINE))
     parts.append(NON_SCOPE_FOOTER)
     return "\n\n".join(parts)
@@ -237,47 +284,87 @@ def synthesize(state) -> dict:
                 "grounding": {"tier": "llm", "claims": [], "dropped_claims": [], "attempts": 0}}
     plan = state.get("plan") or {}
     question, focus = plan.get("question") or "", plan.get("focus")
+    mode = answer_mode() if question else None
     sections = list(dict.fromkeys(d.section for d in docs))
-    extra = (ANSWER_SECTION,) if question else ()
+    texts: dict[str, str] = {}
+    for d in docs:
+        texts[d.doc_id] = f"{texts.get(d.doc_id, '')} {d.text}".strip()
+    extra = (ANSWER_SECTION,) if mode == "guarded" else ()
     # Numbers the user typed (the question, the place) may be restated;
     # they are the user's words, not claims about the data.
     exempt = frozenset(numbers_in(f"{question} {state.get('query') or ''} "
                                   f"{(state.get('geocode') or {}).get('address') or ''}"))
-    schema = claims_schema(sorted({d.doc_id for d in docs}), [*extra, *sections])
-    messages = [{"role": "system", "content": SYSTEM_PROMPT + (ANSWER_RULES if question else "")},
+    schema = claims_schema(sorted(texts), [*extra, *sections])
+    if mode == "extractive":
+        schema["properties"]["answer"] = {
+            "type": "object", "additionalProperties": False, "required": ["lead", "facts"],
+            "properties": {"lead": {"type": "string", "enum": list(LEADS)},
+                           "facts": {"type": "array", "items": {"type": "string", "enum": sorted(texts)},
+                                     "maxItems": 4}}}
+        schema["required"] = [*schema["required"], "answer"]
+    rules = {"guarded": ANSWER_RULES + GUARD_RULES, "extractive": EXTRACTIVE_RULES}.get(mode or "", "")
+    messages = [{"role": "system", "content": SYSTEM_PROMPT + rules},
                 {"role": "user", "content": _user_prompt(docs, sections, question, focus)}]
+
+    def check(out: dict):
+        kept, dropped = verify(out.get("claims") or [], docs, extra, exempt)
+        notes: list[str] = []
+        lead, facts, lead_hits = "", [], []
+        if mode == "guarded":
+            kept, dropped, notes = _guard(kept, dropped, texts, question)
+        elif mode == "extractive":
+            lead, facts, lead_hits = _extract(out, question, texts)
+            notes = [f"answer lead {lead!r}: {r}" for _, r in lead_hits]
+        return kept, dropped, notes, (lead, facts, lead_hits)
+
     attempts, model, first_dropped, calls = 0, None, [], []
     try:
         out, model = llm.chat_json(messages, schema, name="claims", ledger=calls)
         attempts = 1
-        kept, dropped = verify(out.get("claims") or [], docs, extra, exempt)
+        kept, dropped, notes, answer = check(out)
         first_dropped = dropped
-        if dropped:
-            failures = "\n".join(f'- "{d["text"]}": {d["reason"]}' for d in dropped)
+        if dropped or notes:
+            failures = "\n".join([f'- "{d["text"]}": {d["reason"]}' for d in dropped] + [f"- {n}" for n in notes])
             messages += [
                 {"role": "assistant", "content": json.dumps(out)},
-                {"role": "user", "content": "These claims failed verification:\n" + failures +
-                 "\nReturn the full claim list again. Fix these claims using only numbers "
-                 "that appear in their cited documents, or leave them out."},
+                {"role": "user", "content": "These failed verification:\n" + failures +
+                 "\nReturn the full output again. Fix these using only what their cited documents "
+                 "say, or leave them out."},
             ]
             out, model = llm.chat_json(messages, schema, name="claims", ledger=calls)
             attempts = 2
-            kept, dropped = verify(out.get("claims") or [], docs, extra, exempt)
+            kept, dropped, notes, answer = check(out)
     except llm.LLMUnavailable as e:
         paragraph, cites = compose_briefing(state)
         return {"paragraph": paragraph, "citations": cites,
                 "grounding": {"tier": "no_llm", "fallback_reason": f"LLM unavailable: {e}",
                               "claims": [], "dropped_claims": [], "attempts": attempts,
-                              "llm_calls": calls}}
+                              "llm_calls": calls, "answer_mode": mode}}
+    lead_phrase, answer_flags, lead = "", notes, None
+    if mode == "extractive":
+        lead, facts, lead_hits = answer
+        rel = answer_checks.relevant_doc(question, texts)
+        if rel and rel not in facts and lead != "cannot_answer" and any(k == "dropped_count" for k, _ in lead_hits):
+            facts = [*facts, rel]  # the source the question is about, verbatim
+        if any(k != "dropped_count" for k, _ in lead_hits):
+            dropped = [*dropped, {"section": ANSWER_SECTION, "text": f"{lead}: {', '.join(facts)}",
+                                  "doc_ids": facts, "numbers": [],
+                                  "reason": "answer check: " + "; ".join(r for _, r in lead_hits)}]
+            lead, facts = "cannot_answer", []
+        kept = [*({"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts),
+                *kept]
+        lead_phrase = LEAD_PHRASES.get(lead, "")
     cited = {i for c in kept for i in c["doc_ids"]}
     return {
-        "paragraph": _render(kept, docs, sections, question),
+        "paragraph": _render(kept, docs, sections, question, lead_phrase),
         "citations": {k: v for k, v in evidence.citations(items).items() if k in cited},
         "grounding": {"tier": "llm", "model": model, "attempts": attempts,
                       "claims": kept, "dropped_claims": dropped,
                       "retried_claims": first_dropped if attempts == 2 else [],
                       "n_kept": len(kept), "n_dropped": len(dropped), "llm_calls": calls,
-                      "question": question, "n_documents": len(docs),
+                      "question": question, "n_documents": len(docs), "answer_mode": mode,
+                      "answer_lead": lead,
+                      "answer_flags": answer_flags,
                       "answered": any(c["section"] == ANSWER_SECTION for c in kept) if question else None},
     }
 

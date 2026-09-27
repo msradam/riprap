@@ -168,3 +168,30 @@ def check_answer(answer_texts: list[str], question: str, docs: dict[str, str]) -
     if not number_supported(counts[0], said):
         return [("dropped_count", f"omits the figure from {rel} ({counts[0]})")]
     return []
+
+
+def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str]) -> list[tuple[str, str]]:
+    """Extractive mode: check the model's lead against the facts it chose.
+    The facts are template sentences shown verbatim, so only the lead and
+    the choice of facts can be wrong."""
+    if lead == "cannot_answer":
+        return []
+    if not facts:
+        return [("empty", f"lead {lead!r} with no facts")]
+    texts = [docs.get(i, "") for i in facts]
+    hits: list[tuple[str, str]] = []
+    positive = [i for i, t in zip(facts, texts, strict=True) if reports_result(t)]
+    if lead == "no" and positive:
+        hits.append(("absence", f"lead 'no', but {', '.join(positive)} reports a result"))
+    if lead == "yes":
+        if not positive:
+            hits.append(("absence", "lead 'yes', but every fact reports an absence"))
+        partial = [i for i, t in zip(facts, texts, strict=True) if (c := _register_counts(t)) and min(c[1:]) < c[0]]
+        if partial:
+            hits.append(("universal", f"lead 'yes', but {', '.join(partial)} counts only some; use 'partly'"))
+    if lead == "count" and not any(count_numbers(t) for t in texts):
+        hits.append(("dropped_count", "lead 'count' needs a fact with a count"))
+    rel = relevant_doc(question, docs)
+    if rel and rel not in facts and count_numbers(docs[rel]):
+        hits.append(("dropped_count", f"omits {rel}, the source the question is about"))
+    return hits
