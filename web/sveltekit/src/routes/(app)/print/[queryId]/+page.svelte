@@ -203,20 +203,20 @@
     margin: 0.5in auto;
     padding: 0 0.5in;
     font-family: var(--font-serif), Georgia, serif;
-    color: #111;
+    color: #0F172A;
     background: white;
   }
-  .print-head { border-bottom: 1pt solid #111; padding-bottom: 8pt; margin-bottom: 14pt; }
+  .print-head { border-bottom: 1pt solid #0F172A; padding-bottom: 8pt; margin-bottom: 14pt; }
   .print-head-top {
     display: flex; justify-content: space-between; align-items: baseline; gap: 12pt;
     flex-wrap: wrap;
-    font: 9pt var(--font-mono, "Overpass Mono"); color: #4a4a4a;
+    font: 9pt var(--font-mono, "Overpass Mono"); color: #4E5A6E;
     text-transform: uppercase; letter-spacing: 0.04em;
   }
-  .wordmark { font-weight: 600; color: #111; }
+  .wordmark { font-weight: 600; color: #0F172A; }
   .print-eyebrow {
     margin: 10pt 0 0;
-    font: 9pt var(--font-mono, "Overpass Mono"); color: #4a4a4a;
+    font: 9pt var(--font-mono, "Overpass Mono"); color: #4E5A6E;
     text-transform: uppercase; letter-spacing: 0.06em;
   }
   .print-title {
@@ -225,30 +225,30 @@
   }
   .print-eyebrow + .print-title { margin-top: 2pt; }
   .print-place {
-    margin: 4pt 0; font: 12pt var(--font-sans, "Sofia Sans"); color: #111;
+    margin: 4pt 0; font: 12pt var(--font-sans, "Sofia Sans"); color: #0F172A;
   }
   .print-place-label { font-weight: 600; }
   .print-sub {
-    font: 10pt var(--font-mono, "Overpass Mono"); color: #4a4a4a;
+    font: 10pt var(--font-mono, "Overpass Mono"); color: #4E5A6E;
   }
   .print-controls {
     display: flex; gap: 12px; align-items: center;
     margin: 12pt 0; padding: 8pt 10pt;
-    background: #f5f5f3; border: 1px solid #d8d6d2; border-radius: 4px;
+    background: #F4F6F9; border: 1px solid #DCE2EA; border-radius: 4px;
     font: 10pt var(--font-sans, "Sofia Sans");
   }
   .print-controls button {
     font: 10pt var(--font-sans, "Sofia Sans");
-    padding: 4pt 10pt; background: #111; color: white; border: 0;
+    padding: 4pt 10pt; background: #0F172A; color: white; border: 0;
     border-radius: 3px; cursor: pointer;
   }
-  .hint { color: #4a4a4a; font-size: 9pt; }
+  .hint { color: #4E5A6E; font-size: 9pt; }
   .print-unanswered {
     margin: 10pt 0; font: 11pt var(--font-sans, "Sofia Sans"); color: #334155;
   }
   .print-sources {
     display: grid; grid-template-columns: 1fr 1fr; gap: 16pt;
-    margin: 12pt 0 16pt; padding: 8pt 0; border-top: 1pt solid #c8c6c2; border-bottom: 1pt solid #c8c6c2;
+    margin: 12pt 0 16pt; padding: 8pt 0; border-top: 1pt solid #CBD5E1; border-bottom: 1pt solid #CBD5E1;
     font: 10pt var(--font-sans, "Sofia Sans"); line-height: 1.4;
     break-inside: avoid;
   }
@@ -256,7 +256,7 @@
   .print-sources ul { margin: 0; padding-left: 12pt; }
   .print-sources p { margin: 0; }
   .print-citations {
-    margin-top: 18pt; padding-top: 8pt; border-top: 1pt solid #111;
+    margin-top: 18pt; padding-top: 8pt; border-top: 1pt solid #0F172A;
     page-break-before: always;
     font-variant-numeric: tabular-nums;
   }
@@ -271,26 +271,26 @@
   }
   .cn {
     position: absolute; left: 0; top: 0;
-    font: 600 10pt var(--font-mono, "Overpass Mono"); color: #0B5394;
+    font: 600 10pt var(--font-mono, "Overpass Mono"); color: #005EA2;
   }
   .cglyph { display: inline-block; vertical-align: middle; margin-right: 4pt; }
   .csrc { font-weight: 600; }
-  .cvint { color: #4a4a4a; margin-left: 6pt; font-size: 9pt; }
-  .ctitle { color: #1a1a1a; }
-  .curl { font: 9pt var(--font-mono, "Overpass Mono"); color: #0B5394; word-break: break-all; }
-  .cdocid { font: 9pt var(--font-mono, "Overpass Mono"); color: #4a4a4a; }
+  .cvint { color: #4E5A6E; margin-left: 6pt; font-size: 9pt; }
+  .ctitle { color: #0F172A; }
+  .curl { font: 9pt var(--font-mono, "Overpass Mono"); color: #005EA2; word-break: break-all; }
+  .cdocid { font: 9pt var(--font-mono, "Overpass Mono"); color: #4E5A6E; }
   .print-foot {
-    margin-top: 18pt; padding-top: 6pt; border-top: 1pt solid #c8c6c2;
-    font: 9pt var(--font-mono, "Overpass Mono"); color: #4a4a4a;
+    margin-top: 18pt; padding-top: 6pt; border-top: 1pt solid #CBD5E1;
+    font: 9pt var(--font-mono, "Overpass Mono"); color: #4E5A6E;
     line-height: 1.5;
   }
   .empty {
     max-width: 600px; margin: 100px auto; padding: 24px;
     font-family: var(--font-sans, "Sofia Sans");
-    color: #1a1a1a;
+    color: #0F172A;
   }
   .empty h1 { font-size: 20pt; margin-bottom: 8pt; line-height: 1.2; }
-  .empty a { color: #0B5394; }
+  .empty a { color: #005EA2; }
   .empty-action {
     display: inline-block;
     padding: 8px 16px;
@@ -300,7 +300,7 @@
     font-weight: 600;
     text-decoration: none;
   }
-  .empty-action:hover { background: #000; }
+  .empty-action:hover { background: #0F172A; }
 
   @media (max-width: 640px) {
     .print-doc { margin: 24px auto; padding: 0 16px; }
@@ -316,11 +316,11 @@
       margin: 0.85in 0.85in 0.85in 1in;
       @bottom-right {
         content: "page " counter(page) " of " counter(pages);
-        font: 9pt "Overpass Mono"; color: #4a4a4a;
+        font: 9pt "Overpass Mono"; color: #4E5A6E;
       }
       @bottom-left {
         content: "riprap.nyc";
-        font: 9pt "Overpass Mono"; color: #4a4a4a;
+        font: 9pt "Overpass Mono"; color: #4E5A6E;
       }
     }
     .print-citations { page-break-before: always; }

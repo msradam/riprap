@@ -98,9 +98,10 @@
   .land-hero-headline-city {
     display: block;
   }
-  /* Ink, not federal blue: blue is reserved for things a reader can
-     act on (DESIGN.md, the Checkable Blue Rule). */
+  /* Italic federal blue, as the landing had before the rotating city
+     was removed. #005EA2 on paper is above 6:1 at this size. */
   .city {
+    color: var(--accent);
     font-style: italic;
     white-space: nowrap;
   }
