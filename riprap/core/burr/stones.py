@@ -44,10 +44,29 @@ FLOOR = {
     "development_check": ("sandy_nta", "dep_moderate_2050_nta", "dob_permits_nta"),
 }
 
+# What an analyst checks for a question's focus, whatever the planner
+# chose: the record of past floods, the live signals, the asset register.
+# Ids outside the intent's scope (point vs area) are ignored.
+FOCUS_FLOOR = {
+    ("time_frame", "past"): ("nyc311", "floodnet", "ida_hwm", "sandy", "nyc311_nta", "sandy_nta"),
+    ("time_frame", "now"): ("nws_alerts", "nws_obs", "floodnet", "noaa_tides"),
+    ("assets", "subway"): ("mta_entrances",),
+    ("assets", "schools"): ("doe_schools",),
+    ("assets", "public_housing"): ("nycha_developments",),
+    ("assets", "hospitals"): ("doh_hospitals",),
+    ("assets", "construction"): ("dob_permits_nta",),
+}
+
+
+def floor_for(plan: dict) -> set[str]:
+    focus = plan.get("focus") or {}
+    keys = [("time_frame", focus.get("time_frame")), *(("assets", a) for a in focus.get("assets") or [])]
+    return set(FLOOR.get(plan.get("intent"), ())).union(*(FOCUS_FLOOR.get(k, ()) for k in keys))
+
 
 def select_pebbles(plan: dict | None, registry) -> list[str]:
     """The pebbles to run for a plan, in registry order: the planner's
-    choice plus the intent's FLOOR. A bare place (no question), no-LLM
+    choice plus the intent's FLOOR and the focus floor. A bare place (no question), no-LLM
     mode (no choice), or a plan made against another deployment's catalog
     gets every pebble for the intent. One plain function so another
     selector (a small classifier) can replace the planner's choice."""
@@ -59,7 +78,7 @@ def select_pebbles(plan: dict | None, registry) -> list[str]:
         return ids
     if not set(plan.get("catalog") or []).issuperset(ids):
         return ids  # e.g. planned with the NYC catalog, routed to Chicago
-    keep = set(chosen) | set(FLOOR.get(intent, ()))
+    keep = set(chosen) | floor_for(plan)
     return [i for i in ids if i in keep]
 
 

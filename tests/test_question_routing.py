@@ -121,3 +121,14 @@ def test_out_of_scope_rules_override_the_llm_planner(monkeypatch):
     monkeypatch.setattr("app.planner.plan", lambda q, ledger=None: P)
     assert burr_app.plan_for("Should I buy the house at 2017 East 17th Street?")["intent"] == "out_of_scope"
     assert burr_app.plan_for("Has 2017 East 17th Street flooded?")["intent"] == "single_address"
+
+
+def test_focus_floor_adds_what_an_analyst_checks():
+    cat = [p.id for p in NYC.all()]
+    past = {"intent": "single_address", "question": "q", "pebbles": [], "catalog": cat,
+            "focus": {"time_frame": "past", "assets": ["schools"]}}
+    assert {"nyc311", "floodnet", "ida_hwm", "sandy", "doe_schools"} <= set(select_pebbles(past, NYC))
+    now = {**past, "intent": "live_now", "focus": {"time_frame": "now", "assets": []}}
+    assert set(select_pebbles(now, NYC)) == {"nws_alerts", "nws_obs", "floodnet", "noaa_tides"}
+    area = {**past, "intent": "neighborhood", "focus": {"time_frame": "past", "assets": []}}
+    assert set(select_pebbles(area, NYC)) == {"sandy_nta", "dep_moderate_2050_nta", "nyc311_nta"}

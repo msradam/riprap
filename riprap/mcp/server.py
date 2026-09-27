@@ -122,7 +122,7 @@ def plan_query(question: str, address: str | None = None) -> dict:
     planner (which selects every pebble for the intent)."""
     from app.geocode import geocode_one
     from riprap.core.burr.app import plan_for
-    from riprap.core.burr.stones import FLOOR, select_pebbles
+    from riprap.core.burr.stones import floor_for, select_pebbles
     from riprap.core.pebbles.bridge import get_registry
     from riprap.core.pebbles.deployments import pick_deployment
 
@@ -134,7 +134,7 @@ def plan_query(question: str, address: str | None = None) -> dict:
     return {
         "intent": plan["intent"], "targets": plan.get("targets"), "question": plan.get("question"),
         "focus": plan.get("focus"), "chosen": plan.get("pebbles"),
-        "floor": list(FLOOR.get(plan["intent"], ())), "deployment": deployment,
+        "floor": sorted(floor_for(plan)), "deployment": deployment,
         "selected": select_pebbles(plan, get_registry(deployment)),
         "rationale": plan.get("rationale"),
     }
