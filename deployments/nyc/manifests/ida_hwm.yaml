@@ -27,6 +27,7 @@ config:
     - site_description
     - elev_ft
     - height_above_gnd
+    - vertical_datum
   aggregations:
     max_elev_ft:
       op: max

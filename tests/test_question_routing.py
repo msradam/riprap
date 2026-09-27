@@ -132,3 +132,16 @@ def test_focus_floor_adds_what_an_analyst_checks():
     assert set(select_pebbles(now, NYC)) == {"nws_alerts", "nws_obs", "floodnet", "noaa_tides"}
     area = {**past, "intent": "neighborhood", "focus": {"time_frame": "past", "assets": []}}
     assert set(select_pebbles(area, NYC)) == {"sandy_nta", "dep_moderate_2050_nta", "nyc311_nta"}
+
+
+def test_empty_section_is_hidden_when_the_answer_covers_its_stone():
+    from riprap.core.burr.synthesis import Doc
+
+    docs = [Doc("sandy_inundation", "Hazard Reader", "Inside the Sandy footprint.", False),
+            Doc("fema_nfhl", "Hazard Reader", "Zone AE.", False),
+            Doc("nyc311", "Live Observer", "82 complaints.", False)]
+    kept = [{"section": "answer", "text": "It was inside the Sandy footprint", "doc_ids": ["sandy_inundation"],
+             "numbers": []}]
+    text = _render(kept, docs, ["Hazard Reader", "Live Observer"], question="Did Sandy flood it?")
+    assert "**Hazard Reader.**" not in text  # covered by the answer
+    assert "**Live Observer.**\nNo grounded evidence" in text  # not covered: the gap stays visible

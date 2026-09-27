@@ -47,13 +47,19 @@ def shape(value: dict | None, manifest=None) -> dict | None:
     # honest-negative case ("no marks within radius — the nearest is X").
     # The latter matches the NWS "no active alerts" all-clear card; users
     # see Riprap asked the question and the answer was reassuring.
+    # Height above ground is what a reader means by "how deep"; the
+    # elevation is a water surface above a survey datum (NAVD88 for every
+    # NY Ida mark), so it is stated only with its datum. The two maxima
+    # can come from different marks, so they get separate clauses.
+    datums = {(f.get("properties") or {}).get("vertical_datum") for f in features}
+    datum = datums.pop() if len(datums) == 1 else None
     if n and n > 0:
         bits = [f"USGS surveyed {n} Hurricane Ida high-water mark(s) within"
                 f" {radius} m of this address"]
-        if max_elev is not None:
-            bits.append(f"; the highest observed water elevation was {max_elev} ft")
         if max_above is not None:
-            bits.append(f" (up to {max_above} ft above ground)")
+            bits.append(f"; the highest stood {max_above} ft above ground")
+        if max_elev is not None and datum:
+            bits.append(f"; the highest water surface elevation was {max_elev} ft {datum}")
         if nearest_site and nearest_dist is not None:
             bits.append(
                 f". Nearest mark: {nearest_site} ({int(nearest_dist)} m away)"
@@ -77,6 +83,7 @@ def shape(value: dict | None, manifest=None) -> dict | None:
         "nearest_dist_m": nearest_dist,
         "nearest_site": nearest_site,
         "nearest_elev_ft": nearest_props.get("elev_ft"),
+        "vertical_datum": datum,
         "sample_sites": sample_sites,
         "points": points,
         "narrative": narrative,

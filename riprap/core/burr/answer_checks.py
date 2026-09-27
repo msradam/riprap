@@ -87,8 +87,14 @@ def _register_counts(doc: str) -> tuple[int, int, int] | None:
     return tuple(int(g.replace(",", "")) for g in m.groups()) if m else None  # type: ignore[return-value]
 
 
-def count_numbers(doc: str) -> list[str]:
-    """Numbers in a document that are counts or values, not distances or years."""
+# For these sources only the number next to the word answers the question
+# (a rain question wants the precipitation, not the temperature).
+_NEAR = {"nws_obs": "precip"}
+
+
+def count_numbers(doc: str, near: str = "") -> list[str]:
+    """Numbers in a document that are counts or values, not distances or
+    years; with `near`, only numbers followed closely by that word."""
     from riprap.core.burr.synthesis import numbers_in
 
     out = []
@@ -100,6 +106,8 @@ def count_numbers(doc: str) -> list[str]:
             continue
         if re.fullmatch(r"(19|20)\d\d", n) or len(n.replace(",", "")) > 7:
             continue  # a year, or an identifier such as a FIRM panel
+        if near and near not in doc[m.end():m.end() + 12].lower():
+            continue
         out.append(n)
     return out
 
@@ -159,7 +167,7 @@ def check_answer(answer_texts: list[str], question: str, docs: dict[str, str]) -
     rel = relevant_doc(question, docs)
     if rel is None:
         return []
-    counts = count_numbers(docs[rel])
+    counts = count_numbers(docs[rel], _NEAR.get(rel, ""))
     if not counts:
         return []
     from riprap.core.burr.synthesis import _parse, number_supported
@@ -192,6 +200,6 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str])
     if lead == "count" and not any(count_numbers(t) for t in texts):
         hits.append(("dropped_count", "lead 'count' needs a fact with a count"))
     rel = relevant_doc(question, docs)
-    if rel and rel not in facts and count_numbers(docs[rel]):
+    if rel and rel not in facts and count_numbers(docs[rel], _NEAR.get(rel, "")):
         hits.append(("dropped_count", f"omits {rel}, the source the question is about"))
     return hits

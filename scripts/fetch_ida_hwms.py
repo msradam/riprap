@@ -36,6 +36,7 @@ def main() -> int:
                 "site_no": d.get("site_no"),
                 "elev_ft": d.get("elev_ft"),
                 "height_above_gnd": d.get("height_above_gnd"),
+                "vertical_datum": d.get("verticalDatumName"),
                 "hwm_type": d.get("hwmTypeName"),
                 "hwm_quality": d.get("hwmQualityName"),
                 "county": d.get("countyName"),

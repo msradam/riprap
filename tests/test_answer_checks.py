@@ -68,3 +68,12 @@ def test_q05_elevation_without_datum():
 
 def test_number_words():
     assert words_to_digits("Four schools and two hospitals") == "4 schools and 2 hospitals"
+
+
+def test_rain_question_wants_the_precipitation_not_the_temperature():
+    q = "Is it raining near the address right now?"
+    dry = {"nws_obs": "Latest METAR at JFK (7.8 km away): 15.0°C, no recent precipitation."}
+    assert not check_answer(["No recent precipitation was reported at JFK."], q, dry)
+    wet = {"nws_obs": "Latest METAR at JFK (7.8 km away): 15.0°C, 8.4 mm precip in the last hour."}
+    assert check_answer(["It is 15.0°C at JFK."], q, wet)
+    assert not check_answer(["JFK reported 8.4 mm of rain in the last hour."], q, wet)
