@@ -154,7 +154,7 @@
 <section class="hero-band">
   <div class="hero-band-inner">
     <div class="app-shell-top is-desktop" class:is-stopped={run.stopped} class:is-generating={loading}>
-      <main id="region-briefing" class="app-region app-region-brief" aria-labelledby="brief-h1">
+      <section id="region-briefing" class="app-region app-region-brief" aria-labelledby="brief-h1">
         <header class="region-head">
           <span class="section-label">Briefing</span>
         </header>
@@ -238,7 +238,7 @@
 
           <DroppedClaims claims={grounding?.dropped_claims} />
         {/if}
-      </main>
+      </section>
 
       {#if !run.stopped}
       <div class="app-region-side" style="grid-area: side;">

@@ -153,6 +153,7 @@ a:hover { text-decoration-thickness: 2px; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 24px;
   text-decoration: none;
 }
 

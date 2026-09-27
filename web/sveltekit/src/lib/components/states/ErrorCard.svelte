@@ -110,7 +110,7 @@
     <TierGlyph tier={spec.tier} size={11} color="var(--tier-{spec.tier})" />
     <span class="error-card-eyebrow">{eyebrowOverride ?? spec.eyebrow}</span>
   </header>
-  <h3 class="error-card-headline">{headlineOverride ?? spec.headline}</h3>
+  <h2 class="error-card-headline">{headlineOverride ?? spec.headline}</h2>
   <p class="error-card-body">{bodyOverride ?? spec.body}</p>
   {#if state === 'geocoder' && looksLikeDistrict && !bodyOverride && (isUnknown || depName === 'nyc')}
     <p class="error-card-body">

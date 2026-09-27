@@ -5,9 +5,9 @@
 </script>
 
 {#if status === 'fan'}
-  <span class="trace-status-glyph" aria-label="fan-out">⤳</span>
+  <span class="trace-status-glyph" role="img" aria-label="fan-out">⤳</span>
 {:else if status === 'merge'}
-  <span class="trace-status-glyph" aria-label="merge">⤺</span>
+  <span class="trace-status-glyph" role="img" aria-label="merge">⤺</span>
 {:else if status === 'silent'}
   <svg width="9" height="9" viewBox="0 0 9 9" aria-label="silent">
     <rect x="0.75" y="0.75" width="7.5" height="7.5" fill="transparent" stroke="#6B6B6B" stroke-width="1.5" />

@@ -16,7 +16,7 @@
 
 <section class="hero-band">
   <div class="hero-band-inner">
-    <div class="app-region app-region-brief" aria-labelledby="gallery-h1">
+    <section class="app-region app-region-brief" aria-labelledby="gallery-h1">
       <header class="region-head">
         <span class="section-label">Gallery</span>
       </header>
@@ -58,7 +58,7 @@
           </li>
         {/each}
       </ul>
-    </div>
+    </section>
   </div>
 </section>
 

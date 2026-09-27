@@ -5,9 +5,8 @@
    *  content" lets them bypass repeated nav. Hidden visually until
    *  focused (NOT display:none, which removes from a11y tree).
    *
-   *  Existing per-route `Skip to briefing / map / trace` links in
-   *  the app shell continue to work; this one is the top-level
-   *  canonical that USWDS audits look for.
+   *  Used by the landing (target .land-page) and by the root layout on
+   *  app routes (target the layout <main>).
    */
   interface Props {
     /** Anchor id to skip to. Defaults to `main-content`. */

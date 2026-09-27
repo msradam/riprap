@@ -3,7 +3,7 @@
   import type { Snippet } from 'svelte';
   import AppHeader from '$lib/components/shell/AppHeader.svelte';
   import AppFooter from '$lib/components/shell/AppFooter.svelte';
-  import SkipLinks from '$lib/components/shell/SkipLinks.svelte';
+  import SkipLink from '$lib/components/shell/SkipLink.svelte';
   import { page } from '$app/state';
   import { resolve } from '$app/paths';
   // The first view of every page sets its text in these three faces; the
@@ -36,10 +36,11 @@
 </svelte:head>
 
 {#if !chromeFree}
-  <SkipLinks />
+  <SkipLink />
   <AppHeader {query} offline={isGallery} onResetCold={() => (window.location.href = query ? `${resolve('/')}?q=${encodeURIComponent(query)}` : resolve('/'))} />
 {/if}
-<main>{@render children()}</main>
+<!-- The landing sets its own skip target (.land-page), so main only carries the skip-link id on app routes. -->
+<main id={chromeFree ? undefined : 'main-content'} tabindex="-1">{@render children()}</main>
 {#if !chromeFree}
   <AppFooter />
 {/if}
@@ -47,5 +48,9 @@
 <style>
   main {
     min-height: calc(100vh - 200px);
+  }
+  /* Skip-link target, not a control: no ring around the whole page. */
+  main:focus-visible {
+    outline: none;
   }
 </style>

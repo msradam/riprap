@@ -13,7 +13,7 @@
   let entries = $derived(Object.values(citations).sort((a, b) => a.n - b.n));
 </script>
 
-<aside class="citation-drawer" aria-label="Citations">
+<div class="citation-drawer">
   <div class="citation-drawer-head">
     <span class="section-label">Citations · {entries.length}</span>
     <span class="citation-drawer-meta">{snapshot ? 'snapshot' : 'live'} · primary sources</span>
@@ -55,7 +55,7 @@
       state, and city sources. No commercial APIs contacted at runtime.
     </p>
   </div>
-</aside>
+</div>
 
 <style>
   .citation-drawer :global(a) {
@@ -66,5 +66,9 @@
   .citation-drawer :global(a:hover) {
     border-bottom-color: var(--accent);
     color: var(--accent);
+  }
+  /* 17px text box + 2 x 3.5px = 24px target (WCAG 2.5.8); inline padding does not change line height. */
+  .citation-title a {
+    padding-block: 3.5px;
   }
 </style>

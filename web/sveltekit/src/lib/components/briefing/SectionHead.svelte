@@ -6,7 +6,7 @@
   let { n, label, tier, title }: Props = $props();
 </script>
 
-<h3 class="briefing-section-head">
+<h2 class="briefing-section-head">
   <span class="briefing-section-num">{n}</span>
   <span class="briefing-section-label">{label}</span>
   {#if tier}
@@ -15,4 +15,4 @@
   {#if title}
     <span class="briefing-section-title">{title}</span>
   {/if}
-</h3>
+</h2>

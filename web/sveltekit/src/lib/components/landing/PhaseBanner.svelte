@@ -53,6 +53,9 @@
   }
   .phase-banner a {
     color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
     text-decoration: underline;
     text-underline-offset: 2px;
   }

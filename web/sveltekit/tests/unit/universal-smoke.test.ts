@@ -22,7 +22,6 @@ import AppFooter from '$lib/components/shell/AppFooter.svelte';
 import StatusPill from '$lib/components/shell/StatusPill.svelte';
 import RipMark from '$lib/components/shell/RipMark.svelte';
 import SkipLink from '$lib/components/shell/SkipLink.svelte';
-import SkipLinks from '$lib/components/shell/SkipLinks.svelte';
 import ColdStart from '$lib/components/shell/ColdStart.svelte';
 // Briefing
 import Briefing from '$lib/components/briefing/Briefing.svelte';
@@ -74,7 +73,6 @@ const CASES: SmokeCase[] = [
   { name: 'StatusPill',        Component: StatusPill,        props: {} },
   { name: 'RipMark',           Component: RipMark,           props: {} },
   { name: 'SkipLink',          Component: SkipLink,          props: {} },
-  { name: 'SkipLinks',         Component: SkipLinks,         props: {} },
   { name: 'ColdStart',         Component: ColdStart,         props: {} },
 
   // Briefing

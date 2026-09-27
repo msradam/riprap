@@ -24,6 +24,6 @@ test.describe('v0.4.2 state components', () => {
     // page mounts without hard errors. The status pulse is in the page.
     // (If geocode fails, we get the geocoder ErrorCard; either way the
     // briefing region exists.)
-    await expect(page.locator('main#region-briefing')).toBeVisible();
+    await expect(page.locator('section#region-briefing')).toBeVisible();
   });
 });
