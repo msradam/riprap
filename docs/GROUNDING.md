@@ -62,17 +62,52 @@ When the input is a question, not just a place, three more rules apply.
 - The planner chooses which sources to consult from each manifest's
   `answers:` line; `select_pebbles` adds a short always-run floor (FEMA flood
   zone, Sandy extent and the DEP 2050 scenario for an address; NWS alerts for
-  a "right now" question). Only those pebbles run, and every briefing lists the
+  a "right now" question) and a floor for the question's focus (for a past
+  question 311, FloodNet, Ida high-water marks and Sandy; for a right-now
+  question alerts, observations, FloodNet and the tide gauge; for an asset
+  question that asset's register). Only those pebbles run, and every briefing lists the
   sources consulted and the ones not checked. A bare address runs every source.
-- The claims schema gains a section `answer`. The model writes one to three
-  claims there that answer the question directly; they are verified exactly
-  like every other claim. The briefing opens with them. If none survives, it
-  opens with the fixed line "The sources consulted do not answer this question
-  directly. Here is what they show." A section whose only evidence is already
-  stated in the answer is not repeated.
+- The briefing opens with an answer, written in one of two modes
+  (`RIPRAP_ANSWER_MODE`, described below). If no answer survives the checks,
+  it opens with the fixed line "The sources consulted do not answer this
+  question directly. Here is what they show." A Stone whose evidence the
+  answer already covers is not repeated as an empty section.
 - Questions Riprap does not answer (buying, renting or insuring property,
   legal advice, a prediction for a specific day, or a hazard other than
   flooding) get a fixed refusal text, never model prose.
+
+### Answer modes and answer checks
+
+**Guarded.** The model writes one to three claims in section `answer`. They
+pass the number and citation checks like every claim, and then five answer
+checks (`riprap/core/burr/answer_checks.py`). A claim that fails one is
+retried once with the reason and dropped if it still fails:
+
+| Check | Flags | Example it catches |
+|---|---|---|
+| absence | "no", "none", "not", "zero", "without" about a cited source whose text reports something (it has no absence word and no zero) | "No active flood alerts" citing three alerts |
+| universal | "all", "every", "both", "each of", or "the <assets> are", when the cited asset register counts fewer inside than in total | "The NYCHA developments are inside Sandy" when 3 of 5 are |
+| inference | "which means", "indicating", "therefore" and similar in a claim citing two sources; or a warning or forecast stated as flooding happening | "Coastal Flood Warning, indicating flooding is occurring" |
+| datum | an elevation without its datum, or without the height above ground when the source gives one | "water elevation 48.2 ft" |
+| dropped count | the answer omits the count or value of the source the question is about (chosen from the question's words: subway, school, 311, sensor, Ida, rain, tide, sea level, alert), when that source has one | "the subway entrances are inside the scenario" without "8" |
+
+A dropped count asks for a retry but drops nothing, since the claims that
+were written are still true; if it persists it is recorded in
+`grounding.answer_flags`.
+
+**Extractive.** The model does not write the answer. It returns a lead
+(`yes`, `no`, `partly`, `count`, `cannot_answer`) and up to four document
+ids. The answer is a fixed phrase for the lead ("Yes.", "No.", "In part.",
+"From the sources consulted:") followed by those documents' template
+sentences, word for word. Code checks the lead: `no` is invalid when a
+chosen fact reports something; `yes` is invalid when every fact reports an
+absence or when an asset register counts only some inside; `count` needs a
+fact with a count. An invalid lead is retried once, then replaced by the
+cannot-answer line. If the source the question is about is missing from
+the facts after the retry, it is appended.
+
+Number words ("four", "two") are read as digits by the number check in both
+modes.
 
 ### Number tolerance
 
@@ -96,10 +131,21 @@ document does not count.
 
 ### What is not checked
 
-Only citations and numbers are verified. Whether a non-numeric phrase ("sits
-outside the 2012 Sandy extent") is supported by its cited document is not
-checked by code. The evidence sentences are short and the model is told to
-restate them, but a claim can still misstate a non-numeric fact and pass.
+Body claims (the sections after the answer) get citation and number
+checks only. Answer claims in guarded mode also get the five answer
+checks, which are word patterns, not a reading of meaning. They miss:
+
+- an absence stated without one of the listed words ("the address is
+  clear of alerts");
+- a wrong quantifier over something other than an asset register count;
+- an inference that uses no listed connective, or joins facts from one
+  source;
+- a wrong non-numeric fact ("inside" for "outside") with correct numbers;
+- an omitted figure when the question's words match no listed source.
+
+In extractive mode the answer text is the evidence text, so it cannot
+paraphrase; what can still be wrong is the lead and the choice of facts,
+and only the lead rules above are checked.
 
 ## Measuring it
 
