@@ -65,4 +65,12 @@ describe('parseBriefing: answer section', () => {
     ]);
     expect(citations.ida_hwm).toBeDefined();
   });
+
+  it('numbers Stone sections from 01 after the Answer', () => {
+    const { blocks } = parseBriefing(
+      'Scope line.\n\n**Answer.**\nYes [ida_hwm].\n\n**Hazard Reader.**\nZone X [fema_nfhl].\n\n**Out of scope.** Title.'
+    );
+    const heads = blocks.filter((b) => b.kind === 'head');
+    expect(heads.map((h) => (h.kind === 'head' ? h.n : ''))).toEqual(['00', '01', '02']);
+  });
 });

@@ -182,10 +182,10 @@ export function parseBriefing(
     if (m[2] !== undefined) {
       // **Heading.** form. Canonical legacy heads keep their fixed number;
       // any other head (Stone taglines such as "Hazard Reader", "Out of
-      // scope") is numbered by position.
+      // scope") is numbered by position, not counting the Answer.
       const sec = findSection(m[2]);
       indices.push({
-        num: sec?.n ?? String(indices.length + 1).padStart(2, '0'),
+        num: sec?.n ?? String(indices.filter((i) => i.num !== '00').length + 1).padStart(2, '0'),
         label: sec?.label ?? m[2].trim(),
         tier: sec?.tier,
         start: m.index + m[1].length,
