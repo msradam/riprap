@@ -40,6 +40,7 @@ from typing import Any
 
 import httpx
 
+from riprap.core.pebbles import record_filter
 from riprap.core.pebbles._http import fetch_url_json
 from riprap.core.pebbles.base import BasePebble, PebbleResult, SpatialQuery
 
@@ -101,7 +102,8 @@ class SocrataRecordsPebble(BasePebble):
                 error=f"socrata_records: expected list, got {type(data).__name__}",
             )
 
-        records: list[dict] = data
+        limit_was_hit = len(data) >= limit
+        records, filter_info = record_filter.apply(data, cfg.get("record_filter"), self.id, limit_was_hit)
         n = len(records)
         sample_cap = int(cfg.get("sample_cap", 5))
         sample: list[dict] = []
@@ -117,7 +119,6 @@ class SocrataRecordsPebble(BasePebble):
         # didn't fetch. Surface as a boolean so the UI can append the
         # "+" suffix and the narration can distinguish exact from
         # truncated counts.
-        limit_was_hit = n >= limit
         value: dict[str, Any] = {
             "n_records": n,
             "n_truncated": limit_was_hit,
@@ -129,5 +130,6 @@ class SocrataRecordsPebble(BasePebble):
             counter = Counter(str(r.get(count_by) or "?") for r in records)
             top = [{"value": v, "count": c} for v, c in counter.most_common(5)]
             value[f"top_by_{count_by}"] = top
+        value.update(filter_info)
 
         return PebbleResult(pebble_id=self.id, value=value)

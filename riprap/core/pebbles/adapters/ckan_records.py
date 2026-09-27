@@ -42,6 +42,7 @@ from urllib.parse import quote
 
 import httpx
 
+from riprap.core.pebbles import record_filter
 from riprap.core.pebbles._geo import bbox_from_radius, haversine_m
 from riprap.core.pebbles._http import fetch_url_json
 from riprap.core.pebbles.base import BasePebble, PebbleResult, SpatialQuery
@@ -160,6 +161,8 @@ class CKANRecordsPebble(BasePebble):
         refined = _refine_haversine(
             raw_rows, query, lat_field, lon_field, radius_m,
         )
+        refined, filter_info = record_filter.apply(refined, cfg.get("record_filter"), self.id,
+                                                   len(raw_rows) >= sql_limit)
 
         # When the SQL LIMIT capped the upstream pull, we don't know
         # the true count — surface as `n_truncated` so the briefing
@@ -177,5 +180,6 @@ class CKANRecordsPebble(BasePebble):
         count_by = cfg.get("count_by_field")
         if count_by:
             value[f"top_by_{count_by}"] = _top_by(refined, count_by)
+        value.update(filter_info)
 
         return PebbleResult(pebble_id=self.id, value=value)

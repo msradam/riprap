@@ -1,20 +1,21 @@
 id: sf_311
 type: live
-title: San Francisco 311 service requests near this address
-answers: "all San Francisco 311 service requests within 300 m, any category (not flood-filtered)"
+title: San Francisco flood-related 311 service requests near this address
+answers: "San Francisco 311 service requests within 300 m that read as flooding, sewer backup or drainage problems (text classifier, experimental)"
 stone: touchstone
+maturity: experimental
 adapter: socrata_records
 
 spatial:
   scope: point
   crs: EPSG:4326
 
-# San Francisco open-data portal (data.sfgov.org) — 311 service requests.
+# San Francisco open-data portal (data.sf.gov; data.sfgov.org now redirects) — 311 service requests.
 # SF311 stores location as a Socrata "Location" type field named `point`
 # (a {latitude, longitude} object). `within_circle(point, lat, lon, m)`
 # is the geo filter.
 config:
-  base_url: https://data.sfgov.org/resource/vw6y-z8j6.json
+  base_url: https://data.sf.gov/resource/vw6y-z8j6.json
   radius_m: 300
   location_field: point
   limit: 200
@@ -28,21 +29,29 @@ config:
   count_by_field: service_name
   order: requested_datetime DESC
   cache_ttl_s: 1800
+  # Keep records a text classifier reads as flood-related (refactor 4).
+  # Text built as the System One experiment built it: service_details | status_notes.
+  record_filter:
+    kind: flood_311_model
+    text_fields: [service_details, status_notes]
+    join: " | "
+    id_field: service_request_id
+    threshold: 0.0043
 
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
   source_name: San Francisco Open Data — 311 / service requests (vw6y-z8j6)
-  source_url: https://data.sfgov.org/d/vw6y-z8j6
+  source_url: https://data.sf.gov/d/vw6y-z8j6
   license: San Francisco Open Data Terms of Use
   doc_id: sf_311
   citation: San Francisco Open Data 311 service requests within 300 m of address.
 
 narration:
-  short: San Francisco 311 service requests filed within 300 m of this address (all categories).
+  short: Flood-related San Francisco 311 service requests within 300 m of this address.
   template: >-
-    San Francisco 311 received {n_records} service requests within {radius_m} m
-    of this address.
+    {n_kept} of {n_before_phrase} San Francisco 311 service requests within {radius_m} m of this
+    address {filter_note}.
 
 display:
   order: 20

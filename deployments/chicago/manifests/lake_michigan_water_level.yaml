@@ -3,6 +3,7 @@ type: live
 title: Lake Michigan water level — Calumet Harbor (NOAA station 9087044)
 answers: "latest Lake Michigan water level at the NOAA Calumet Harbor gauge"
 stone: touchstone
+maturity: experimental
 adapter: python_call
 
 spatial:

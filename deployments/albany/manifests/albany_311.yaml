@@ -1,8 +1,9 @@
 id: albany_311
 type: live
-title: Albany 311 (SeeClickFix) service requests near this address
-answers: "all SeeClickFix service requests within 300 m in Albany, any category"
+title: Albany flood-related 311 (SeeClickFix) service requests near this address
+answers: "Albany SeeClickFix service requests within 300 m whose text reads as flooding, sewer backup or drainage problems (text classifier, experimental)"
 stone: touchstone
+maturity: experimental
 adapter: python_call
 
 spatial:
@@ -21,6 +22,15 @@ config:
     - {source: lon}
   kwargs:
     radius_m: {const: 300}
+    # Keep records a text classifier reads as flood-related (refactor 4);
+    # text is the resident's "summary: description", as in the System One experiment.
+    record_filter:
+      const:
+        kind: flood_311_model
+        text_fields: [summary, description]
+        join: ": "
+        id_field: id
+        threshold: 0.0043
   on_none: offline
 
 provenance:
@@ -33,10 +43,10 @@ provenance:
   citation: SeeClickFix public API, all Albany service-request categories within 300 m of address.
 
 narration:
-  short: Albany 311 (SeeClickFix) service requests filed within 300 m of this address (all categories).
+  short: Flood-related Albany 311 (SeeClickFix) service requests within 300 m of this address.
   template: >-
-    Albany 311 (SeeClickFix) received {n_records} service requests within
-    {radius_m} m of this address.
+    {n_kept} of {n_before_phrase} Albany 311 service requests within {radius_m} m of this
+    address {filter_note}.
 
 display:
   order: 20

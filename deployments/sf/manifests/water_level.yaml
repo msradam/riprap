@@ -3,6 +3,7 @@ type: live
 title: Local water level — NOAA San Francisco, CA (station 9414290)
 answers: "latest San Francisco Bay water level at the NOAA gauge"
 stone: touchstone
+maturity: experimental
 adapter: python_call
 
 spatial:

@@ -3,6 +3,7 @@ type: live
 title: Local water level — NOAA Albany, NY (Hudson River, station 8518995)
 answers: "latest Hudson River water level at the NOAA Albany gauge"
 stone: touchstone
+maturity: experimental
 adapter: python_call
 
 spatial:

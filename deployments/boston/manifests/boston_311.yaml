@@ -1,8 +1,9 @@
 id: boston_311
 type: live
-title: Boston 311 service requests near this address
-answers: "all Boston 311 service requests within 300 m, any category (not flood-filtered)"
+title: Boston flood-related 311 service requests near this address
+answers: "Boston 311 service requests within 300 m whose closure notes read as flooding, sewer backup or drainage problems (text classifier, experimental)"
 stone: touchstone
+maturity: experimental
 adapter: ckan_records
 
 spatial:
@@ -30,6 +31,15 @@ config:
   count_by_field: reason
   order: open_dt DESC
   cache_ttl_s: 1800
+  # Keep records a text classifier reads as flood-related (refactor 4).
+  # Text: the worker's closure note after "Case Resolved", as in the System One
+  # experiment. Open cases have no note yet and are not counted (n_no_text).
+  record_filter:
+    kind: flood_311_model
+    text_fields: [closure_reason]
+    text_after: Case Resolved
+    id_field: case_enquiry_id
+    threshold: 0.0043
 
 provenance:
   date_modified: at_fetch
@@ -41,10 +51,10 @@ provenance:
   citation: Analyze Boston 311 service requests within 300 m of address.
 
 narration:
-  short: Boston 311 service requests filed within 300 m of this address (all reasons).
+  short: Flood-related Boston 311 service requests within 300 m of this address.
   template: >-
-    Boston 311 received {n_records} service requests within {radius_m} m
-    of this address.
+    {n_kept} of {n_before_phrase} Boston 311 service requests within {radius_m} m of this
+    address {filter_note}.
 
 display:
   order: 20

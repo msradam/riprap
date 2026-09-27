@@ -183,8 +183,10 @@ def test_build_documents_covers_non_nyc_deployment_pebbles():
             "narrative": "Nearest USGS stream gauge: stage -1.67 ft, discharge 425.0 ft³/s.",
         },
         "chicago_311": {
-            "n_records": 200, "n_truncated": True, "radius_m": 200,
-            "top_by_sr_type": [{"value": "Graffiti Removal Request", "count": 53}],
+            "n_records": 3, "n_truncated": True, "radius_m": 200,
+            "top_by_sr_type": [{"value": "Water On Street Complaint", "count": 2}],
+            "filter": "category_table", "n_before": 200, "n_kept": 3, "n_before_phrase": "the latest 200",
+            "filter_note": "are in categories reviewed as flood-related",
         },
     }
     docs, _, _ = build_documents(state)
@@ -212,7 +214,8 @@ def test_build_documents_keeps_two_311_variants_separate():
     state = {
         "deployment": "albany",
         "geocode": {"address": "24 Eagle St", "lat": 42.652, "lon": -73.756},
-        "albany_311": {"n_records": 62, "radius_m": 300},
+        "albany_311": {"n_records": 62, "radius_m": 300, "n_before": 62, "n_kept": 62, "n_before_phrase": "62",
+                       "filter": "none", "filter_note": "were counted without a flood filter (not installed)"},
         "albany_flood_311": {"n_records": 6, "radius_m": 800},
     }
     docs, _, _ = build_documents(state)

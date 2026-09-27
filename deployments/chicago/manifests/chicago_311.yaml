@@ -1,8 +1,9 @@
 id: chicago_311
 type: live
-title: Chicago 311 service requests near this address
-answers: "all Chicago 311 service requests within 200 m, any category (not flood-filtered)"
+title: Chicago flood-related 311 service requests near this address
+answers: "Chicago 311 service requests within 200 m in categories reviewed as flooding, basement water or sewer problems"
 stone: touchstone
+maturity: experimental
 adapter: socrata_records
 
 spatial:
@@ -26,6 +27,19 @@ config:
   count_by_field: sr_type
   order: created_date DESC
   cache_ttl_s: 1800
+  # Chicago gives only a category name, so a reviewed table, not a model
+  # (refactor 4). Reviewed against all 110 sr_type values on 2026-09-27;
+  # water-supply categories (Check for Leak, Open Fire Hydrant, No Water,
+  # Low Water Pressure, Water Quality Concern) are not flooding.
+  record_filter:
+    kind: category_table
+    field: sr_type
+    labels:
+      Water On Street Complaint: street_flooding
+      Water in Basement Complaint: basement_or_building_flooding
+      Sewer Cleaning Inspection Request: drainage_infrastructure
+      Sewer Cave-In Inspection Request: drainage_infrastructure
+      Alley Sewer Inspection Request: drainage_infrastructure
 
 provenance:
   date_modified: at_fetch
@@ -37,10 +51,10 @@ provenance:
   citation: Chicago Data Portal 311 Service Requests, all categories within 200 m of address.
 
 narration:
-  short: Chicago 311 service requests filed within 200 m of this address (all categories).
+  short: Flood-related Chicago 311 service requests within 200 m of this address.
   template: >-
-    Chicago 311 received {n_records} service requests within {radius_m} m
-    of this address.
+    {n_kept} of {n_before_phrase} Chicago 311 service requests within {radius_m} m of this
+    address {filter_note}.
 
 display:
   order: 20

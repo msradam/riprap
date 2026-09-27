@@ -1,0 +1,61 @@
+id: seattle_311
+type: live
+title: Seattle flood-related 311 service requests near this address
+answers: "Seattle Customer Service Requests within 300 m in categories reviewed as drainage problems (clogged storm drains)"
+stone: touchstone
+maturity: experimental
+adapter: socrata_records
+
+spatial:
+  scope: point
+  crs: EPSG:4326
+
+# Seattle Customer Service Requests (Socrata 5ngg-rpne). Seattle gives only
+# a category name, so a reviewed table, not a model (refactor 4). Reviewed
+# against all 47 webintakeservicerequests values on 2026-09-27: only
+# "Clogged Storm Drain" is flood-related; Seattle has no street-flooding
+# or sewer-backup category in this feed.
+config:
+  base_url: https://data.seattle.gov/resource/5ngg-rpne.json
+  radius_m: 300
+  location_field: latitude_longitude
+  limit: 500
+  sample_cap: 5
+  sample_fields:
+    - webintakeservicerequests
+    - servicerequeststatusname
+    - createddate
+    - location
+  count_by_field: webintakeservicerequests
+  order: createddate DESC
+  cache_ttl_s: 1800
+  record_filter:
+    kind: category_table
+    field: webintakeservicerequests
+    labels:
+      Clogged Storm Drain: drainage_infrastructure
+
+provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
+  source_name: Seattle Open Data — Customer Service Requests (5ngg-rpne)
+  source_url: https://data.seattle.gov/d/5ngg-rpne
+  license: Seattle Open Data Terms of Use
+  doc_id: seattle_311
+  citation: Seattle Open Data Customer Service Requests within 300 m of address.
+
+narration:
+  short: Flood-related Seattle service requests within 300 m of this address.
+  template: >-
+    {n_kept} of {n_before_phrase} Seattle service requests within {radius_m} m of this
+    address {filter_note}.
+
+display:
+  order: 20
+  kind: list
+  map_layer: true
+  icon: "📞"
+
+fallback:
+  on_offline: skip
+  message: Seattle Open Data SODA endpoint unreachable.
