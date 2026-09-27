@@ -724,8 +724,6 @@
 
 /* Rationale */
 .spec-section-quote { background: var(--paper); }
-.rationale-quote { margin: 0; max-width: 70ch; border-left: 3px solid var(--ink); padding: 16px 0 16px 24px; }
-.rationale-quote p { font-family: var(--font-serif); font-size: 19px; line-height: 1.55; margin: 0 0 16px; text-wrap: pretty; }
 .rationale-cite { display: block; font-family: var(--font-mono); font-size: 12px; color: var(--ink-tertiary); font-style: normal; }
 
 /* Dark mode — deferred to v0.5 (see §17). Partial styles removed in v0.4.2. */
@@ -772,9 +770,6 @@
 }
 
 
-.loading-rules { padding: 18px 22px; background: white; border: 1px solid var(--rule-soft); border-left: 3px solid var(--tier-empirical); }
-.loading-rules ul { margin: 8px 0 0 18px; }
-.loading-rules li { font-size: 13px; line-height: 1.6; margin-bottom: 4px; color: var(--ink-secondary); }
 
 /* §12 Errors */
 .error-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
@@ -842,9 +837,6 @@
 .register-card-foot { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; margin-top: 14px; border-top: 1px dashed var(--rule-soft); }
 .register-foot-note { font-size: 12px; color: var(--riprap-text-tertiary); font-style: italic; max-width: 50ch; }
 
-.register-rules { padding: 18px 22px; background: white; border: 1px solid var(--rule-soft); border-left: 3px solid var(--tier-empirical); }
-.register-rules ul { margin: 8px 0 0 18px; }
-.register-rules li { font-size: 13px; line-height: 1.6; margin-bottom: 4px; color: var(--ink-secondary); }
 
 /* §16 caveats */
 .caveat-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0; }
@@ -853,9 +845,6 @@
 .caveat-list strong { color: var(--ink); font-weight: 600; }
 
 /* §17 dark mode */
-.darkmode-rules { padding: 18px 22px; background: white; border: 1px solid var(--rule-soft); border-left: 3px solid var(--tier-proxy); }
-.darkmode-rules ul { margin: 8px 0 0 18px; }
-.darkmode-rules li { font-size: 13px; line-height: 1.6; margin-bottom: 4px; color: var(--ink-secondary); }
 
 /* §18 print */
 .print-css-block { font-family: var(--font-mono); font-size: 11px; line-height: 1.55; color: var(--ink); background: #FBF8EF; padding: 18px 22px; border: 1px solid var(--rule-soft); white-space: pre; overflow-x: auto; }
