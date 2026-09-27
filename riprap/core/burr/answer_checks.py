@@ -170,10 +170,15 @@ def check_answer(answer_texts: list[str], question: str, docs: dict[str, str]) -
     counts = count_numbers(docs[rel], _NEAR.get(rel, ""))
     if not counts:
         return []
-    from riprap.core.burr.synthesis import _parse, number_supported
+    from riprap.core.burr.synthesis import _parse
 
-    said = [p[0] for n in count_numbers(words_to_digits(" ".join(answer_texts))) if (p := _parse(n))]
-    if not number_supported(counts[0], said):
+    # Exact equality: the verifier's unit-conversion tolerance would let
+    # "0.76 ft" (2.49 m) stand in for a count of 2.
+    said = {p[0] for n in count_numbers(words_to_digits(" ".join(answer_texts))) if (p := _parse(n))}
+    lead = _parse(counts[0])
+    if lead and lead[0] == 0 and ABSENCE_RE.search(" ".join(answer_texts)):
+        return []  # "no hospitals" states a count of 0
+    if lead and lead[0] not in said:
         return [("dropped_count", f"omits the figure from {rel} ({counts[0]})")]
     return []
 

@@ -369,5 +369,96 @@
     "text": "Four NYC Department of Education (DOE) schools within a 1500-meter radius of 116-02 Rockaway Beach Boulevard are mapped within the 2012 Hurricane Sandy inundation footprint, indicating exposure to flooding."
    }
   ]
+ },
+ "v3g": {
+  "questions_with_answer": 20,
+  "answer_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 1,
+   "datum": 0
+  },
+  "answer_total": 1,
+  "answer_questions_flagged": 1,
+  "all_claim_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 1,
+   "datum": 2
+  },
+  "hits": [
+   {
+    "id": "q01",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 14.87 m; this point sits at the 29.1th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 0.0 m above nearest drainage; TWI 11.78. Local basin relief: 35.02 m."
+   },
+   {
+    "id": "q02",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 6.56 m; this point sits at the 48.8th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.52 m above nearest drainage; TWI 10.28. Local basin relief: 1.48 m."
+   },
+   {
+    "id": "q05",
+    "section": "answer",
+    "class": "dropped_count",
+    "reason": "omits the figure from ida_hwm (2)",
+    "text": "The block around 90-01 183rd Street, Queens was recorded to have a Hurricane Ida high-water mark within 800 meters, with the highest mark standing 0.76 ft above ground."
+   }
+  ]
+ },
+ "v3x": {
+  "questions_with_answer": 20,
+  "answer_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 0,
+   "datum": 0
+  },
+  "answer_total": 0,
+  "answer_questions_flagged": 0,
+  "all_claim_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 0,
+   "datum": 4
+  },
+  "hits": [
+   {
+    "id": "q01",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 14.87 m; this point sits at the 29.1th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 0.0 m above nearest drainage; TWI 11.78. Local basin relief: 35.02 m."
+   },
+   {
+    "id": "q02",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 6.56 m; this point sits at the 48.8th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.52 m above nearest drainage; TWI 10.28. Local basin relief: 1.48 m."
+   },
+   {
+    "id": "q03",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 1.37 m; this point sits at the 0.8th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.81 m above nearest drainage; TWI 14.79. Local basin relief: 13.27 m."
+   },
+   {
+    "id": "q04",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 5.82 m; this point sits at the 67.3th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 5.82 m above nearest drainage; TWI 8.49. Local basin relief: 5.24 m."
+   }
+  ]
  }
 }

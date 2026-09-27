@@ -1,0 +1,51 @@
+{
+ "id": "q29",
+ "kind": "not_covered",
+ "question": "Is 560 Grand Street, Manhattan a heat island in the summer?",
+ "error": null,
+ "wall_s": 8.3,
+ "intent": "out_of_scope",
+ "deployment": null,
+ "plan": {
+  "intent": "out_of_scope",
+  "rationale": "Heuristic match: heat question.",
+  "focus": {
+   "hazard": "heat",
+   "time_frame": "any",
+   "assets": []
+  },
+  "targets": [
+   {
+    "type": "address",
+    "text": "560 Grand Street, Manhattan a heat island in the summer"
+   }
+  ]
+ },
+ "pebbles_run": [],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 1739,
+  "completion": 98,
+  "seconds": 8.3,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 0,
+  "completion": 0,
+  "seconds": 0,
+  "n_calls": 0
+ },
+ "n_documents": 0,
+ "tier": "llm",
+ "model": null,
+ "attempts": 0,
+ "claims": [],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "Riprap's New York City deployment covers flood evidence only. It has no heat sources for this place, so it cannot answer this question. Ask about flooding at this address to see what it does cover.",
+ "documents": {},
+ "answer_mode": null,
+ "answer_lead": null,
+ "answer_flags": []
+}

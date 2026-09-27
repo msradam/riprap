@@ -6,7 +6,7 @@
            question_eval.py score tests/question_eval/v1 tests/question_eval/v2
     review build the blind owner review pack (question_eval_review.html) and
            its key (question_eval_key.json) at the repo root, both git-ignored:
-           question_eval.py review tests/question_eval/v1 tests/question_eval/v2
+           question_eval.py review tests/question_eval/v1 tests/question_eval/v2 [_v3]
     score-ratings  unblind the owner's exported ratings:
            question_eval.py score-ratings ratings.json question_eval_key.json
 
@@ -242,7 +242,7 @@ Choices are saved in this browser. When done, press Export and send the file.</p
 <p><button id="export">Export ratings (JSON)</button> <span id="count"></span></p>
 __ITEMS__
 <script>
-const KEY = "question_eval_ratings";
+const KEY = "question_eval_ratings__SUFFIX__";
 let r = {}; try { r = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
 const inputs = document.querySelectorAll("input[type=radio]");
 function count() { document.getElementById("count").textContent =
@@ -259,7 +259,7 @@ count();
 document.getElementById("export").onclick = () => {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([JSON.stringify(r, null, 1)], {type: "application/json"}));
-  a.download = "question_eval_ratings.json"; a.click();
+  a.download = "question_eval_ratings__SUFFIX__.json"; a.click();
 };
 </script></body></html>
 """
@@ -283,7 +283,7 @@ def _radios(qid: str, key: str, prompt: str, options: list[str]) -> str:
     return f"<fieldset><legend>{prompt}</legend>{opts}</fieldset>"
 
 
-def cmd_review(a: Path, b: Path) -> None:
+def cmd_review(a: Path, b: Path, suffix: str = "") -> None:
     """Blind pack: REVIEW_N questions (every kind except bare addresses,
     sampled with a fixed seed), arm order shuffled per question."""
     import html
@@ -305,16 +305,19 @@ def cmd_review(a: Path, b: Path) -> None:
             + _radios(q["id"], "better", "Which answers the question better?", ["Left", "Right", "Same"])
             + _radios(q["id"], "wrong", "Is either one wrong?", ["Left", "Right", "Neither", "Both"])
             + "</section>")
-    (ROOT / "question_eval_review.html").write_text(
-        _PAGE.replace("__ITEMS__", "\n".join(items)).replace("__N__", str(len(picked))))
-    (ROOT / "question_eval_key.json").write_text(json.dumps(key, indent=1) + "\n")
-    print(f"{len(picked)} questions -> question_eval_review.html, key -> question_eval_key.json")
+    (ROOT / f"question_eval_review{suffix}.html").write_text(
+        _PAGE.replace("__ITEMS__", "\n".join(items)).replace("__N__", str(len(picked)))
+        .replace("__SUFFIX__", suffix))
+    (ROOT / f"question_eval_key{suffix}.json").write_text(json.dumps(key, indent=1) + "\n")
+    print(f"{len(picked)} questions -> question_eval_review{suffix}.html, key -> question_eval_key{suffix}.json")
 
 
 def cmd_score_ratings(ratings: Path, key: Path) -> None:
     r, k = json.loads(ratings.read_text()), json.loads(key.read_text())
     better, wrong = Counter(), Counter()
     for qid, v in r.items():
+        if qid not in k:
+            continue  # a rating from another pack
         side = k[qid]
         b = v.get("better")
         better[side[b] if b in ("left", "right") else b or "unrated"] += 1
@@ -335,7 +338,7 @@ if __name__ == "__main__":
     elif cmd == "score":
         cmd_score([Path(a) for a in args])
     elif cmd == "review":
-        cmd_review(Path(args[0]), Path(args[1]))
+        cmd_review(Path(args[0]), Path(args[1]), args[2] if len(args) > 2 else "")
     elif cmd == "score-ratings":
         cmd_score_ratings(Path(args[0]), Path(args[1]))
     else:

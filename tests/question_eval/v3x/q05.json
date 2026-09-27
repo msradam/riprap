@@ -1,0 +1,272 @@
+{
+ "id": "q05",
+ "kind": "flood_history",
+ "question": "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?",
+ "error": null,
+ "wall_s": 46.7,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "90-01 183rd Street, Queens"
+   }
+  ],
+  "rationale": "The question asks about past flooding at a specific address since Hurricane Ida, requiring the Sandy flood extent and Ida high-water mark data.",
+  "question": "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "past",
+   "assets": []
+  },
+  "pebbles": [
+   "sandy",
+   "ida_hwm"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_moderate_2050",
+  "fema_nfhl",
+  "floodnet",
+  "ida_hwm",
+  "nyc311",
+  "sandy"
+ ],
+ "consulted": [
+  {
+   "id": "sandy",
+   "title": "NYC Sandy Inundation Zone (2012 empirical extent)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "ida_hwm",
+   "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "dep_extreme_2080",
+   "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "prithvi_water",
+   "title": "Satellite-detected surface water after Hurricane Ida (experimental)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo",
+   "title": "LiDAR / DEM-derived micro-topography",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  },
+  {
+   "id": "mta_entrances",
+   "title": "MTA subway/rail entrances exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nycha_developments",
+   "title": "NYCHA developments exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doe_schools",
+   "title": "NYC DOE schools exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doh_hospitals",
+   "title": "NYC DOH hospitals exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_battery_surge",
+   "title": "Granite TTM r2 Battery Surge \u2014 96 h hourly nowcast (fine-tune)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_311_forecast",
+   "title": "Granite TTM r2 \u2014 weekly 311 flood-complaint forecast at this address",
+   "stone": "lodestone"
+  },
+  {
+   "id": "floodnet_forecast",
+   "title": "Granite TTM r2 \u2014 flood-event recurrence at nearest FloodNet sensor",
+   "stone": "lodestone"
+  },
+  {
+   "id": "npcc4_slr",
+   "title": "NPCC4 (2024) sea-level rise projections",
+   "stone": "lodestone"
+  },
+  {
+   "id": "policy_corpus",
+   "title": "NYC flood-policy corpus \u2014 agency reports + plans",
+   "stone": "cornerstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1745,
+  "completion": 139,
+  "seconds": 13.45,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 679,
+  "completion": 343,
+  "seconds": 31.94,
+  "n_calls": 1
+ },
+ "n_documents": 6,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "USGS surveyed 2 Hurricane Ida high-water mark(s) within 800 m of this address; the highest stood 0.76 ft above ground; the highest water surface elevation was 48.2 ft NAVD88. Nearest mark: Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174 m away).",
+   "doc_ids": [
+    "ida_hwm"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "answer",
+   "text": "This address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",
+   "doc_ids": [
+    "sandy_inundation"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "This address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",
+   "doc_ids": [
+    "sandy_inundation"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007.",
+   "doc_ids": [
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR).",
+   "doc_ids": [
+    "dep_moderate_2050"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "USGS surveyed 2 Hurricane Ida high-water mark(s) within 800 m of this address; the highest stood 0.76 ft above ground; the highest water surface elevation was 48.2 ft NAVD88. Nearest mark: Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174 m away).",
+   "doc_ids": [
+    "ida_hwm"
+   ],
+   "numbers": [
+    "0.76",
+    "48.2",
+    "174"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nIn part. USGS surveyed 2 Hurricane Ida high-water mark(s) within 800 m of this address; the highest stood 0.76 ft above ground; the highest water surface elevation was 48.2 ft NAVD88. Nearest mark: Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174 m away) [ida_hwm]. This address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation].\n\n**Hazard Reader.**\nThis address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007 [fema_nfhl]. This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) [dep_moderate_2050]. USGS surveyed 2 Hurricane Ida high-water mark(s) within 800 m of this address; the highest stood 0.76 ft above ground; the highest water surface elevation was 48.2 ft NAVD88. Nearest mark: Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174 m away) [ida_hwm].\n\n**Live Observer.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+ "documents": {
+  "sandy_inundation": "This address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",
+  "fema_nfhl": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007.",
+  "dep_moderate_2050": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR).",
+  "ida_hwm": "USGS surveyed 2 Hurricane Ida high-water mark(s) within 800 m of this address; the highest stood 0.76 ft above ground; the highest water surface elevation was 48.2 ft NAVD88. Nearest mark: Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174 m away).",
+  "floodnet": "2 FloodNet community sensor(s) within 600 m have logged 14 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 1172 mm.",
+  "nyc311": "82 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years. Most common descriptor: Sewer Backup (Use Comments) (SA)."
+ },
+ "answer_mode": "extractive",
+ "answer_lead": "partly",
+ "answer_flags": []
+}

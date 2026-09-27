@@ -1,0 +1,195 @@
+{
+ "id": "q12",
+ "kind": "right_now",
+ "question": "Is it raining hard near 90-01 183rd Street, Queens at the moment?",
+ "error": null,
+ "wall_s": 90.7,
+ "intent": "live_now",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "live_now",
+  "targets": [
+   {
+    "type": "address",
+    "text": "90-01 183rd Street, Queens"
+   }
+  ],
+  "rationale": "The question asks for current rain intensity at a specific address, requiring live weather and flood sensors.",
+  "question": "Is it raining hard near 90-01 183rd Street, Queens at the moment?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "now",
+   "assets": []
+  },
+  "pebbles": [
+   "nws_alerts",
+   "noaa_tides",
+   "usgs_gauges",
+   "floodnet",
+   "nws_obs"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "floodnet",
+  "noaa_tides",
+  "nws_alerts",
+  "nws_obs",
+  "usgs_gauges"
+ ],
+ "consulted": [
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1744,
+  "completion": 144,
+  "seconds": 15.26,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 1740,
+  "completion": 674,
+  "seconds": 73.4,
+  "n_calls": 2
+ },
+ "n_documents": 5,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 2,
+ "claims": [
+  {
+   "section": "Live Observer",
+   "text": "The nearest USGS stream gauge reported a stage of 0.35 ft at 2026-09-27 00:00 UTC.",
+   "doc_ids": [
+    "usgs_gauges"
+   ],
+   "numbers": [
+    "0.35",
+    "2026-09-27 00:00 UTC"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest METAR at JFK Airport recorded a temperature of 14.0\u00b0C at 2026-09-27T01:40.",
+   "doc_ids": [
+    "nws_obs"
+   ],
+   "numbers": [
+    "14.0",
+    "2026-09-27T01:40"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest tide reading at Kings Point was 9.03 ft above Mean Lower Low Water, observed at 2026-09-26 22:00.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "9.03",
+    "2026-09-26 22:00"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "FloodNet sensors within 600 m logged 14 above-curb flood events in the last 3 years, with a peak depth of 1172 mm.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "14",
+    "1172"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [
+  {
+   "section": "answer",
+   "text": "No active NWS alerts indicate heavy rain at 90-01 183rd Street, Queens right now.",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": [],
+   "reason": "answer check: absence: states an absence, but nws_alerts reports a result"
+  }
+ ],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThe sources consulted do not answer this question directly. Here is what they show.\n\n**Live Observer.**\nThe nearest USGS stream gauge reported a stage of 0.35 ft at 2026-09-27 00:00 UTC [usgs_gauges]. The latest METAR at JFK Airport recorded a temperature of 14.0\u00b0C at 2026-09-27T01:40 [nws_obs]. The latest tide reading at Kings Point was 9.03 ft above Mean Lower Low Water, observed at 2026-09-26 22:00 [noaa_tides]. FloodNet sensors within 600 m logged 14 above-curb flood events in the last 3 years, with a peak depth of 1172 mm [floodnet].\n\n**Projector.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+ "documents": {
+  "floodnet": "2 FloodNet community sensor(s) within 600 m have logged 14 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 1172 mm.",
+  "nws_obs": "Latest METAR at JFK Airport, NY (7.8 km away): 14.0\u00b0C (obs 2026-09-27T01:40).",
+  "noaa_tides": "Latest reading at Kings Point, NY: 9.03 ft above MLLW (+3.78 ft vs predicted tide), observed 2026-09-26 22:00.",
+  "usgs_gauges": "Nearest USGS stream gauge, Alley Creek Near Oakland Gardens NY (01302050, 5.7 km away): stage 0.35 ft, observed 2026-09-27 00:00 UTC.",
+  "nws_alerts": "3 active NWS alerts at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor), Rip Current Statement (Moderate)."
+ },
+ "answer_mode": "guarded",
+ "answer_lead": null,
+ "answer_flags": []
+}

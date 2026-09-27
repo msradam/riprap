@@ -1,0 +1,209 @@
+{
+ "id": "q10",
+ "kind": "right_now",
+ "question": "Is there flooding near 80 Pioneer Street, Brooklyn right now?",
+ "error": null,
+ "wall_s": 53.2,
+ "intent": "live_now",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "live_now",
+  "targets": [
+   {
+    "type": "address",
+    "text": "80 Pioneer Street, Brooklyn"
+   }
+  ],
+  "rationale": "The query asks for current flooding conditions at a specific address, requiring live flood alerts, sensor data, tide levels, and stream gauge readings.",
+  "question": "Is there flooding near 80 Pioneer Street, Brooklyn right now?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "now",
+   "assets": []
+  },
+  "pebbles": [
+   "nws_alerts",
+   "floodnet",
+   "noaa_tides",
+   "usgs_gauges"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "floodnet",
+  "noaa_tides",
+  "nws_alerts",
+  "nws_obs",
+  "usgs_gauges"
+ ],
+ "consulted": [
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1738,
+  "completion": 138,
+  "seconds": 12.51,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 588,
+  "completion": 433,
+  "seconds": 39.27,
+  "n_calls": 1
+ },
+ "n_documents": 4,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "3 active NWS alerts at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor), Rip Current Statement (Moderate).",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "answer",
+   "text": "6 FloodNet community sensor(s) within 600 m have logged 9 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 89 mm.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "answer",
+   "text": "Latest reading at The Battery, NY: 6.82 ft above MLLW (+1.96 ft vs predicted tide), observed 2026-09-26 22:30.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Live Observer",
+   "text": "The area around 80 Pioneer Street, Brooklyn, is mapped within 600 meters of 6 FloodNet community sensors that have recorded 9 above-curb flood events over the past three years, with a peak depth of 89 mm.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "6",
+    "9",
+    "89"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest METAR observation at Central Park, New York, 11.8 kilometers from 80 Pioneer Street, reports 1.0 mm of precipitation in the last hour as of 2026-09-27T01:51.",
+   "doc_ids": [
+    "nws_obs"
+   ],
+   "numbers": [
+    "1.0",
+    "11.8",
+    "2026-09-27T01:51"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest tide reading at The Battery, New York, shows a water level of 6.82 feet above Mean Lower Low Water, observed at 2026-09-26 22:30, which is 1.96 feet higher than the predicted tide.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "6.82",
+    "1.96",
+    "2026-09-26 22:30"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "There are currently three active National Weather Service alerts affecting the vicinity of 80 Pioneer Street, Brooklyn: a Coastal Flood Warning classified as Severe, a High Surf Advisory classified as Minor, and a Rip Current Statement classified as Moderate.",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": [
+    "3"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nIn part. 3 active NWS alerts at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor), Rip Current Statement (Moderate) [nws_alerts]. 6 FloodNet community sensor(s) within 600 m have logged 9 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 89 mm [floodnet]. Latest reading at The Battery, NY: 6.82 ft above MLLW (+1.96 ft vs predicted tide), observed 2026-09-26 22:30 [noaa_tides].\n\n**Live Observer.**\nThe area around 80 Pioneer Street, Brooklyn, is mapped within 600 meters of 6 FloodNet community sensors that have recorded 9 above-curb flood events over the past three years, with a peak depth of 89 mm [floodnet]. The latest METAR observation at Central Park, New York, 11.8 kilometers from 80 Pioneer Street, reports 1.0 mm of precipitation in the last hour as of 2026-09-27T01:51 [nws_obs]. The latest tide reading at The Battery, New York, shows a water level of 6.82 feet above Mean Lower Low Water, observed at 2026-09-26 22:30, which is 1.96 feet higher than the predicted tide [noaa_tides].\n\n**Projector.**\nThere are currently three active National Weather Service alerts affecting the vicinity of 80 Pioneer Street, Brooklyn: a Coastal Flood Warning classified as Severe, a High Surf Advisory classified as Minor, and a Rip Current Statement classified as Moderate [nws_alerts].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+ "documents": {
+  "floodnet": "6 FloodNet community sensor(s) within 600 m have logged 9 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 89 mm.",
+  "nws_obs": "Latest METAR at Central Park, NY (11.8 km away): 13.9\u00b0C, 1.0 mm precip in the last hour (obs 2026-09-27T01:51).",
+  "noaa_tides": "Latest reading at The Battery, NY: 6.82 ft above MLLW (+1.96 ft vs predicted tide), observed 2026-09-26 22:30.",
+  "nws_alerts": "3 active NWS alerts at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor), Rip Current Statement (Moderate)."
+ },
+ "answer_mode": "extractive",
+ "answer_lead": "partly",
+ "answer_flags": []
+}

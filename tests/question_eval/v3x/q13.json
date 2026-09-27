@@ -1,0 +1,193 @@
+{
+ "id": "q13",
+ "kind": "right_now",
+ "question": "What is the water level in New York Harbor near 560 Grand Street, Manhattan right now?",
+ "error": null,
+ "wall_s": 38.8,
+ "intent": "live_now",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "live_now",
+  "targets": [
+   {
+    "type": "address",
+    "text": "560 Grand Street, Manhattan"
+   }
+  ],
+  "rationale": "The question asks for the current water level in New York Harbor near a specific address, requiring a live tide gauge reading.",
+  "question": "What is the water level in New York Harbor near 560 Grand Street, Manhattan right now?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "now",
+   "assets": []
+  },
+  "pebbles": [
+   "noaa_tides"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "floodnet",
+  "noaa_tides",
+  "nws_alerts",
+  "nws_obs"
+ ],
+ "consulted": [
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1744,
+  "completion": 122,
+  "seconds": 10.83,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 587,
+  "completion": 321,
+  "seconds": 27.08,
+  "n_calls": 1
+ },
+ "n_documents": 4,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "Latest reading at The Battery, NY: 6.82 ft above MLLW (+1.96 ft vs predicted tide), observed 2026-09-26 22:30.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "answer",
+   "text": "2 FloodNet community sensor(s) within 600 m have logged 6 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 96 mm.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "answer",
+   "text": "Latest METAR at Central Park, NY (7.3 km away): 13.9\u00b0C, 1.0 mm precip in the last hour (obs 2026-09-27T01:51).",
+   "doc_ids": [
+    "nws_obs"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Live Observer",
+   "text": "The water level at The Battery, New York, which is near 560 Grand Street, Manhattan, is currently 6.82 feet above Mean Lower Low Water (MLLW).",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "6.82",
+    "MLLW"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Within a 600-meter radius of 560 Grand Street, there have been six above-curb flood events recorded by FloodNet community sensors over the past three years, with the deepest recorded depth being 96 millimeters.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "6",
+    "96"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest METAR observation at Central Park, located 7.3 kilometers from 560 Grand Street, reports a temperature of 13.9\u00b0C and 1.0 mm of precipitation in the last hour, observed at 2026-09-27T01:51.",
+   "doc_ids": [
+    "nws_obs"
+   ],
+   "numbers": [
+    "13.9",
+    "1.0",
+    "2026-09-27T01:51"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: Latest reading at The Battery, NY: 6.82 ft above MLLW (+1.96 ft vs predicted tide), observed 2026-09-26 22:30 [noaa_tides]. 2 FloodNet community sensor(s) within 600 m have logged 6 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 96 mm [floodnet]. Latest METAR at Central Park, NY (7.3 km away): 13.9\u00b0C, 1.0 mm precip in the last hour (obs 2026-09-27T01:51) [nws_obs].\n\n**Live Observer.**\nThe water level at The Battery, New York, which is near 560 Grand Street, Manhattan, is currently 6.82 feet above Mean Lower Low Water (MLLW) [noaa_tides]. Within a 600-meter radius of 560 Grand Street, there have been six above-curb flood events recorded by FloodNet community sensors over the past three years, with the deepest recorded depth being 96 millimeters [floodnet]. The latest METAR observation at Central Park, located 7.3 kilometers from 560 Grand Street, reports a temperature of 13.9\u00b0C and 1.0 mm of precipitation in the last hour, observed at 2026-09-27T01:51 [nws_obs].\n\n**Projector.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+ "documents": {
+  "floodnet": "2 FloodNet community sensor(s) within 600 m have logged 6 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 96 mm.",
+  "nws_obs": "Latest METAR at Central Park, NY (7.3 km away): 13.9\u00b0C, 1.0 mm precip in the last hour (obs 2026-09-27T01:51).",
+  "noaa_tides": "Latest reading at The Battery, NY: 6.82 ft above MLLW (+1.96 ft vs predicted tide), observed 2026-09-26 22:30.",
+  "nws_alerts": "2 active NWS alerts at this point: Coastal Flood Warning (Severe), Coastal Flood Advisory (Minor)."
+ },
+ "answer_mode": "extractive",
+ "answer_lead": "count",
+ "answer_flags": []
+}

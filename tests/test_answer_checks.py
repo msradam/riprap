@@ -77,3 +77,15 @@ def test_rain_question_wants_the_precipitation_not_the_temperature():
     wet = {"nws_obs": "Latest METAR at JFK (7.8 km away): 15.0°C, 8.4 mm precip in the last hour."}
     assert check_answer(["It is 15.0°C at JFK."], q, wet)
     assert not check_answer(["JFK reported 8.4 mm of rain in the last hour."], q, wet)
+
+
+def test_a_count_is_matched_exactly_not_through_unit_conversion():
+    q = "Has the block around 90-01 183rd Street flooded since Hurricane Ida?"
+    doc = {"ida_hwm": "USGS surveyed 2 Hurricane Ida high-water mark(s) within 800 m; the highest stood 0.76 ft above ground."}
+    ans = ["The block had a Hurricane Ida high-water mark, the highest standing 0.76 ft above ground."]
+    assert classes(check_answer(ans, q, doc)) == {"dropped_count"}
+
+
+def test_no_states_a_count_of_zero():
+    doc = {"doh_hospital_exposure": "0 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario."}
+    assert not check_answer(["No hospitals are mapped within 3000 meters."], "Are any hospitals nearby flooded?", doc)
