@@ -1,0 +1,48 @@
+{
+ "schemaVersion": 2,
+ "generatedAt": "2026-09-27T12:10:00-04:00",
+ "title": "Design System: Riprap",
+ "extensions": {
+  "colorMeta": {
+   "blue-60v": {"role": "primary", "displayName": "Federal Blue", "canonical": "#005EA2"},
+   "blue-warm-70v": {"role": "primary", "displayName": "Warm Navy", "canonical": "#1A4480"},
+   "cyan-700": {"role": "secondary", "displayName": "Survey Cyan", "canonical": "#0E7490"},
+   "amber-800": {"role": "tertiary", "displayName": "Hazard Amber", "canonical": "#92400E"},
+   "red-700": {"role": "tertiary", "displayName": "Alert Red", "canonical": "#B91C1C"},
+   "paper": {"role": "neutral", "displayName": "Paper", "canonical": "#F4F6F9"},
+   "slate-950": {"role": "neutral", "displayName": "Ink", "canonical": "#0F172A"}
+  },
+  "typographyMeta": {
+   "display": {"displayName": "Display", "purpose": "Briefing place or question heading."},
+   "body": {"displayName": "Body", "purpose": "Briefing prose and answers, 70ch."},
+   "label": {"displayName": "Label", "purpose": "Section labels and badges, Overpass Mono uppercase."},
+   "data": {"displayName": "Data", "purpose": "Figures, citation lines, metadata."}
+  },
+  "motion": [{"name": "report-transition", "value": "150ms ease", "purpose": "The one motion budget for report content."}],
+  "breakpoints": [{"name": "narrow", "value": "760px"}, {"name": "wide", "value": "1600px"}]
+ },
+ "components": [
+  {"name": "Inline citation", "kind": "custom", "refersTo": "inline-cite", "description": "Superscript source mark that opens its citation.",
+   "html": "<p class=\"ds-prose\">82 flood complaints in five years<a href=\"#\" class=\"ds-cite\" aria-label=\"Citation 3: NYC OpenData 311\"><sup>[3]</sup></a>.</p>",
+   "css": ".ds-prose { font-family: var(--riprap-font-sans); font-size: 16px; line-height: 1.55; color: var(--riprap-text-primary); } .ds-cite { color: var(--riprap-text-link); font-family: var(--riprap-font-mono); font-weight: 500; text-decoration: none; transition: color 120ms ease; } .ds-cite:hover { color: var(--riprap-blue-warm-70v); } .ds-cite:focus-visible { outline: 2px solid var(--riprap-focus); outline-offset: 2px; }"},
+  {"name": "Experimental badge", "kind": "chip", "refersTo": "exp-badge", "description": "Marks a source without an evaluation behind it.",
+   "html": "<span class=\"ds-exp\">Experimental</span>",
+   "css": ".ds-exp { display: inline-flex; font-family: var(--riprap-font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--riprap-text-secondary); border: 1px solid var(--riprap-rule-soft); border-radius: 3px; padding: 0 5px; line-height: 1.5; }"},
+  {"name": "Citation list item", "kind": "card", "refersTo": "citation-item", "description": "One numbered source in the citations list.",
+   "html": "<div class=\"ds-citation\"><span class=\"ds-num\">[3]</span><div><strong>NYC OpenData</strong> <span class=\"ds-vintage\">v. live</span><div class=\"ds-title\">311 flood service requests</div></div></div>",
+   "css": ".ds-citation { display: grid; grid-template-columns: 32px 1fr; gap: 8px; padding: 10px 12px; border-left: 2px solid var(--riprap-rule-soft); font-family: var(--riprap-font-sans); background: var(--riprap-surface-card); transition: background 150ms ease; } .ds-citation:hover { background: var(--riprap-surface-inset); } .ds-num { font-family: var(--riprap-font-mono); color: var(--riprap-text-link); } .ds-vintage { font-family: var(--riprap-font-mono); font-size: 11px; color: var(--riprap-text-tertiary); } .ds-title { font-size: 13px; color: var(--riprap-text-secondary); }"}
+ ],
+ "narrative": {
+  "northStar": "The Survey Sheet",
+  "overview": "Riprap reads like a public-works survey sheet brought to a desk: cool paper, navy ink, drafting labels in a highway-signage mono, and a federal blue that marks what can be checked. Depth comes from tonal layering of paper surfaces and hairline rules, not shadows.",
+  "keyCharacteristics": ["Cool paper surfaces in three tones, navy text, one federal-blue accent.", "Sofia Sans for reading; Overpass Mono for data, labels and citation marks.", "Evidence tier carried by a square's fill, hue as reinforcement only.", "Flat, hairline-ruled, square-cornered."],
+  "rules": [
+   {"name": "The Checkable Blue Rule", "body": "Federal Blue means a source or a control you can act on. Do not use it for decoration or headings.", "section": "colors"},
+   {"name": "The Signal Budget Rule", "body": "Amber and red appear only for hazard signal (warnings, alerts, severity). A calm briefing has none.", "section": "colors"},
+   {"name": "The Twelve Pixel Floor Rule", "body": "Text a reader must read is at least 12px.", "section": "typography"},
+   {"name": "The No-Elevation Rule", "body": "No box shadows on report content.", "section": "elevation"}
+  ],
+  "dos": ["Do keep every numeric claim next to its citation mark.", "Do carry evidence tier and severity by shape as well as colour.", "Do make an omitted section read as intentional, not broken."],
+  "donts": ["Don't add or swap a typeface, recolour the dam mark, or introduce a hue family.", "Don't rename the Five Stones; add plain-language subtitles instead.", "Don't use shadows or rounded card chrome on report content."]
+ }
+}
