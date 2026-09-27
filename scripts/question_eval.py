@@ -28,7 +28,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-QUESTIONS = Path(__file__).resolve().parent.parent / "tests" / "question_eval" / "questions.yaml"
+# QE_QUESTIONS picks another set, e.g. tests/question_eval/heldout.yaml.
+QUESTIONS = Path(os.environ.get("QE_QUESTIONS") or
+                 Path(__file__).resolve().parent.parent / "tests" / "question_eval" / "questions.yaml")
 
 
 def _load_questions(path: Path = QUESTIONS) -> list[dict]:
@@ -50,6 +52,19 @@ def _tokens(calls: list[dict]) -> dict:
     return {"prompt": sum(c.get("prompt_tokens") or 0 for c in calls),
             "completion": sum(c.get("completion_tokens") or 0 for c in calls),
             "seconds": round(sum(c.get("duration_s") or 0 for c in calls), 2), "n_calls": len(calls)}
+
+
+def _doc_texts(out: dict) -> dict[str, str]:
+    """doc_id -> evidence text, as the synthesis saw it (for answer_audit.py)."""
+    from riprap.core.burr.synthesis import _documents
+
+    try:
+        docs: dict[str, str] = {}
+        for d in _documents(out)[0]:
+            docs[d.doc_id] = (docs.get(d.doc_id, "") + " " + d.text).strip()
+        return docs
+    except Exception:  # noqa: BLE001 - informational
+        return {}
 
 
 def _n_documents(out: dict) -> int | None:
@@ -93,6 +108,8 @@ def cmd_run(outdir: Path, only: list[str] | None = None, suffix: str = "") -> No
             "claims": g.get("claims") or [], "dropped_claims": g.get("dropped_claims") or [],
             "retried_claims": g.get("retried_claims") or [],
             "paragraph": out.get("paragraph"),
+            "documents": _doc_texts(out) if out else {},
+            "answer_mode": g.get("answer_mode"),
         }
         (outdir / f"{q['id']}{suffix}.json").write_text(json.dumps(rec, indent=1, default=str))
         print(f"{q['id']}{suffix} {q['kind']:13s} {str(rec['intent']):16s} pebbles={len(rec['pebbles_run']):2d} "
