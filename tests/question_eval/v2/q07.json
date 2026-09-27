@@ -1,0 +1,277 @@
+{
+ "id": "q07",
+ "kind": "flood_history",
+ "question": "What flood events have been recorded near 400 Carroll Street, Brooklyn?",
+ "error": null,
+ "wall_s": 37.0,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "400 Carroll Street, Brooklyn"
+   }
+  ],
+  "rationale": "To retrieve past flood events near the specified address, we need historical flood records (floodnet), potential sea level rise projections (npcc4_slr), current alerts (nws_alerts), Sandy flood data (sandy), and local elevation context (microtopo).",
+  "question": "What flood events have been recorded near 400 Carroll Street, Brooklyn?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "past",
+   "assets": []
+  },
+  "pebbles": [
+   "floodnet",
+   "npcc4_slr",
+   "nws_alerts",
+   "sandy",
+   "microtopo"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_moderate_2050",
+  "fema_nfhl",
+  "floodnet",
+  "microtopo",
+  "npcc4_slr",
+  "nws_alerts",
+  "sandy"
+ ],
+ "consulted": [
+  {
+   "id": "sandy",
+   "title": "NYC Sandy Inundation Zone (2012 empirical extent)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo",
+   "title": "LiDAR / DEM-derived micro-topography",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "npcc4_slr",
+   "title": "NPCC4 (2024) sea-level rise projections",
+   "stone": "lodestone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "dep_extreme_2080",
+   "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "ida_hwm",
+   "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "prithvi_water",
+   "title": "Satellite-detected surface water after Hurricane Ida (experimental)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  },
+  {
+   "id": "mta_entrances",
+   "title": "MTA subway/rail entrances exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nycha_developments",
+   "title": "NYCHA developments exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doe_schools",
+   "title": "NYC DOE schools exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doh_hospitals",
+   "title": "NYC DOH hospitals exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "ttm_battery_surge",
+   "title": "Granite TTM r2 Battery Surge \u2014 96 h hourly nowcast (fine-tune)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_311_forecast",
+   "title": "Granite TTM r2 \u2014 weekly 311 flood-complaint forecast at this address",
+   "stone": "lodestone"
+  },
+  {
+   "id": "floodnet_forecast",
+   "title": "Granite TTM r2 \u2014 flood-event recurrence at nearest FloodNet sensor",
+   "stone": "lodestone"
+  },
+  {
+   "id": "policy_corpus",
+   "title": "NYC flood-policy corpus \u2014 agency reports + plans",
+   "stone": "cornerstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1739,
+  "completion": 176,
+  "seconds": 8.54,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 669,
+  "completion": 579,
+  "seconds": 27.53,
+  "n_calls": 1
+ },
+ "n_documents": 7,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "The address at 400 Carroll Street, Brooklyn, was recorded within the empirical 2012 Hurricane Sandy inundation footprint and is mapped within FEMA flood zone AE, a Special Flood Hazard Area, per NFHL FIRM panel 3604970211F, effective 2007.",
+   "doc_ids": [
+    "sandy_inundation",
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "answer",
+   "text": "Four FloodNet community sensors within 600 meters of 400 Carroll Street, Brooklyn, have logged 27 above-curb flood events in the last three years, with a peak depth recorded by these sensors of 913 mm.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "27",
+    "913"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "The NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) models flooding at 400 Carroll Street, Brooklyn, as Deep Contiguous (>4 ft).",
+   "doc_ids": [
+    "dep_moderate_2050"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Live Observer",
+   "text": "Elevation at 400 Carroll Street, Brooklyn, is 0.0 m, placing it at the 5.0th percentile of elevation within a 200 m window, indicating a topographic low with HAND 0.0 m above the nearest drainage and TWI 15.11.",
+   "doc_ids": [
+    "microtopo"
+   ],
+   "numbers": [
+    "0.0",
+    "5.0",
+    "0.0",
+    "15.11"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, with a 90th percentile of 0.74 m and 1.65 m.",
+   "doc_ids": [
+    "npcc4_slr"
+   ],
+   "numbers": [
+    "0.38",
+    "15",
+    "0.79",
+    "31",
+    "0.74",
+    "1.65"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Three active NWS alerts are currently at 400 Carroll Street, Brooklyn: a Coastal Flood Warning (Severe), a High Surf Advisory (Minor), and a Rip Current Statement (Moderate).",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThe address at 400 Carroll Street, Brooklyn, was recorded within the empirical 2012 Hurricane Sandy inundation footprint and is mapped within FEMA flood zone AE, a Special Flood Hazard Area, per NFHL FIRM panel 3604970211F, effective 2007 [sandy_inundation][fema_nfhl]. Four FloodNet community sensors within 600 meters of 400 Carroll Street, Brooklyn, have logged 27 above-curb flood events in the last three years, with a peak depth recorded by these sensors of 913 mm [floodnet].\n\n**Hazard Reader.**\nThe NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) models flooding at 400 Carroll Street, Brooklyn, as Deep Contiguous (>4 ft) [dep_moderate_2050].\n\n**Live Observer.**\nElevation at 400 Carroll Street, Brooklyn, is 0.0 m, placing it at the 5.0th percentile of elevation within a 200 m window, indicating a topographic low with HAND 0.0 m above the nearest drainage and TWI 15.11 [microtopo]. Three active NWS alerts are currently at 400 Carroll Street, Brooklyn: a Coastal Flood Warning (Severe), a High Surf Advisory (Minor), and a Rip Current Statement (Moderate) [nws_alerts].\n\n**Projector.**\nNPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, with a 90th percentile of 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

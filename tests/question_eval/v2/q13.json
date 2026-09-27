@@ -1,0 +1,156 @@
+{
+ "id": "q13",
+ "kind": "right_now",
+ "question": "What is the water level in New York Harbor near 560 Grand Street, Manhattan right now?",
+ "error": null,
+ "wall_s": 22.8,
+ "intent": "live_now",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "live_now",
+  "targets": [
+   {
+    "type": "address",
+    "text": "560 Grand Street, Manhattan"
+   }
+  ],
+  "rationale": "The question asks for the current water level in New York Harbor near a specific address, requiring a live tide gauge reading.",
+  "question": "What is the water level in New York Harbor near 560 Grand Street, Manhattan right now?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "now",
+   "assets": []
+  },
+  "pebbles": [
+   "noaa_tides"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "noaa_tides",
+  "nws_alerts"
+ ],
+ "consulted": [
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1744,
+  "completion": 122,
+  "seconds": 6.47,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 412,
+  "completion": 265,
+  "seconds": 13.75,
+  "n_calls": 1
+ },
+ "n_documents": 2,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "The water level at New York Harbor near 560 Grand Street, Manhattan, is currently 6.75 feet above Mean Lower Low Water (MLLW).",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "6.75",
+    "MLLW"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The latest tide observation at The Battery, NY, recorded a water level of 6.75 ft above MLLW, with a deviation of +1.67 ft from the predicted tide, observed on 2026-09-26 at 20:00.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "6.75",
+    "1.67",
+    "2026-09-26",
+    "20:00"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "There are currently two active National Weather Service (NWS) alerts for this location: a Coastal Flood Warning classified as Severe and a Coastal Flood Advisory classified as Minor.",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThe water level at New York Harbor near 560 Grand Street, Manhattan, is currently 6.75 feet above Mean Lower Low Water (MLLW) [noaa_tides].\n\n**Live Observer.**\nThe latest tide observation at The Battery, NY, recorded a water level of 6.75 ft above MLLW, with a deviation of +1.67 ft from the predicted tide, observed on 2026-09-26 at 20:00 [noaa_tides].\n\n**Projector.**\nThere are currently two active National Weather Service (NWS) alerts for this location: a Coastal Flood Warning classified as Severe and a Coastal Flood Advisory classified as Minor [nws_alerts].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

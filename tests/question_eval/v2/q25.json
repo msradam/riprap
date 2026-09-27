@@ -1,0 +1,135 @@
+{
+ "id": "q25",
+ "kind": "district",
+ "question": "How much of community district QN12 is in the DEP extreme stormwater scenario?",
+ "error": null,
+ "wall_s": 16.3,
+ "intent": "neighborhood",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "neighborhood",
+  "targets": [
+   {
+    "type": "nta",
+    "text": "QN12"
+   }
+  ],
+  "rationale": "The query asks for the share of area within community district QN12 modeled to flood under the DEP extreme stormwater scenario for 2080 sea level.",
+  "question": "How much of community district QN12 is in the DEP extreme stormwater scenario?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "future",
+   "assets": []
+  },
+  "pebbles": [
+   "dep_extreme_2080_nta"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_extreme_2080_nta",
+  "dep_moderate_2050_nta",
+  "sandy_nta"
+ ],
+ "consulted": [
+  {
+   "id": "sandy_nta",
+   "title": "Share of the neighborhood inside the 2012 Sandy extent",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_extreme_2080_nta",
+   "title": "DEP Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050_nta",
+   "title": "DEP Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "dep_moderate_current_nta",
+   "title": "DEP Moderate (2.13 in/hr, current sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo_nta",
+   "title": "Neighborhood terrain from the USGS 3DEP DEM",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311_nta",
+   "title": "NYC 311 flood complaints inside the neighborhood",
+   "stone": "touchstone"
+  },
+  {
+   "id": "dob_permits_nta",
+   "title": "Active DOB construction permits inside the neighborhood",
+   "stone": "keystone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1743,
+  "completion": 136,
+  "seconds": 8.89,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 524,
+  "completion": 86,
+  "seconds": 6.1,
+  "n_calls": 1
+ },
+ "n_documents": 3,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "In the DEP extreme stormwater scenario for 2080 with sea level rise, 16.4% of community district QN12 is modeled to flood.",
+   "doc_ids": [
+    "dep_extreme_2080_nta"
+   ],
+   "numbers": [
+    "16.4"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nIn the DEP extreme stormwater scenario for 2080 with sea level rise, 16.4% of community district QN12 is modeled to flood [dep_extreme_2080_nta].\n\n**Hazard Reader.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

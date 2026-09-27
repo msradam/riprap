@@ -1,0 +1,81 @@
+{
+ "id": "q30",
+ "kind": "not_covered",
+ "question": "What is the air quality near 355 Food Center Drive, Bronx today?",
+ "error": null,
+ "wall_s": 7.7,
+ "intent": "out_of_scope",
+ "deployment": null,
+ "plan": {
+  "intent": "out_of_scope",
+  "targets": [
+   {
+    "type": "address",
+    "text": "355 Food Center Drive, Bronx"
+   }
+  ],
+  "rationale": "Riprap does not provide air quality data.",
+  "question": "What is the air quality near 355 Food Center Drive, Bronx today?",
+  "focus": {
+   "hazard": "air",
+   "time_frame": "now",
+   "assets": []
+  },
+  "pebbles": [],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 1740,
+  "completion": 113,
+  "seconds": 7.61,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 0,
+  "completion": 0,
+  "seconds": 0,
+  "n_calls": 0
+ },
+ "n_documents": 0,
+ "tier": "llm",
+ "model": null,
+ "attempts": 0,
+ "claims": [],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "Riprap's New York City deployment covers flood evidence only. It has no air-quality sources for this place, so it cannot answer this question. Ask about flooding at this address to see what it does cover."
+}

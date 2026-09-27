@@ -1,0 +1,249 @@
+{
+ "id": "q04",
+ "kind": "bare_address",
+ "question": "560 Grand Street, Manhattan, NY",
+ "error": null,
+ "wall_s": 22.8,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "560 Grand Street, Manhattan, NY"
+   }
+  ],
+  "rationale": "The query specifies a precise street address, so we need point-level flood data from FEMA, current DEP modeling, historic Sandy data, local elevation, and future 2080 DEP scenario.",
+  "question": "What is the flood risk for 560 Grand Street, Manhattan, NY?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "any",
+   "assets": []
+  },
+  "pebbles": [
+   "fema_nfhl",
+   "dep_moderate_current",
+   "sandy",
+   "microtopo",
+   "dep_extreme_2080"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_extreme_2080",
+  "dep_moderate_2050",
+  "dep_moderate_current",
+  "fema_nfhl",
+  "microtopo",
+  "sandy"
+ ],
+ "consulted": [
+  {
+   "id": "sandy",
+   "title": "NYC Sandy Inundation Zone (2012 empirical extent)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_extreme_2080",
+   "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo",
+   "title": "LiDAR / DEM-derived micro-topography",
+   "stone": "cornerstone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "ida_hwm",
+   "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "prithvi_water",
+   "title": "Satellite-detected surface water after Hurricane Ida (experimental)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  },
+  {
+   "id": "mta_entrances",
+   "title": "MTA subway/rail entrances exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nycha_developments",
+   "title": "NYCHA developments exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doe_schools",
+   "title": "NYC DOE schools exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doh_hospitals",
+   "title": "NYC DOH hospitals exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_battery_surge",
+   "title": "Granite TTM r2 Battery Surge \u2014 96 h hourly nowcast (fine-tune)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_311_forecast",
+   "title": "Granite TTM r2 \u2014 weekly 311 flood-complaint forecast at this address",
+   "stone": "lodestone"
+  },
+  {
+   "id": "floodnet_forecast",
+   "title": "Granite TTM r2 \u2014 flood-event recurrence at nearest FloodNet sensor",
+   "stone": "lodestone"
+  },
+  {
+   "id": "npcc4_slr",
+   "title": "NPCC4 (2024) sea-level rise projections",
+   "stone": "lodestone"
+  },
+  {
+   "id": "policy_corpus",
+   "title": "NYC flood-policy corpus \u2014 agency reports + plans",
+   "stone": "cornerstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1732,
+  "completion": 172,
+  "seconds": 8.48,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 561,
+  "completion": 267,
+  "seconds": 12.93,
+  "n_calls": 1
+ },
+ "n_documents": 6,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "560 Grand Street, Manhattan, NY, is mapped within FEMA flood zone X.",
+   "doc_ids": [
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "answer",
+   "text": "This address is outside the modeled flooding for current sea level rise and projected 2050 and 2080 sea level rise scenarios in NYC DEP stormwater models.",
+   "doc_ids": [
+    "dep_moderate_current",
+    "dep_moderate_2050",
+    "dep_extreme_2080"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "The address sits outside the empirical 2012 Hurricane Sandy inundation footprint.",
+   "doc_ids": [
+    "sandy_inundation"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "Elevation at this point is 5.82 meters, placing it at the 67.3th percentile of elevation within a 200-meter window.",
+   "doc_ids": [
+    "microtopo"
+   ],
+   "numbers": [
+    "5.82",
+    "67.3"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n560 Grand Street, Manhattan, NY, is mapped within FEMA flood zone X [fema_nfhl]. This address is outside the modeled flooding for current sea level rise and projected 2050 and 2080 sea level rise scenarios in NYC DEP stormwater models [dep_moderate_current][dep_moderate_2050][dep_extreme_2080].\n\n**Hazard Reader.**\nThe address sits outside the empirical 2012 Hurricane Sandy inundation footprint [sandy_inundation]. Elevation at this point is 5.82 meters, placing it at the 67.3th percentile of elevation within a 200-meter window [microtopo].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

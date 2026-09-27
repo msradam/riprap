@@ -1,0 +1,259 @@
+{
+ "id": "q02",
+ "kind": "bare_address",
+ "question": "2017 East 17th Street, Brooklyn, NY 11229",
+ "error": null,
+ "wall_s": 4295.8,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "2017 East 17th Street, Brooklyn, NY 11229"
+   }
+  ],
+  "rationale": "The query specifies a precise street address, so we need point-level flood data (Sandy, current DEP model, FEMA zone, local elevation) and sea\u2011level rise projection to assess past and future flood risk.",
+  "question": "2017 East 17th Street, Brooklyn, NY 11229",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "past",
+   "assets": []
+  },
+  "pebbles": [
+   "sandy",
+   "dep_moderate_current",
+   "fema_nfhl",
+   "microtopo",
+   "npcc4_slr"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_moderate_2050",
+  "dep_moderate_current",
+  "fema_nfhl",
+  "microtopo",
+  "npcc4_slr",
+  "sandy"
+ ],
+ "consulted": [
+  {
+   "id": "sandy",
+   "title": "NYC Sandy Inundation Zone (2012 empirical extent)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo",
+   "title": "LiDAR / DEM-derived micro-topography",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "npcc4_slr",
+   "title": "NPCC4 (2024) sea-level rise projections",
+   "stone": "lodestone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "dep_extreme_2080",
+   "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "ida_hwm",
+   "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "prithvi_water",
+   "title": "Satellite-detected surface water after Hurricane Ida (experimental)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  },
+  {
+   "id": "mta_entrances",
+   "title": "MTA subway/rail entrances exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nycha_developments",
+   "title": "NYCHA developments exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doe_schools",
+   "title": "NYC DOE schools exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doh_hospitals",
+   "title": "NYC DOH hospitals exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_battery_surge",
+   "title": "Granite TTM r2 Battery Surge \u2014 96 h hourly nowcast (fine-tune)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_311_forecast",
+   "title": "Granite TTM r2 \u2014 weekly 311 flood-complaint forecast at this address",
+   "stone": "lodestone"
+  },
+  {
+   "id": "floodnet_forecast",
+   "title": "Granite TTM r2 \u2014 flood-event recurrence at nearest FloodNet sensor",
+   "stone": "lodestone"
+  },
+  {
+   "id": "policy_corpus",
+   "title": "NYC flood-policy corpus \u2014 agency reports + plans",
+   "stone": "cornerstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1739,
+  "completion": 183,
+  "seconds": 2574.14,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 609,
+  "completion": 431,
+  "seconds": 1720.79,
+  "n_calls": 1
+ },
+ "n_documents": 6,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "The address 2017 East 17th Street, Brooklyn, NY 11229 was recorded outside the empirical 2012 Hurricane Sandy inundation footprint and is modeled to be outside the NYC DEP stormwater scenarios for both current and 2050 sea-level rise conditions.",
+   "doc_ids": [
+    "sandy_inundation",
+    "dep_moderate_current",
+    "dep_moderate_2050"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970352F, effective 2007.",
+   "doc_ids": [
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "Elevation at this point is 6.56 meters; it sits at the 48.8th percentile of elevation within a 200-meter window, with HAND 3.52 meters above the nearest drainage and TWI 10.28. Local basin relief is 1.48 meters.",
+   "doc_ids": [
+    "microtopo"
+   ],
+   "numbers": [
+    "6.56",
+    "48.8",
+    "3.52",
+    "10.28",
+    "1.48"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "NPCC4 (2024) projects a median sea-level rise of 0.38 meters (15 inches) by the 2050s and 0.79 meters (31 inches) by 2100 at the Battery, relative to 2000-2004; the 90th percentile projections are 0.74 meters and 1.65 meters.",
+   "doc_ids": [
+    "npcc4_slr"
+   ],
+   "numbers": [
+    "0.38",
+    "15",
+    "0.79",
+    "31",
+    "0.74",
+    "1.65"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThe address 2017 East 17th Street, Brooklyn, NY 11229 was recorded outside the empirical 2012 Hurricane Sandy inundation footprint and is modeled to be outside the NYC DEP stormwater scenarios for both current and 2050 sea-level rise conditions [sandy_inundation][dep_moderate_current][dep_moderate_2050].\n\n**Hazard Reader.**\nThis address sits in FEMA flood zone X, per NFHL FIRM panel 3604970352F, effective 2007 [fema_nfhl]. Elevation at this point is 6.56 meters; it sits at the 48.8th percentile of elevation within a 200-meter window, with HAND 3.52 meters above the nearest drainage and TWI 10.28. Local basin relief is 1.48 meters [microtopo].\n\n**Projector.**\nNPCC4 (2024) projects a median sea-level rise of 0.38 meters (15 inches) by the 2050s and 0.79 meters (31 inches) by 2100 at the Battery, relative to 2000-2004; the 90th percentile projections are 0.74 meters and 1.65 meters [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

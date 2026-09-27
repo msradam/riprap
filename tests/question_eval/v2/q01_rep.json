@@ -1,0 +1,341 @@
+{
+ "id": "q01",
+ "kind": "bare_address",
+ "question": "90-01 183rd Street, Queens, NY 11423",
+ "error": null,
+ "wall_s": 88.6,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "90-01 183rd Street, Queens, NY 11423"
+   }
+  ],
+  "rationale": "The query specifies a precise street address, so the planner selects point sources that can assess current and future flood risk at that location, including modelled flood extents, FEMA zones, historical Sandy data, elevation, and active construction permits.",
+  "question": "90-01 183rd Street, Queens, NY 11423",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "any",
+   "assets": []
+  },
+  "pebbles": [
+   "dep_moderate_current",
+   "dep_moderate_2050",
+   "dep_extreme_2080",
+   "fema_nfhl",
+   "sandy",
+   "microtopo",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "npcc4_slr",
+   "nws_alerts",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "usgs_gauges"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_extreme_2080",
+  "dep_moderate_2050",
+  "dep_moderate_current",
+  "doe_schools",
+  "doh_hospitals",
+  "fema_nfhl",
+  "floodnet",
+  "microtopo",
+  "mta_entrances",
+  "noaa_tides",
+  "npcc4_slr",
+  "nws_alerts",
+  "nws_obs",
+  "nyc311",
+  "nycha_developments",
+  "sandy",
+  "usgs_gauges"
+ ],
+ "consulted": [
+  {
+   "id": "sandy",
+   "title": "NYC Sandy Inundation Zone (2012 empirical extent)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_extreme_2080",
+   "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo",
+   "title": "LiDAR / DEM-derived micro-topography",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  },
+  {
+   "id": "mta_entrances",
+   "title": "MTA subway/rail entrances exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nycha_developments",
+   "title": "NYCHA developments exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doe_schools",
+   "title": "NYC DOE schools exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doh_hospitals",
+   "title": "NYC DOH hospitals exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "npcc4_slr",
+   "title": "NPCC4 (2024) sea-level rise projections",
+   "stone": "lodestone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "ida_hwm",
+   "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "prithvi_water",
+   "title": "Satellite-detected surface water after Hurricane Ida (experimental)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "ttm_battery_surge",
+   "title": "Granite TTM r2 Battery Surge \u2014 96 h hourly nowcast (fine-tune)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_311_forecast",
+   "title": "Granite TTM r2 \u2014 weekly 311 flood-complaint forecast at this address",
+   "stone": "lodestone"
+  },
+  {
+   "id": "floodnet_forecast",
+   "title": "Granite TTM r2 \u2014 flood-event recurrence at nearest FloodNet sensor",
+   "stone": "lodestone"
+  },
+  {
+   "id": "policy_corpus",
+   "title": "NYC flood-policy corpus \u2014 agency reports + plans",
+   "stone": "cornerstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1739,
+  "completion": 283,
+  "seconds": 24.25,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 1112,
+  "completion": 812,
+  "seconds": 55.65,
+  "n_calls": 1
+ },
+ "n_documents": 17,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "90-01 183rd Street, Queens, NY 11423 is mapped within FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007.",
+   "doc_ids": [
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "answer",
+   "text": "This address is outside the empirical 2012 Hurricane Sandy inundation footprint, per NYC OEM.",
+   "doc_ids": [
+    "sandy_inundation"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "answer",
+   "text": "This address is outside the modeled flooding in the NYC DEP stormwater scenarios for 2050 SLR (2.13 in/hr) and 2080 SLR (3.66 in/hr).",
+   "doc_ids": [
+    "dep_moderate_2050",
+    "dep_extreme_2080"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "The elevation at this point is 14.87 meters, placing it at the 29.1th percentile of elevation within a 200-meter window.",
+   "doc_ids": [
+    "microtopo"
+   ],
+   "numbers": [
+    "14.87",
+    "29.1"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Within a 600-meter radius, 2 FloodNet community sensors have logged 14 above-curb flood events in the last 3 years, with a peak depth of 1172 mm.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "2",
+    "14",
+    "1172"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Within a 200-meter radius, 82 NYC 311 flood-related complaints have been filed in the last 5 years, most commonly describing Sewer Backup (Use Comments).",
+   "doc_ids": [
+    "nyc311"
+   ],
+   "numbers": [
+    "82"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "The nearest USGS stream gauge, Alley Creek Near Oakland Gardens NY, recorded a stage of 0.34 feet at 2026-09-26 23:00 UTC.",
+   "doc_ids": [
+    "usgs_gauges"
+   ],
+   "numbers": [
+    "0.34"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "Within 800 meters, 8 MTA subway entrances are located, with 0 inside the 2012 Sandy inundation extent and 8 inside the DEP extreme stormwater scenario for 2080 SLR.",
+   "doc_ids": [
+    "mta_entrance_exposure"
+   ],
+   "numbers": [
+    "8",
+    "0",
+    "8"
+   ]
+  },
+  {
+   "section": "Asset Register",
+   "text": "Within 2000 meters, 1 NYCHA development is located, with 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario for 2080 SLR.",
+   "doc_ids": [
+    "nycha_development_exposure"
+   ],
+   "numbers": [
+    "1",
+    "0",
+    "1"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "NPCC4 (2024) projects a median sea-level rise of 0.38 meters (15 inches) by the 2050s and 0.79 meters (31 inches) by 2100 at the Battery, relative to 2000-2004.",
+   "doc_ids": [
+    "npcc4_slr"
+   ],
+   "numbers": [
+    "0.38",
+    "0.79",
+    "15",
+    "31"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n90-01 183rd Street, Queens, NY 11423 is mapped within FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007 [fema_nfhl]. This address is outside the empirical 2012 Hurricane Sandy inundation footprint, per NYC OEM [sandy_inundation]. This address is outside the modeled flooding in the NYC DEP stormwater scenarios for 2050 SLR (2.13 in/hr) and 2080 SLR (3.66 in/hr) [dep_moderate_2050][dep_extreme_2080].\n\n**Hazard Reader.**\nThe elevation at this point is 14.87 meters, placing it at the 29.1th percentile of elevation within a 200-meter window [microtopo].\n\n**Live Observer.**\nWithin a 600-meter radius, 2 FloodNet community sensors have logged 14 above-curb flood events in the last 3 years, with a peak depth of 1172 mm [floodnet]. Within a 200-meter radius, 82 NYC 311 flood-related complaints have been filed in the last 5 years, most commonly describing Sewer Backup (Use Comments) [nyc311]. The nearest USGS stream gauge, Alley Creek Near Oakland Gardens NY, recorded a stage of 0.34 feet at 2026-09-26 23:00 UTC [usgs_gauges].\n\n**Asset Register.**\nWithin 800 meters, 8 MTA subway entrances are located, with 0 inside the 2012 Sandy inundation extent and 8 inside the DEP extreme stormwater scenario for 2080 SLR [mta_entrance_exposure]. Within 2000 meters, 1 NYCHA development is located, with 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario for 2080 SLR [nycha_development_exposure].\n\n**Projector.**\nNPCC4 (2024) projects a median sea-level rise of 0.38 meters (15 inches) by the 2050s and 0.79 meters (31 inches) by 2100 at the Battery, relative to 2000-2004 [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}
