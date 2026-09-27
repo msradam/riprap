@@ -78,33 +78,71 @@ When the input is a question, not just a place, three more rules apply.
 
 ### Answer modes and answer checks
 
+`RIPRAP_ANSWER_MODE` picks one of two modes. Extractive is the default.
+
+**Extractive (default).** The model does not write the answer. It returns a
+lead (`yes`, `no`, `partly`, `count`, `cannot_answer`) and up to four
+document ids. The answer is a fixed phrase for the lead ("Yes.", "No.", "In
+part.", "From the sources consulted:") followed by those documents' template
+sentences, word for word. Code checks the lead
+(`riprap/core/burr/answer_checks.py`, `check_lead`):
+
+- `no` is invalid when a chosen fact reports something;
+- `yes` is invalid when every fact reports an absence, or when an asset
+  register counts only some of its assets inside;
+- `partly` needs one fact reporting a result and one reporting none or only
+  some (a register with some inside satisfies both);
+- a count or share question ("how many", "how much", "what share") gets the
+  `count` lead, and `count` needs a fact with a figure;
+- when the question names a source (subway, school, 311, sensor, Ida, rain,
+  tide, sea level, alert), `yes` and `partly` are invalid if that source's
+  fact reports none.
+
+An asset register "reports a result" when any of its inside counts is above
+zero. An invalid lead is retried once, then replaced by the cannot-answer
+line. A count or share question with a figure among the facts is given the
+`count` lead directly. If the source the question is about is missing from
+the facts after the retry, it is appended; if the lead no longer fits the
+appended fact, the lead is dropped and the answer opens "From the sources
+consulted:".
+
 **Guarded.** The model writes one to three claims in section `answer`. They
-pass the number and citation checks like every claim, and then five answer
-checks (`riprap/core/burr/answer_checks.py`). A claim that fails one is
-retried once with the reason and dropped if it still fails:
+pass the number and citation checks like every claim, then five answer
+checks, then the entailment check below. A claim that fails is retried once
+with the reason and dropped if it still fails:
 
 | Check | Flags | Example it catches |
 |---|---|---|
-| absence | "no", "none", "not", "zero", "without" about a cited source whose text reports something (it has no absence word and no zero) | "No active flood alerts" citing three alerts |
+| absence | "no", "none", "not", "zero", "without" about a cited source that reports something | "No active flood alerts" citing three alerts |
 | universal | "all", "every", "both", "each of", or "the <assets> are", when the cited asset register counts fewer inside than in total | "The NYCHA developments are inside Sandy" when 3 of 5 are |
 | inference | "which means", "indicating", "therefore" and similar in a claim citing two sources; or a warning or forecast stated as flooding happening | "Coastal Flood Warning, indicating flooding is occurring" |
 | datum | an elevation without its datum, or without the height above ground when the source gives one | "water elevation 48.2 ft" |
-| dropped count | the answer omits the count or value of the source the question is about (chosen from the question's words: subway, school, 311, sensor, Ida, rain, tide, sea level, alert), when that source has one | "the subway entrances are inside the scenario" without "8" |
+| dropped count | the answer omits the headline figure of the source the question is about, read from the pebble's structured value (`COUNT_FIELD`) | "the subway entrances are inside the scenario" without "8" |
 
 A dropped count asks for a retry but drops nothing, since the claims that
 were written are still true; if it persists it is recorded in
 `grounding.answer_flags`.
 
-**Extractive.** The model does not write the answer. It returns a lead
-(`yes`, `no`, `partly`, `count`, `cannot_answer`) and up to four document
-ids. The answer is a fixed phrase for the lead ("Yes.", "No.", "In part.",
-"From the sources consulted:") followed by those documents' template
-sentences, word for word. Code checks the lead: `no` is invalid when a
-chosen fact reports something; `yes` is invalid when every fact reports an
-absence or when an asset register counts only some inside; `count` needs a
-fact with a count. An invalid lead is retried once, then replaced by the
-cannot-answer line. If the source the question is about is missing from
-the facts after the retry, it is appended.
+**Entailment check (guarded answers).** `riprap/core/burr/entailment.py`
+asks a natural-language-inference model whether the cited evidence supports
+each answer claim: `knowledgator/gliclass-large-v3.0` (pinned SHA,
+safetensors, CPU), the evidence trimmed to the 512 tokens most relevant to
+the claim as premise and the claim as hypothesis. A claim scoring below
+0.787 is dropped with the reason "not supported by the cited evidence
+(entailment check)" and the retry applies. The threshold keeps 95% of the
+true claims in the System One Task B calibration split
+(`scripts/calibrate_entailment.py`); on that experiment's 582 test items it
+keeps 86% of true claims and catches 85% of perturbed ones: 89% of flipped
+directions, 87% of changed numbers, 84% of swapped documents and 67% of
+changed places (`tests/entailment_calibration_gliclass.json`).
+It takes about 0.2 s per claim on CPU. `RIPRAP_ENTAILMENT=guardian` selects
+Granite Guardian 8B on the GPU instead, but it has no calibrated threshold
+yet, so selecting it skips the check. The check needs the `ml` extra.
+Extractive answers are the cited text, so the check does not run on them.
+
+Every LLM briefing ends with a line naming the checks that ran, for example
+"Checks run: citations and numbers on every claim; lead rules on the
+answer; ...", or saying why the entailment check was skipped.
 
 Number words ("four", "two") are read as digits by the number check in both
 modes.
@@ -143,9 +181,47 @@ checks, which are word patterns, not a reading of meaning. They miss:
 - a wrong non-numeric fact ("inside" for "outside") with correct numbers;
 - an omitted figure when the question's words match no listed source.
 
+The entailment check reads meaning, but on the refactor 3 records it
+caught only absence and warning-read-as-observation errors. It passed a
+paraphrased inference ("Given the projected 0.38 m ..., the address
+remains outside the floodplain"), a claim attributing the address's flood
+zone to nearby subway entrances, a true claim that does not answer the
+question, and "the developments are inside" when 3 of 5 are. It also
+dropped correct claims (a district's correct 3.1% share, a correct tide
+reading), about 6% of the answer claims it saw.
+
 In extractive mode the answer text is the evidence text, so it cannot
 paraphrase; what can still be wrong is the lead and the choice of facts,
 and only the lead rules above are checked.
+
+## 311 feeds outside NYC
+
+NYC 311 pebbles keep their descriptor filter. Elsewhere
+(`riprap/core/pebbles/record_filter.py`, set per manifest under
+`config.record_filter`):
+
+- **San Francisco, Boston, Albany** give free text, so a text classifier
+  decides: GLiClass modern-base distilled from Granite 4.1 8B's option
+  probabilities (System One round two), rebuilt by
+  `scripts/train_311_filter.py` because the experiment did not save it. A
+  record is kept when P(any flood class) is at or above the threshold
+  chosen on the experiment's calibration split, and cached by record id.
+  The classifier reads the same text the experiment trained on (SF
+  `service_details | status_notes`, Boston's closure note after "Case
+  Resolved", Albany `summary: description`); a record with no text (an
+  open Boston case) is not counted and is reported as `n_no_text`. Its
+  labels are silver, so these pebbles are experimental. The weights are not
+  in the repo: set `RIPRAP_311_FILTER_PATH`; without them the records pass
+  unfiltered and the sentence says so.
+- **Chicago and Seattle** give only a category name, so a reviewed table in
+  the manifest decides; the reviewed categories are listed in each
+  manifest's comment.
+
+Each sentence says how many of how many records were kept, and "the
+latest N" when the feed hit its fetch limit. What this misses: the
+classifier matched its teacher at about 0.62 accuracy on silver labels,
+so it keeps some non-flood records and drops some flood ones; the
+category tables cannot see a flood report filed under another category.
 
 ## Measuring it
 

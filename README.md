@@ -137,7 +137,11 @@ uv run uvicorn web.main:app --port 7860
 Open <http://localhost:7860> and type an NYC address. You get the no-LLM
 evidence briefing: one cited sentence per data source, grouped by Stone.
 `uv sync` without `--extra ml` is the light core (no torch, about 290 MB);
-the in-process forecasts and policy retrieval then skip themselves.
+the in-process forecasts, policy retrieval, the entailment check on
+guarded answers and the non-NYC 311 flood filter then skip themselves, and
+each briefing says which checks ran. The 311 filter's weights are built
+locally (`scripts/train_311_filter.py`) and found through
+`RIPRAP_311_FILTER_PATH`; see [`docs/GROUNDING.md`](docs/GROUNDING.md).
 
 The same briefing from the command line:
 
