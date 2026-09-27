@@ -1,263 +1,4 @@
 {
- "v1": {
-  "questions_with_answer": 0,
-  "answer_hits": {
-   "absence": 0,
-   "universal": 0,
-   "inference": 0,
-   "dropped_count": 0,
-   "datum": 0
-  },
-  "answer_total": 0,
-  "answer_questions_flagged": 0,
-  "all_claim_hits": {
-   "absence": 2,
-   "universal": 6,
-   "inference": 0,
-   "dropped_count": 0,
-   "datum": 6
-  },
-  "hits": [
-   {
-    "id": "q01",
-    "section": "Hazard Reader",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "Elevation 14.87 m; this point sits at the 29.1th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 0.0 m above nearest drainage; TWI 11.78. Local basin relief: 35.02 m."
-   },
-   {
-    "id": "q06",
-    "section": "Asset Register",
-    "class": "universal",
-    "reason": "implies all, but doh_hospital_exposure counts 0 of 2",
-    "text": "Two hospitals within 3000 meters of this address are outside both the 2012 Sandy inundation extent and the DEP extreme stormwater scenario for 2080 sea-level rise."
-   },
-   {
-    "id": "q07",
-    "section": "Asset Register",
-    "class": "universal",
-    "reason": "implies all, but nycha_development_exposure counts 0 of 2",
-    "text": "Within 2000 m of this address, 2 NYCHA developments are located, both inside the 2012 Sandy inundation extent and none inside the DEP extreme stormwater scenario for 2080 sea-level rise."
-   },
-   {
-    "id": "q14",
-    "section": "Asset Register",
-    "class": "universal",
-    "reason": "implies all, but nycha_development_exposure counts 0 of 2",
-    "text": "Within 2000 m of this address, 2 NYCHA developments are located, both inside the 2012 Sandy inundation extent and none inside the DEP extreme stormwater scenario for 2080 sea-level rise."
-   },
-   {
-    "id": "q16",
-    "section": "Live Observer",
-    "class": "absence",
-    "reason": "states an absence, but nyc311 reports a result",
-    "text": "No FloodNet sensors are deployed within 600 meters of this address, and 36 NYC 311 flood-related complaints were filed within 200 meters in the last five years, with the most common descriptor being Sewer Backup (Use Comments)."
-   },
-   {
-    "id": "q16",
-    "section": "Asset Register",
-    "class": "universal",
-    "reason": "implies all, but doe_school_exposure counts 3 of 4",
-    "text": "Within 800 meters of this address, there is 1 MTA subway entrance inside the 2012 Sandy inundation extent and another inside the DEP extreme stormwater scenario (2080 sea-level rise). Within 1500 meters, there are 4 NYC DOE schools, all inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario."
-   },
-   {
-    "id": "q18",
-    "section": "Hazard Reader",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "Elevation 14.87 m; this point sits at the 29.1th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 0.0 m above nearest drainage; TWI 11.78. Local basin relief: 35.02 m."
-   },
-   {
-    "id": "q19",
-    "section": "Hazard Reader",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "Elevation 5.82 m; this point sits at the 67.3th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 5.82 m above nearest drainage; TWI 8.49. Local basin relief: 5.24 m."
-   },
-   {
-    "id": "q20",
-    "section": "Live Observer",
-    "class": "absence",
-    "reason": "states an absence, but nyc311 reports a result",
-    "text": "No FloodNet sensors are deployed within 600 meters of this address, and 36 NYC 311 flood-related complaints were filed within 200 meters in the last five years, with the most common descriptor being Sewer Backup (Use Comments)."
-   },
-   {
-    "id": "q20",
-    "section": "Asset Register",
-    "class": "universal",
-    "reason": "implies all, but doe_school_exposure counts 3 of 4",
-    "text": "Within 800 meters of this address, there is 1 MTA subway entrance inside the 2012 Sandy inundation extent and another inside the DEP extreme stormwater scenario (2080 sea-level rise). Within 1500 meters, there are 4 NYC DOE schools, all inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario."
-   },
-   {
-    "id": "q21",
-    "section": "Hazard Reader",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "Elevation 5.32 m; this point sits at the 56.2th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 5.32 m above nearest drainage; TWI 10.84. Local basin relief: 6.59 m."
-   },
-   {
-    "id": "q27",
-    "section": "Asset Register",
-    "class": "universal",
-    "reason": "implies all, but doh_hospital_exposure counts 0 of 2",
-    "text": "Two hospitals within 3000 meters of this address are outside both the 2012 Sandy inundation extent and the DEP extreme stormwater scenario for 2080 sea-level rise."
-   },
-   {
-    "id": "q29",
-    "section": "Hazard Reader",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "Elevation 5.82 m; this point sits at the 67.3th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 5.82 m above nearest drainage; TWI 8.49. Local basin relief: 5.24 m."
-   },
-   {
-    "id": "q30",
-    "section": "Hazard Reader",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "Elevation 5.32 m; this point sits at the 56.2th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 5.32 m above nearest drainage; TWI 10.84. Local basin relief: 6.59 m."
-   }
-  ]
- },
- "v2": {
-  "questions_with_answer": 26,
-  "answer_hits": {
-   "absence": 1,
-   "universal": 1,
-   "inference": 5,
-   "dropped_count": 3,
-   "datum": 3
-  },
-  "answer_total": 13,
-  "answer_questions_flagged": 9,
-  "all_claim_hits": {
-   "absence": 1,
-   "universal": 1,
-   "inference": 5,
-   "dropped_count": 3,
-   "datum": 7
-  },
-  "hits": [
-   {
-    "id": "q01",
-    "section": "Hazard Reader",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "The elevation at this point is 14.87 m, placing it at the 29.1th percentile of elevation within a 200 m window, with HAND 0.0 m above nearest drainage and TWI 11.78."
-   },
-   {
-    "id": "q02",
-    "section": "Hazard Reader",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "Elevation at this point is 6.56 meters; it sits at the 48.8th percentile of elevation within a 200-meter window, with HAND 3.52 meters above the nearest drainage and TWI 10.28. Local basin relief is 1.48 meters."
-   },
-   {
-    "id": "q03",
-    "section": "answer",
-    "class": "inference",
-    "reason": "draws a conclusion joining two sources",
-    "text": "80 Pioneer Street, Brooklyn, NY, is mapped within the empirical 2012 Hurricane Sandy inundation footprint and is located in FEMA flood zone AE, indicating a Special Flood Hazard Area."
-   },
-   {
-    "id": "q03",
-    "section": "answer",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "Topographic analysis shows the point at 1.37 m elevation is at the 0.8th percentile within a 200 m window, indicating a low-lying area relative to surrounding terrain."
-   },
-   {
-    "id": "q04",
-    "section": "Hazard Reader",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "Elevation at this point is 5.82 meters, placing it at the 67.3th percentile of elevation within a 200-meter window."
-   },
-   {
-    "id": "q05",
-    "section": "answer",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "The block around 90-01 183rd Street, Queens, was recorded to have a Hurricane Ida high-water mark within 800 meters, with the highest observed water elevation at 48.2 feet."
-   },
-   {
-    "id": "q05",
-    "section": "answer",
-    "class": "dropped_count",
-    "reason": "omits the figure from ida_hwm (2)",
-    "text": "The block around 90-01 183rd Street, Queens, was recorded to have a Hurricane Ida high-water mark within 800 meters, with the highest observed water elevation at 48.2 feet."
-   },
-   {
-    "id": "q07",
-    "section": "Live Observer",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "Elevation at 400 Carroll Street, Brooklyn, is 0.0 m, placing it at the 5.0th percentile of elevation within a 200 m window, indicating a topographic low with HAND 0.0 m above the nearest drainage and TWI 15.11."
-   },
-   {
-    "id": "q10",
-    "section": "answer",
-    "class": "inference",
-    "reason": "states a warning or forecast as an observation",
-    "text": "There is a Coastal Flood Warning active for the area near 80 Pioneer Street, Brooklyn, indicating flooding is currently occurring."
-   },
-   {
-    "id": "q12",
-    "section": "answer",
-    "class": "absence",
-    "reason": "states an absence, but nws_alerts, nws_obs reports a result",
-    "text": "No active flood alerts or precipitation observations indicate heavy rain near 90-01 183rd Street, Queens at the moment."
-   },
-   {
-    "id": "q16",
-    "section": "answer",
-    "class": "inference",
-    "reason": "draws a conclusion joining two sources",
-    "text": "NPCC4 (2024) projects a sea-level rise of 0.38 meters (15 inches) at the Battery by 2050, which means 116-02 Rockaway Beach Boulevard is modeled to be outside the flooding area under the NYC DEP stormwater scenario for that period."
-   },
-   {
-    "id": "q18",
-    "section": "answer",
-    "class": "dropped_count",
-    "reason": "omits the figure from mta_entrance_exposure (8)",
-    "text": "The subway entrances near 90-01 183rd Street, Queens are modeled to be inside the NYC DEP extreme stormwater scenario with 2080 sea-level rise."
-   },
-   {
-    "id": "q19",
-    "section": "answer",
-    "class": "universal",
-    "reason": "implies all, but nycha_development_exposure counts 3 of 5",
-    "text": "The NYCHA developments near 560 Grand Street, Manhattan, are mapped within the 2012 Hurricane Sandy inundation extent."
-   },
-   {
-    "id": "q19",
-    "section": "answer",
-    "class": "dropped_count",
-    "reason": "omits the figure from nycha_development_exposure (5)",
-    "text": "The NYCHA developments near 560 Grand Street, Manhattan, are mapped within the 2012 Hurricane Sandy inundation extent. The address itself is outside the empirical 2012 Hurricane Sandy inundation footprint, but is located in FEMA flood zone X."
-   },
-   {
-    "id": "q20",
-    "section": "answer",
-    "class": "inference",
-    "reason": "draws a conclusion joining two sources",
-    "text": "Four NYC Department of Education (DOE) schools within a 1500-meter radius of 116-02 Rockaway Beach Boulevard are mapped within the 2012 Hurricane Sandy inundation footprint, indicating exposure to flooding."
-   },
-   {
-    "id": "q26",
-    "section": "answer",
-    "class": "inference",
-    "reason": "draws a conclusion joining two sources",
-    "text": "The house is outside the modeled flooding areas for both the current and 2050 NYC DEP stormwater scenarios, suggesting lower modeled flood risk under those projections."
-   },
-   {
-    "id": "q26",
-    "section": "answer",
-    "class": "datum",
-    "reason": "states an elevation without its datum",
-    "text": "The elevation at the address is 6.56 m, placing it at the 48.8th percentile of elevation within a 200 m window, indicating a relatively low topographic position."
-   }
-  ]
- },
  "v2_1": {
   "questions_with_answer": 21,
   "answer_hits": {
@@ -416,6 +157,76 @@
   "questions_with_answer": 20,
   "answer_hits": {
    "absence": 0,
+   "universal": 2,
+   "inference": 0,
+   "dropped_count": 1,
+   "datum": 0
+  },
+  "answer_total": 3,
+  "answer_questions_flagged": 3,
+  "all_claim_hits": {
+   "absence": 0,
+   "universal": 2,
+   "inference": 0,
+   "dropped_count": 1,
+   "datum": 4
+  },
+  "hits": [
+   {
+    "id": "q01",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 14.87 m; this point sits at the 29.1th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 0.0 m above nearest drainage; TWI 11.78. Local basin relief: 35.02 m."
+   },
+   {
+    "id": "q02",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 6.56 m; this point sits at the 48.8th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.52 m above nearest drainage; TWI 10.28. Local basin relief: 1.48 m."
+   },
+   {
+    "id": "q03",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 1.37 m; this point sits at the 0.8th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.81 m above nearest drainage; TWI 14.79. Local basin relief: 13.27 m."
+   },
+   {
+    "id": "q04",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 5.82 m; this point sits at the 67.3th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 5.82 m above nearest drainage; TWI 8.49. Local basin relief: 5.24 m."
+   },
+   {
+    "id": "q10",
+    "section": "answer",
+    "class": "universal",
+    "reason": "lead 'partly' needs one fact reporting a result and one reporting none or only some",
+    "text": "partly: nws_alerts, floodnet, noaa_tides"
+   },
+   {
+    "id": "q22",
+    "section": "answer",
+    "class": "universal",
+    "reason": "lead 'partly' needs one fact reporting a result and one reporting none or only some",
+    "text": "partly: nycha_development_exposure"
+   },
+   {
+    "id": "q24",
+    "section": "answer",
+    "class": "dropped_count",
+    "reason": "lead 'yes': a count or share question needs the count lead",
+    "text": "yes: sandy_nta"
+   }
+  ]
+ },
+ "v4": {
+  "questions_with_answer": 19,
+  "answer_hits": {
+   "absence": 0,
    "universal": 0,
    "inference": 0,
    "dropped_count": 0,
@@ -457,7 +268,63 @@
     "section": "Hazard Reader",
     "class": "datum",
     "reason": "states an elevation without its datum",
-    "text": "Elevation 5.82 m; this point sits at the 67.3th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 5.82 m above nearest drainage; TWI 8.49. Local basin relief: 5.24 m."
+    "text": "Elevation 6.51 m; this point sits at the 66.2th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 6.51 m above nearest drainage; TWI 8.03. Local basin relief: 4.92 m."
+   }
+  ]
+ },
+ "v4g": {
+  "questions_with_answer": 19,
+  "answer_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 1,
+   "datum": 0
+  },
+  "answer_total": 1,
+  "answer_questions_flagged": 1,
+  "all_claim_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 1,
+   "datum": 4
+  },
+  "hits": [
+   {
+    "id": "q01",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 14.87 m; this point sits at the 29.1th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 0.0 m above nearest drainage; TWI 11.78. Local basin relief: 35.02 m."
+   },
+   {
+    "id": "q02",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 6.56 m; this point sits at the 48.8th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.52 m above nearest drainage; TWI 10.28. Local basin relief: 1.48 m."
+   },
+   {
+    "id": "q03",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 1.37 m; this point sits at the 0.8th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.81 m above nearest drainage; TWI 14.79. Local basin relief: 13.27 m."
+   },
+   {
+    "id": "q04",
+    "section": "Hazard Reader",
+    "class": "datum",
+    "reason": "states an elevation without its datum",
+    "text": "Elevation 6.51 m; this point sits at the 66.2th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 6.51 m above nearest drainage; TWI 8.03. Local basin relief: 4.92 m."
+   },
+   {
+    "id": "q05",
+    "section": "answer",
+    "class": "dropped_count",
+    "reason": "omits the figure from ida_hwm (2)",
+    "text": "The block around 90-01 183rd Street, Queens was recorded to have a Hurricane Ida high-water mark within 800 meters, with the highest mark standing 0.76 ft above ground and the highest water surface elevation at 48.2 ft NAVD88."
    }
   ]
  }

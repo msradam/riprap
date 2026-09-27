@@ -1,0 +1,203 @@
+{
+ "id": "q12",
+ "kind": "right_now",
+ "question": "Is it raining hard near 90-01 183rd Street, Queens at the moment?",
+ "error": null,
+ "wall_s": 37.2,
+ "intent": "live_now",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "live_now",
+  "targets": [
+   {
+    "type": "address",
+    "text": "90-01 183rd Street, Queens"
+   }
+  ],
+  "rationale": "The question asks for current rain intensity at a specific address, requiring live weather and flood sensors.",
+  "question": "Is it raining hard near 90-01 183rd Street, Queens at the moment?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "now",
+   "assets": []
+  },
+  "pebbles": [
+   "nws_alerts",
+   "noaa_tides",
+   "usgs_gauges",
+   "floodnet",
+   "nws_obs"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "floodnet",
+  "noaa_tides",
+  "nws_alerts",
+  "nws_obs",
+  "usgs_gauges"
+ ],
+ "consulted": [
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1744,
+  "completion": 144,
+  "seconds": 9.87,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 637,
+  "completion": 350,
+  "seconds": 23.62,
+  "n_calls": 1
+ },
+ "n_documents": 5,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "Live Observer",
+   "text": "Alley Creek Near Oakland Gardens NY is modeled to have a stage of 0.68 ft as of 2026-09-27 14:00 UTC.",
+   "doc_ids": [
+    "usgs_gauges"
+   ],
+   "numbers": [
+    "0.68",
+    "2026-09-27 14:00 UTC"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Kings Point tide is observed at 10.22 ft above mean lower low water as of 2026-09-27 10:30.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "10.22",
+    "2026-09-27 10:30"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "JFK Airport reported a temperature of 17.0\u00b0C as of 2026-09-27T14:20.",
+   "doc_ids": [
+    "nws_obs"
+   ],
+   "numbers": [
+    "17.0",
+    "2026-09-27T14:20"
+   ]
+  },
+  {
+   "section": "Projector",
+   "text": "Three active NWS alerts are in effect near 90-01 183rd Street, Queens: High Surf Advisory (Minor), Coastal Flood Warning (Severe), and Rip Current Statement (Moderate).",
+   "doc_ids": [
+    "nws_alerts"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThe sources consulted do not answer this question directly. Here is what they show.\n\n**Live Observer.**\nAlley Creek Near Oakland Gardens NY is modeled to have a stage of 0.68 ft as of 2026-09-27 14:00 UTC [usgs_gauges]. Kings Point tide is observed at 10.22 ft above mean lower low water as of 2026-09-27 10:30 [noaa_tides]. JFK Airport reported a temperature of 17.0\u00b0C as of 2026-09-27T14:20 [nws_obs].\n\n**Projector.**\nThree active NWS alerts are in effect near 90-01 183rd Street, Queens: High Surf Advisory (Minor), Coastal Flood Warning (Severe), and Rip Current Statement (Moderate) [nws_alerts].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+ "documents": {
+  "floodnet": "2 FloodNet community sensor(s) within 600 m have logged 14 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 1172 mm.",
+  "nws_obs": "Latest METAR at JFK Airport, NY (7.8 km away): 17.0\u00b0C (obs 2026-09-27T14:20).",
+  "noaa_tides": "Latest reading at Kings Point, NY: 10.22 ft above MLLW (+3.89 ft vs predicted tide), observed 2026-09-27 10:30.",
+  "usgs_gauges": "Nearest USGS stream gauge, Alley Creek Near Oakland Gardens NY (01302050, 5.7 km away): stage 0.68 ft, observed 2026-09-27 14:00 UTC.",
+  "nws_alerts": "3 active NWS alerts at this point: High Surf Advisory (Minor), Coastal Flood Warning (Severe), Rip Current Statement (Moderate)."
+ },
+ "values": {
+  "floodnet": {
+   "n_flood_events_3y": 14
+  },
+  "nws_obs": {
+   "precip_last_hour_mm": null,
+   "precip_last_6h_mm": null
+  },
+  "noaa_tides": {
+   "observed_ft_mllw": 10.22
+  },
+  "usgs_gauges": {},
+  "nws_alerts": {
+   "n_active": 3
+  }
+ },
+ "checks": [
+  "citations and numbers on every claim",
+  "lead rules on the answer; no entailment check needed, since the answer is the cited text word for word"
+ ],
+ "entailment": {},
+ "answer_mode": "extractive",
+ "answer_lead": "cannot_answer",
+ "answer_flags": []
+}

@@ -1,0 +1,317 @@
+{
+ "id": "q20",
+ "kind": "asset",
+ "question": "Are the schools near 116-02 Rockaway Beach Boulevard exposed to flooding?",
+ "error": null,
+ "wall_s": 60.3,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "116-02 Rockaway Beach Boulevard"
+   }
+  ],
+  "rationale": "The query asks about flood exposure for schools near a specific address, requiring point-level school data and flood risk layers.",
+  "question": "Are the schools near 116-02 Rockaway Beach Boulevard exposed to flooding?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "any",
+   "assets": [
+    "schools"
+   ]
+  },
+  "pebbles": [
+   "doe_schools",
+   "sandy",
+   "dep_moderate_current",
+   "dep_extreme_2080"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_extreme_2080",
+  "dep_moderate_2050",
+  "dep_moderate_current",
+  "doe_schools",
+  "fema_nfhl",
+  "sandy"
+ ],
+ "consulted": [
+  {
+   "id": "sandy",
+   "title": "NYC Sandy Inundation Zone (2012 empirical extent)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_extreme_2080",
+   "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "doe_schools",
+   "title": "NYC DOE schools exposed nearby",
+   "stone": "keystone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "ida_hwm",
+   "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "prithvi_water",
+   "title": "Satellite-detected surface water after Hurricane Ida (experimental)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo",
+   "title": "LiDAR / DEM-derived micro-topography",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  },
+  {
+   "id": "mta_entrances",
+   "title": "MTA subway/rail entrances exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nycha_developments",
+   "title": "NYCHA developments exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doh_hospitals",
+   "title": "NYC DOH hospitals exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_battery_surge",
+   "title": "Granite TTM r2 Battery Surge \u2014 96 h hourly nowcast (fine-tune)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_311_forecast",
+   "title": "Granite TTM r2 \u2014 weekly 311 flood-complaint forecast at this address",
+   "stone": "lodestone"
+  },
+  {
+   "id": "floodnet_forecast",
+   "title": "Granite TTM r2 \u2014 flood-event recurrence at nearest FloodNet sensor",
+   "stone": "lodestone"
+  },
+  {
+   "id": "npcc4_slr",
+   "title": "NPCC4 (2024) sea-level rise projections",
+   "stone": "lodestone"
+  },
+  {
+   "id": "policy_corpus",
+   "title": "NYC flood-policy corpus \u2014 agency reports + plans",
+   "stone": "cornerstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1741,
+  "completion": 146,
+  "seconds": 9.91,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 1718,
+  "completion": 672,
+  "seconds": 47.15,
+  "n_calls": 2
+ },
+ "n_documents": 6,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 2,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "Three of the four schools within 1,500 meters of 116-02 Rockaway Beach Boulevard are also modeled to be inside the NYC DEP extreme stormwater scenario for 2080 sea-level rise, further confirming flood exposure.",
+   "doc_ids": [
+    "dep_extreme_2080",
+    "doe_school_exposure"
+   ],
+   "numbers": [
+    "3",
+    "2080"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "The address is inside FEMA flood zone X, per NFHL FIRM panel 3604970379F, effective 2007.",
+   "doc_ids": [
+    "fema_nfhl"
+   ],
+   "numbers": [
+    "2007"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "The address is outside the modeled flooding in the NYC DEP stormwater scenarios for 2080 SLR, 2050 SLR, and current SLR.",
+   "doc_ids": [
+    "dep_extreme_2080",
+    "dep_moderate_2050",
+    "dep_moderate_current"
+   ],
+   "numbers": [
+    "2080",
+    "2050"
+   ]
+  }
+ ],
+ "dropped_claims": [
+  {
+   "section": "answer",
+   "text": "Four NYC DOE schools within 1,500 meters of 116-02 Rockaway Beach Boulevard are mapped within the 2012 Hurricane Sandy inundation footprint, indicating exposure to flooding.",
+   "doc_ids": [
+    "sandy_inundation",
+    "doe_school_exposure"
+   ],
+   "numbers": [
+    "4",
+    "2012",
+    "1,500"
+   ],
+   "reason": "answer check: inference: draws a conclusion joining two sources"
+  }
+ ],
+ "retried_claims": [
+  {
+   "section": "answer",
+   "text": "Four NYC DOE schools within 1,500 meters of 116-02 Rockaway Beach Boulevard are mapped within the 2012 Hurricane Sandy inundation footprint, indicating exposure to flooding.",
+   "doc_ids": [
+    "sandy_inundation",
+    "doe_school_exposure"
+   ],
+   "numbers": [
+    "4",
+    "2012",
+    "1,500"
+   ],
+   "reason": "answer check: inference: draws a conclusion joining two sources"
+  }
+ ],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThree of the four schools within 1,500 meters of 116-02 Rockaway Beach Boulevard are also modeled to be inside the NYC DEP extreme stormwater scenario for 2080 sea-level rise, further confirming flood exposure [dep_extreme_2080][doe_school_exposure].\n\n**Hazard Reader.**\nThe address is inside FEMA flood zone X, per NFHL FIRM panel 3604970379F, effective 2007 [fema_nfhl]. The address is outside the modeled flooding in the NYC DEP stormwater scenarios for 2080 SLR, 2050 SLR, and current SLR [dep_extreme_2080][dep_moderate_2050][dep_moderate_current].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; five answer rules on the answer; entailment check (GLiClass large, CPU) on the answer.",
+ "documents": {
+  "sandy_inundation": "This address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",
+  "fema_nfhl": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970379F, effective 2007.",
+  "dep_extreme_2080": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (3.66 in/hr, 2080 SLR).",
+  "dep_moderate_2050": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR).",
+  "dep_moderate_current": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, current SLR).",
+  "doe_school_exposure": "4 NYC DOE schools within 1500 m of this address: 4 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario (2080 sea-level rise)."
+ },
+ "values": {
+  "sandy_inundation": {},
+  "fema_nfhl": {},
+  "dep_extreme_2080": {},
+  "dep_moderate_2050": {},
+  "dep_moderate_current": {},
+  "doe_school_exposure": {
+   "n_schools": 4
+  }
+ },
+ "checks": [
+  "citations and numbers on every claim",
+  "five answer rules on the answer",
+  "entailment check (GLiClass large, CPU) on the answer"
+ ],
+ "entailment": {
+  "ran": true,
+  "backend": "gliclass",
+  "threshold": 0.787085,
+  "scores": [
+   {
+    "text": "Three of the four schools within 1,500 meters of 116-02 Rockaway Beach Boulevard are also modeled to be inside the NYC DEP extreme stormwater scenario for 2080 sea-level rise, further confirming flood exposure.",
+    "p_supported": 0.9491
+   }
+  ],
+  "seconds": 0.168,
+  "label": "entailment check (GLiClass large, CPU)"
+ },
+ "answer_mode": "guarded",
+ "answer_lead": null,
+ "answer_flags": []
+}

@@ -107,22 +107,43 @@
  "v3x": {
   "questions_with_answer": 17,
   "answer_hits": {
-   "absence": 0,
-   "universal": 0,
+   "absence": 1,
+   "universal": 1,
    "inference": 0,
-   "dropped_count": 0,
+   "dropped_count": 1,
    "datum": 0
   },
-  "answer_total": 0,
-  "answer_questions_flagged": 0,
+  "answer_total": 3,
+  "answer_questions_flagged": 2,
   "all_claim_hits": {
-   "absence": 0,
-   "universal": 0,
+   "absence": 1,
+   "universal": 1,
    "inference": 0,
-   "dropped_count": 0,
+   "dropped_count": 1,
    "datum": 2
   },
   "hits": [
+   {
+    "id": "a04",
+    "section": "answer",
+    "class": "absence",
+    "reason": "lead 'partly', but doh_hospital_exposure, the source the question is about, reports none",
+    "text": "partly: sandy_inundation, doh_hospital_exposure"
+   },
+   {
+    "id": "d01",
+    "section": "answer",
+    "class": "dropped_count",
+    "reason": "lead 'partly': a count or share question needs the count lead",
+    "text": "partly: dep_moderate_2050_nta"
+   },
+   {
+    "id": "d01",
+    "section": "answer",
+    "class": "universal",
+    "reason": "lead 'partly' needs one fact reporting a result and one reporting none or only some",
+    "text": "partly: dep_moderate_2050_nta"
+   },
    {
     "id": "o02",
     "section": "Hazard Reader",
@@ -136,6 +157,54 @@
     "class": "datum",
     "reason": "states an elevation without its datum",
     "text": "Elevation 2.31 m; this point sits at the 39.9th percentile of elevation within a 200 m window (lower percentile = topographic low); HAND 3.54 m above nearest drainage; TWI 8.63. Local basin relief: 21.29 m."
+   }
+  ]
+ },
+ "v4": {
+  "questions_with_answer": 16,
+  "answer_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 0,
+   "datum": 0
+  },
+  "answer_total": 0,
+  "answer_questions_flagged": 0,
+  "all_claim_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 0,
+   "datum": 0
+  },
+  "hits": []
+ },
+ "v4g": {
+  "questions_with_answer": 13,
+  "answer_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 1,
+   "datum": 0
+  },
+  "answer_total": 1,
+  "answer_questions_flagged": 1,
+  "all_claim_hits": {
+   "absence": 0,
+   "universal": 0,
+   "inference": 0,
+   "dropped_count": 1,
+   "datum": 0
+  },
+  "hits": [
+   {
+    "id": "a04",
+    "section": "answer",
+    "class": "dropped_count",
+    "reason": "omits the figure from doh_hospital_exposure (3)",
+    "text": "No hospitals within 3000 meters of 200 Water Street, Manhattan are mapped within the NYC DEP extreme stormwater scenario for 2080 sea-level rise."
    }
   ]
  }

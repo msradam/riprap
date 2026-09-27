@@ -1,0 +1,306 @@
+{
+ "id": "q19",
+ "kind": "asset",
+ "question": "Are the NYCHA developments near 560 Grand Street, Manhattan exposed to flooding?",
+ "error": null,
+ "wall_s": 58.0,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "560 Grand Street, Manhattan"
+   }
+  ],
+  "rationale": "Determine if NYCHA housing near the specified address falls within historical (Sandy) or projected (DEP models) flood zones.",
+  "question": "Are the NYCHA developments near 560 Grand Street, Manhattan exposed to flooding?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "any",
+   "assets": [
+    "public_housing"
+   ]
+  },
+  "pebbles": [
+   "nycha_developments",
+   "sandy",
+   "dep_moderate_current_nta",
+   "dep_extreme_2080_nta"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_moderate_2050",
+  "fema_nfhl",
+  "nycha_developments",
+  "sandy"
+ ],
+ "consulted": [
+  {
+   "id": "sandy",
+   "title": "NYC Sandy Inundation Zone (2012 empirical extent)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nycha_developments",
+   "title": "NYCHA developments exposed nearby",
+   "stone": "keystone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "dep_extreme_2080",
+   "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "ida_hwm",
+   "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "prithvi_water",
+   "title": "Satellite-detected surface water after Hurricane Ida (experimental)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo",
+   "title": "LiDAR / DEM-derived micro-topography",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  },
+  {
+   "id": "mta_entrances",
+   "title": "MTA subway/rail entrances exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doe_schools",
+   "title": "NYC DOE schools exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doh_hospitals",
+   "title": "NYC DOH hospitals exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_battery_surge",
+   "title": "Granite TTM r2 Battery Surge \u2014 96 h hourly nowcast (fine-tune)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_311_forecast",
+   "title": "Granite TTM r2 \u2014 weekly 311 flood-complaint forecast at this address",
+   "stone": "lodestone"
+  },
+  {
+   "id": "floodnet_forecast",
+   "title": "Granite TTM r2 \u2014 flood-event recurrence at nearest FloodNet sensor",
+   "stone": "lodestone"
+  },
+  {
+   "id": "npcc4_slr",
+   "title": "NPCC4 (2024) sea-level rise projections",
+   "stone": "lodestone"
+  },
+  {
+   "id": "policy_corpus",
+   "title": "NYC flood-policy corpus \u2014 agency reports + plans",
+   "stone": "cornerstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1741,
+  "completion": 155,
+  "seconds": 10.54,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 1575,
+  "completion": 632,
+  "seconds": 44.03,
+  "n_calls": 2
+ },
+ "n_documents": 4,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 2,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "Three of the five NYCHA developments within 2,000 meters of 560 Grand Street, Manhattan, are mapped within the 2012 Hurricane Sandy inundation footprint.",
+   "doc_ids": [
+    "nycha_development_exposure"
+   ],
+   "numbers": [
+    "3",
+    "5"
+   ]
+  },
+  {
+   "section": "answer",
+   "text": "Two of the five NYCHA developments within 2,000 meters of 560 Grand Street, Manhattan, are modeled to be inside the NYC DEP extreme stormwater scenario.",
+   "doc_ids": [
+    "nycha_development_exposure"
+   ],
+   "numbers": [
+    "2",
+    "5"
+   ]
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "The address is outside the empirical 2012 Hurricane Sandy inundation footprint.",
+   "doc_ids": [
+    "sandy_inundation"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "The address sits in FEMA flood zone X, per NFHL FIRM panel 3604970203F, effective 2007.",
+   "doc_ids": [
+    "fema_nfhl"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Hazard Reader",
+   "text": "The address is outside the modeled flooding in the NYC DEP stormwater scenario.",
+   "doc_ids": [
+    "dep_moderate_2050"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [
+  {
+   "section": "Hazard Reader",
+   "text": "The address is outside the modeled flooding in the NYC DEP stormwater scenario for 2050 with 2.13 in/hr and 2080 sea-level rise.",
+   "doc_ids": [
+    "dep_moderate_2050"
+   ],
+   "numbers": [],
+   "reason": "numbers not found in the cited documents: 2080"
+  }
+ ],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThree of the five NYCHA developments within 2,000 meters of 560 Grand Street, Manhattan, are mapped within the 2012 Hurricane Sandy inundation footprint [nycha_development_exposure]. Two of the five NYCHA developments within 2,000 meters of 560 Grand Street, Manhattan, are modeled to be inside the NYC DEP extreme stormwater scenario [nycha_development_exposure].\n\n**Hazard Reader.**\nThe address is outside the empirical 2012 Hurricane Sandy inundation footprint [sandy_inundation]. The address sits in FEMA flood zone X, per NFHL FIRM panel 3604970203F, effective 2007 [fema_nfhl]. The address is outside the modeled flooding in the NYC DEP stormwater scenario [dep_moderate_2050].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; five answer rules on the answer; entailment check (GLiClass large, CPU) on the answer.",
+ "documents": {
+  "sandy_inundation": "This address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",
+  "fema_nfhl": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970203F, effective 2007.",
+  "dep_moderate_2050": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR).",
+  "nycha_development_exposure": "5 NYCHA developments within 2000 m of this address: 3 inside the 2012 Sandy inundation extent and 2 inside the DEP extreme stormwater scenario (2080 sea-level rise)."
+ },
+ "values": {
+  "sandy_inundation": {},
+  "fema_nfhl": {},
+  "dep_moderate_2050": {},
+  "nycha_development_exposure": {
+   "n_developments": 5
+  }
+ },
+ "checks": [
+  "citations and numbers on every claim",
+  "five answer rules on the answer",
+  "entailment check (GLiClass large, CPU) on the answer"
+ ],
+ "entailment": {
+  "ran": true,
+  "backend": "gliclass",
+  "threshold": 0.787085,
+  "scores": [
+   {
+    "text": "Three of the five NYCHA developments within 2,000 meters of 560 Grand Street, Manhattan, are mapped within the 2012 Hurricane Sandy inundation footprint.",
+    "p_supported": 0.9996
+   },
+   {
+    "text": "Two of the five NYCHA developments within 2,000 meters of 560 Grand Street, Manhattan, are modeled to be inside the NYC DEP extreme stormwater scenario.",
+    "p_supported": 0.992
+   }
+  ],
+  "seconds": 0.276,
+  "label": "entailment check (GLiClass large, CPU)"
+ },
+ "answer_mode": "guarded",
+ "answer_lead": null,
+ "answer_flags": []
+}
