@@ -145,3 +145,25 @@ def test_empty_section_is_hidden_when_the_answer_covers_its_stone():
     text = _render(kept, docs, ["Hazard Reader", "Live Observer"], question="Did Sandy flood it?")
     assert "**Hazard Reader.**" not in text  # covered by the answer
     assert "**Live Observer.**\nNo grounded evidence" in text  # not covered: the gap stays visible
+
+
+def test_a_named_future_day_is_refused_but_a_past_day_is_not():
+    assert heuristic_plan("Will 200 Water Street, Manhattan flood next Tuesday?")["intent"] == "out_of_scope"
+    assert heuristic_plan("Is 80 Pioneer Street going to flood tomorrow?")["intent"] == "out_of_scope"
+    assert heuristic_plan("Did 80 Pioneer Street, Brooklyn flood on Monday?")["intent"] != "out_of_scope"
+    assert heuristic_plan("Is there flooding near 80 Pioneer Street right now?")["intent"] == "live_now"
+
+
+def test_compare_with_one_place_twice_is_a_single_address():
+    from app.planner import _validate
+
+    t = {"type": "address", "text": "200 Water Street, Manhattan"}
+    p = _validate({"intent": "compare", "targets": [t, dict(t)]}, "Will 200 Water Street flood?", [])
+    assert p.intent == "single_address" and p.targets == [t]
+
+
+def test_a_dep_question_runs_every_dep_scenario():
+    cat = [p.id for p in NYC.all()]
+    plan = {"intent": "single_address", "question": "Is it in any of the DEP stormwater flood scenarios?",
+            "pebbles": ["dep_extreme_2080"], "catalog": cat, "focus": {"time_frame": "future", "assets": []}}
+    assert {"dep_moderate_current", "dep_moderate_2050", "dep_extreme_2080"} <= set(select_pebbles(plan, NYC))

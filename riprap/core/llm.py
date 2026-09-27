@@ -67,7 +67,7 @@ def chat_json(messages: list[dict], schema: dict, *, name: str = "output",
 
     from app.emissions import measure_call  # noqa: PLC0415
 
-    timeout_s = timeout_s or float(os.environ.get("RIPRAP_LLM_TIMEOUT_S", "180"))
+    timeout_s = timeout_s or float(os.environ.get("RIPRAP_LLM_TIMEOUT_S", "300"))
     errors = []
     for ep in endpoints():
         try:
@@ -95,7 +95,7 @@ def chat_text(messages: list[dict], *, temperature: float = 0.0, max_tokens: int
     """Plain completion with the same endpoint fallback."""
     from openai import OpenAI  # noqa: PLC0415
 
-    timeout_s = timeout_s or float(os.environ.get("RIPRAP_LLM_TIMEOUT_S", "180"))
+    timeout_s = timeout_s or float(os.environ.get("RIPRAP_LLM_TIMEOUT_S", "300"))
     errors = []
     for ep in endpoints():
         try:

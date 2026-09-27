@@ -89,3 +89,12 @@ def test_a_count_is_matched_exactly_not_through_unit_conversion():
 def test_no_states_a_count_of_zero():
     doc = {"doh_hospital_exposure": "0 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario."}
     assert not check_answer(["No hospitals are mapped within 3000 meters."], "Are any hospitals nearby flooded?", doc)
+
+
+def test_figure_comes_from_the_structured_value_not_a_street_number():
+    doc = {"ida_hwm": "No Hurricane Ida high-water marks were surveyed within 800 m of this address. "
+                      "Nearest USGS-surveyed mark: East of 67th St. and Laurel Hill Blvd. (1126 m away)."}
+    q = "Did the area around 79-01 Broadway flood during Hurricane Ida?"
+    ans = ["No Hurricane Ida high-water marks were surveyed within 800 meters of the address."]
+    assert check_answer(ans, q, doc)  # from the sentence alone, "67" looks like the figure
+    assert not check_answer(ans, q, doc, {"ida_hwm": {"n_within_radius": 0}})

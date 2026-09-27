@@ -82,6 +82,14 @@ _DEVELOPMENT_RE = re.compile(r"\b(building|construction|permits?|development|pro
 _HOUSE_NUMBER_RE = re.compile(r"^\s*\d+(-\d+)?\s+\S")
 _OUT_OF_SCOPE_RE = re.compile(r"\b(should i (buy|rent|sell|move)|insurance (cost|premium|price|rate)"
                               r"|cost me|sue|lawsuit|lawyer|mortgage)\b", re.IGNORECASE)
+# A forecast for a named future day or date ("Will X flood next Tuesday?").
+# Needs a future word, so "Did it flood on Monday?" stays a history question.
+_FUTURE_DAY_RE = re.compile(
+    r"\b(will|going to|gonna|expected to|likely to|forecast)\b.*\b(tomorrow|next (monday|tuesday|wednesday"
+    r"|thursday|friday|saturday|sunday|week|weekend|month|year)|this (coming )?(monday|tuesday|wednesday"
+    r"|thursday|friday|saturday|sunday|weekend)|on (monday|tuesday|wednesday|thursday|friday|saturday|sunday)"
+    r"|on (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.? \d{1,2}|\d{1,2}/\d{1,2}(/\d{2,4})?)\b",
+    re.IGNORECASE)
 _OTHER_HAZARD_RE = {"heat": re.compile(r"\b(heat island|heat wave|heat vulnerab|hot in the summer)", re.I),
                     "air": re.compile(r"\b(air quality|aqi|air pollution|smog)\b", re.I)}
 
@@ -107,7 +115,7 @@ def heuristic_plan(query: str) -> dict:
             return {"intent": "out_of_scope", "rationale": f"Heuristic match: {hazard} question.",
                     "focus": {"hazard": hazard, "time_frame": "any", "assets": []},
                     "targets": [{"type": "address", "text": _address_from_query(q)}]}
-    if _OUT_OF_SCOPE_RE.search(q):
+    if _OUT_OF_SCOPE_RE.search(q) or _FUTURE_DAY_RE.search(q):
         return {"intent": "out_of_scope", "rationale": "Heuristic match: out of scope.",
                 "focus": {"hazard": "flood", "time_frame": "any", "assets": []},
                 "targets": [{"type": "address", "text": _address_from_query(q)}]}

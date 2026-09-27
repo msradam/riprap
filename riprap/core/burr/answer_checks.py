@@ -178,31 +178,60 @@ def check_claim(text: str, doc_ids: list[str], docs: dict[str, str]) -> list[tup
     return hits
 
 
-def check_answer(answer_texts: list[str], question: str, docs: dict[str, str]) -> list[tuple[str, str]]:
+# The structured field that holds each source's headline figure.
+COUNT_FIELD = {
+    "ida_hwm": "n_within_radius", "mta_entrance_exposure": "n_entrances", "doe_school_exposure": "n_schools",
+    "doh_hospital_exposure": "n_hospitals", "nycha_development_exposure": "n_developments",
+    "nyc311": "n", "nyc311_nta": "n", "floodnet": "n_flood_events_3y", "nws_alerts": "n_active",
+    "noaa_tides": "observed_ft_mllw",
+}
+
+
+def relevant_figure(rel: str, docs: dict[str, str], values: dict | None = None) -> float | None:
+    """The headline figure of the source a question is about: from the
+    pebble's structured value when there is one (a sentence can hold a
+    street number, "67th St."), else the first count in its sentence."""
+    v = (values or {}).get(rel)
+    if isinstance(v, dict):
+        if rel == "nws_obs":  # a rain question wants the precipitation reading
+            for k in ("precip_last_hour_mm", "precip_last_6h_mm"):
+                if v.get(k):
+                    return float(v[k])
+            return 0.0 if 0 in (v.get("precip_last_hour_mm"), v.get("precip_last_6h_mm")) else None
+        if COUNT_FIELD.get(rel) in v:
+            x = v[COUNT_FIELD[rel]]
+            return float(x) if isinstance(x, (int, float)) else None
+    from riprap.core.burr.synthesis import _parse
+
+    counts = count_numbers(docs.get(rel, ""), _NEAR.get(rel, ""))
+    parsed = _parse(counts[0]) if counts else None
+    return parsed[0] if parsed else None
+
+
+def check_answer(answer_texts: list[str], question: str, docs: dict[str, str],
+                 values: dict | None = None) -> list[tuple[str, str]]:
     """Answer-level check (dropped_count). An empty answer (the cannot-answer
     line) is not flagged: saying the evidence does not answer is honest."""
     if not answer_texts:
         return []
     rel = relevant_doc(question, docs)
-    if rel is None:
-        return []
-    counts = count_numbers(docs[rel], _NEAR.get(rel, ""))
-    if not counts:
+    figure = relevant_figure(rel, docs, values) if rel else None
+    if figure is None:
         return []
     from riprap.core.burr.synthesis import _parse
 
     # Exact equality: the verifier's unit-conversion tolerance would let
     # "0.76 ft" (2.49 m) stand in for a count of 2.
     said = {p[0] for n in count_numbers(words_to_digits(" ".join(answer_texts))) if (p := _parse(n))}
-    lead = _parse(counts[0])
-    if lead and lead[0] == 0 and ABSENCE_RE.search(" ".join(answer_texts)):
+    if figure == 0 and ABSENCE_RE.search(" ".join(answer_texts)):
         return []  # "no hospitals" states a count of 0
-    if lead and lead[0] not in said:
-        return [("dropped_count", f"omits the figure from {rel} ({counts[0]})")]
+    if figure not in said:
+        return [("dropped_count", f"omits the figure from {rel} ({figure:g})")]
     return []
 
 
-def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str]) -> list[tuple[str, str]]:
+def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str],
+               values: dict | None = None) -> list[tuple[str, str]]:
     """Extractive mode: check the model's lead against the facts it chose.
     The facts are template sentences shown verbatim, so only the lead and
     the choice of facts can be wrong."""
@@ -232,6 +261,6 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str])
     rel = relevant_doc(question, docs)
     if rel in texts and lead in ("yes", "partly") and not reports_result(texts[rel]):
         hits.append(("absence", f"lead {lead!r}, but {rel}, the source the question is about, reports none"))
-    if rel and rel not in facts and count_numbers(docs[rel], _NEAR.get(rel, "")):
+    if rel and rel not in facts and relevant_figure(rel, docs, values) is not None:
         hits.append(("dropped_count", f"omits {rel}, the source the question is about"))
     return hits

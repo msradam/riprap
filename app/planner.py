@@ -300,6 +300,11 @@ def _validate(d: dict[str, Any], raw_query: str, catalog_ids: list[str] | None =
         else:
             targets = [{"type": "nyc", "text": "NYC"}]
 
+    if intent == "compare":
+        # The planner can name one place twice; that is not a comparison.
+        distinct = list({t["text"].lower().strip(" ,."): t for t in targets}.values())
+        if len(distinct) < 2:
+            intent, targets = "single_address", distinct[:1] or [{"type": "address", "text": raw_query}]
     rationale = (d.get("rationale") or "").strip()[:300] or "(no rationale provided)"
     # The question is the user's own text, decided in code: the model
     # echoes a bare address or invents "What is the flood risk for X?".

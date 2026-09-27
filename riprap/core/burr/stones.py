@@ -20,6 +20,7 @@ from the other evidence.
 from __future__ import annotations
 
 import functools
+import re
 from collections.abc import Generator, Iterable
 from typing import Any
 
@@ -58,10 +59,17 @@ FOCUS_FLOOR = {
 }
 
 
+# A question about the DEP stormwater scenarios runs all of them.
+_DEP_RE = re.compile(r"\b(dep|stormwater)\b", re.IGNORECASE)
+DEP_FLOOR = ("dep_moderate_current", "dep_moderate_2050", "dep_extreme_2080",
+             "dep_moderate_current_nta", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
+
+
 def floor_for(plan: dict) -> set[str]:
     focus = plan.get("focus") or {}
     keys = [("time_frame", focus.get("time_frame")), *(("assets", a) for a in focus.get("assets") or [])]
-    return set(FLOOR.get(plan.get("intent"), ())).union(*(FOCUS_FLOOR.get(k, ()) for k in keys))
+    floor = set(FLOOR.get(plan.get("intent"), ())).union(*(FOCUS_FLOOR.get(k, ()) for k in keys))
+    return floor | set(DEP_FLOOR) if _DEP_RE.search(plan.get("question") or "") else floor
 
 
 def select_pebbles(plan: dict | None, registry) -> list[str]:
