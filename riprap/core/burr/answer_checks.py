@@ -78,8 +78,27 @@ def words_to_digits(text: str) -> str:
 
 
 def reports_result(doc: str) -> bool:
-    """True when a document reports something present, not an absence."""
+    """True when a document reports something present, not an absence. An
+    asset register reports a result when any of its inside counts is above
+    zero ("3 hospitals: 0 inside Sandy and 1 inside the DEP scenario")."""
+    counts = _register_counts(doc)
+    if counts:
+        return max(counts[1:]) > 0
     return bool(doc) and not _DOC_ABSENCE_RE.search(doc)
+
+
+def _partial(doc: str) -> bool:
+    """An asset register with some, but not all, of its assets inside."""
+    counts = _register_counts(doc)
+    return bool(counts) and any(0 < k < counts[0] for k in counts[1:])
+
+
+def is_count_question(question: str) -> bool:
+    return bool(_COUNT_QUESTION_RE.search(question or ""))
+
+
+_COUNT_QUESTION_RE = re.compile(r"\bhow (many|much)\b|\bshare\b|\bpercent|\bproportion\b|\bfraction\b"
+                                r"|\bnumber of\b", re.IGNORECASE)
 
 
 def _register_counts(doc: str) -> tuple[int, int, int] | None:
@@ -191,20 +210,28 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str])
         return []
     if not facts:
         return [("empty", f"lead {lead!r} with no facts")]
-    texts = [docs.get(i, "") for i in facts]
+    texts = dict(zip(facts, (docs.get(i, "") for i in facts), strict=True))
     hits: list[tuple[str, str]] = []
-    positive = [i for i, t in zip(facts, texts, strict=True) if reports_result(t)]
+    positive = [i for i, t in texts.items() if reports_result(t)]
+    negative = [i for i, t in texts.items() if not reports_result(t)]
+    partial = [i for i, t in texts.items() if _partial(t)]
+    if is_count_question(question) and lead not in ("count", "facts"):
+        hits.append(("dropped_count", f"lead {lead!r}: a count or share question needs the count lead"))
     if lead == "no" and positive:
         hits.append(("absence", f"lead 'no', but {', '.join(positive)} reports a result"))
     if lead == "yes":
         if not positive:
             hits.append(("absence", "lead 'yes', but every fact reports an absence"))
-        partial = [i for i, t in zip(facts, texts, strict=True) if (c := _register_counts(t)) and min(c[1:]) < c[0]]
         if partial:
             hits.append(("universal", f"lead 'yes', but {', '.join(partial)} counts only some; use 'partly'"))
-    if lead == "count" and not any(count_numbers(t) for t in texts):
+    if lead == "partly" and not (positive and (negative or partial)):
+        hits.append(("universal", "lead 'partly' needs one fact reporting a result and one reporting "
+                                  "none or only some"))
+    if lead == "count" and not any(count_numbers(t) for t in texts.values()):
         hits.append(("dropped_count", "lead 'count' needs a fact with a count"))
     rel = relevant_doc(question, docs)
+    if rel in texts and lead in ("yes", "partly") and not reports_result(texts[rel]):
+        hits.append(("absence", f"lead {lead!r}, but {rel}, the source the question is about, reports none"))
     if rel and rel not in facts and count_numbers(docs[rel], _NEAR.get(rel, "")):
         hits.append(("dropped_count", f"omits {rel}, the source the question is about"))
     return hits

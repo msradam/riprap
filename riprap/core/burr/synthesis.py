@@ -171,8 +171,9 @@ GUARD_RULES = """
 Answer claims are also checked in code. Do not say no, none or not when a cited document reports something. Do not write "all", "both" or "the <things> are" when a document counts fewer inside than in total; give the count ("3 of 5"). Do not join two documents with "which means", "indicating" or "therefore", and do not state a warning or forecast as something happening. State an elevation with its datum. Include the count or value that answers the question.
 """
 LEADS = ("yes", "no", "partly", "count", "cannot_answer")
-# ponytail: one module constant; refactor 3 phase 6 sets it by measurement.
-DEFAULT_ANSWER_MODE = "guarded"
+# The owner's decision after refactor 3: extractive cannot paraphrase, and
+# it declines honestly when the evidence does not answer.
+DEFAULT_ANSWER_MODE = "extractive"
 
 
 def answer_mode() -> str:
@@ -206,7 +207,9 @@ def _extract(out: dict, question: str, texts: dict[str, str]) -> tuple[str, list
     lead = a.get("lead") if a.get("lead") in LEADS else "cannot_answer"
     facts = [f for f in dict.fromkeys(a.get("facts") or []) if f in texts]
     return lead, facts, answer_checks.check_lead(lead, facts, question, texts)
-LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:"}
+# "facts" is set only by code: the facts with no yes or no in front of them.
+LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:",
+                "facts": "From the sources consulted:"}
 
 ANSWER_RULES = """
 A question was asked. First write one to three claims in section "answer" that answer it directly, using only the documents, with the same citation and number rules. Lead with the fact that answers the question. If the documents do not contain the answer, write no "answer" claims; do not guess. Then write the other sections as usual.
@@ -344,8 +347,16 @@ def synthesize(state) -> dict:
     if mode == "extractive":
         lead, facts, lead_hits = answer
         rel = answer_checks.relevant_doc(question, texts)
-        if rel and rel not in facts and lead != "cannot_answer" and any(k == "dropped_count" for k, _ in lead_hits):
+        appended = bool(rel and rel not in facts and lead != "cannot_answer"
+                        and any(k == "dropped_count" for k, _ in lead_hits))
+        if appended:
             facts = [*facts, rel]  # the source the question is about, verbatim
+        if (answer_checks.is_count_question(question) and lead not in ("count", "cannot_answer")
+                and any(answer_checks.count_numbers(texts[f]) for f in facts)):
+            lead = "count"  # a count or share question gets the number, not "In part."
+        lead_hits = answer_checks.check_lead(lead, facts, question, texts)
+        if appended and any(k != "dropped_count" for k, _ in lead_hits):
+            lead, lead_hits = "facts", []  # the appended fact no longer fits the lead: drop the lead
         if any(k != "dropped_count" for k, _ in lead_hits):
             dropped = [*dropped, {"section": ANSWER_SECTION, "text": f"{lead}: {', '.join(facts)}",
                                   "doc_ids": facts, "numbers": [],
