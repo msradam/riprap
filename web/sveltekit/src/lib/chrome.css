@@ -1,0 +1,72 @@
+/* App header and footer. In the base sheet (not styles.css) because the
+   root layout renders them on every route except the landing and print,
+   including error pages that sit outside the (app) route group. */
+
+/* ── App header ────────────────────────────────────────── */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--paper);
+  border-bottom: 2px solid var(--ink);
+}
+.app-header-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 14px 28px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+}
+.app-header-left { display: flex; align-items: center; gap: 12px; font-family: var(--font-mono); font-size: 13px; }
+.app-header-sep { color: var(--ink-tertiary); }
+.app-header-context { color: var(--ink-secondary); letter-spacing: 0.04em; }
+.app-header-mid { display: flex; justify-content: center; }
+.app-header-query {
+  background: var(--paper-deep);
+  border: 1px solid var(--rule-soft);
+  padding: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 360px;
+  text-align: left;
+}
+.app-header-query-icon { color: var(--ink-tertiary); }
+.app-header-query-edit {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-tertiary);
+}
+.app-header-right { display: flex; align-items: center; justify-content: flex-end; gap: 18px; font-family: var(--font-mono); font-size: 12px; }
+.app-header-link { color: var(--ink-secondary); text-decoration: none; border-bottom: 1px solid transparent; }
+.app-header-link:hover { border-bottom-color: var(--ink); color: var(--ink); }
+.app-header-status { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-tertiary); text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; }
+.app-header-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-graphical); display: inline-block; }
+
+/* Footer */
+.app-footer { background: var(--ink); color: var(--paper); }
+.app-footer-inner { max-width: 1600px; margin: 0 auto; padding: 32px 28px; display: flex; flex-direction: column; gap: 12px; }
+.app-footer-guard { font-size: 14px; line-height: 1.5; max-width: 70ch; margin: 0; }
+/* Footer text on ink: links in paper with an underline (17:1), secondary
+   lines in slate-450 (6.8:1). Blue on ink was 2.65:1. */
+.app-footer-guard a { color: var(--paper); text-decoration: underline; text-underline-offset: 2px; }
+.app-footer-guard a:hover { text-decoration-thickness: 2px; }
+.app-footer-build { font-family: var(--font-mono); font-size: 12px; color: var(--riprap-slate-450); margin: 0; letter-spacing: 0.04em; }
+.app-footer-credits { font-family: var(--font-mono); font-size: 12px; color: var(--riprap-slate-450); margin: 0; letter-spacing: 0.04em; }
+.app-footer-credits a { color: var(--paper); text-decoration: underline dotted; text-underline-offset: 2px; }
+.app-footer-credits a:hover { text-decoration-style: solid; }
+.app-footer :focus-visible { outline-color: var(--paper); }
+
+@media (max-width: 720px) {
+  .app-header-inner { grid-template-columns: 1fr; gap: 8px; }
+  .app-header-mid, .app-header-right { justify-content: flex-start; }
+  .app-header-query { min-width: 0; width: 100%; }
+}

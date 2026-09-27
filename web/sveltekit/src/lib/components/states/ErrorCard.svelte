@@ -68,7 +68,7 @@
         : 'Try a full street address.',
       tier: 'proxy',
       defaultActions: [
-        { label: 'Use a sample query', href: resolve('/q/[queryId]', { queryId: encodeURIComponent(SAMPLE_ADDRESS) }) },
+        { label: 'Use a sample query', href: resolve('/(app)/q/[queryId]', { queryId: encodeURIComponent(SAMPLE_ADDRESS) }) },
         // The landing reads ?q= into its search box and focuses it.
         { label: 'Edit query', href: query ? `${resolve('/')}?q=${encodeURIComponent(query)}` : resolve('/') }
       ]
@@ -115,7 +115,7 @@
   {#if state === 'geocoder' && looksLikeDistrict && !bodyOverride && (isUnknown || depName === 'nyc')}
     <p class="error-card-body">
       Write a district code with a space, for example QN 12, or read the precomputed
-      <a href="{resolve('/gallery/[slug]', { slug: 'qn12-complaints' })}/">QN 12 briefing in the gallery</a>.
+      <a href="{resolve('/(app)/gallery/[slug]', { slug: 'qn12-complaints' })}/">QN 12 briefing in the gallery</a>.
     </p>
   {/if}
   <div class="error-card-actions">

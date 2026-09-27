@@ -64,4 +64,8 @@
   }
   /* Below desktop the side rail collapses out of sticky behaviour
      (handled in styles.css's @media block). */
+  /* While a live briefing is generating, the rail waits: in one column it
+     sits under a short status line and was pushed down when the briefing
+     landed (a 0.38 layout shift on a phone). */
+  .app-shell-top.is-generating .app-region-side { display: none; }
 }

@@ -6,6 +6,11 @@
   import SkipLinks from '$lib/components/shell/SkipLinks.svelte';
   import { page } from '$app/state';
   import { resolve } from '$app/paths';
+  // The first view of every page sets its text in these three faces; the
+  // other weights load on demand through app.css (font-display: swap).
+  import sofia400 from '@fontsource/sofia-sans/files/sofia-sans-latin-400-normal.woff2?url';
+  import sofia600 from '@fontsource/sofia-sans/files/sofia-sans-latin-600-normal.woff2?url';
+  import mono500 from '@fontsource/overpass-mono/files/overpass-mono-latin-500-normal.woff2?url';
 
   interface Props { children: Snippet; }
   let { children }: Props = $props();
@@ -15,13 +20,20 @@
 
   // The landing at / and the print artifact at /print/<id> both bring
   // their own chrome, so the layout's AppHeader / AppFooter sit out
-  // for those. Briefings at /q/<id> still get the app chrome.
-  let isPrint = $derived(page.route.id?.startsWith('/print/') ?? false);
-  let isLanding = $derived(page.route.id === '/');
-  let chromeFree = $derived(isPrint || isLanding);
+  // for those. Briefings at /q/<id> and error pages still get the app
+  // chrome (styled by lib/chrome.css in the base sheet).
+  let routeId = $derived(page.route.id ?? '');
+  let isPrint = $derived(routeId.startsWith('/(app)/print/'));
+  let chromeFree = $derived(isPrint || routeId === '/');
   // Gallery pages are static snapshots: the header must not call /api/*.
-  let isGallery = $derived(page.route.id?.startsWith('/gallery') ?? false);
+  let isGallery = $derived(routeId.startsWith('/(app)/gallery'));
 </script>
+
+<svelte:head>
+  {#each [sofia400, sofia600, mono500] as href (href)}
+    <link rel="preload" as="font" type="font/woff2" {href} crossorigin="anonymous" />
+  {/each}
+</svelte:head>
 
 {#if !chromeFree}
   <SkipLinks />

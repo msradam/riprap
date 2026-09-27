@@ -2,17 +2,10 @@
    self-hosted. IBM Plex retired: --font-sans/--font-mono/--font-serif
    and the report-content --riprap-font-* tokens (tokens.css) all point
    here now, so there's exactly one type system in the app. */
-@import '@fontsource/sofia-sans/400.css';
-@import '@fontsource/sofia-sans/500.css';
-@import '@fontsource/sofia-sans/600.css';
-@import '@fontsource/sofia-sans/700.css';
-@import '@fontsource/sofia-sans/800.css';
-@import '@fontsource/overpass-mono/400.css';
-@import '@fontsource/overpass-mono/500.css';
-@import '@fontsource/overpass-mono/600.css';
 
+@import './lib/fonts.css';
 @import './lib/tokens.css';
-@import './lib/styles.css';
-@import './lib/layout.css';
-@import './lib/print.css';
-@import 'maplibre-gl/dist/maplibre-gl.css';
+@import './lib/chrome.css';
+/* styles.css, layout.css and print.css belong to the briefing, gallery and
+   print routes; routes/(app)/+layout.svelte loads them so the landing's
+   render-blocking CSS stays small. */

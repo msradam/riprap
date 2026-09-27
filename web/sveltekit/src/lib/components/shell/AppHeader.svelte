@@ -90,7 +90,7 @@
         <!-- The browser print view, built from the snapshot this run saved. -->
         <a
           class="app-header-link"
-          href={resolve('/print/[queryId]', { queryId: encodeURIComponent(page.params.queryId) })}
+          href={resolve('/(app)/print/[queryId]', { queryId: encodeURIComponent(page.params.queryId) })}
         >print</a>
         <button
           type="button"

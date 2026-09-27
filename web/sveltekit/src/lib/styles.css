@@ -1,54 +1,5 @@
 /* Riprap component styles. Civic-tech-clean. */
 
-/* ── App header ────────────────────────────────────────── */
-.app-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: var(--paper);
-  border-bottom: 2px solid var(--ink);
-}
-.app-header-inner {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 14px 28px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 24px;
-}
-.app-header-left { display: flex; align-items: center; gap: 12px; font-family: var(--font-mono); font-size: 13px; }
-.app-header-sep { color: var(--ink-tertiary); }
-.app-header-context { color: var(--ink-secondary); letter-spacing: 0.04em; }
-.app-header-mid { display: flex; justify-content: center; }
-.app-header-query {
-  background: var(--paper-deep);
-  border: 1px solid var(--rule-soft);
-  padding: 8px 14px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--ink);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 360px;
-  text-align: left;
-}
-.app-header-query-icon { color: var(--ink-tertiary); }
-.app-header-query-edit {
-  margin-left: auto;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-tertiary);
-}
-.app-header-right { display: flex; align-items: center; justify-content: flex-end; gap: 18px; font-family: var(--font-mono); font-size: 12px; }
-.app-header-link { color: var(--ink-secondary); text-decoration: none; border-bottom: 1px solid transparent; }
-.app-header-link:hover { border-bottom-color: var(--ink); color: var(--ink); }
-.app-header-status { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-tertiary); text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; }
-.app-header-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-graphical); display: inline-block; }
-
 /* ── Hero band (prototype) ───────────────────────────────── */
 .hero-band { background: var(--paper); border-bottom: 1px solid var(--rule-soft); }
 .hero-band-inner { max-width: 1600px; margin: 0 auto; padding: 32px 28px 56px; }
@@ -100,6 +51,8 @@
   grid-area: cites;
   position: static;
 }
+/* Findings cards are figures: digits line up across rows. */
+.app-region-findings { font-variant-numeric: tabular-nums; }
 .app-region-evidence { grid-area: evidence; }
 .app-region-trace { grid-area: trace; }
 
@@ -214,6 +167,16 @@
   text-wrap: pretty;
 }
 
+/* Backend disclosure (the scope preamble and the Out of scope section),
+   kept word for word but set as a quiet note so the Answer is the first
+   body text a reader meets. */
+.scope-note { margin: 0 0 20px; max-width: 70ch; }
+.scope-note .briefing-prose { font-size: 13px; line-height: 1.5; color: var(--ink-secondary); }
+.scope-note .briefing-para { margin: 0 0 6px; }
+.scope-note .briefing-para:last-child { margin-bottom: 0; }
+.scope-note-end { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--rule-soft); }
+.scope-note-label { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--ink-secondary); }
+
 .claim {
   position: relative;
 }
@@ -268,6 +231,7 @@
   border-bottom: 1px solid var(--rule-soft);
   padding: 16px 0;
   font-size: 13px;
+  font-variant-numeric: tabular-nums;
 }
 .citation-drawer-head {
   display: flex;
@@ -282,6 +246,8 @@
 .citation-item {
   display: grid;
   grid-template-columns: 32px 1fr;
+  /* [n] sits on the source line's baseline, not a few px above it. */
+  align-items: baseline;
   gap: 8px;
   padding: 10px 12px;
   border-left: 2px solid var(--rule-soft);
@@ -289,14 +255,12 @@
 }
 .citation-item.is-active {
   border-left-color: var(--accent-graphical);
-  background: rgba(209,124,0,0.06);
+  background: var(--paper-deep); /* was an off-palette orange tint */
 }
 .citation-num { font-family: var(--font-mono); color: var(--ink-tertiary); font-size: 12px; }
 .citation-line-1 { display: flex; align-items: center; gap: 8px; }
 .citation-source { font-weight: 600; }
 .citation-vintage { font-family: var(--font-mono); font-size: 11px; color: var(--ink-tertiary); margin-left: auto; }
-/* Small neutral tag for pebbles / citations whose manifest says maturity: experimental. */
-.exp-badge { display: inline-flex; align-items: center; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-secondary); border: 1px solid var(--rule-soft); border-radius: 3px; padding: 0 5px; line-height: 1.5; white-space: nowrap; }
 .citation-title { font-size: 13px; line-height: 1.4; margin: 4px 0; color: var(--ink-secondary); }
 .citation-meta { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--ink-tertiary); }
 .citation-drawer-foot { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--rule-soft); }
@@ -764,20 +728,6 @@
 .rationale-quote p { font-family: var(--font-serif); font-size: 19px; line-height: 1.55; margin: 0 0 16px; text-wrap: pretty; }
 .rationale-cite { display: block; font-family: var(--font-mono); font-size: 12px; color: var(--ink-tertiary); font-style: normal; }
 
-/* Footer */
-.app-footer { background: var(--ink); color: var(--paper); }
-.app-footer-inner { max-width: 1600px; margin: 0 auto; padding: 32px 28px; display: flex; flex-direction: column; gap: 12px; }
-.app-footer-guard { font-size: 14px; line-height: 1.5; max-width: 70ch; margin: 0; }
-/* Footer text on ink: links in paper with an underline (17:1), secondary
-   lines in slate-450 (6.8:1). Blue on ink was 2.65:1. */
-.app-footer-guard a { color: var(--paper); text-decoration: underline; text-underline-offset: 2px; }
-.app-footer-guard a:hover { text-decoration-thickness: 2px; }
-.app-footer-build { font-family: var(--font-mono); font-size: 12px; color: var(--riprap-slate-450); margin: 0; letter-spacing: 0.04em; }
-.app-footer-credits { font-family: var(--font-mono); font-size: 12px; color: var(--riprap-slate-450); margin: 0; letter-spacing: 0.04em; }
-.app-footer-credits a { color: var(--paper); text-decoration: underline dotted; text-underline-offset: 2px; }
-.app-footer-credits a:hover { text-decoration-style: solid; }
-.app-footer :focus-visible { outline-color: var(--paper); }
-
 /* Dark mode — deferred to v0.5 (see §17). Partial styles removed in v0.4.2. */
 
 /* ════════════════════════════════════════════════════════════════════
@@ -862,15 +812,6 @@
    surface zebra, tabular-nums on numeric columns, tokens throughout
    (was warm-newsprint hex left over from the Civic Hydrology palette
    pass — see tokens.css's header comment). */
-.visually-hidden {
-  position: absolute;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
 .register-frame { padding: 28px; background: var(--paper); border: 1px solid var(--rule-soft); margin-bottom: 22px; }
 .register-card { background: var(--riprap-surface-card); border: 1px solid var(--rule-soft); padding: 22px 26px; max-width: 760px; font-family: var(--riprap-font-sans); }
 .register-card-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--rule-soft); margin-bottom: 14px; }
@@ -929,9 +870,6 @@
 
 /* Mobile */
 @media (max-width: 720px) {
-  .app-header-inner { grid-template-columns: 1fr; gap: 8px; }
-  .app-header-mid, .app-header-right { justify-content: flex-start; }
-  .app-header-query { min-width: 0; width: 100%; }
   .hero-band-inner { padding: 20px 16px 32px; }
   .spec-band-inner { padding: 40px 16px 60px; }
   .spec-band-title { font-size: 28px; }

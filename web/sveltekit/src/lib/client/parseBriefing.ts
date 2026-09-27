@@ -264,6 +264,27 @@ export function parseBriefing(
   return { blocks, citations: cites, unresolvedDocIds: [...unresolvedDocIds] };
 }
 
+/** Display split of parsed blocks. `scope` is the preamble before the first
+ *  head (the backend's scope disclosure) and `outOfScope` is the body of the
+ *  "Out of scope" section: both are disclosure notes the page shows quietly,
+ *  apart from the Answer (`lead`) and the numbered sections (`body`). */
+export function splitBriefing(blocks: BriefingBlock[]) {
+  const firstHead = blocks.findIndex((b) => b.kind === 'head');
+  const scope = firstHead < 0 ? [] : blocks.slice(0, firstHead);
+  const rest = firstHead < 0 ? blocks : blocks.slice(firstHead);
+  const i = rest.findIndex((b) => b.kind === 'head' && b.label !== 'Answer');
+  const bodyStart = i < 0 ? rest.length : i;
+  const body: BriefingBlock[] = [];
+  const outOfScope: BriefingBlock[] = [];
+  let inOutOfScope = false;
+  for (const b of rest.slice(bodyStart)) {
+    if (b.kind === 'head') inOutOfScope = /^out of scope$/i.test(b.label.trim());
+    if (!inOutOfScope) body.push(b);
+    else if (b.kind !== 'head') outOfScope.push(b);
+  }
+  return { scope, lead: rest.slice(0, bodyStart), body, outOfScope };
+}
+
 /**
  * HTML escape — kept around because the v0.4.1 parser used it for the
  * status-preamble fallback path. The v0.4.2 parser drops the preamble

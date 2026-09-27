@@ -8,7 +8,7 @@
  * through as plain text.
  */
 import { describe, it, expect } from 'vitest';
-import { parseBriefing } from '$lib/client/parseBriefing';
+import { parseBriefing, splitBriefing } from '$lib/client/parseBriefing';
 
 function proseText(blocks: ReturnType<typeof parseBriefing>['blocks']): string {
   return blocks
@@ -72,5 +72,31 @@ describe('parseBriefing: answer section', () => {
     );
     const heads = blocks.filter((b) => b.kind === 'head');
     expect(heads.map((h) => (h.kind === 'head' ? h.n : ''))).toEqual(['00', '01', '02']);
+  });
+});
+
+describe('splitBriefing', () => {
+  const text = (bs: ReturnType<typeof parseBriefing>['blocks']) =>
+    bs.map((b) => (b.kind === 'head' ? `#${b.label}` : proseText([b]))).join(' | ');
+
+  it('separates the scope preamble, the Answer, the body and Out of scope', () => {
+    const { blocks } = parseBriefing(
+      'Scope line.\n\n**Answer.**\nYes [ida_hwm].\n\n**Hazard Reader.**\nZone X [fema_nfhl].\n\n' +
+        '**Out of scope.** Title.\n\nChecks run: citations.'
+    );
+    const s = splitBriefing(blocks);
+    expect(text(s.scope)).toBe('Scope line.');
+    expect(text(s.lead)).toMatch(/^#Answer \| Yes/);
+    expect(text(s.body)).toMatch(/^#Hazard Reader \| Zone X/);
+    expect(text(s.outOfScope)).toBe('Title. | Checks run: citations.');
+  });
+
+  it('keeps everything in the body when there is no preamble or Out of scope', () => {
+    const { blocks } = parseBriefing('**Hazard Reader.**\nZone X [fema_nfhl].');
+    const s = splitBriefing(blocks);
+    expect(s.scope).toEqual([]);
+    expect(s.lead).toEqual([]);
+    expect(s.outOfScope).toEqual([]);
+    expect(s.body).toEqual(blocks);
   });
 });

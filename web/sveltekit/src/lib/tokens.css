@@ -118,6 +118,18 @@ html, body {
   border-radius: 1px;
 }
 
+/* Selection in Mist with ink text: visible on every paper surface and
+   on the ink footer, and not Federal Blue (which means "actionable"). */
+::selection {
+  background: var(--riprap-mist);
+  color: var(--riprap-slate-950);
+}
+
+/* Underlines sit clear of descenders; a hover thickens them. Component
+   rules that set their own offset or hover still win. */
+a { text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -159,6 +171,20 @@ html, body {
 .skip-link:focus {
   left: 8px;
 }
+
+/* Used by the landing as well as the app routes, so they live in this
+   base sheet rather than styles.css (which only the app routes load). */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* Small neutral tag for pebbles / citations whose manifest says maturity: experimental. */
+.exp-badge { display: inline-flex; align-items: center; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-secondary); border: 1px solid var(--rule-soft); border-radius: 3px; padding: 0 5px; line-height: 1.5; white-space: nowrap; }
 
 /* ── Generic section labels ── */
 .section-label {

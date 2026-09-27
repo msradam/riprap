@@ -21,7 +21,7 @@
   }
 
   function briefHref(v: string) {
-    return resolve('/q/[queryId]', { queryId: encodeURIComponent(v) });
+    return resolve('/(app)/q/[queryId]', { queryId: encodeURIComponent(v) });
   }
 
   function submit() {
@@ -73,7 +73,7 @@
     </ul>
   </div>
   <p class="land-gallery">
-    <a href="{resolve('/gallery')}/">See precomputed briefings</a> in the gallery.
+    <a href="{resolve('/(app)/gallery')}/">See precomputed briefings</a> in the gallery.
   </p>
 </section>
 

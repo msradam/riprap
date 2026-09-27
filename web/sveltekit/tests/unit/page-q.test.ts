@@ -18,7 +18,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
-import Page from '../../src/routes/q/[queryId]/+page.svelte';
+import Page from '../../src/routes/(app)/q/[queryId]/+page.svelte';
 import { resetStores, seedForCity } from './helpers/stores';
 import { briefingState } from '$lib/stores/briefingState.svelte';
 import { deployment } from '$lib/stores/deployment.svelte';

@@ -4,7 +4,7 @@
   import CompareBriefing from '$lib/components/briefing/CompareBriefing.svelte';
   import CitationDrawer from '$lib/components/briefing/CitationDrawer.svelte';
   import DroppedClaims from '$lib/components/briefing/DroppedClaims.svelte';
-  import RipMap from '$lib/components/map/RipMap.svelte';
+  import LazyMap from '$lib/components/map/LazyMap.svelte';
   import MapLegend from '$lib/components/map/MapLegend.svelte';
   import SkeletonBriefing from '$lib/components/states/SkeletonBriefing.svelte';
   import ErrorCard from '$lib/components/states/ErrorCard.svelte';
@@ -14,6 +14,7 @@
   import { briefingState } from '$lib/stores/briefingState.svelte';
   import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
   import { looksLikeQuestion } from '$lib/client/runState.svelte';
+  import { splitBriefing } from '$lib/client/parseBriefing';
   import { browser } from '$app/environment';
   import { page } from '$app/state';
 
@@ -69,12 +70,11 @@
   /** Lists at or under this length open by default. */
   const SHORT_LIST = 8;
 
-  // Lead = disclaimer plus the Answer section; the body starts at the
-  // first other section head. Sources sit between the two.
-  let bodyStart = $derived.by(() => {
-    const i = blocks.findIndex((b) => b.kind === 'head' && b.label !== 'Answer');
-    return i < 0 ? blocks.length : i;
-  });
+  // Lead = the Answer section; the body starts at the first other section
+  // head. The backend's scope preamble and its "Out of scope" section are
+  // disclosure, so they render as quiet notes (words unchanged): the
+  // preamble under the Answer, Out of scope after the body.
+  let split = $derived(splitBriefing(blocks));
   let hasAnswer = $derived(blocks.some((b) => b.kind === 'head' && b.label === 'Answer'));
   let unanswered = $derived(
     !!question && !!run.finalResult && !run.stopped && !hasAnswer && grounding?.tier !== 'llm'
@@ -153,7 +153,7 @@
 
 <section class="hero-band">
   <div class="hero-band-inner">
-    <div class="app-shell-top is-desktop" class:is-stopped={run.stopped}>
+    <div class="app-shell-top is-desktop" class:is-stopped={run.stopped} class:is-generating={loading}>
       <main id="region-briefing" class="app-region app-region-brief" aria-labelledby="brief-h1">
         <header class="region-head">
           <span class="section-label">Briefing</span>
@@ -217,13 +217,22 @@
             />
             {#if showSources}{@render sources()}{/if}
           {:else}
-            {#if bodyStart > 0}
-              <Briefing blocks={blocks.slice(0, bodyStart)} {citations} streaming={false} />
+            {#if split.lead.length}
+              <Briefing blocks={split.lead} {citations} streaming={false} />
             {/if}
             {#if unanswered}{@render notAnswered()}{/if}
+            {#if split.scope.length}
+              <div class="scope-note"><Briefing blocks={split.scope} {citations} streaming={false} /></div>
+            {/if}
             {#if showSources}{@render sources()}{/if}
-            {#if bodyStart < blocks.length}
-              <Briefing blocks={blocks.slice(bodyStart)} {citations} streaming={false} />
+            {#if split.body.length}
+              <Briefing blocks={split.body} {citations} streaming={false} />
+            {/if}
+            {#if split.outOfScope.length}
+              <div class="scope-note scope-note-end">
+                <p class="scope-note-label">Out of scope</p>
+                <Briefing blocks={split.outOfScope} {citations} streaming={false} />
+              </div>
             {/if}
           {/if}
 
@@ -250,7 +259,8 @@
                 <div class="compare-map-place">
                   <div class="compare-map-label">A · {run.compareAddressA.label}</div>
                   <div style="position: relative;">
-                    <RipMap
+                    <LazyMap
+                ready={!loading}
                       address={run.compareAddressA}
                       activeLayers={active}
                       sandyEmpirical={run.sandyFcA}
@@ -266,7 +276,8 @@
                 <div class="compare-map-place">
                   <div class="compare-map-label">B · {run.compareAddressB.label}</div>
                   <div style="position: relative;">
-                    <RipMap
+                    <LazyMap
+                ready={!loading}
                       address={run.compareAddressB}
                       activeLayers={active}
                       sandyEmpirical={run.sandyFcB}
@@ -279,9 +290,12 @@
                 </div>
               {/if}
             </div>
-          {:else if run.address}
+          {:else}
+            <!-- Rendered before the geocode lands too, so the frame and the
+                 layer list hold their space and the citations never jump. -->
             <div style="position: relative; flex: 1; min-height: 0;">
-              <RipMap
+              <LazyMap
+                ready={!loading}
                 address={run.address}
                 activeLayers={active}
                 sandyEmpirical={run.sandyFc}
@@ -376,6 +390,9 @@
   }
   summary.sources-head {
     cursor: pointer;
+  }
+  summary.sources-head:hover {
+    text-decoration: underline;
   }
   .sources-list {
     margin: 4px 0 0;

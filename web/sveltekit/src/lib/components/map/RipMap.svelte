@@ -1,5 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  // Loaded with this component (see LazyMap), not in the global sheet.
+  import 'maplibre-gl/dist/maplibre-gl.css';
   import type { Map as MapLibreMap, GeoJSONSource } from 'maplibre-gl';
   import { POSITRON_NO_LABELS } from './baseStyle';
   import { registerSynStripe } from './synStripe';
@@ -413,7 +415,7 @@
       map.addLayer({
         id: 'queried-halo', type: 'circle', source: 'queried-address',
         paint: {
-          'circle-color': 'rgba(209, 124, 0, 0.20)',
+          'circle-color': 'rgba(0, 94, 162, 0.20)', // Federal Blue halo (was an off-palette orange)
           'circle-radius': 16
         }
       });
@@ -482,12 +484,33 @@
   .map-frame {
     aspect-ratio: 8 / 5.6;
     position: relative;
-    transition: outline-color 200ms ease;
+    transition: outline-color 150ms ease;
     outline: 0 solid transparent;
     outline-offset: 0;
   }
   .map-frame[data-linked]:not([data-linked='']) {
     outline: 2px solid var(--accent-graphical);
+  }
+  /* MapLibre's own focus is a cyan (#0096ff) glow and none at all on the
+     canvas; both take the app's focus token instead. */
+  /* !important: MapLibre sets `outline: none` inline on the canvas. */
+  .map-frame :global(.maplibregl-canvas:focus-visible) {
+    outline: 3px solid var(--riprap-focus) !important;
+    outline-offset: -3px;
+  }
+  /* The attribution toggle had no hover; match MapLibre's other buttons. */
+  .map-frame :global(.maplibregl-ctrl-attrib-button:hover) {
+    background-color: rgb(0 0 0 / 5%);
+  }
+  .map-frame :global(.maplibregl-ctrl-group button:focus),
+  .map-frame :global(.maplibregl-ctrl-attrib-button:focus) {
+    box-shadow: none;
+  }
+  .map-frame :global(.maplibregl-ctrl-group button:focus-visible),
+  .map-frame :global(.maplibregl-ctrl-attrib-button:focus-visible) {
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 0 3px var(--riprap-focus);
   }
   .link-badge {
     position: absolute;

@@ -13,7 +13,7 @@
   <nav class="land-header-nav">
     <a href="#methodology">Methodology</a>
     <a href="#sources">Sources</a>
-    <a href="{resolve('/gallery')}/">Gallery</a>
+    <a href="{resolve('/(app)/gallery')}/">Gallery</a>
   </nav>
 </header>
 

@@ -334,6 +334,11 @@
     outline: 3px solid var(--riprap-focus);
     outline-offset: 2px;
   }
+  /* Hover: disclosure labels darken to ink; a tier toggle takes a 2px ink edge. */
+  .layers-head:hover .section-label,
+  .layers-head:hover .layers-caret,
+  .layers-group summary:hover .layers-caret { color: var(--ink); }
+  .layers-master:hover { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
   .layers-master-state {
     margin-left: 4px;
     color: var(--ink-tertiary);

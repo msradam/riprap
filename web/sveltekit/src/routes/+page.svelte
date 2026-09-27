@@ -24,7 +24,6 @@
   import SourceStrip from '$lib/components/landing/SourceStrip.svelte';
   import UseBand from '$lib/components/landing/UseBand.svelte';
   import StandardsStrip from '$lib/components/landing/StandardsStrip.svelte';
-  import ByodDialog from '$lib/components/landing/ByodDialog.svelte';
   import LandStones from '$lib/components/landing/LandStones.svelte';
   import LandFooter from '$lib/components/landing/LandFooter.svelte';
   import { byodRegistry } from '$lib/stores/byodRegistry.svelte';
@@ -79,7 +78,13 @@
     </div>
   </div>
 
-  <ByodDialog open={byodOpen} onClose={() => (byodOpen = false)} />
+  <!-- Loaded on first open: it brings js-yaml and papaparse, which the
+       landing's first view does not need. -->
+  {#if byodOpen}
+    {#await import('$lib/components/landing/ByodDialog.svelte') then { default: ByodDialog }}
+      <ByodDialog open onClose={() => (byodOpen = false)} />
+    {/await}
+  {/if}
   <LandStones />
   <LandFooter />
 </div>
