@@ -218,10 +218,19 @@ NYC 311 pebbles keep their descriptor filter. Elsewhere
   manifest's comment.
 
 Each sentence says how many of how many records were kept, and "the
-latest N" when the feed hit its fetch limit. What this misses: the
-classifier matched its teacher at about 0.62 accuracy on silver labels,
-so it keeps some non-flood records and drops some flood ones; the
-category tables cannot see a flood report filed under another category.
+latest N" when the feed hit its fetch limit.
+
+What this misses. The classifier matches its teacher on the experiment's
+silver test set (0.618 accuracy; at the 0.0043 threshold it keeps 55% of
+silver flood records and drops 90% of the rest), but it does not hold up on
+live feeds: on 2026-09-27 it kept 89 of the latest 200 San Francisco
+requests near City Hall, led by street-cleaning reports of human waste,
+and 62 of 68 Albany requests near 24 Eagle Street, including sidewalk
+repairs (`tests/flood311_live_counts_2026-09-27.txt`). Albany had no silver
+labels, so the test set never measured it. Leave `RIPRAP_311_FILTER_PATH`
+unset until it is checked against hand labels. The category tables cannot
+see a flood report filed under another category, and Seattle's feed has no
+street-flooding category at all.
 
 ## Measuring it
 
