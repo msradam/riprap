@@ -28,6 +28,7 @@ def run(monkeypatch):
     def go(mode, question, *outputs):
         replies = list(outputs)
         monkeypatch.setenv("RIPRAP_ANSWER_MODE", mode)
+        monkeypatch.setenv("RIPRAP_ENTAILMENT", "off")  # tested on its own in test_entailment.py
         monkeypatch.setattr(syn, "_documents", lambda state: (DOCS, [], None))
         monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
         monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (replies.pop(0), "scripted"))

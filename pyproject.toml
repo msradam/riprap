@@ -67,6 +67,7 @@ ml = [
     "flair>=0.13.0,<0.16",
     "granite-tsfm>=0.3.0,<0.4",
     "pypdf>=5.0,<7",
+    "gliclass>=0.1.17,<0.1.18",
 ]
 # Batch earth-observation jobs (scripts/run_eo_batch.py), never per request.
 eo = [

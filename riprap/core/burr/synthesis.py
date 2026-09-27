@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from burr.core import State, action
 
 from riprap.core import llm
-from riprap.core.burr import answer_checks, evidence
+from riprap.core.burr import answer_checks, entailment, evidence
 from riprap.core.burr.templated_reconciler import NON_SCOPE_FOOTER, _scope_header, compose_briefing
 
 log = logging.getLogger("riprap.synthesis")
@@ -186,7 +186,7 @@ def answer_mode() -> str:
 
 
 def _guard(kept: list[dict], dropped: list[dict], texts: dict[str, str],
-           question: str) -> tuple[list[dict], list[dict], list[str]]:
+           question: str, values: dict | None = None) -> tuple[list[dict], list[dict], list[str]]:
     """Guarded mode: an answer claim failing an answer check is dropped with
     the reason. An omitted count asks for a retry but drops nothing (the
     claims that were written are still true)."""
@@ -198,15 +198,29 @@ def _guard(kept: list[dict], dropped: list[dict], texts: dict[str, str],
         else:
             out.append(c)
     notes = [f"the answer {r}" for _, r in answer_checks.check_answer(
-        [c["text"] for c in out if c["section"] == ANSWER_SECTION], question, texts)]
+        [c["text"] for c in out if c["section"] == ANSWER_SECTION], question, texts, values)]
     return out, dropped, notes
 
 
-def _extract(out: dict, question: str, texts: dict[str, str]) -> tuple[str, list[str], list[tuple[str, str]]]:
+def _checks_run(mode: str | None, entail_info: dict) -> list[str]:
+    """What was verified, in words, for the line at the end of the briefing."""
+    checks = ["citations and numbers on every claim"]
+    if mode == "guarded":
+        checks.append("five answer rules on the answer")
+        checks.append(f"{entail_info['label']} on the answer" if entail_info.get("ran")
+                      else entail_info.get("reason", "entailment check not run"))
+    elif mode == "extractive":
+        checks.append("lead rules on the answer; no entailment check needed, since the answer is the "
+                      "cited text word for word")
+    return checks
+
+
+def _extract(out: dict, question: str, texts: dict[str, str],
+             values: dict | None = None) -> tuple[str, list[str], list[tuple[str, str]]]:
     a = out.get("answer") or {}
     lead = a.get("lead") if a.get("lead") in LEADS else "cannot_answer"
     facts = [f for f in dict.fromkeys(a.get("facts") or []) if f in texts]
-    return lead, facts, answer_checks.check_lead(lead, facts, question, texts)
+    return lead, facts, answer_checks.check_lead(lead, facts, question, texts, values)
 # "facts" is set only by code: the facts with no yes or no in front of them.
 LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:",
                 "facts": "From the sources consulted:"}
@@ -289,6 +303,8 @@ def synthesize(state) -> dict:
     question, focus = plan.get("question") or "", plan.get("focus")
     mode = answer_mode() if question else None
     sections = list(dict.fromkeys(d.section for d in docs))
+    # Structured pebble values by doc_id, for the headline figure checks.
+    values = {e.doc_id: state.get(e.pebble_id) for e in items if isinstance(state.get(e.pebble_id), dict)}
     texts: dict[str, str] = {}
     for d in docs:
         texts[d.doc_id] = f"{texts.get(d.doc_id, '')} {d.text}".strip()
@@ -309,14 +325,19 @@ def synthesize(state) -> dict:
     messages = [{"role": "system", "content": SYSTEM_PROMPT + rules},
                 {"role": "user", "content": _user_prompt(docs, sections, question, focus)}]
 
+    entail_info: dict = {}
+
     def check(out: dict):
+        nonlocal entail_info
         kept, dropped = verify(out.get("claims") or [], docs, extra, exempt)
         notes: list[str] = []
         lead, facts, lead_hits = "", [], []
         if mode == "guarded":
-            kept, dropped, notes = _guard(kept, dropped, texts, question)
+            kept, dropped, notes = _guard(kept, dropped, texts, question, values)
+            kept, failed, entail_info = entailment.check(kept, texts)
+            dropped = [*dropped, *failed]
         elif mode == "extractive":
-            lead, facts, lead_hits = _extract(out, question, texts)
+            lead, facts, lead_hits = _extract(out, question, texts, values)
             notes = [f"answer lead {lead!r}: {r}" for _, r in lead_hits]
         return kept, dropped, notes, (lead, facts, lead_hits)
 
@@ -354,7 +375,7 @@ def synthesize(state) -> dict:
         if (answer_checks.is_count_question(question) and lead not in ("count", "cannot_answer")
                 and any(answer_checks.count_numbers(texts[f]) for f in facts)):
             lead = "count"  # a count or share question gets the number, not "In part."
-        lead_hits = answer_checks.check_lead(lead, facts, question, texts)
+        lead_hits = answer_checks.check_lead(lead, facts, question, texts, values)
         if appended and any(k != "dropped_count" for k, _ in lead_hits):
             lead, lead_hits = "facts", []  # the appended fact no longer fits the lead: drop the lead
         if any(k != "dropped_count" for k, _ in lead_hits):
@@ -365,9 +386,10 @@ def synthesize(state) -> dict:
         kept = [*({"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts),
                 *kept]
         lead_phrase = LEAD_PHRASES.get(lead, "")
+    checks = _checks_run(mode, entail_info)
     cited = {i for c in kept for i in c["doc_ids"]}
     return {
-        "paragraph": _render(kept, docs, sections, question, lead_phrase),
+        "paragraph": _render(kept, docs, sections, question, lead_phrase) + f"\n\nChecks run: {'; '.join(checks)}.",
         "citations": {k: v for k, v in evidence.citations(items).items() if k in cited},
         "grounding": {"tier": "llm", "model": model, "attempts": attempts,
                       "claims": kept, "dropped_claims": dropped,
@@ -375,7 +397,7 @@ def synthesize(state) -> dict:
                       "n_kept": len(kept), "n_dropped": len(dropped), "llm_calls": calls,
                       "question": question, "n_documents": len(docs), "answer_mode": mode,
                       "answer_lead": lead,
-                      "answer_flags": answer_flags,
+                      "answer_flags": answer_flags, "checks": checks, "entailment": entail_info,
                       "answered": any(c["section"] == ANSWER_SECTION for c in kept) if question else None},
     }
 

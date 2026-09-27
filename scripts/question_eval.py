@@ -67,6 +67,19 @@ def _doc_texts(out: dict) -> dict[str, str]:
         return {}
 
 
+def _doc_values(out: dict) -> dict[str, dict]:
+    """doc_id -> the headline figure fields of its pebble value (for the audit)."""
+    from riprap.core.burr.answer_checks import COUNT_FIELD
+    from riprap.core.burr.synthesis import _documents
+
+    keep = {*COUNT_FIELD.values(), "precip_last_hour_mm", "precip_last_6h_mm"}
+    try:
+        return {e.doc_id: {k: v for k, v in out[e.pebble_id].items() if k in keep}
+                for e in _documents(out)[1] if isinstance(out.get(e.pebble_id), dict)}
+    except Exception:  # noqa: BLE001 - informational
+        return {}
+
+
 def _n_documents(out: dict) -> int | None:
     try:
         from riprap.core.burr.synthesis import _documents
@@ -109,6 +122,8 @@ def cmd_run(outdir: Path, only: list[str] | None = None, suffix: str = "") -> No
             "retried_claims": g.get("retried_claims") or [],
             "paragraph": out.get("paragraph"),
             "documents": _doc_texts(out) if out else {},
+            "values": _doc_values(out) if out else {},
+            "checks": g.get("checks"), "entailment": g.get("entailment"),
             "answer_mode": g.get("answer_mode"), "answer_lead": g.get("answer_lead"),
             "answer_flags": g.get("answer_flags") or [],
         }

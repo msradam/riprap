@@ -1,0 +1,480 @@
+{
+ "backend": "gliclass",
+ "threshold": 0.787085,
+ "v2_1": {
+  "claims": 24,
+  "dropped": 5,
+  "median_seconds_per_question": 0.24,
+  "rows": [
+   {
+    "id": "a01",
+    "question": "Are the subway entrances near 1 East 161st Street, Bronx in a flood scenario?",
+    "text": "The subway entrances near 1 East 161st Street, Bronx are mapped within FEMA flood zone X and are outside the modeled flooding extents for both the 2012 Hurricane Sandy inundation and the NYC DEP stormwater scenarios (both current and projected sea-level rise).",
+    "doc_ids": [
+     "fema_nfhl",
+     "sandy_inundation",
+     "dep_extreme_2080",
+     "dep_moderate_2050",
+     "dep_moderate_current"
+    ],
+    "p_supported": 0.9994,
+    "dropped": false
+   },
+   {
+    "id": "a01",
+    "question": "Are the subway entrances near 1 East 161st Street, Bronx in a flood scenario?",
+    "text": "According to the MTA asset register, there are 8 subway entrances within 800 meters of this address, and none of them are inside the 2012 Sandy inundation extent or the DEP extreme stormwater scenario (2080 SLR).",
+    "doc_ids": [
+     "mta_entrance_exposure"
+    ],
+    "p_supported": 0.9993,
+    "dropped": false
+   },
+   {
+    "id": "a02",
+    "question": "How many public housing developments near 1310 Surf Avenue, Brooklyn were inside the Sandy flood extent?",
+    "text": "Five public housing developments near 1310 Surf Avenue, Brooklyn were inside the Hurricane Sandy flood extent.",
+    "doc_ids": [
+     "nycha_development_exposure"
+    ],
+    "p_supported": 0.9989,
+    "dropped": false
+   },
+   {
+    "id": "a03",
+    "question": "Are the schools near 79-01 Broadway, Queens exposed to flooding?",
+    "text": "One NYC DOE school within 1,500 meters of 79-01 Broadway, Queens, is modeled to be inside the NYC DEP extreme stormwater scenario for 2080 sea-level rise.",
+    "doc_ids": [
+     "doe_school_exposure"
+    ],
+    "p_supported": 0.9998,
+    "dropped": false
+   },
+   {
+    "id": "a04",
+    "question": "Are any hospitals near 200 Water Street, Manhattan in a flood scenario?",
+    "text": "No hospitals within 3000 meters of 200 Water Street, Manhattan are mapped within the 2012 Hurricane Sandy inundation footprint or the NYC DEP extreme stormwater scenario for 2080 sea-level rise.",
+    "doc_ids": [
+     "sandy_inundation",
+     "dep_extreme_2080",
+     "doh_hospital_exposure"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "a04",
+    "question": "Are any hospitals near 200 Water Street, Manhattan in a flood scenario?",
+    "text": "The address is located in FEMA flood zone AE, indicating a Special Flood Hazard Area.",
+    "doc_ids": [
+     "fema_nfhl"
+    ],
+    "p_supported": 1.0,
+    "dropped": false
+   },
+   {
+    "id": "a05",
+    "question": "Are there NYCHA developments near 1000 Richmond Terrace, Staten Island inside a flood scenario?",
+    "text": "One NYCHA development is mapped within the NYC DEP extreme stormwater scenario for 2080 sea-level rise and located within 2000 meters of 1000 Richmond Terrace, Staten Island.",
+    "doc_ids": [
+     "nycha_development_exposure"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "d01",
+    "question": "What share of community district QN04 is inside the DEP 2050 stormwater scenario?",
+    "text": "3.1% of community district QN04 is modeled to be inside the DEP 2050 stormwater scenario.",
+    "doc_ids": [
+     "dep_moderate_2050_nta"
+    ],
+    "p_supported": 0.0144,
+    "dropped": true
+   },
+   {
+    "id": "d02",
+    "question": "How many flooding complaints has community district QN04 had?",
+    "text": "Community district QN04 has had 623 flood-related complaints filed in the last 3 years.",
+    "doc_ids": [
+     "nyc311_nta"
+    ],
+    "p_supported": 0.9996,
+    "dropped": false
+   },
+   {
+    "id": "f01",
+    "question": "Would 79-01 Broadway, Queens flood in the NYC DEP extreme stormwater scenario for 2080?",
+    "text": "79-01 Broadway, Queens is modeled to be outside the flooding in the NYC DEP extreme stormwater scenario for 2080.",
+    "doc_ids": [
+     "dep_extreme_2080"
+    ],
+    "p_supported": 0.967,
+    "dropped": false
+   },
+   {
+    "id": "f02",
+    "question": "How much sea-level rise is projected near 200 Water Street, Manhattan by the 2050s?",
+    "text": "NPCC4 projects a sea-level rise of 0.38 meters (15 inches) near 200 Water Street, Manhattan by the 2050s.",
+    "doc_ids": [
+     "npcc4_slr"
+    ],
+    "p_supported": 0.0965,
+    "dropped": true
+   },
+   {
+    "id": "f03",
+    "question": "Is 1000 Richmond Terrace, Staten Island in any of the DEP stormwater flood scenarios?",
+    "text": "1000 Richmond Terrace, Staten Island is not mapped within any of the NYC DEP stormwater flood scenarios for 2050 or 2080.",
+    "doc_ids": [
+     "dep_moderate_2050",
+     "dep_extreme_2080"
+    ],
+    "p_supported": 0.98,
+    "dropped": false
+   },
+   {
+    "id": "h01",
+    "question": "Did the area around 79-01 Broadway, Queens flood during Hurricane Ida?",
+    "text": "The area around 79-01 Broadway, Queens was recorded as outside the empirical 2012 Hurricane Sandy inundation footprint.",
+    "doc_ids": [
+     "sandy_inundation"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "h01",
+    "question": "Did the area around 79-01 Broadway, Queens flood during Hurricane Ida?",
+    "text": "The address is mapped within FEMA flood zone X, per NFHL FIRM panel 3604970207F, effective 2007.",
+    "doc_ids": [
+     "fema_nfhl"
+    ],
+    "p_supported": 1.0,
+    "dropped": false
+   },
+   {
+    "id": "h01",
+    "question": "Did the area around 79-01 Broadway, Queens flood during Hurricane Ida?",
+    "text": "The address is modeled to be outside the NYC DEP stormwater scenario for 2050 with a 2.13 in/hr rainfall and sea-level rise.",
+    "doc_ids": [
+     "dep_moderate_2050"
+    ],
+    "p_supported": 0.9994,
+    "dropped": false
+   },
+   {
+    "id": "h02",
+    "question": "Was 1310 Surf Avenue, Brooklyn inside the area Hurricane Sandy flooded?",
+    "text": "1310 Surf Avenue, Brooklyn was recorded inside the empirical 2012 Hurricane Sandy inundation footprint.",
+    "doc_ids": [
+     "sandy_inundation"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "h03",
+    "question": "How many flooding complaints have been made to 311 near 200 Water Street, Manhattan?",
+    "text": "28 flooding complaints have been made to 311 near 200 Water Street, Manhattan in the past 5 years.",
+    "doc_ids": [
+     "nyc311"
+    ],
+    "p_supported": 0.9969,
+    "dropped": false
+   },
+   {
+    "id": "h04",
+    "question": "Have street flood sensors recorded flooding near 1 East 161st Street, Bronx?",
+    "text": "FloodNet community sensors within 600 meters of 1 East 161st Street, Bronx, have logged zero above-curb flood events in the past three years.",
+    "doc_ids": [
+     "floodnet"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "h05",
+    "question": "What past floods have been recorded near 1000 Richmond Terrace, Staten Island?",
+    "text": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 meters of 1000 Richmond Terrace, Staten Island.",
+    "doc_ids": [
+     "ida_hwm"
+    ],
+    "p_supported": 0.9586,
+    "dropped": false
+   },
+   {
+    "id": "h05",
+    "question": "What past floods have been recorded near 1000 Richmond Terrace, Staten Island?",
+    "text": "This address sits outside the empirical 2012 Hurricane Sandy inundation footprint.",
+    "doc_ids": [
+     "sandy_inundation"
+    ],
+    "p_supported": 1.0,
+    "dropped": false
+   },
+   {
+    "id": "h05",
+    "question": "What past floods have been recorded near 1000 Richmond Terrace, Staten Island?",
+    "text": "This address is in FEMA flood zone X, per NFHL FIRM panel 3604970188F, effective 2007.",
+    "doc_ids": [
+     "fema_nfhl"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "n01",
+    "question": "Is there a coastal flood alert at 1310 Surf Avenue, Brooklyn right now?",
+    "text": "There is a Coastal Flood Warning in effect for 1310 Surf Avenue, Brooklyn right now.",
+    "doc_ids": [
+     "nws_alerts"
+    ],
+    "p_supported": 0.0957,
+    "dropped": true
+   },
+   {
+    "id": "n02",
+    "question": "Is it raining near 79-01 Broadway, Queens right now?",
+    "text": "A Coastal Flood Warning is currently active for the area near 79-01 Broadway, Queens, indicating potential flooding conditions now.",
+    "doc_ids": [
+     "nws_alerts"
+    ],
+    "p_supported": 0.1559,
+    "dropped": true
+   },
+   {
+    "id": "n03",
+    "question": "What is the water level in the harbor near 200 Water Street, Manhattan right now?",
+    "text": "The water level at the harbor near 200 Water Street, Manhattan is currently 6.54 feet above Mean Lower Low Water (MLLW).",
+    "doc_ids": [
+     "noaa_tides"
+    ],
+    "p_supported": 0.7571,
+    "dropped": true
+   }
+  ]
+ },
+ "v3g": {
+  "claims": 21,
+  "dropped": 4,
+  "median_seconds_per_question": 0.192,
+  "rows": [
+   {
+    "id": "a01",
+    "question": "Are the subway entrances near 1 East 161st Street, Bronx in a flood scenario?",
+    "text": "The subway entrances near 1 East 161st Street, Bronx are not mapped within the 2012 Hurricane Sandy inundation footprint and are outside the modeled flooding scenarios for 2050 and 2080 sea-level rise.",
+    "doc_ids": [
+     "sandy_inundation",
+     "dep_extreme_2080",
+     "dep_moderate_2050",
+     "dep_moderate_current"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "a01",
+    "question": "Are the subway entrances near 1 East 161st Street, Bronx in a flood scenario?",
+    "text": "According to the MTA asset register, 0 of the 8 subway entrances within 800 meters of this address are inside the 2012 Sandy inundation extent or the DEP extreme stormwater scenario.",
+    "doc_ids": [
+     "mta_entrance_exposure"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "a02",
+    "question": "How many public housing developments near 1310 Surf Avenue, Brooklyn were inside the Sandy flood extent?",
+    "text": "Five public housing developments near 1310 Surf Avenue, Brooklyn were inside the Sandy flood extent.",
+    "doc_ids": [
+     "nycha_development_exposure"
+    ],
+    "p_supported": 0.999,
+    "dropped": false
+   },
+   {
+    "id": "a03",
+    "question": "Are the schools near 79-01 Broadway, Queens exposed to flooding?",
+    "text": "One NYC DOE school within 1,500 meters of 79-01 Broadway, Queens, is modeled to be inside the NYC DEP extreme stormwater scenario (2080 sea-level rise).",
+    "doc_ids": [
+     "doe_school_exposure"
+    ],
+    "p_supported": 0.9997,
+    "dropped": false
+   },
+   {
+    "id": "a04",
+    "question": "Are any hospitals near 200 Water Street, Manhattan in a flood scenario?",
+    "text": "No hospitals within 3000 meters of 200 Water Street, Manhattan are mapped within the NYC DEP extreme stormwater scenario for 2080 sea-level rise.",
+    "doc_ids": [
+     "dep_extreme_2080",
+     "doh_hospital_exposure"
+    ],
+    "p_supported": 0.9992,
+    "dropped": false
+   },
+   {
+    "id": "a05",
+    "question": "Are there NYCHA developments near 1000 Richmond Terrace, Staten Island inside a flood scenario?",
+    "text": "One NYCHA development is within 2000 meters of 1000 Richmond Terrace, Staten Island and is modeled to be inside the NYC DEP extreme stormwater scenario for 2080 sea-level rise.",
+    "doc_ids": [
+     "nycha_development_exposure"
+    ],
+    "p_supported": 0.9998,
+    "dropped": false
+   },
+   {
+    "id": "d01",
+    "question": "What share of community district QN04 is inside the DEP 2050 stormwater scenario?",
+    "text": "3.1% of community district QN04 is modeled to be inside the DEP 2050 stormwater scenario.",
+    "doc_ids": [
+     "dep_moderate_2050_nta"
+    ],
+    "p_supported": 0.0144,
+    "dropped": true
+   },
+   {
+    "id": "d02",
+    "question": "How many flooding complaints has community district QN04 had?",
+    "text": "Community district QN04 has had 623 flooding complaints in the past three years.",
+    "doc_ids": [
+     "nyc311_nta"
+    ],
+    "p_supported": 0.9993,
+    "dropped": false
+   },
+   {
+    "id": "f01",
+    "question": "Would 79-01 Broadway, Queens flood in the NYC DEP extreme stormwater scenario for 2080?",
+    "text": "79-01 Broadway, Queens is modeled to be outside the flooding in the NYC DEP extreme stormwater scenario for 2080.",
+    "doc_ids": [
+     "dep_extreme_2080"
+    ],
+    "p_supported": 0.967,
+    "dropped": false
+   },
+   {
+    "id": "f02",
+    "question": "How much sea-level rise is projected near 200 Water Street, Manhattan by the 2050s?",
+    "text": "NPCC4 projects a sea-level rise of 0.38 meters (15 inches) near 200 Water Street, Manhattan by the 2050s.",
+    "doc_ids": [
+     "npcc4_slr"
+    ],
+    "p_supported": 0.0965,
+    "dropped": true
+   },
+   {
+    "id": "f03",
+    "question": "Is 1000 Richmond Terrace, Staten Island in any of the DEP stormwater flood scenarios?",
+    "text": "1000 Richmond Terrace, Staten Island is not mapped within any of the NYC DEP stormwater flood scenarios.",
+    "doc_ids": [
+     "dep_extreme_2080",
+     "dep_moderate_2050"
+    ],
+    "p_supported": 0.9748,
+    "dropped": false
+   },
+   {
+    "id": "h01",
+    "question": "Did the area around 79-01 Broadway, Queens flood during Hurricane Ida?",
+    "text": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 meters of 79-01 Broadway, Queens; the nearest surveyed mark was 1126 meters away.",
+    "doc_ids": [
+     "ida_hwm"
+    ],
+    "p_supported": 0.9997,
+    "dropped": false
+   },
+   {
+    "id": "h02",
+    "question": "Was 1310 Surf Avenue, Brooklyn inside the area Hurricane Sandy flooded?",
+    "text": "1310 Surf Avenue, Brooklyn was recorded within the empirical 2012 Hurricane Sandy inundation footprint.",
+    "doc_ids": [
+     "sandy_inundation"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "h03",
+    "question": "How many flooding complaints have been made to 311 near 200 Water Street, Manhattan?",
+    "text": "28 flooding complaints have been made to 311 near 200 Water Street, Manhattan in the past 5 years.",
+    "doc_ids": [
+     "nyc311"
+    ],
+    "p_supported": 0.9969,
+    "dropped": false
+   },
+   {
+    "id": "h04",
+    "question": "Have street flood sensors recorded flooding near 1 East 161st Street, Bronx?",
+    "text": "Street flood sensors have not recorded any above-curb flood events near 1 East 161st Street, Bronx, within the last 3 years.",
+    "doc_ids": [
+     "floodnet"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "h05",
+    "question": "What past floods have been recorded near 1000 Richmond Terrace, Staten Island?",
+    "text": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 meters of 1000 Richmond Terrace, Staten Island.",
+    "doc_ids": [
+     "ida_hwm"
+    ],
+    "p_supported": 0.9586,
+    "dropped": false
+   },
+   {
+    "id": "h05",
+    "question": "What past floods have been recorded near 1000 Richmond Terrace, Staten Island?",
+    "text": "Three FloodNet community sensors within 600 meters of 1000 Richmond Terrace, Staten Island have logged 29 above-curb flood events in the last 3 years.",
+    "doc_ids": [
+     "floodnet"
+    ],
+    "p_supported": 0.9935,
+    "dropped": false
+   },
+   {
+    "id": "h05",
+    "question": "What past floods have been recorded near 1000 Richmond Terrace, Staten Island?",
+    "text": "Two NYC 311 flood-related complaints were filed within 200 meters of 1000 Richmond Terrace, Staten Island in the last 5 years, with the most common descriptor being Sewer Backup (Use Comments) (SA).",
+    "doc_ids": [
+     "nyc311"
+    ],
+    "p_supported": 0.9994,
+    "dropped": false
+   },
+   {
+    "id": "n01",
+    "question": "Is there a coastal flood alert at 1310 Surf Avenue, Brooklyn right now?",
+    "text": "There are 3 active NWS alerts at 1310 Surf Avenue, Brooklyn right now, including a Coastal Flood Warning (Severe).",
+    "doc_ids": [
+     "nws_alerts"
+    ],
+    "p_supported": 0.998,
+    "dropped": false
+   },
+   {
+    "id": "n02",
+    "question": "Is it raining near 79-01 Broadway, Queens right now?",
+    "text": "A Coastal Flood Warning (Severe) is active for the location near 79-01 Broadway, Queens, indicating potential flooding conditions now.",
+    "doc_ids": [
+     "nws_alerts"
+    ],
+    "p_supported": 0.0665,
+    "dropped": true
+   },
+   {
+    "id": "n03",
+    "question": "What is the water level in the harbor near 200 Water Street, Manhattan right now?",
+    "text": "The water level at the harbor near 200 Water Street, Manhattan right now is 6.54 feet above Mean Lower Low Water (MLLW).",
+    "doc_ids": [
+     "noaa_tides"
+    ],
+    "p_supported": 0.5355,
+    "dropped": true
+   }
+  ]
+ }
+}

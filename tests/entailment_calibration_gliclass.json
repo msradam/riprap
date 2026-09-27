@@ -1,0 +1,33 @@
+{
+ "backend": "gliclass",
+ "keep_true": 0.95,
+ "threshold": 0.787085,
+ "calibration": {
+  "n": 146,
+  "n_true": 40,
+  "auroc": 0.9729,
+  "seconds_per_claim": 0.225,
+  "true_kept": 0.95,
+  "false_caught": 0.8679,
+  "caught_by_perturbation": {
+   "direction": 0.8333,
+   "doc_swap": 0.925,
+   "number": 0.925,
+   "place": 0.375
+  }
+ },
+ "test": {
+  "n": 582,
+  "n_true": 158,
+  "auroc": 0.9281,
+  "seconds_per_claim": 0.211,
+  "true_kept": 0.8608,
+  "false_caught": 0.8467,
+  "caught_by_perturbation": {
+   "direction": 0.8933,
+   "doc_swap": 0.8354,
+   "number": 0.8734,
+   "place": 0.6667
+  }
+ }
+}

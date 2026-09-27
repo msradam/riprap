@@ -2,6 +2,7 @@
 riprap/core/burr/answer_checks.py (refactor 3).
 
     answer_audit.py audit tests/question_eval/v1 tests/question_eval/v2_1 ...
+    answer_audit.py entail tests/question_eval/v2_1 tests/question_eval/v3g
     answer_audit.py rebuild-docs tests/question_eval/audit_docs_30.json tests/question_eval/v2_1
 
 `audit` reads the run records `scripts/question_eval.py run` writes and
@@ -59,10 +60,10 @@ def audit_record(rec: dict, question: str, docs: dict[str, str]) -> list[dict]:
                          "text": c["text"]})
     if rec.get("answer_lead"):  # extractive: the facts are verbatim, so check the lead
         facts = [c["doc_ids"][0] for c in answer if c.get("doc_ids")]
-        for cls, reason in ac.check_lead(rec["answer_lead"], facts, question, docs):
+        for cls, reason in ac.check_lead(rec["answer_lead"], facts, question, docs, rec.get("values")):
             hits.append({"id": rec["id"], "section": "answer", "class": cls, "reason": reason,
                          "text": f"{rec['answer_lead']}: {', '.join(facts)}"})
-    for cls, reason in ac.check_answer([c["text"] for c in answer], question, docs):
+    for cls, reason in ac.check_answer([c["text"] for c in answer], question, docs, rec.get("values")):
         hits.append({"id": rec["id"], "section": "answer", "class": cls, "reason": reason,
                      "text": " ".join(c["text"] for c in answer)})
     return hits
@@ -92,6 +93,44 @@ def cmd_audit(dirs: list[Path]) -> None:
     (dirs[-1].parent / "audit.json").write_text(json.dumps(report, indent=1))
 
 
+def cmd_entail(dirs: list[Path]) -> None:
+    """Score every model-written answer claim with the entailment check and
+    write entail.json next to the arm directories (claims, scores, drops,
+    seconds per question). Extractive answers are the cited text, so they are
+    listed but not scored."""
+    import time
+
+    from riprap.core.burr import entailment as en
+
+    qs = _questions()
+    rebuilt = json.loads(DOCS_30.read_text()) if DOCS_30.exists() else {}
+    backend, threshold = en.backend(), en.THRESHOLDS[en.backend()]
+    report = {"backend": backend, "threshold": threshold}
+    for d in dirs:
+        rows, per_q = [], []
+        for f in sorted(d.glob("*.json")):
+            rec = json.loads(f.read_text())
+            if "claims" not in rec or f.stem.endswith("_rep") or rec.get("answer_lead"):
+                continue
+            docs = record_docs(rec, rebuilt)
+            t0, n = time.perf_counter(), 0
+            for c in rec["claims"]:
+                if c.get("section") != "answer":
+                    continue
+                ev = "\n".join(docs.get(i, "") for i in c.get("doc_ids") or [])
+                p = en.p_supported(c["text"], ev, backend)
+                n += 1
+                rows.append({"id": rec["id"], "question": qs[rec["id"]]["question"], "text": c["text"],
+                             "doc_ids": c.get("doc_ids"), "p_supported": round(p, 4), "dropped": p < threshold})
+            if n:
+                per_q.append(time.perf_counter() - t0)
+        report[d.name] = {"claims": len(rows), "dropped": sum(r["dropped"] for r in rows),
+                          "median_seconds_per_question": round(sorted(per_q)[len(per_q) // 2], 3) if per_q else None,
+                          "rows": rows}
+        print(d.name, {k: v for k, v in report[d.name].items() if k != "rows"}, flush=True)
+    (dirs[-1].parent / "entail.json").write_text(json.dumps(report, indent=1))
+
+
 def cmd_rebuild_docs(out: Path, arm: Path) -> None:
     """One no-LLM run per place, using the target each question resolved
     to in `arm` (the regex planner cannot pull a place out of a question);
@@ -118,6 +157,8 @@ if __name__ == "__main__":
     cmd, *args = sys.argv[1:] or ["help"]
     if cmd == "audit":
         cmd_audit([Path(a) for a in args])
+    elif cmd == "entail":
+        cmd_entail([Path(a) for a in args])
     elif cmd == "rebuild-docs":
         cmd_rebuild_docs(Path(args[0]), Path(args[1]))
     else:

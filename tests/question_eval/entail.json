@@ -1,0 +1,521 @@
+{
+ "backend": "gliclass",
+ "threshold": 0.787085,
+ "v2_1": {
+  "claims": 25,
+  "dropped": 3,
+  "median_seconds_per_question": 0.174,
+  "rows": [
+   {
+    "id": "q05",
+    "question": "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?",
+    "text": "The block around 90-01 183rd Street, Queens, was recorded to have a Hurricane Ida high-water mark within 800 meters, with the highest observed water elevation at 48.2 feet.",
+    "doc_ids": [
+     "ida_hwm"
+    ],
+    "p_supported": 0.9812,
+    "dropped": false
+   },
+   {
+    "id": "q06",
+    "question": "Was 80 Pioneer Street in Red Hook inside the area Hurricane Sandy flooded in 2012?",
+    "text": "80 Pioneer Street in Red Hook was recorded within the area Hurricane Sandy flooded in 2012.",
+    "doc_ids": [
+     "sandy_inundation"
+    ],
+    "p_supported": 0.9936,
+    "dropped": false
+   },
+   {
+    "id": "q07",
+    "question": "What flood events have been recorded near 400 Carroll Street, Brooklyn?",
+    "text": "The address at 400 Carroll Street, Brooklyn, was recorded within the empirical 2012 Hurricane Sandy inundation footprint and is mapped within FEMA flood zone AE, a Special Flood Hazard Area, per NFHL FIRM panel 3604970211F, effective 2007.",
+    "doc_ids": [
+     "sandy_inundation",
+     "fema_nfhl"
+    ],
+    "p_supported": 0.9998,
+    "dropped": false
+   },
+   {
+    "id": "q07",
+    "question": "What flood events have been recorded near 400 Carroll Street, Brooklyn?",
+    "text": "Four FloodNet community sensors within 600 meters of 400 Carroll Street, Brooklyn, have logged 27 above-curb flood events in the last three years, with a peak depth recorded by these sensors of 913 mm.",
+    "doc_ids": [
+     "floodnet"
+    ],
+    "p_supported": 0.9987,
+    "dropped": false
+   },
+   {
+    "id": "q08",
+    "question": "Did Hurricane Sandy flood 801 Father Capodanno Boulevard, Staten Island?",
+    "text": "801 Father Capodanno Boulevard, Staten Island, was recorded within the empirical 2012 Hurricane Sandy inundation footprint.",
+    "doc_ids": [
+     "sandy_inundation"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "q08",
+    "question": "Did Hurricane Sandy flood 801 Father Capodanno Boulevard, Staten Island?",
+    "text": "The address is mapped within FEMA flood zone AE, indicating it is a Special Flood Hazard Area as of 2007.",
+    "doc_ids": [
+     "fema_nfhl"
+    ],
+    "p_supported": 1.0,
+    "dropped": false
+   },
+   {
+    "id": "q08",
+    "question": "Did Hurricane Sandy flood 801 Father Capodanno Boulevard, Staten Island?",
+    "text": "The address is outside the modeled flooding for the NYC DEP stormwater scenario in 2050 with a 2.13 in/hr rainfall and sea-level rise.",
+    "doc_ids": [
+     "dep_moderate_2050"
+    ],
+    "p_supported": 0.9996,
+    "dropped": false
+   },
+   {
+    "id": "q09",
+    "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
+    "text": "People near 2017 East 17th Street, Brooklyn have made 34 flooding complaints to 311 within the past 5 years.",
+    "doc_ids": [
+     "nyc311"
+    ],
+    "p_supported": 0.9994,
+    "dropped": false
+   },
+   {
+    "id": "q10",
+    "question": "Is there flooding near 80 Pioneer Street, Brooklyn right now?",
+    "text": "There is a Coastal Flood Warning active for the area near 80 Pioneer Street, Brooklyn, indicating flooding is currently occurring.",
+    "doc_ids": [
+     "nws_alerts"
+    ],
+    "p_supported": 0.1525,
+    "dropped": true
+   },
+   {
+    "id": "q11",
+    "question": "Are there any active flood or coastal alerts at 116-02 Rockaway Beach Boulevard right now?",
+    "text": "There are three active NWS alerts at 116-02 Rockaway Beach Boulevard right now: a Coastal Flood Warning (Severe), a High Surf Advisory (Minor), and a Rip Current Statement (Moderate).",
+    "doc_ids": [
+     "nws_alerts"
+    ],
+    "p_supported": 0.9979,
+    "dropped": false
+   },
+   {
+    "id": "q12",
+    "question": "Is it raining hard near 90-01 183rd Street, Queens at the moment?",
+    "text": "No active flood alerts or precipitation observations indicate heavy rain near 90-01 183rd Street, Queens at the moment.",
+    "doc_ids": [
+     "nws_alerts",
+     "nws_obs"
+    ],
+    "p_supported": 0.0005,
+    "dropped": true
+   },
+   {
+    "id": "q13",
+    "question": "What is the water level in New York Harbor near 560 Grand Street, Manhattan right now?",
+    "text": "The water level at New York Harbor near 560 Grand Street, Manhattan, is currently 6.96 feet above Mean Lower Low Water (MLLW).",
+    "doc_ids": [
+     "noaa_tides"
+    ],
+    "p_supported": 0.8962,
+    "dropped": false
+   },
+   {
+    "id": "q14",
+    "question": "What does the 2050 stormwater scenario show at 400 Carroll Street, Brooklyn?",
+    "text": "The 2050 stormwater scenario models deep contiguous flooding (>4 ft) at 400 Carroll Street, Brooklyn.",
+    "doc_ids": [
+     "dep_moderate_2050"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "q15",
+    "question": "Is 2017 East 17th Street, Brooklyn in any of the DEP stormwater flood scenarios?",
+    "text": "2017 East 17th Street, Brooklyn is not mapped within any of the NYC DEP stormwater flood scenarios for 2050, 2080, or the current year.",
+    "doc_ids": [
+     "dep_moderate_2050",
+     "dep_extreme_2080",
+     "dep_moderate_current"
+    ],
+    "p_supported": 0.9899,
+    "dropped": false
+   },
+   {
+    "id": "q16",
+    "question": "How much sea level rise is projected at the Battery by 2050, and what does that mean for 116-02 Rockaway Beach Boulevard?",
+    "text": "NPCC4 (2024) projects a sea-level rise of 0.38 meters (15 inches) at the Battery by 2050, which means 116-02 Rockaway Beach Boulevard is modeled to be outside the flooding area under the NYC DEP stormwater scenario for that period.",
+    "doc_ids": [
+     "npcc4_slr",
+     "dep_moderate_2050"
+    ],
+    "p_supported": 0.9994,
+    "dropped": false
+   },
+   {
+    "id": "q17",
+    "question": "What do the future stormwater scenarios show near 801 Father Capodanno Boulevard, Staten Island?",
+    "text": "The future stormwater scenarios from the NYC DEP show that this address is outside the modeled flooding for both the moderate (2.13 in/hr, 2050 SLR) and extreme (3.66 in/hr, 2080 SLR) scenarios.",
+    "doc_ids": [
+     "dep_moderate_2050",
+     "dep_extreme_2080"
+    ],
+    "p_supported": 0.9805,
+    "dropped": false
+   },
+   {
+    "id": "q18",
+    "question": "Are the subway entrances near 90-01 183rd Street, Queens in a flood scenario?",
+    "text": "The subway entrances near 90-01 183rd Street, Queens are modeled to be inside the NYC DEP extreme stormwater scenario with 2080 sea-level rise.",
+    "doc_ids": [
+     "mta_entrance_exposure"
+    ],
+    "p_supported": 0.9984,
+    "dropped": false
+   },
+   {
+    "id": "q19",
+    "question": "Are the NYCHA developments near 560 Grand Street, Manhattan exposed to flooding?",
+    "text": "The NYCHA developments near 560 Grand Street, Manhattan, are mapped within the 2012 Hurricane Sandy inundation extent.",
+    "doc_ids": [
+     "nycha_development_exposure"
+    ],
+    "p_supported": 0.9992,
+    "dropped": false
+   },
+   {
+    "id": "q19",
+    "question": "Are the NYCHA developments near 560 Grand Street, Manhattan exposed to flooding?",
+    "text": "The address itself is outside the empirical 2012 Hurricane Sandy inundation footprint, but is located in FEMA flood zone X.",
+    "doc_ids": [
+     "sandy_inundation",
+     "fema_nfhl"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "q20",
+    "question": "Are the schools near 116-02 Rockaway Beach Boulevard exposed to flooding?",
+    "text": "Four NYC Department of Education (DOE) schools within a 1500-meter radius of 116-02 Rockaway Beach Boulevard are mapped within the 2012 Hurricane Sandy inundation footprint, indicating exposure to flooding.",
+    "doc_ids": [
+     "doe_school_exposure",
+     "sandy_inundation"
+    ],
+    "p_supported": 0.9955,
+    "dropped": false
+   },
+   {
+    "id": "q21",
+    "question": "Are any hospitals near 355 Food Center Drive, Bronx in a flood zone?",
+    "text": "No hospitals are mapped within 3000 meters of 355 Food Center Drive, Bronx, according to the Department of Health hospital exposure data.",
+    "doc_ids": [
+     "doh_hospital_exposure"
+    ],
+    "p_supported": 0.9319,
+    "dropped": false
+   },
+   {
+    "id": "q22",
+    "question": "Which public housing near 80 Pioneer Street, Brooklyn was inside the Sandy flood extent?",
+    "text": "Two NYCHA developments within 2000 meters of 80 Pioneer Street, Brooklyn were inside the 2012 Hurricane Sandy flood extent.",
+    "doc_ids": [
+     "nycha_development_exposure"
+    ],
+    "p_supported": 0.9959,
+    "dropped": false
+   },
+   {
+    "id": "q23",
+    "question": "How many street flooding complaints has community district QN12 had?",
+    "text": "Community District QN12 has had 4379 street flooding complaints in the past three years.",
+    "doc_ids": [
+     "nyc311_nta"
+    ],
+    "p_supported": 0.6728,
+    "dropped": true
+   },
+   {
+    "id": "q24",
+    "question": "What share of community district BK15 was inside the area Sandy flooded?",
+    "text": "38.5% of community district BK15 was inside the area Sandy flooded.",
+    "doc_ids": [
+     "sandy_nta"
+    ],
+    "p_supported": 0.9932,
+    "dropped": false
+   },
+   {
+    "id": "q25",
+    "question": "How much of community district QN12 is in the DEP extreme stormwater scenario?",
+    "text": "In the DEP extreme stormwater scenario for 2080 with sea level rise, 16.4% of community district QN12 is modeled to flood.",
+    "doc_ids": [
+     "dep_extreme_2080_nta"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   }
+  ]
+ },
+ "v3g": {
+  "claims": 24,
+  "dropped": 2,
+  "median_seconds_per_question": 0.186,
+  "rows": [
+   {
+    "id": "q05",
+    "question": "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?",
+    "text": "The block around 90-01 183rd Street, Queens was recorded to have a Hurricane Ida high-water mark within 800 meters, with the highest mark standing 0.76 ft above ground.",
+    "doc_ids": [
+     "ida_hwm"
+    ],
+    "p_supported": 0.9712,
+    "dropped": false
+   },
+   {
+    "id": "q06",
+    "question": "Was 80 Pioneer Street in Red Hook inside the area Hurricane Sandy flooded in 2012?",
+    "text": "80 Pioneer Street in Red Hook was recorded within the empirical 2012 Hurricane Sandy inundation footprint.",
+    "doc_ids": [
+     "sandy_inundation"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "q07",
+    "question": "What flood events have been recorded near 400 Carroll Street, Brooklyn?",
+    "text": "Hurricane Sandy inundated the area around 400 Carroll Street, Brooklyn, in 2012, as documented by the NYC OEM empirical footprint.",
+    "doc_ids": [
+     "sandy_inundation"
+    ],
+    "p_supported": 0.9995,
+    "dropped": false
+   },
+   {
+    "id": "q07",
+    "question": "What flood events have been recorded near 400 Carroll Street, Brooklyn?",
+    "text": "USGS recorded 10 high-water marks within 800 meters of 400 Carroll Street, Brooklyn, from Hurricane Ida, with the highest mark reaching 2.32 feet above ground and a water surface elevation of 30.6 feet NAVD88.",
+    "doc_ids": [
+     "ida_hwm"
+    ],
+    "p_supported": 0.9994,
+    "dropped": false
+   },
+   {
+    "id": "q07",
+    "question": "What flood events have been recorded near 400 Carroll Street, Brooklyn?",
+    "text": "Four FloodNet community sensors within 600 meters of 400 Carroll Street, Brooklyn, logged 27 above-curb flood events in the past three years, with the peak depth recorded at 913 mm.",
+    "doc_ids": [
+     "floodnet"
+    ],
+    "p_supported": 0.9979,
+    "dropped": false
+   },
+   {
+    "id": "q08",
+    "question": "Did Hurricane Sandy flood 801 Father Capodanno Boulevard, Staten Island?",
+    "text": "801 Father Capodanno Boulevard, Staten Island, was recorded within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",
+    "doc_ids": [
+     "sandy_inundation"
+    ],
+    "p_supported": 0.9998,
+    "dropped": false
+   },
+   {
+    "id": "q09",
+    "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
+    "text": "People near 2017 East 17th Street, Brooklyn have made 34 flooding complaints to 311 within the past 5 years.",
+    "doc_ids": [
+     "nyc311"
+    ],
+    "p_supported": 0.9994,
+    "dropped": false
+   },
+   {
+    "id": "q10",
+    "question": "Is there flooding near 80 Pioneer Street, Brooklyn right now?",
+    "text": "There is a Coastal Flood Warning active for the area near 80 Pioneer Street, Brooklyn, indicating potential flooding in the vicinity right now.",
+    "doc_ids": [
+     "nws_alerts"
+    ],
+    "p_supported": 0.0308,
+    "dropped": true
+   },
+   {
+    "id": "q11",
+    "question": "Are there any active flood or coastal alerts at 116-02 Rockaway Beach Boulevard right now?",
+    "text": "There are 3 active NWS alerts at 116-02 Rockaway Beach Boulevard right now, including a Coastal Flood Warning (Severe).",
+    "doc_ids": [
+     "nws_alerts"
+    ],
+    "p_supported": 0.9974,
+    "dropped": false
+   },
+   {
+    "id": "q13",
+    "question": "What is the water level in New York Harbor near 560 Grand Street, Manhattan right now?",
+    "text": "The water level at The Battery, New York Harbor, near 560 Grand Street, Manhattan, is currently 7.07 feet above Mean Lower Low Water (MLLW).",
+    "doc_ids": [
+     "noaa_tides"
+    ],
+    "p_supported": 0.9991,
+    "dropped": false
+   },
+   {
+    "id": "q14",
+    "question": "What does the 2050 stormwater scenario show at 400 Carroll Street, Brooklyn?",
+    "text": "The 2050 stormwater scenario models deep contiguous flooding (>4 ft) at 400 Carroll Street, Brooklyn.",
+    "doc_ids": [
+     "dep_moderate_2050"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "q15",
+    "question": "Is 2017 East 17th Street, Brooklyn in any of the DEP stormwater flood scenarios?",
+    "text": "2017 East 17th Street, Brooklyn is outside the modeled flooding in the NYC DEP stormwater scenarios for 2050 SLR (2.13 in/hr) and 2080 SLR (3.66 in/hr), as well as the current SLR scenario.",
+    "doc_ids": [
+     "dep_moderate_2050",
+     "dep_extreme_2080",
+     "dep_moderate_current"
+    ],
+    "p_supported": 0.9989,
+    "dropped": false
+   },
+   {
+    "id": "q16",
+    "question": "How much sea level rise is projected at the Battery by 2050, and what does that mean for 116-02 Rockaway Beach Boulevard?",
+    "text": "NPCC4 (2024) projects a sea-level rise of 0.38 meters (15 inches) at the Battery by 2050, relative to the 2000-2004 baseline.",
+    "doc_ids": [
+     "npcc4_slr"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   },
+   {
+    "id": "q16",
+    "question": "How much sea level rise is projected at the Battery by 2050, and what does that mean for 116-02 Rockaway Beach Boulevard?",
+    "text": "Given the projected 0.38 m (15 in) sea-level rise at the Battery by 2050, 116-02 Rockaway Beach Boulevard, which is outside the modeled flooding in the NYC DEP stormwater scenario for 2050, remains outside the projected floodplain for that period.",
+    "doc_ids": [
+     "npcc4_slr",
+     "dep_moderate_2050"
+    ],
+    "p_supported": 0.8619,
+    "dropped": false
+   },
+   {
+    "id": "q17",
+    "question": "What do the future stormwater scenarios show near 801 Father Capodanno Boulevard, Staten Island?",
+    "text": "The future stormwater scenarios from the NYC DEP show that the address at 801 Father Capodanno Boulevard, Staten Island, is outside the modeled flooding for both the moderate (2.13 in/hr, 2050 SLR) and extreme (3.66 in/hr, 2080 SLR) scenarios.",
+    "doc_ids": [
+     "dep_moderate_2050",
+     "dep_extreme_2080"
+    ],
+    "p_supported": 0.9768,
+    "dropped": false
+   },
+   {
+    "id": "q18",
+    "question": "Are the subway entrances near 90-01 183rd Street, Queens in a flood scenario?",
+    "text": "The subway entrances near 90-01 183rd Street, Queens are modeled to be inside the NYC DEP extreme stormwater scenario with 2080 sea-level rise, including 8 entrances within 800 meters.",
+    "doc_ids": [
+     "mta_entrance_exposure"
+    ],
+    "p_supported": 0.9983,
+    "dropped": false
+   },
+   {
+    "id": "q19",
+    "question": "Are the NYCHA developments near 560 Grand Street, Manhattan exposed to flooding?",
+    "text": "Three of the five NYCHA developments within 2,000 meters of 560 Grand Street, Manhattan, are mapped within the 2012 Hurricane Sandy inundation footprint.",
+    "doc_ids": [
+     "nycha_development_exposure"
+    ],
+    "p_supported": 0.9996,
+    "dropped": false
+   },
+   {
+    "id": "q19",
+    "question": "Are the NYCHA developments near 560 Grand Street, Manhattan exposed to flooding?",
+    "text": "Two of the five NYCHA developments within 2,000 meters of 560 Grand Street, Manhattan, are modeled to be inside the NYC DEP extreme stormwater scenario.",
+    "doc_ids": [
+     "nycha_development_exposure"
+    ],
+    "p_supported": 0.992,
+    "dropped": false
+   },
+   {
+    "id": "q20",
+    "question": "Are the schools near 116-02 Rockaway Beach Boulevard exposed to flooding?",
+    "text": "Three of the four schools within 1,500 meters of 116-02 Rockaway Beach Boulevard are also modeled to be inside the NYC DEP extreme stormwater scenario for 2080 sea-level rise, further confirming flood exposure.",
+    "doc_ids": [
+     "dep_extreme_2080",
+     "doe_school_exposure"
+    ],
+    "p_supported": 0.9491,
+    "dropped": false
+   },
+   {
+    "id": "q21",
+    "question": "Are any hospitals near 355 Food Center Drive, Bronx in a flood zone?",
+    "text": "No hospitals are mapped within 3000 meters of 355 Food Center Drive, Bronx, according to the Department of Health hospital exposure data.",
+    "doc_ids": [
+     "doh_hospital_exposure"
+    ],
+    "p_supported": 0.9319,
+    "dropped": false
+   },
+   {
+    "id": "q22",
+    "question": "Which public housing near 80 Pioneer Street, Brooklyn was inside the Sandy flood extent?",
+    "text": "Two NYCHA developments within 2000 meters of 80 Pioneer Street, Brooklyn were inside the 2012 Hurricane Sandy flood extent.",
+    "doc_ids": [
+     "nycha_development_exposure"
+    ],
+    "p_supported": 0.9959,
+    "dropped": false
+   },
+   {
+    "id": "q23",
+    "question": "How many street flooding complaints has community district QN12 had?",
+    "text": "Community district QN12 has had 4379 street flooding complaints in the past three years.",
+    "doc_ids": [
+     "nyc311_nta"
+    ],
+    "p_supported": 0.6615,
+    "dropped": true
+   },
+   {
+    "id": "q24",
+    "question": "What share of community district BK15 was inside the area Sandy flooded?",
+    "text": "38.5% of community district BK15 was inside the area Sandy flooded.",
+    "doc_ids": [
+     "sandy_nta"
+    ],
+    "p_supported": 0.9932,
+    "dropped": false
+   },
+   {
+    "id": "q25",
+    "question": "How much of community district QN12 is in the DEP extreme stormwater scenario?",
+    "text": "In the DEP extreme stormwater scenario for 2080 with sea level rise, 16.4% of community district QN12 is modeled to flood.",
+    "doc_ids": [
+     "dep_extreme_2080_nta"
+    ],
+    "p_supported": 0.9999,
+    "dropped": false
+   }
+  ]
+ }
+}
