@@ -1,108 +1,80 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
+  import { EXAMPLES } from '$lib/samples';
 
-  /** Landing hero — Civic-Hydrology voice.
-   *  H1: "A climate-exposure briefing for <city>." with rotating city.
-   *  Deck names the four primary source families (FEMA / NOAA / USGS /
-   *  city open data) so the trust-strip claim is foreshadowed inline.
-   *  Cycling "Try:" rail rotates real probe examples.
-   */
-
-  // "New York City" rather than "NYC" so the H1 line-break rhythm
-  // stays consistent across the rotation. NYC is short enough to fit
-  // beside "A climate-exposure briefing for", which makes the line
-  // visibly shorter than for Chicago / Seattle / San Francisco /
-  // Boston, where the city always falls to its own line. Using the
-  // long form keeps the city on the second line every cycle.
-  const CITIES = ['New York City', 'Chicago', 'Seattle', 'San Francisco', 'Boston', 'Albany'];
-
-  const SAMPLE_QUERIES = [
-    '80 Pioneer Street, Red Hook',
-    '233 S Wacker Dr, Chicago',
-    '1 City Hall Square, Boston',
-    '2100 5th Ave, Seattle',
-    '1 Dr Carlton B Goodlett Pl, San Francisco',
-    '25 Erie Blvd, Albany',
-    'PS 188, Lower East Side',
-    'Hammels Houses, Rockaway',
-  ];
+  /** Landing hero. A static headline (New York City is the production
+   *  deployment; the other cities are experimental and listed below in
+   *  CityPicker), the query box, and one runnable example per kind of
+   *  input the backend accepts. Nothing rotates: WCAG 2.2.2. */
 
   let q = $state('');
-  let cityIdx = $state(0);
-  let queryIdx = $state(0);
-  let cityFading = $state(false);
 
-  $effect(() => {
-    if (typeof window === 'undefined') return;
-    // Fade-out → swap text → fade-in. Avoids the absolute-positioning
-    // layout drift that detaches the trailing period from the H1.
-    // Period stays glued to the city because the city is a single span
-    // whose text content swaps in place.
-    const t = setInterval(() => {
-      cityFading = true;
-      setTimeout(() => {
-        cityIdx = (cityIdx + 1) % CITIES.length;
-        queryIdx = (queryIdx + 1) % SAMPLE_QUERIES.length;
-        cityFading = false;
-      }, 240);
-    }, 2400);
-    return () => clearInterval(t);
-  });
+  // "Edit query" from a briefing arrives as /?q=<query>. Attachments run
+  // on the client only, which matters because the landing is prerendered.
+  function prefill(node: HTMLInputElement) {
+    const v = new URLSearchParams(window.location.search).get('q');
+    if (v) {
+      q = v;
+      node.focus();
+    }
+  }
+
+  function briefHref(v: string) {
+    return resolve('/q/[queryId]', { queryId: encodeURIComponent(v) });
+  }
 
   function submit() {
     const v = q.trim();
     if (!v) return;
-    goto(`/q/${encodeURIComponent(v)}`);
-  }
-
-  function pickExample() {
-    const v = SAMPLE_QUERIES[queryIdx];
-    goto(`/q/${encodeURIComponent(v)}`);
+    goto(briefHref(v));
   }
 </script>
 
-<!-- +layout.svelte already wraps every page in <main> — this was a
-     second, nested <main>, tripping axe's landmark-no-duplicate-main /
-     landmark-main-is-top-level checks. -->
+<!-- +layout.svelte already wraps every page in <main>. -->
 <section class="land-hero">
   <h1 class="land-hero-h1">
     <span class="land-hero-headline">
-      <span class="land-hero-headline-intro">A climate-exposure briefing for</span>
-      <span class="land-hero-headline-city"><span
-        class="city-rotate"
-        class:is-fading={cityFading}
-        aria-live="polite"
-      >{CITIES[cityIdx]}</span>.</span>
+      <span class="land-hero-headline-intro">A flood-exposure briefing for</span>
+      <span class="land-hero-headline-city"><span class="city">New York City</span>.</span>
     </span>
     <span class="land-hero-deck">
-      Type an address. Get a written briefing on flood, heat, or air-quality
-      exposure. Every claim cites a public record from FEMA, NOAA, USGS, or
-      city open data.
+      Type an address, a community district, or a flood question. Get a written
+      briefing on flood exposure. Every claim cites a public record from FEMA,
+      NOAA, USGS, or city open data.
     </span>
   </h1>
 
   <form class="land-query" onsubmit={(e) => { e.preventDefault(); submit(); }} role="search">
     <span class="land-query-prompt" aria-hidden="true">›</span>
-    <label class="visually-hidden" for="land-query-input">Address, neighborhood, or BBL</label>
     <input
       id="land-query-input"
       type="text"
+      {@attach prefill}
       bind:value={q}
-      placeholder="Address, neighborhood, or BBL. e.g. 80 Pioneer Street, Red Hook"
+      placeholder="Address, district such as QN 12, or a question"
       class="land-query-input"
-      autocomplete="street-address"
+      autocomplete="off"
       enterkeyhint="search"
-      aria-label="Address, neighborhood, or BBL"
+      aria-label="Address, community district, or flood question"
     />
     <button type="submit" class="land-query-submit">Brief this place →</button>
   </form>
 
-  <div class="land-cycling" aria-live="polite">
-    <span class="land-cycling-label">Try:</span>
-    <button type="button" class="land-cycling-rail" onclick={pickExample} title="Run this example">
-      <span class="land-cycling-item" class:is-fading={cityFading}>{SAMPLE_QUERIES[queryIdx]}</span>
-    </button>
+  <div class="land-try">
+    <span class="land-try-label" id="land-try-label">Try:</span>
+    <ul class="land-try-list" aria-labelledby="land-try-label">
+      {#each EXAMPLES as ex (ex.kind)}
+        <li>
+          <span class="land-try-kind">{ex.kind}</span>
+          <a class="land-try-link" href={briefHref(ex.q)}>{ex.q}</a>
+        </li>
+      {/each}
+    </ul>
   </div>
+  <p class="land-gallery">
+    <a href="{resolve('/gallery')}/">See precomputed briefings</a> in the gallery.
+  </p>
 </section>
 
 <style>
@@ -122,13 +94,15 @@
     color: var(--ink);
     letter-spacing: -0.015em;
   }
-  /* Always two lines, city on its own line below — otherwise the
-     rotation reflows between one line (short cities like "Boston")
-     and two (e.g. "San Francisco"), changing the header's height
-     every 2.4s. */
   .land-hero-headline-intro,
   .land-hero-headline-city {
     display: block;
+  }
+  /* Ink, not federal blue: blue is reserved for things a reader can
+     act on (DESIGN.md, the Checkable Blue Rule). */
+  .city {
+    font-style: italic;
+    white-space: nowrap;
   }
   .land-hero-deck {
     font-family: var(--font-serif);
@@ -136,31 +110,6 @@
     line-height: 1.55;
     color: var(--ink-secondary);
     max-width: 64ch;
-  }
-
-  /* City-rotate — fade-out → swap text → fade-in. Single span so the
-     trailing period stays glued to the city text. H1 reflows naturally
-     when the city width changes (San Francisco is the widest). */
-  .city-rotate {
-    display: inline;
-    color: var(--accent);
-    font-style: italic;
-    white-space: nowrap;
-    transition: opacity 240ms ease;
-  }
-  .city-rotate.is-fading { opacity: 0; }
-  @media (prefers-reduced-motion: reduce) {
-    .city-rotate { transition: none; }
-  }
-
-  .visually-hidden {
-    position: absolute;
-    width: 1px; height: 1px;
-    padding: 0; margin: -1px;
-    overflow: hidden;
-    clip: rect(0,0,0,0);
-    white-space: nowrap;
-    border: 0;
   }
 
   .land-query {
@@ -193,6 +142,12 @@
     background: white;
     color: var(--ink);
   }
+  /* Inset ring so it sits inside the ink border: 3px federal blue on
+     white is 7:1. */
+  .land-query-input:focus-visible {
+    outline: 3px solid var(--riprap-focus);
+    outline-offset: -3px;
+  }
   .land-query-input::placeholder { color: var(--ink-tertiary); }
   .land-query-submit {
     padding: 0 22px;
@@ -208,57 +163,69 @@
   }
   .land-query-submit:hover { background: #000; }
 
-  /* Try-row: single-span fade pattern. align-items: center rather than
-     baseline — .land-cycling-rail is a <button>, and buttons don't
-     reliably expose their inner text's baseline to a flex ancestor
-     (the same class of misalignment as the header wordmark), which
-     floated "TRY:" out of line with the address text. */
-  .land-cycling {
+  .land-try {
     margin-top: 18px;
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 10px;
+    max-width: 760px;
     font-family: var(--font-mono);
     font-size: 13px;
     color: var(--ink-tertiary);
-    max-width: 760px;
   }
-  .land-cycling-label {
+  .land-try-label {
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    font-size: 11px;
-    line-height: 1.4em;
+    font-size: 12px;
     flex: 0 0 auto;
   }
-  .land-cycling-rail {
-    flex: 1 1 auto;
-    min-width: 0;
-    background: transparent;
-    border: 0;
+  .land-try-list {
+    list-style: none;
+    margin: 0;
     padding: 0;
-    cursor: pointer;
-    text-align: left;
-    line-height: 1.4em;
+    display: grid;
+    gap: 2px;
+    min-width: 0;
   }
-  .land-cycling-item {
+  .land-try-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .land-try-kind {
+    flex: 0 0 9ch;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .land-try-link {
     display: inline-block;
+    padding: 3px 0;
+    min-height: 24px;
     color: var(--ink);
-    border-bottom: 1px dotted var(--rule-soft);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    transition: opacity 240ms ease;
+    text-decoration: underline dotted var(--ink-tertiary);
+    text-underline-offset: 3px;
   }
-  .land-cycling-item.is-fading { opacity: 0; }
-  @media (prefers-reduced-motion: reduce) {
-    .land-cycling-item { transition: none; }
+  .land-try-link:hover { text-decoration-style: solid; }
+
+  .land-gallery {
+    margin: 14px 0 0;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: var(--ink-secondary);
+  }
+  .land-gallery a {
+    display: inline-block;
+    min-height: 24px;
+    color: var(--accent);
+    text-underline-offset: 2px;
   }
 
   @media (max-width: 640px) {
     .land-hero-headline { font-size: 38px; }
-    .land-hero { padding: 40px 24px 32px; }
+    .land-hero { padding: 40px 16px 32px; }
+    .land-try { flex-direction: column; gap: 6px; }
+    .land-try-list li { flex-direction: column; gap: 0; }
+    .land-try-kind { flex-basis: auto; }
   }
 </style>

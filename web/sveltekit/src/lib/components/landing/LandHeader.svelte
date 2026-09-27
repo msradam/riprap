@@ -9,7 +9,7 @@
 <header class="land-header">
   <span class="riprap-wordmark"><RipMark size={22} />riprap</span>
   <span class="land-header-sep">/</span>
-  <span class="land-header-context">Climate-exposure briefing</span>
+  <span class="land-header-context">Flood-exposure briefing</span>
   <nav class="land-header-nav">
     <a href="#methodology">Methodology</a>
     <a href="#sources">Sources</a>
@@ -27,9 +27,13 @@
        against "CLIMATE-EXPOSURE BRIEFING". Center is stable regardless
        of child display type. */
     align-items: center;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 8px 12px;
     padding: 20px 32px;
     border-bottom: 1px solid var(--rule-soft);
+  }
+  @media (max-width: 640px) {
+    .land-header { padding: 14px 16px; }
   }
   .land-header :global(.riprap-wordmark) {
     font-family: var(--font-serif);
@@ -40,7 +44,7 @@
   .land-header-sep { color: var(--ink-tertiary); }
   .land-header-context {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--ink-secondary);
@@ -48,7 +52,8 @@
   .land-header-nav {
     margin-left: auto;
     display: flex;
-    gap: 18px;
+    flex-wrap: wrap;
+    gap: 4px 18px;
     font-family: var(--font-mono);
     font-size: 12px;
   }

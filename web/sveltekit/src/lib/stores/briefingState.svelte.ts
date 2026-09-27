@@ -10,6 +10,8 @@
  * `window.open`) can hydrate from it without re-running the pipeline.
  */
 import type { BriefingBlock, Citation } from '$lib/types/claim';
+import { looksLikeQuestion, type RunState } from '$lib/client/runState.svelte';
+import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 
 export interface PrintSnapshot {
   queryId: string;
@@ -22,6 +24,62 @@ export interface PrintSnapshot {
   /** The place the backend resolved the query to (address, or district
    *  with its NTA name). Optional: older snapshots lack it. */
   resolvedPlace?: string | null;
+  /** The fields below are optional for the same reason. */
+  question?: string | null;
+  /** The reader-facing mode line, e.g. "Evidence briefing (no LLM)". */
+  mode?: string | null;
+  /** A question run in no-LLM mode that produced no Answer section. */
+  unanswered?: boolean;
+  /** Undefined when the payload predates the consulted list. */
+  consulted?: { title: string; failed: boolean }[];
+  notChecked?: string[];
+}
+
+/** Build the print snapshot from a finished run: the live route calls it
+ *  when the stream ends, the gallery when a reader presses Print. Mirrors
+ *  what ResultsView shows above the briefing body. */
+export function snapshotFromRun(
+  run: RunState,
+  queryId: string,
+  queryText: string,
+  generatedAt: string = new Date().toISOString(),
+): PrintSnapshot {
+  const f = run.finalResult;
+  const g = f?.grounding;
+  const question =
+    run.plan?.question || g?.question || (looksLikeQuestion(queryText) ? queryText : '');
+  const blocks = run.briefing.blocks;
+  const hasAnswer = blocks.some((b) => b.kind === 'head' && b.label === 'Answer');
+  let consulted: PrintSnapshot['consulted'];
+  if (f?.consulted || run.failedSteps.length) {
+    const failed = run.failedSteps;
+    consulted = (f?.consulted ?? []).map((c) => ({ title: c.title, failed: failed.includes(c.id) }));
+    const known = [...(f?.consulted ?? []), ...(f?.not_checked ?? [])].map((c) => c.id);
+    for (const id of failed) {
+      if (!known.includes(id)) consulted.push({ title: pebbleManifest.byId[id]?.title ?? id, failed: true });
+    }
+  }
+  let mode: string | null = null;
+  if (g?.tier === 'llm') {
+    mode = `LLM claims checked against cited sources: ${g.claims?.length ?? 0} kept, ${g.dropped_claims?.length ?? 0} dropped${g.model ? ` (${g.model})` : ''}`;
+  } else if (g) {
+    mode = 'Evidence briefing (no LLM)';
+  }
+  return {
+    queryId,
+    queryText,
+    intent: run.plan?.intent ?? null,
+    specialists: run.plan?.specialists?.length ?? 0,
+    blocks,
+    citations: run.briefing.citations,
+    generatedAt,
+    resolvedPlace: run.resolvedPlace,
+    question: question || null,
+    mode,
+    unanswered: !!question && !hasAnswer && g?.tier !== 'llm',
+    consulted,
+    notChecked: f?.not_checked?.map((c) => c.title),
+  };
 }
 
 /** Coarse pipeline phase, surfaced in the AppHeader status indicator
@@ -33,6 +91,7 @@ export type RunPhase =
   | 'specialists'   // FSM is firing data Stones (cornerstone → lodestone)
   | 'reconciling'   // Capstone is composing the briefing (arrives whole in `final`)
   | 'done'
+  | 'stopped'       // ended on purpose: refused, or the place did not resolve
   | 'error';
 
 class BriefingState {
@@ -70,6 +129,14 @@ class BriefingState {
 
   markError(msg: string) {
     this.phase = 'error';
+    this.errorMessage = msg;
+  }
+
+  /** A run that ended without a briefing on purpose (a refusal, an
+   *  unresolved place). Not an error: the pill shows it in neutral ink. */
+  markStopped(msg: string) {
+    this.phase = 'stopped';
+    this.activeStep = null;
     this.errorMessage = msg;
   }
 }

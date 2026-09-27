@@ -1,39 +1,51 @@
 <script lang="ts">
-  /** StandardsStrip — compliance badges.
-   *
-   *  Surfaces the civic-tech compliance registers the design and
-   *  implementation satisfy. Aspirational badges (USWDS, WCAG 2.2 AA,
-   *  Section 508, Plain Writing Act, OSS) serve as a procurement/audit
-   *  shorthand for federal + state buyers. Drop badges that no longer
-   *  hold; don't add badges the implementation can't substantiate.
-   */
+  /** StandardsStrip: the standards the design and implementation are
+   *  built to. Worded as commitments, not certification: no check marks,
+   *  and a heading that says so. Drop entries that no longer hold; don't
+   *  add ones the implementation can't substantiate. */
+  const STANDARDS = ['USWDS', 'WCAG 2.2 AA', 'Section 508', 'Plain Writing Act'];
 </script>
 
-<div class="standards-strip" role="region" aria-label="Compliance badges">
-  <span class="badge"><span class="tick">✓</span> <strong>USWDS</strong></span>
-  <span class="badge"><span class="tick">✓</span> <strong>WCAG 2.2 AA</strong></span>
-  <span class="badge"><span class="tick">✓</span> <strong>Section 508</strong></span>
-  <span class="badge"><span class="tick">✓</span> <strong>Plain Writing Act</strong></span>
-  <span class="badge"><span class="tick">✓</span> <strong>Open source</strong>&nbsp;· Apache-2.0</span>
-</div>
+<section class="standards-strip" aria-labelledby="standards-head">
+  <h2 class="standards-head" id="standards-head">Standards we build to</h2>
+  <ul class="standards-list">
+    {#each STANDARDS as s (s)}
+      <li class="badge"><strong>{s}</strong></li>
+    {/each}
+    <li class="badge"><strong>Open source</strong>&nbsp;· Apache-2.0</li>
+  </ul>
+</section>
 
 <style>
   .standards-strip {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
     margin-top: 28px;
     padding-top: 18px;
     border-top: 1px solid var(--rule-soft);
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.04em;
     color: var(--ink-tertiary);
+  }
+  .standards-head {
+    margin: 0 0 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-secondary);
+  }
+  .standards-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
   .badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
     padding: 4px 14px 4px 0;
     margin-right: 14px;
     border-right: 1px solid var(--rule-soft);
@@ -42,10 +54,6 @@
   .badge:last-child {
     border-right: none;
     margin-right: 0;
-  }
-  .badge .tick {
-    color: var(--accent);
-    font-weight: 600;
   }
   .badge strong {
     color: var(--ink);

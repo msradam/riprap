@@ -56,6 +56,9 @@
     padding: 56px 32px;
     border-top: 1px solid var(--rule-soft);
   }
+  @media (max-width: 640px) {
+    .land-section-stones-detail { padding: 40px 16px; }
+  }
   .land-page { max-width: 1200px; margin: 0 auto; }
   .land-section-head {
     display: flex;
@@ -71,7 +74,7 @@
      bare <span>, jumping straight from the page's h1 to h3). Reset the
      browser's default h2 margin so it still sits inline like the span
      did. */
-  .land-section-h2 { margin: 0; }
+  .land-section-h2 { margin: 0; font-size: 12px; }
   .land-section-meta {
     font-family: var(--font-serif);
     font-style: italic;
@@ -147,7 +150,7 @@
     padding-top: 10px;
     border-top: 1px dashed var(--rule-soft);
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     color: var(--ink-secondary);
     line-height: 1.55;
   }

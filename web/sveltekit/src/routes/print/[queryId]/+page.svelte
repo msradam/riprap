@@ -1,9 +1,12 @@
 <script lang="ts">
   import { page } from '$app/state';
+  import { resolve } from '$app/paths';
   import { onMount } from 'svelte';
   import Briefing from '$lib/components/briefing/Briefing.svelte';
   import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
   import { loadSnapshot, type PrintSnapshot } from '$lib/stores/briefingState.svelte';
+  import { formatGeneratedAt } from '$lib/client/gallery';
+  import { APP_VERSION } from '$lib/version';
 
   let queryId = $derived(page.params.queryId ?? '');
   let snapshot = $state<PrintSnapshot | null>(null);
@@ -20,51 +23,88 @@
     // Wait one rAF so the DOM lays out before opening the print dialog.
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        if (typeof window !== 'undefined') {
-          window.print();
-          printed = true;
-        }
+        window.print();
+        printed = true;
       });
     });
   });
 
   function reprint() {
-    if (typeof window !== 'undefined') window.print();
+    window.print();
   }
 
   let citationEntries = $derived(
     snapshot ? Object.values(snapshot.citations).sort((a, b) => a.n - b.n) : []
   );
-  let dateLine = $derived(
-    snapshot ? new Date(snapshot.generatedAt).toISOString().slice(0, 10) : ''
+  // "2026-09-27 17:05 UTC": the time the briefing was generated (for a
+  // gallery entry, when the snapshot was built), not the time of printing.
+  let generated = $derived(snapshot ? formatGeneratedAt(snapshot.generatedAt) : '');
+  let blocks = $derived(snapshot?.blocks ?? []);
+  // Lead = disclaimer plus the Answer section, as on screen; the sources
+  // lists sit between the lead and the body.
+  let bodyStart = $derived.by(() => {
+    const i = blocks.findIndex((b) => b.kind === 'head' && b.label !== 'Answer');
+    return i < 0 ? blocks.length : i;
+  });
+  let subLine = $derived.by(() => {
+    if (!snapshot) return '';
+    const n = citationEntries.length;
+    const parts = [snapshot.mode, `${n} ${n === 1 ? 'source' : 'sources'} cited`];
+    if (snapshot.notChecked) parts.push(`${snapshot.notChecked.length} not checked`);
+    return parts.filter(Boolean).join(' · ');
+  });
+
+  /** A CSS string literal that is safe inside a <style> element. */
+  function cssString(s: string): string {
+    return JSON.stringify(s.replace(/\s+/g, ' ')).replace(/</g, '\\3c ');
+  }
+  // The @page running header is plain CSS and cannot read the snapshot,
+  // so the place, date and version are written into it here.
+  let pageStyle = $derived(
+    snapshot
+      ? `<style>@page { @top-left { content: ${cssString(`riprap · ${snapshot.resolvedPlace || snapshot.queryText}`)}; } ` +
+        `@top-right { content: ${cssString(`Generated ${generated} · v${APP_VERSION}`)}; } }</style>`
+      : ''
   );
 </script>
 
 <svelte:head>
-  <title>Riprap briefing — {snapshot?.queryText ?? 'export'}</title>
+  <title>Riprap briefing: {snapshot?.question || snapshot?.queryText || 'print'}</title>
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -- string built from escaped CSS literals above -->
+  {@html pageStyle}
 </svelte:head>
 
 {#if hydrationFailed}
   <div class="empty">
-    <h1>No briefing snapshot found</h1>
+    <h1>This briefing has not run in this browser</h1>
     <p>
-      Run a briefing first at <a href="/">riprap home</a>; once it finishes,
-      use <strong>export PDF</strong> from the header to open this view.
-      Snapshots are stored per-browser and persist between runs of the same query.
+      The print view is built from a briefing that has already run in this browser. Nothing
+      is stored on a server, so a print link opened in another browser starts empty.
     </p>
+    <p>
+      <a class="empty-action" href={resolve('/q/[queryId]', { queryId: encodeURIComponent(queryId) })}>Run this briefing</a>
+    </p>
+    <p>When it finishes, choose <strong>print</strong> in the header to come back here.</p>
   </div>
 {:else if snapshot}
   <article class="print-doc">
     <header class="print-head">
       <div class="print-head-top">
         <span class="wordmark">riprap</span>
-        <span class="meta">flood-exposure briefing · v0.4.2 · {dateLine}</span>
+        <span class="meta">flood-exposure briefing · v{APP_VERSION} · generated {generated}</span>
       </div>
-      <h1 class="print-title">{snapshot.queryText}</h1>
-      <div class="print-sub">
-        intent <strong>{snapshot.intent ?? 'briefing'}</strong>
-        · {snapshot.specialists} specialists
-      </div>
+      {#if snapshot.question}
+        <p class="print-eyebrow">Question</p>
+        <h1 class="print-title">{snapshot.question}</h1>
+      {:else}
+        <h1 class="print-title">{snapshot.queryText}</h1>
+      {/if}
+      {#if snapshot.resolvedPlace}
+        <p class="print-place"><span class="print-place-label">Briefing for:</span> {snapshot.resolvedPlace}</p>
+      {/if}
+      {#if subLine}
+        <div class="print-sub">{subLine}</div>
+      {/if}
     </header>
 
     <div class="print-controls no-print">
@@ -74,7 +114,48 @@
       </span>
     </div>
 
-    <Briefing blocks={snapshot.blocks} citations={snapshot.citations} streaming={false} />
+    {#if bodyStart > 0}
+      <Briefing blocks={blocks.slice(0, bodyStart)} citations={snapshot.citations} streaming={false} />
+    {/if}
+    {#if snapshot.unanswered}
+      <p class="print-unanswered">
+        This question was not answered directly. Riprap is running without a language model here,
+        so this is the evidence briefing for the place above.
+      </p>
+    {/if}
+
+    {#if snapshot.consulted || snapshot.notChecked}
+      <section class="print-sources" aria-label="Sources consulted and not checked">
+        {#if snapshot.consulted}
+          <div>
+            <h2>Sources consulted ({snapshot.consulted.length})</h2>
+            <ul>
+              {#each snapshot.consulted as c, i (`${i}-${c.title}`)}
+                <li>{c.title}{#if c.failed}: failed to respond{/if}</li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
+        {#if snapshot.notChecked}
+          <div>
+            <h2>{snapshot.notChecked.length ? `Not checked (${snapshot.notChecked.length})` : 'Not checked'}</h2>
+            {#if snapshot.notChecked.length}
+              <ul>
+                {#each snapshot.notChecked as t, i (`${i}-${t}`)}
+                  <li>{t}</li>
+                {/each}
+              </ul>
+            {:else}
+              <p>none</p>
+            {/if}
+          </div>
+        {/if}
+      </section>
+    {/if}
+
+    {#if bodyStart < blocks.length}
+      <Briefing blocks={blocks.slice(bodyStart)} citations={snapshot.citations} streaming={false} />
+    {/if}
 
     {#if citationEntries.length}
       <section class="print-citations">
@@ -98,7 +179,7 @@
     {/if}
 
     <footer class="print-foot">
-      Generated {dateLine} ·
+      Generated {generated} ·
       Riprap briefings are built from cited source values, or written by an LLM
       with each claim checked against its cited sources.
       Numbers without bracketed citations are not present in source documents.
@@ -119,15 +200,26 @@
   }
   .print-head { border-bottom: 1pt solid #111; padding-bottom: 8pt; margin-bottom: 14pt; }
   .print-head-top {
-    display: flex; justify-content: space-between; align-items: baseline;
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12pt;
+    flex-wrap: wrap;
     font: 9pt var(--font-mono, "Overpass Mono"); color: #4a4a4a;
     text-transform: uppercase; letter-spacing: 0.04em;
   }
   .wordmark { font-weight: 600; color: #111; }
+  .print-eyebrow {
+    margin: 10pt 0 0;
+    font: 9pt var(--font-mono, "Overpass Mono"); color: #4a4a4a;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
   .print-title {
     font: 600 22pt var(--font-sans, "Sofia Sans");
     margin: 8pt 0 4pt; line-height: 1.15;
   }
+  .print-eyebrow + .print-title { margin-top: 2pt; }
+  .print-place {
+    margin: 4pt 0; font: 12pt var(--font-sans, "Sofia Sans"); color: #111;
+  }
+  .print-place-label { font-weight: 600; }
   .print-sub {
     font: 10pt var(--font-mono, "Overpass Mono"); color: #4a4a4a;
   }
@@ -143,6 +235,18 @@
     border-radius: 3px; cursor: pointer;
   }
   .hint { color: #4a4a4a; font-size: 9pt; }
+  .print-unanswered {
+    margin: 10pt 0; font: 11pt var(--font-sans, "Sofia Sans"); color: #334155;
+  }
+  .print-sources {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16pt;
+    margin: 12pt 0 16pt; padding: 8pt 0; border-top: 1pt solid #c8c6c2; border-bottom: 1pt solid #c8c6c2;
+    font: 10pt var(--font-sans, "Sofia Sans"); line-height: 1.4;
+    break-inside: avoid;
+  }
+  .print-sources h2 { font: 600 11pt var(--font-sans, "Sofia Sans"); margin: 0 0 4pt; }
+  .print-sources ul { margin: 0; padding-left: 12pt; }
+  .print-sources p { margin: 0; }
   .print-citations {
     margin-top: 18pt; padding-top: 8pt; border-top: 1pt solid #111;
     page-break-before: always;
@@ -164,11 +268,11 @@
   .csrc { font-weight: 600; }
   .cvint { color: #4a4a4a; margin-left: 6pt; font-size: 9pt; }
   .ctitle { color: #1a1a1a; }
-  .curl { font: 8.5pt var(--font-mono, "Overpass Mono"); color: #0B5394; word-break: break-all; }
-  .cdocid { font: 8.5pt var(--font-mono, "Overpass Mono"); color: #6b6b6b; }
+  .curl { font: 9pt var(--font-mono, "Overpass Mono"); color: #0B5394; word-break: break-all; }
+  .cdocid { font: 9pt var(--font-mono, "Overpass Mono"); color: #4a4a4a; }
   .print-foot {
     margin-top: 18pt; padding-top: 6pt; border-top: 1pt solid #c8c6c2;
-    font: 8.5pt var(--font-mono, "Overpass Mono"); color: #6b6b6b;
+    font: 9pt var(--font-mono, "Overpass Mono"); color: #4a4a4a;
     line-height: 1.5;
   }
   .empty {
@@ -176,8 +280,24 @@
     font-family: var(--font-sans, "Sofia Sans");
     color: #1a1a1a;
   }
-  .empty h1 { font-size: 20pt; margin-bottom: 8pt; }
+  .empty h1 { font-size: 20pt; margin-bottom: 8pt; line-height: 1.2; }
   .empty a { color: #0B5394; }
+  .empty-action {
+    display: inline-block;
+    padding: 8px 16px;
+    min-height: 24px;
+    background: var(--ink);
+    color: var(--paper) !important;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .empty-action:hover { background: #000; }
+
+  @media (max-width: 640px) {
+    .print-doc { margin: 24px auto; padding: 0 16px; }
+    .print-sources { grid-template-columns: 1fr; }
+    .empty { margin: 48px auto; padding: 16px; }
+  }
 
   @media print {
     .no-print { display: none !important; }

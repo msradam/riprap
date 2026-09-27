@@ -46,7 +46,7 @@
     background: var(--accent);
     color: white;
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;

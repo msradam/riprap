@@ -4,6 +4,9 @@
   import type { PageProps } from './$types';
 
   let { data }: PageProps = $props();
+
+  let questions = $derived(data.entries.filter((e) => e.question));
+  let addresses = $derived(data.entries.filter((e) => !e.question));
 </script>
 
 <svelte:head>
@@ -18,39 +21,105 @@
         <span class="section-label">Gallery</span>
       </header>
       <h1 id="gallery-h1" class="brief-h1">Precomputed briefings</h1>
-      <p class="region-head-meta gallery-intro">
+      <p class="gallery-intro">
         Snapshots generated ahead of time and saved as static pages. Opening one does not
         contact the Riprap backend, so the data is as of the generation date shown.
       </p>
-      <ol class="citation-list">
-        {#each data.entries as e (e.slug)}
-          <li class="citation-item">
-            <span class="citation-num" aria-hidden="true">·</span>
-            <div class="citation-body">
-              <div class="citation-line-1">
-                <span class="citation-source">{e.neighborhood}</span>
-                <span class="citation-vintage">{formatGeneratedAt(e.generated_at)}</span>
-              </div>
-              <div class="citation-title">
-                <a href="{resolve('/gallery/[slug]', { slug: e.slug })}/">{e.address}</a>
-              </div>
-              {#if e.question}
-                <div class="citation-title">Question: {e.question}</div>
-              {/if}
-              <div class="citation-meta">
-                <span>{llmStamp(e) ?? modeLabel(e.mode)}</span>
-              </div>
+
+      <h2 class="gallery-group">Questions</h2>
+      <p class="gallery-group-note">
+        Written by a language model, with each claim checked against its cited sources.
+      </p>
+      <ul class="gallery-list">
+        {#each questions as e (e.slug)}
+          <li class="gallery-item">
+            <div class="gallery-line-1">
+              <span class="gallery-place">{e.neighborhood}</span>
+              <span class="gallery-date">{formatGeneratedAt(e.generated_at)}</span>
             </div>
+            <a class="gallery-link" href="{resolve('/gallery/[slug]', { slug: e.slug })}/">{e.question}</a>
+            <div class="gallery-meta">{llmStamp(e) ?? modeLabel(e.mode)}</div>
           </li>
         {/each}
-      </ol>
+      </ul>
+
+      <h2 class="gallery-group">Addresses</h2>
+      <p class="gallery-group-note">
+        Evidence briefings built from cited source values, with no language model.
+      </p>
+      <ul class="gallery-list">
+        {#each addresses as e (e.slug)}
+          <li class="gallery-item">
+            <div class="gallery-line-1">
+              <span class="gallery-place">{e.neighborhood}</span>
+              <span class="gallery-date">{formatGeneratedAt(e.generated_at)}</span>
+            </div>
+            <a class="gallery-link" href="{resolve('/gallery/[slug]', { slug: e.slug })}/">{e.address}</a>
+          </li>
+        {/each}
+      </ul>
     </div>
   </div>
 </section>
 
 <style>
+  .region-head .section-label { font-size: 12px; }
   .gallery-intro {
-    margin: 0 0 20px;
+    margin: 0 0 8px;
     max-width: 70ch;
+    font-size: 15px;
+    color: var(--ink-secondary);
+  }
+  .gallery-group {
+    margin: 32px 0 4px;
+    font-size: 22px;
+    line-height: 1.25;
+    font-weight: 600;
+  }
+  .gallery-group-note {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: var(--ink-secondary);
+  }
+  .gallery-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+    max-width: 80ch;
+  }
+  .gallery-item {
+    padding: 8px 12px;
+    border-left: 2px solid var(--rule-soft);
+  }
+  .gallery-line-1 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+  }
+  .gallery-place { font-weight: 600; }
+  .gallery-date {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-tertiary);
+  }
+  /* WCAG 2.5.8: at least 24px tall, even for a one-line address. */
+  .gallery-link {
+    display: inline-block;
+    min-height: 24px;
+    padding: 2px 0;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--accent);
+    text-underline-offset: 2px;
+  }
+  .gallery-link:hover { text-decoration-thickness: 2px; }
+  .gallery-meta {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-tertiary);
   }
 </style>

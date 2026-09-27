@@ -102,7 +102,9 @@
       color: #334155;
     }
     @top-right {
-      content: "Generated " var(--print-date, "today") " · v0.4.2";
+      /* The /print route overrides this box with the generation time
+         and the version from $lib/version. */
+      content: "Generated " var(--print-date, "today");
       font: 9pt "Overpass Mono";
       color: #334155;
     }

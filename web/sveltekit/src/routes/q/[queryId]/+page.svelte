@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import ResultsView from '$lib/components/results/ResultsView.svelte';
   import { RunState } from '$lib/client/runState.svelte';
-  import { briefingState, persistSnapshot } from '$lib/stores/briefingState.svelte';
+  import { briefingState, persistSnapshot, snapshotFromRun } from '$lib/stores/briefingState.svelte';
   import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
   import { deployment } from '$lib/stores/deployment.svelte';
   import { openAgentStream } from '$lib/client/agentStream';
@@ -119,27 +119,14 @@
       onDone: () => {
         if (runStartedAt != null) run.runWallSeconds = (Date.now() - runStartedAt) / 1000;
         run.finish();
-        const { blocks, citations } = run.briefing;
         // Snapshot for the /print/<queryId> route and PDF export.
-        if (!run.errorState && blocks.length > 0) {
-          persistSnapshot({
-            queryId,
-            queryText,
-            intent: run.plan?.intent ?? null,
-            specialists: run.plan?.specialists?.length ?? 0,
-            blocks,
-            citations,
-            generatedAt: new Date().toISOString(),
-            resolvedPlace: run.resolvedPlace,
-          });
+        if (!run.errorState && run.briefing.blocks.length > 0) {
+          persistSnapshot(snapshotFromRun(run, queryId, queryText));
         }
         // End the header pill on a final state; a stopped run must not
         // keep saying "gathering evidence".
         const stopped = STOPPED_LABEL[run.errorState ?? ''] ?? (run.refused ? 'refused' : null);
-        if (stopped) {
-          briefingState.activeStep = null;
-          briefingState.markError(stopped);
-        }
+        if (stopped) briefingState.markStopped(stopped);
         else if (!run.errorState) briefingState.markReady();
       }
     });

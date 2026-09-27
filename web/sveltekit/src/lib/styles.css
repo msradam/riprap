@@ -768,11 +768,15 @@
 .app-footer { background: var(--ink); color: var(--paper); }
 .app-footer-inner { max-width: 1600px; margin: 0 auto; padding: 32px 28px; display: flex; flex-direction: column; gap: 12px; }
 .app-footer-guard { font-size: 14px; line-height: 1.5; max-width: 70ch; margin: 0; }
-.app-footer-guard a { color: var(--accent-graphical); border-bottom: 1px solid var(--accent-graphical); text-decoration: none; }
-.app-footer-build { font-family: var(--font-mono); font-size: 11px; color: rgba(244,246,249,0.55); margin: 0; letter-spacing: 0.04em; }
-.app-footer-credits { font-family: var(--font-mono); font-size: 11px; color: rgba(244,246,249,0.4); margin: 0; letter-spacing: 0.04em; }
-.app-footer-credits a { color: rgba(244,246,249,0.7); text-decoration: none; border-bottom: 1px dotted rgba(244,246,249,0.3); }
-.app-footer-credits a:hover { color: rgba(244,246,249,0.9); border-bottom-color: rgba(244,246,249,0.6); }
+/* Footer text on ink: links in paper with an underline (17:1), secondary
+   lines in slate-450 (6.8:1). Blue on ink was 2.65:1. */
+.app-footer-guard a { color: var(--paper); text-decoration: underline; text-underline-offset: 2px; }
+.app-footer-guard a:hover { text-decoration-thickness: 2px; }
+.app-footer-build { font-family: var(--font-mono); font-size: 12px; color: var(--riprap-slate-450); margin: 0; letter-spacing: 0.04em; }
+.app-footer-credits { font-family: var(--font-mono); font-size: 12px; color: var(--riprap-slate-450); margin: 0; letter-spacing: 0.04em; }
+.app-footer-credits a { color: var(--paper); text-decoration: underline dotted; text-underline-offset: 2px; }
+.app-footer-credits a:hover { text-decoration-style: solid; }
+.app-footer :focus-visible { outline-color: var(--paper); }
 
 /* Dark mode — deferred to v0.5 (see §17). Partial styles removed in v0.4.2. */
 

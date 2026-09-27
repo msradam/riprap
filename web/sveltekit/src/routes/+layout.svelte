@@ -25,7 +25,7 @@
 
 {#if !chromeFree}
   <SkipLinks />
-  <AppHeader {query} offline={isGallery} onResetCold={() => (window.location.href = resolve('/'))} />
+  <AppHeader {query} offline={isGallery} onResetCold={() => (window.location.href = query ? `${resolve('/')}?q=${encodeURIComponent(query)}` : resolve('/'))} />
 {/if}
 <main>{@render children()}</main>
 {#if !chromeFree}

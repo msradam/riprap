@@ -1,8 +1,8 @@
 <script lang="ts">
-  /** SourceStrip — trust-signal numbers.
+  /** SourceStrip: trust-signal numbers.
    *
    *  Surfaces the data-source counts inline (23 sources · 9 agencies ·
-   *  5 cities · 3 hazards) so the "every claim cites a public record"
+   *  1 production city · 5 experimental) so the "every claim cites a public record"
    *  promise from the deck is visually substantiated. Last reviewed
    *  date is the live-data vintage marker; update when the methodology
    *  page changes.
@@ -13,20 +13,20 @@
   interface Props {
     sources?: number;
     agencies?: number;
-    cities?: number;
-    hazards?: number;
+    productionCities?: number;
+    experimentalCities?: number;
     lastReview?: string;
   }
   let {
     sources = 23,
     agencies = 9,
-    cities = 5,
-    hazards = 3,
+    productionCities = 1,
+    experimentalCities = 5,
     lastReview = '2026-05-17',
   }: Props = $props();
 </script>
 
-<div class="source-strip" role="region" aria-label="Source counts">
+<div class="source-strip" id="sources" role="region" aria-label="Source counts">
   <span class="source-strip-stat">
     <span class="source-strip-stat-num">{sources}</span>data sources
   </span>
@@ -34,10 +34,10 @@
     <span class="source-strip-stat-num">{agencies}</span>federal + state + city agencies
   </span>
   <span class="source-strip-stat">
-    <span class="source-strip-stat-num">{cities}</span>cities live
+    <span class="source-strip-stat-num">{productionCities}</span>city in production
   </span>
   <span class="source-strip-stat">
-    <span class="source-strip-stat-num">{hazards}</span>hazards validated
+    <span class="source-strip-stat-num">{experimentalCities}</span>experimental cities
   </span>
   <span class="source-strip-meta">last methodology review · {lastReview}</span>
 </div>
@@ -52,7 +52,7 @@
     padding-top: 16px;
     border-top: 1px dashed var(--rule-soft);
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     color: var(--ink-tertiary);
     letter-spacing: 0.04em;
   }

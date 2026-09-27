@@ -11,6 +11,7 @@
    *  legend's proxy mark. One mark family now. */
   import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
   import type { Tier } from '$lib/types/tier';
+  import { APP_VERSION } from '$lib/version';
 
   const TIERS: Tier[] = ['empirical', 'modeled', 'proxy', 'synthetic'];
 </script>
@@ -21,7 +22,7 @@
       <span class="land-footer-tier"><EvidenceMark {tier} size={9} />{tier}</span>
     {/each}
   </span>
-  <span class="land-footer-build">Riprap v0.4.6 · NYC OpenData · FEMA NFHL · USGS · NPCC4 · Dam mark by Chintuza, Noun Project (CC-BY)</span>
+  <span class="land-footer-build">Riprap v{APP_VERSION} · NYC OpenData · FEMA NFHL · USGS · NPCC4 · Dam mark by Chintuza, Noun Project (CC-BY)</span>
 </footer>
 
 <style>
@@ -34,7 +35,7 @@
     padding: 16px 32px;
     border-top: 1px solid var(--rule-soft);
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     color: var(--ink-tertiary);
     letter-spacing: 0.02em;
   }

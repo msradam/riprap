@@ -53,6 +53,8 @@
       case 'specialists': return 'gathering evidence';
       case 'reconciling': return 'reconciling';
       case 'error':       return 'error';
+      // A stopped run shows only its reason, e.g. "refused".
+      case 'stopped':     return briefingState.errorMessage ?? 'stopped';
       default:            return '';
     }
   });
@@ -71,11 +73,11 @@
     return `${fired}/${total}`;
   });
 
-  let kind = $derived.by(() => {
-    // Drives the dot color — error red, otherwise the accent pulse.
-    if (briefingState.phase === 'error') return 'err';
-    return 'live';
-  });
+  // Drives the colour: red for real errors, neutral for a run that
+  // stopped on purpose, otherwise the accent pulse.
+  let kind = $derived(
+    briefingState.phase === 'error' ? 'err' : briefingState.phase === 'stopped' ? 'stopped' : 'live'
+  );
 </script>
 
 {#if visible}
@@ -106,7 +108,7 @@
     background: var(--paper-deep);
     border: 1px solid var(--rule-soft);
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     color: var(--ink-secondary);
     letter-spacing: 0.04em;
     max-width: min(60ch, 50vw);
@@ -129,6 +131,14 @@
   .status[data-kind='err'] .status-dot {
     background: #B91C1C;
     animation: none;
+  }
+  .status[data-kind='stopped'] .status-dot {
+    background: var(--ink-tertiary);
+    animation: none;
+  }
+  .status[data-kind='stopped'] .status-phase {
+    color: var(--ink-secondary);
+    font-weight: 500;
   }
   .status-phase {
     color: var(--ink);

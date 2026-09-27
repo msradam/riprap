@@ -68,3 +68,14 @@ describe('StatusPill content per phase', () => {
     expect(container.textContent ?? '').toContain('planner timed out');
   });
 });
+
+describe('StatusPill stopped runs', () => {
+  it('phase=stopped → neutral kind, reason only, no "error" prefix', () => {
+    briefingState.markStopped('refused');
+    const { container } = render(StatusPill);
+    const pill = container.querySelector('.status');
+    expect(pill?.getAttribute('data-kind')).toBe('stopped');
+    expect(container.textContent ?? '').toContain('refused');
+    expect(container.textContent ?? '').not.toContain('error');
+  });
+});

@@ -63,6 +63,6 @@ test.describe('export-PDF curated print flow', () => {
     await page.addInitScript(() => localStorage.clear());
     await page.goto('/print/no-such-query');
     await expect(page.locator('.empty')).toBeVisible();
-    await expect(page.locator('.empty')).toContainText(/no briefing snapshot/i);
+    await expect(page.locator('.empty')).toContainText(/has not run in this browser/i);
   });
 });

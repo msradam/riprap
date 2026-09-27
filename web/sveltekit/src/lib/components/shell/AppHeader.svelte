@@ -67,7 +67,7 @@
       <span class="app-header-sep">/</span>
       <span class="app-header-context">{hazardText}</span>
       {#if cityText}
-        <span class="app-header-city-pill" aria-label="Active deployment">{cityText}</span>
+        <span class="app-header-city-pill"><span class="visually-hidden">Active deployment: </span>{cityText}</span>
       {/if}
     </div>
     <div class="app-header-mid">
@@ -86,7 +86,12 @@
     </div>
     <div class="app-header-right">
       <a class="app-header-link" href="#methodology">methodology</a>
-      {#if briefingState.ready && !offline}
+      {#if briefingState.ready && !offline && page.params.queryId}
+        <!-- The browser print view, built from the snapshot this run saved. -->
+        <a
+          class="app-header-link"
+          href={resolve('/print/[queryId]', { queryId: encodeURIComponent(page.params.queryId) })}
+        >print</a>
         <button
           type="button"
           class="app-header-link app-header-link-button"

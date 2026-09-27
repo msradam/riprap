@@ -1,11 +1,9 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
 
-  /** CityPicker — five-city selector row below the search input.
-   *
-   *  Showcases the multi-city generalisation claim without requiring
-   *  text input. Each pill jumps to a curated anchor address in that
-   *  city so the user immediately sees a working cross-city briefing.
+  /** CityPicker: one sample address per shipped city. New York City is
+   *  the production deployment; the other five are experimental and are
+   *  grouped under a visible "Experimental" label.
    *
    *  Anchors match probe_cities.py's smoke-test addresses so what
    *  loads here is identical to what `scripts/probe_cities.py`
@@ -17,8 +15,8 @@
     address: string;
   }
 
-  const CITIES: CityAnchor[] = [
-    { city: 'NYC',           address: '189 Atlantic Avenue, Brooklyn, NY' },
+  const PRODUCTION: CityAnchor = { city: 'NYC', address: '189 Atlantic Avenue, Brooklyn, NY' };
+  const EXPERIMENTAL: CityAnchor[] = [
     { city: 'Chicago',       address: '233 S Wacker Dr, Chicago, IL' },
     { city: 'Seattle',       address: '2100 5th Ave, Seattle, WA' },
     { city: 'San Francisco', address: '1 Dr Carlton B Goodlett Pl, San Francisco, CA' },
@@ -31,16 +29,25 @@
   }
 </script>
 
-<div class="city-picker" role="region" aria-label="Try a shipped city">
+<div class="city-picker" role="region" aria-label="Sample address by city">
   <span class="city-picker-label">Or pick a city:</span>
   <div class="city-picker-row">
-    {#each CITIES as c (c.city)}
+    <button
+      type="button"
+      class="city-picker-pill"
+      onclick={() => pick(PRODUCTION.address)}
+      title="Brief the sample address for {PRODUCTION.city}: {PRODUCTION.address}"
+    >{PRODUCTION.city}</button>
+  </div>
+  <div class="city-picker-row" role="group" aria-labelledby="city-picker-exp">
+    <span class="exp-badge" id="city-picker-exp">Experimental</span>
+    {#each EXPERIMENTAL as c (c.city)}
       <button
         type="button"
         class="city-picker-pill"
         onclick={() => pick(c.address)}
-        title="Brief the anchor address for {c.city}: {c.address}"
-      >{c.city}</button>
+        title="Brief the sample address for {c.city} (experimental): {c.address}"
+      >{c.city}<span class="visually-hidden"> (experimental)</span></button>
     {/each}
   </div>
 </div>
@@ -56,13 +63,14 @@
   }
   .city-picker-label {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--ink-tertiary);
   }
   .city-picker-row {
     display: flex;
+    align-items: center;
     gap: 8px;
     flex-wrap: wrap;
   }

@@ -84,3 +84,15 @@ describe('ErrorCard out-of-coverage uses neutral fallback', () => {
     expect(text).not.toContain('NYC');
   });
 });
+
+describe('ErrorCard geocoder actions', () => {
+  it('links the sample query and the landing search box', () => {
+    seedForCity(NYC);
+    const { container } = render(ErrorCard, { props: { state: 'geocoder' } });
+    const hrefs = [...container.querySelectorAll('a.error-card-action')].map((a) => a.getAttribute('href'));
+    expect(hrefs).toEqual([
+      `/q/${encodeURIComponent('90-01 183rd Street, Queens')}`,
+      '/?q=test-query',
+    ]);
+  });
+});

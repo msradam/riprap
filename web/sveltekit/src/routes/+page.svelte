@@ -47,8 +47,8 @@
 </script>
 
 <svelte:head>
-  <title>Riprap — climate-exposure briefings for any US place</title>
-  <meta name="description" content="Riprap composes federal, state, and city open data into a written, citation-grounded climate-exposure briefing for any US address. Open source, Apache-2.0. Six cities live: NYC, Chicago, Seattle, San Francisco, Boston, Albany." />
+  <title>Riprap: flood-exposure briefings for New York City</title>
+  <meta name="description" content="Riprap composes federal, state, and city open data into a written flood-exposure briefing in which every claim cites a public record. Open source, Apache-2.0. New York City is in production; Chicago, Seattle, San Francisco, Boston and Albany are experimental." />
 </svelte:head>
 
 <SkipLink />
@@ -130,7 +130,7 @@
     display: inline-block;
     background: var(--accent);
     color: white;
-    font-size: 10.5px;
+    font-size: 12px;
     padding: 1px 6px;
     border-radius: 2px;
     margin-left: 2px;
@@ -141,11 +141,11 @@
   }
   .land-byod-note {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     color: var(--ink-tertiary);
     letter-spacing: 0.02em;
   }
   @media (max-width: 640px) {
-    .land-trust { padding: 0 24px 8px; }
+    .land-trust { padding: 0 16px 8px; }
   }
 </style>

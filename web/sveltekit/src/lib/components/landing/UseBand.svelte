@@ -60,14 +60,9 @@
     flex-direction: column;
     gap: 8px;
   }
-  .use-band-body a {
-    color: var(--accent);
-    border-bottom: 1px solid var(--accent);
-    text-decoration: none;
-  }
   .use-band-affil {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     color: var(--ink-tertiary);
     letter-spacing: 0.02em;
     padding-top: 6px;

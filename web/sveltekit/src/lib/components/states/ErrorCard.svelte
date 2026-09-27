@@ -9,6 +9,9 @@
   import type { ErrorKey } from '$lib/types/states';
   import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
   import { deployment } from '$lib/stores/deployment.svelte';
+  import { page } from '$app/state';
+  import { resolve } from '$app/paths';
+  import { SAMPLE_ADDRESS } from '$lib/samples';
 
   interface Action {
     label: string;
@@ -38,8 +41,13 @@
     headline: string;
     body: string;
     tier: Tier;
-    defaultActions: string[];
+    defaultActions: (string | Action)[];
   }
+
+  // The query as typed; empty outside the live route.
+  let query = $derived(page.params.queryId ?? '');
+  // A borough code and district number, typed with or without a space.
+  let looksLikeDistrict = $derived(/^\s*(MN|BX|BK|QN|SI)\s*\d{1,2}\s*$/i.test(query));
 
   // The routed deployment decides whether the geocoder hint may name
   // an NYC community district; under a Boston chip it would mislead.
@@ -59,7 +67,11 @@
         ? 'Try a full street address, or a community district such as QN 12.'
         : 'Try a full street address.',
       tier: 'proxy',
-      defaultActions: ['Use a sample query', 'Edit query']
+      defaultActions: [
+        { label: 'Use a sample query', href: resolve('/q/[queryId]', { queryId: encodeURIComponent(SAMPLE_ADDRESS) }) },
+        // The landing reads ?q= into its search box and focuses it.
+        { label: 'Edit query', href: query ? `${resolve('/')}?q=${encodeURIComponent(query)}` : resolve('/') }
+      ]
     },
     'all-silent': {
       eyebrow: 'Outside evidence coverage',
@@ -89,7 +101,7 @@
 
   let spec = $derived(SPECS[state]);
   let resolvedActions = $derived<Action[]>(
-    actions ?? spec.defaultActions.map((label) => ({ label }))
+    actions ?? spec.defaultActions.map((a) => (typeof a === 'string' ? { label: a } : a))
   );
 </script>
 
@@ -100,6 +112,12 @@
   </header>
   <h3 class="error-card-headline">{headlineOverride ?? spec.headline}</h3>
   <p class="error-card-body">{bodyOverride ?? spec.body}</p>
+  {#if state === 'geocoder' && looksLikeDistrict && !bodyOverride && (isUnknown || depName === 'nyc')}
+    <p class="error-card-body">
+      Write a district code with a space, for example QN 12, or read the precomputed
+      <a href="{resolve('/gallery/[slug]', { slug: 'qn12-complaints' })}/">QN 12 briefing in the gallery</a>.
+    </p>
+  {/if}
   <div class="error-card-actions">
     {#each resolvedActions as a, i (i)}
       {#if a.href}
