@@ -1,0 +1,218 @@
+# Held-out question set for refactor 3.
+#
+# Written before any v3 code change and before any arm was run on it.
+# Every entry is author-written by the refactor author. No address or
+# district here appears in questions.yaml. No data was looked up to write
+# it: answer_should_mention names the concept an answer must address, not
+# a value, so the set cannot be fitted to results.
+#
+# Targets (real NYC addresses, one per borough, plus one district):
+#   elmhurst      79-01 Broadway, Queens, NY 11373          inland, Ida basement flooding area
+#   coney-island  1310 Surf Avenue, Brooklyn, NY 11224      coastal
+#   seaport       200 Water Street, Manhattan, NY 10038     coastal, Sandy
+#   yankee        1 East 161st Street, Bronx, NY 10451      inland, near the Harlem River
+#   snug-harbor   1000 Richmond Terrace, Staten Island, NY 10301  north shore waterfront
+#   QN04          community district (Elmhurst, Corona)
+#
+# Fields as in questions.yaml. Mix: 5 flood_history, 3 right_now, 3 future,
+# 5 asset, 2 district, 2 out_of_scope.
+
+- id: h01
+  kind: flood_history
+  author: author-written
+  target: elmhurst
+  question: "Did the area around 79-01 Broadway, Queens flood during Hurricane Ida?"
+  expected_intent: single_address
+  must_run: [ida_hwm, nyc311, floodnet]
+  irrelevant: [npcc4_slr, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["high-water mark", "high water mark"], ["311"]]
+
+- id: h02
+  kind: flood_history
+  author: author-written
+  target: coney-island
+  question: "Was 1310 Surf Avenue, Brooklyn inside the area Hurricane Sandy flooded?"
+  expected_intent: single_address
+  must_run: [sandy]
+  irrelevant: [nws_alerts, nws_obs, noaa_tides, usgs_gauges, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["sandy"]]
+
+- id: h03
+  kind: flood_history
+  author: author-written
+  target: seaport
+  question: "How many flooding complaints have been made to 311 near 200 Water Street, Manhattan?"
+  expected_intent: single_address
+  must_run: [nyc311]
+  irrelevant: [npcc4_slr, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["311"], ["complaint"]]
+
+- id: h04
+  kind: flood_history
+  author: author-written
+  target: yankee
+  question: "Have street flood sensors recorded flooding near 1 East 161st Street, Bronx?"
+  expected_intent: single_address
+  must_run: [floodnet]
+  irrelevant: [npcc4_slr, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["floodnet", "sensor"]]
+
+- id: h05
+  kind: flood_history
+  author: author-written
+  target: snug-harbor
+  question: "What past floods have been recorded near 1000 Richmond Terrace, Staten Island?"
+  expected_intent: single_address
+  must_run: [sandy, ida_hwm, nyc311, floodnet]
+  irrelevant: [npcc4_slr, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["sandy"], ["311"]]
+
+- id: n01
+  kind: right_now
+  author: author-written
+  target: coney-island
+  question: "Is there a coastal flood alert at 1310 Surf Avenue, Brooklyn right now?"
+  expected_intent: live_now
+  must_run: [nws_alerts]
+  irrelevant: [npcc4_slr, ida_hwm, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["alert"]]
+
+- id: n02
+  kind: right_now
+  author: author-written
+  target: elmhurst
+  question: "Is it raining near 79-01 Broadway, Queens right now?"
+  expected_intent: live_now
+  must_run: [nws_obs]
+  irrelevant: [npcc4_slr, ida_hwm, sandy, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["precip", "rain", "observation"]]
+
+- id: n03
+  kind: right_now
+  author: author-written
+  target: seaport
+  question: "What is the water level in the harbor near 200 Water Street, Manhattan right now?"
+  expected_intent: live_now
+  must_run: [noaa_tides]
+  irrelevant: [npcc4_slr, ida_hwm, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["tide", "water level", "mllw"]]
+
+- id: f01
+  kind: future
+  author: author-written
+  target: elmhurst
+  question: "Would 79-01 Broadway, Queens flood in the NYC DEP extreme stormwater scenario for 2080?"
+  expected_intent: single_address
+  must_run: [dep_extreme_2080]
+  irrelevant: [nws_alerts, nws_obs, noaa_tides, usgs_gauges, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["2080", "extreme"]]
+
+- id: f02
+  kind: future
+  author: author-written
+  target: seaport
+  question: "How much sea-level rise is projected near 200 Water Street, Manhattan by the 2050s?"
+  expected_intent: single_address
+  must_run: [npcc4_slr]
+  irrelevant: [nws_alerts, nws_obs, usgs_gauges, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["sea-level", "sea level"], ["2050"]]
+
+- id: f03
+  kind: future
+  author: author-written
+  target: snug-harbor
+  question: "Is 1000 Richmond Terrace, Staten Island in any of the DEP stormwater flood scenarios?"
+  expected_intent: single_address
+  must_run: [dep_extreme_2080, dep_moderate_2050, dep_moderate_current]
+  irrelevant: [nws_alerts, nws_obs, noaa_tides, usgs_gauges, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["stormwater", "dep"]]
+
+- id: a01
+  kind: asset
+  author: author-written
+  target: yankee
+  question: "Are the subway entrances near 1 East 161st Street, Bronx in a flood scenario?"
+  expected_intent: single_address
+  must_run: [mta_entrances]
+  irrelevant: [nws_alerts, nws_obs, noaa_tides, doe_schools, doh_hospitals, nycha_developments]
+  answer_should_mention: [["subway", "entrance"]]
+
+- id: a02
+  kind: asset
+  author: author-written
+  target: coney-island
+  question: "How many public housing developments near 1310 Surf Avenue, Brooklyn were inside the Sandy flood extent?"
+  expected_intent: single_address
+  must_run: [nycha_developments]
+  irrelevant: [nws_alerts, nws_obs, noaa_tides, doe_schools, doh_hospitals, mta_entrances]
+  answer_should_mention: [["nycha", "public housing"], ["sandy"]]
+
+- id: a03
+  kind: asset
+  author: author-written
+  target: elmhurst
+  question: "Are the schools near 79-01 Broadway, Queens exposed to flooding?"
+  expected_intent: single_address
+  must_run: [doe_schools]
+  irrelevant: [nws_alerts, nws_obs, noaa_tides, doh_hospitals, mta_entrances, nycha_developments]
+  answer_should_mention: [["school"]]
+
+- id: a04
+  kind: asset
+  author: author-written
+  target: seaport
+  question: "Are any hospitals near 200 Water Street, Manhattan in a flood scenario?"
+  expected_intent: single_address
+  must_run: [doh_hospitals]
+  irrelevant: [nws_alerts, nws_obs, noaa_tides, doe_schools, mta_entrances, nycha_developments]
+  answer_should_mention: [["hospital"]]
+
+- id: a05
+  kind: asset
+  author: author-written
+  target: snug-harbor
+  question: "Are there NYCHA developments near 1000 Richmond Terrace, Staten Island inside a flood scenario?"
+  expected_intent: single_address
+  must_run: [nycha_developments]
+  irrelevant: [nws_alerts, nws_obs, noaa_tides, doe_schools, doh_hospitals, mta_entrances]
+  answer_should_mention: [["nycha", "public housing"]]
+
+- id: d01
+  kind: district
+  author: author-written
+  target: QN04
+  question: "What share of community district QN04 is inside the DEP 2050 stormwater scenario?"
+  expected_intent: neighborhood
+  must_run: [dep_moderate_2050_nta]
+  irrelevant: [dob_permits_nta]
+  answer_should_mention: [["2050"]]
+
+- id: d02
+  kind: district
+  author: author-written
+  target: QN04
+  question: "How many flooding complaints has community district QN04 had?"
+  expected_intent: neighborhood
+  must_run: [nyc311_nta]
+  irrelevant: [dob_permits_nta, microtopo_nta]
+  answer_should_mention: [["complaint", "311"]]
+
+- id: o01
+  kind: out_of_scope
+  author: author-written
+  target: coney-island
+  question: "How much would flood insurance cost me at 1310 Surf Avenue, Brooklyn?"
+  expected_intent: out_of_scope
+  must_run: []
+  irrelevant: []
+  answer_should_mention: [["does not answer", "cannot", "not a substitute"]]
+
+- id: o02
+  kind: out_of_scope
+  author: author-written
+  target: seaport
+  question: "Will 200 Water Street, Manhattan flood next Tuesday?"
+  expected_intent: out_of_scope
+  must_run: []
+  irrelevant: []
+  answer_should_mention: [["does not answer", "cannot", "not a substitute"]]
