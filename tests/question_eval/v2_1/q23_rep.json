@@ -1,0 +1,135 @@
+{
+ "id": "q23",
+ "kind": "district",
+ "question": "How many street flooding complaints has community district QN12 had?",
+ "error": null,
+ "wall_s": 23.0,
+ "intent": "neighborhood",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "neighborhood",
+  "targets": [
+   {
+    "type": "nta",
+    "text": "QN12"
+   }
+  ],
+  "rationale": "The question asks for past street flooding complaints in a specific community district, which is answered by the nyc311_nta source.",
+  "question": "How many street flooding complaints has community district QN12 had?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "past",
+   "assets": []
+  },
+  "pebbles": [
+   "nyc311_nta"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_moderate_2050_nta",
+  "nyc311_nta",
+  "sandy_nta"
+ ],
+ "consulted": [
+  {
+   "id": "sandy_nta",
+   "title": "Share of the neighborhood inside the 2012 Sandy extent",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050_nta",
+   "title": "DEP Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311_nta",
+   "title": "NYC 311 flood complaints inside the neighborhood",
+   "stone": "touchstone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "dep_extreme_2080_nta",
+   "title": "DEP Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current_nta",
+   "title": "DEP Moderate (2.13 in/hr, current sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo_nta",
+   "title": "Neighborhood terrain from the USGS 3DEP DEM",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dob_permits_nta",
+   "title": "Active DOB construction permits inside the neighborhood",
+   "stone": "keystone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1738,
+  "completion": 122,
+  "seconds": 10.11,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 486,
+  "completion": 68,
+  "seconds": 6.92,
+  "n_calls": 1
+ },
+ "n_documents": 3,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "Community District QN12 has had 4379 street flooding complaints in the past three years.",
+   "doc_ids": [
+    "nyc311_nta"
+   ],
+   "numbers": [
+    "4379"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nCommunity District QN12 has had 4379 street flooding complaints in the past three years [nyc311_nta].\n\n**Hazard Reader.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}

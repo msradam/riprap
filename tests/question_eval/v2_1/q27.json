@@ -1,0 +1,47 @@
+{
+ "id": "q27",
+ "kind": "out_of_scope",
+ "question": "What will flood insurance cost me at 80 Pioneer Street, Brooklyn?",
+ "error": null,
+ "wall_s": 9.9,
+ "intent": "out_of_scope",
+ "deployment": null,
+ "plan": {
+  "intent": "out_of_scope",
+  "rationale": "Heuristic match: out of scope.",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "any",
+   "assets": []
+  },
+  "targets": [
+   {
+    "type": "address",
+    "text": "80 Pioneer Street, Brooklyn"
+   }
+  ]
+ },
+ "pebbles_run": [],
+ "consulted": null,
+ "not_checked": null,
+ "planner_tokens": {
+  "prompt": 1739,
+  "completion": 92,
+  "seconds": 9.72,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 0,
+  "completion": 0,
+  "seconds": 0,
+  "n_calls": 0
+ },
+ "n_documents": 0,
+ "tier": "llm",
+ "model": null,
+ "attempts": 0,
+ "claims": [],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "Riprap does not answer this question. It reports public flood evidence for a place: flood maps, past flood records, live sensors and forecasts, each cited to its source. It does not give advice on buying, renting or insuring property, legal advice, or a prediction for a specific day. For those, consult a licensed professional; for a regulatory flood determination, use FEMA's Flood Map Service Center (msc.fema.gov)."
+}

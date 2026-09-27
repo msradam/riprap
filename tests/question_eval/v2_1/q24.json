@@ -1,0 +1,135 @@
+{
+ "id": "q24",
+ "kind": "district",
+ "question": "What share of community district BK15 was inside the area Sandy flooded?",
+ "error": null,
+ "wall_s": 18.7,
+ "intent": "neighborhood",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "neighborhood",
+  "targets": [
+   {
+    "type": "nta",
+    "text": "BK15"
+   }
+  ],
+  "rationale": "The query asks for the proportion of community district BK15 (a community district, thus an NTA) that was flooded by Hurricane Sandy in 2012, which is directly answered by the 'sandy_nta' source.",
+  "question": "What share of community district BK15 was inside the area Sandy flooded?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "past",
+   "assets": []
+  },
+  "pebbles": [
+   "sandy_nta"
+  ],
+  "catalog": [
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_moderate_2050_nta",
+  "sandy_nta"
+ ],
+ "consulted": [
+  {
+   "id": "sandy_nta",
+   "title": "Share of the neighborhood inside the 2012 Sandy extent",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050_nta",
+   "title": "DEP Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "dep_extreme_2080_nta",
+   "title": "DEP Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current_nta",
+   "title": "DEP Moderate (2.13 in/hr, current sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo_nta",
+   "title": "Neighborhood terrain from the USGS 3DEP DEM",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311_nta",
+   "title": "NYC 311 flood complaints inside the neighborhood",
+   "stone": "touchstone"
+  },
+  {
+   "id": "dob_permits_nta",
+   "title": "Active DOB construction permits inside the neighborhood",
+   "stone": "keystone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1739,
+  "completion": 142,
+  "seconds": 11.46,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 442,
+  "completion": 70,
+  "seconds": 6.05,
+  "n_calls": 1
+ },
+ "n_documents": 2,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "38.5% of community district BK15 was inside the area Sandy flooded.",
+   "doc_ids": [
+    "sandy_nta"
+   ],
+   "numbers": [
+    "38.5",
+    "11.67"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n38.5% of community district BK15 was inside the area Sandy flooded [sandy_nta].\n\n**Hazard Reader.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal."
+}
