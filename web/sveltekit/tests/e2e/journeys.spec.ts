@@ -85,7 +85,9 @@ async function answerThenSource(page: Page, viaKeyboard = false) {
   const source = entry.locator('a[href^="http"]').first();
   await expect(source).toHaveAttribute('href', /^https?:\/\//);
   if (viaKeyboard) {
-    for (let i = 0; i < 40 && !(await source.evaluate((el) => el === document.activeElement)); i++) await page.keyboard.press('Tab');
+    // Enter moves focus to the entry itself; one Tab then reaches its source.
+    await expect(entry).toBeFocused();
+    await page.keyboard.press('Tab');
     await expect(source).toBeFocused();
   }
   await noAxeViolations(page, 'citation open');

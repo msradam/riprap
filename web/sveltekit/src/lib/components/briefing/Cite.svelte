@@ -9,7 +9,13 @@
     e.preventDefault();
     citations.active = c.id;
     const el = document.getElementById(`cite-${c.id}`);
-    el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if (!el) return;
+    // Focus the entry (tabindex -1) so the next Tab reaches its source
+    // link. preventScroll stops the focus jump; one instant scroll then
+    // brings the entry into view (a smooth scroll would run far past the
+    // 150 ms motion budget).
+    el.focus({ preventScroll: true });
+    el.scrollIntoView({ block: 'nearest' });
   }
 </script>
 

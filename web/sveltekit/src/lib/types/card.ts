@@ -250,6 +250,9 @@ export type FindingsData = {
   /** Per-call inference emissions (energy + tokens). Surfaced as a
    *  chip in RunHealthStrip; full breakdown available via tooltip. */
   emissions?: import('$lib/client/agentStream').EmissionsSummary;
+  /** Sources that ran but returned no value or were marked unavailable
+   *  (failed steps excluded). Feeds the "Ran but returned no data" list. */
+  noData?: { id: string; title: string }[];
 };
 
 /** Density toggle — affects card padding + register row height. */

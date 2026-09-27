@@ -36,8 +36,9 @@
     font-size: 12px;
     color: var(--ink-tertiary);
     letter-spacing: 0.02em;
-    text-transform: lowercase;
-    overflow-wrap: anywhere;
+    /* Readable labels with units ("Temperature (°C)"): no forced
+       lowercase, and words break only when one cannot fit. */
+    overflow-wrap: break-word;
   }
   .body-sub {
     margin-top: var(--s-3);

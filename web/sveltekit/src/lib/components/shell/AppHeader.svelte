@@ -51,9 +51,8 @@
     try {
       await exportBriefingPdf(id);
     } catch (e) {
+      // Stays until the reader dismisses it.
       exportError = e instanceof ExportPdfError ? e.message : String(e);
-      // Auto-clear the toast after 8s so it doesn't stick around forever.
-      setTimeout(() => { exportError = null; }, 8000);
     } finally {
       exporting = false;
     }
@@ -103,9 +102,19 @@
       <StatusPill />
     </div>
   </div>
-  {#if exportError}
-    <div class="app-header-toast" role="alert">{exportError}</div>
-  {/if}
+  <!-- The live region is always in the DOM so screen readers announce
+       the message when it appears. -->
+  <div role="status">
+    {#if exportError}
+      <div class="app-header-toast">
+        <span>{exportError}</span>
+        {#if page.params.queryId}
+          <a href={resolve('/(app)/print/[queryId]', { queryId: encodeURIComponent(page.params.queryId) })}>Open the print view</a>
+        {/if}
+        <button type="button" class="app-header-toast-close" onclick={() => (exportError = null)}>Dismiss</button>
+      </div>
+    {/if}
+  </div>
 </header>
 
 <style>
@@ -120,16 +129,35 @@
     color: var(--ink-tertiary);
     cursor: progress;
   }
-  /* Inline error toast (PDF unavailable, snapshot missing, etc.). Lives
-     below the header so it doesn't shift the page layout. Auto-clears
-     after 8 s — set by exportPdf(). */
+  /* Inline export message (PDF unavailable, snapshot missing, etc.),
+     below the header. Stays until dismissed. */
   .app-header-toast {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 16px;
     background: #FEF3C7;
     border-top: 1px solid var(--accent-warn);
     color: var(--ink);
     font-family: var(--font-mono);
     font-size: 12px;
     padding: 8px 14px;
+  }
+  .app-header-toast a {
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+  }
+  .app-header-toast-close {
+    margin-left: auto;
+    min-height: 24px;
+    padding: 0 8px;
+    background: transparent;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
   }
   /* City-pill on the chip — small federal-blue tag that ties the
      header to the active deployment. Quiet, not competing with

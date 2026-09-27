@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Citation } from '$lib/types/claim';
   import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
+  import TierKey from '$lib/components/glyphs/TierKey.svelte';
   import { citations as cstore } from '$lib/stores/citations.svelte';
 
   interface Props {
@@ -18,10 +19,16 @@
     <span class="section-label">Citations · {entries.length}</span>
     <span class="citation-drawer-meta">{snapshot ? 'snapshot' : 'live'} · primary sources</span>
   </div>
+  {#if entries.length}
+    <div class="citation-tier-key"><TierKey /></div>
+  {/if}
   <ol class="citation-list">
     {#each entries as c (c.id)}
+      <!-- tabindex: an inline citation moves focus here, so the next Tab
+           reaches this entry's source link. -->
       <li
         id="cite-{c.id}"
+        tabindex="-1"
         class="citation-item"
         class:is-active={cstore.active === c.id}
       >
@@ -66,6 +73,11 @@
   .citation-drawer :global(a:hover) {
     border-bottom-color: var(--accent);
     color: var(--accent);
+  }
+  .citation-tier-key {
+    margin: 0 0 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule-soft);
   }
   /* 17px text box + 2 x 3.5px = 24px target (WCAG 2.5.8); inline padding does not change line height. */
   .citation-title a {

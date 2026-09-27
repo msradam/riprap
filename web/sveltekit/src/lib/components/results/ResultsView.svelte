@@ -11,8 +11,7 @@
   import FindingsRegion from '$lib/components/findings/FindingsRegion.svelte';
   import type { Density, ProvenanceMode } from '$lib/types/card';
   import type { RunState } from '$lib/client/runState.svelte';
-  import { briefingState } from '$lib/stores/briefingState.svelte';
-  import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
+  import { briefingState, sourceLists } from '$lib/stores/briefingState.svelte';
   import { looksLikeQuestion } from '$lib/client/runState.svelte';
   import { splitBriefing } from '$lib/client/parseBriefing';
   import { browser } from '$app/environment';
@@ -45,27 +44,13 @@
   let question = $derived(
     run.plan?.question || grounding?.question || (looksLikeQuestion(queryText) ? queryText : '')
   );
-  // undefined means the payload predates the field (older gallery JSON).
-  let consulted = $derived(run.finalResult?.consulted);
-  let notChecked = $derived(run.finalResult?.not_checked);
-
-  /** Consulted sources, with a "failed to respond" flag from step events
-   *  that reported ok: false. A failed step missing from the list is
-   *  added so it is never visible only in the provenance trace. */
-  let consultedRows = $derived.by(() => {
-    const failed = run.failedSteps;
-    const rows = (consulted ?? []).map((s) => ({ id: s.id, title: s.title, failed: failed.includes(s.id) }));
-    const known = new Set([...rows.map((r) => r.id), ...(notChecked ?? []).map((s) => s.id)]);
-    for (const id of failed) {
-      if (!known.has(id)) rows.push({ id, title: pebbleManifest.byId[id]?.title ?? id, failed: true });
-    }
-    // Failures first, so a closed list still leads with them.
-    return rows.sort((x, y) => Number(y.failed) - Number(x.failed));
-  });
-  let failedCount = $derived(consultedRows.filter((r) => r.failed).length);
+  // Consulted (failed steps flagged), ran but returned no data, and not
+  // checked for this question. Older gallery JSON lacks the first and last.
+  let lists = $derived(sourceLists(run));
+  let failedCount = $derived(lists.consulted?.filter((r) => r.failed).length ?? 0);
   let showSources = $derived(
     !!run.finalResult && !run.stopped &&
-    (consulted !== undefined || notChecked !== undefined || consultedRows.length > 0)
+    (!!lists.consulted || lists.noData.length > 0 || lists.notChecked !== undefined)
   );
   /** Lists at or under this length open by default. */
   const SHORT_LIST = 8;
@@ -117,29 +102,43 @@
 </script>
 
 {#snippet sources()}
-  <section class="sources" aria-label="Sources consulted and not checked">
-    <details class="sources-col" open={consultedRows.length <= SHORT_LIST}>
-      <summary class="sources-head">
-        <!-- Older snapshots carry no consulted list, only the failed steps. -->
-        {consulted ? 'Sources consulted' : 'Sources that failed to respond'} ({consultedRows.length}){#if consulted && failedCount}, {failedCount} failed to respond{/if}
-      </summary>
-      <ul class="sources-list">
-        {#each consultedRows as s (s.id)}
-          <li class:is-failed={s.failed}>{s.title}{#if s.failed}<span class="sources-failed">: failed to respond</span>{/if}</li>
-        {/each}
-      </ul>
-    </details>
-    {#if notChecked?.length}
-      <details class="sources-col" open={notChecked.length <= SHORT_LIST}>
-        <summary class="sources-head">Not checked ({notChecked.length})</summary>
+  <section class="sources" aria-label="Sources consulted, sources with no data, and sources not checked">
+    {#if lists.consulted}
+      <details class="sources-col" open={lists.consulted.length <= SHORT_LIST}>
+        <summary class="sources-head">
+          <!-- Older snapshots carry no consulted list, only the failed steps. -->
+          {lists.hasConsultedList ? 'Sources consulted' : 'Sources that failed to respond'} ({lists.consulted.length}){#if lists.hasConsultedList && failedCount}, {failedCount} failed to respond{/if}
+        </summary>
         <ul class="sources-list">
-          {#each notChecked as s (s.id)}
-            <li>{s.title}</li>
+          {#each lists.consulted as s (s.id)}
+            <li class:is-failed={s.failed}>{s.title}{#if s.failed}<span class="sources-failed">: failed to respond</span>{/if}</li>
           {/each}
         </ul>
       </details>
-    {:else if notChecked}
-      <p class="sources-col sources-head sources-none">Not checked: none</p>
+    {/if}
+    {#if lists.noData.length}
+      <details class="sources-col" open={lists.noData.length <= SHORT_LIST}>
+        <summary class="sources-head">Ran but returned no data ({lists.noData.length})</summary>
+        <ul class="sources-list">
+          {#each lists.noData as t, i (`${i}-${t}`)}
+            <li>{t}</li>
+          {/each}
+        </ul>
+      </details>
+    {/if}
+    {#if lists.notChecked?.length}
+      <details class="sources-col" open={lists.notChecked.length <= SHORT_LIST}>
+        <summary class="sources-head">Not checked for this question ({lists.notChecked.length})</summary>
+        <ul class="sources-list">
+          {#each lists.notChecked as t, i (`${i}-${t}`)}
+            <li>{t}</li>
+          {/each}
+        </ul>
+      </details>
+    {:else if lists.notChecked}
+      <p class="sources-col sources-none">
+        <span class="sources-head">Not checked for this question:</span> none of the sources for this kind of place were skipped.
+      </p>
     {/if}
   </section>
 {/snippet}
@@ -245,6 +244,9 @@
         <aside id="region-map" class="app-region app-region-map" aria-label="Map region">
           <header class="region-head">
             <span class="section-label">Map</span>
+            <!-- The map canvas, its controls and the layer list are many tab
+                 stops; this jumps straight to the citations. -->
+            <a class="map-skip" href="#region-cites">Skip the map</a>
             {#if run.plan?.intent === 'compare'}
               {#if !(run.compareAddressA || run.compareAddressB)}
                 <span class="region-head-meta">awaiting geocode…</span>
@@ -315,9 +317,12 @@
               />
             </div>
           {/if}
+          <p class="map-text-note">Everything shown on the map is also listed in the briefing and the citations.</p>
         </aside>
 
-        <aside id="region-cites" class="app-region app-region-cites" aria-label="Citations">
+        <!-- tabindex: the "Skip the map" target takes focus, so the next Tab
+             continues inside the citations. -->
+        <aside id="region-cites" class="app-region app-region-cites" aria-label="Citations" tabindex="-1">
           <CitationDrawer {citations} {snapshot} />
         </aside>
       </div>
@@ -403,6 +408,32 @@
   }
   .sources-list li + li {
     margin-top: 2px;
+  }
+  .sources-none {
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-secondary);
+  }
+  .map-skip {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+  }
+  .map-skip + .region-head-meta {
+    margin-left: 12px;
+  }
+  .map-text-note {
+    margin: 8px 0 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink-secondary);
+  }
+  #region-cites:focus-visible {
+    outline: none;
   }
   .sources-failed {
     color: var(--ink);

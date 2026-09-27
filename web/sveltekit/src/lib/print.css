@@ -66,6 +66,15 @@
     orphans: 3;
     widows: 3;
   }
+  /* Short blocks stay whole; a label never ends a page on its own. */
+  .scope-note-label,
+  .sources-head {
+    break-after: avoid;
+  }
+  .scope-note-end,
+  .sources-list li {
+    break-inside: avoid;
+  }
 
   /* Citation appendix appears at end of print when drawer carries
      .print-appendix (caller adds it before window.print()). */

@@ -27,6 +27,47 @@ import { pebbleManifest, type PebbleManifest } from '$lib/stores/pebbleManifest.
  *  back to the Riprap publication date. */
 const RIPRAP_VINTAGE = '2026-05';
 
+/** Card-header source: the part of `source_name` before a spaced dash or
+ *  an em dash. Splitting on any hyphen cut "NOAA CO-OPS" to "NOAA CO"
+ *  and "NYC flood-policy corpus" to "NYC flood". */
+function shortSource(name: string): string {
+  return name.split(/\s[-–—]\s|—/)[0].trim();
+}
+
+/** Reader-facing labels for the value fields that scalar and meta cards
+ *  show. Each label restates the field as the pebble's own narrative
+ *  describes it. A field with no label here is not shown: a snake_case
+ *  key tells a reader nothing. */
+const FIELD_LABELS: Record<string, string> = {
+  // microtopo
+  point_elev_m: 'Elevation (m)',
+  rel_elev_pct_200m: 'Elevation percentile, 200 m window',
+  rel_elev_pct_750m: 'Elevation percentile, 750 m window',
+  basin_relief_m: 'Local basin relief (m)',
+  aoi_min_m: 'Lowest elevation in the area (m)',
+  aoi_max_m: 'Highest elevation in the area (m)',
+  resolution_m: 'DEM resolution (m)',
+  hand_m: 'Height above nearest drainage (m)',
+  twi: 'TWI',
+  // fema_nfhl
+  effective_year: 'FIRM panel effective year',
+  // floodnet
+  n_sensors: 'Sensors nearby',
+  n_flood_events_3y: 'Flood events, last 3 years',
+  n_sensors_with_events: 'Sensors with flood events',
+  // nws_obs, noaa_tides, usgs_gauges
+  distance_km: 'Distance to station (km)',
+  temp_c: 'Temperature (°C)',
+  precip_last_hour_mm: 'Precipitation, last hour (mm)',
+  precip_last_3h_mm: 'Precipitation, last 3 hours (mm)',
+  precip_last_6h_mm: 'Precipitation, last 6 hours (mm)',
+  observed_ft: 'Observed water level (ft)',
+  residual_ft: 'Difference from predicted tide (ft)',
+  stage_ft: 'Stream stage (ft)',
+  discharge_cfs: 'Discharge (cfs)',
+  n_gauges_in_area: 'Gauges in the area',
+};
+
 /**
  * Format a pebble's `narration.template` against its value dict.
  * Mirrors the backend templated_reconciler's _format_template logic
@@ -412,7 +453,7 @@ function buildTimeseriesForecast(m: PebbleManifest, value: unknown): Card | null
       ? m.display.variant
       : 'timeseries';
   const tier = (m.tier ?? 'modeled') as Card['tier'];
-  const source = m.provenance.source_name.split(/[—-]/)[0].trim();
+  const source = shortSource(m.provenance.source_name);
   return {
     id: `fsm-${m.id.replace(/_/g, '-')}`,
     stone: m.stone, tier, variant,
@@ -589,7 +630,7 @@ function buildHistogramCard(m: PebbleManifest, value: unknown): Card | null {
     ? `Within ${radius} m · ${years} y window. Filtered to flood-relevant descriptors.`
     : undefined;
   const tier = (m.tier ?? 'proxy') as Card['tier'];
-  const source = m.provenance.source_name.split(/[—-]/)[0].trim();
+  const source = shortSource(m.provenance.source_name);
   return {
     id: `fsm-${m.id.replace(/_/g, '-')}`,
     stone: m.stone, tier, variant: 'histogram',
@@ -640,7 +681,7 @@ function buildRasterCard(m: PebbleManifest, value: unknown): Card | null {
       ? m.display.variant
       : 'raster';
   const tier = (m.tier ?? 'modeled') as Card['tier'];
-  const source = m.provenance.source_name.split(/[—-]/)[0].trim();
+  const source = shortSource(m.provenance.source_name);
   return {
     id: `fsm-${m.id.replace(/_/g, '-')}`,
     stone: m.stone, tier, variant,
@@ -776,7 +817,7 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
   const tier = m.type === 'model' ? 'modeled'
              : m.type === 'live'  ? 'empirical'
              : 'empirical';
-  const source = m.provenance.source_name.split(/[—-]/)[0].trim();
+  const source = shortSource(m.provenance.source_name);
   const vintage = m.provenance.date_modified ?? RIPRAP_VINTAGE;
   const base: Card = {
     id: `pebble-${m.id}`,
@@ -798,6 +839,14 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
     return { ...base, variant: 'headline',
              absent: value === undefined && !failed ? 'Not run' : 'Not available',
              sub: m.fallback.message ?? undefined };
+  }
+  // The source ran and said it has nothing (e.g. a forecast with too
+  // little history). Its own reason, when given, beats the manifest's
+  // "offline" fallback, which would be untrue here.
+  const rec = obj(value);
+  if (rec?.available === false) {
+    return { ...base, variant: 'headline', absent: 'Not available',
+             sub: str(rec.reason) ?? m.fallback.message ?? undefined };
   }
   if (variant === 'headline') {
     // Format manifest.narration.template against the pebble value
@@ -833,9 +882,10 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
     ]);
     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
       for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-        if (SCALAR_IGNORE.has(k)) continue;
+        const label = FIELD_LABELS[k];
+        if (SCALAR_IGNORE.has(k) || !label) continue;
         if (typeof v === 'number' && Number.isFinite(v)) {
-          scalars.push({ value: `${v}`, label: k });
+          scalars.push({ value: `${v}`, label });
         }
       }
     } else if (typeof value === 'number') {
@@ -991,8 +1041,11 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
   // meta fallback (chart pebbles without a special builder)
   const metaRows: { k: string; v: string }[] = [];
   if (typeof value === 'object' && value !== null) {
-    for (const [k, v] of Object.entries(value as Record<string, unknown>).slice(0, 6)) {
-      metaRows.push({ k, v: typeof v === 'object' ? JSON.stringify(v).slice(0, 40) : String(v) });
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      const label = FIELD_LABELS[k];
+      if (!label || v === null || typeof v === 'object') continue;
+      metaRows.push({ k: label, v: String(v) });
+      if (metaRows.length >= 6) break;
     }
   }
   return { ...base, variant: 'meta', metaRows,
@@ -1034,6 +1087,10 @@ export function adaptFinalToFindings(
   // appear here automatically.
   const templatedCards: Card[] = [];
   const handledIds = new Set<string>();
+  // Sources that ran and came back empty or marked unavailable: the same
+  // pebbles the muted "Not available" cards and silent register rows show.
+  // Failed steps are left out; the sources list flags those already.
+  const noData: { id: string; title: string }[] = [];
   const intent = str(f.intent);
   const failedIds = new Set<string>();
   const walk = (n: TraceNode | null | undefined) => {
@@ -1058,7 +1115,11 @@ export function adaptFinalToFindings(
         composite.experimental = registerMs.some((m) => m.maturity === 'experimental');
         templatedCards.push(composite);
       }
-      for (const m of registerMs) handledIds.add(m.id);
+      for (const m of registerMs) {
+        handledIds.add(m.id);
+        const v = obj((f as Record<string, unknown>)[m.id]);
+        if (v?.available === false && !failedIds.has(m.id)) noData.push({ id: m.id, title: m.title });
+      }
     }
     // Per-pebble loop — single-pebble bespoke variants + the generic
     // templated fallback. Type-keyed dispatch by display.variant.
@@ -1074,6 +1135,7 @@ export function adaptFinalToFindings(
         card = buildHistogramCard(m, value);
       }
       if (!card) card = buildTemplated(m, value, failedIds.has(m.id));
+      if (card?.absent === 'Not available' && !failedIds.has(m.id)) noData.push({ id: m.id, title: m.title });
       if (card) templatedCards.push({ ...card, experimental: m.maturity === 'experimental' });
     }
   }
@@ -1083,6 +1145,7 @@ export function adaptFinalToFindings(
     stones: buildStoneTraces(trace),
     wallSeconds,
     emissions: (f as { emissions?: FindingsData['emissions'] }).emissions,
+    noData,
   };
 }
 

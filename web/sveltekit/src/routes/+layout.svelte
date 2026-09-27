@@ -4,6 +4,8 @@
   import AppHeader from '$lib/components/shell/AppHeader.svelte';
   import AppFooter from '$lib/components/shell/AppFooter.svelte';
   import SkipLink from '$lib/components/shell/SkipLink.svelte';
+  import { briefingState } from '$lib/stores/briefingState.svelte';
+  import { afterNavigate } from '$app/navigation';
   import { page } from '$app/state';
   import { resolve } from '$app/paths';
   // The first view of every page sets its text in these three faces; the
@@ -27,6 +29,14 @@
   let chromeFree = $derived(isPrint || routeId === '/');
   // Gallery pages are static snapshots: the header must not call /api/*.
   let isGallery = $derived(routeId.startsWith('/(app)/gallery'));
+
+  // The run status lives in a module store that outlives the /q/ page, so
+  // a refused run's "stopped" pill followed the reader into the gallery.
+  // Pages that show no live run start from idle.
+  afterNavigate(({ to }) => {
+    const id = to?.route.id ?? '';
+    if (id === '/' || id.startsWith('/(app)/gallery')) briefingState.reset();
+  });
 </script>
 
 <svelte:head>

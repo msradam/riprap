@@ -32,7 +32,45 @@ export interface PrintSnapshot {
   unanswered?: boolean;
   /** Undefined when the payload predates the consulted list. */
   consulted?: { title: string; failed: boolean }[];
+  /** Sources that ran but returned no data or were unavailable. */
+  noData?: string[];
   notChecked?: string[];
+}
+
+/** The three source lists shown above the briefing body and in print.
+ *  Each says only what the payload knows:
+ *  - consulted: the sources chosen for the question, with steps that
+ *    reported ok: false flagged (and added when missing from the list).
+ *    Undefined when the payload predates the list and nothing failed.
+ *  - noData: sources that ran and returned nothing or were marked
+ *    unavailable (the muted "Not available" cards).
+ *  - notChecked: sources available for this kind of place that were not
+ *    run for the question. Undefined on payloads that predate it. */
+export function sourceLists(run: RunState) {
+  const f = run.finalResult;
+  const failed = run.failedSteps;
+  let consulted: { id: string; title: string; failed: boolean }[] | undefined;
+  if (f?.consulted || failed.length) {
+    consulted = (f?.consulted ?? []).map((c) => ({ id: c.id, title: c.title, failed: failed.includes(c.id) }));
+    const known = new Set([...(f?.consulted ?? []), ...(f?.not_checked ?? [])].map((c) => c.id));
+    for (const id of failed) {
+      if (!known.has(id)) consulted.push({ id, title: pebbleManifest.byId[id]?.title ?? id, failed: true });
+    }
+    // Failures first, so a closed list still leads with them.
+    consulted.sort((x, y) => Number(y.failed) - Number(x.failed));
+  }
+  // With a consulted list, only its members ran; older payloads ran all.
+  const ran = f?.consulted ? new Set(f.consulted.map((c) => c.id)) : null;
+  const noData = (run.findingsData.noData ?? [])
+    .filter((s) => !ran || ran.has(s.id))
+    .map((s) => s.title);
+  return {
+    consulted,
+    /** False when `consulted` holds only failed steps (older payloads). */
+    hasConsultedList: !!f?.consulted,
+    noData,
+    notChecked: f?.not_checked?.map((c) => c.title),
+  };
 }
 
 /** Build the print snapshot from a finished run: the live route calls it
@@ -50,15 +88,7 @@ export function snapshotFromRun(
     run.plan?.question || g?.question || (looksLikeQuestion(queryText) ? queryText : '');
   const blocks = run.briefing.blocks;
   const hasAnswer = blocks.some((b) => b.kind === 'head' && b.label === 'Answer');
-  let consulted: PrintSnapshot['consulted'];
-  if (f?.consulted || run.failedSteps.length) {
-    const failed = run.failedSteps;
-    consulted = (f?.consulted ?? []).map((c) => ({ title: c.title, failed: failed.includes(c.id) }));
-    const known = [...(f?.consulted ?? []), ...(f?.not_checked ?? [])].map((c) => c.id);
-    for (const id of failed) {
-      if (!known.includes(id)) consulted.push({ title: pebbleManifest.byId[id]?.title ?? id, failed: true });
-    }
-  }
+  const lists = sourceLists(run);
   let mode: string | null = null;
   if (g?.tier === 'llm') {
     mode = `LLM claims checked against cited sources: ${g.claims?.length ?? 0} kept, ${g.dropped_claims?.length ?? 0} dropped${g.model ? ` (${g.model})` : ''}`;
@@ -77,8 +107,9 @@ export function snapshotFromRun(
     question: question || null,
     mode,
     unanswered: !!question && !hasAnswer && g?.tier !== 'llm',
-    consulted,
-    notChecked: f?.not_checked?.map((c) => c.title),
+    consulted: lists.consulted?.map(({ title, failed }) => ({ title, failed })),
+    noData: lists.noData,
+    notChecked: lists.notChecked,
   };
 }
 

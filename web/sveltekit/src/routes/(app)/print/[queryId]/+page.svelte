@@ -4,6 +4,7 @@
   import { onMount } from 'svelte';
   import Briefing from '$lib/components/briefing/Briefing.svelte';
   import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
+  import TierKey from '$lib/components/glyphs/TierKey.svelte';
   import { loadSnapshot, type PrintSnapshot } from '$lib/stores/briefingState.svelte';
   import { formatGeneratedAt } from '$lib/client/gallery';
   import { APP_VERSION } from '$lib/version';
@@ -49,7 +50,8 @@
     if (!snapshot) return '';
     const n = citationEntries.length;
     const parts = [snapshot.mode, `${n} ${n === 1 ? 'source' : 'sources'} cited`];
-    if (snapshot.notChecked) parts.push(`${snapshot.notChecked.length} not checked`);
+    if (snapshot.noData?.length) parts.push(`${snapshot.noData.length} with no data`);
+    if (snapshot.notChecked) parts.push(`${snapshot.notChecked.length} not checked for this question`);
     return parts.filter(Boolean).join(' · ');
   });
 
@@ -113,23 +115,26 @@
       </span>
     </div>
 
-    {#if split.lead.length}
-      <Briefing blocks={split.lead} citations={snapshot.citations} streaming={false} />
-    {/if}
-    {#if snapshot.unanswered}
-      <p class="print-unanswered">
-        This question was not answered directly. Riprap is running without a language model here,
-        so this is the evidence briefing for the place above.
-      </p>
-    {/if}
+    <!-- The answer is short: keep it on one page. -->
+    <div class="print-lead">
+      {#if split.lead.length}
+        <Briefing blocks={split.lead} citations={snapshot.citations} streaming={false} />
+      {/if}
+      {#if snapshot.unanswered}
+        <p class="print-unanswered">
+          This question was not answered directly. Riprap is running without a language model here,
+          so this is the evidence briefing for the place above.
+        </p>
+      {/if}
+    </div>
     {#if split.scope.length}
       <div class="scope-note"><Briefing blocks={split.scope} citations={snapshot.citations} streaming={false} /></div>
     {/if}
 
-    {#if snapshot.consulted || snapshot.notChecked}
-      <section class="print-sources" aria-label="Sources consulted and not checked">
+    {#if snapshot.consulted || snapshot.noData?.length || snapshot.notChecked}
+      <section class="print-sources" aria-label="Sources consulted, sources with no data, and sources not checked">
         {#if snapshot.consulted}
-          <div>
+          <div class="print-sources-col">
             <h2>Sources consulted ({snapshot.consulted.length})</h2>
             <ul>
               {#each snapshot.consulted as c, i (`${i}-${c.title}`)}
@@ -138,17 +143,28 @@
             </ul>
           </div>
         {/if}
+        {#if snapshot.noData?.length}
+          <div class="print-sources-col">
+            <h2>Ran but returned no data ({snapshot.noData.length})</h2>
+            <ul>
+              {#each snapshot.noData as t, i (`${i}-${t}`)}
+                <li>{t}</li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
         {#if snapshot.notChecked}
-          <div>
-            <h2>{snapshot.notChecked.length ? `Not checked (${snapshot.notChecked.length})` : 'Not checked'}</h2>
+          <div class="print-sources-col">
             {#if snapshot.notChecked.length}
+              <h2>Not checked for this question ({snapshot.notChecked.length})</h2>
               <ul>
                 {#each snapshot.notChecked as t, i (`${i}-${t}`)}
                   <li>{t}</li>
                 {/each}
               </ul>
             {:else}
-              <p>none</p>
+              <h2>Not checked for this question</h2>
+              <p>None of the sources for this kind of place were skipped.</p>
             {/if}
           </div>
         {/if}
@@ -159,7 +175,7 @@
       <Briefing blocks={split.body} citations={snapshot.citations} streaming={false} />
     {/if}
     {#if split.outOfScope.length}
-      <div class="scope-note scope-note-end">
+      <div class="scope-note scope-note-end print-keep">
         <p class="scope-note-label">Out of scope</p>
         <Briefing blocks={split.outOfScope} citations={snapshot.citations} streaming={false} />
       </div>
@@ -168,6 +184,7 @@
     {#if citationEntries.length}
       <section class="print-citations">
         <h2>Citations</h2>
+        <div class="print-tier-key"><TierKey /></div>
         <ol>
           {#each citationEntries as c (c.id)}
             <li>
@@ -247,21 +264,30 @@
     margin: 10pt 0; font: 11pt var(--font-sans, "Sofia Sans"); color: #334155;
   }
   .print-sources {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 16pt;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150pt, 1fr)); gap: 12pt 16pt;
     margin: 12pt 0 16pt; padding: 8pt 0; border-top: 1pt solid #CBD5E1; border-bottom: 1pt solid #CBD5E1;
     font: 10pt var(--font-sans, "Sofia Sans"); line-height: 1.4;
-    break-inside: avoid;
   }
-  .print-sources h2 { font: 600 11pt var(--font-sans, "Sofia Sans"); margin: 0 0 4pt; }
+  /* A long list (17 sources not checked) may split across pages; keeping
+     it whole pushed the lists to page 2 and left page 1 half empty. Each
+     item and each heading stays with its neighbour instead. */
+  .print-sources li { break-inside: avoid; }
+  .print-sources h2 { font: 600 11pt var(--font-sans, "Sofia Sans"); margin: 0 0 4pt; break-after: avoid; }
+  .print-lead { break-inside: avoid; }
+  .print-keep { break-inside: avoid; }
+  .scope-note-label { break-after: avoid; }
+  .print-tier-key { margin: 0 0 10pt; break-inside: avoid; }
   .print-sources ul { margin: 0; padding-left: 12pt; }
   .print-sources p { margin: 0; }
+  /* No forced page break before the citations: it left page 2 mostly
+     blank. The heading stays with the first entries instead. */
   .print-citations {
     margin-top: 18pt; padding-top: 8pt; border-top: 1pt solid #0F172A;
-    page-break-before: always;
     font-variant-numeric: tabular-nums;
   }
   .print-citations h2 {
     font: 600 13pt var(--font-sans, "Sofia Sans"); margin: 0 0 8pt;
+    break-after: avoid;
   }
   .print-citations ol { list-style: none; padding: 0; margin: 0; }
   .print-citations li {
@@ -311,6 +337,9 @@
   @media print {
     .no-print { display: none !important; }
     .print-doc { margin: 0; padding: 0; max-width: none; }
+    /* The app layout's paper ground and min-height printed as a grey block
+       after the last line. */
+    :global(html), :global(body), :global(main) { background: white !important; min-height: 0 !important; }
     @page {
       size: letter;
       margin: 0.85in 0.85in 0.85in 1in;
@@ -323,6 +352,5 @@
         font: 9pt "Overpass Mono"; color: #4E5A6E;
       }
     }
-    .print-citations { page-break-before: always; }
   }
 </style>

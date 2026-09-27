@@ -66,11 +66,11 @@
     letter-spacing: 0.05em;
     font-weight: 500;
   }
+  /* Wraps: a long facility name is the finding, not a detail to clip. */
   .reg-label {
     color: var(--riprap-text-primary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: break-word;
+    min-width: 0;
   }
   .reg-source {
     color: var(--riprap-text-tertiary);
