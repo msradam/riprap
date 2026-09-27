@@ -34,43 +34,28 @@
   let isLinked = $derived(linkedKey != null && card.mapLayer != null && card.mapLayer === linkedKey);
   let tierShort = $derived(TIER_META[card.tier].short);
 
-  let interactive = $derived(card.mapLayer != null);
-
   function handleEnter() { if (card.mapLayer) onLink?.(card.mapLayer); }
   function handleLeave() { if (card.mapLayer) onLink?.(null); }
-  function handleCite(e: Event) {
-    e.stopPropagation();
+  function handleCite() {
     if (card.citeId) onCite?.(card.citeId);
-  }
-  function handleKey(e: KeyboardEvent) {
-    // Ignore keys bubbling up from the footer's cite button.
-    if (!interactive || e.target !== e.currentTarget) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onLink?.(card.mapLayer ?? null);
-    }
   }
 </script>
 
-<!-- Interactive cards are a focusable div, not a <button>: the footer
-     holds its own cite <button>, and nested buttons are invalid HTML
-     that breaks hydration on prerendered pages. -->
-<svelte:element
-  this={interactive ? 'div' : 'article'}
-  role={interactive ? 'button' : 'article'}
-  tabindex={interactive ? 0 : undefined}
+<!-- A plain article, not a focusable button: its only control is the
+     footer cite button (no nested interactive elements). Pointer hover
+     and focus inside the card light up its map layer; this is a
+     progressive enhancement, so the handlers stay on the article. -->
+<article
   class="fc fc-{card.variant} fc-tier-{card.tier}"
   class:is-compact={density === 'compact'}
   class:is-linked={isLinked}
-  class:is-interactive={interactive}
-  class:has-illustrative={card.illustrative || card.tier === 'synthetic' || card.variant === 'comparison'}
+  class:is-absent={!!card.absent}
+  class:has-illustrative={!card.absent && (card.illustrative || card.tier === 'synthetic' || card.variant === 'comparison')}
   aria-labelledby={`fc-${card.id}-title`}
-  aria-label={`${TIER_META[card.tier].label} card · ${card.title} · ${card.source}`}
   onpointerenter={handleEnter}
   onpointerleave={handleLeave}
-  onfocus={handleEnter}
-  onblur={handleLeave}
-  onkeydown={handleKey}
+  onfocusin={handleEnter}
+  onfocusout={handleLeave}
 >
   <header class="fc-head">
     <div class="fc-head-source">
@@ -85,10 +70,16 @@
 
   <h4 id={`fc-${card.id}-title`} class="fc-title">{card.title}</h4>
 
-  <CardBody {card} />
+  {#if card.absent}
+    <p class="fc-absent">
+      <span class="fc-absent-label">{card.absent}</span>{#if card.sub}<span class="fc-absent-reason">{card.sub}</span>{/if}
+    </p>
+  {:else}
+    <CardBody {card} />
+  {/if}
 
   <footer class="fc-foot">
-    {#if card.citeId}
+    {#if card.citeId && !card.absent}
       <button
         type="button"
         class="fc-foot-cite"
@@ -101,12 +92,12 @@
     {:else}
       <span class="fc-foot-docid fc-foot-docid-mute">{card.docId}</span>
     {/if}
-    <span class="fc-tier-badge fc-tier-badge-{card.tier}" aria-label={`epistemic tier ${tierShort}`}>
+    <span class="fc-tier-badge fc-tier-badge-{card.tier}">
       <TierGlyph tier={card.tier} size={9} color="var(--tier-{card.tier})" />
       <span>{tierShort}</span>
     </span>
   </footer>
-</svelte:element>
+</article>
 
 <style>
   .fc {
@@ -114,7 +105,7 @@
     border: 1px solid var(--rule-soft);
     display: flex;
     flex-direction: column;
-    transition: background-color 200ms ease, border-color 200ms ease, outline-color 200ms ease;
+    transition: background-color 150ms ease, border-color 150ms ease, outline-color 150ms ease;
     outline: 0 solid transparent;
     outline-offset: 0;
     /* Reset inherited text styles so interactive (div role=button) and
@@ -126,13 +117,41 @@
     width: 100%;
     /* Fade each card in as it lands in the rail. Respects
        prefers-reduced-motion via the global rule in tokens.css. */
-    animation: fc-fade-in 360ms ease-out both;
+    animation: fc-fade-in 150ms ease-out both;
   }
   @keyframes fc-fade-in {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  .fc.is-interactive { cursor: pointer; }
+  /* Absence: compact and muted, so it reads as a gap, not a finding. */
+  .fc.is-absent {
+    align-self: start;
+    background: transparent;
+    border-style: dashed;
+    animation: none;
+  }
+  .fc.is-absent .fc-head { background: transparent; }
+  .fc.is-absent .fc-head-source,
+  .fc.is-absent .fc-title { color: var(--ink-secondary); font-weight: 500; }
+  .fc.is-absent .fc-foot { background: transparent; }
+  .fc-absent {
+    margin: 0;
+    padding: var(--s-2) var(--s-4) var(--s-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    align-items: baseline;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink-tertiary);
+  }
+  .fc-absent-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-secondary);
+  }
   .fc:hover { background: var(--paper-deep); }
   .fc.is-linked {
     outline: 2px solid var(--accent-graphical);
@@ -173,7 +192,7 @@
   }
   .fc-head-vintage {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     color: var(--ink-tertiary);
     letter-spacing: 0.05em;
   }
@@ -208,10 +227,11 @@
     background: transparent;
     border: 0;
     padding: 0;
+    min-height: 24px; /* WCAG 2.5.8 target size */
     cursor: pointer;
     font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.05em;
+    font-size: 12px;
+    letter-spacing: 0.02em;
     color: var(--accent);
   }
   .fc-foot-cite:hover { color: var(--ink); }
@@ -220,7 +240,7 @@
   }
   .fc-foot-docid-mute {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     color: var(--ink-tertiary);
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -235,9 +255,9 @@
     align-items: center;
     gap: 4px;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 500;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
   }
   .fc-tier-badge-empirical { color: var(--tier-empirical); }

@@ -16,14 +16,14 @@
 
 <div class="body body-register">
   <ul class="reg-list">
-    {#each card.registers ?? [] as r}
+    {#each card.registers ?? [] as r, i (i)}
       <li class="reg-row" class:silent={!r.label}>
         <span class="reg-tag" title={r.tier}>
           <EvidenceMark tier={r.tier} size={9} />
           <span>{r.reg}</span>
         </span>
         {#if r.label}
-          <span class="reg-label" title={r.detail ? `${r.label} — ${r.detail}` : r.label}>{r.label}</span>
+          <span class="reg-label" title={r.detail ? `${r.label}: ${r.detail}` : r.label}>{r.label}</span>
           <span class="reg-source">{r.sourceId ?? ''}</span>
         {:else}
           <span class="reg-silent">{r.note}</span>
@@ -74,7 +74,7 @@
   }
   .reg-source {
     color: var(--riprap-text-tertiary);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.05em;
   }
   .reg-silent {
@@ -82,7 +82,6 @@
     color: var(--riprap-text-tertiary);
     font-style: italic;
   }
-  .reg-row.silent { opacity: 0.65; }
   .body-sub {
     margin-top: var(--s-2);
     font-family: var(--riprap-font-mono);

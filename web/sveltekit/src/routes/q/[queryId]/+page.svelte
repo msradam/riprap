@@ -18,6 +18,11 @@
   let queryText = $derived(queryId);
 
   const run = new RunState();
+  const STOPPED_LABEL: Record<string, string> = {
+    geocoder: 'stopped: could not resolve the place',
+    'all-silent': 'stopped: no evidence found for this place',
+    grounding: 'stopped: no written claim passed verification',
+  };
   // True once the SSE `deployment` event has fired, i.e. the pebble
   // manifest and deployment chip reflect the routed-to city. An error
   // before that must clear the boot (NYC) scaffold.
@@ -125,9 +130,17 @@
             blocks,
             citations,
             generatedAt: new Date().toISOString(),
+            resolvedPlace: run.resolvedPlace,
           });
         }
-        if (!run.errorState) briefingState.markReady();
+        // End the header pill on a final state; a stopped run must not
+        // keep saying "gathering evidence".
+        const stopped = STOPPED_LABEL[run.errorState ?? ''] ?? (run.refused ? 'refused' : null);
+        if (stopped) {
+          briefingState.activeStep = null;
+          briefingState.markError(stopped);
+        }
+        else if (!run.errorState) briefingState.markReady();
       }
     });
     return () => stream.close();

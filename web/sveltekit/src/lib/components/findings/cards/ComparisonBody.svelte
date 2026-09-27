@@ -52,7 +52,7 @@
     align-items: center;
     gap: 4px;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     color: var(--ink-tertiary);
     letter-spacing: 0.05em;
     text-transform: lowercase;
@@ -65,7 +65,7 @@
   }
   .cell-aux {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     color: var(--ink-tertiary);
   }
   .divider {

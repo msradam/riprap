@@ -74,6 +74,7 @@
   function tally(stone: StoneKey): number {
     return stoneLayers[stone].length;
   }
+  let layerTotal = $derived(STONE_ORDER.reduce((n, s) => n + stoneLayers[s].length, 0));
 
   // Active tier toggles — rendered as small chips at the bottom of the
   // panel so the user can still flip the four master switches.
@@ -90,10 +91,13 @@
 </script>
 
 <aside class="layers-panel" aria-label="Map layers grouped by Stone">
-  <div class="layers-head">
-    <span class="section-label">Layers · grouped by Stone</span>
-  </div>
-
+  <!-- Closed by default so the layer catalog never pushes the citations
+       list out of view; the tier toggles below stay visible. -->
+  <details class="layers-all">
+    <summary class="layers-head">
+      <span class="layers-caret" aria-hidden="true">▾</span>
+      <span class="section-label">Layers · grouped by Stone ({layerTotal})</span>
+    </summary>
   {#each STONE_ORDER as stone (stone)}
     <!--
       Stones with no map layers (Boston/Chicago/SF Cornerstone +
@@ -108,7 +112,7 @@
       <summary>
         <span class="layers-caret" aria-hidden="true">▾</span>
         <span class="layers-stone-name">{STONE_META[stone].name}</span>
-        <span class="layers-stone-tag">— {
+        <span class="layers-stone-tag">· {
           pebbleManifest.stones.find((s) => s.id === stone)?.description
             ?? STONE_META[stone].tag
         }</span>
@@ -123,7 +127,7 @@
           </li>
         {:else if stoneLayers[stone].length === 0}
           <li class="layers-row layers-row-empty">
-            <span class="layers-empty-text">no map layers — see Findings cards</span>
+            <span class="layers-empty-text">no map layers; see Findings cards</span>
           </li>
         {:else}
           {#each stoneLayers[stone] as row, i (i)}
@@ -150,6 +154,7 @@
       </ul>
     </details>
   {/each}
+  </details>
 
   <!-- Master tier toggles. These are the actual switches the map honours
        today; each Stone row above resolves ON/OFF from these. -->
@@ -183,7 +188,18 @@
     gap: var(--s-3);
     font-family: var(--font-sans);
   }
-  .layers-head { padding-bottom: 4px; }
+  .layers-head {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 24px;
+    padding-bottom: 4px;
+    cursor: pointer;
+    list-style: none;
+  }
+  .layers-head::-webkit-details-marker { display: none; }
+  .layers-all:not([open]) > .layers-head .layers-caret { transform: rotate(-90deg); }
+  .layers-all[open] > .layers-head { margin-bottom: var(--s-3); }
 
   .layers-group {
     border-top: 1px solid var(--rule-soft);
@@ -208,9 +224,9 @@
   }
   .layers-group summary::-webkit-details-marker { display: none; }
   .layers-caret {
-    font-size: 10px;
+    font-size: 12px;
     color: var(--ink-tertiary);
-    transition: transform 200ms ease;
+    transition: transform 150ms ease;
   }
   .layers-group:not([open]) .layers-caret { transform: rotate(-90deg); }
   .layers-stone-name {
@@ -228,7 +244,7 @@
   .layers-count {
     margin-left: auto;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     color: var(--ink-tertiary);
     letter-spacing: 0.05em;
     text-transform: lowercase;
@@ -263,7 +279,7 @@
   }
   .layers-meta {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     color: var(--ink-tertiary);
     display: inline-flex;
     align-items: center;
@@ -271,7 +287,7 @@
   }
   .layers-state {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.05em;
     color: var(--ink);
     text-transform: uppercase;
@@ -309,7 +325,7 @@
     border: 1px solid var(--rule-soft);
     cursor: pointer;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.05em;
     color: var(--ink);
   }
@@ -321,7 +337,7 @@
   .layers-master-state {
     margin-left: 4px;
     color: var(--ink-tertiary);
-    font-size: 9px;
+    font-size: 12px;
   }
   .layers-master.is-on .layers-master-state { color: var(--ink); }
 </style>

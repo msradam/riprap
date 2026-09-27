@@ -133,6 +133,11 @@ export type Card = {
    *  / preview cards). Always implied true for tier=synthetic. */
   illustrative?: boolean;
 
+  /** Set when the source produced nothing: a short label such as "Not
+   *  available" or "Not run". The card renders as a muted absence line,
+   *  never as a finding; `sub` carries the reason when there is one. */
+  absent?: string;
+
   /** The pebble behind this card is marked experimental in its manifest. */
   experimental?: boolean;
 

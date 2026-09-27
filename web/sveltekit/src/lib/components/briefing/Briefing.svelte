@@ -13,10 +13,10 @@
 
   let { blocks, citations: cites, streaming = false, replayKey = 0 }: Props = $props();
 
-  // svelte-ignore state_referenced_locally — `blocks.length` is read
-  // once for the initial value; the $effect below keeps visibleCount
-  // synced after that (either by snapping to full count when not
-  // streaming, or by stepping through during animated reveal).
+  // `blocks.length` is read once for the initial value; the $effect
+  // below keeps visibleCount synced after that (snapping to the full
+  // count when not streaming, or stepping through an animated reveal).
+  // svelte-ignore state_referenced_locally
   let visibleCount = $state(blocks.length);
   let prefersReducedMotion = $state(false);
 
@@ -87,12 +87,11 @@
 </div>
 
 <style>
-  /* Each newly-revealed block fades in over 320ms instead of the
-     blinking-cursor "typing" cadence. Citation-grounded paragraphs
-     should land with authority, not chatter. Respects
+  /* Each newly-revealed block fades in over 150ms (the report-content
+     motion budget) instead of a typing cadence. Respects
      prefers-reduced-motion via the global rule in tokens.css. */
   .briefing-fade-in {
-    animation: briefing-fade 320ms ease-out both;
+    animation: briefing-fade 150ms ease-out both;
   }
   @keyframes briefing-fade {
     from { opacity: 0; transform: translateY(2px); }

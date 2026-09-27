@@ -65,6 +65,9 @@ function snapshotToPrintPayload(snap: PrintSnapshot): Record<string, unknown> {
   };
 }
 
+export const PDF_UNAVAILABLE =
+  "PDF export is not available on this server. Use your browser's print instead.";
+
 export class ExportPdfError extends Error {
   constructor(message: string, public readonly status?: number) { super(message); }
 }
@@ -82,19 +85,26 @@ export async function exportBriefingPdf(queryId: string): Promise<void> {
   }
   const payload = snapshotToPrintPayload(snap);
 
-  const r = await fetch('/api/print', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
+  let r: Response;
+  try {
+    r = await fetch('/api/print', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    throw new ExportPdfError(PDF_UNAVAILABLE);
+  }
   if (!r.ok) {
-    let detail = `HTTP ${r.status}`;
-    try {
-      const j = await r.json();
-      if (j?.detail) detail = j.detail;
-      else if (j?.error) detail = j.error;
-    } catch { /* non-JSON error body */ }
-    throw new ExportPdfError(`PDF render failed — ${detail}`, r.status);
+    // The server's detail (for example a missing libpango) is for the
+    // operator, not the reader; the console keeps it.
+    console.warn('PDF export failed', r.status, await r.text().catch(() => ''));
+    throw new ExportPdfError(
+      r.status === 503 || r.status === 501 || r.status === 404
+        ? PDF_UNAVAILABLE
+        : `PDF export failed on the server (HTTP ${r.status}). Use your browser's print instead.`,
+      r.status,
+    );
   }
 
   const blob = await r.blob();

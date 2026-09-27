@@ -20,7 +20,7 @@
  * any other `stat`-kind pebble whose value is non-numeric.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { adaptFinalToFindings } from '$lib/client/cardAdapter';
+import { adaptFinalToFindings, dropUnfilled } from '$lib/client/cardAdapter';
 import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 import type { PebbleManifest, PebbleStone } from '$lib/stores/pebbleManifest.svelte';
 
@@ -118,7 +118,10 @@ describe('cardAdapter — stat-kind pebble with a non-numeric shaped value', () 
     };
     const findings = adaptFinalToFindings(final as never, null, 1.0);
     const card = findings.cards.find((c) => c.id === 'pebble-sandy' || c.id === 'sandy');
-    expect(card?.body ?? card?.headline).toContain('unavailable');
+    // An absence, not a finding: muted label plus the reason, no headline.
+    expect(card?.absent).toBe('Not available');
+    expect(card?.headline).toBeUndefined();
+    expect(card?.sub).toContain('unavailable');
   });
 });
 
@@ -179,6 +182,29 @@ describe('cardAdapter — policy_corpus rag_hits shape', () => {
     };
     const findings = adaptFinalToFindings(final as never, null, 1.0);
     const card = findings.cards.find((c) => c.id === 'pebble-policy_corpus' || c.id === 'policy_corpus');
-    expect(card?.headline).toContain('unavailable');
+    expect(card?.absent).toBe('Not available');
+    expect(card?.sub).toContain('unavailable');
+  });
+});
+
+describe('cardAdapter: absent sources and unfilled templates', () => {
+  it('marks a pebble that never ran as Not run', () => {
+    seedManifest([SANDY_MANIFEST]);
+    const findings = adaptFinalToFindings({ trace: [] } as never, null, 1.0);
+    const card = findings.cards.find((c) => c.id === 'pebble-sandy');
+    expect(card?.absent).toBe('Not run');
+  });
+
+  it('never renders a line that still holds a {field} placeholder', () => {
+    const card = dropUnfilled({
+      id: 'x', stone: 'lodestone', tier: 'modeled', variant: 'timeseries',
+      source: 'S', agency: 'A', vintage: 'v', title: 'T', docId: 'd',
+      headline: '12 cm',
+      sub: 'forecasts a peak surge residual of {forecast_peak_m} m',
+      metaRows: [{ k: 'a', v: '{narrative}' }, { k: 'b', v: '3' }],
+    });
+    expect(card.headline).toBe('12 cm');
+    expect(card.sub).toBeUndefined();
+    expect(card.metaRows).toEqual([{ k: 'b', v: '3' }]);
   });
 });

@@ -55,6 +55,26 @@ function formatTemplate(template: string, value: unknown): string | null {
   return missing ? null : out.trim();
 }
 
+const UNFILLED = /\{\w+\}/;
+const TEXT_FIELDS = ['headline', 'subhead', 'body', 'sub', 'sparkSub', 'spatialNote'] as const;
+
+/** Drop any card text line that still holds a `{field}` placeholder: an
+ *  unfilled template is worse than no line. Every card passes through
+ *  here, whichever builder made it. */
+export function dropUnfilled(card: Card): Card {
+  let out = card;
+  for (const k of TEXT_FIELDS) {
+    const v = card[k];
+    if (typeof v === 'string' && UNFILLED.test(v)) {
+      if (out === card) out = { ...card };
+      out[k] = undefined;
+    }
+  }
+  const rows = card.metaRows?.filter((r) => !UNFILLED.test(r.v));
+  if (rows && rows.length !== card.metaRows?.length) out = { ...out, metaRows: rows };
+  return out;
+}
+
 /** Map the FSM trace's TraceStatus into the v0.4.5 5-state SpecialistStatus.
  *  Crucial split: a specialist that "returned no data" is `silent_by_design`,
  *  not `errored`. The FSM marks both as `silent` in the trace; we
@@ -402,7 +422,7 @@ function buildTimeseriesForecast(m: PebbleManifest, value: unknown): Card | null
     timeseries,
     headline,
     subhead,
-    sub: m.narration.template ?? undefined,
+    sub: m.narration.template ? formatTemplate(m.narration.template, t) ?? undefined : undefined,
     spatialNote: t.spatial_note,
     docId: m.provenance.doc_id ?? m.id,
     citeId: m.provenance.doc_id ?? m.id,
@@ -739,7 +759,7 @@ export function pebbleInScope(m: PebbleManifest, intent: string | null | undefin
   return (m.scope ?? 'point') === want;
 }
 
-function buildTemplated(m: PebbleManifest, value: unknown): Card | null {
+function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card | null {
   // The manifest's `display.variant` is an explicit per-pebble override
   // of the kind→variant default (e.g. sandy.yaml: `kind: stat, variant:
   // headline` — a boolean_zone result has no numeric fields, so the
@@ -771,12 +791,13 @@ function buildTemplated(m: PebbleManifest, value: unknown): Card | null {
     citeId: m.provenance.doc_id ?? m.id,
     mapLayer: m.display.map_layer ? m.id : null,
   };
-  // Pebble offline / no value → render a "no data" headline card so the
-  // pebble is still surfaced (with its provenance) instead of vanishing.
+  // No value: keep the pebble visible with its provenance, but as a muted
+  // absence, not a finding. A step that errored, or ran and returned
+  // null, is "Not available"; a step that never ran is "Not run".
   if (value === null || value === undefined) {
     return { ...base, variant: 'headline',
-             headline: m.fallback.message ?? 'No data',
-             subhead: m.narration.short ?? undefined };
+             absent: value === undefined && !failed ? 'Not run' : 'Not available',
+             sub: m.fallback.message ?? undefined };
   }
   if (variant === 'headline') {
     // Format manifest.narration.template against the pebble value
@@ -790,9 +811,7 @@ function buildTemplated(m: PebbleManifest, value: unknown): Card | null {
       : null;
     return { ...base,
              headline: m.narration.short ?? m.title,
-             body: formatted
-                 ?? (typeof value === 'string' ? value
-                     : (m.narration.template ?? undefined)) };
+             body: formatted ?? (typeof value === 'string' ? value : undefined) };
   }
   if (variant === 'scalars') {
     const scalars: NonNullable<Card['scalars']> = [];
@@ -849,10 +868,10 @@ function buildTemplated(m: PebbleManifest, value: unknown): Card | null {
         ? (value as Record<string, unknown>).error
         : null);
       return { ...base, variant: 'headline',
-               headline: typeof errStr === 'string'
-                 ? `Source unavailable — ${errStr.split('\n')[0].slice(0, 80)}`
-                 : (m.fallback.message ?? 'No measurements'),
-               subhead: m.narration.short ?? undefined };
+               absent: 'Not available',
+               sub: typeof errStr === 'string'
+                 ? errStr.split('\n')[0].slice(0, 80)
+                 : (m.fallback.message ?? undefined) };
     }
     // If the manifest carries a narration.template with the
     // pebble-adapter-built `{narrative}` (or any other placeholder
@@ -965,10 +984,9 @@ function buildTemplated(m: PebbleManifest, value: unknown): Card | null {
     const tabularNarrative = m.narration.template
       ? formatTemplate(m.narration.template, value)
       : null;
-    return { ...base, variant: 'headline',
-             headline: tabularNarrative
-               ?? m.fallback.message ?? 'No records within range',
-             subhead: tabularNarrative ? undefined : (m.narration.short ?? undefined) };
+    if (tabularNarrative) return { ...base, variant: 'headline', headline: tabularNarrative };
+    return { ...base, variant: 'headline', absent: 'Not available',
+             sub: m.fallback.message ?? 'No records within range' };
   }
   // meta fallback (chart pebbles without a special builder)
   const metaRows: { k: string; v: string }[] = [];
@@ -1017,6 +1035,13 @@ export function adaptFinalToFindings(
   const templatedCards: Card[] = [];
   const handledIds = new Set<string>();
   const intent = str(f.intent);
+  const failedIds = new Set<string>();
+  const walk = (n: TraceNode | null | undefined) => {
+    if (!n) return;
+    if (n.status === 'error') failedIds.add(n.name);
+    for (const c of n.children ?? []) walk(c);
+  };
+  walk(trace);
   const inScope = (stoneId: string) =>
     (pebbleManifest.byStone[stoneId] ?? []).filter((m) => pebbleInScope(m, intent));
   for (const stone of pebbleManifest.stones) {
@@ -1048,13 +1073,13 @@ export function adaptFinalToFindings(
       } else if (m.display.variant === 'histogram') {
         card = buildHistogramCard(m, value);
       }
-      if (!card) card = buildTemplated(m, value);
+      if (!card) card = buildTemplated(m, value, failedIds.has(m.id));
       if (card) templatedCards.push({ ...card, experimental: m.maturity === 'experimental' });
     }
   }
 
   return {
-    cards: [...curatedCards, ...templatedCards],
+    cards: [...curatedCards, ...templatedCards].map(dropUnfilled),
     stones: buildStoneTraces(trace),
     wallSeconds,
     emissions: (f as { emissions?: FindingsData['emissions'] }).emissions,

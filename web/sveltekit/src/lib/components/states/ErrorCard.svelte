@@ -41,25 +41,23 @@
     defaultActions: string[];
   }
 
-  // City-name interpolation. The geocoder + all-silent messages
-  // referenced NYC / FloodNet NYC / Sandy by name; under a Boston
-  // chip those strings are misleading. Pull the city from
-  // deployment.current. When no city resolved at all (the chip
-  // shows the neutral "Not in any shipped deployment" string), drop
-  // the "in X" suffix — "address in Not in any shipped deployment"
-  // reads like a parse error.
+  // The routed deployment decides whether the geocoder hint may name
+  // an NYC community district; under a Boston chip it would mislead.
   let depName = $derived(deployment.current?.name);
-  let isUnknown = $derived(!depName || depName === 'unknown' || depName === '__none__');
   let cityName = $derived(deployment.current?.city ?? '');
+  let isUnknown = $derived(!depName || depName === 'unknown' || depName === '__none__');
 
   const SPECS = $derived<Record<ErrorKey, Spec>>({
     geocoder: {
       eyebrow: 'Address not resolved',
       headline: isUnknown
-        ? "We couldn't resolve that input to a street address."
-        : `We couldn't resolve that to an address in ${cityName}.`,
-      body:
-        `Try a more specific street address. Riprap currently routes per-query to one of the shipped city deployments; international addresses, question-form queries, and addresses outside every shipped deployment's bounding box aren't supported.`,
+        ? 'We could not match that to a place Riprap covers.'
+        : `We could not match that to a place Riprap covers in ${cityName}.`,
+      // Community districts are New York City codes; name them only
+      // when the run is in NYC or no city resolved at all.
+      body: isUnknown || depName === 'nyc'
+        ? 'Try a full street address, or a community district such as QN 12.'
+        : 'Try a full street address.',
       tier: 'proxy',
       defaultActions: ['Use a sample query', 'Edit query']
     },

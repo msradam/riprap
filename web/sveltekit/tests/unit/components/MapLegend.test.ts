@@ -44,7 +44,7 @@ describe('MapLegend derives layers from the loaded deployment\'s manifest', () =
     const text = container.textContent ?? '';
     // Seattle's manifest has zero map_layer=true pebbles, so every
     // non-capstone Stone collapses to the "no map layers" message.
-    expect(text).toContain('no map layers — see Findings cards');
+    expect(text).toContain('no map layers; see Findings cards');
     // And no NYC ghost layers anywhere.
     for (const needle of NYC_LEAK_NEEDLES) {
       expect(text, `Seattle legend leaked NYC needle "${needle}"`).not.toContain(needle);

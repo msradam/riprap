@@ -19,6 +19,9 @@ export interface PrintSnapshot {
   blocks: BriefingBlock[];
   citations: Record<string, Citation>;
   generatedAt: string;
+  /** The place the backend resolved the query to (address, or district
+   *  with its NTA name). Optional: older snapshots lack it. */
+  resolvedPlace?: string | null;
 }
 
 /** Coarse pipeline phase, surfaced in the AppHeader status indicator

@@ -79,7 +79,7 @@ describe('ErrorCard out-of-coverage uses neutral fallback', () => {
     // The neutral / unknown deployment state used to render as "in
     // Not in any shipped deployment." — reads like a parse error.
     // Now the suffix is dropped entirely.
-    expect(text).toContain("couldn't resolve");
+    expect(text).toContain('could not match that to a place');
     expect(text).not.toContain('Not in any shipped deployment');
     expect(text).not.toContain('NYC');
   });

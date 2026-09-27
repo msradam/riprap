@@ -64,7 +64,7 @@
     background: rgba(26, 26, 26, 0.7);
     color: var(--paper);
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: 12px;
     padding: 2px 6px;
     letter-spacing: 0.05em;
     text-transform: lowercase;

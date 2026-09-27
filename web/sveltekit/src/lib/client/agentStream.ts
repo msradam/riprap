@@ -106,6 +106,8 @@ export interface FinalResult {
   intent?: string;
   plan?: PlanInfo;
   nta?: { nta_code: string; nta_name: string; borough: string; bbox: number[] } | null;
+  /** The place the backend resolved the query to; null when it could not. */
+  geocode?: { address?: string; borough?: string; lat?: number; lon?: number } | null;
   trace?: StepEvent[];
   /** Present when intent === "compare". */
   targets?: Array<{ label: string; address: string }>;

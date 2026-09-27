@@ -88,17 +88,26 @@ describe('FindingCard header chrome', () => {
 });
 
 describe('FindingCard interactive map-link affordance', () => {
-  it('renders as a focusable role=button div when card.mapLayer is set', () => {
+  it('stays a plain article when card.mapLayer is set (no nested interactive)', () => {
     const { container } = render(FindingCard, {
       props: { card: card('headline', { headline: 'x', sub: 'y', mapLayer: 'noaa', citeId: 'noaa' }) },
     });
     const root = container.querySelector('.fc');
-    expect(root?.tagName).toBe('DIV');
-    expect(root?.getAttribute('role')).toBe('button');
-    expect(root?.getAttribute('tabindex')).toBe('0');
-    expect(container.querySelector('article')).toBeNull();
-    // The cite <button> is not nested inside another <button>.
-    expect(container.querySelector('button button')).toBeNull();
+    expect(root?.tagName).toBe('ARTICLE');
+    expect(root?.getAttribute('role')).toBeNull();
+    expect(root?.getAttribute('tabindex')).toBeNull();
+    // The cite <button> is the only control; nothing interactive wraps it.
+    expect(container.querySelector('[role="button"] button, button button')).toBeNull();
+  });
+
+  it('renders an absent source as a muted label, not a headline', () => {
+    const { container } = render(FindingCard, {
+      props: { card: card('headline', { absent: 'Not available', sub: 'Raster offline.', citeId: 'x' }) },
+    });
+    expect(container.querySelector('.fc-absent-label')?.textContent).toBe('Not available');
+    expect(container.querySelector('.fc-absent-reason')?.textContent).toBe('Raster offline.');
+    expect(container.querySelector('.body-headline')).toBeNull();
+    expect(container.querySelector('button')).toBeNull();
   });
 
   it('renders as <article> when card.mapLayer is null (non-interactive)', () => {

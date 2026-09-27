@@ -112,10 +112,10 @@
 
 <div class="compare-layout">
   {#if deltaRows.length > 0}
-    <div class="compare-delta-bar" aria-label="Key differences">
+    <div class="compare-delta-bar" role="group" aria-label="Key differences">
       <span class="compare-delta-title">Key differences</span>
       <div class="compare-delta-rows">
-        {#each deltaRows as row}
+        {#each deltaRows as row, j (j)}
           <div class="compare-delta-row">
             <span class="compare-delta-section">{row.label}</span>
             <span class="compare-delta-claim">
@@ -131,7 +131,7 @@
   {/if}
 
   <div class="compare-cols">
-    {#each halves as half, i}
+    {#each halves as half, i (i)}
       <div class="compare-col">
         <h2 class="compare-address-header address-header">
           {halves[i].address}
@@ -167,7 +167,7 @@
   }
   .compare-delta-title {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -192,7 +192,7 @@
     color: var(--ink-tertiary);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    font-size: 10px;
+    font-size: 12px;
     flex-shrink: 0;
   }
   .compare-delta-claim {

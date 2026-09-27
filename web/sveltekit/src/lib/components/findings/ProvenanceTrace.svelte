@@ -46,7 +46,7 @@
         </span>
       {/if}
       <span class="prov-name">{m.name}</span>
-      {#if m.note}<span class="prov-note">— {m.note}</span>{/if}
+      {#if m.note}<span class="prov-note">· {m.note}</span>{/if}
       {#if m.ms != null}<span class="prov-ms">{m.ms < 1000 ? `${m.ms}ms` : `${(m.ms / 1000).toFixed(1)}s`}</span>{/if}
     </li>
     {#if m.children?.length}
@@ -65,9 +65,14 @@
     padding-left: calc(var(--depth, 0) * 16px);
   }
   .prov-row {
-    display: grid;
-    grid-template-columns: 14px max-content max-content 1fr auto;
-    gap: var(--s-2);
+    /* Flex, not a fixed grid: rows carry four to six cells (tier and note
+       are optional), and a grid pushed the timing into the 14px pip
+       column on the next line. */
+    display: flex;
+    flex-wrap: wrap;
+    overflow-wrap: break-word;
+    column-gap: var(--s-2);
+    row-gap: 2px;
     align-items: baseline;
     padding: 3px 0;
     font-family: var(--font-mono);
@@ -75,9 +80,11 @@
     border-bottom: 1px dotted var(--rule-soft);
   }
   .prov-row:last-child { border-bottom: 0; }
+  .prov-row > * { min-width: 0; }
   .prov-pip {
+    flex: 0 0 14px;
     text-align: center;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1;
   }
   .prov-id {
@@ -101,8 +108,9 @@
     color: var(--ink-tertiary);
   }
   .prov-ms {
+    margin-left: auto;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     color: var(--ink-tertiary);
   }
   /* v0.4.5 status row treatments */
@@ -119,7 +127,6 @@
   }
   .prov-status-not_invoked .prov-id {
     color: var(--ink-tertiary);
-    opacity: 0.6;
   }
   .prov-children { padding: 0; }
 </style>

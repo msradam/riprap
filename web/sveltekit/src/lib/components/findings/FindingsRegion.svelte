@@ -37,6 +37,8 @@
       cornerstone: [], keystone: [], touchstone: [], lodestone: [], capstone: [],
     };
     for (const c of data.cards) out[c.stone].push(c);
+    // Findings first; sources that produced nothing go to the end.
+    for (const k of STONE_ORDER) out[k].sort((a, b) => Number(!!a.absent) - Number(!!b.absent));
     return out;
   });
 
@@ -110,7 +112,9 @@
   }
   .findings-tagline {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
+    min-width: 0;
+    overflow-wrap: anywhere;
     color: var(--ink-tertiary);
     letter-spacing: 0.05em;
   }

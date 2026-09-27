@@ -11,8 +11,9 @@
   import FindingsRegion from '$lib/components/findings/FindingsRegion.svelte';
   import type { Density, ProvenanceMode } from '$lib/types/card';
   import type { RunState } from '$lib/client/runState.svelte';
-  import type { SourceRef } from '$lib/client/agentStream';
   import { briefingState } from '$lib/stores/briefingState.svelte';
+  import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
+  import { looksLikeQuestion } from '$lib/client/runState.svelte';
   import { browser } from '$app/environment';
   import { page } from '$app/state';
 
@@ -40,31 +41,119 @@
   let grounding = $derived(run.finalResult?.grounding);
   let blocks = $derived(run.briefing.blocks);
   let citations = $derived(run.briefing.citations);
-  let question = $derived(run.plan?.question || grounding?.question || '');
-  let consulted = $derived(run.finalResult?.consulted ?? []);
-  let notChecked = $derived(run.finalResult?.not_checked ?? []);
+  let question = $derived(
+    run.plan?.question || grounding?.question || (looksLikeQuestion(queryText) ? queryText : '')
+  );
+  // undefined means the payload predates the field (older gallery JSON).
+  let consulted = $derived(run.finalResult?.consulted);
+  let notChecked = $derived(run.finalResult?.not_checked);
+
+  /** Consulted sources, with a "failed to respond" flag from step events
+   *  that reported ok: false. A failed step missing from the list is
+   *  added so it is never visible only in the provenance trace. */
+  let consultedRows = $derived.by(() => {
+    const failed = run.failedSteps;
+    const rows = (consulted ?? []).map((s) => ({ id: s.id, title: s.title, failed: failed.includes(s.id) }));
+    const known = new Set([...rows.map((r) => r.id), ...(notChecked ?? []).map((s) => s.id)]);
+    for (const id of failed) {
+      if (!known.has(id)) rows.push({ id, title: pebbleManifest.byId[id]?.title ?? id, failed: true });
+    }
+    // Failures first, so a closed list still leads with them.
+    return rows.sort((x, y) => Number(y.failed) - Number(x.failed));
+  });
+  let failedCount = $derived(consultedRows.filter((r) => r.failed).length);
+  let showSources = $derived(
+    !!run.finalResult && !run.stopped &&
+    (consulted !== undefined || notChecked !== undefined || consultedRows.length > 0)
+  );
+  /** Lists at or under this length open by default. */
+  const SHORT_LIST = 8;
+
+  // Lead = disclaimer plus the Answer section; the body starts at the
+  // first other section head. Sources sit between the two.
+  let bodyStart = $derived.by(() => {
+    const i = blocks.findIndex((b) => b.kind === 'head' && b.label !== 'Answer');
+    return i < 0 ? blocks.length : i;
+  });
+  let hasAnswer = $derived(blocks.some((b) => b.kind === 'head' && b.label === 'Answer'));
+  let unanswered = $derived(
+    !!question && !!run.finalResult && !run.stopped && !hasAnswer && grounding?.tier !== 'llm'
+  );
+
+  // Live runs only: elapsed time while the briefing is being built. The
+  // visible counter ticks every second; the screen-reader line changes
+  // at most every 10 seconds.
+  const startedAt = Date.now();
+  let now = $state(startedAt);
+  let srStatus = $state('Planning intent');
+  let loading = $derived(!snapshot && !run.finalResult && !run.errorState && !run.streamDone);
+  let elapsed = $derived(Math.max(0, Math.round((now - startedAt) / 1000)));
+  let loadingText = $derived.by(() => {
+    if (!run.plan) return 'Planning intent';
+    switch (briefingState.phase) {
+      case 'specialists':
+        return briefingState.totalSpecialists
+          ? `Gathering evidence (${briefingState.firedCount}/${briefingState.totalSpecialists})`
+          : 'Gathering evidence';
+      case 'reconciling': return 'Reconciling';
+      case 'error': return `Error${briefingState.errorMessage ? `: ${briefingState.errorMessage}` : ''}`;
+      default: return 'Resolving address';
+    }
+  });
+  $effect(() => {
+    if (!loading) return;
+    let ticks = 0;
+    const t = setInterval(() => {
+      now = Date.now();
+      ticks += 1;
+      if (ticks % 10 === 0) srStatus = `${loadingText}, ${ticks} seconds elapsed`;
+    }, 1000);
+    return () => clearInterval(t);
+  });
 
   function handleFindingsCite() {
     document.getElementById('region-cites')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 </script>
 
-{#snippet sourceList(label: string, items: SourceRef[])}
-  {#if items.length}
-    <details class="region-head-meta grounding-line">
-      <summary>{label} ({items.length})</summary>
-      <ul>
-        {#each items as s (s.id)}
-          <li>{s.title}</li>
+{#snippet sources()}
+  <section class="sources" aria-label="Sources consulted and not checked">
+    <details class="sources-col" open={consultedRows.length <= SHORT_LIST}>
+      <summary class="sources-head">
+        <!-- Older snapshots carry no consulted list, only the failed steps. -->
+        {consulted ? 'Sources consulted' : 'Sources that failed to respond'} ({consultedRows.length}){#if consulted && failedCount}, {failedCount} failed to respond{/if}
+      </summary>
+      <ul class="sources-list">
+        {#each consultedRows as s (s.id)}
+          <li class:is-failed={s.failed}>{s.title}{#if s.failed}<span class="sources-failed">: failed to respond</span>{/if}</li>
         {/each}
       </ul>
     </details>
-  {/if}
+    {#if notChecked?.length}
+      <details class="sources-col" open={notChecked.length <= SHORT_LIST}>
+        <summary class="sources-head">Not checked ({notChecked.length})</summary>
+        <ul class="sources-list">
+          {#each notChecked as s (s.id)}
+            <li>{s.title}</li>
+          {/each}
+        </ul>
+      </details>
+    {:else if notChecked}
+      <p class="sources-col sources-head sources-none">Not checked: none</p>
+    {/if}
+  </section>
+{/snippet}
+
+{#snippet notAnswered()}
+  <p class="briefing-status unanswered" role="status">
+    This question was not answered directly. Riprap is running without a language model here,
+    so this is the evidence briefing for the place above.
+  </p>
 {/snippet}
 
 <section class="hero-band">
   <div class="hero-band-inner">
-    <div class="app-shell-top is-desktop">
+    <div class="app-shell-top is-desktop" class:is-stopped={run.stopped}>
       <main id="region-briefing" class="app-region app-region-brief" aria-labelledby="brief-h1">
         <header class="region-head">
           <span class="section-label">Briefing</span>
@@ -75,7 +164,12 @@
         </h1>
         {@render notice?.()}
         {#if question}
-          <p class="grounding-line">Question: {question}</p>
+          <p class="brief-line">Question: {question}</p>
+        {/if}
+        {#if run.resolvedPlace}
+          <p class="brief-line resolved-place">
+            <span class="brief-line-label">Briefing for:</span> {run.resolvedPlace}
+          </p>
         {/if}
 
         {#if run.errorState}
@@ -91,6 +185,28 @@
             </p>
           {/if}
 
+          {#if loading}
+            <div class="generating-status">
+              <span class="pulse" aria-hidden="true"></span>
+              <span aria-hidden="true">{loadingText}… <span class="generating-elapsed">{elapsed} s</span></span>
+              <span class="visually-hidden" aria-live="polite">{srStatus}</span>
+              <p class="generating-expect">
+                Briefings take from a few seconds to a few minutes; questions answered by a
+                language model can take up to five minutes.
+              </p>
+              {#if !run.plan && run.planTokens}
+                <details class="plan-details">
+                  <summary>Planner streaming ({run.planTokens.length} chars)</summary>
+                  <pre class="plan-stream">{run.planTokens}</pre>
+                </details>
+              {/if}
+            </div>
+            {#if run.geocodeSucceeded}
+              <!-- Geocode done; the briefing arrives whole in `final`. -->
+              <SkeletonBriefing />
+            {/if}
+          {/if}
+
           {#if run.plan?.intent === 'compare' && run.finalResult?.targets?.length === 2}
             <CompareBriefing
               paragraph={run.finalResult.paragraph}
@@ -99,45 +215,23 @@
               structuredA={run.compareStepsA}
               structuredB={run.compareStepsB}
             />
-          {:else if blocks.length}
-            <Briefing {blocks} {citations} streaming={false} />
-          {:else if run.geocodeSucceeded && !run.finalResult}
-            <!-- Geocode done; the briefing arrives whole in `final`. -->
-            <SkeletonBriefing />
-          {:else if !run.plan}
-            <div class="generating-status" aria-live="polite">
-              <span class="pulse"></span> Planning intent…
-              {#if run.planTokens}
-                <details class="plan-details">
-                  <summary>Planner streaming ({run.planTokens.length} chars)</summary>
-                  <pre class="plan-stream">{run.planTokens}</pre>
-                </details>
-              {/if}
-            </div>
-          {:else if !run.finalResult}
-            <!-- Mirrors StatusPill's phase logic. -->
-            <div class="generating-status" aria-live="polite">
-              <span class="pulse"></span>
-              {#if briefingState.phase === 'specialists'}
-                Gathering evidence{#if briefingState.totalSpecialists}
-                  ({briefingState.firedCount}/{briefingState.totalSpecialists}){/if}…
-              {:else if briefingState.phase === 'reconciling'}
-                Reconciling…
-              {:else if briefingState.phase === 'error'}
-                Error{#if briefingState.errorMessage}: {briefingState.errorMessage}{/if}
-              {:else}
-                Resolving address…
-              {/if}
-            </div>
+            {#if showSources}{@render sources()}{/if}
+          {:else}
+            {#if bodyStart > 0}
+              <Briefing blocks={blocks.slice(0, bodyStart)} {citations} streaming={false} />
+            {/if}
+            {#if unanswered}{@render notAnswered()}{/if}
+            {#if showSources}{@render sources()}{/if}
+            {#if bodyStart < blocks.length}
+              <Briefing blocks={blocks.slice(bodyStart)} {citations} streaming={false} />
+            {/if}
           {/if}
-
-          {@render sourceList('Sources consulted', consulted)}
-          {@render sourceList('Not checked', notChecked)}
 
           <DroppedClaims claims={grounding?.dropped_claims} />
         {/if}
       </main>
 
+      {#if !run.stopped}
       <div class="app-region-side" style="grid-area: side;">
         <aside id="region-map" class="app-region app-region-map" aria-label="Map region">
           <header class="region-head">
@@ -213,8 +307,10 @@
           <CitationDrawer {citations} {snapshot} />
         </aside>
       </div>
+      {/if}
     </div>
 
+    {#if !run.stopped}
     <div class="app-shell-bottom">
       <section class="app-region app-region-findings" aria-label="Findings">
         <FindingsRegion
@@ -228,12 +324,84 @@
         />
       </section>
     </div>
+    {/if}
   </div>
 </section>
 
 <style>
   .grounding-line {
     margin: 0 0 12px;
+  }
+  .brief-line {
+    margin: 0 0 8px;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--ink-secondary);
+    max-width: 70ch;
+    overflow-wrap: anywhere;
+  }
+  .brief-line.resolved-place {
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+  .brief-line-label {
+    font-weight: 600;
+  }
+  .unanswered {
+    max-width: 70ch;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .sources {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: 12px 24px;
+    margin: 8px 0 24px;
+    padding: 12px 0;
+    border-top: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    max-width: 70ch;
+  }
+  .sources-col {
+    margin: 0;
+    min-width: 0;
+  }
+  .sources-head {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    min-height: 24px;
+    line-height: 24px;
+  }
+  summary.sources-head {
+    cursor: pointer;
+  }
+  .sources-list {
+    margin: 4px 0 0;
+    padding-left: 18px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-secondary);
+  }
+  .sources-list li + li {
+    margin-top: 2px;
+  }
+  .sources-failed {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .generating-elapsed {
+    color: var(--ink-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+  .generating-expect {
+    flex-basis: 100%;
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--ink-secondary);
+    max-width: 70ch;
   }
   .compare-map-stack {
     display: flex;
@@ -247,7 +415,7 @@
   }
   .compare-map-label {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -270,7 +438,7 @@
   }
   .plan-stream {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     color: var(--ink-tertiary);
     white-space: pre-wrap;
     padding: 0 14px 12px;

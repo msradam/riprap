@@ -17,6 +17,22 @@ import type { FindingsData } from '$lib/types/card';
 import type { BriefingBlock, Citation } from '$lib/types/claim';
 import { tierForStep } from '$lib/types/tier';
 
+// Mirrors _QUESTION_WORDS in app/planner.py. The heuristic (no-LLM)
+// planner leaves plan.question empty, so the page decides for itself
+// whether the reader typed a question.
+// ponytail: word list, so an address with a word such as "Will" in it
+// reads as a question; use the planner's answer if that ever bites.
+const QUESTION_WORDS = new Set(
+  ('what whats how has have had is are was were will would does did do can could should ' +
+   'which when where why who whom show tell list compare any many much').split(' ')
+);
+
+/** True when the query reads as a question rather than a bare place. */
+export function looksLikeQuestion(q: string): boolean {
+  if (q.includes('?')) return true;
+  return (q.toLowerCase().match(/[a-z]+/g) ?? []).some((w) => QUESTION_WORDS.has(w));
+}
+
 export type AddressSource = 'geocode' | 'nta';
 export interface Place { label: string; lat: number; lon: number; source: AddressSource }
 
@@ -214,6 +230,36 @@ export class RunState {
   });
 
   briefing = $derived(briefingFromFinal(this.finalResult));
+
+  /** The place the backend resolved, in its own words, so a reader can
+   *  see at once when the wrong place was looked up. */
+  resolvedPlace = $derived.by<string | null>(() => {
+    const a = this.compareAddressA?.label;
+    const b = this.compareAddressB?.label;
+    if (a || b) return [a && `A: ${a}`, b && `B: ${b}`].filter(Boolean).join('; ');
+    const addr = this.finalResult?.geocode?.address ?? this.address?.label ?? null;
+    const nta = this.finalResult?.nta?.nta_name;
+    if (addr && nta && !addr.includes(nta)) return `${addr} (${nta})`;
+    return addr ?? nta ?? null;
+  });
+
+  /** Step names whose event reported ok: false, in run order. */
+  failedSteps = $derived.by<string[]>(() => {
+    const out: string[] = [];
+    const walk = (n: TraceNode) => {
+      if (n.status === 'error' && !out.includes(n.name)) out.push(n.name);
+      for (const c of n.children ?? []) walk(c);
+    };
+    walk(this.traceRoot);
+    return out;
+  });
+
+  /** The planner refused the question (out of scope). */
+  refused = $derived((this.finalResult?.intent ?? this.plan?.intent) === 'out_of_scope');
+
+  /** The run ended without evidence to show: refused, the place did not
+   *  resolve, or the backend failed. Map and findings are hidden. */
+  stopped = $derived(this.refused || this.errorState === 'geocoder' || this.errorState === 'backend');
 
   /** Per-tier feature counts for the map legend; zero-count layers are
    *  hidden from the legend. */

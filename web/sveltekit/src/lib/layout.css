@@ -35,7 +35,7 @@
 }
 .app-shell-top.is-tablet {
   grid-template-columns: 1fr;
-  grid-template-areas: "side" "brief";
+  grid-template-areas: "brief" "side";
 }
 .app-shell-top.is-mobile {
   grid-template-columns: 1fr;
@@ -47,10 +47,20 @@
   gap: 24px;
 }
 
+/* A refused or unresolved run has no map and no citations: the brief
+   takes the full width. */
+.app-shell-top.is-stopped {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "brief";
+  min-height: 0;
+}
+
 @media (max-width: 1099px) {
+  /* Briefing first, then map, then citations: a phone reader gets the
+     heading, resolved place and answer in the first screen. */
   .app-shell-top.is-desktop {
-    grid-template-columns: 1fr;
-    grid-template-areas: "side" "brief";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "brief" "side";
   }
   /* Below desktop the side rail collapses out of sticky behaviour
      (handled in styles.css's @media block). */

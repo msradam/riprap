@@ -205,7 +205,7 @@
   }
   .silent-tag {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     color: var(--ink-tertiary);
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -223,6 +223,7 @@
     background: transparent;
     border: 0;
     padding: 4px 0;
+    min-height: 24px; /* WCAG 2.5.8 target size */
     cursor: pointer;
     display: inline-flex;
     align-items: baseline;
@@ -233,7 +234,7 @@
     letter-spacing: 0.05em;
   }
   .prov-toggle:hover { color: var(--ink); }
-  .prov-caret { font-size: 10px; color: var(--ink-tertiary); }
+  .prov-caret { font-size: 12px; color: var(--ink-tertiary); }
   .prov-meta { color: var(--ink-tertiary); }
   .prov-body {
     margin-top: var(--s-2);

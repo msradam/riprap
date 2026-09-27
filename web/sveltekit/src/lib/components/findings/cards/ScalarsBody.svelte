@@ -5,7 +5,7 @@
 
 <div class="body body-scalars">
   <div class="row">
-    {#each card.scalars ?? [] as s}
+    {#each card.scalars ?? [] as s (s.label)}
       <div class="cell">
         <div class="value" style="color: var(--tier-{card.tier});">{s.value}</div>
         <div class="label">{s.label}</div>
@@ -23,7 +23,7 @@
     grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
     gap: var(--s-3);
   }
-  .cell { display: flex; flex-direction: column; gap: 2px; }
+  .cell { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .value {
     font-family: var(--font-serif);
     font-style: italic;
@@ -33,10 +33,11 @@
   }
   .label {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     color: var(--ink-tertiary);
-    letter-spacing: 0.06em;
+    letter-spacing: 0.02em;
     text-transform: lowercase;
+    overflow-wrap: anywhere;
   }
   .body-sub {
     margin-top: var(--s-3);

@@ -52,7 +52,7 @@
     color: var(--ink);
   }
   .ft-stat-k {
-    font-size: 10px;
+    font-size: 12px;
     color: var(--ink-tertiary);
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -65,7 +65,7 @@
     border: 1px solid var(--ink);
     color: var(--ink);
     padding: 1px 6px;
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     background: var(--paper);
