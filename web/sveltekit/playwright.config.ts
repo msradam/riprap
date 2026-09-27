@@ -24,6 +24,7 @@ export default defineConfig({
     headless: true
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } }
+    // PW_CHANNEL=chrome runs on the installed Chrome when Playwright's own browser build is not cached.
+    { name: 'chromium', use: { ...devices['Desktop Chrome'], channel: process.env.PW_CHANNEL || undefined } }
   ]
 });
