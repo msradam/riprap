@@ -65,9 +65,9 @@ async function ask(page: Page, text: string, viaKeyboard = false) {
   }
 }
 
-async function answerThenSource(page: Page, viaKeyboard = false) {
+async function answerThenSource(page: Page, viaKeyboard = false, answerTimeout = 30_000) {
   const answer = page.getByRole('heading', { name: 'Answer' });
-  await expect(answer).toBeVisible({ timeout: 30_000 });
+  await expect(answer).toBeVisible({ timeout: answerTimeout });
   await expect(page.getByText('Briefing for:')).toBeVisible();
   await noAxeViolations(page, 'answer shown');
   const cite = page.locator('a.inline-cite:visible').first();
@@ -164,6 +164,6 @@ test.describe('journeys', () => {
     test.skip(!process.env.RIPRAP_E2E_LLM, 'set RIPRAP_E2E_LLM=1 with an LLM-backed server');
     test.setTimeout(360_000);
     await ask(page, QUESTION);
-    await answerThenSource(page);
+    await answerThenSource(page, false, 300_000);
   });
 });
