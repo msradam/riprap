@@ -246,6 +246,25 @@ def plan(query: str, on_token=None, ledger: list | None = None, registry=None) -
     return _validate(d, raw_query=query, catalog_ids=ids)
 
 
+_QUESTION_WORDS = frozenset(
+    "what whats how has have had is are was were will would does did do can could should "
+    "which when where why who whom show tell list compare any many much".split())
+
+
+def is_bare_place(raw_query: str, targets: list[dict[str, str]]) -> bool:
+    """True when the input is only a place: no '?' and no question word
+    once the target text is removed.
+
+    ponytail: word list, so "flooding at 80 Pioneer Street" reads as bare
+    and gets the full briefing (the safe side); a classifier if that bites."""
+    if "?" in raw_query:
+        return False
+    rest = raw_query.lower()
+    for t in targets:
+        rest = rest.replace(t.get("text", "").lower(), " ")
+    return not any(w in _QUESTION_WORDS for w in re.findall(r"[a-z]+", rest))
+
+
 def _validate(d: dict[str, Any], raw_query: str, catalog_ids: list[str] | None = None) -> Plan:  # TODO(cleanup): cc-grade-D (23)
     """Defensive parse + sanitize. The model might pick an invalid intent
     or no usable target; fall back to single_address
@@ -282,7 +301,9 @@ def _validate(d: dict[str, Any], raw_query: str, catalog_ids: list[str] | None =
             targets = [{"type": "nyc", "text": "NYC"}]
 
     rationale = (d.get("rationale") or "").strip()[:300] or "(no rationale provided)"
-    question = (d.get("question") or "").strip()
+    # The question is the user's own text, decided in code: the model
+    # echoes a bare address or invents "What is the flood risk for X?".
+    question = "" if is_bare_place(raw_query, targets) else raw_query.strip()
     focus = d.get("focus") if isinstance(d.get("focus"), dict) else {}
     focus = {"hazard": focus.get("hazard") if focus.get("hazard") in FOCUS_HAZARDS else "flood",
              "time_frame": focus.get("time_frame") if focus.get("time_frame") in FOCUS_TIMES else "any",

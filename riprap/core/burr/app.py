@@ -83,6 +83,9 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
             from app.planner import plan as run_planner
 
             p = run_planner(query, ledger=calls)
+            guard = heuristic_plan(query)
+            if guard["intent"] == "out_of_scope":  # the same fixed rules in both modes
+                return {**guard, "llm_calls": calls}
             return {"intent": p.intent, "targets": p.targets, "rationale": p.rationale,
                     "question": p.question, "focus": p.focus, "pebbles": p.pebbles,
                     "catalog": p.catalog, "llm_calls": calls}

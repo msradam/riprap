@@ -95,3 +95,29 @@ def test_section_used_only_by_the_answer_is_omitted():
     kept = [{"section": "answer", "text": "82 flood complaints were filed", "doc_ids": ["nyc311"], "numbers": ["82"]}]
     text = _render(kept, DOCS, ["Live observer"], question="How many complaints?")
     assert "**Live observer.**" not in text
+
+
+def test_question_is_the_users_text_and_bare_places_have_none():
+    from app.planner import _validate
+
+    targets = [{"type": "address", "text": "2017 East 17th Street, Brooklyn, NY 11229"}]
+    echoed = {"intent": "single_address", "targets": targets,
+              "question": "2017 East 17th Street, Brooklyn, NY 11229", "pebbles": ["sandy"]}
+    assert _validate(echoed, "2017 East 17th Street, Brooklyn, NY 11229", ["sandy"]).question == ""
+    invented = {**echoed, "question": "What is the flood risk for 80 Pioneer Street?"}
+    assert _validate(invented, "80 Pioneer Street, Brooklyn, NY", ["sandy"]).question == ""
+    asked = "Has 2017 East 17th Street flooded since Ida"
+    assert _validate({**echoed, "question": "paraphrase"}, asked, ["sandy"]).question == asked
+
+
+def test_out_of_scope_rules_override_the_llm_planner(monkeypatch):
+    from riprap.core.burr import app as burr_app
+
+    class P:
+        intent, targets, rationale, question = "single_address", [{"type": "address", "text": "x"}], "", "q"
+        focus, pebbles, catalog = {}, ["sandy"], ["sandy"]
+
+    monkeypatch.setattr(burr_app, "_tier", lambda: "llm")
+    monkeypatch.setattr("app.planner.plan", lambda q, ledger=None: P)
+    assert burr_app.plan_for("Should I buy the house at 2017 East 17th Street?")["intent"] == "out_of_scope"
+    assert burr_app.plan_for("Has 2017 East 17th Street flooded?")["intent"] == "single_address"
