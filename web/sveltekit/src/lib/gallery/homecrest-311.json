@@ -3,8 +3,8 @@
  "neighborhood": "Homecrest, Brooklyn",
  "address": "2017 East 17th Street, Brooklyn, NY 11229",
  "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
- "generated_at": "2026-09-27T03:48Z",
- "riprap_commit": "a22fff2",
+ "generated_at": "2026-09-27T15:19Z",
+ "riprap_commit": "095184e",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -1104,7 +1104,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1747,
      "completion_tokens": 133,
-     "duration_s": 9.498,
+     "duration_s": 6.122,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1131,9 +1131,9 @@
     "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR)."
    }
   },
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nPeople near 2017 East 17th Street, Brooklyn have made 34 flooding complaints to 311 within the past 5 years [nyc311].\n\n**Hazard Reader.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years. Most common descriptor: Catch Basin Clogged/Flooding (Use Comments) (SC) [nyc311].\n\n**Hazard Reader.**\nNo grounded evidence for this section.\n\n**Live Observer.**\n34 NYC 311 flood-related complaints have been filed within 200 meters of 2017 East 17th Street, Brooklyn, in the last 5 years [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nPeople near 2017 East 17th Street, Brooklyn have made 34 flooding complaints to 311 within the past 5 years [nyc311].\n\n**Hazard Reader.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years. Most common descriptor: Catch Basin Clogged/Flooding (Use Comments) (SC) [nyc311].\n\n**Hazard Reader.**\nNo grounded evidence for this section.\n\n**Live Observer.**\n34 NYC 311 flood-related complaints have been filed within 200 meters of 2017 East 17th Street, Brooklyn, in the last 5 years [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
    "dropped": [],
    "tier": "llm"
   },
@@ -1144,27 +1144,37 @@
    "claims": [
     {
      "section": "answer",
-     "text": "People near 2017 East 17th Street, Brooklyn have made 34 flooding complaints to 311 within the past 5 years.",
+     "text": "34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years. Most common descriptor: Catch Basin Clogged/Flooding (Use Comments) (SC).",
+     "doc_ids": [
+      "nyc311"
+     ],
+     "numbers": []
+    },
+    {
+     "section": "Live Observer",
+     "text": "34 NYC 311 flood-related complaints have been filed within 200 meters of 2017 East 17th Street, Brooklyn, in the last 5 years.",
      "doc_ids": [
       "nyc311"
      ],
      "numbers": [
-      "34"
+      "34",
+      "200",
+      "5"
      ]
     }
    ],
    "dropped_claims": [],
    "retried_claims": [],
-   "n_kept": 1,
+   "n_kept": 2,
    "n_dropped": 0,
    "llm_calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 588,
-     "completion_tokens": 74,
-     "duration_s": 6.664,
+     "prompt_tokens": 562,
+     "completion_tokens": 108,
+     "duration_s": 5.151,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1172,9 +1182,14 @@
    ],
    "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
    "n_documents": 4,
-   "answer_mode": "guarded",
-   "answer_lead": null,
+   "answer_mode": "extractive",
+   "answer_lead": "count",
    "answer_flags": [],
+   "checks": [
+    "citations and numbers on every claim",
+    "lead rules on the answer; no entailment check needed, since the answer is the cited text word for word"
+   ],
+   "entailment": {},
    "answered": true
   },
   "citations": {
@@ -1185,7 +1200,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-27T01:37:50+0000",
-    "retrieved_at": "2026-09-27T03:48Z",
+    "retrieved_at": "2026-09-27T15:19Z",
     "vintage": "2026-09-27T01:37:50+0000",
     "maturity": "production"
    }
@@ -1630,8 +1645,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790480882.169556,
-    "elapsed_s": 0.17,
+    "started_at": 1790522393.064451,
+    "elapsed_s": 0.16,
     "err": null,
     "result": {
      "address": "2017 EAST 17 STREET, Brooklyn, NY, USA",
@@ -1643,7 +1658,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790480882.3426602,
+    "started_at": 1790522393.224038,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1655,7 +1670,7 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790480882.386615,
+    "started_at": 1790522393.2743511,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1665,7 +1680,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790480882.386616,
+    "started_at": 1790522393.2743528,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1675,7 +1690,7 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790480882.3866172,
+    "started_at": 1790522393.2743528,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1685,7 +1700,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790480882.3866172,
+    "started_at": 1790522393.2743528,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1695,7 +1710,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790480882.3866172,
+    "started_at": 1790522393.274354,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1705,7 +1720,7 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790480882.3866172,
+    "started_at": 1790522393.274354,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1715,7 +1730,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790480882.3866181,
+    "started_at": 1790522393.274354,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1725,7 +1740,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790480882.3866181,
+    "started_at": 1790522393.274354,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1735,7 +1750,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790480882.3866181,
+    "started_at": 1790522393.274355,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1745,7 +1760,7 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790480882.3866181,
+    "started_at": 1790522393.274355,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1755,7 +1770,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790480882.3866189,
+    "started_at": 1790522393.274355,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1765,7 +1780,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790480882.3866189,
+    "started_at": 1790522393.274355,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1775,7 +1790,7 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790480882.3866189,
+    "started_at": 1790522393.274355,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1785,7 +1800,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790480882.3866189,
+    "started_at": 1790522393.274356,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1795,7 +1810,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790480882.3866189,
+    "started_at": 1790522393.274356,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1805,7 +1820,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790480882.3866198,
+    "started_at": 1790522393.274356,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1815,7 +1830,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790480882.3866198,
+    "started_at": 1790522393.274357,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1825,7 +1840,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790480882.3866198,
+    "started_at": 1790522393.274357,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1835,7 +1850,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790480882.3866198,
+    "started_at": 1790522393.274357,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1845,7 +1860,7 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790480882.415154,
+    "started_at": 1790522393.303139,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -1859,8 +1874,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790480882.4169579,
-    "elapsed_s": 0.25,
+    "started_at": 1790522393.306126,
+    "elapsed_s": 0.22,
     "err": null,
     "result": {
      "zone": "X",
@@ -1872,8 +1887,8 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790480882.417145,
-    "elapsed_s": 0.02,
+    "started_at": 1790522393.306302,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -1883,8 +1898,8 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790480882.4148622,
-    "elapsed_s": 0.64,
+    "started_at": 1790522393.3057559,
+    "elapsed_s": 0.34,
     "err": null,
     "result": {
      "n": 34
@@ -1893,7 +1908,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790480883.294793,
+    "started_at": 1790522393.907402,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1904,35 +1919,45 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790480883.294972,
+    "started_at": 1790522393.907595,
     "ok": true,
     "result": {
      "tier": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "attempts": 1,
-     "kept": 1,
+     "kept": 2,
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 6.72
+    "elapsed_s": 5.22
    }
   ],
   "compliance": {
-   "passed": true,
-   "n_passed": 13,
+   "passed": false,
+   "n_passed": 12,
    "n_total": 13,
-   "failed": []
+   "failed": [
+    {
+     "name": "every_numeric_claim_cited",
+     "rule": "SPJ 7.1 / AP 6.1",
+     "description": "Every sentence with a numeric quantity must carry a [doc_id] citation.",
+     "reason": "",
+     "evidence": [
+      "**Answer.**\nFrom the sources consulted: 34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years."
+     ]
+    }
+   ]
   },
   "emissions": {
    "n_calls": 2,
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 16.162,
+   "total_duration_s": 11.273,
    "tokens": {
-    "prompt": 2335,
-    "completion": 207,
-    "total": 2542
+    "prompt": 2309,
+    "completion": 241,
+    "total": 2550
    },
    "calls": [
     {
@@ -1941,7 +1966,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1747,
      "completion_tokens": 133,
-     "duration_s": 9.498,
+     "duration_s": 6.122,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1950,9 +1975,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 588,
-     "completion_tokens": 74,
-     "duration_s": 6.664,
+     "prompt_tokens": 562,
+     "completion_tokens": 108,
+     "duration_s": 5.151,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"

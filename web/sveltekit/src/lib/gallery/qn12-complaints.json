@@ -3,8 +3,8 @@
  "neighborhood": "Community district QN12, Queens",
  "address": "QN12",
  "question": "How many street flooding complaints has community district QN12 had?",
- "generated_at": "2026-09-27T03:48Z",
- "riprap_commit": "a22fff2",
+ "generated_at": "2026-09-27T15:20Z",
+ "riprap_commit": "095184e",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -1104,10 +1104,10 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1738,
      "completion_tokens": 122,
-     "duration_s": 8.777,
-     "energy_status": "unknown",
-     "wh": null,
-     "energy_note": "energy counters returned no CPU energy on this chip"
+     "duration_s": 8.691,
+     "energy_status": "measured",
+     "wh": 0.34014,
+     "energy_note": "Apple SoC energy (CPU+GPU+DRAM+ANE) during the call, includes other processes"
     }
    ]
   },
@@ -1135,9 +1135,9 @@
   },
   "policy_corpus": null,
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nCommunity district QN12 has had 4380 street flooding complaints in the past three years [nyc311_nta].\n\n**Hazard Reader.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 4379 NYC 311 flood-related complaints were filed inside this area in the last 3 years. Most common descriptor: Sewer Backup (Use Comments) (SA) [nyc311_nta].\n\n**Hazard Reader.**\nNo grounded evidence for this section.\n\n**Live Observer.**\nCommunity District QN12 has had 4379 flood-related complaints filed via NYC 311 in the last 3 years, with the most common descriptor being Sewer Backup (Use Comments) (SA) [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nCommunity district QN12 has had 4380 street flooding complaints in the past three years [nyc311_nta].\n\n**Hazard Reader.**\nNo grounded evidence for this section.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 4379 NYC 311 flood-related complaints were filed inside this area in the last 3 years. Most common descriptor: Sewer Backup (Use Comments) (SA) [nyc311_nta].\n\n**Hazard Reader.**\nNo grounded evidence for this section.\n\n**Live Observer.**\nCommunity District QN12 has had 4379 flood-related complaints filed via NYC 311 in the last 3 years, with the most common descriptor being Sewer Backup (Use Comments) (SA) [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
    "dropped": [],
    "tier": "llm"
   },
@@ -1148,27 +1148,35 @@
    "claims": [
     {
      "section": "answer",
-     "text": "Community district QN12 has had 4380 street flooding complaints in the past three years.",
+     "text": "4379 NYC 311 flood-related complaints were filed inside this area in the last 3 years. Most common descriptor: Sewer Backup (Use Comments) (SA).",
+     "doc_ids": [
+      "nyc311_nta"
+     ],
+     "numbers": []
+    },
+    {
+     "section": "Live Observer",
+     "text": "Community District QN12 has had 4379 flood-related complaints filed via NYC 311 in the last 3 years, with the most common descriptor being Sewer Backup (Use Comments) (SA).",
      "doc_ids": [
       "nyc311_nta"
      ],
      "numbers": [
-      "4380"
+      "4379"
      ]
     }
    ],
    "dropped_claims": [],
    "retried_claims": [],
-   "n_kept": 1,
+   "n_kept": 2,
    "n_dropped": 0,
    "llm_calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 593,
-     "completion_tokens": 68,
-     "duration_s": 4.646,
+     "prompt_tokens": 567,
+     "completion_tokens": 116,
+     "duration_s": 9.763,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1176,9 +1184,14 @@
    ],
    "question": "How many street flooding complaints has community district QN12 had?",
    "n_documents": 3,
-   "answer_mode": "guarded",
-   "answer_lead": null,
+   "answer_mode": "extractive",
+   "answer_lead": "count",
    "answer_flags": [],
+   "checks": [
+    "citations and numbers on every claim",
+    "lead rules on the answer; no entailment check needed, since the answer is the cited text word for word"
+   ],
+   "entailment": {},
    "answered": true
   },
   "citations": {
@@ -1189,7 +1202,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-27T01:37:50+0000",
-    "retrieved_at": "2026-09-27T03:48Z",
+    "retrieved_at": "2026-09-27T15:20Z",
     "vintage": "2026-09-27T01:37:50+0000",
     "maturity": "production"
    }
@@ -1254,17 +1267,17 @@
    "narrative": "DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.3% of this area is modeled to flood (1.9% nuisance, over 4 in to 1 ft; 1.5% 1 to 4 ft; 0.0% over 4 ft)."
   },
   "nyc311_nta": {
-   "n": 4380,
+   "n": 4379,
    "radius_m": null,
    "years": 3,
    "by_year": {
-    "2023": 533,
+    "2023": 532,
     "2024": 1454,
     "2025": 1316,
     "2026": 1077
    },
    "by_descriptor": {
-    "Sewer Backup (Use Comments) (SA)": 2711,
+    "Sewer Backup (Use Comments) (SA)": 2710,
     "Catch Basin Clogged/Flooding (Use Comments) (SC)": 952,
     "Street Flooding (SJ)": 488,
     "Manhole Overflow (Use Comments) (SA1)": 149,
@@ -1298,11 +1311,11 @@
     }
    ],
    "points": [],
-   "headline_value": "4380 calls",
+   "headline_value": "4379 calls",
    "subhead_text": "top descriptor: Sewer Backup (Use Comments) (SA)",
-   "narrative": "4380 NYC 311 flood-related complaints were filed inside this area in the last 3 years. Most common descriptor: Sewer Backup (Use Comments) (SA).",
+   "narrative": "4379 NYC 311 flood-related complaints were filed inside this area in the last 3 years. Most common descriptor: Sewer Backup (Use Comments) (SA).",
    "histogram": [
-    533,
+    532,
     1454,
     1316,
     1077
@@ -1312,8 +1325,8 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790480914.825482,
-    "elapsed_s": 0.01,
+    "started_at": 1790522430.3465002,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "nta_code": "QN12",
@@ -1331,7 +1344,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790480914.8322408,
+    "started_at": 1790522430.3481832,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1343,7 +1356,7 @@
    {
     "step": "dep_extreme_2080_nta",
     "ok": true,
-    "started_at": 1790480914.857412,
+    "started_at": 1790522430.375516,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1353,7 +1366,7 @@
    {
     "step": "dep_moderate_current_nta",
     "ok": true,
-    "started_at": 1790480914.857413,
+    "started_at": 1790522430.375517,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1363,7 +1376,7 @@
    {
     "step": "microtopo_nta",
     "ok": true,
-    "started_at": 1790480914.857414,
+    "started_at": 1790522430.375517,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1373,7 +1386,7 @@
    {
     "step": "dob_permits_nta",
     "ok": true,
-    "started_at": 1790480914.857414,
+    "started_at": 1790522430.375517,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1383,31 +1396,31 @@
    {
     "step": "sandy_nta",
     "ok": true,
-    "started_at": 1790480914.8826811,
-    "elapsed_s": 0.97,
+    "started_at": 1790522430.401987,
+    "elapsed_s": 1.03,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_2050_nta",
     "ok": true,
-    "started_at": 1790480914.8823302,
-    "elapsed_s": 0.2,
+    "started_at": 1790522430.402173,
+    "elapsed_s": 0.22,
     "err": null,
     "result": {}
    },
    {
     "step": "nyc311_nta",
     "ok": true,
-    "started_at": 1790480914.882715,
-    "elapsed_s": 8.54,
+    "started_at": 1790522430.402126,
+    "elapsed_s": 8.29,
     "err": null,
     "result": {}
    },
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790480923.6483042,
+    "started_at": 1790522438.924234,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1416,17 +1429,17 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790480923.648423,
+    "started_at": 1790522438.924355,
     "ok": true,
     "result": {
      "tier": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "attempts": 1,
-     "kept": 1,
+     "kept": 2,
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 4.71
+    "elapsed_s": 9.82
    }
   ],
   "compliance": {
@@ -1437,14 +1450,14 @@
   },
   "emissions": {
    "n_calls": 2,
-   "n_measured": 0,
-   "energy_status": "unknown",
+   "n_measured": 1,
+   "energy_status": "mixed",
    "total_wh": null,
-   "total_duration_s": 13.423,
+   "total_duration_s": 18.454,
    "tokens": {
-    "prompt": 2331,
-    "completion": 190,
-    "total": 2521
+    "prompt": 2305,
+    "completion": 238,
+    "total": 2543
    },
    "calls": [
     {
@@ -1453,18 +1466,18 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1738,
      "completion_tokens": 122,
-     "duration_s": 8.777,
-     "energy_status": "unknown",
-     "wh": null,
-     "energy_note": "energy counters returned no CPU energy on this chip"
+     "duration_s": 8.691,
+     "energy_status": "measured",
+     "wh": 0.34014,
+     "energy_note": "Apple SoC energy (CPU+GPU+DRAM+ANE) during the call, includes other processes"
     },
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 593,
-     "completion_tokens": 68,
-     "duration_s": 4.646,
+     "prompt_tokens": 567,
+     "completion_tokens": 116,
+     "duration_s": 9.763,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"

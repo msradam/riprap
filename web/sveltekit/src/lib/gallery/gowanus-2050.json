@@ -3,8 +3,8 @@
  "neighborhood": "Gowanus, Brooklyn",
  "address": "400 Carroll Street, Brooklyn, NY",
  "question": "What does the 2050 stormwater scenario show at 400 Carroll Street, Brooklyn?",
- "generated_at": "2026-09-27T03:48Z",
- "riprap_commit": "a22fff2",
+ "generated_at": "2026-09-27T15:20Z",
+ "riprap_commit": "095184e",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -1104,7 +1104,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1743,
      "completion_tokens": 141,
-     "duration_s": 10.091,
+     "duration_s": 6.973,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1124,16 +1124,28 @@
   "nta": null,
   "policy_corpus": null,
   "dep": {
+   "dep_extreme_2080": {
+    "depth_class": 3,
+    "depth_label": "Deep Contiguous (>4 ft)",
+    "citation": "NYC DEP Stormwater Flood Map \u2014 Extreme (3.66 in/hr, 2080 SLR)",
+    "narrative": "The NYC DEP stormwater scenario (3.66 in/hr, 2080 SLR) models flooding at this address: Deep Contiguous (>4 ft)."
+   },
    "dep_moderate_2050": {
     "depth_class": 3,
     "depth_label": "Deep Contiguous (>4 ft)",
     "citation": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
     "narrative": "The NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) models flooding at this address: Deep Contiguous (>4 ft)."
+   },
+   "dep_moderate_current": {
+    "depth_class": 0,
+    "depth_label": "outside",
+    "citation": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, current SLR)",
+    "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, current SLR)."
    }
   },
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThe 2050 stormwater scenario models deep contiguous flooding (>4 ft) at 400 Carroll Street, Brooklyn [dep_moderate_2050].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nYes. The NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) models flooding at this address: Deep Contiguous (>4 ft) [dep_moderate_2050]. This address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970211F, effective 2007 [fema_nfhl].\n\n**Hazard Reader.**\nThe NYC DEP stormwater scenario for 2050 (2.13 in/hr, 2050 SLR) models deep contiguous flooding (>4 ft) at 400 Carroll Street, Brooklyn [dep_moderate_2050]. The address is mapped within the empirical 2012 Hurricane Sandy inundation footprint in Brooklyn [sandy_inundation]. The address is located in FEMA flood zone AE, a Special Flood Hazard Area, according to NFHL FIRM panel 3604970211F, effective 2007 [fema_nfhl].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThe 2050 stormwater scenario models deep contiguous flooding (>4 ft) at 400 Carroll Street, Brooklyn [dep_moderate_2050].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nYes. The NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) models flooding at this address: Deep Contiguous (>4 ft) [dep_moderate_2050]. This address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970211F, effective 2007 [fema_nfhl].\n\n**Hazard Reader.**\nThe NYC DEP stormwater scenario for 2050 (2.13 in/hr, 2050 SLR) models deep contiguous flooding (>4 ft) at 400 Carroll Street, Brooklyn [dep_moderate_2050]. The address is mapped within the empirical 2012 Hurricane Sandy inundation footprint in Brooklyn [sandy_inundation]. The address is located in FEMA flood zone AE, a Special Flood Hazard Area, according to NFHL FIRM panel 3604970211F, effective 2007 [fema_nfhl].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
    "dropped": [],
    "tier": "llm"
   },
@@ -1144,38 +1156,105 @@
    "claims": [
     {
      "section": "answer",
-     "text": "The 2050 stormwater scenario models deep contiguous flooding (>4 ft) at 400 Carroll Street, Brooklyn.",
+     "text": "The NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) models flooding at this address: Deep Contiguous (>4 ft).",
      "doc_ids": [
       "dep_moderate_2050"
+     ],
+     "numbers": []
+    },
+    {
+     "section": "answer",
+     "text": "This address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",
+     "doc_ids": [
+      "sandy_inundation"
+     ],
+     "numbers": []
+    },
+    {
+     "section": "answer",
+     "text": "This address sits in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970211F, effective 2007.",
+     "doc_ids": [
+      "fema_nfhl"
+     ],
+     "numbers": []
+    },
+    {
+     "section": "Hazard Reader",
+     "text": "The NYC DEP stormwater scenario for 2050 (2.13 in/hr, 2050 SLR) models deep contiguous flooding (>4 ft) at 400 Carroll Street, Brooklyn.",
+     "doc_ids": [
+      "dep_moderate_2050"
+     ],
+     "numbers": []
+    },
+    {
+     "section": "Hazard Reader",
+     "text": "The address is mapped within the empirical 2012 Hurricane Sandy inundation footprint in Brooklyn.",
+     "doc_ids": [
+      "sandy_inundation"
+     ],
+     "numbers": []
+    },
+    {
+     "section": "Hazard Reader",
+     "text": "The address is located in FEMA flood zone AE, a Special Flood Hazard Area, according to NFHL FIRM panel 3604970211F, effective 2007.",
+     "doc_ids": [
+      "fema_nfhl"
      ],
      "numbers": []
     }
    ],
    "dropped_claims": [],
    "retried_claims": [],
-   "n_kept": 1,
+   "n_kept": 6,
    "n_dropped": 0,
    "llm_calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 546,
-     "completion_tokens": 69,
-     "duration_s": 5.107,
+     "prompt_tokens": 594,
+     "completion_tokens": 249,
+     "duration_s": 14.198,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
     }
    ],
    "question": "What does the 2050 stormwater scenario show at 400 Carroll Street, Brooklyn?",
-   "n_documents": 3,
-   "answer_mode": "guarded",
-   "answer_lead": null,
+   "n_documents": 5,
+   "answer_mode": "extractive",
+   "answer_lead": "yes",
    "answer_flags": [],
+   "checks": [
+    "citations and numbers on every claim",
+    "lead rules on the answer; no entailment check needed, since the answer is the cited text word for word"
+   ],
+   "entailment": {},
    "answered": true
   },
   "citations": {
+   "sandy_inundation": {
+    "doc_id": "sandy_inundation",
+    "source": "NYC Open Data \u2014 Sandy Inundation Zone",
+    "title": "NYC Sandy Inundation Zone (NYC OpenData uyj8-7rv5, empirical 2012 extent)",
+    "url": "https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/uyj8-7rv5",
+    "license": "NYC Open Data Terms of Use",
+    "date_modified": "2015-11-09",
+    "retrieved_at": "2026-07-11",
+    "vintage": "2015-11-09",
+    "maturity": "production"
+   },
+   "fema_nfhl": {
+    "doc_id": "fema_nfhl",
+    "source": "FEMA National Flood Hazard Layer (NFHL) \u2014 effective flood zones",
+    "title": "FEMA NFHL effective flood-zone polygon and FIRM panel intersecting the address point.",
+    "url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
+    "license": "U.S. Public Domain",
+    "date_modified": "2026-09-27T15:20Z",
+    "retrieved_at": "2026-09-27T15:20Z",
+    "vintage": "2026-09-27T15:20Z",
+    "maturity": "production"
+   },
    "dep_moderate_2050": {
     "doc_id": "dep_moderate_2050",
     "source": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
@@ -1200,22 +1279,22 @@
     "stone": "cornerstone"
    },
    {
-    "id": "dep_moderate_2050",
-    "title": "NYC DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
-    "stone": "cornerstone"
-   }
-  ],
-  "not_checked": [
-   {
     "id": "dep_extreme_2080",
     "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
+    "stone": "cornerstone"
+   },
+   {
+    "id": "dep_moderate_2050",
+    "title": "NYC DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
     "stone": "cornerstone"
    },
    {
     "id": "dep_moderate_current",
     "title": "NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)",
     "stone": "cornerstone"
-   },
+   }
+  ],
+  "not_checked": [
    {
     "id": "ida_hwm",
     "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
@@ -1321,18 +1400,30 @@
    "effective_year": 2007,
    "narrative": "This address sits in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970211F, effective 2007."
   },
+  "dep_extreme_2080": {
+   "depth_class": 3,
+   "depth_label": "Deep Contiguous (>4 ft)",
+   "citation": "NYC DEP Stormwater Flood Map \u2014 Extreme (3.66 in/hr, 2080 SLR)",
+   "narrative": "The NYC DEP stormwater scenario (3.66 in/hr, 2080 SLR) models flooding at this address: Deep Contiguous (>4 ft)."
+  },
   "dep_moderate_2050": {
    "depth_class": 3,
    "depth_label": "Deep Contiguous (>4 ft)",
    "citation": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
    "narrative": "The NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) models flooding at this address: Deep Contiguous (>4 ft)."
   },
+  "dep_moderate_current": {
+   "depth_class": 0,
+   "depth_label": "outside",
+   "citation": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, current SLR)",
+   "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, current SLR)."
+  },
   "trace": [
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790480900.172704,
-    "elapsed_s": 0.14,
+    "started_at": 1790522406.184674,
+    "elapsed_s": 0.59,
     "err": null,
     "result": {
      "address": "400 CARROLL STREET, Brooklyn, NY, USA",
@@ -1344,7 +1435,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790480900.308884,
+    "started_at": 1790522406.7743769,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1354,29 +1445,9 @@
     }
    },
    {
-    "step": "dep_extreme_2080",
-    "ok": true,
-    "started_at": 1790480900.3614311,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
-    "step": "dep_moderate_current",
-    "ok": true,
-    "started_at": 1790480900.361433,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790480900.361433,
+    "started_at": 1790522406.8240519,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1386,7 +1457,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790480900.3614342,
+    "started_at": 1790522406.824053,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1396,7 +1467,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790480900.3614342,
+    "started_at": 1790522406.824054,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1406,7 +1477,7 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790480900.3614342,
+    "started_at": 1790522406.824054,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1416,7 +1487,7 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790480900.3614342,
+    "started_at": 1790522406.824054,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1426,7 +1497,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790480900.361435,
+    "started_at": 1790522406.824054,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1436,7 +1507,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790480900.361435,
+    "started_at": 1790522406.824055,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1446,7 +1517,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790480900.361435,
+    "started_at": 1790522406.824055,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1456,7 +1527,7 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790480900.361435,
+    "started_at": 1790522406.824055,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1466,7 +1537,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790480900.361435,
+    "started_at": 1790522406.824055,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1476,7 +1547,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790480900.361436,
+    "started_at": 1790522406.8240561,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1486,7 +1557,7 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790480900.361436,
+    "started_at": 1790522406.8240561,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1496,7 +1567,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790480900.361436,
+    "started_at": 1790522406.8240561,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1506,7 +1577,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790480900.361436,
+    "started_at": 1790522406.8240561,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1516,7 +1587,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790480900.361436,
+    "started_at": 1790522406.8240561,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1526,7 +1597,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790480900.3614368,
+    "started_at": 1790522406.824057,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1536,7 +1607,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790480900.3614368,
+    "started_at": 1790522406.824057,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1546,7 +1617,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790480900.3614368,
+    "started_at": 1790522406.824057,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1556,8 +1627,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790480900.392273,
-    "elapsed_s": 0.02,
+    "started_at": 1790522406.854304,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "inside": {
@@ -1570,8 +1641,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790480900.395448,
-    "elapsed_s": 0.19,
+    "started_at": 1790522406.85731,
+    "elapsed_s": 0.21,
     "err": null,
     "result": {
      "zone": "AE",
@@ -1581,10 +1652,10 @@
     }
    },
    {
-    "step": "dep_moderate_2050",
+    "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790480900.390743,
-    "elapsed_s": 0.02,
+    "started_at": 1790522406.852855,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "depth_label": "Deep Contiguous (>4 ft)",
@@ -1592,58 +1663,72 @@
     }
    },
    {
+    "step": "dep_moderate_2050",
+    "ok": true,
+    "started_at": 1790522406.858282,
+    "elapsed_s": 0.03,
+    "err": null,
+    "result": {
+     "depth_label": "Deep Contiguous (>4 ft)",
+     "depth_class": 3
+    }
+   },
+   {
+    "step": "dep_moderate_current",
+    "ok": true,
+    "started_at": 1790522406.860283,
+    "elapsed_s": 0.03,
+    "err": null,
+    "result": {
+     "depth_label": "outside",
+     "depth_class": 0
+    }
+   },
+   {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790480900.816162,
+    "started_at": 1790522407.3249652,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
      "scenarios": [
-      "dep_moderate_2050"
+      "dep_extreme_2080",
+      "dep_moderate_2050",
+      "dep_moderate_current"
      ]
     }
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790480900.816339,
+    "started_at": 1790522407.325155,
     "ok": true,
     "result": {
      "tier": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "attempts": 1,
-     "kept": 1,
+     "kept": 6,
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 5.16
+    "elapsed_s": 14.26
    }
   ],
   "compliance": {
-   "passed": false,
-   "n_passed": 12,
+   "passed": true,
+   "n_passed": 13,
    "n_total": 13,
-   "failed": [
-    {
-     "name": "projection_has_horizon",
-     "rule": "TCFD 3.2",
-     "description": "Projection sentences must declare a time horizon (short/medium/long-term or an explicit year/duration).",
-     "reason": "",
-     "evidence": [
-      "**Answer.**\nThe 2050 stormwater scenario models deep contiguous flooding (>4 ft) at 400 Carroll Street, Brooklyn [dep_moderate_2050]."
-     ]
-    }
-   ]
+   "failed": []
   },
   "emissions": {
    "n_calls": 2,
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 15.198,
+   "total_duration_s": 21.171,
    "tokens": {
-    "prompt": 2289,
-    "completion": 210,
-    "total": 2499
+    "prompt": 2337,
+    "completion": 390,
+    "total": 2727
    },
    "calls": [
     {
@@ -1652,7 +1737,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1743,
      "completion_tokens": 141,
-     "duration_s": 10.091,
+     "duration_s": 6.973,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1661,9 +1746,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 546,
-     "completion_tokens": 69,
-     "duration_s": 5.107,
+     "prompt_tokens": 594,
+     "completion_tokens": 249,
+     "duration_s": 14.198,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
