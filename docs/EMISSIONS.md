@@ -58,7 +58,8 @@ installed, or with `RIPRAP_ENERGY_WATTS` set, and read the `emissions`
 block:
 
 ```bash
-RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 RIPRAP_LLM_MODEL=granite4:micro \
+RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 \
+RIPRAP_LLM_MODEL=hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M \
   uv run python -c "from riprap.core.burr.app import run; import json; \
 print(json.dumps(run('189 Atlantic Avenue, Brooklyn, NY')['emissions'], indent=2, default=str))"
 ```

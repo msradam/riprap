@@ -25,8 +25,9 @@ Open `http://localhost:7860`. Every briefing is the no-LLM evidence briefing
 Any OpenAI-compatible endpoint works. With [Ollama](https://ollama.com):
 
 ```bash
-ollama pull granite4:micro
-RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 RIPRAP_LLM_MODEL=granite4:micro \
+ollama pull hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M
+RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 \
+RIPRAP_LLM_MODEL=hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M \
   uv run uvicorn web.main:app --port 7860
 ```
 
@@ -34,7 +35,8 @@ RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 RIPRAP_LLM_MODEL=granite4:micro \
 `_MODEL` and `_API_KEY` name a second endpoint tried when the first fails.
 Settings are read when a request runs, not frozen at import.
 
-On an Apple M5 laptop, a briefing with `granite4:micro` took 19 to 60 s
+This is IBM's own GGUF on Hugging Face, the model the gallery uses. On an
+Apple M5 laptop, earlier probes with `granite4:micro` took 19 to 60 s
 (`tests/probe_grounding_results.json`) and with `llama3.1:8b` 189 to 325 s,
 about 3 to 5.5 minutes (`tests/probe_grounding_results_llama3.1-8b.json`).
 A small shared VPS will be several times slower for 8B models.
