@@ -151,6 +151,22 @@ def _lead(state, items) -> str | None:
     return " ".join(out) or None
 
 
+def nothing_built(state) -> str:
+    """The briefing when no source produced evidence: which sources failed
+    to respond and which answered with nothing, not a bare "no data"."""
+    ok = {t.get("step"): t.get("ok") for t in state.get("trace") or []}
+    consulted = state.get("consulted") or []
+    failed = [e["title"] for e in consulted if ok.get(e["id"]) is False]
+    empty = [e["title"] for e in consulted if ok.get(e["id"]) is not False]
+    out = [f"{_scope_header()}\n\nRiprap could not build this briefing: no source it consulted returned evidence "
+           "for this place."]
+    if failed:
+        out.append(f"Failed to respond: {'; '.join(failed)}.")
+    if empty:
+        out.append(f"Answered with nothing for this place: {'; '.join(empty)}.")
+    return " ".join(out)
+
+
 def compose_briefing(state) -> tuple[str, dict[str, dict]]:
     """One section per Stone (stones.yaml order), one cited sentence per
     pebble with a value, the DEP scenarios merged into one sentence.
@@ -184,7 +200,7 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
         if body:
             sections.append(f"**{evidence.stone_heading(stone)}**\n{body}")
     if len(sections) == 1:
-        return "No grounded data available for this address.", {}
+        return nothing_built(state), {}
     sections.append(NON_SCOPE_FOOTER)
     return "\n\n".join(sections), evidence.citations(items)
 

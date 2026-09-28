@@ -324,7 +324,9 @@ def synthesize(state) -> dict:
                 "grounding": {"tier": "llm", "claims": [], "dropped_claims": [], "attempts": 0}}
     docs, items, stones = _documents(state)
     if not docs:
-        return {"paragraph": "No grounded data available for this address.", "citations": {},
+        from riprap.core.burr.templated_reconciler import nothing_built
+
+        return {"paragraph": nothing_built(state), "citations": {},
                 "grounding": {"tier": "llm", "claims": [], "dropped_claims": [], "attempts": 0}}
     plan = state.get("plan") or {}
     question, focus = plan.get("question") or "", plan.get("focus")

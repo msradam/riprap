@@ -163,3 +163,32 @@ def test_extractive_no_from_an_unavailable_source_falls_back_to_cannot_answer(mo
     monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (reply, "scripted"))
     out = syn.synthesize({"intent": "live_now", "plan": {"question": "Is there a flood warning here?"}})
     assert CANNOT_ANSWER in out["paragraph"] and "No." not in out["paragraph"]
+
+
+# Refactor 6: say why a source said nothing.
+
+def test_no_gauge_nearby_is_a_true_zero_and_an_api_error_fails(monkeypatch):
+    import dataretrieval.waterdata as wd
+    import pandas as pd
+
+    from app.context import usgs_gauges
+
+    monkeypatch.setattr(wd, "get_latest_continuous", lambda **k: (pd.DataFrame(), None))
+    v = usgs_gauges.summary_for_point(40.30, -73.50)
+    assert v["n_gauges_in_area"] == 0 and v["narrative"].startswith("No active USGS stream gauge")
+    monkeypatch.setattr(wd, "get_latest_continuous", _broken)
+    with pytest.raises(OSError):
+        usgs_gauges.summary_for_point(40.30, -73.50)
+
+
+def test_a_briefing_with_no_evidence_names_the_failed_sources():
+    from riprap.core.burr.templated_reconciler import compose_briefing
+
+    state = {"intent": "single_address", "deployment": "nyc", "plan": {"question": ""},
+             "consulted": [{"id": "fema_nfhl", "title": "FEMA National Flood Hazard Layer", "stone": "cornerstone"},
+                           {"id": "nyc311", "title": "NYC 311 flood-related complaints (5y)", "stone": "touchstone"}],
+             "trace": [{"step": "fema_nfhl", "ok": False}, {"step": "nyc311", "ok": False}]}
+    paragraph, cites = compose_briefing(state)
+    assert "Riprap could not build this briefing" in paragraph and cites == {}
+    assert "Failed to respond: FEMA National Flood Hazard Layer; NYC 311 flood-related complaints (5y)." in paragraph
+    assert "No grounded data available" not in paragraph

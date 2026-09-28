@@ -4,9 +4,10 @@ api.waterdata.usgs.gov `latest-continuous`, read through `dataretrieval`.
 It replaces the legacy waterservices.usgs.gov/nwis/iv service, which is
 being degraded and shuts down in Q1 2027. National coverage, so this
 ships as a federal pebble: every deployment gets the nearest active
-stream gauge's stage (and discharge where published). Points with no
-active gauge in the search box skip cleanly (summary_for_point returns
-None).
+stream gauge's stage (and discharge where published). A point with no
+active gauge in the search box is a true "none nearby" result
+(n_gauges_in_area 0); an API error raises, so the step is reported as
+failed (refactor 6: the two used to look the same).
 
 No key is needed. Unauthenticated requests share USGS's small hourly
 quota; set API_USGS_PAT (read by dataretrieval) to raise it.
@@ -14,12 +15,9 @@ quota; set API_USGS_PAT (read by dataretrieval) to raise it.
 
 from __future__ import annotations
 
-import logging
 from datetime import UTC, datetime, timedelta
 from math import asin, cos, radians, sin, sqrt
 from typing import Any
-
-log = logging.getLogger("riprap.usgs_gauges")
 
 DOC_ID = "usgs_gauges"
 CITATION = "USGS Water Data OGC API, latest continuous values (api.waterdata.usgs.gov)"
@@ -47,19 +45,22 @@ def _pretty_name(raw: str) -> str:
     return " ".join(words)
 
 
+def _none_nearby() -> dict[str, Any]:
+    """The API answered and no gauge in the box reported stage in the last
+    two days: a true zero."""
+    return {"n_gauges_in_area": 0,
+            "narrative": "No active USGS stream gauge reported a stage reading in the last 2 days "
+                         "within about 10 to 14 km of this address."}
+
+
 def summary_for_point(lat: float, lon: float) -> dict[str, Any] | None:
     import dataretrieval.waterdata as wd  # noqa: PLC0415
 
     bbox = [lon - _BOX_DEG, lat - _BOX_DEG, lon + _BOX_DEG, lat + _BOX_DEG]
-    try:
-        df, _ = wd.get_latest_continuous(
-            parameter_code=[_PARAM_STAGE, _PARAM_DISCHARGE], bbox=bbox
-        )
-    except Exception as e:  # noqa: BLE001 - an unreachable API skips the pebble
-        log.warning("USGS latest-continuous failed: %r", e)
-        return None
+    # An API error propagates: "failed to respond", never "no gauge nearby".
+    df, _ = wd.get_latest_continuous(parameter_code=[_PARAM_STAGE, _PARAM_DISCHARGE], bbox=bbox)
     if df is None or df.empty:
-        return None
+        return _none_nearby()
     df = df[df["time"] >= datetime.now(UTC) - _MAX_AGE]
 
     sites: dict[str, dict[str, Any]] = {}
@@ -75,7 +76,7 @@ def summary_for_point(lat: float, lon: float) -> dict[str, Any] | None:
 
     gauged = [s for s in sites.values() if "stage_ft" in s]
     if not gauged:
-        return None
+        return _none_nearby()
     for s in gauged:
         s["distance_km"] = round(_haversine_km(lat, lon, s["lat"], s["lon"]), 1)
     nearest = min(gauged, key=lambda s: s["distance_km"])

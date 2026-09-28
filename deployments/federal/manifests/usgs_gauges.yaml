@@ -51,4 +51,4 @@ display:
 
 fallback:
   on_offline: skip
-  message: No active USGS stream gauge within the search box, or the USGS API is unreachable.
+  message: The USGS Water Data API did not respond.
