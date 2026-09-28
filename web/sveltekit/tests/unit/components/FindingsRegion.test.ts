@@ -15,7 +15,7 @@ import { BOSTON, NYC, NYC_LEAK_NEEDLES } from '../fixtures/cities';
 
 function emptyTrace(stone: StoneKey): StoneTrace {
   return {
-    stone, members: [], fired: 0, silent_by_design: 0, errored: 0, ms: 0,
+    key: stone, members: [],
   };
 }
 

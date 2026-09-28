@@ -18,7 +18,7 @@ describe('AppHeader chip text per deployment', () => {
     (_key, city) => {
       seedForCity(city);
       const { container } = render(AppHeader, {
-        props: { queryId: 'test-query' },
+        props: { query: 'test-query' },
       });
       // City pill text
       const pill = container.querySelector('.app-header-city-pill');
@@ -36,7 +36,7 @@ describe('AppHeader chip text per deployment', () => {
       resetStores();
       seedForCity(city);
       const { container } = render(AppHeader, {
-        props: { queryId: 'test-query' },
+        props: { query: 'test-query' },
       });
       const text = container.textContent ?? '';
       // The header chip should not contain the string "NYC" anywhere
@@ -50,7 +50,7 @@ describe('AppHeader chip text per deployment', () => {
   it('falls back gracefully when deployment.current is null', () => {
     // Pre-load state (deployment.current=null), still renders something.
     const { container } = render(AppHeader, {
-      props: { queryId: 'test-query' },
+      props: { query: 'test-query' },
     });
     expect(container.textContent).toBeTruthy();
   });
@@ -62,7 +62,7 @@ describe('AppHeader regression: NYC needles must not leak into other cities', ()
       resetStores();
       seedForCity(city);
       const { container } = render(AppHeader, {
-        props: { queryId: 'test-query' },
+        props: { query: 'test-query' },
       });
       const text = container.textContent ?? '';
       for (const needle of NYC_LEAK_NEEDLES) {
@@ -76,7 +76,7 @@ describe('AppHeader regression: NYC needles must not leak into other cities', ()
 describe('AppHeader baseline: NYC city renders the NYC pill', () => {
   it('shows "NYC" pill when seeded with NYC fixture', () => {
     seedForCity(NYC);
-    render(AppHeader, { props: { queryId: 'test-query' } });
+    render(AppHeader, { props: { query: 'test-query' } });
     expect(screen.getByText('NYC')).toBeInTheDocument();
   });
 });

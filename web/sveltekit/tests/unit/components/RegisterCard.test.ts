@@ -20,14 +20,14 @@ const NYC_REGISTER: RegisterData = {
   rows: [
     {
       name: 'Atlantic Av · Pacific St',
-      asset: 'SUBWAY',
+      asset: 'subway',
       primaryTier: 'empirical',
       ada: true,
       elev: '5.2 ft',
       fema: 'X',
       sandy: 'inside',
       dep: 'mod',
-    } as RegisterData['rows'][0],
+    },
   ],
 };
 

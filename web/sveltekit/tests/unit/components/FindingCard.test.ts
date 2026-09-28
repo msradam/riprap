@@ -38,7 +38,7 @@ const VARIANTS_WITH_FIXTURES: { variant: CardVariant; props: Partial<Card> }[] =
   { variant: 'spark',        props: { spark: [1, 2, 3, 4, 5], sparkSub: 'last 5 readings' } },
   { variant: 'histogram',    props: { histogram: [1, 3, 2, 5, 4] } },
   { variant: 'timeseries',   props: { timeseries: { hours: 96, peak: { x: 38, y: 47 }, peakLabel: 'storm peak' } } },
-  { variant: 'forecast',     props: { forecastBands: [{ year: 2050, low: 0.3, mid: 0.5, high: 1.2 }] } },
+  { variant: 'forecast',     props: { forecast: [{ year: 2050, low: 0.3, mid: 0.5, high: 1.2 }] } },
   { variant: 'register',     props: { /* RegisterBody reads from a separate data path, smoke only */ } },
   { variant: 'meta',         props: { body: 'mode · evidence briefing (no LLM)' } },
 ];

@@ -22,12 +22,8 @@ import { ALL_CITIES, NYC_LEAK_NEEDLES, NYC, BOSTON } from '../fixtures/cities';
 import type { StoneTrace } from '$lib/types/card';
 
 const EMPTY_TRACE: StoneTrace = {
-  stone: 'cornerstone',
+  key: 'cornerstone',
   members: [],
-  fired: 0,
-  silent_by_design: 0,
-  errored: 0,
-  ms: 0,
 };
 
 beforeEach(resetStores);
@@ -42,7 +38,7 @@ describe('StoneRegion no longer renders the per-deployment tagline', () => {
       props: {
         stone: 'cornerstone',
         cards: [],
-        trace: { ...EMPTY_TRACE, stone: 'cornerstone' },
+        trace: { ...EMPTY_TRACE, key: 'cornerstone' },
       },
     });
     expect(container.querySelector('.region-tag')).toBeNull();
@@ -56,7 +52,7 @@ describe('StoneRegion no longer renders the per-deployment tagline', () => {
         props: {
           stone: 'cornerstone',
           cards: [],
-          trace: { ...EMPTY_TRACE, stone: 'cornerstone' },
+          trace: { ...EMPTY_TRACE, key: 'cornerstone' },
         },
       });
       expect(container.textContent, `${city.key} cornerstone leaked NYC tagline`)
@@ -72,7 +68,7 @@ describe('StoneRegion roster comes from pebbleManifest.byStone for the loaded ci
       props: {
         stone: 'cornerstone',
         cards: [],
-        trace: { ...EMPTY_TRACE, stone: 'cornerstone' },
+        trace: { ...EMPTY_TRACE, key: 'cornerstone' },
       },
     });
     const text = container.textContent ?? '';
@@ -91,7 +87,7 @@ describe('StoneRegion roster comes from pebbleManifest.byStone for the loaded ci
       props: {
         stone: 'cornerstone',
         cards: [],
-        trace: { ...EMPTY_TRACE, stone: 'cornerstone' },
+        trace: { ...EMPTY_TRACE, key: 'cornerstone' },
       },
     });
     expect(container.textContent).toContain('Cornerstone');
@@ -109,7 +105,7 @@ describe('StoneRegion cross-city sweep: no NYC needle in any non-NYC Stone', () 
           props: {
             stone,
             cards: [],
-            trace: { ...EMPTY_TRACE, stone },
+            trace: { ...EMPTY_TRACE, key: stone },
           },
         });
         const text = container.textContent ?? '';
