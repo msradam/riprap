@@ -1,28 +1,28 @@
 <script lang="ts">
   /** SourceStrip: trust-signal numbers.
    *
-   *  Surfaces the data-source counts inline (23 sources · 9 agencies ·
-   *  1 production city · 5 experimental) so the "every claim cites a public record"
-   *  promise from the deck is visually substantiated. Last reviewed
-   *  date is the live-data vintage marker; update when the methodology
-   *  page changes.
+   *  Surfaces the data-source counts inline (31 sources · 1 production
+   *  city · 5 experimental) so the "every claim cites a public record"
+   *  promise from the deck is visually substantiated. The date is the
+   *  last git change to docs/METHODOLOGY.md; update it when that file
+   *  changes.
    *
-   *  Values are props so a different deployment (or an automated
-   *  pre-build pass scanning manifests) can drive them dynamically.
+   *  The numbers are defaults, checked against the manifests on
+   *  2026-09-28 (31 pebbles: 27 NYC manifests plus 4 federal). They are
+   *  props so a different deployment (or an automated pre-build pass
+   *  scanning manifests) can drive them dynamically.
    */
   interface Props {
     sources?: number;
-    agencies?: number;
     productionCities?: number;
     experimentalCities?: number;
     lastReview?: string;
   }
   let {
-    sources = 23,
-    agencies = 9,
+    sources = 31,
     productionCities = 1,
     experimentalCities = 5,
-    lastReview = '2026-05-17',
+    lastReview = '2026-09-26',
   }: Props = $props();
 </script>
 
@@ -31,15 +31,12 @@
     <span class="source-strip-stat-num">{sources}</span>data sources
   </span>
   <span class="source-strip-stat">
-    <span class="source-strip-stat-num">{agencies}</span>federal + state + city agencies
-  </span>
-  <span class="source-strip-stat">
     <span class="source-strip-stat-num">{productionCities}</span>city in production
   </span>
   <span class="source-strip-stat">
     <span class="source-strip-stat-num">{experimentalCities}</span>experimental cities
   </span>
-  <span class="source-strip-meta">last methodology review · {lastReview}</span>
+  <span class="source-strip-meta">methodology updated · {lastReview}</span>
 </div>
 
 <style>
