@@ -92,6 +92,7 @@ Documentation = "https://github.com/msradam/riprap/blob/main/docs/INDEX.md"
 Repository    = "https://github.com/msradam/riprap"
 Issues        = "https://github.com/msradam/riprap/issues"
 Changelog     = "https://github.com/msradam/riprap/blob/main/CHANGELOG.md"
+Gallery       = "https://msradam.github.io/riprap/"
 
 [dependency-groups]
 dev = [
