@@ -1,0 +1,195 @@
+- input: 90-01 183rd Street, Queens, NY 11423
+  source: questions.yaml:q01
+  address: 90-01 183rd Street, Queens, NY 11423
+- input: 2017 East 17th Street, Brooklyn, NY 11229
+  source: questions.yaml:q02
+  address: 2017 East 17th Street, Brooklyn, NY 11229
+- input: 80 Pioneer Street, Brooklyn, NY
+  source: questions.yaml:q03
+  address: 80 Pioneer Street, Brooklyn, NY
+- input: 560 Grand Street, Manhattan, NY
+  source: questions.yaml:q04
+  address: 560 Grand Street, Manhattan, NY
+- input: Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?
+  source: questions.yaml:q05
+  address: 90-01 183rd Street, Queens, NY 11423
+- input: Was 80 Pioneer Street in Red Hook inside the area Hurricane Sandy flooded in 2012?
+  source: questions.yaml:q06
+  address: 80 Pioneer Street, Brooklyn, NY
+- input: What flood events have been recorded near 400 Carroll Street, Brooklyn?
+  source: questions.yaml:q07
+  address: 400 Carroll Street, Brooklyn, NY
+- input: Did Hurricane Sandy flood 801 Father Capodanno Boulevard, Staten Island?
+  source: questions.yaml:q08
+  address: 801 Father Capodanno Boulevard, Staten Island, NY
+- input: How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?
+  source: questions.yaml:q09
+  address: 2017 East 17th Street, Brooklyn, NY 11229
+- input: Is there flooding near 80 Pioneer Street, Brooklyn right now?
+  source: questions.yaml:q10
+  address: 80 Pioneer Street, Brooklyn, NY
+- input: Are there any active flood or coastal alerts at 116-02 Rockaway Beach Boulevard right now?
+  source: questions.yaml:q11
+  address: 116-02 Rockaway Beach Boulevard, Queens, NY
+- input: Is it raining hard near 90-01 183rd Street, Queens at the moment?
+  source: questions.yaml:q12
+  address: 90-01 183rd Street, Queens, NY 11423
+- input: What is the water level in New York Harbor near 560 Grand Street, Manhattan right now?
+  source: questions.yaml:q13
+  address: 560 Grand Street, Manhattan, NY
+- input: What does the 2050 stormwater scenario show at 400 Carroll Street, Brooklyn?
+  source: questions.yaml:q14
+  address: 400 Carroll Street, Brooklyn, NY
+- input: Is 2017 East 17th Street, Brooklyn in any of the DEP stormwater flood scenarios?
+  source: questions.yaml:q15
+  address: 2017 East 17th Street, Brooklyn, NY 11229
+- input: How much sea level rise is projected at the Battery by 2050, and what does that mean for 116-02 Rockaway Beach Boulevard?
+  source: questions.yaml:q16
+  address: 116-02 Rockaway Beach Boulevard, Queens, NY
+- input: What do the future stormwater scenarios show near 801 Father Capodanno Boulevard, Staten Island?
+  source: questions.yaml:q17
+  address: 801 Father Capodanno Boulevard, Staten Island, NY
+- input: Are the subway entrances near 90-01 183rd Street, Queens in a flood scenario?
+  source: questions.yaml:q18
+  address: 90-01 183rd Street, Queens, NY 11423
+- input: Are the NYCHA developments near 560 Grand Street, Manhattan exposed to flooding?
+  source: questions.yaml:q19
+  address: 560 Grand Street, Manhattan, NY
+- input: Are the schools near 116-02 Rockaway Beach Boulevard exposed to flooding?
+  source: questions.yaml:q20
+  address: 116-02 Rockaway Beach Boulevard, Queens, NY
+- input: Are any hospitals near 355 Food Center Drive, Bronx in a flood zone?
+  source: questions.yaml:q21
+  address: 355 Food Center Drive, Bronx, NY
+- input: Which public housing near 80 Pioneer Street, Brooklyn was inside the Sandy flood extent?
+  source: questions.yaml:q22
+  address: 80 Pioneer Street, Brooklyn, NY
+- input: How many street flooding complaints has community district QN12 had?
+  source: questions.yaml:q23
+  district: QN12
+- input: What share of community district BK15 was inside the area Sandy flooded?
+  source: questions.yaml:q24
+  district: BK15
+- input: How much of community district QN12 is in the DEP extreme stormwater scenario?
+  source: questions.yaml:q25
+  district: QN12
+- input: Did the area around 79-01 Broadway, Queens flood during Hurricane Ida?
+  source: heldout.yaml:h01
+  address: 79-01 Broadway, Queens, NY 11373
+- input: Was 1310 Surf Avenue, Brooklyn inside the area Hurricane Sandy flooded?
+  source: heldout.yaml:h02
+  address: 1310 Surf Avenue, Brooklyn, NY 11224
+- input: How many flooding complaints have been made to 311 near 200 Water Street, Manhattan?
+  source: heldout.yaml:h03
+  address: 200 Water Street, Manhattan, NY 10038
+- input: Have street flood sensors recorded flooding near 1 East 161st Street, Bronx?
+  source: heldout.yaml:h04
+  address: 1 East 161st Street, Bronx, NY 10451
+- input: What past floods have been recorded near 1000 Richmond Terrace, Staten Island?
+  source: heldout.yaml:h05
+  address: 1000 Richmond Terrace, Staten Island, NY 10301
+- input: Is there a coastal flood alert at 1310 Surf Avenue, Brooklyn right now?
+  source: heldout.yaml:n01
+  address: 1310 Surf Avenue, Brooklyn, NY 11224
+- input: Is it raining near 79-01 Broadway, Queens right now?
+  source: heldout.yaml:n02
+  address: 79-01 Broadway, Queens, NY 11373
+- input: What is the water level in the harbor near 200 Water Street, Manhattan right now?
+  source: heldout.yaml:n03
+  address: 200 Water Street, Manhattan, NY 10038
+- input: Would 79-01 Broadway, Queens flood in the NYC DEP extreme stormwater scenario for 2080?
+  source: heldout.yaml:f01
+  address: 79-01 Broadway, Queens, NY 11373
+- input: How much sea-level rise is projected near 200 Water Street, Manhattan by the 2050s?
+  source: heldout.yaml:f02
+  address: 200 Water Street, Manhattan, NY 10038
+- input: Is 1000 Richmond Terrace, Staten Island in any of the DEP stormwater flood scenarios?
+  source: heldout.yaml:f03
+  address: 1000 Richmond Terrace, Staten Island, NY 10301
+- input: Are the subway entrances near 1 East 161st Street, Bronx in a flood scenario?
+  source: heldout.yaml:a01
+  address: 1 East 161st Street, Bronx, NY 10451
+- input: How many public housing developments near 1310 Surf Avenue, Brooklyn were inside the Sandy flood extent?
+  source: heldout.yaml:a02
+  address: 1310 Surf Avenue, Brooklyn, NY 11224
+- input: Are the schools near 79-01 Broadway, Queens exposed to flooding?
+  source: heldout.yaml:a03
+  address: 79-01 Broadway, Queens, NY 11373
+- input: Are any hospitals near 200 Water Street, Manhattan in a flood scenario?
+  source: heldout.yaml:a04
+  address: 200 Water Street, Manhattan, NY 10038
+- input: Are there NYCHA developments near 1000 Richmond Terrace, Staten Island inside a flood scenario?
+  source: heldout.yaml:a05
+  address: 1000 Richmond Terrace, Staten Island, NY 10301
+- input: What share of community district QN04 is inside the DEP 2050 stormwater scenario?
+  source: heldout.yaml:d01
+  district: QN04
+- input: How many flooding complaints has community district QN04 had?
+  source: heldout.yaml:d02
+  district: QN04
+- input: QN12
+  source: dogfood (impeccable_report.md)
+  district: QN12
+- input: QN 12
+  source: dogfood (impeccable_report.md)
+  district: QN12
+- input: Community District 12 Queens
+  source: dogfood (impeccable_report.md)
+  district: QN12
+- input: Queens CD 12
+  source: dogfood (impeccable_report.md)
+  district: QN12
+- input: Queens Community Board 12
+  source: dogfood (impeccable_report.md)
+  district: QN12
+- input: How many street flooding complaints has QN12 had?
+  source: dogfood (impeccable_report.md)
+  district: QN12
+- input: Jamaica, Queens
+  source: dogfood (impeccable_report.md)
+  neighborhood: Jamaica
+- input: Has 90-01 183rd Street, Queens flooded?
+  source: dogfood (impeccable_report.md)
+  address: 90-01 183rd Street, Queens, NY 11423
+- input: flooding near 90-01 183rd Street, Queens
+  source: dogfood (impeccable_report.md)
+  address: 90-01 183rd Street, Queens, NY 11423
+- input: Are the schools near 116-02 Rockaway Beach Boulevard exposed to flooding?
+  source: dogfood (impeccable_report.md)
+  address: 116-02 Rockaway Beach Boulevard, Queens, NY
+- input: Are the schools near 116-02 Rockaway Beach Boulevard, Queens exposed to flooding?
+  source: dogfood (impeccable_report.md)
+  address: 116-02 Rockaway Beach Boulevard, Queens, NY
+- input: What is the flood risk at 79-01 Broadway, Queens?
+  source: new, written before running
+  address: 79-01 Broadway, Queens, NY 11373
+- input: flooding near 1310 Surf Avenue, Coney Island
+  source: new, written before running
+  address: 1310 Surf Avenue, Brooklyn, NY 11224
+- input: Tell me about 355 Food Center Drive in the Bronx
+  source: new, written before running
+  address: 355 Food Center Drive, Bronx, NY
+- input: Is 200 Water Street in Manhattan in a FEMA flood zone
+  source: new, written before running
+  address: 200 Water Street, Manhattan, NY 10038
+- input: Has 1000 Richmond Terrace flooded?
+  source: new, written before running
+  address: 1000 Richmond Terrace, Staten Island, NY 10301
+- input: Brooklyn Community Board 6
+  source: new, written before running
+  district: BK06
+- input: BX 1
+  source: new, written before running
+  district: BX01
+- input: What share of Manhattan CD 3 flooded in Sandy?
+  source: new, written before running
+  district: MN03
+- input: Staten Island community district 2
+  source: new, written before running
+  district: SI02
+- input: Queens CB 15
+  source: new, written before running
+  refuse: Queens has community districts QN01 to QN14
+- input: Is Red Hook at risk of flooding?
+  source: new, written before running
+  neighborhood: Red Hook
