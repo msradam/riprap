@@ -3,6 +3,10 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [sveltekit()],
+  // Read by src/lib/staticSite.ts. '' when the variable is unset.
+  define: {
+    'import.meta.env.PUBLIC_RIPRAP_STATIC': JSON.stringify(process.env.PUBLIC_RIPRAP_STATIC ?? '')
+  },
   server: {
     proxy: {
       '/api': { target: 'http://127.0.0.1:7860', changeOrigin: true }

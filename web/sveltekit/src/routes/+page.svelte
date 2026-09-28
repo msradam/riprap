@@ -27,6 +27,7 @@
   import LandStones from '$lib/components/landing/LandStones.svelte';
   import LandFooter from '$lib/components/landing/LandFooter.svelte';
   import { byodRegistry } from '$lib/stores/byodRegistry.svelte';
+  import { STATIC_SITE } from '$lib/staticSite';
 
   // LandPreview was removed: its "Briefing excerpt" pane fabricated
   // citation chrome around numbers no one had queried (a `4.7 ft Sandy
@@ -39,7 +40,7 @@
   // Load BYOD registry on mount so the trigger badge shows how many
   // user pebbles are already stored in this browser.
   $effect(() => {
-    if (typeof window !== 'undefined' && !byodRegistry.loaded) {
+    if (!STATIC_SITE && typeof window !== 'undefined' && !byodRegistry.loaded) {
       void byodRegistry.load();
     }
   });
@@ -58,21 +59,26 @@
   <div class="land-page" id="main-content">
     <LandHero />
     <div class="land-trust">
-      <CityPicker />
+      <!-- City samples and BYOD both run a live briefing: not on the static site. -->
+      {#if !STATIC_SITE}
+        <CityPicker />
+      {/if}
       <SourceStrip />
-      <div class="land-byod-row">
-        <button
-          type="button"
-          class="land-byod-trigger"
-          onclick={() => (byodOpen = true)}
-        >
-          + Bring your own data
-          {#if byodRegistry.entries.length > 0}
-            <span class="land-byod-badge">{byodRegistry.entries.length}</span>
-          {/if}
-        </button>
-        <span class="land-byod-note">Files stay in your browser. No upload.</span>
-      </div>
+      {#if !STATIC_SITE}
+        <div class="land-byod-row">
+          <button
+            type="button"
+            class="land-byod-trigger"
+            onclick={() => (byodOpen = true)}
+          >
+            + Bring your own data
+            {#if byodRegistry.entries.length > 0}
+              <span class="land-byod-badge">{byodRegistry.entries.length}</span>
+            {/if}
+          </button>
+          <span class="land-byod-note">Files stay in your browser. No upload.</span>
+        </div>
+      {/if}
       <UseBand />
       <StandardsStrip />
     </div>

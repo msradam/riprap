@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { EXAMPLES } from '$lib/samples';
+  import { STATIC_SITE, QUICKSTART_URL } from '$lib/staticSite';
 
   /** Landing hero. A static headline (New York City is the production
    *  deployment; the other cities are experimental and listed below in
@@ -39,42 +40,58 @@
       <span class="land-hero-headline-city"><span class="city">New York City</span>.</span>
     </span>
     <span class="land-hero-deck">
-      Type an address, a community district, or a flood question. Get a written
-      briefing on flood exposure. Every claim cites a public record from FEMA,
-      NOAA, USGS, or city open data.
+      {#if STATIC_SITE}
+        Riprap turns an address, a community district, or a flood question into a
+        written briefing on flood exposure.
+      {:else}
+        Type an address, a community district, or a flood question. Get a written
+        briefing on flood exposure.
+      {/if}
+      Every claim cites a public record from FEMA, NOAA, USGS, or city open data.
     </span>
   </h1>
 
-  <form class="land-query" onsubmit={(e) => { e.preventDefault(); submit(); }} role="search">
-    <span class="land-query-prompt" aria-hidden="true">›</span>
-    <input
-      id="land-query-input"
-      type="text"
-      {@attach prefill}
-      bind:value={q}
-      placeholder="Address, district such as QN 12, or a question"
-      class="land-query-input"
-      autocomplete="off"
-      enterkeyhint="search"
-      aria-label="Address, community district, or flood question"
-    />
-    <button type="submit" class="land-query-submit">Brief this place →</button>
-  </form>
+  {#if STATIC_SITE}
+    <!-- The public site has no backend: the gallery replaces the query box. -->
+    <div class="land-static">
+      <a class="land-static-gallery" href="{resolve('/(app)/gallery')}/">Read the precomputed briefings →</a>
+      <p class="land-static-note">
+        This public copy has no backend.
+        <a href={QUICKSTART_URL}>Run locally to ask your own question</a>.
+      </p>
+    </div>
+  {:else}
+    <form class="land-query" onsubmit={(e) => { e.preventDefault(); submit(); }} role="search">
+      <span class="land-query-prompt" aria-hidden="true">›</span>
+      <input
+        id="land-query-input"
+        type="text"
+        {@attach prefill}
+        bind:value={q}
+        placeholder="Address, district such as QN 12, or a question"
+        class="land-query-input"
+        autocomplete="off"
+        enterkeyhint="search"
+        aria-label="Address, community district, or flood question"
+      />
+      <button type="submit" class="land-query-submit">Brief this place →</button>
+    </form>
 
-  <div class="land-try">
-    <span class="land-try-label" id="land-try-label">Try:</span>
-    <ul class="land-try-list" aria-labelledby="land-try-label">
-      {#each EXAMPLES as ex (ex.kind)}
-        <li>
-          <span class="land-try-kind">{ex.kind}</span>
-          <a class="land-try-link" href={briefHref(ex.q)}>{ex.q}</a>
-        </li>
-      {/each}
-    </ul>
-  </div>
-  <p class="land-gallery">
-    <a href="{resolve('/(app)/gallery')}/">See precomputed briefings</a> in the gallery.
-  </p>
+    <div class="land-try">
+      <span class="land-try-label" id="land-try-label">Try:</span>
+      <ul class="land-try-list" aria-labelledby="land-try-label">
+        {#each EXAMPLES as ex (ex.kind)}
+          <li>
+            <span class="land-try-kind">{ex.kind}</span>
+            <a class="land-try-link" href={briefHref(ex.q)}>{ex.q}</a>
+          </li>
+        {/each}
+      </ul>
+    </div>
+    <p class="land-gallery">
+      <a href="{resolve('/(app)/gallery')}/">See precomputed briefings</a> in the gallery.
+    </p>
+  {/if}
 </section>
 
 <style>
@@ -216,6 +233,45 @@
     color: var(--ink-secondary);
   }
   .land-gallery a {
+    display: inline-block;
+    min-height: 24px;
+    color: var(--accent);
+    text-underline-offset: 2px;
+  }
+
+  .land-static {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    max-width: 760px;
+  }
+  /* Same weight as the query box's submit button it replaces. */
+  .land-static-gallery {
+    display: inline-flex;
+    align-items: center;
+    min-height: 56px;
+    padding: 0 22px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+    background: var(--ink);
+    color: var(--paper);
+    text-decoration: none;
+  }
+  .land-static-gallery:hover { background: #000; }
+  .land-static-gallery:focus-visible {
+    outline: 3px solid var(--riprap-focus);
+    outline-offset: 2px;
+  }
+  .land-static-note {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: var(--ink-secondary);
+  }
+  .land-static-note a {
     display: inline-block;
     min-height: 24px;
     color: var(--accent);

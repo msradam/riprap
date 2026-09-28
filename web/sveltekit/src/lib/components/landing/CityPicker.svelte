@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
 
   /** CityPicker: one sample address per shipped city. New York City is
    *  the production deployment; the other five are experimental and are
@@ -25,7 +26,7 @@
   ];
 
   function pick(addr: string) {
-    goto(`/q/${encodeURIComponent(addr)}`);
+    goto(resolve('/(app)/q/[queryId]', { queryId: encodeURIComponent(addr) }));
   }
 </script>
 

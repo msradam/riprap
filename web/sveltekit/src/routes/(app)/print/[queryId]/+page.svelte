@@ -9,6 +9,7 @@
   import { formatGeneratedAt } from '$lib/client/gallery';
   import { APP_VERSION } from '$lib/version';
   import { splitBriefing } from '$lib/client/parseBriefing';
+  import { STATIC_SITE, QUICKSTART_URL } from '$lib/staticSite';
 
   let queryId = $derived(page.params.queryId ?? '');
   let snapshot = $state<PrintSnapshot | null>(null);
@@ -82,10 +83,17 @@
       The print view is built from a briefing that has already run in this browser. Nothing
       is stored on a server, so a print link opened in another browser starts empty.
     </p>
-    <p>
-      <a class="empty-action" href={resolve('/(app)/q/[queryId]', { queryId: encodeURIComponent(queryId) })}>Run this briefing</a>
-    </p>
-    <p>When it finishes, choose <strong>print</strong> in the header to come back here.</p>
+    {#if STATIC_SITE}
+      <p>
+        <a class="empty-action" href="{resolve('/(app)/gallery')}/">Open the gallery</a>
+      </p>
+      <p>Choose <strong>Print this briefing</strong> on a gallery entry, or <a href={QUICKSTART_URL}>run locally to ask your own question</a>.</p>
+    {:else}
+      <p>
+        <a class="empty-action" href={resolve('/(app)/q/[queryId]', { queryId: encodeURIComponent(queryId) })}>Run this briefing</a>
+      </p>
+      <p>When it finishes, choose <strong>print</strong> in the header to come back here.</p>
+    {/if}
   </div>
 {:else if snapshot}
   <article class="print-doc">

@@ -4,6 +4,7 @@
   import { briefingState } from '$lib/stores/briefingState.svelte';
   import { deployment } from '$lib/stores/deployment.svelte';
   import { exportBriefingPdf, ExportPdfError } from '$lib/client/exportPdf';
+  import { STATIC_SITE } from '$lib/staticSite';
   import RipMark from './RipMark.svelte';
   import StatusPill from './StatusPill.svelte';
 
@@ -13,7 +14,9 @@
     /** Static snapshot pages (gallery): no /api/* calls, no PDF export. */
     offline?: boolean;
   }
-  let { query = null, onResetCold, offline = false }: Props = $props();
+  let { query = null, onResetCold, offline: offlinePage = false }: Props = $props();
+  // The public static build has no backend on any page.
+  const offline = $derived(offlinePage || STATIC_SITE);
 
   // Fetch the active-deployment descriptor on mount; cheap, cached
   // by the store, returns hazard + city pulled from stones.yaml.
@@ -70,7 +73,7 @@
       {/if}
     </div>
     <div class="app-header-mid">
-      {#if query}
+      {#if query && !offline}
         <button
           type="button"
           class="app-header-query"

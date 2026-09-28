@@ -15,6 +15,7 @@
  * propagate to the UI with no TS edits.
  */
 import type { StoneKey, CardVariant, Citation } from '$lib/types/card';
+import { STATIC_SITE } from '$lib/staticSite';
 
 /** One stone descriptor from /api/pebbles. */
 export interface PebbleStone {
@@ -143,7 +144,7 @@ class PebbleManifestStore {
     // Snapshot whether this is the per-query call vs the boot call.
     // If lockedForQuery is true and name is null, this is the racing
     // boot call from load() that fired before the lock was set — skip.
-    if (name === null && this.lockedForQuery) return;
+    if (STATIC_SITE || (name === null && this.lockedForQuery)) return;
     const url = name
       ? '/api/pebbles?deployment=' + encodeURIComponent(name)
       : '/api/pebbles';

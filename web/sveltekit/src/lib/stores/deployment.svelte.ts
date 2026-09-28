@@ -9,6 +9,8 @@
  * App pages use the active deployment's actual hazard + city.
  */
 
+import { STATIC_SITE } from '$lib/staticSite';
+
 export interface Deployment {
   /** Directory name — `nyc`, `boston`, `chicago`, `heat`, `air`, ... */
   name: string;
@@ -33,7 +35,8 @@ class DeploymentStore {
    *  the per-query lock so a slow boot fetch can't clobber a chip
    *  the SSE handshake already pivoted. */
   async load(): Promise<void> {
-    if (this.loaded || this.lockedForQuery) return;
+    // The public static site has no /api; the header keeps its fallback text.
+    if (STATIC_SITE || this.loaded || this.lockedForQuery) return;
     try {
       const r = await fetch('/api/deployment');
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -73,7 +76,7 @@ class DeploymentStore {
       this.loaded = true;
       return;
     }
-    if (this.current?.name === name && this.loaded) return;
+    if (STATIC_SITE || (this.current?.name === name && this.loaded)) return;
     try {
       const r = await fetch('/api/deployment?deployment=' + encodeURIComponent(name));
       if (!r.ok) throw new Error(`HTTP ${r.status}`);

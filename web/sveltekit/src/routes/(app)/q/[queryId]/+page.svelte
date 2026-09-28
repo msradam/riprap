@@ -134,4 +134,8 @@
   });
 </script>
 
+<svelte:head>
+  <title>Riprap: flood-exposure briefing</title>
+</svelte:head>
+
 <ResultsView {run} {queryText} />
