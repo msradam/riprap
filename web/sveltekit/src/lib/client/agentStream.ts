@@ -119,6 +119,8 @@ export interface FinalResult {
   consulted?: SourceRef[];
   /** Sources available here but not run for this question. */
   not_checked?: SourceRef[];
+  /** Neighbourhood and district runs: the area outline (GeoJSON geometry, EPSG:4326). */
+  area_boundary?: { geojson?: unknown; narrative?: string } | null;
 }
 
 /** Normalise `final.citations` (object keyed by doc_id, or legacy array). */

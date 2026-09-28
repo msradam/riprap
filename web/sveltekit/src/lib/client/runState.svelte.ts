@@ -133,8 +133,10 @@ function countAllNodes(n: TraceNode): number {
 type Rec = Record<string, unknown>;
 
 /** Register assets (subway entrances, schools, NYCHA, hospitals) as map
- *  points, carrying the properties the map click popup shows. */
-function buildRegisterPointsFc(fr: Rec): FeatureCollection {
+ *  points, carrying the properties the map click popup and the map point
+ *  list show. `pid` is unique per point (doc_id is shared by the entrances
+ *  of one station). */
+export function buildRegisterPointsFc(fr: Rec): FeatureCollection {
   const features: GeoJSON.Feature[] = [];
   const add = (
     key: string, listKey: string, kind: string,
@@ -142,15 +144,22 @@ function buildRegisterPointsFc(fr: Rec): FeatureCollection {
   ) => {
     const block = fr[key] as Rec | null | undefined;
     if (!block || !Array.isArray(block[listKey])) return;
-    for (const e of block[listKey] as Rec[]) {
+    (block[listKey] as Rec[]).forEach((e, i) => {
       const la = Number(e[lat]); const lo = Number(e[lon]);
-      if (!Number.isFinite(la) || !Number.isFinite(lo)) continue;
+      if (!Number.isFinite(la) || !Number.isFinite(lo)) return;
       features.push({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [lo, la] },
-        properties: { kind, name: name(e), doc_id: docId(e), inside_sandy_2012: e['inside_sandy_2012'] === true }
+        properties: {
+          pid: `${kind}-${i}`, kind, name: name(e), doc_id: docId(e),
+          distance_m: typeof e['distance_m'] === 'number' ? e['distance_m'] : null,
+          inside_sandy_2012: e['inside_sandy_2012'] === true,
+          // Depth class 0 or missing means outside the scenario.
+          dep_extreme_2080: Number(e['dep_extreme_2080_class'] ?? 0) > 0,
+          dep_moderate_2050: Number(e['dep_moderate_2050_class'] ?? 0) > 0
+        }
       });
-    }
+    });
   };
   add('mta_entrances', 'entrances', 'subway', 'entrance_lat', 'entrance_lon',
     (e) => `${e['station_name'] ?? '?'} (${e['daytime_routes'] ?? '?'})`,
@@ -166,6 +175,45 @@ function buildRegisterPointsFc(fr: Rec): FeatureCollection {
     (e) => String(e['facility_name'] ?? '?'),
     (e) => `nyc_hospital_${e['fac_id'] ?? ''}`);
   return { type: 'FeatureCollection', features };
+}
+
+const POINT_SCENARIOS: [string, string][] = [
+  ['inside_sandy_2012', 'Sandy 2012 extent'],
+  ['dep_extreme_2080', 'DEP 2080 extreme stormwater'],
+  ['dep_moderate_2050', 'DEP 2050 moderate stormwater']
+];
+
+export interface MapPointRow { id: string; name: string; distance: string; scenarios: string }
+
+/** One list row per register point on the map, in map order. */
+export function mapPointRows(fc: FeatureCollection | undefined): MapPointRow[] {
+  return (fc?.features ?? []).map((f) => {
+    const p = f.properties ?? {};
+    const inside = POINT_SCENARIOS.filter(([k]) => p[k] === true).map(([, label]) => label);
+    return {
+      id: String(p.pid),
+      name: String(p.name ?? '?'),
+      distance: typeof p.distance_m === 'number' ? `${Math.round(p.distance_m)} m` : 'distance not given',
+      scenarios: inside.join(', ') || 'none'
+    };
+  });
+}
+
+/** Legend row for the area outline. Shown only when a run returns one. */
+export const AREA_BOUNDARY_LEGEND = {
+  label: 'Area boundary (NYC DCP 2020 NTAs)',
+  source: 'NYC Department of City Planning'
+};
+
+/** The area outline from a neighbourhood or district run, if the final
+ *  payload carries a usable Polygon or MultiPolygon. */
+export function areaBoundaryGeometry(
+  f: FinalResult | null | undefined
+): GeoJSON.Polygon | GeoJSON.MultiPolygon | undefined {
+  const g = f?.area_boundary?.geojson as { type?: unknown; coordinates?: unknown } | null | undefined;
+  if ((g?.type === 'Polygon' || g?.type === 'MultiPolygon') && Array.isArray(g.coordinates))
+    return g as GeoJSON.Polygon | GeoJSON.MultiPolygon;
+  return undefined;
 }
 
 function polygons(v: unknown): FeatureCollection | undefined {
@@ -230,6 +278,8 @@ export class RunState {
   });
 
   briefing = $derived(briefingFromFinal(this.finalResult));
+  areaBoundary = $derived(areaBoundaryGeometry(this.finalResult));
+  mapPoints = $derived(mapPointRows(this.registerPointsFc));
 
   /** The place the backend resolved, in its own words, so a reader can
    *  see at once when the wrong place was looked up. A closest-match

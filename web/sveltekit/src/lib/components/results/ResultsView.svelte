@@ -35,6 +35,9 @@
   let density = $state<Density>('comfortable');
   let provenanceMode = $state<ProvenanceMode>('smart');
   let active = $state({ empirical: true, modeled: true, synthetic: true, proxy: true });
+  /** pid of the register point selected on the map or in its list; a new
+   *  run starts with none. */
+  let selectedPoint = $derived.by<string | null>(() => (void run, null));
   // ?grammar=1 surfaces the dev-only card-grammar catalog. Client only:
   // prerendering forbids reading url.searchParams.
   let showGrammar = $derived(browser && page.url.searchParams.get('grammar') === '1');
@@ -309,14 +312,38 @@
                 registerPoints={run.registerPointsFc}
                 terramindLulc={run.terramindLulcFc}
                 terramindBuildings={run.terramindBuildingsFc}
+                areaBoundary={run.areaBoundary}
+                {selectedPoint}
+                onSelectPoint={(pid) => (selectedPoint = pid)}
                 {linkedKey}
               />
               <MapLegend
                 {active}
                 featureCounts={run.mapFeatureCounts}
                 onToggle={(k) => (active = { ...active, [k]: !active[k] })}
+                areaBoundary={!!run.areaBoundary}
               />
             </div>
+            {#if run.address && run.mapPoints.length}
+              <details class="sources-col map-points">
+                <summary class="sources-head">Map points as a list ({run.mapPoints.length})</summary>
+                <ul class="map-points-list">
+                  {#each run.mapPoints as row (row.id)}
+                    <li>
+                      <button
+                        type="button"
+                        class={['map-point', selectedPoint === row.id && 'is-selected']}
+                        aria-pressed={selectedPoint === row.id}
+                        onclick={() => (selectedPoint = row.id)}
+                      >
+                        <span class="map-point-name">{row.name}</span>
+                        <span class="map-point-meta">{row.distance}; scenarios: {row.scenarios}</span>
+                      </button>
+                    </li>
+                  {/each}
+                </ul>
+              </details>
+            {/if}
           {/if}
           <p class="map-text-note">Everything shown on the map is also listed in the briefing and the citations.</p>
         </aside>
@@ -426,6 +453,51 @@
   }
   .map-skip + .region-head-meta {
     margin-left: 12px;
+  }
+  .map-points {
+    margin-top: 8px;
+  }
+  .map-points-list {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  .map-point {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 24px;
+    padding: 4px 8px;
+    border: 0;
+    border-left: 3px solid transparent;
+    background: none;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.45;
+    text-align: left;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .map-point:hover {
+    background: var(--paper-deep);
+  }
+  .map-point:focus-visible {
+    outline: 3px solid var(--riprap-focus);
+    outline-offset: -3px;
+  }
+  .map-point.is-selected {
+    border-left-color: var(--accent);
+    background: var(--paper-deep);
+  }
+  .map-point-name {
+    font-weight: 600;
+  }
+  .map-point-meta {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-secondary);
   }
   .map-text-note {
     margin: 8px 0 0;

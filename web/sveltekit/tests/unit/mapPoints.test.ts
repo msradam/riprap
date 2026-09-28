@@ -1,0 +1,49 @@
+/**
+ * The map point list and the map's register layer are built from the same
+ * FeatureCollection, and the area outline is read from `final.area_boundary`.
+ */
+import { describe, it, expect } from 'vitest';
+import { areaBoundaryGeometry, buildRegisterPointsFc, mapPointRows } from '$lib/client/runState.svelte';
+import type { FinalResult } from '$lib/client/agentStream';
+
+describe('mapPointRows', () => {
+  const fc = buildRegisterPointsFc({
+    mta_entrances: {
+      entrances: [
+        { station_name: 'Carroll St', daytime_routes: 'F G', station_id: 'F21', entrance_lat: 40.68,
+          entrance_lon: -73.99, distance_m: 212.4, inside_sandy_2012: true, dep_extreme_2080_class: 2,
+          dep_moderate_2050_class: 0 },
+        { station_name: 'Carroll St', daytime_routes: 'F G', station_id: 'F21', entrance_lat: 40.681,
+          entrance_lon: -73.991, distance_m: 250, inside_sandy_2012: false, dep_extreme_2080_class: null }
+      ]
+    },
+    doh_hospitals: { hospitals: [{ facility_name: 'No coords' }] }
+  });
+
+  it('gives one row per mapped point, with a unique id, distance and scenarios', () => {
+    expect(mapPointRows(fc)).toEqual([
+      { id: 'subway-0', name: 'Carroll St (F G)', distance: '212 m',
+        scenarios: 'Sandy 2012 extent, DEP 2080 extreme stormwater' },
+      { id: 'subway-1', name: 'Carroll St (F G)', distance: '250 m', scenarios: 'none' }
+    ]);
+  });
+
+  it('is empty when there are no points', () => {
+    expect(mapPointRows(undefined)).toEqual([]);
+  });
+});
+
+describe('areaBoundaryGeometry', () => {
+  const ring = [[-74, 40.6], [-73.9, 40.6], [-73.9, 40.7], [-74, 40.6]];
+
+  it('returns a Polygon or MultiPolygon geometry', () => {
+    const f = { paragraph: '', area_boundary: { geojson: { type: 'Polygon', coordinates: [ring] } } } as FinalResult;
+    expect(areaBoundaryGeometry(f)?.type).toBe('Polygon');
+  });
+
+  it('ignores address runs and malformed geometry', () => {
+    expect(areaBoundaryGeometry({ paragraph: '' })).toBeUndefined();
+    const point = { paragraph: '', area_boundary: { geojson: { type: 'Point', coordinates: [-74, 40.6] } } };
+    expect(areaBoundaryGeometry(point as FinalResult)).toBeUndefined();
+  });
+});

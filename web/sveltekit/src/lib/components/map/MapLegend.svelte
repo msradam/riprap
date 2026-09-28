@@ -5,6 +5,7 @@
   import type { StoneKey } from '$lib/types/card';
   import { STONE_META, STONE_ORDER } from '$lib/types/card';
   import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
+  import { AREA_BOUNDARY_LEGEND } from '$lib/client/runState.svelte';
 
   /** v0.4.5 §7 — LAYERS panel restructured to mirror Findings Stones.
    *
@@ -26,9 +27,11 @@
      *  shown regardless of data-driven counts. */
     featureCounts?: Record<MasterKey, number> | null;
     onToggle: (key: MasterKey) => void;
+    /** A neighbourhood or district outline is on the map. */
+    areaBoundary?: boolean;
   }
 
-  let { active, featureCounts, onToggle }: Props = $props();
+  let { active, featureCounts, onToggle, areaBoundary = false }: Props = $props();
 
   type LayerRow = {
     label: string;
@@ -62,6 +65,9 @@
           wired: true,
         });
       }
+    }
+    if (areaBoundary) {
+      empty.cornerstone.unshift({ ...AREA_BOUNDARY_LEGEND, tier: 'empirical', wired: true });
     }
     return empty;
   });

@@ -131,7 +131,7 @@ def test_focus_floor_adds_what_an_analyst_checks():
     now = {**past, "intent": "live_now", "focus": {"time_frame": "now", "assets": []}}
     assert set(select_pebbles(now, NYC)) == {"nws_alerts", "nws_obs", "floodnet", "noaa_tides"}
     area = {**past, "intent": "neighborhood", "focus": {"time_frame": "past", "assets": []}}
-    assert set(select_pebbles(area, NYC)) == {"sandy_nta", "dep_moderate_2050_nta", "nyc311_nta"}
+    assert set(select_pebbles(area, NYC)) == {"area_boundary", "sandy_nta", "dep_moderate_2050_nta", "nyc311_nta"}
 
 
 def test_empty_section_is_hidden_when_the_answer_covers_its_stone():

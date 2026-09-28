@@ -1,0 +1,40 @@
+id: area_boundary
+type: baked
+title: Area boundary (2020 Neighborhood Tabulation Areas)
+answers: "the outline of the neighborhood or community district the briefing covers"
+stone: cornerstone
+tier: empirical
+adapter: python_call
+
+# Neighbourhood and district runs draw this outline on the map instead of
+# a single point (refactor 5).
+spatial:
+  scope: polygon
+  crs: EPSG:4326
+
+config:
+  module: app.areas.nta_evidence
+  function: boundary
+  args:
+    - {source: polygon_4326}
+  on_none: offline
+
+provenance:
+  date_modified: null
+  retrieved_at: 2026-07-11
+  source_name: NYC Department of City Planning, 2020 Neighborhood Tabulation Areas
+  source_url: https://data.cityofnewyork.us/City-Government/2020-Neighborhood-Tabulation-Areas-NTAs-/9nt8-h7nd
+  license: NYC Open Data Terms of Use
+  doc_id: area_boundary
+  citation: NYC DCP 2020 Neighborhood Tabulation Areas (9nt8-h7nd); a community district is the union of its NTAs
+
+narration:
+  short: The outline of the area this briefing covers.
+  template: "{narrative}"
+
+display:
+  order: 0
+  kind: text
+
+fallback:
+  on_offline: skip

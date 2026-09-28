@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   // Loaded with this component (see LazyMap), not in the global sheet.
   import 'maplibre-gl/dist/maplibre-gl.css';
-  import type { Map as MapLibreMap, GeoJSONSource } from 'maplibre-gl';
+  import type { Map as MapLibreMap, GeoJSONSource, Popup as PopupT } from 'maplibre-gl';
   import { POSITRON_NO_LABELS } from './baseStyle';
   import { registerSynStripe } from './synStripe';
   import { MapboxOverlay } from '@deck.gl/mapbox';
@@ -65,6 +65,13 @@
      *  `is-link-{key}` so existing layers can be visually emphasised
      *  via scoped CSS. */
     linkedKey?: string | null;
+    /** Neighbourhood or district outline. When set, the map fits to it
+     *  and hides the centroid pin, which is not an address. */
+    areaBoundary?: GeoJSON.Polygon | GeoJSON.MultiPolygon;
+    /** `pid` of the selected register point; the list below the map and
+     *  a click on the map both set it through `onSelectPoint`. */
+    selectedPoint?: string | null;
+    onSelectPoint?: (pid: string | null) => void;
   }
 
   let {
@@ -81,6 +88,9 @@
     idaHwm,
     activeLayers = { empirical: true, modeled: true, synthetic: true, proxy: true },
     linkedKey = null,
+    areaBoundary,
+    selectedPoint = null,
+    onSelectPoint,
   }: Props = $props();
 
   let container: HTMLDivElement | null = $state(null);
@@ -89,6 +99,66 @@
   let ready = $state(false);
 
   const EMPTY: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
+
+  function boundaryFc(): GeoJSON.FeatureCollection {
+    return areaBoundary
+      ? { type: 'FeatureCollection', features: [{ type: 'Feature', geometry: areaBoundary, properties: {} }] }
+      : EMPTY;
+  }
+
+  /** [[west, south], [east, north]] of a 2D Polygon or MultiPolygon. */
+  function boundsOf(g: GeoJSON.Polygon | GeoJSON.MultiPolygon): [[number, number], [number, number]] {
+    const xy = (g.coordinates as unknown[]).flat(Infinity) as number[];
+    let [w, s, e, n] = [Infinity, Infinity, -Infinity, -Infinity];
+    for (let i = 0; i + 1 < xy.length; i += 2) {
+      w = Math.min(w, xy[i]); e = Math.max(e, xy[i]);
+      s = Math.min(s, xy[i + 1]); n = Math.max(n, xy[i + 1]);
+    }
+    return [[w, s], [e, n]];
+  }
+
+  let PopupCtor: typeof PopupT | null = null;
+  let popup: PopupT | null = null;
+  /** pid of the register point whose popup is open. */
+  let shownPoint: string | null = null;
+
+  function registerPopupHtml(p: Record<string, unknown>): string {
+    const name = String(p.name ?? '?');
+    const kind = String(p.kind ?? '?');
+    const inside = p.inside_sandy_2012 === true || p.inside_sandy_2012 === 'true';
+    const docId = String(p.doc_id ?? '');
+    return `
+          <div style="font-family: 'Sofia Sans', system-ui; font-size: 12px;">
+            <div style="font-weight: 600; color: #0F172A;">${name}</div>
+            <div style="color: #6B6B6B; font-size: 11px; margin-top: 2px;">${kind}</div>
+            <div style="margin-top: 6px;">
+              <span style="font-family: 'Overpass Mono', monospace; font-size: 10.5px; color: ${inside ? '#0B5394' : '#6B6B6B'};">
+                inside_sandy_2012=${inside}
+              </span>
+            </div>
+            ${docId ? `<div style="margin-top: 4px; font-family: 'Overpass Mono', monospace; font-size: 10.5px; color: #005EA2;">[${docId}]</div>` : ''}
+          </div>`;
+  }
+
+  /** Open the register point's popup, replacing any open one. Closing it
+   *  (button, map click, Escape) clears the selection. */
+  function showRegisterPoint(f: GeoJSON.Feature) {
+    if (!map || !PopupCtor) return;
+    const p = (f.properties ?? {}) as Record<string, unknown>;
+    const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
+    const next = new PopupCtor({ closeButton: true, offset: 12 }).setLngLat(coords).setHTML(registerPopupHtml(p));
+    const prev = popup;
+    popup = next;
+    shownPoint = String(p.pid ?? '');
+    prev?.remove();
+    next.on('close', () => {
+      if (popup !== next) return;
+      popup = null;
+      shownPoint = null;
+      onSelectPoint?.(null);
+    });
+    next.addTo(map);
+  }
 
   function setSourceData(id: string, fc: GeoJSON.FeatureCollection | undefined) {
     if (!map || !ready) return;
@@ -202,6 +272,30 @@
   $effect(() => { setSourceData('terramind-lulc', terramindLulc); });
   $effect(() => { setSourceData('terramind-buildings', terramindBuildings); });
   $effect(() => { setSourceData('prithvi-live', prithviLive); });
+  $effect(() => { setSourceData('area-boundary', boundaryFc()); });
+
+  // `ready` is read first so these run once the style has loaded.
+  $effect(() => {
+    if (!ready || !map) return;
+    for (const id of ['queried-halo', 'queried-pin', 'queried-label']) setLayerVisibility(id, !areaBoundary);
+    if (!areaBoundary) return;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    map.fitBounds(boundsOf(areaBoundary), { padding: 24, animate: !reducedMotion });
+  });
+
+  // A row in the map point list was chosen: bring the point into view and
+  // open the same popup a click on it opens.
+  $effect(() => {
+    const pid = selectedPoint;
+    if (!ready || !map || !pid || pid === shownPoint) return;
+    const f = registerPoints?.features.find((x) => x.properties?.pid === pid);
+    if (!f) return;
+    const center = (f.geometry as GeoJSON.Point).coordinates as [number, number];
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) map.jumpTo({ center });
+    else map.easeTo({ center });
+    showRegisterPoint(f);
+  });
 
   $effect(() => {
     setLayerVisibility('tier-synthetic-fill', activeLayers.synthetic);
@@ -212,6 +306,8 @@
     setLayerVisibility('terramind-buildings-line', activeLayers.synthetic);
     setLayerVisibility('prithvi-live-fill', activeLayers.modeled);
     setLayerVisibility('prithvi-live-line', activeLayers.modeled);
+    setLayerVisibility('area-boundary-fill', activeLayers.empirical);
+    setLayerVisibility('area-boundary-line', activeLayers.empirical);
   });
 
   // Sandy / DEP / Ida HWM / 311 now live entirely in deck.gl — rebuild
@@ -237,6 +333,7 @@
   onMount(async () => {
     if (!container) return;
     const maplibre = await import('maplibre-gl');
+    PopupCtor = maplibre.Popup;
     map = new maplibre.Map({
       container,
       style: POSITRON_NO_LABELS,
@@ -269,6 +366,7 @@
       map.addSource('terramind-lulc', { type: 'geojson', data: terramindLulc ?? fcEmpty() });
       map.addSource('terramind-buildings', { type: 'geojson', data: terramindBuildings ?? fcEmpty() });
       map.addSource('prithvi-live', { type: 'geojson', data: prithviLive ?? fcEmpty() });
+      map.addSource('area-boundary', { type: 'geojson', data: boundaryFc() });
       map.addSource('queried-address', {
         type: 'geojson',
         data: {
@@ -327,6 +425,17 @@
       map.addLayer({
         id: 'prithvi-live-line', type: 'line', source: 'prithvi-live',
         paint: { 'line-color': '#0D9488', 'line-width': 1.0, 'line-opacity': 0.55 }
+      });
+
+      // Neighbourhood / district outline (NYC DCP 2020 NTAs), drawn in
+      // the queried-address blue because it stands in for that pin.
+      map.addLayer({
+        id: 'area-boundary-fill', type: 'fill', source: 'area-boundary',
+        paint: { 'fill-color': '#005EA2', 'fill-opacity': 0.05 }
+      });
+      map.addLayer({
+        id: 'area-boundary-line', type: 'line', source: 'area-boundary',
+        paint: { 'line-color': '#005EA2', 'line-width': 2, 'line-opacity': 0.9 }
       });
 
       // Register-asset polygons (NYCHA developments only). Fill graded
@@ -390,25 +499,8 @@
       map.on('click', 'register-points-circle', (e) => {
         if (!map || !e.features?.length) return;
         const f = e.features[0];
-        const p = (f.properties ?? {}) as Record<string, unknown>;
-        const name = String(p.name ?? '?');
-        const kind = String(p.kind ?? '?');
-        const inside = p.inside_sandy_2012 === true || p.inside_sandy_2012 === 'true';
-        const docId = String(p.doc_id ?? '');
-        const html = `
-          <div style="font-family: 'Sofia Sans', system-ui; font-size: 12px;">
-            <div style="font-weight: 600; color: #0F172A;">${name}</div>
-            <div style="color: #6B6B6B; font-size: 11px; margin-top: 2px;">${kind}</div>
-            <div style="margin-top: 6px;">
-              <span style="font-family: 'Overpass Mono', monospace; font-size: 10.5px; color: ${inside ? '#0B5394' : '#6B6B6B'};">
-                inside_sandy_2012=${inside}
-              </span>
-            </div>
-            ${docId ? `<div style="margin-top: 4px; font-family: 'Overpass Mono', monospace; font-size: 10.5px; color: #005EA2;">[${docId}]</div>` : ''}
-          </div>`;
-        const popup = new maplibre.Popup({ closeButton: true, offset: 12 });
-        const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
-        popup.setLngLat(coords).setHTML(html).addTo(map);
+        showRegisterPoint(f);
+        onSelectPoint?.(shownPoint);
       });
 
       // queried-address pin: federal-blue halo + dot, dominant

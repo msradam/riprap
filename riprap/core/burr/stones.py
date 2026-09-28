@@ -41,8 +41,8 @@ FLOOR = {
     "single_address": ("fema_nfhl", "sandy", "dep_moderate_2050"),
     "compare": ("fema_nfhl", "sandy", "dep_moderate_2050"),
     "live_now": ("nws_alerts",),
-    "neighborhood": ("sandy_nta", "dep_moderate_2050_nta"),
-    "development_check": ("sandy_nta", "dep_moderate_2050_nta", "dob_permits_nta"),
+    "neighborhood": ("area_boundary", "sandy_nta", "dep_moderate_2050_nta"),
+    "development_check": ("area_boundary", "sandy_nta", "dep_moderate_2050_nta", "dob_permits_nta"),
 }
 
 # What an analyst checks for a question's focus, whatever the planner

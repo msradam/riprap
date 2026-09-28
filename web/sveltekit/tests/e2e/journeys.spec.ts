@@ -160,6 +160,18 @@ test.describe('journeys', () => {
     await noAxeViolations(page, 'failed source');
   });
 
+  test('10. district question in no-LLM mode resolves the named district', async ({ page }) => {
+    // Refactor 5: the no-LLM resolver used to send any question naming a
+    // borough to that borough's first neighbourhood (Astoria).
+    test.setTimeout(240_000);
+    await ask(page, 'How many flood complaints has Queens Community Board 12 had?');
+    const place = page.locator('.resolved-place');
+    await expect(place).toBeVisible({ timeout: 200_000 });
+    await expect(place).toContainText('QN12');
+    await expect(place).not.toContainText('Astoria');
+    await noAxeViolations(page, 'district briefing');
+  });
+
   test('9. optional: live LLM question', async ({ page }) => {
     test.skip(!process.env.RIPRAP_E2E_LLM, 'set RIPRAP_E2E_LLM=1 with an LLM-backed server');
     test.setTimeout(360_000);

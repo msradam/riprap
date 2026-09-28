@@ -61,3 +61,16 @@ def permits(polygon) -> dict:
         "inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise)."
     )
     return v
+
+
+def boundary(polygon) -> dict:
+    """The resolved area's outline for the map, simplified to about 20 m,
+    as GeoJSON. A community district is the union of its 2020 NTAs."""
+    from shapely.geometry import mapping
+
+    return {
+        "geojson": mapping(polygon.simplify(0.0002, preserve_topology=True)),
+        "narrative": ("The outline on the map is this area's boundary from the NYC Department of City "
+                      "Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as "
+                      "the union of its tabulation areas, which approximates the district."),
+    }
