@@ -144,7 +144,30 @@ def test_empty_section_is_hidden_when_the_answer_covers_its_stone():
              "numbers": []}]
     text = _render(kept, docs, ["Hazard Reader", "Live Observer"], question="Did Sandy flood it?")
     assert "**Hazard Reader.**" not in text  # covered by the answer
-    assert "**Live Observer.**\nNo grounded evidence" in text  # not covered: the gap stays visible
+    # Refactor 6: a Stone with facts but no claim is hidden too; its facts are in the evidence cards.
+    assert "**Live Observer.**" not in text and "No grounded evidence" not in text
+
+
+def test_a_stone_whose_sources_returned_nothing_says_what_it_consulted():
+    from riprap.core.burr.synthesis import Doc
+
+    docs = [Doc("sandy_inundation", "Hazard Reader", "Inside the Sandy footprint.", False)]
+    kept = [{"section": "answer", "text": "Inside the Sandy footprint", "doc_ids": ["sandy_inundation"], "numbers": []}]
+    text = _render(kept, docs, ["Hazard Reader", "Live Observer"], question="Did Sandy flood it?",
+                   empty={"Live Observer": ["FloodNet sensors", "NYC 311 complaints"]})
+    assert "**Live Observer.**\nConsulted FloodNet sensors and NYC 311 complaints; they returned nothing" in text
+
+
+def test_a_later_claim_that_restates_the_answer_is_left_out():
+    from riprap.core.burr.synthesis import Doc
+
+    fact = "4376 complaints inside this area in the last 3 years: 568 street flooding."
+    docs = [Doc("nyc311_nta", "Live Observer", fact, False)]
+    kept = [{"section": "answer", "text": fact, "doc_ids": ["nyc311_nta"], "numbers": []},
+            {"section": "Live Observer", "text": "QN12 has had 568 street flooding complaints in the past 3 years",
+             "doc_ids": ["nyc311_nta"], "numbers": []}]
+    text = _render(kept, docs, ["Live Observer"], question="How many street flooding complaints?")
+    assert text.count("568") == 1 and "**Live Observer.**" not in text
 
 
 def test_a_named_future_day_is_refused_but_a_past_day_is_not():

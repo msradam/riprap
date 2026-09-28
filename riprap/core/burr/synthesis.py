@@ -256,16 +256,33 @@ def _user_prompt(docs: list[Doc], sections: list[str], question: str = "", focus
     return "Documents, grouped by section:\n\n" + "\n".join(lines) + "\nReturn the claims as JSON."
 
 
+def _and(items: list[str]) -> str:
+    return items[0] if len(items) == 1 else f"{', '.join(items[:-1])} and {items[-1]}"
+
+
 def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: str = "",
-            lead: str = "") -> str:
+            lead: str = "", empty: dict[str, list[str]] | None = None) -> str:
     """Scope header, then the answer (when a question was asked), then one
-    section per Stone that ran, then the footer. Only verified claims."""
+    section per Stone that ran, then the footer. Only verified claims.
+
+    A question page says each thing once: a claim that only restates the
+    answer (the same sources, no number the answer lacks) is left out, and
+    a Stone section left with nothing is hidden, since its facts are in the
+    evidence cards. `empty` maps a Stone heading to the sources it consulted
+    that returned nothing; such a Stone says so instead of the generic line."""
     experimental = {d.doc_id for d in docs if d.experimental}
+    answer = [c for c in kept if c["section"] == ANSWER_SECTION]
+    answer_ids = {i for c in answer for i in c["doc_ids"]}
+    answer_nums = set(numbers_in(" ".join(c["text"] for c in answer)))
+
+    def restates(c: dict) -> bool:
+        return (bool(answer) and c["section"] != ANSWER_SECTION and set(c["doc_ids"]) <= answer_ids
+                and set(numbers_in(c["text"])) <= answer_nums)
 
     def sentences(sec: str) -> str:
         out = []
         for c in kept:
-            if c["section"] != sec:
+            if c["section"] != sec or restates(c):
                 continue
             text = c["text"].rstrip(". ")
             if any(i in experimental for i in c["doc_ids"]) and "experimental" not in text.lower():
@@ -280,11 +297,14 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
     if question:
         body = sentences(ANSWER_SECTION)
         parts.append("**Answer.**\n" + ((f"{lead} " if lead else "") + body if body else CANNOT_ANSWER))
-    in_answer = {i for c in kept if c["section"] == ANSWER_SECTION for i in c["doc_ids"]}
     for sec in sections:
         body = sentences(sec)
-        if not body and question and {d.doc_id for d in docs if d.section == sec} & in_answer:
-            continue  # the answer covers this Stone; an empty section would only say so
+        if not body and question and sec in (empty or {}):
+            parts.append(f"**{sec}.**\nConsulted {_and(empty[sec])}; "
+                         f"{'it' if len(empty[sec]) == 1 else 'they'} returned nothing for this place.")
+            continue
+        if not body and question:
+            continue  # its facts are in the answer or the evidence cards; the section would only say so
         parts.append(f"**{sec}.**\n" + (body or NO_EVIDENCE_LINE))
     parts.append(NON_SCOPE_FOOTER)
     return "\n\n".join(parts)
@@ -298,14 +318,25 @@ def synthesize(state) -> dict:
         paragraph, _ = compose_briefing(state)
         return {"paragraph": paragraph, "citations": {},
                 "grounding": {"tier": "llm", "claims": [], "dropped_claims": [], "attempts": 0}}
-    docs, items, _ = _documents(state)
+    docs, items, stones = _documents(state)
     if not docs:
         return {"paragraph": "No grounded data available for this address.", "citations": {},
                 "grounding": {"tier": "llm", "claims": [], "dropped_claims": [], "attempts": 0}}
     plan = state.get("plan") or {}
     question, focus = plan.get("question") or "", plan.get("focus")
     mode = answer_mode() if question else None
-    sections = list(dict.fromkeys(d.section for d in docs))
+    # Stones whose consulted sources all returned nothing: named on a question page.
+    empty: dict[str, list[str]] = {}
+    if question and stones is not None:
+        heading = {s.id: evidence.stone_heading(s).rstrip(".") for s in stones.all() if s.id != "capstone"}
+        with_docs = {d.section for d in docs}
+        for e in state.get("consulted") or []:
+            h = heading.get(e.get("stone"))
+            if h and h not in with_docs:
+                empty.setdefault(h, []).append(e["title"])
+    order = list(heading.values()) if empty else []
+    sections = list(dict.fromkeys([*(h for h in order if h in empty or h in {d.section for d in docs}),
+                                   *(d.section for d in docs)]))
     # Structured pebble values by doc_id, for the headline figure checks.
     values = {e.doc_id: state.get(e.pebble_id) for e in items if isinstance(state.get(e.pebble_id), dict)}
     texts: dict[str, str] = {}
@@ -394,7 +425,8 @@ def synthesize(state) -> dict:
     checks = _checks_run(mode, entail_info)
     cited = {i for c in kept for i in c["doc_ids"]}
     return {
-        "paragraph": _render(kept, docs, sections, question, lead_phrase) + f"\n\nChecks run: {'; '.join(checks)}.",
+        "paragraph": _render(kept, docs, sections, question, lead_phrase, empty)
+        + f"\n\nChecks run: {'; '.join(checks)}.",
         "citations": {k: v for k, v in evidence.citations(items).items() if k in cited},
         "grounding": {"tier": "llm", "model": model, "attempts": attempts,
                       "claims": kept, "dropped_claims": dropped,
