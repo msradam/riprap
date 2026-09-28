@@ -1,5 +1,9 @@
 # Load tests
 
+The scripts target endpoints the current app serves. `RESULTS.md` was
+recorded on 2026-05-16 against an earlier pipeline (Granian, Mellea
+retries) and is kept as a historical record.
+
 Reproducible load-test scripts (k6) for the Riprap HTTP API. Three
 scenarios cover the three classes of endpoint we care about:
 
@@ -15,21 +19,17 @@ scenarios cover the three classes of endpoint we care about:
 # 1. Install k6
 brew install k6                  # macOS
 
-# 2. Boot Riprap with Granian
-RIPRAP_LLM_PRIMARY=ollama \
-RIPRAP_USE_BURR_APP=1 \
-RIPRAP_MELLEA_MAX_ATTEMPTS=4 \
-.venv/bin/granian --interface asgi \
-  --port 8765 --host 127.0.0.1 --workers 1 \
-  web.main:app
+# 2. Boot Riprap (no LLM; set RIPRAP_LLM_BASE_URL and RIPRAP_LLM_MODEL
+#    to load the LLM path, which agent_concurrency.js is meant to measure)
+uv run uvicorn web.main:app --host 127.0.0.1 --port 8765
 
 # 3. Run the tests
-k6 run load/k6/baseline.js
-k6 run load/k6/agent_concurrency.js
-k6 run load/k6/sse_streaming.js
+k6 run tests/load/k6/baseline.js
+k6 run tests/load/k6/agent_concurrency.js
+k6 run tests/load/k6/sse_streaming.js
 
 # Override base URL for remote testing
-k6 run -e BASE=https://your.host load/k6/baseline.js
+k6 run -e BASE=https://your.host tests/load/k6/baseline.js
 ```
 
 ## Where the curve bends

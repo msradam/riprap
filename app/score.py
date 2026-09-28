@@ -304,7 +304,7 @@ def tier(score: int) -> int:
     return 0
 
 
-# Legacy WEIGHTS map kept so riprap.py and any external consumer
+# Legacy WEIGHTS map kept so riprap-register (riprap/cli/register.py) and any external consumer
 # continue to import without breaking. The new composite() is the
 # authoritative scorer.
 WEIGHTS = {

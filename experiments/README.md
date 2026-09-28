@@ -14,7 +14,7 @@ upstream.**
   ledger (`shared/licenses.md`).
 - `.cache/` directories inside experiments hold downloaded HF models
   and cached HTTP responses; gitignored.
-- `requirements-experiments.txt` (top-level) is the experiment-only
+- `experiments/requirements.txt` is the experiment-only
   dependency set. Production `requirements.txt` is **not** modified.
 - All experiments call into Riprap's existing LLM abstraction via
   `from app import llm` (or `shared.backends`). Experiments do not

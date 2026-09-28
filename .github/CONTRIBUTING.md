@@ -13,11 +13,11 @@ PRs welcome. Three high-leverage paths in:
 - **Port your city.** Fork the closest existing `deployments/<city>/`
   and replace the data sources. Most US cities are a manifest directory
   away because they expose a Socrata or CKAN open-data portal. See
-  [`docs/PORT-YOUR-CITY.md`](docs/PORT-YOUR-CITY.md) for the
+  [`docs/PORT-YOUR-CITY.md`](../docs/PORT-YOUR-CITY.md) for the
   step-by-step using Boston as the worked example.
 - **Bring your own data.** Drop a YAML manifest into `${CWD}/.riprap/`
   or point `RIPRAP_EXTRA_MANIFESTS` at it. No fork needed. See
-  [`docs/byod.md`](docs/byod.md).
+  [`docs/byod.md`](../docs/byod.md).
 - **Write a new adapter.** If your data source isn't covered by
   `socrata_records`, `ckan_records`, `csv_points`, `baked_vector`,
   `rest_json`, or `python_call`, drop a new adapter into
@@ -26,7 +26,7 @@ PRs welcome. Three high-leverage paths in:
 ## Quickstart
 
 Requires [Git LFS](https://git-lfs.com): `data/` (flood layers, about
-150 MB of GeoJSON/raster) and `corpus/` (policy PDFs) are LFS-tracked. Without
+150 MB of GeoJSON/raster) and `deployments/nyc/corpus/` (policy PDFs) are LFS-tracked. Without
 it, `git clone` silently checks out small text pointer files instead of
 the real data, and the app crashes on startup trying to parse one as
 GeoJSON (`DataSourceError: not recognized as being in a supported file
@@ -76,8 +76,8 @@ uv run uvicorn web.main:app --host 127.0.0.1 --port 7860
 ```
 
 To work on LLM mode, point it at any OpenAI-compatible endpoint, such as
-local Ollama (see [`docs/DEPLOY.md`](docs/DEPLOY.md) and
-[`docs/GROUNDING.md`](docs/GROUNDING.md)):
+local Ollama (see [`docs/DEPLOY.md`](../docs/DEPLOY.md) and
+[`docs/GROUNDING.md`](../docs/GROUNDING.md)):
 
 ```bash
 ollama pull granite4:micro
@@ -128,6 +128,7 @@ riprap/core/
 └── llm.py                 OpenAI-compatible client, tier selection
 
 riprap/mcp/server.py       MCP server (stdio or --http)
+riprap/cli/register.py     riprap-register: offline schools exposure register
 
 app/
 ├── context/, flood_layers/, live/, assets/, areas/
@@ -138,7 +139,8 @@ app/
 ├── rag.py                 Policy-corpus retrieval (query embedding)
 └── score.py               Register tier rubric (offline builders only)
 
-deployments/<city>/        Manifests, stones.yaml, data
+deployments/<city>/        Manifests, stones.yaml, data (NYC also corpus/, the policy PDFs)
+deploy/                    Dockerfile and the optional Modal host (modal_app.py)
 web/main.py                FastAPI: JSON, SSE, district, 311, layers, PDF
 web/sveltekit/             UI and static gallery (build committed)
 
@@ -153,7 +155,7 @@ scripts/
 
 experiments/               Reproduction recipes for the NYC fine-tunes
 docs/                      See docs/INDEX.md
-tests/                     pytest suite
+tests/                     pytest suite; tests/load/ has k6 load scripts
 ```
 
 ## Style

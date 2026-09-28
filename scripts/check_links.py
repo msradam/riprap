@@ -1,6 +1,11 @@
 """Check every source link in the deployment manifests with a real request.
 
     uv run python scripts/check_links.py [deployment ...] [--json out.json]
+    uv run python scripts/check_links.py --local
+
+--local needs no network: it checks that every relative link in README.md,
+docs/ and .github/ (markdown links and images) points at a file on disk,
+and exits 1 listing the ones that do not.
 
 Collects each manifest's provenance.source_url and any URL in its
 provenance.citation, requests each once (GET, redirects followed, no
@@ -43,6 +48,25 @@ def links(deployments: list[str]) -> list[tuple[str, str, str]]:
     return out
 
 
+_MD_LINK = re.compile(r"!?\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+
+
+def local_links() -> int:
+    files = [ROOT / "README.md", *sorted((ROOT / "docs").rglob("*.md")), *sorted((ROOT / ".github").rglob("*.md"))]
+    bad = 0
+    for f in files:
+        for n, line in enumerate(f.read_text().splitlines(), 1):
+            for target in _MD_LINK.findall(line):
+                path = target.split("#")[0]
+                if not path or re.match(r"[a-z][a-z0-9+.-]*:", path):
+                    continue  # an anchor, or http:, https:, mailto:
+                if not (f.parent / path).exists():
+                    bad += 1
+                    print(f"missing  {f.relative_to(ROOT)}:{n}  {target}")
+    print(f"{len(files)} files checked, {bad} broken relative links")
+    return 1 if bad else 0
+
+
 def status(client: httpx.Client, url: str) -> str:
     try:
         with client.stream("GET", url) as r:
@@ -53,6 +77,8 @@ def status(client: httpx.Client, url: str) -> str:
 
 def main() -> int:
     args = sys.argv[1:]
+    if "--local" in args:
+        return local_links()
     out_json = args[args.index("--json") + 1] if "--json" in args else None
     deps = [a for a in args if not a.startswith("--") and a != out_json]
     rows, bad = [], 0

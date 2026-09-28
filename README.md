@@ -343,7 +343,7 @@ Source-of-truth pointers:
 Long form in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Grounding in
 [`docs/GROUNDING.md`](docs/GROUNDING.md). Methodology and civil-engineering
 framing in [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md). Literature review
-in [`docs/RESEARCH.md`](docs/RESEARCH.md). Deployment in
+in [`docs/history/RESEARCH.md`](docs/history/RESEARCH.md). Deployment in
 [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 ---
@@ -362,7 +362,7 @@ duration and an energy status:
 zeus-apple-silicon 1.1.0 reads 0 mJ of CPU energy on an Apple M5; those
 readings are rejected and the call is marked unknown. The ledger is the
 `emissions` block of every result. In-process CPU models are not in it.
-The numbers in [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) come from the
+The numbers in [`docs/history/BENCHMARKS.md`](docs/history/BENCHMARKS.md) come from the
 retired GPU stack and are historical. Details in
 [`docs/EMISSIONS.md`](docs/EMISSIONS.md).
 
@@ -420,14 +420,14 @@ web/                       FastAPI + SvelteKit
 ├── main.py                FastAPI app, SSE stream, layer endpoints
 └── sveltekit/             UI and static gallery (build committed)
 
-modal/                     Optional Modal host for the app (CPU)
+deploy/                    Dockerfile and the optional Modal host (modal_app.py)
 scripts/                   Gallery, RAG index, EO batch, probes, register builders
 experiments/               Reproduction recipes for the NYC fine-tunes
 docs/                      See docs/INDEX.md
 tests/                     pytest + vitest
 ```
 
-[`CONTRIBUTING.md`](CONTRIBUTING.md) covers dev setup and house style.
+[`CONTRIBUTING.md`](.github/CONTRIBUTING.md) covers dev setup and house style.
 [`CHANGELOG.md`](CHANGELOG.md) tracks changes since the v0.5.0 hackathon
 submission.
 

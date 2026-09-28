@@ -2,7 +2,7 @@
 # Production requirements.txt stays minimal; this file picks up the
 # heavy ML / EO toolchain that experiments need.
 #
-# Install:  uv pip install -r requirements-experiments.txt
+# Install:  uv pip install -r experiments/requirements.txt
 
 # STAC + remote sensing
 pystac-client>=0.7

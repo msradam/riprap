@@ -57,6 +57,9 @@ dependencies = [
     "stamina>=25,<27",
 ]
 
+[project.scripts]
+riprap-register = "riprap.cli.register:main"
+
 [project.optional-dependencies]
 # In-process CPU models: TTM forecasts, policy-corpus embeddings, NER.
 ml = [
@@ -111,13 +114,13 @@ where = ["."]
 include = ["riprap*", "app*"]
 exclude = [
     "tests*", "scripts*", "experiments*", "load*", "examples*",
-    "deployments*", "docs*", "web*", "outputs*", "data*", "corpus*",
+    "deployments*", "docs*", "web*", "outputs*", "data*",
 ]
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-extend-exclude = [".venv", "data", "corpus", "outputs"]
+extend-exclude = [".venv", "data", "outputs"]
 
 [tool.ruff.lint]
 # Pyflakes (real bug class) + import + bugbear; skip purely stylistic rules

@@ -41,7 +41,7 @@ from riprap.core.pebbles.base import BasePebble, PebbleResult, SpatialQuery
 class LocalCorpusWithNERPebble(BasePebble):
     """Combined retrieval + NER over a local PDF corpus.
 
-    The corpus path is configured in `app.rag` (i.e. `corpus/`) and
+    The corpus path is configured in `app.rag` (i.e. `deployments/nyc/corpus/`) and
     embedded once at startup. This adapter is the pebble-shaped seam
     over the existing rag + entity_extract modules so the Burr graph
     can compose text-pebbles uniformly with data-pebbles.

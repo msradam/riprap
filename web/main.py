@@ -39,7 +39,7 @@ from riprap.core.stones import load_stones as _load_stones  # noqa: E402
 # Modal's shutdown logging was flagging as "36 background threads still
 # running after container exit" (blocking a clean container recycle for
 # up to 30s). Bounded to the same width as @modal.concurrent's max_inputs
-# in modal/riprap_frontend.py — never more workers than could ever be
+# in deploy/modal_app.py — never more workers than could ever be
 # concurrently needed.
 _SSE_EXECUTOR = ThreadPoolExecutor(max_workers=20, thread_name_prefix="riprap-sse")
 

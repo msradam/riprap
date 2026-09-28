@@ -13,16 +13,16 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: '^(data/|tests/integration/results/|tests/(probe_50_results|queries_50)\.json$|web/sveltekit/build/|web/static/(dist|vendor)/|experiments/|outputs/|corpus/|examples/byod/.*\.csv$)'
+        exclude: '^(data/|tests/integration/results/|tests/(probe_50_results|queries_50)\.json$|web/sveltekit/build/|web/static/(dist|vendor)/|experiments/|outputs/|deployments/nyc/corpus/|examples/byod/.*\.csv$)'
       - id: end-of-file-fixer
-        exclude: '^(data/|tests/integration/results/|tests/(probe_50_results|queries_50)\.json$|web/sveltekit/build/|web/static/(dist|vendor)/|experiments/|outputs/|corpus/|examples/byod/.*\.csv$)'
+        exclude: '^(data/|tests/integration/results/|tests/(probe_50_results|queries_50)\.json$|web/sveltekit/build/|web/static/(dist|vendor)/|experiments/|outputs/|deployments/nyc/corpus/|examples/byod/.*\.csv$)'
       - id: check-yaml
         exclude: '^(web/sveltekit/|experiments/)'
       - id: check-toml
       - id: check-merge-conflict
       - id: check-added-large-files
         args: ["--maxkb=2000"]
-        exclude: '^(data/|examples/byod/|assets/|corpus/)'
+        exclude: '^(data/|examples/byod/|assets/|deployments/nyc/corpus/)'
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.4

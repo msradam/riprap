@@ -6,7 +6,7 @@
 > remote LitServe ML server (Prithvi live, TerraMind, zero-shot TTM,
 > GLiNER) and NVML power sampling. All of those are removed. The app now
 > runs no per-request earth-observation models, and hosted LLM endpoints
-> get no energy figure ([`EMISSIONS.md`](EMISSIONS.md)). The page is kept
+> get no energy figure ([`EMISSIONS.md`](../EMISSIONS.md)). The page is kept
 > as a record of what that stack cost.
 
 Measurements collected against the lablab demo Space on 2026-05-09,
@@ -205,4 +205,4 @@ These figures cannot be reproduced: the GPU stack and its NVML proxy are
 gone. `scripts/probe_addresses.py --base http://127.0.0.1:7860` still runs
 the four addresses against a current server and reports latency and the
 `emissions` block, which for a local endpoint is measured, estimated or
-unknown as described in [`EMISSIONS.md`](EMISSIONS.md).
+unknown as described in [`EMISSIONS.md`](../EMISSIONS.md).

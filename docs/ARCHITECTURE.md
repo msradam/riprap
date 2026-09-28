@@ -505,7 +505,7 @@ Three things a file listing does not make obvious:
 2. **Inference energy.** A local endpoint can report a measured or
    estimated figure per call; a hosted endpoint reports none, so Riprap
    shows no per-query figure for it ([`EMISSIONS.md`](EMISSIONS.md)). The
-   1.3 to 1.6 Wh per briefing in [`BENCHMARKS.md`](BENCHMARKS.md) came
+   1.3 to 1.6 Wh per briefing in [`history/BENCHMARKS.md`](history/BENCHMARKS.md) came
    from the retired GPU stack and is historical.
 3. **Reproducibility.** Apache-2.0 stack end to end; no commercial
    licenses required to reproduce the system.
@@ -515,7 +515,7 @@ Three things a file listing does not make obvious:
 ## 13. Deployment
 
 See [`DEPLOY.md`](DEPLOY.md): local with no LLM, local with an LLM,
-Docker (`Dockerfile.app` installs core plus `ml`; `docker-compose.yml` has
+Docker (`deploy/Dockerfile` installs core plus `ml`; `docker-compose.yml` has
 the app and an optional `local-llm` Ollama profile), and an optional GPU
 LLM endpoint on Modal.
 

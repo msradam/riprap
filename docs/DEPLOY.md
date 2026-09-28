@@ -12,7 +12,7 @@ is always a separate OpenAI-compatible endpoint you point it at.
 ## 1. Local, no LLM (default)
 
 ```bash
-git lfs install && git lfs pull      # data/ and corpus/ are Git LFS files
+git lfs install && git lfs pull      # data/ and the policy PDFs are Git LFS files
 uv sync
 uv run uvicorn web.main:app --port 7860
 ```
@@ -47,7 +47,7 @@ docker compose --profile local-llm up  # app plus an Ollama container
 ```
 
 See the comments in `docker-compose.yml` for pointing the app at the bundled
-Ollama. `Dockerfile.app` builds the image on its own.
+Ollama. `deploy/Dockerfile` builds the image on its own.
 
 ## 4. Optional: a GPU LLM endpoint on Modal
 
@@ -72,7 +72,7 @@ export RIPRAP_LLM_API_KEY=<the RIPRAP_VLLM_API_KEY value>
 
 A cold start there takes one to two minutes, and the GPU bills for its idle
 window. A hosted provider serving an open model is usually cheaper for low
-traffic. `modal/riprap_frontend.py` can also host the app itself on Modal as a
+traffic. `deploy/modal_app.py` can also host the app itself on Modal as a
 CPU-only function.
 
 The per-request ML specialist server in riprap-inference (`modal_app.py`,

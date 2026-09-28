@@ -1,4 +1,7 @@
-"""Riprap — CLI driver for the bulk-mode flood exposure register.
+"""riprap-register: CLI driver for the bulk-mode flood exposure register.
+
+    uv run riprap-register [--asset-class schools] [--out FILE] [--top N]
+
 
 Joins an asset class (schools / NYCHA / MTA entrances) against the
 static flood layers (Sandy + DEP Stormwater scenarios), runs the
@@ -20,8 +23,7 @@ from app.assets import schools  # noqa: E402
 from app.flood_layers import dep_stormwater, sandy_inundation  # noqa: E402
 from app.score import WEIGHTS, score_frame  # noqa: E402
 
-OUT = Path(__file__).resolve().parent / "outputs"
-OUT.mkdir(exist_ok=True)
+OUT = Path("outputs")  # relative to where the command runs (git-ignored in the repo)
 
 
 def build_schools_register() -> pd.DataFrame:
@@ -71,6 +73,7 @@ def main() -> int:
     df = df.sort_values(["score", "name"], ascending=[False, True])
 
     out_path = Path(args.out) if args.out else OUT / "schools_register.csv"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out_path, index=False)
     print(f"\nwrote {len(df)} rows -> {out_path}", file=sys.stderr)
 

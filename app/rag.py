@@ -21,7 +21,7 @@ import numpy as np
 
 log = logging.getLogger("riprap.rag")
 
-CORPUS_DIR = Path(__file__).resolve().parent.parent / "corpus"
+CORPUS_DIR = Path(__file__).resolve().parent.parent / "deployments" / "nyc" / "corpus"
 EMBED_MODEL_NAME = "ibm-granite/granite-embedding-278m-multilingual"
 
 CORPUS_META = {

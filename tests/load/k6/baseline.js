@@ -11,8 +11,8 @@
 //   /api/layers/sandy?... — geo layer clip for the map (per-coord, cached)
 //
 // Run:
-//   k6 run load/k6/baseline.js                 # default scenario
-//   k6 run -e BASE=http://other.host load/k6/baseline.js
+//   k6 run tests/load/k6/baseline.js                 # default scenario
+//   k6 run -e BASE=http://other.host tests/load/k6/baseline.js
 //
 // What "good" looks like (single-worker Granian, M3 laptop):
 //   /api/pebbles  p95 < 5 ms,    >5000 RPS

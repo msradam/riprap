@@ -5,7 +5,7 @@
 # and RIPRAP_LLM_MODEL to use any OpenAI-compatible endpoint.
 # See .env.example and docs/DEPLOY.md.
 #
-# Build:    docker build -t riprap -f Dockerfile.app .
+# Build:    docker build -t riprap -f deploy/Dockerfile .
 # Run:      docker run --rm -p 7860:7860 --env-file .env riprap
 
 # -----------------------------------------------------------------------
@@ -48,13 +48,12 @@ COPY pyproject.toml uv.lock ./
 # from the CPU wheel index on Linux (see [tool.uv.sources]).
 RUN uv sync --frozen --no-dev --extra ml --no-install-project
 
-# App code, manifests, fixtures and corpus.
+# App code, manifests (with the policy corpus under deployments/nyc/corpus/) and fixtures.
 COPY app/ ./app/
 COPY riprap/ ./riprap/
 COPY deployments/ ./deployments/
 COPY web/__init__.py web/main.py ./web/
 COPY data/ ./data/
-COPY corpus/ ./corpus/
 
 # Pre-built SvelteKit bundle from stage 1.
 COPY --from=frontend-build /build/build ./web/sveltekit/build

@@ -15,7 +15,7 @@ Every call record says how its energy figure was obtained:
 
 In-process CPU models (TTM, embeddings, NER) are not in the ledger. The
 2026-05 benchmark measured them at about 0.3% of a briefing's inference
-energy (docs/BENCHMARKS.md).
+energy (docs/history/BENCHMARKS.md).
 """
 
 from __future__ import annotations

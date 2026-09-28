@@ -3,7 +3,7 @@
 This is not the default path. The app runs anywhere with `uv sync` and
 needs no GPU: see the README quickstart. Modal is one place to host it.
 
-    modal deploy modal/riprap_frontend.py --env riprap
+    modal deploy deploy/modal_app.py --env riprap
 
 Without LLM settings the app serves the no-LLM evidence briefing. To turn
 on LLM synthesis, point it at any OpenAI-compatible endpoint (a hosted
@@ -33,7 +33,7 @@ FRONTEND_ENV = {
 def _image() -> modal.Image:
     return (
         modal.Image.debian_slim(python_version="3.12")
-        # Mirrors Dockerfile.app: the geo wheels bundle GDAL, GEOS and PROJ;
+        # Mirrors deploy/Dockerfile: the geo wheels bundle GDAL, GEOS and PROJ;
         # rasterio still links the system libexpat.
         .apt_install("curl", "ca-certificates", "libexpat1")
         .pip_install_from_pyproject(str(REPO / "pyproject.toml"))
@@ -41,13 +41,12 @@ def _image() -> modal.Image:
         .workdir("/app")
         # Runtime code + fixtures. The pebble framework resolves
         # `deployments/<name>/manifests` relative to the repo root (cwd),
-        # so deployments/ + data/ + corpus/ must all be present. `riprap/`
+        # so deployments/ (with the policy corpus) + data/ must be present. `riprap/`
         # is the post-refactor core package web.main imports from.
         .add_local_dir(str(REPO / "riprap"), "/app/riprap")
         .add_local_dir(str(REPO / "app"), "/app/app")
         .add_local_dir(str(REPO / "deployments"), "/app/deployments")
         .add_local_dir(str(REPO / "data"), "/app/data")
-        .add_local_dir(str(REPO / "corpus"), "/app/corpus")
         .add_local_file(str(REPO / "web" / "__init__.py"), "/app/web/__init__.py")
         .add_local_file(str(REPO / "web" / "main.py"), "/app/web/main.py")
         .add_local_dir(

@@ -1,6 +1,6 @@
 """Embed the policy corpus once and write data/rag_index.npz.
 
-Run after adding or changing a PDF in corpus/. Needs the `ml` extra:
+Run after adding or changing a PDF in deployments/nyc/corpus/. Needs the `ml` extra:
 
     uv sync --extra ml
     uv run python scripts/build_rag_index.py

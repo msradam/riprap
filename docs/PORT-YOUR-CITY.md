@@ -338,7 +338,7 @@ you want the latter.
   data on top of any existing deployment, without forking.
 - [`docs/multi-city.md`](multi-city.md) — current city roster +
   the framework claim.
-- [`docs/VERIFICATION.md`](VERIFICATION.md): a dated snapshot of a
+- [`docs/history/VERIFICATION.md`](history/VERIFICATION.md): a dated snapshot of a
   deterministic verification pass.
 - [`examples/byod/`](../examples/byod/) — real-data BYOD walkthrough
   using NYC FDNY firehouses (`hc8x-tcnd`).

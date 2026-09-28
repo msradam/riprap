@@ -8,7 +8,7 @@
 // blowback makes p95 unacceptable.
 //
 // Run:
-//   k6 run load/k6/agent_concurrency.js
+//   k6 run tests/load/k6/agent_concurrency.js
 //
 // What "good" looks like (single Ollama, M3, granite4.1:8b-q3):
 //   VU=1     p95 ~90 s   (baseline single-user)

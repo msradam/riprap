@@ -1,6 +1,6 @@
 """Riprap stakeholder integration suite.
 
-Drives `/api/agent/stream` against 20 queries derived from RESEARCH.md
+Drives `/api/agent/stream` against 20 queries derived from docs/history/RESEARCH.md
 (six anchored personas, six adapted variants, eight lateral use cases)
 and records, for each:
 
@@ -53,11 +53,11 @@ import httpx
 #   expected_intent : the planner intent we expect (None = no expectation;
 #                     used to flag classifier drift but not as a hard fail)
 #   anchor        : 'verbatim' | 'adapted' | 'lateral' — provenance in
-#                   RESEARCH.md
+#                   docs/history/RESEARCH.md
 #   notes         : free-form note about what makes this query interesting
 
 QUERIES: list[dict[str, Any]] = [
-    # --- ANCHORED (verbatim from RESEARCH.md) ---
+    # --- ANCHORED (verbatim from docs/history/RESEARCH.md) ---
     {
         "id": "01", "slug": "resident-pioneer",
         "query": "What flood evidence is on record for 80 Pioneer Street, Brooklyn?",
@@ -169,7 +169,7 @@ QUERIES: list[dict[str, Any]] = [
         "notes": "Has known protection infrastructure (BPC Resiliency). Protection-shadow case.",
     },
 
-    # --- LATERAL USE CASES (RESEARCH.md §"Lateral and unexpected") ---
+    # --- LATERAL USE CASES (docs/history/RESEARCH.md §"Lateral and unexpected") ---
     {
         "id": "13", "slug": "grant-twobridges-cdbg",
         "query": "Generate the vulnerability assessment section for a HUD CDBG-DR application for the Two Bridges NTA, Manhattan.",

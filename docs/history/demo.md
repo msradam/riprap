@@ -1,5 +1,8 @@
 # Riprap MVP demo: flood, heat, air
 
+> **History.** This records the demo script for the flood, heat and air
+> deployments from mid-2026. It is not current: only the flood part runs today.
+
 The "open-source climate briefing tool" MVP, in three deployments. Same
 code, same Burr graph, same disclosure checks, same web UI. Three
 hazards, three `deployments/` directories, no per-hazard code branches.
@@ -34,7 +37,7 @@ uv run uvicorn web.main:app --port 7860
 ```
 
 Open `http://127.0.0.1:7860/`. With no LLM endpoint configured, every
-briefing is the no-LLM evidence briefing ([`GROUNDING.md`](GROUNDING.md)).
+briefing is the no-LLM evidence briefing ([`GROUNDING.md`](../GROUNDING.md)).
 
 ## The demo flow
 

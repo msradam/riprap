@@ -9,7 +9,7 @@
 //   * time_to_first_final_seconds — when the briefing prose lands
 //
 // Run:
-//   k6 run load/k6/sse_streaming.js
+//   k6 run tests/load/k6/sse_streaming.js
 //
 // k6's http.get with stream-friendly timeouts pulls the SSE body as
 // chunks via `responseCallback`. We parse event boundaries ourselves

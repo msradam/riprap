@@ -44,7 +44,7 @@ not measured.
 
 ## Historical numbers
 
-[`BENCHMARKS.md`](BENCHMARKS.md) reports 1.3 to 1.6 Wh per briefing. Those
+[`history/BENCHMARKS.md`](history/BENCHMARKS.md) reports 1.3 to 1.6 Wh per briefing. Those
 figures came from the retired Modal/L4 stack on 2026-05-09 (Granite 4.1
 8B on vLLM, NVML sampling through a proxy) and are historical. The NVML
 proxy headers, the `/v1/power` bracket sampling and the
