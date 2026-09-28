@@ -124,7 +124,8 @@ def reading_at(lat: float, lon: float) -> TideReading:
             if out.observed_ft is not None and out.predicted_ft is not None:
                 out.residual_ft = round(out.observed_ft - out.predicted_ft, 2)
     except Exception as e:
-        out.error = str(e)
+        if out.observed_ft is None:  # a failed predictions fetch keeps the reading
+            out.error = str(e)
     return out
 
 

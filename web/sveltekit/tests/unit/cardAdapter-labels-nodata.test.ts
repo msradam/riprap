@@ -36,4 +36,25 @@ describe('card labels and no-data sources', () => {
     // A register with items is not "no data".
     expect(ids).not.toContain('doe_schools');
   });
+
+  // Refactor 5: unavailable is not zero. A register that could not be
+  // read is "no data" and says unavailable; one read with nothing in
+  // range is a true zero, stays out of "no data" and says 0.
+  const withMta = (mta: Record<string, unknown>) =>
+    RunState.fromFinal({ ...final, mta_entrances: mta } as unknown as FinalResult, redHook.address).findingsData;
+  const mtaRow = (d: typeof data) =>
+    d.cards.find((c) => c.variant === 'register')?.registers?.find((r) => r.reg === 'MTA');
+
+  it('an unreadable register is no data and says unavailable', () => {
+    const d = withMta({ available: false });
+    expect((d.noData ?? []).map((s) => s.id)).toContain('mta_entrances');
+    expect(mtaRow(d)?.note).toMatch(/unavailable/);
+  });
+
+  it('a register read with nothing in range says 0 and is not no data', () => {
+    const d = withMta({ available: true, n_entrances: 0, n_inside_sandy_2012: 0, n_in_dep_extreme_2080: 0,
+                        radius_m: 800, entrances: [] });
+    expect((d.noData ?? []).map((s) => s.id)).not.toContain('mta_entrances');
+    expect(mtaRow(d)?.note).toBe('0 within 800 m');
+  });
 });

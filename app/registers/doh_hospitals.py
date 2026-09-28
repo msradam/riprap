@@ -166,8 +166,10 @@ def summary_for_point(lat: float, lon: float,
     full GeoJSON and sample the rasters per-hit. Sub-ms per query."""
     near = _hospitals_near(lat, lon, radius_m)
     if near.empty:
-        # None nearby is evidence too: the template reports zeros.
-        return {"available": False,
+        # None nearby is a true zero: the register was read and nothing is
+        # in range, so the template reports zeros. A register that cannot
+        # be read raises instead, and the step is reported as failed.
+        return {"available": True,
                 "n_hospitals": 0, "n_inside_sandy_2012": 0, "n_in_dep_extreme_2080": 0,
                 "radius_m": radius_m,
                 "hospitals": []}

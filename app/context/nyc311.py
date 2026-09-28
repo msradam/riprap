@@ -28,6 +28,18 @@ FLOOD_DESCRIPTORS = [
 
 _DESC_CLAUSE = "(" + " OR ".join(f"descriptor='{d}'" for d in FLOOD_DESCRIPTORS) + ")"
 
+# The kind of complaint each descriptor records, in the words a question
+# uses ("street flooding"). Two descriptors record street flooding.
+KIND = {
+    "Street Flooding (SJ)": "street flooding",
+    "Flooding on Street": "street flooding",
+    "Sewer Backup (Use Comments) (SA)": "sewer backup",
+    "Catch Basin Clogged/Flooding (Use Comments) (SC)": "catch basin",
+    "Highway Flooding (SH)": "highway flooding",
+    "Manhole Overflow (Use Comments) (SA1)": "manhole overflow",
+    "RAIN GARDEN FLOODING (SRGFLD)": "rain garden flooding",
+}
+
 
 @dataclass
 class Complaint:
@@ -80,7 +92,7 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 200,
                       years: int = 5) -> dict:
     since = datetime.now(UTC) - timedelta(days=365 * years)
     cs = complaints_near(lat, lon, radius_m, since=since, limit=2000)
-    return _summarize(cs, years=years, radius_m=radius_m)
+    return _summarize(cs, years=years, radius_m=radius_m, limit=2000)
 
 
 def complaints_in_polygon(polygon, polygon_crs: str = "EPSG:4326",
@@ -129,13 +141,14 @@ def summary_for_polygon(polygon, polygon_crs: str = "EPSG:4326",
     """Polygon-mode aggregation: counts of flood-related 311 complaints
     inside the polygon over the trailing window."""
     since = datetime.now(UTC) - timedelta(days=365 * years)
-    cs = complaints_in_polygon(polygon, polygon_crs=polygon_crs, since=since)
-    return _summarize(cs, years=years, radius_m=None)
+    cs = complaints_in_polygon(polygon, polygon_crs=polygon_crs, since=since, limit=5000)
+    return _summarize(cs, years=years, radius_m=None, limit=5000)
 
 
-def _summarize(cs: list[Complaint], years: int, radius_m: float | None) -> dict:
+def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: int | None = None) -> dict:
     by_year: Counter = Counter(c.created_date[:4] for c in cs if c.created_date)
     by_descriptor: Counter = Counter(c.descriptor for c in cs)
+    by_kind: Counter = Counter(KIND.get(c.descriptor, c.descriptor) for c in cs)
     # Cap at 60 most-recent points for the map layer — keeps the SSE
     # payload small while still showing meaningful clustering.
     points = [
@@ -148,28 +161,23 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None) -> dict:
     ]
     n = len(cs)
     by_year_sorted = dict(sorted(by_year.items()))
-    by_descriptor_top = dict(by_descriptor.most_common(6))
-    top_descriptor = next(iter(by_descriptor_top), None) if by_descriptor_top else None
-    radius_str = f"{radius_m:.0f} m" if radius_m else "the NTA"
-    if n == 0:
-        narrative = (
-            f"No NYC 311 flood-related complaints filed within {radius_str} "
-            f"of this location in the last {years} years."
-        )
-    else:
-        narrative = (
-            f"{n} NYC 311 flood-related complaint{'s' if n != 1 else ''} "
-            f"filed within {radius_str} of this location in the last "
-            f"{years} years."
-        )
-        if top_descriptor:
-            narrative += f" Most common descriptor: {top_descriptor}."
+    kinds = dict(by_kind.most_common())
+    where = f"within {radius_m:.0f} m of this location" if radius_m else "inside this area"
+    # The source answered: 0 here is a true zero, and the sentence says so.
+    # At the fetch limit the count is a floor, not the total.
+    capped = limit is not None and n >= limit
+    narrative = (f"{'At least ' if capped else ''}{n} NYC 311 flood-related complaint{'s' if n != 1 else ''} filed {where} "
+                 f"in the last {years} years")
+    narrative += (": " + ", ".join(f"{k} {kind}" for kind, k in kinds.items()) + "." if n
+                  else " (the 311 service answered and none matched).")
     return {
         "n": n,
+        "capped": capped,
         "radius_m": radius_m,
         "years": years,
         "by_year": by_year_sorted,
-        "by_descriptor": by_descriptor_top,
+        "by_descriptor": dict(by_descriptor.most_common()),
+        "by_kind": kinds,
         "most_recent": [
             {"date": c.created_date[:10],
              "descriptor": c.descriptor,
@@ -181,11 +189,20 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None) -> dict:
         # reads. `histogram` is the array the chart draws; `headline_value`
         # is the bold figure; `subhead_text` is the descriptor caption.
         "headline_value": f"{n} call{'s' if n != 1 else ''}",
-        "subhead_text": (f"top descriptor: {top_descriptor}"
-                         if top_descriptor else "all flood-related descriptors"),
+        "subhead_text": ", ".join(f"{k} {kind}" for kind, k in kinds.items()) or "no flood-related calls",
         "narrative": narrative,
         "histogram": list(by_year_sorted.values()) or [],
     }
+
+
+def kind_named(question: str) -> str | None:
+    """The complaint kind a question names ("street flooding", "sewer
+    backup"), or None when it asks about flood complaints in general."""
+    q = (question or "").lower()
+    for kind in dict.fromkeys(KIND.values()):
+        if kind in q or kind.replace("backup", "back-up") in q or kind.replace("basin", "basins") in q:
+            return kind
+    return None
 
 
 _BORO_BY_PREFIX = {"MN": "MANHATTAN", "BX": "BRONX", "BK": "BROOKLYN", "QN": "QUEENS",
@@ -234,6 +251,8 @@ def flood_requests(*, lat: float | None = None, lon: float | None = None,
         "days": days,
         "n": sum(int(row["n"]) for row in by_desc),
         "by_descriptor": {row.get("descriptor"): int(row["n"]) for row in by_desc},
+        "by_kind": dict(sum((Counter({KIND.get(row.get("descriptor"), row.get("descriptor")): int(row["n"])})
+                             for row in by_desc), Counter()).most_common()),
         "by_month": {row["month"][:7]: int(row["n"]) for row in by_month},
         "most_recent": [{"date": (row.get("created_date") or "")[:10],
                          "descriptor": row.get("descriptor"),

@@ -38,13 +38,7 @@ def dep(polygon, scenario: str) -> dict:
 
 
 def complaints(polygon, years: int = 3) -> dict:
-    v = nyc311.summary_for_polygon(polygon, years=years)
-    top = next(iter(v.get("by_descriptor") or {}), None)
-    v["narrative"] = (
-        f"{v['n']} NYC 311 flood-related complaints were filed inside this area in the "
-        f"last {years} years." + (f" Most common descriptor: {top}." if top else "")
-    )
-    return v
+    return nyc311.summary_for_polygon(polygon, years=years)
 
 
 def terrain(polygon) -> dict | None:

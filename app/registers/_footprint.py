@@ -42,22 +42,20 @@ BUFFER_DOH_HOSPITAL_M = 100
 def inside_sandy_buffered(lat: float, lon: float, buffer_m: float) -> bool:
     """True if the buffer of (lat, lon) by buffer_m metres intersects
     the 2012 Sandy Inundation Zone."""
-    try:
-        import geopandas as gpd
-        from shapely.geometry import Point
+    # A failed join raises: counting the asset as outside Sandy would
+    # print a failure as a zero.
+    import geopandas as gpd
+    from shapely.geometry import Point
 
-        from app.flood_layers import sandy_inundation
-        # Project before buffering so the buffer is metric. EPSG:2263
-        # is NYC State Plane (feet) — convert metres to feet for buffer.
-        ft = buffer_m * 3.280839895
-        pt = gpd.GeoDataFrame(
-            geometry=[Point(lon, lat)], crs="EPSG:4326"
-        ).to_crs("EPSG:2263")
-        pt["geometry"] = pt.geometry.buffer(ft)
-        return bool(sandy_inundation.join(pt).iloc[0])
-    except Exception:
-        log.exception("buffered sandy join failed")
-        return False
+    from app.flood_layers import sandy_inundation
+    # Project before buffering so the buffer is metric. EPSG:2263
+    # is NYC State Plane (feet) — convert metres to feet for buffer.
+    ft = buffer_m * 3.280839895
+    pt = gpd.GeoDataFrame(
+        geometry=[Point(lon, lat)], crs="EPSG:4326"
+    ).to_crs("EPSG:2263")
+    pt["geometry"] = pt.geometry.buffer(ft)
+    return bool(sandy_inundation.join(pt).iloc[0])
 
 
 def dep_class_buffered(lat: float, lon: float, buffer_m: float,
@@ -65,20 +63,16 @@ def dep_class_buffered(lat: float, lon: float, buffer_m: float,
     """Max DEP depth class within `buffer_m` of (lat, lon).
 
     Returns (depth_class, depth_label). Higher class wins on overlap,
-    matching `dep_stormwater.join`'s semantics. None on failure.
+    matching `dep_stormwater.join`'s semantics. A failed join raises.
     """
-    try:
-        import geopandas as gpd
-        from shapely.geometry import Point
+    import geopandas as gpd
+    from shapely.geometry import Point
 
-        from app.flood_layers import dep_stormwater
-        ft = buffer_m * 3.280839895
-        pt = gpd.GeoDataFrame(
-            geometry=[Point(lon, lat)], crs="EPSG:4326"
-        ).to_crs("EPSG:2263")
-        pt["geometry"] = pt.geometry.buffer(ft)
-        j = dep_stormwater.join(pt, scenario).iloc[0]
-        return int(j["depth_class"]), str(j["depth_label"])
-    except Exception:
-        log.exception("buffered dep join failed for %s", scenario)
-        return None, None
+    from app.flood_layers import dep_stormwater
+    ft = buffer_m * 3.280839895
+    pt = gpd.GeoDataFrame(
+        geometry=[Point(lon, lat)], crs="EPSG:4326"
+    ).to_crs("EPSG:2263")
+    pt["geometry"] = pt.geometry.buffer(ft)
+    j = dep_stormwater.join(pt, scenario).iloc[0]
+    return int(j["depth_class"]), str(j["depth_label"])

@@ -100,6 +100,11 @@ def fetch_pebble(pebble_id: str, lat: float, lon: float,
         return None, {}, result.error or "no value"
 
     value = result.value
+    # Some helpers catch their own fetch error and return it in the value
+    # (nws_alerts, noaa_tides, nws_obs). That is a failed source, never a
+    # reading of zero.
+    if isinstance(value, dict) and value.get("error"):
+        return None, {}, str(value["error"])
     trace_map = pebble.manifest.trace_summary or {}
     trace_summary: dict = {}
     for tk, vk in trace_map.items():

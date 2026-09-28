@@ -34,9 +34,7 @@ def load_register(asset_class: str) -> list[dict]:
     """Return the rows list from data/registers/<asset_class>.json. The
     caller treats each row as opaque except for the lat/lon fields."""
     p = REGISTERS_DIR / f"{asset_class}.json"
-    if not p.exists():
-        return []
-    with open(p) as f:
+    with open(p) as f:  # a missing file raises: unavailable, never "0 nearby"
         d = json.load(f)
     return list(d.get("rows", []))
 

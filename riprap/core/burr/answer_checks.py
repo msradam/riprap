@@ -13,6 +13,8 @@ ways an answer can still misstate its evidence (refactor 3):
                 question is about, when that source produced one
   datum         an elevation stated without its datum, or without the
                 height above ground when the source gives one
+  unavailable   (extractive leads, refactor 5) a "no" or a count of 0
+                resting on a source that could not answer
 
 Every check is a pattern over words; none reads meaning. They are used by
 scripts/answer_audit.py and, in guarded answer mode, by the verifier.
@@ -22,7 +24,7 @@ from __future__ import annotations
 
 import re
 
-CLASSES = ("absence", "universal", "inference", "dropped_count", "datum")
+CLASSES = ("absence", "universal", "inference", "dropped_count", "datum", "unavailable")
 
 _WORDS = {w: i for i, w in enumerate(
     "zero one two three four five six seven eight nine ten eleven twelve thirteen "
@@ -35,6 +37,9 @@ ABSENCE_RE = re.compile(r"\b(no|none|not|zero|without|never)\b|n't\b", re.IGNORE
 # A document that itself reports an absence or a zero.
 _DOC_ABSENCE_RE = re.compile(r"\b(no|none|not|zero|without|outside|never)\b|(?<![\d.,])0(?![\d.,])",
                              re.IGNORECASE)
+# A document or value that says its source could not answer.
+_UNAVAILABLE_RE = re.compile(r"\bunavailable\b|\bnot available\b|could not be (read|reached)|failed to respond"
+                             r"|\bunreachable\b", re.IGNORECASE)
 _UNIVERSAL_RE = re.compile(r"\b(all|every|both|each of)\b", re.IGNORECASE)
 _THE_ASSETS_RE = re.compile(
     r"^\W*the\s+(?:[\w'-]+\s+){0,3}?(developments|entrances|schools|hospitals|sensors|gauges)\b"
@@ -62,7 +67,7 @@ RELEVANT = (
     (re.compile(r"school", re.I), ("doe_school_exposure",)),
     (re.compile(r"hospital", re.I), ("doh_hospital_exposure",)),
     (re.compile(r"nycha|public housing", re.I), ("nycha_development_exposure",)),
-    (re.compile(r"\b311\b|complaint", re.I), ("nyc311", "nyc311_nta")),
+    (re.compile(r"\b311\b|complaint|street flooding|sewer back|catch basin|manhole", re.I), ("nyc311", "nyc311_nta")),
     (re.compile(r"sensor|floodnet", re.I), ("floodnet",)),
     (re.compile(r"high.water|\bida\b", re.I), ("ida_hwm",)),
     (re.compile(r"\brain|precip", re.I), ("nws_obs#precip",)),
@@ -187,7 +192,35 @@ COUNT_FIELD = {
 }
 
 
-def relevant_figure(rel: str, docs: dict[str, str], values: dict | None = None) -> float | None:
+def kind_asked(rel: str, question: str, value: dict | None) -> str | None:
+    """The 311 complaint kind the question names, when `rel` is a 311
+    source whose value splits its count by kind."""
+    from app.context.nyc311 import kind_named
+
+    if rel in ("nyc311", "nyc311_nta") and isinstance(value, dict) and "by_kind" in value:
+        return kind_named(question)
+    return None
+
+
+def kind_lead(question: str, docs: dict[str, str], values: dict | None) -> str | None:
+    """For a question about one kind of 311 complaint, the lead that states
+    that kind's count and the descriptors counted, built from the pebble's
+    structured value (the cited sentence after it gives the full split)."""
+    from app.context.nyc311 import KIND
+
+    rel = relevant_doc(question, docs)
+    value = (values or {}).get(rel) if rel else None
+    kind = kind_asked(rel or "", question, value)
+    if not kind:
+        return None
+    k = value["by_kind"].get(kind, 0)  # type: ignore[index]
+    names = " and ".join(f'"{d}"' for d, kd in KIND.items() if kd == kind)
+    return (f"{k} {kind} complaint{'s' if k != 1 else ''}, counting the 311 "
+            f"descriptor{'s' if ' and ' in names else ''} {names}.")
+
+
+def relevant_figure(rel: str, docs: dict[str, str], values: dict | None = None,
+                    question: str = "") -> float | None:
     """The headline figure of the source a question is about: from the
     pebble's structured value when there is one (a sentence can hold a
     street number, "67th St."), else the first count in its sentence."""
@@ -198,6 +231,9 @@ def relevant_figure(rel: str, docs: dict[str, str], values: dict | None = None) 
                 if v.get(k):
                     return float(v[k])
             return 0.0 if 0 in (v.get("precip_last_hour_mm"), v.get("precip_last_6h_mm")) else None
+        kind = kind_asked(rel, question, v)
+        if kind:  # "how many street flooding complaints": that kind's count, not the total
+            return float(v["by_kind"].get(kind, 0))
         if COUNT_FIELD.get(rel) in v:
             x = v[COUNT_FIELD[rel]]
             return float(x) if isinstance(x, (int, float)) else None
@@ -208,6 +244,16 @@ def relevant_figure(rel: str, docs: dict[str, str], values: dict | None = None) 
     return parsed[0] if parsed else None
 
 
+def unavailable(doc_id: str, docs: dict[str, str], values: dict | None = None) -> bool:
+    """True when the source behind a document could not answer: its value
+    is marked unavailable or carries an error, or its text says so. Such a
+    source supports neither a "no" nor a count of 0."""
+    v = (values or {}).get(doc_id)
+    if isinstance(v, dict) and (v.get("available") is False or v.get("error")):
+        return True
+    return bool(_UNAVAILABLE_RE.search(docs.get(doc_id, "")))
+
+
 def check_answer(answer_texts: list[str], question: str, docs: dict[str, str],
                  values: dict | None = None) -> list[tuple[str, str]]:
     """Answer-level check (dropped_count). An empty answer (the cannot-answer
@@ -215,7 +261,7 @@ def check_answer(answer_texts: list[str], question: str, docs: dict[str, str],
     if not answer_texts:
         return []
     rel = relevant_doc(question, docs)
-    figure = relevant_figure(rel, docs, values) if rel else None
+    figure = relevant_figure(rel, docs, values, question) if rel else None
     if figure is None:
         return []
     from riprap.core.burr.synthesis import _parse
@@ -228,6 +274,12 @@ def check_answer(answer_texts: list[str], question: str, docs: dict[str, str],
     if figure not in said:
         return [("dropped_count", f"omits the figure from {rel} ({figure:g})")]
     return []
+
+
+def rel_zero_down(question: str, docs: dict[str, str], values: dict | None) -> bool:
+    """The source the question is about gives 0, but it was unavailable."""
+    rel = relevant_doc(question, docs)
+    return bool(rel) and unavailable(rel, docs, values) and relevant_figure(rel, docs, values, question) == 0
 
 
 def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str],
@@ -246,6 +298,11 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str],
     partial = [i for i, t in texts.items() if _partial(t)]
     if is_count_question(question) and lead not in ("count", "facts"):
         hits.append(("dropped_count", f"lead {lead!r}: a count or share question needs the count lead"))
+    down = [i for i in facts if unavailable(i, docs, values)]
+    if lead == "no" and down:
+        hits.append(("unavailable", f"lead 'no', but {', '.join(down)} was unavailable, not a zero"))
+    if lead in ("count", "facts") and rel_zero_down(question, docs, values):
+        hits.append(("unavailable", "a count of 0 from a source that was unavailable"))
     if lead == "no" and positive:
         hits.append(("absence", f"lead 'no', but {', '.join(positive)} reports a result"))
     if lead == "yes":
@@ -261,6 +318,6 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str],
     rel = relevant_doc(question, docs)
     if rel in texts and lead in ("yes", "partly") and not reports_result(texts[rel]):
         hits.append(("absence", f"lead {lead!r}, but {rel}, the source the question is about, reports none"))
-    if rel and rel not in facts and relevant_figure(rel, docs, values) is not None:
+    if rel and rel not in facts and relevant_figure(rel, docs, values, question) is not None:
         hits.append(("dropped_count", f"omits {rel}, the source the question is about"))
     return hits

@@ -109,6 +109,9 @@ def apply(records: list[dict], cfg: dict | None, source: str = "",
 def _apply(records: list[dict], cfg: dict, source: str) -> tuple[list[dict], dict]:
     if cfg.get("kind") == "category_table":
         labels, field = cfg.get("labels") or {}, cfg.get("field")
+        if records and not any(r.get(field) for r in records):
+            # A renamed column would file every record as not flooding: "0 of 200".
+            raise ValueError(f"record_filter: no record has the category field {field!r}")
         kept = [r for r in records if labels.get(str(r.get(field) or ""), "not_flooding") != "not_flooding"]
         return kept, {"filter": "category_table", "n_before": len(records), "n_kept": len(kept),
                       "filter_note": "are in categories reviewed as flood-related"}
@@ -135,7 +138,11 @@ def _apply(records: list[dict], cfg: dict, source: str) -> tuple[list[dict], dic
                 con.execute("INSERT OR REPLACE INTO p VALUES (?, ?)", (key, p))
             if p >= threshold:
                 kept.append({**r, "p_flood": round(p, 3)})
+    if records and no_text == len(records):
+        # Nothing was readable: the count is unknown, not "0 of N".
+        raise ValueError(f"record_filter: none of the {len(records)} records has text for the flood classifier")
+    note = "read as flood-related to a text classifier (experimental, not checked against hand labels)"
+    if no_text:
+        note += f"; {no_text} had no text to read and were not counted"
     return kept, {"filter": "flood_311_model", "threshold": threshold, "n_before": len(records),
-                  "n_kept": len(kept), "n_no_text": no_text,
-                  "filter_note": "read as flood-related to a text classifier (experimental, not checked against "
-                                 "hand labels)"}
+                  "n_kept": len(kept), "n_no_text": no_text, "filter_note": note}

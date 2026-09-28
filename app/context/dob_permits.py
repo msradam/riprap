@@ -103,8 +103,12 @@ def permits_in_bbox(min_lat: float, min_lon: float,
         "$limit": str(limit),
     }, timeout=60)
     r.raise_for_status()
+    rows = r.json()
+    if rows and not any(row.get("gis_latitude") for row in rows):
+        # A renamed coordinate column would drop every row and print "0 permits".
+        raise ValueError("DOB permits: no row has gis_latitude")
     out: list[Permit] = []
-    for row in r.json():
+    for row in rows:
         try:
             lat = float(row["gis_latitude"])
             lon = float(row["gis_longitude"])

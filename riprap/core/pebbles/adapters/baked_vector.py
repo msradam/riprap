@@ -64,7 +64,7 @@ def _load_features_local(path_str: str) -> tuple[dict, ...]:
     """Load and cache features from a local file path."""
     with open(path_str) as f:
         data = json.load(f)
-    return tuple(data.get("features", []))
+    return tuple(data["features"])  # no features key: unreadable, not zero features
 
 
 class _BakedVectorFetchError(Exception):
@@ -85,9 +85,9 @@ def _load_features(path_str: str, *, cache_ttl_s: int = 3600) -> tuple[dict, ...
         try:
             text = fetch_url_text(path_str, cache_ttl_s=cache_ttl_s)
             data = json.loads(text)
+            return tuple(data["features"])  # no features key: unreadable, not zero features
         except Exception as e:  # noqa: BLE001 — network / parse / status all fold into offline
             raise _BakedVectorFetchError(f"{type(e).__name__}: {e}") from e
-        return tuple(data.get("features", []))
     return _load_features_local(path_str)
 
 

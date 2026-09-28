@@ -386,6 +386,8 @@ def synthesize(state) -> dict:
         kept = [*({"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts),
                 *kept]
         lead_phrase = LEAD_PHRASES.get(lead, "")
+        if lead == "count" and rel in facts and (kl := answer_checks.kind_lead(question, texts, values)):
+            lead_phrase = f"{kl} {lead_phrase}"
     checks = _checks_run(mode, entail_info)
     cited = {i for c in kept for i in c["doc_ids"]}
     return {

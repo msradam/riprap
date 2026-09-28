@@ -567,10 +567,15 @@ function buildRegisterComposite(
     const reg = _regLabelFromManifest(m);
     const items = _itemsFromRegisterValue(v);
     if (v.available === false || items.length === 0) {
+      // Unavailable is not zero: only a register that could not be read
+      // says so; one read with nothing in range reports 0.
+      const radius = num((v as Record<string, unknown>).radius_m);
       rows.push({
         reg, tier: 'empirical',
         label: null, detail: null, sourceId: null,
-        note: (m.fallback.message ?? `no ${reg} items in range (silent)`),
+        note: v.available === false
+          ? (m.fallback.message ?? `${reg} register unavailable`)
+          : `0 within ${radius != null ? `${radius} m` : 'range'}`,
       });
       continue;
     }
