@@ -113,8 +113,9 @@ npx @modelcontextprotocol/inspector --cli uv run riprap-mcp \
 
 **Gallery.** `uv run python scripts/build_gallery.py` rebuilds the ten address
 entries in `web/sveltekit/src/lib/gallery/`; the four question entries are kept
-unless an LLM is configured. Docker and the Modal host are in
-[docs/DEPLOY.md](docs/DEPLOY.md).
+unless an LLM is configured. To see them in the app, rebuild the frontend
+(needs Node and [pnpm](https://pnpm.io)): `cd web/sveltekit && pnpm install &&
+pnpm build`. Docker and the Modal host are in [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## How it works
 
