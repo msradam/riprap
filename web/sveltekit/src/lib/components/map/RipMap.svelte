@@ -146,7 +146,8 @@
     if (!map || !PopupCtor) return;
     const p = (f.properties ?? {}) as Record<string, unknown>;
     const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
-    const next = new PopupCtor({ closeButton: true, offset: 12 }).setLngLat(coords).setHTML(registerPopupHtml(p));
+    // Keep focus where the user is (e.g. a list row); the popup repeats that row's information.
+    const next = new PopupCtor({ closeButton: true, offset: 12, focusAfterOpen: false }).setLngLat(coords).setHTML(registerPopupHtml(p));
     const prev = popup;
     popup = next;
     shownPoint = String(p.pid ?? '');

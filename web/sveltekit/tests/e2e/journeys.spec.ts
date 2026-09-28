@@ -172,6 +172,55 @@ test.describe('journeys', () => {
     await noAxeViolations(page, 'district briefing');
   });
 
+  // Refactor 6: the map point list in a real browser (the static Hollis page).
+  async function openMapList(page: Page) {
+    await page.route('**/api/**', (route) => route.abort());
+    await page.goto(`${STATIC}/gallery/hollis/`);
+    await expect(page.locator('.maplibregl-canvas')).toBeVisible({ timeout: 30_000 });
+    const summary = page.locator('summary', { hasText: 'Map points as a list' });
+    await summary.click();
+    const rows = page.locator('.map-points-list button');
+    await expect(rows.first()).toBeVisible();
+    await noAxeViolations(page, 'map list open');
+    return rows;
+  }
+
+  test('11. map list: a row chosen with the mouse selects its point', async ({ page }) => {
+    const rows = await openMapList(page);
+    const name = (await rows.first().locator('.map-point-name').textContent())!.trim();
+    await rows.first().click();
+    await expect(rows.first()).toHaveAttribute('aria-pressed', 'true');
+    const popup = page.locator('.maplibregl-popup');
+    await expect(popup).toBeVisible();
+    await expect(popup).toContainText(name);
+    await noAxeViolations(page, 'map point selected with the mouse');
+    // Closing the popup clears the selection.
+    await popup.locator('.maplibregl-popup-close-button').click();
+    await expect(popup).toHaveCount(0);
+    await expect(rows.first()).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('12. map list: a row chosen with the keyboard selects its point and keeps focus', async ({ page }) => {
+    const rows = await openMapList(page);
+    const second = rows.nth(1);
+    const name = (await second.locator('.map-point-name').textContent())!.trim();
+    await rows.first().focus();
+    await page.keyboard.press('Tab');
+    await expect(second).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(second).toHaveAttribute('aria-pressed', 'true');
+    await expect(rows.first()).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('.maplibregl-popup')).toContainText(name);
+    // Focus stays in the list so the reader can move on to the next point.
+    await expect(second).toBeFocused();
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Space');
+    await expect(rows.nth(2)).toHaveAttribute('aria-pressed', 'true');
+    await expect(second).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('.maplibregl-popup')).toHaveCount(1);
+    await noAxeViolations(page, 'map point selected with the keyboard');
+  });
+
   test('9. optional: live LLM question', async ({ page }) => {
     test.skip(!process.env.RIPRAP_E2E_LLM, 'set RIPRAP_E2E_LLM=1 with an LLM-backed server');
     test.setTimeout(360_000);
