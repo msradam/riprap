@@ -387,7 +387,7 @@ check work with any model and any endpoint.
 
 The in-process models need the `ml` extra; without it their pebbles skip
 themselves. TerraMind and the NYC TerraMind adapters are not used by the
-app. See the README's Models section for what each evaluation supports.
+app. See [MODELS.md](MODELS.md) for what each evaluation supports.
 
 **Granite 4.1 is not Granite TimeSeries.** Granite 4.1 is IBM's chat LLM
 family. Granite TimeSeries TTM is a separate IBM Research model line
@@ -453,7 +453,7 @@ API. Each manifest also carries `maturity: production` or
 
 ## 10. Repository layout
 
-The top-level tree is in the README's "Repository structure" section.
+The top-level tree is in [REPOSITORY.md](REPOSITORY.md).
 Three things a file listing does not make obvious:
 
 - **`riprap/core/`** is the framework: `pebbles/` (registry, schema,

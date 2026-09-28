@@ -1,6 +1,6 @@
 [project]
 name = "riprap"
-version = "0.6.0"
+version = "0.7.0"
 description = "Composable, citation-grounded civic climate-exposure briefings for any US place."
 readme = "README.md"
 requires-python = ">=3.12"

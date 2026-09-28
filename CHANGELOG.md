@@ -4,6 +4,28 @@ All notable changes to Riprap. The hackathon submission tag is
 `v0.5.0` (build 2026-05-07); subsequent dates record polish work
 that landed on the hackathon-period production deploys.
 
+## [0.7.0] - 2026-09-28 (a presentable public repository)
+
+- The README is rewritten to about 170 lines: what Riprap does with a real
+  cited answer from the gallery, who it is for and not for, a status table,
+  a Quickstart whose commands were run from a fresh clone, the Five Stones,
+  data sources, privacy and how to get involved. The long sections it
+  dropped moved, unchanged, to `docs/BACKGROUND.md`, `docs/MODELS.md`,
+  `docs/DATA-SOURCES.md` and `docs/REPOSITORY.md`.
+- `docs/PRIVACY.md` says what Riprap stores and sends, how 311 free text is
+  redacted, and what it should not be used for.
+- The gallery can be published on GitHub Pages
+  (`.github/workflows/pages.yml`). The public build has no backend: it makes
+  no API calls, puts the gallery one click from the landing page, and points
+  to the Quickstart for your own questions.
+- A tidier root: community files in `.github/`, `PRODUCT.md` and `DESIGN.md`
+  in `docs/`, the Dockerfile and Modal host in `deploy/`, the policy corpus
+  in `deployments/nyc/corpus/`, the load tests in `tests/load/`, historical
+  docs in `docs/history/`, and `riprap.py` as the `riprap-register` command.
+  Unused files (an old Space entrypoint, May screenshots) are deleted.
+- A new hero image from the current Hollis "since Ida" answer.
+- `scripts/check_links.py --local` checks every relative link in the docs.
+
 ## [Unreleased] (refactors 2 to 6 and the design pass)
 
 Plain-language summary of the work on branches `refactor/mvp-2` to

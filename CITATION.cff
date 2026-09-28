@@ -1,11 +1,11 @@
-# Citation File Format — https://citation-file-format.github.io/
+# Citation File Format: https://citation-file-format.github.io/
 # Run `cffconvert -i CITATION.cff -f bibtex` to get a BibTeX entry.
 cff-version: 1.2.0
-title: "Riprap: composable citation-grounded climate briefings for any US place"
+title: "Riprap: cited flood-evidence briefings for New York City places, from public data"
 type: software
 message: >-
-  If you use Riprap, or its multi-city framework / BYOD pebble system,
-  in research or applied civic work, please cite it.
+  If you use Riprap in research, reporting or applied civic work, please
+  cite it.
 authors:
   - given-names: Adam
     family-names: Rahman
@@ -13,16 +13,19 @@ authors:
     email: msrahmanadam@gmail.com
     affiliation: "Independent"
 repository-code: "https://github.com/msradam/riprap"
+url: "https://msradam.github.io/riprap/"
 abstract: >-
-  Riprap composes ~25 federal, state, and city public-record data
-  sources into a citation-grounded climate-exposure briefing for any
-  US address. NYC is the reference deployment; Chicago, Seattle, San
-  Francisco, Boston, and Albany run on the same code via per-city YAML
-  pebble manifests. Every numeric claim in a briefing links back to a
-  primary public-record source; the reconciler (IBM Granite 4.1 with
-  Mellea rejection sampling) refuses to ship a sentence it cannot
-  ground. Compliance audit covers 13 predicates derived from FEMA,
-  IPCC AR6, TCFD, ASTM E1527-21, EPA/CDC CERC, AP Stylebook, SPJ.
+  Riprap gathers public flood evidence for a New York City address, a
+  question about one, or a community district, and cites every sentence
+  to its source. NYC is the production deployment, with 31 public-record
+  city, state and federal sources; Chicago, Seattle, San Francisco,
+  Boston and Albany are experimental deployments on the same code. With
+  no model configured, the briefing is built directly from the data; an
+  optional LLM can phrase an answer, and code checks its citations and
+  numbers and drops what fails. Thirteen disclosure checks drawn from
+  FEMA, IPCC AR6, TCFD, ASTM E1527-21, EPA/CDC CERC, the AP Stylebook
+  and the SPJ Code report on every briefing. Riprap reports evidence; it
+  does not give advice or make regulatory flood determinations.
 keywords:
   - civic-tech
   - flood-risk
@@ -37,8 +40,8 @@ keywords:
   - noaa-coops
   - npcc4
 license: Apache-2.0
-version: 0.6.0
-date-released: "2026-07-11"
+version: 0.7.0
+date-released: "2026-09-28"
 
 # How Riprap depends on prior work. We cite the data sources Riprap
 # composes in each per-pebble manifest's `provenance` block (see
@@ -50,7 +53,7 @@ references:
     authors:
       - family-names: "IBM Research"
     year: 2025
-    notes: "Reconciler LLM. Apache-2.0. https://huggingface.co/ibm-granite"
+    notes: "One of the optional LLMs used for answers and the gallery question entries. Apache-2.0. https://huggingface.co/ibm-granite"
   - type: article
     title: "Prithvi-EO 2.0: A versatile multi-temporal foundation model for Earth observation"
     authors:
