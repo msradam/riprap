@@ -225,6 +225,25 @@ def read_bands(item, bbox: list[float], match=None):
     return np.nan_to_num(img.astype("float32")), ref
 
 
+# Sentinel-2 L2A scene classification (SCL) classes that are not a clear
+# view of the ground: saturated or defective, cloud shadow, cloud (medium
+# and high probability), thin cirrus. Unclassified (7) is kept.
+SCL_UNCLEAR = (1, 3, 8, 9, 10)
+
+
+def clear_mask(item, bbox: list[float], match):
+    """(H, W) bool, True where the scene's SCL layer shows a clear view,
+    read onto the `match` grid (nearest neighbour, SCL is 20 m)."""
+    import numpy as np
+    import rioxarray  # noqa: F401
+    from rasterio.enums import Resampling
+
+    da = rioxarray.open_rasterio(item.assets["SCL"].href, masked=False).squeeze(drop=True)
+    da = da.rio.clip_box(*bbox, crs="EPSG:4326").rio.reproject_match(match, resampling=Resampling.nearest)
+    scl = da.values
+    return (scl > 0) & ~np.isin(scl, SCL_UNCLEAR)
+
+
 def water_mask(img):
     """(6, H, W) reflectance -> (H, W) uint8 mask, 1 = water. Runs the
     model on 512 px windows (zero-padded at the edges), in eval mode."""

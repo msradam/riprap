@@ -13,7 +13,9 @@ Method (the constraints the per-request layer lacked):
     the rain; the run stops if there is none;
   * pre scene: the least cloudy scene in the 30 days before, read on the
     same grid, whose water is treated as permanent (rivers, harbour, ponds);
-  * new water = water after and not water before.
+  * new water = water after and not water before, only where both scenes
+    have a clear view in the Sentinel-2 scene classification (SCL) layer:
+    cloud, cloud shadow, cirrus and saturated pixels count as unobserved.
 
 Street and basement flooding usually drains within hours and cannot be
 seen at 10 to 20 m, so an empty result is not evidence of no flooding.
@@ -83,7 +85,10 @@ def main() -> int:
               f"({post_item.properties.get('eo:cloud_cover'):.1f}% cloud), pre {pre_item.id}", flush=True)
         post_img, _ = prithvi.read_bands(post_item, args.bbox, match=ref)
         pre_img, _ = prithvi.read_bands(pre_item, args.bbox, match=ref)
-        valid = (post_img.sum(0) > 0) & (pre_img.sum(0) > 0) & ~observed
+        # Observed = both scenes have data and a clear view (no cloud, shadow or
+        # saturation in the scene classification layer).
+        valid = ((post_img.sum(0) > 0) & (pre_img.sum(0) > 0) & ~observed
+                 & prithvi.clear_mask(post_item, args.bbox, ref) & prithvi.clear_mask(pre_item, args.bbox, ref))
         new = (prithvi.water_mask(post_img) == 1) & (prithvi.water_mask(pre_img) == 0) & valid
         new_water[new] = 1
         observed |= valid
