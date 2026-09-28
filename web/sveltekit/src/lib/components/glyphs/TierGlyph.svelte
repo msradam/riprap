@@ -1,5 +1,9 @@
 <script lang="ts">
+  /** Labelled tier mark. The drawing is EvidenceMark's (DESIGN.md: a square
+   *  whose fill is solid, hatched, hollow or stippled), so every tier mark
+   *  in the app has one shape vocabulary. */
   import type { Tier } from '$lib/types/tier';
+  import EvidenceMark from './EvidenceMark.svelte';
 
   interface Props {
     tier: Tier;
@@ -16,55 +20,6 @@
     proxy: 'Proxy: indirect indicator',
     synthetic: 'Synthetic prior: generated, not observed'
   };
-
-  let stroke = $derived(Math.max(1, Math.round(size / 9)));
-  let label = $derived(title ?? TIER_DESC[tier]);
-  let patternId = $derived(`rip-stripe-${tier}-${size}`);
 </script>
 
-<svg
-  width={size}
-  height={size}
-  viewBox="0 0 {size} {size}"
-  role="img"
-  aria-label={label}
-  style="flex: none; display: inline-block; vertical-align: -0.12em;"
->
-  <title>{label}</title>
-  {#if tier === 'empirical'}
-    <rect x="0" y="0" width={size} height={size} fill={color} />
-  {:else if tier === 'modeled'}
-    <rect
-      x={stroke / 2}
-      y={stroke / 2}
-      width={size - stroke}
-      height={size - stroke}
-      fill="none"
-      stroke={color}
-      stroke-width={stroke}
-    />
-  {:else if tier === 'proxy'}
-    <circle cx={size / 2} cy={size / 2} r={size / 2 - 0.5} fill={color} />
-  {:else}
-    <defs>
-      <pattern
-        id={patternId}
-        width="3"
-        height="3"
-        patternUnits="userSpaceOnUse"
-        patternTransform="rotate(45)"
-      >
-        <line x1="0" y1="0" x2="0" y2="3" stroke={color} stroke-width="1.5" />
-      </pattern>
-    </defs>
-    <rect
-      x={stroke / 2}
-      y={stroke / 2}
-      width={size - stroke}
-      height={size - stroke}
-      fill="url(#{patternId})"
-      stroke={color}
-      stroke-width={stroke}
-    />
-  {/if}
-</svg>
+<EvidenceMark {tier} {size} {color} title={title ?? TIER_DESC[tier]} />

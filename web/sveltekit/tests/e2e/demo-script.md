@@ -47,8 +47,8 @@ Each image captures the full page after the SSE `done` event. Look for:
 
 1. **Header**: wordmark, query echo, `live` status pill
 2. **Briefing prose** (left column): four sections numbered 01–04, claim
-   glyphs in the gutter (filled square = empirical, open square = modeled,
-   filled circle = proxy, striped square = synthetic prior), citations
+   glyphs in the gutter (solid square = empirical, hatched square = modeled,
+   hollow square = proxy, stippled square = synthetic prior), citations
    numbered `[1]`–`[N]`
 3. **Map** (right column, sticky): four tier-coloured polygon/dot layers.
    Layers with zero features are **omitted** from the legend (silence

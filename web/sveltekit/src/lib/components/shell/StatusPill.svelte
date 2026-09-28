@@ -161,4 +161,13 @@
   @media (prefers-reduced-motion: reduce) {
     .status-dot { animation: none; opacity: 0.7; }
   }
+  /* Phones: the pill has its own header row, so it wraps rather than
+     cutting "stopped: could not resolve the place" to half a word. */
+  @media (max-width: 720px) {
+    .status {
+      max-width: 100%;
+      flex-wrap: wrap;
+      white-space: normal;
+    }
+  }
 </style>

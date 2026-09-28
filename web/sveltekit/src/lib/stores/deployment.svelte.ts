@@ -68,7 +68,7 @@ class DeploymentStore {
       this.current = {
         name: 'unknown',
         city: 'Not in any shipped deployment',
-        hazard: 'Climate-exposure briefing',
+        hazard: 'Flood-exposure briefing',
       };
       this.loaded = true;
       return;

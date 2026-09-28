@@ -86,6 +86,8 @@ export interface Grounding {
   fallback_reason?: string;
   question?: string;
   answered?: boolean;
+  /** "extractive": the answer quotes source sentences under a model-chosen lead. */
+  answer_mode?: string;
 }
 
 /** Substring checks for required disclosure phrases. Not a quality score. */

@@ -19,10 +19,11 @@
   align-items: center;
   gap: 24px;
 }
-.app-header-left { display: flex; align-items: center; gap: 12px; font-family: var(--font-mono); font-size: 13px; }
+.app-header-left { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-family: var(--font-mono); font-size: 13px; }
 .app-header-sep { color: var(--ink-tertiary); }
 .app-header-context { color: var(--ink-secondary); letter-spacing: 0.04em; }
-.app-header-mid { display: flex; justify-content: center; }
+/* min-width 0: a long query truncates instead of widening the grid. */
+.app-header-mid { display: flex; justify-content: center; min-width: 0; }
 .app-header-query {
   background: var(--paper-deep);
   border: 1px solid var(--rule-soft);
@@ -35,8 +36,11 @@
   align-items: center;
   gap: 10px;
   min-width: 360px;
+  max-width: min(560px, 100%);
   text-align: left;
 }
+/* A long question truncates here; the briefing heading shows it in full. */
+.app-header-query-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .app-header-query-icon { color: var(--ink-tertiary); }
 .app-header-query-edit {
   margin-left: auto;
@@ -45,7 +49,7 @@
   text-transform: uppercase;
   color: var(--ink-tertiary);
 }
-.app-header-right { display: flex; align-items: center; justify-content: flex-end; gap: 18px; font-family: var(--font-mono); font-size: 12px; }
+.app-header-right { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 4px 18px; font-family: var(--font-mono); font-size: 12px; }
 .app-header-link { color: var(--ink-secondary); text-decoration: none; border-bottom: 1px solid transparent; display: inline-flex; align-items: center; min-height: 24px; }
 .app-header-link:hover { border-bottom-color: var(--ink); color: var(--ink); }
 .app-header-status { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-tertiary); text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; }
@@ -65,8 +69,16 @@
 .app-footer-credits a:hover { text-decoration-style: solid; }
 .app-footer :focus-visible { outline-color: var(--paper); }
 
+/* Tablet: the query moves to its own row so the context and the links
+   (methodology, print, export PDF, status) share the first row. */
+@media (max-width: 1100px) {
+  .app-header-inner { grid-template-columns: 1fr auto; gap: 10px 24px; }
+  .app-header-mid { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+  .app-header-query { min-width: 0; width: 100%; max-width: none; }
+}
 @media (max-width: 720px) {
   .app-header-inner { grid-template-columns: 1fr; gap: 8px; }
+  .app-header-mid { grid-row: auto; }
   .app-header-mid, .app-header-right { justify-content: flex-start; }
   .app-header-query { min-width: 0; width: 100%; }
 }

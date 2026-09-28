@@ -7,6 +7,16 @@
 
   let questions = $derived(data.entries.filter((e) => e.question));
   let addresses = $derived(data.entries.filter((e) => !e.question));
+
+  // The note depends on how each answer was made. In extractive mode the
+  // answer is source sentences quoted under a lead the model chose.
+  const NOTE_EXTRACTIVE =
+    'The model chose the lead and which source sentences answer the question; the sentences are quoted from the sources.';
+  const NOTE_WRITTEN = 'Written by a language model, with each claim checked against its cited sources.';
+  const isExtractive = (slug: string) => data.answerModes[slug] === 'extractive';
+  let allExtractive = $derived(questions.every((e) => isExtractive(e.slug)));
+  let noneExtractive = $derived(questions.every((e) => !isExtractive(e.slug)));
+  let mixed = $derived(!allExtractive && !noneExtractive);
 </script>
 
 <svelte:head>
@@ -27,9 +37,9 @@
       </p>
 
       <h2 class="gallery-group">Questions</h2>
-      <p class="gallery-group-note">
-        Written by a language model, with each claim checked against its cited sources.
-      </p>
+      {#if !mixed}
+        <p class="gallery-group-note">{allExtractive ? NOTE_EXTRACTIVE : NOTE_WRITTEN}</p>
+      {/if}
       <ul class="gallery-list">
         {#each questions as e (e.slug)}
           <li class="gallery-item">
@@ -39,6 +49,9 @@
             </div>
             <a class="gallery-link" href="{resolve('/(app)/gallery/[slug]', { slug: e.slug })}/">{e.question}</a>
             <div class="gallery-meta">{llmStamp(e) ?? modeLabel(e.mode)}</div>
+            {#if mixed}
+              <p class="gallery-group-note">{isExtractive(e.slug) ? NOTE_EXTRACTIVE : NOTE_WRITTEN}</p>
+            {/if}
           </li>
         {/each}
       </ul>
