@@ -41,8 +41,8 @@ provenance:
 narration:
   short: NYC street trees within 200 m of this address (heat-island mitigation proxy).
   template: >-
-    NYC Forestry recorded {n_within_radius} street tree(s) within 200 m
-    of this address in the 2015 census.
+    Street trees within 200 m of this address in NYC Forestry's 2015
+    census: {n_within_radius}.
 
 display:
   order: 20

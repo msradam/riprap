@@ -422,9 +422,9 @@ def _render_html(payload: dict[str, Any], doc_hash: str) -> str:
     <dl>
       <dt>Document hash</dt><dd class="hash">{_e(doc_hash)}</dd>
       <dt>Reconciler</dt><dd>IBM Granite 4.1 (Apache 2.0)</dd>
-      <dt>Grounding</dt><dd>claims checked against cited sources, {_e(str(mellea_attempts))} attempt(s)</dd>
-      <dt>Mellea passed</dt><dd>{mellea_passed}</dd>
-      <dt>Mellea failed</dt><dd>{mellea_failed}</dd>
+      <dt>Grounding</dt><dd>claims checked against cited sources, attempts: {_e(str(mellea_attempts))}</dd>
+      <dt>Checks passed</dt><dd>{mellea_passed}</dd>
+      <dt>Checks failed</dt><dd>{mellea_failed}</dd>
     </dl>
   </div>
   <h3 style="font-family:'Overpass Mono',monospace;font-size:9pt;letter-spacing:0.08em;text-transform:uppercase;color:#4E5A6E;margin:0 0 8pt;">Energy ledger</h3>

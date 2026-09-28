@@ -54,7 +54,7 @@ def shape(value: dict | None, manifest=None) -> dict | None:
     datums = {(f.get("properties") or {}).get("vertical_datum") for f in features}
     datum = datums.pop() if len(datums) == 1 else None
     if n and n > 0:
-        bits = [f"USGS surveyed {n} Hurricane Ida high-water mark(s) within"
+        bits = [f"USGS surveyed {n} Hurricane Ida high-water mark{'' if n == 1 else 's'} within"
                 f" {radius} m of this address"]
         if max_above is not None:
             bits.append(f"; the highest stood {max_above} ft above ground")

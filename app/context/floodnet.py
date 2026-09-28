@@ -151,9 +151,9 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
         )
     else:
         narrative = (
-            f"{n_sensors} FloodNet community sensor(s) within "
-            f"{int(radius_m)} m have logged {n_events} above-curb flood "
-            f"event(s) in the last 3 years."
+            f"{n_sensors} FloodNet community sensor{'' if n_sensors == 1 else 's'} within "
+            f"{int(radius_m)} m {'has' if n_sensors == 1 else 'have'} logged {n_events} "
+            f"above-curb flood event{'' if n_events == 1 else 's'} in the last 3 years."
         )
         if peak is not None and peak.max_depth_mm is not None:
             narrative += (
