@@ -19,6 +19,9 @@
     linkedKey?: string | null;
     onCite?: (citeId: string) => void;
     onLink?: (key: string | null) => void;
+    /** Doc ids the briefing text cites. Cards for these restate the
+     *  briefing, so they stay collapsed until the reader asks for them. */
+    citedDocIds?: Set<string>;
   }
 
   let {
@@ -29,7 +32,20 @@
     linkedKey = null,
     onCite,
     onLink,
+    citedDocIds = new Set(),
   }: Props = $props();
+
+  const isStated = (c: Card) =>
+    citedDocIds.has(c.docId) || (!!c.citeId && citedDocIds.has(c.citeId));
+  let hiddenCards = $derived(data.cards.filter(isStated));
+  /** Collapsed again whenever a new run's data arrives; never persisted. */
+  let showAll = $derived.by(() => (void data, false));
+
+  /** A hover that links a collapsed card reveals every card first. */
+  function link(key: string | null) {
+    if (key && !showAll && hiddenCards.some((c) => c.mapLayer === key)) showAll = true;
+    onLink?.(key);
+  }
 
   // Index cards by Stone, keep order from `data.cards`.
   let cardsByStone = $derived.by<Record<StoneKey, Card[]>>(() => {
@@ -63,6 +79,18 @@
     <span class="findings-tagline">cards = what each Stone found · provenance collapses below</span>
   </header>
 
+  {#if hiddenCards.length}
+    <button
+      type="button"
+      class="evidence-toggle"
+      aria-expanded={showAll}
+      aria-controls="findings-stones"
+      onclick={() => (showAll = !showAll)}
+    >
+      {showAll ? 'Show fewer evidence cards' : `Show all evidence cards (${hiddenCards.length} more)`}
+    </button>
+  {/if}
+
   <RunHealthStrip
     cards={data.cards}
     stones={data.stones}
@@ -71,18 +99,23 @@
     emissions={data.emissions}
   />
 
-  {#each STONE_ORDER as key (key)}
-    <StoneRegion
-      stone={key}
-      cards={cardsByStone[key]}
-      trace={tracesByStone[key]}
-      {density}
-      {provenanceMode}
-      {linkedKey}
-      {onCite}
-      {onLink}
-    />
-  {/each}
+  <div id="findings-stones">
+    {#each STONE_ORDER as key (key)}
+      {@const all = cardsByStone[key]}
+      {@const cards = showAll ? all : all.filter((c) => !isStated(c))}
+      <StoneRegion
+        stone={key}
+        {cards}
+        hiddenCount={all.length - cards.length}
+        trace={tracesByStone[key]}
+        {density}
+        {provenanceMode}
+        {linkedKey}
+        {onCite}
+        onLink={link}
+      />
+    {/each}
+  </div>
 
   {#if showGrammar}
     <CardGrammarReference {density} />
@@ -110,6 +143,21 @@
     font-weight: 500;
     color: var(--ink);
   }
+  .evidence-toggle {
+    background: transparent;
+    border: 0;
+    padding: 4px 0;
+    min-height: 24px; /* WCAG 2.5.8 target size */
+    margin-bottom: var(--s-2);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-secondary);
+    letter-spacing: 0.05em;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .evidence-toggle:hover { color: var(--ink); }
   .findings-tagline {
     font-family: var(--font-mono);
     font-size: 12px;

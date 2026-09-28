@@ -13,7 +13,7 @@
   import type { RunState } from '$lib/client/runState.svelte';
   import { briefingState, sourceLists } from '$lib/stores/briefingState.svelte';
   import { looksLikeQuestion } from '$lib/client/runState.svelte';
-  import { splitBriefing } from '$lib/client/parseBriefing';
+  import { citedDocIds, splitBriefing } from '$lib/client/parseBriefing';
   import { modeLine } from '$lib/client/cardAdapter';
   import { browser } from '$app/environment';
   import { page } from '$app/state';
@@ -45,6 +45,7 @@
   let grounding = $derived(run.finalResult?.grounding);
   let blocks = $derived(run.briefing.blocks);
   let citations = $derived(run.briefing.citations);
+  let cited = $derived(citedDocIds(blocks));
   let question = $derived(
     run.plan?.question || grounding?.question || (looksLikeQuestion(queryText) ? queryText : '')
   );
@@ -368,6 +369,7 @@
           {linkedKey}
           onLink={(key) => (linkedKey = key)}
           onCite={handleFindingsCite}
+          citedDocIds={cited}
         />
       </section>
     </div>

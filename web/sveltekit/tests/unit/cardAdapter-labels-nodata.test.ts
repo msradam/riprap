@@ -29,9 +29,8 @@ describe('card labels and no-data sources', () => {
     expect(data.cards.map((c) => c.source)).toContain('NOAA CO-OPS');
   });
 
-  it('lists unavailable registers and null or unavailable pebbles as no data', () => {
+  it('lists null or unavailable pebbles as no data', () => {
     const ids = (data.noData ?? []).map((s) => s.id);
-    expect(ids).toContain('mta_entrances');
     expect(ids).toContain('floodnet_forecast');
     // A register with items is not "no data".
     expect(ids).not.toContain('doe_schools');

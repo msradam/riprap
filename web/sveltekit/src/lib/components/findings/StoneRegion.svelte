@@ -16,6 +16,8 @@
     linkedKey?: string | null;
     onCite?: (citeId: string) => void;
     onLink?: (key: string | null) => void;
+    /** Cards collapsed because they restate the briefing. */
+    hiddenCount?: number;
   }
 
   let {
@@ -27,6 +29,7 @@
     linkedKey = null,
     onCite,
     onLink,
+    hiddenCount = 0,
   }: Props = $props();
 
   let meta = $derived(STONE_META[stone]);
@@ -69,10 +72,14 @@
       <h3 id={`region-h-${stone}`} class="region-name">{meta.name}</h3>
       <span class="region-role">· {meta.role}</span>
     </div>
-    <StoneTally cardCount={cards.length} members={trace.members} />
+    <StoneTally cardCount={cards.length + hiddenCount} members={trace.members} />
   </header>
 
-  {#if cards.length === 0}
+  {#if cards.length === 0 && hiddenCount > 0}
+    <p class="restated">
+      {hiddenCount} card{hiddenCount === 1 ? ' restates' : 's restate'} the briefing above; show all evidence cards to see {hiddenCount === 1 ? 'it' : 'them'}.
+    </p>
+  {:else if cards.length === 0}
     <div class="silent">
       <span class="silent-tag">silent</span>
       <p class="silent-prose">
@@ -211,6 +218,14 @@
     text-transform: uppercase;
   }
   .silent-prose {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ink-secondary);
+    line-height: 1.5;
+    max-width: var(--measure);
+  }
+
+  .restated {
     margin: 0;
     font-size: 13px;
     color: var(--ink-secondary);

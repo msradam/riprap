@@ -287,6 +287,18 @@ export function splitBriefing(blocks: BriefingBlock[]) {
   return { scope, lead: rest.slice(0, bodyStart), body, outOfScope };
 }
 
+/** Doc ids the parsed briefing text cites, read from the blocks' claim
+ *  parts. Not the `citations` registry, which also holds the run's
+ *  uncited sources. */
+export function citedDocIds(blocks: BriefingBlock[]): Set<string> {
+  const ids = new Set<string>();
+  for (const b of blocks) {
+    if (b.kind !== 'prose') continue;
+    for (const p of b.parts) if (p.cite) ids.add(p.cite);
+  }
+  return ids;
+}
+
 /**
  * HTML escape — kept around because the v0.4.1 parser used it for the
  * status-preamble fallback path. The v0.4.2 parser drops the preamble
