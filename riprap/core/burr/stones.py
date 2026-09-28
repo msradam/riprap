@@ -51,6 +51,10 @@ FLOOR = {
 FOCUS_FLOOR = {
     ("time_frame", "past"): ("nyc311", "floodnet", "ida_hwm", "sandy", "nyc311_nta", "sandy_nta"),
     ("time_frame", "now"): ("nws_alerts", "nws_obs", "floodnet", "noaa_tides"),
+    # Refactor 8: a forecast question runs every forecast and projection.
+    ("time_frame", "future"): ("npcc4_slr", "ttm_battery_surge", "floodnet_forecast", "ttm_311_forecast",
+                               "dep_moderate_2050", "dep_extreme_2080",
+                               "dep_moderate_2050_nta", "dep_extreme_2080_nta"),
     ("assets", "subway"): ("mta_entrances",),
     ("assets", "schools"): ("doe_schools",),
     ("assets", "public_housing"): ("nycha_developments",),

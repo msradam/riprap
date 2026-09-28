@@ -91,6 +91,20 @@ _FUTURE_DAY_RE = re.compile(
     r"|thursday|friday|saturday|sunday|weekend)|on (monday|tuesday|wednesday|thursday|friday|saturday|sunday)"
     r"|on (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.? \d{1,2}|\d{1,2}/\d{1,2}(/\d{2,4})?)\b",
     re.IGNORECASE)
+# A question about forecasts, projections or what is coming. A named future
+# day is refused first (_FUTURE_DAY_RE); this is the rest (refactor 8).
+_FORECAST_Q_RE = re.compile(
+    r"\b(forecasts?|forecasting|projections?|projected|outlook|predictions?|what is coming|what's coming"
+    r"|in the (coming|next) (years|decades)|in the future|by 20\d\d)\b", re.IGNORECASE)
+
+
+def forecast_question(query: str) -> bool:
+    """A question about forecasts or projections, not about now or the past.
+    It plans as a point (or area) question with focus time_frame future, so
+    the Lodestone's forecast pebbles run; never as live_now."""
+    return bool(_FORECAST_Q_RE.search(query or "")) and not _FUTURE_DAY_RE.search(query or "")
+
+
 _OTHER_HAZARD_RE = {"heat": re.compile(r"\b(heat island|heat wave|heat vulnerab|hot in the summer)", re.I),
                     "air": re.compile(r"\b(air quality|aqi|air pollution|smog)\b", re.I)}
 
@@ -137,9 +151,10 @@ def heuristic_plan(query: str) -> dict:
     if place["kind"] == "district":
         return {"intent": area_intent, "rationale": f"Heuristic match: community district {place['text']}.",
                 "targets": [{"type": "district", "text": place["text"]}], "place": place}
+    live = _LIVE_RE.search(q) and not forecast_question(q)
     if place["kind"] == "address":
-        intent, target = ("live_now" if _LIVE_RE.search(q) else "single_address"), place["text"]
-    elif _LIVE_RE.search(q):
+        intent, target = ("live_now" if live else "single_address"), place["text"]
+    elif live:
         intent, target = "live_now", "New York City Hall, New York, NY"
     elif place["kind"] == "neighborhood" and nta.resolve(place["text"]):
         intent, target = area_intent, place["text"]
@@ -147,8 +162,11 @@ def heuristic_plan(query: str) -> dict:
         # A landmark or anything else: let the geocoder decide, and fail honestly.
         intent, target = "single_address", place["text"] or _address_from_query(q)
     kind = "nta" if intent in ("neighborhood", "development_check") else "address"
-    return {"intent": intent, "rationale": f"Heuristic match: {intent}.",
-            "targets": [{"type": kind, "text": target}], "place": place}
+    out = {"intent": intent, "rationale": f"Heuristic match: {intent}.",
+           "targets": [{"type": kind, "text": target}], "place": place}
+    if forecast_question(q):
+        out["focus"] = {"hazard": "flood", "time_frame": "future", "assets": []}
+    return out
 
 
 @action(reads=["query"], writes=["plan", "intent", "first_target", "trace"])

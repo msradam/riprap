@@ -29,6 +29,7 @@ from burr.lifecycle import PostRunStepHook
 
 from riprap.core.burr.capstone import assemble_legacy_state, step_policy_corpus
 from riprap.core.burr.intake import (
+    forecast_question,
     geocode_target,
     heuristic_plan,
     plan_heuristic,
@@ -86,8 +87,14 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
             guard = heuristic_plan(query)
             if guard["intent"] == "out_of_scope":  # the same fixed rules in both modes
                 return {**guard, "llm_calls": calls}
-            return {"intent": p.intent, "targets": p.targets, "rationale": p.rationale,
-                    "question": p.question, "focus": p.focus, "pebbles": p.pebbles,
+            intent, focus = p.intent, p.focus
+            if forecast_question(query):
+                # Decided in code: a forecast question is about what is coming,
+                # so it runs the Lodestone's forecast pebbles, never live_now.
+                intent = "single_address" if intent == "live_now" else intent
+                focus = {**(focus or {}), "time_frame": "future"}
+            return {"intent": intent, "targets": p.targets, "rationale": p.rationale,
+                    "question": p.question, "focus": focus, "pebbles": p.pebbles,
                     "catalog": p.catalog, "llm_calls": calls}
         except Exception as e:  # noqa: BLE001 - fall back to the regex planner
             log.warning("LLM planner failed (%s); using the heuristic planner", e)

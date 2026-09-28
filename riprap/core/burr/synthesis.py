@@ -224,6 +224,8 @@ def _extract(out: dict, question: str, texts: dict[str, str],
     rule = answer_checks.past_event_lead(question, focus, facts, texts, values)
     if rule:
         lead, facts = rule
+    if (focus or {}).get("time_frame") == "future" and lead in ("yes", "no", "partly"):
+        lead = "facts"  # a forecast or projection is not an observation: no yes or no in front of it
     return lead, facts, answer_checks.check_lead(lead, facts, question, texts, values)
 # "facts" is set only by code: the facts with no yes or no in front of them.
 LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:",
