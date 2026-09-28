@@ -4,8 +4,9 @@ type: guide
 
 # Deployment
 
-Riprap is one CPU process: FastAPI serving the SvelteKit build, the evidence
-pipeline and the MCP tools. It needs no GPU and no keys. An LLM is optional and
+Riprap is one CPU process: FastAPI serving the SvelteKit build and the evidence
+pipeline. The MCP server is a separate process (`python -m riprap.mcp.server`);
+`web/main.py` does not mount it. It needs no GPU and no keys. An LLM is optional and
 is always a separate OpenAI-compatible endpoint you point it at.
 
 ## 1. Local, no LLM (default)
@@ -33,8 +34,9 @@ RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 RIPRAP_LLM_MODEL=granite4:micro \
 `_MODEL` and `_API_KEY` name a second endpoint tried when the first fails.
 Settings are read when a request runs, not frozen at import.
 
-On an Apple M5 laptop, a briefing with `granite4:micro` took 19 to 60 s and
-with `llama3.1:8b` about 3 to 4 minutes (`tests/probe_grounding_results.json`).
+On an Apple M5 laptop, a briefing with `granite4:micro` took 19 to 60 s
+(`tests/probe_grounding_results.json`) and with `llama3.1:8b` 189 to 325 s,
+about 3 to 5.5 minutes (`tests/probe_grounding_results_llama3.1-8b.json`).
 A small shared VPS will be several times slower for 8B models.
 
 ## 3. Docker

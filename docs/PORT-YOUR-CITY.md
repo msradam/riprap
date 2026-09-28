@@ -19,18 +19,23 @@ work. You write YAML.
 
 ```
 deployments/<city>/
-├── stones.yaml              # five entries, one per Stone (Cornerstone,
+├── stones.yaml              # a coverage: block (bounding box, city, state)
+│                            # and five entries, one per Stone (Cornerstone,
 │                            # Keystone, Touchstone, Lodestone, Capstone),
 │                            # with city-flavoured taglines and descriptions
 └── manifests/
-    ├── nws_obs.yaml         # federal pebble — works for any US address
-    ├── nws_alerts.yaml      # federal pebble — works for any US address
-    ├── water_level.yaml     # federal pebble — NOAA tides, nearest station auto-resolves
+    ├── water_level.yaml     # NOAA tides, nearest station auto-resolves
     └── <city>_311.yaml      # your city's 311 / equivalent service-request feed
 ```
 
-Four pebbles is enough to pass the 13 disclosure checks (caveat-phrase
-substring tests) on every city we've shipped. Passing them says the
+A city directory holds only its own manifests. The four federal pebbles
+in `deployments/federal/manifests/` (`fema_nfhl`, `nws_alerts`,
+`nws_obs`, `usgs_gauges`) are merged into every deployment
+automatically, so do not copy them.
+
+The Boston set (two city manifests plus the four federal pebbles) is
+enough to pass the 13 disclosure checks (caveat-phrase substring tests)
+on every city we've shipped. Passing them says the
 briefing carries its caveats, not that it is useful. Add more for your local hazard signals
 (historical inundation, regulatory floodplain, asset registers, etc.) —
 those depend on what your jurisdiction publishes.
@@ -55,10 +60,9 @@ Most US cities publish 311 service requests. Find yours on the open-data
 portal. The two things you need:
 
 - **Resource ID** (Socrata: `xxxx-xxxx`; CKAN: a UUID)
-- **Spatial field name** — Socrata datasets vary: NYC + Chicago use
-  `location`, SF uses `point`, Seattle's 311 dataset has *no usable
-  Point geometry* (we skipped it). CKAN datasets typically ship
-  `latitude`/`longitude` numeric columns.
+- The **spatial field name**. Socrata datasets vary: NYC and Chicago use
+  `location`, SF uses `point`, and Seattle uses `latitude_longitude`.
+  CKAN datasets typically ship `latitude`/`longitude` numeric columns.
 
 Verify with a tiny curl before writing YAML:
 
@@ -77,8 +81,8 @@ If the spatial field is missing, you have two options:
 
 1. **Different dataset** — many cities publish multiple 311 exports;
    one might have a `Point`-typed geo column even if another doesn't.
-2. **Skip the 311 pebble** — Seattle ships with federal pebbles only,
-   and still passes the 13/13 disclosure checks.
+2. **Skip the 311 pebble**: a deployment with only the federal pebbles
+   and a water-level gauge still passes the 13/13 disclosure checks.
 
 ## Step 2 — Scaffold the deployment directory
 
@@ -88,14 +92,19 @@ Easiest path: copy a sibling.
 cp -r deployments/boston deployments/<your-city>
 ```
 
-This gives you a stones.yaml + the four-pebble starter set
-(federal × 3 + city 311). You'll edit `stones.yaml` for taglines and
-the 311 manifest for resource id + spatial field; everything else can
-stay.
+This gives you a `stones.yaml` and Boston's two city manifests
+(`boston_311.yaml`, `water_level.yaml`); rename the 311 one. The federal
+pebbles come in automatically. You'll edit `stones.yaml` for the coverage
+box and taglines, and the 311 manifest for resource id, spatial field and
+record filter; everything else can stay.
 
 ## Step 3 — Edit `stones.yaml`
 
 ```yaml
+coverage:
+  bbox: [-71.20, 42.23, -70.92, 42.40]   # [min_lon, min_lat, max_lon, max_lat], WGS84
+  city: Boston
+  state: MA
 stones:
   - id: cornerstone
     name: Cornerstone
@@ -112,8 +121,16 @@ stones:
   ...
 ```
 
-This is the only "voice" you'll write. It's what readers see at the
-top of each Stone section in the briefing. Keep it short and local.
+The `coverage:` block is required. Riprap routes each query by it:
+`pick_deployment` in `riprap/core/pebbles/deployments.py` picks the
+deployment whose `bbox` contains the geocoded point. A deployment without
+a `bbox` is never picked, and `RIPRAP_DEPLOYMENT` does not override this
+per-query routing. The example is Boston's box from
+`deployments/boston/stones.yaml`; draw yours around your city.
+
+The Stone taglines are the only "voice" you'll write. They are what
+readers see at the top of each Stone section in the briefing. Keep them
+short and local.
 
 ## Step 4 — Edit the 311 manifest
 
@@ -137,6 +154,13 @@ config:
   count_by_field: <category field>   # e.g. `service_name`, `reason`
   order: <date_field> DESC
   cache_ttl_s: 1800
+  record_filter:                     # keep only flood-related records
+    kind: category_table
+    field: <category field>          # e.g. `sr_type`
+    labels:                          # category value: flood class
+      Water On Street Complaint: street_flooding
+      Water in Basement Complaint: basement_or_building_flooding
+      Sewer Cleaning Inspection Request: drainage_infrastructure
 
 provenance:
   date_modified: at_fetch           # live Socrata sources resolve this from the metadata API
@@ -147,11 +171,20 @@ provenance:
   doc_id: <city>_311
 
 narration:
-  short: <City> 311 service requests filed within 300 m of this address.
+  short: Flood-related <City> 311 service requests within 300 m of this address.
   template: >-
-    <City> 311 received {n_records} service requests within {radius_m} m
-    of this address.
+    {n_kept} of {n_before_phrase} <City> 311 service requests within {radius_m} m of this
+    address {filter_note}.
 ```
+
+Without `config.record_filter` the count is every service request in the
+radius, and a count equal to `limit` is the query limit, not a flood
+signal. The labels above are from `deployments/chicago/manifests/chicago_311.yaml`;
+review every category value your feed has and list only the flood-related
+ones (Chicago's comment records its review). A feed with free text instead
+of categories can use `kind: flood_311_model` (see the SF, Boston and
+Albany manifests), but that classifier needs locally built weights and
+passes records unfiltered without them ([`docs/GROUNDING.md`](GROUNDING.md)).
 
 ### CKAN cities
 
@@ -209,7 +242,7 @@ nearest station at <https://tidesandcurrents.noaa.gov/>. Examples:
 ## Step 6 — Run the probe
 
 ```bash
-RIPRAP_DEPLOYMENT=deployments/<your-city> RIPRAP_RECONCILER_TIER=no_llm \
+RIPRAP_RECONCILER_TIER=no_llm \
 uv run python -c "
 import riprap.core.burr.app as a
 r = a.run('<your test address>')
@@ -218,8 +251,9 @@ print('compliance:', r['compliance'])
 "
 ```
 
-Expected: a Markdown paragraph with **Live Observer.**, **Projector.**,
-etc. headers, citations like `[<city>_311]` and `[nws_obs]`, and
+The query routes to your deployment only if the geocoded address falls
+inside your `coverage:` bbox. Expected: a Markdown paragraph with
+**Live Observer.**, **Projector.**, etc. headers, citations like `[<city>_311]` and `[nws_obs]`, and
 `compliance: {'passed': True, 'n_passed': 13, 'n_total': 13, ...}`. The
 `compliance` key holds the disclosure checks; the name is kept for API
 compatibility and it is not a quality score.
@@ -271,7 +305,7 @@ your state code or city name to that regex.
 **A disclosure check fails.** Read the `failed` list:
 
 ```bash
-RIPRAP_DEPLOYMENT=deployments/<city> RIPRAP_RECONCILER_TIER=no_llm \
+RIPRAP_RECONCILER_TIER=no_llm \
 uv run python -c "
 import riprap.core.burr.app as a
 r = a.run('<addr>')

@@ -36,9 +36,11 @@ Every result carries an `emissions` block (`riprap/core/burr/app.py`,
 | `tokens` | Prompt, completion and total tokens |
 | `calls` | The per-call records, each with `energy_status`, `wh` and an `energy_note` |
 
-In-process CPU models (TTM, Granite Embedding, Flair NER) are not in the
-ledger. On the retired GPU stack they were about 0.3% of a briefing's
-inference energy.
+In-process CPU models (TTM, Granite Embedding, Flair NER, the GLiClass
+entailment check on guarded answers and the GLiClass 311 filter) are not
+in the ledger. On the retired GPU stack the TTM, embedding and NER models
+were about 0.3% of a briefing's inference energy; the GLiClass models were
+not measured.
 
 ## Historical numbers
 

@@ -15,7 +15,7 @@ Drop two new deployment directories alongside `deployments/nyc/`
 
 ```
 deployments/
-  nyc/        flood (23 pebbles, full production stack)
+  nyc/        flood (31 pebbles, full production stack)
   heat/       heat (6 pebbles, scaffold)
   air/        air quality (5 pebbles, scaffold)
 ```
@@ -24,6 +24,13 @@ Each carries:
 - `stones.yaml` — same five Stones, taglines re-framed for the hazard
 - `manifests/*.yaml` — pebble manifests pointing at hazard-relevant
   data sources
+
+> **Historical.** Per-query routing picks a deployment by the bounding
+> box in its `stones.yaml` (`coverage:`), and `deployments/heat` and
+> `deployments/air` have none. The planner also refuses heat and air
+> questions as out of scope. `RIPRAP_DEPLOYMENT` does not override the
+> routing, so the commands and results below produce the NYC flood
+> briefing today.
 
 Switch deployments via env var:
 

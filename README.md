@@ -29,22 +29,25 @@ by this project, and does not reflect the current code:
 > **Now an open-source civic-tech framework.** NYC is the reference
 > deployment. Five more deployments (Chicago, Seattle, San Francisco,
 > Boston, Albany) share the same code and are experimental: they have only
-> the federal pebbles plus a 311 feed and/or a water-level gauge, and the
-> Chicago, SF and Boston 311 feeds are not flood-filtered (a reported "200"
-> is the query limit). Adding your city is a directory of YAML, not a fork.
+> the federal pebbles plus a 311 feed and/or a water-level gauge. Chicago
+> and Seattle filter 311 records with a reviewed category table. SF, Boston
+> and Albany pass their 311 records unfiltered, and say so, unless
+> `RIPRAP_311_FILTER_PATH` points at locally built classifier weights; an
+> unfiltered count of 200 (500 for Boston) is the query limit. Adding your
+> city is a directory of YAML, not a fork.
 >
-> - **[`docs/multi-city.md`](docs/multi-city.md)** — six cities, three
+> - **[`docs/multi-city.md`](docs/multi-city.md)**: six cities, three
 >   311-platform paths (Socrata, CKAN, SeeClickFix), one codebase.
-> - **[`docs/byod.md`](docs/byod.md)** — drop your own data in via
+> - **[`docs/byod.md`](docs/byod.md)**: drop your own data in via
 >   `.riprap/` auto-discovery or the `RIPRAP_EXTRA_MANIFESTS` env var.
-> - **[`docs/PORT-YOUR-CITY.md`](docs/PORT-YOUR-CITY.md)** — walkthrough
+> - **[`docs/PORT-YOUR-CITY.md`](docs/PORT-YOUR-CITY.md)**: walkthrough
 >   for adding a new city, using the Boston port as the worked example.
-> - **[`docs/multi-hazard.md`](docs/multi-hazard.md)** — the same Five
->   Stones produce a heat-exposure or air-quality briefing from a
->   `deployments/heat/` or `deployments/air/` directory. Flood/NYC is
->   the production-grade deployment (23 pebbles); heat and air are
->   working scaffolds (3-4 pebbles) proving the architecture
->   generalizes past flood.
+> - **[`docs/multi-hazard.md`](docs/multi-hazard.md)**: `deployments/heat/`
+>   (6 pebbles) and `deployments/air/` (5) are scaffolds for heat and
+>   air-quality briefings. They are not reachable today: they have no
+>   `coverage:` bounding box, so no query routes to them, and the planner
+>   refuses heat and air questions as out of scope. Flood/NYC is the
+>   production-grade deployment (31 pebbles, including the 4 federal ones).
 
 ---
 
@@ -64,9 +67,9 @@ briefing that should be a tool call ends up as a half-day of manual joins.
 Existing tools either return opaque vendor risk scores or skip the audit
 trail a stamped engineering memo actually requires.
 
-Riprap composes it. Type an address in any deployed city, get a
-four-section, citation-grounded briefing in about two minutes, with every
-claim pointing back to a `[doc_id]` in public-record data.
+Riprap composes it. Type an address in any deployed city and get a
+citation-grounded briefing with one section per Stone that has evidence,
+every claim pointing back to a `[doc_id]` in public-record data.
 
 ---
 
@@ -137,13 +140,20 @@ uv run uvicorn web.main:app --port 7860
 ```
 
 Open <http://localhost:7860> and type an NYC address. You get the no-LLM
-evidence briefing: one cited sentence per data source, grouped by Stone.
+evidence briefing: an "In brief" lead (Sandy footprint, FEMA zone, DEP
+scenarios, 311 count), each part cited and passed through the claim
+verifier, then one cited sentence per data source, grouped by Stone, with
+the three point DEP scenarios merged into one sentence.
 `uv sync` without `--extra ml` is the light core (no torch, about 290 MB);
 the in-process forecasts, policy retrieval, the entailment check on
 guarded answers and the non-NYC 311 flood filter then skip themselves, and
 each briefing says which checks ran. The 311 filter's weights are built
-locally (`scripts/train_311_filter.py`) and found through
-`RIPRAP_311_FILTER_PATH`; see [`docs/GROUNDING.md`](docs/GROUNDING.md).
+locally with `scripts/train_311_filter.py`, which needs `--pool` (a pool
+of records you supply, kept outside the repo) and new teacher
+probabilities for a new pool (see
+[`data/calibration/README.md`](data/calibration/README.md)). The app finds
+them through `RIPRAP_311_FILTER_PATH`; see
+[`docs/GROUNDING.md`](docs/GROUNDING.md).
 
 The same briefing from the command line:
 
@@ -165,7 +175,12 @@ RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 RIPRAP_LLM_MODEL=granite4:micro \
 The model rewrites the evidence as JSON claims. Code checks every claim's
 citations and numbers against the documents it cites, retries once, and
 drops what still fails; dropped claims are listed, never shown as part of
-the briefing ([`docs/GROUNDING.md`](docs/GROUNDING.md)). Other deployment
+the briefing. For a question, the default extractive mode has the model
+pick a lead and facts, and code checks the lead with rules (for a yes or
+no question about past flooding, a rule sets the lead). The guarded mode
+adds five word-pattern answer checks and an entailment check with a
+classifier that misses paraphrased inferences
+([`docs/GROUNDING.md`](docs/GROUNDING.md)). Other deployment
 shapes (Docker, a GPU endpoint on Modal) are in
 [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
@@ -213,7 +228,7 @@ deployment directory and groups them into five roles, the **Five Stones**:
 | **Keystone** | What is exposed | MTA subway entrances, NYCHA developments, NYC DOE schools, NYS DOH hospitals |
 | **Touchstone** | Current state of the city | FloodNet depth sensors, NYC 311 flood complaints, NWS hourly observations, NOAA tide-gauge water levels, USGS stream gauges |
 | **Lodestone** | What is coming | NWS flood alerts, NPCC4 sea-level projections, 311 weekly forecast (experimental), FloodNet recurrence forecast (experimental), Battery surge forecast (experimental) |
-| **Capstone** | The briefing | The evidence sentences as written (no-LLM mode), or JSON claims from any OpenAI-compatible model with citations and numbers checked in code |
+| **Capstone** | The briefing | An "In brief" lead and the evidence sentences as written, with the point DEP scenarios merged into one sentence (no-LLM mode), or JSON claims from any OpenAI-compatible model with citations and numbers checked in code |
 
 One Burr application runs every intent. All pebbles for the intent fan out
 in one parallel `MapActions` group; the Capstone then turns their evidence
@@ -236,8 +251,9 @@ same; only the pebbles plugged into each Stone change.
 | **Capstone** | Citation-grounded synthesis | Same |
 
 What transfers unchanged: one Burr graph that fans pebble manifests out in
-parallel, evidence rendered from manifest templates, verified structured
-claims when an LLM is configured, and every sentence cited to its source.
+parallel, evidence rendered from manifest templates, claims checked in
+code for citations and numbers when an LLM is configured, and every
+sentence cited to its source.
 To port Riprap to a new city you write a deployment directory of manifests
 against local data. See [`docs/PORT-YOUR-CITY.md`](docs/PORT-YOUR-CITY.md).
 
@@ -258,7 +274,9 @@ table lists what the app runs today and what each evaluation supports.
 | Prithvi-EO 2.0 | Offline only: the baked Ida layer behind `prithvi_water`, and `scripts/run_eo_batch.py` | Experimental | Satellite-detected surface water after Ida. It mostly shows marsh, shoreline and park water, gives no inside or outside verdict for an address, and says nothing about street or basement flooding. |
 | [`msradam/Prithvi-EO-2.0-NYC-Pluvial`](https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial) | Default checkpoint for `scripts/run_eo_batch.py`; not used by the app at runtime | Experimental | Test IoU 0.598, but the labels are the base model's own Ida polygons (self-distillation) and the random split shares parent scenes, so this measures agreement with pseudo-labels, not flood detection. |
 | [`msradam/TerraMind-NYC-Adapters`](https://huggingface.co/msradam/TerraMind-NYC-Adapters) | Not used by the app | Research artifact | LoRA family on TerraMind 1.0. Reported mIoU: LULC 0.5866, TiM 0.6023, Buildings 0.5511. |
-| Any OpenAI-compatible LLM | Optional, external endpoint | Production path, with claims checked in code | On ten gallery addresses, `granite4:micro` kept 122 claims and dropped 0; `llama3.1:8b` kept 191 and dropped 0 (`tests/probe_grounding_results*.json`). Only citations and numbers are checked ([`docs/GROUNDING.md`](docs/GROUNDING.md)). |
+| Any OpenAI-compatible LLM | Optional, external endpoint | Production path, with claims checked in code | On ten gallery addresses, `granite4:micro` kept 122 claims and dropped 0; `llama3.1:8b` kept 191 and dropped 0 (`tests/probe_grounding_results*.json`). Every claim gets citation and number checks. Question answers also get lead rules (extractive mode, the default) or five answer checks and the entailment check (guarded mode) ([`docs/GROUNDING.md`](docs/GROUNDING.md)). |
+| `knowledgator/gliclass-large-v3.0` (GLiClass large v3.0) | Entailment check on guarded answers, in process on CPU (`ml` extra) | Experimental | An NLI-style classifier that scores whether the cited evidence supports each answer claim. It misses paraphrased inferences and drops some correct claims ([`docs/GROUNDING.md`](docs/GROUNDING.md)). |
+| GLiClass modern-base 311 filter | Non-NYC free-text 311 feeds (SF, Boston, Albany), in process on CPU; weights built locally and found through `RIPRAP_311_FILTER_PATH` | Experimental | Distilled from silver labels. Unreliable on live feeds: it kept street-cleaning and sidewalk reports as flooding (`tests/flood311_live_counts_2026-09-27.txt`). Without the weights, records pass unfiltered and the briefing says so. |
 
 The three `msradam/*` fine-tunes were trained on AMD Instinct MI300X via
 AMD Developer Cloud and are published under Apache 2.0. Reproduction
@@ -288,7 +306,7 @@ query ──► plan (LLM planner: intent, question, pebbles needed; regex heuri
    assemble_legacy_state ──► policy_corpus ──► reconcile
              │
              ▼
-   evidence from manifest templates ──► no-LLM briefing, or verified JSON claims
+   evidence from manifest templates ──► no-LLM briefing, or JSON claims checked in code for citations and numbers
              │
              ▼
    cited briefing + disclosure checks + energy ledger ──► JSON, SSE, MCP
@@ -296,7 +314,8 @@ query ──► plan (LLM planner: intent, question, pebbles needed; regex heuri
 
 `riprap/core/burr/app.py` is the only orchestrator. It handles every
 intent (`single_address`, `neighborhood`, `development_check`, `live_now`,
-`compare`, `not_implemented`); `compare` is two `single_address` runs
+`compare`, `not_implemented`, `out_of_scope`); `out_of_scope` returns a
+fixed refusal, and `compare` is two `single_address` runs
 merged. Point intents run pebbles with `spatial.scope: point`,
 `neighborhood` and `development_check` run the polygon pebbles, and
 `live_now` runs only the live point pebbles. Burr tracking is off unless

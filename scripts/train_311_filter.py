@@ -4,7 +4,7 @@
     uv run --extra ml python scripts/train_311_filter.py --pool PATH [--teacher PATH] [--out DIR] [--device mps|cpu]
 
 Recipe copied from experiments/23_system_one/scripts/finetune_gliclass.py
-(experiment/system-one, 06e20e8), task a: base
+(an unpublished experiment, System One), task a: base
 knowledgator/gliclass-modern-base-v3.0 at ac369222ca4375ca66ebaf7fb5220f223514c035
 (safetensors only); a pool of unlabelled 311 records (--pool, a CSV with
 item_id and text columns) labelled with the teacher's soft probabilities
@@ -190,7 +190,7 @@ def main() -> None:
     prov = {"base": {"repo": BASE[0], "sha": BASE[1]},
             "teacher": "ibm-granite/granite-4.1-8b @ 1504002f, A1 option-probability readout, phrasing v1",
             "training_data": f"{pool.name} with {Path(a.teacher).name} ({n} records)",
-            "recipe": "experiments/23_system_one/scripts/finetune_gliclass.py, task a, on experiment/system-one 06e20e8",
+            "recipe": "experiments/23_system_one/scripts/finetune_gliclass.py, task a, in an unpublished experiment (System One)",
             "script": "scripts/train_311_filter.py", "riprap_commit": commit, "device": a.device,
             "n_train": n, "epochs": epochs, "train_seconds": round(train_s), "scores": scores}
     (out / "provenance.json").write_text(json.dumps(prov, indent=1) + "\n")

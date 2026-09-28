@@ -19,9 +19,16 @@ and nowhere else.
 
 ## No-LLM mode (default)
 
-With no LLM endpoint configured, the briefing is the evidence itself: one section
-per Stone, one cited sentence per pebble. There is no model and nothing to
-verify. This is the mode the static gallery and the MCP evidence tools use.
+With no LLM endpoint configured, the briefing is the evidence itself, built by
+`riprap/core/burr/templated_reconciler.py`. A bare address opens with an "In
+brief" lead: the Sandy footprint, the FEMA zone, the DEP scenarios and the 311
+count, each cited and each passed through the claim verifier below (a part
+that fails is left out). Then comes one section per Stone with evidence, one
+cited sentence per pebble, with the three point DEP scenarios merged into one
+sentence. When no source produces evidence, the briefing says Riprap could not
+build it and names the sources that failed to respond. There is no model. This
+is the mode the MCP evidence tools use. The static gallery has 10 address
+entries in this mode and 4 question entries in LLM mode.
 
 ## LLM mode
 
@@ -70,8 +77,10 @@ When the input is a question, not just a place, three more rules apply.
 - The briefing opens with an answer, written in one of two modes
   (`RIPRAP_ANSWER_MODE`, described below). If no answer survives the checks,
   it opens with the fixed line "The sources consulted do not answer this
-  question directly. Here is what they show." A Stone whose evidence the
-  answer already covers is not repeated as an empty section.
+  question directly. Here is what they show." The answer is not repeated in
+  the sections below it, and a Stone section with no sentence is hidden. A
+  Stone whose consulted sources all returned nothing says so: "Consulted X;
+  it returned nothing for this place."
 - Questions Riprap does not answer (buying, renting or insuring property,
   legal advice, a prediction for a specific day, or a hazard other than
   flooding) get a fixed refusal text, never model prose.
@@ -96,7 +105,21 @@ sentences, word for word. Code checks the lead
   `count` lead, and `count` needs a fact with a figure;
 - when the question names a source (subway, school, 311, sensor, Ida, rain,
   tide, sea level, alert), `yes` and `partly` are invalid if that source's
-  fact reports none.
+  fact reports none;
+- `no` is invalid when a chosen source was unavailable, and a count of 0 is
+  invalid when it comes from an unavailable source (the `unavailable` rule:
+  a source that could not answer supports neither a "no" nor a zero).
+
+For a yes or no question about past flooding ("has this block flooded since
+Ida?"), the lead is set by a rule, not chosen by the model
+(`answer_checks.past_event_lead`). The model still picks and orders the
+facts. The lead is `yes` when a relevant observed source (311, FloodNet, the
+Ida high-water marks or the Sandy extent, depending on the question) reports
+an event in the asked period, `no` only when every relevant source answered
+and reported none, and `cannot_answer` otherwise. Silence is not a "no": a
+FloodNet query with no sensor in range, or no Ida mark nearby, cannot say the
+place stayed dry. The source the rule relies on is added to the facts when
+the model left it out, so the lead is always cited.
 
 An asset register "reports a result" when any of its inside counts is above
 zero. An invalid lead is retried once, then replaced by the cannot-answer
@@ -130,7 +153,8 @@ safetensors, CPU), the evidence trimmed to the 512 tokens most relevant to
 the claim as premise and the claim as hypothesis. A claim scoring below
 0.787 is dropped with the reason "not supported by the cited evidence
 (entailment check)" and the retry applies. The threshold keeps 95% of the
-true claims in the System One Task B calibration split
+true claims in the Task B calibration split from an unpublished experiment;
+its calibration data is in `data/calibration/`
 (`scripts/calibrate_entailment.py`); on that experiment's 582 test items it
 keeps 86% of true claims and catches 85% of perturbed ones: 89% of flipped
 directions, 87% of changed numbers, 84% of swapped documents and 67% of
@@ -181,7 +205,8 @@ checks, which are word patterns, not a reading of meaning. They miss:
 - a wrong non-numeric fact ("inside" for "outside") with correct numbers;
 - an omitted figure when the question's words match no listed source.
 
-The entailment check reads meaning, but on the refactor 3 records it
+The entailment check is a classifier that scores whether the cited text
+supports a claim. On the records in `tests/question_eval/entail.json` it
 caught only absence and warning-read-as-observation errors. It passed a
 paraphrased inference ("Given the projected 0.38 m ..., the address
 remains outside the floodplain"), a claim attributing the address's flood
@@ -202,8 +227,11 @@ NYC 311 pebbles keep their descriptor filter. Elsewhere
 
 - **San Francisco, Boston, Albany** give free text, so a text classifier
   decides: GLiClass modern-base distilled from Granite 4.1 8B's option
-  probabilities (System One round two), rebuilt by
-  `scripts/train_311_filter.py` because the experiment did not save it. A
+  probabilities in an unpublished experiment (its calibration data is in
+  `data/calibration/`), rebuilt by `scripts/train_311_filter.py` because
+  the experiment did not save it. The script needs `--pool` (a pool of
+  records you supply, kept outside the repo) and new teacher probabilities
+  for a new pool; see `data/calibration/README.md`. A
   record is kept when P(any flood class) is at or above the threshold
   chosen on the experiment's calibration split, and cached by record id.
   The classifier reads the same text the experiment trained on (SF

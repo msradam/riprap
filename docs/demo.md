@@ -6,9 +6,14 @@ hazards, three `deployments/` directories, no per-hazard code branches.
 
 ## What the demo shows
 
+Today only the flood briefing runs. Per-query routing picks a deployment
+by its coverage bounding box, and `deployments/heat` and `deployments/air`
+have none, so items 2 and 3 describe scaffolds that a query never reaches
+(and the planner refuses heat and air questions as out of scope).
+
 1. **Flood briefing** at an NYC address, the reference deployment.
-   23 point pebbles across Cornerstone, Keystone, Touchstone and
-   Lodestone, and the 13 disclosure checks.
+   31 pebbles (23 point, 8 area) across Cornerstone, Keystone, Touchstone
+   and Lodestone, and the 13 disclosure checks.
 2. **Heat briefing** at the same address (`deployments/heat/`): NYC HVI,
    NYC Forestry, NWS observations and NWS alerts. Same UI; the
    `stones.yaml` taglines drive different section headings.
@@ -48,8 +53,10 @@ curl "http://127.0.0.1:7860/api/agent?q=189%20Atlantic%20Ave%2C%20Brooklyn" \
   | jq '{intent, compliance, paragraph_chars: (.paragraph | length)}'
 ```
 
-What lands: one cited sentence per pebble that returned a value, grouped
-by Stone, and the disclosure-check result under `compliance`.
+What lands: an "In brief" lead (Sandy footprint, FEMA zone, DEP
+scenarios, 311 count, each part cited and checked by the claim verifier),
+then one cited sentence per pebble that returned a value, grouped by
+Stone, and the disclosure-check result under `compliance`.
 
 ### 2. LLM mode, same evidence
 
@@ -67,6 +74,12 @@ checks run the same way. `RIPRAP_RECONCILER_TIER=no_llm` forces no-LLM
 mode even when an endpoint is set.
 
 ### 3. Heat deployment: same code, different YAML directory
+
+> **Historical.** Per-query routing picks a deployment by the bounding
+> box in its `stones.yaml` (`coverage:`), and `deployments/heat` and
+> `deployments/air` have none. The planner also refuses heat and air
+> questions as out of scope. `RIPRAP_DEPLOYMENT` does not override the
+> routing, so these commands produce the NYC flood briefing today.
 
 Restart pointing at the heat manifests:
 
@@ -144,16 +157,17 @@ the `epa_airnow` pebble adds live AQI / PM2.5 / ozone for the address's
 
 ## What the demo proves
 
-- **Architecture is hazard-agnostic.** Three deployments produce three
-  briefings from one codebase. Adding a new hazard = a new
-  `deployments/<hazard>/` directory.
-- **Disclosures are present.** All three pass the 13 disclosure checks
+- **Architecture is hazard-agnostic in its code.** A deployment is a
+  directory of manifests with no per-hazard code. Today only flood is
+  reachable: making heat or air answer needs a coverage bounding box
+  for them and planner support for heat and air questions.
+- **Disclosures are present.** The flood briefing passes the 13 disclosure checks
   (caveat-phrase substring tests drawn from FEMA / IPCC / TCFD / ASTM /
   EPA / AP / SPJ). The check result ships in every response. It is not
   a quality score.
 - **Two modes ship side by side.** No-LLM mode prints the evidence
-  sentences; LLM mode returns claims verified in code against the same
-  evidence. Same disclosure checks, same UI.
+  sentences; LLM mode returns claims checked in code for citations and
+  numbers against the same evidence. Same disclosure checks, same UI.
 - **In-process models stay on a clean lineage.** Granite TTM r2 (IBM,
   NOAA gauge data), Granite Embedding 278M (IBM), Flair NER (OntoNotes
   5.0, human-labeled LDC). The offline Prithvi-EO 2.0 layer is NASA/IBM
@@ -163,6 +177,12 @@ the `epa_airnow` pebble adds live AQI / PM2.5 / ozone for the address's
   API, CSV, or GeoJSON (local or URL) and add it to any deployment.
 
 ## Demo cheat-sheet: switching deployments
+
+> **Historical.** Per-query routing picks a deployment by the bounding
+> box in its `stones.yaml` (`coverage:`), and `deployments/heat` and
+> `deployments/air` have none. The planner also refuses heat and air
+> questions as out of scope. `RIPRAP_DEPLOYMENT` does not override the
+> routing, so these commands produce the NYC flood briefing today.
 
 ```
 # Flood (the production reference)

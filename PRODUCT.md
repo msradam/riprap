@@ -3,8 +3,8 @@
 <!-- impeccable:product-schema 1 -->
 
 <!-- Written during the unattended Impeccable pass (2026-09-27). The owner
-     asked not to be interviewed; facts come from impeccable_pass.md, the
-     design handoff (docs/design/handoff/) and the refactor reports. Lines
+     asked not to be interviewed; facts come from the design handoff
+     (docs/design/handoff/) and the owner's notes. Lines
      marked (inferred) are the author's reading and await the owner. -->
 
 ## Platform

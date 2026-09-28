@@ -1,8 +1,12 @@
 # Riprap: landscape research
 
+> **Historical research note from May 2026.** The mechanisms it describes
+> (rerolls, four-section prose, GLiNER, TerraMind, the MI300X stack) are
+> removed; see [GROUNDING.md](GROUNDING.md) for the current checks.
+
 Captured 2026-05-06 as part of the AMD x lablab.ai hackathon polish
-phase. This document underpins the pitch deck (`slides/deck.md`) and
-the demo-script choices. Re-validate against the live web before
+phase. This document underpinned the pitch deck (not in the repository)
+and the demo-script choices. Re-validate against the live web before
 re-using any specific figure.
 
 ---

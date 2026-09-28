@@ -5,8 +5,8 @@ you're new; jump directly if you know what you need.
 
 | Doc | Purpose |
 |---|---|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Full system shape: the one Burr app, Five-Stone taxonomy, evidence and verified-claim synthesis, SvelteKit + FastAPI + MCP surface. Start here. |
-| [GROUNDING.md](GROUNDING.md) | How a briefing is grounded: manifest-rendered evidence, no-LLM mode, LLM claims verified in code, what is not checked. |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Full system shape: the one Burr app, Five-Stone taxonomy, evidence and LLM claims checked in code for citations and numbers, SvelteKit + FastAPI + MCP surface. Start here. |
+| [GROUNDING.md](GROUNDING.md) | How a briefing is grounded: manifest-rendered evidence, no-LLM mode, LLM claims checked in code for citations and numbers, answer rules, what is not checked. |
 | [METHODOLOGY.md](METHODOLOGY.md) | The deterministic exposure tier used by the offline register builders: sub-indices, weights, floor rule, references. |
 | [DEPLOY.md](DEPLOY.md) | Running Riprap: local with no LLM, local with an LLM, Docker, and an optional GPU LLM endpoint on Modal. |
 | [briefing-standards.md](briefing-standards.md) | The FEMA, IPCC, TCFD, ASTM, AP Stylebook and SPJ rules behind the 13 disclosure checks (caveat-phrase substring tests, not a quality score). |

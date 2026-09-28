@@ -5,25 +5,31 @@ CKAN, SeeClickFix). Adding a city is a directory of YAML.
 
 > **Experimental outside NYC.** Chicago, Seattle, San Francisco, Boston
 > and Albany are experimental. Each has only the four federal pebbles
-> plus a 311 feed and/or a water-level gauge. The Chicago, SF and Boston
-> 311 feeds are not flood-filtered: they count every service request in
-> the radius, and a reported "200" is the query limit, not a flood
-> signal. NYC (23 pebbles) is the only deployment with local hazard,
-> asset and forecast layers.
+> plus a 311 feed and/or a water-level gauge. Chicago and Seattle filter
+> 311 records with a reviewed category table (`config.record_filter`,
+> `kind: category_table`). SF, Boston and Albany use `kind:
+> flood_311_model`, which passes records unfiltered, and says so, unless
+> `RIPRAP_311_FILTER_PATH` points at locally built classifier weights.
+> An unfiltered count of 200 (500 for Boston) is the query limit, not a
+> flood signal. NYC (31 pebbles) is the only deployment with local
+> hazard, asset and forecast layers.
 
 ## Cities live
 
 | Deployment | Pebbles | 311 data | Platform | Tide/water |
 |---|---|---|---|---|
-| `nyc/` | 23 | NYC Open Data `erm2-nwe9` | Socrata | NOAA Battery 8518750 |
+| `nyc/` | 31 | NYC Open Data `erm2-nwe9` | Socrata | NOAA Battery 8518750 |
 | `chicago/` | 6 | Chicago Data Portal `v6vf-nfxy` | Socrata | NOAA Calumet Harbor 9087044 |
-| `seattle/` | 5 | *(skipped — see below)* | — | NOAA auto-resolves to Puget Sound |
+| `seattle/` | 6 | Seattle Open Data `5ngg-rpne` (`latitude_longitude` field) | Socrata | NOAA auto-resolves to Puget Sound |
 | `sf/` | 6 | DataSF `vw6y-z8j6` (`point` field) | Socrata | NOAA SF Bay auto-resolves |
 | `boston/` | 6 | Analyze Boston `1a0b420d-...` | **CKAN** | NOAA Boston Harbor 8443970 |
 | `albany/` | 7 | SeeClickFix public API (all + flood-filtered) | **SeeClickFix** | NOAA Albany, Hudson River 8518995 |
 
-Plus two NYC-only hazard variants beyond the original flood deployment
-(`nyc/`): `heat/`, `air/`.
+Pebble counts include the four federal pebbles merged into every
+deployment. `deployments/heat/` and `deployments/air/` also exist, but
+they have no `coverage:` bounding box, so no query routes to them, and the
+planner refuses heat and air questions as out of scope. They are not
+reachable today (see [`docs/multi-hazard.md`](multi-hazard.md)).
 
 ## Test results
 
@@ -47,8 +53,10 @@ The DISCLOSURE column is the 13 disclosure checks: substring tests for
 caveat phrases drawn from FEMA, IPCC AR6, TCFD, ASTM E1527-21, EPA/CDC
 CERC, AP Stylebook and SPJ Code of Ethics guidance. A 13/13 means the
 required phrases are present. It says nothing about briefing quality or
-whether the city data is flood-relevant (`chicago_311=200` and
-`sf_311=200` are the query limit on unfiltered 311 feeds).
+whether the city data is flood-relevant. The sweep was recorded before
+Chicago and Seattle had category tables and before Seattle had a 311
+pebble: `chicago_311=200` and `sf_311=200` were the query limit on
+unfiltered 311 feeds.
 
 The NYC time was recorded when NYC still called remote ML models
 (TerraMind, live Prithvi) that the app no longer uses. NYC still runs the
@@ -66,7 +74,7 @@ uv run python scripts/probe_cities_smoke.py http://127.0.0.1:7860
 ## The SF demo (run yourself)
 
 ```bash
-RIPRAP_DEPLOYMENT=deployments/sf RIPRAP_RECONCILER_TIER=no_llm \
+RIPRAP_RECONCILER_TIER=no_llm \
 uv run python -c "
 import riprap.core.burr.app as a
 r = a.run('1 Dr Carlton B Goodlett Pl, San Francisco, CA')
@@ -76,33 +84,13 @@ print(f'top categories: {r[\"sf_311\"][\"top_by_service_name\"][:3]}')
 "
 ```
 
-Output (verified):
-
-```
-This is an automated hazard-exposure briefing produced by Riprap from live and
-baked data sources. It is informational only and not a substitute for a
-professional risk assessment.
-
-**Live Observer.**
-San Francisco 311 received 200 service requests within 300 m of this address
-[sf_311]. Most recent NWS hourly observation at the nearest METAR station —
-temperature, humidity, dewpoint, recent precipitation [nws_obs]. Recent NOAA
-water-level reading at the nearest station to this address [noaa_tides].
-
-**Projector.**
-Currently active NWS alerts intersecting this address [nws_alerts].
-
-**Out of scope.** ...
-
-sf_311 n_records: 200
-top categories: [
-  {'value': 'Street and Sidewalk Cleaning', 'count': 126},
-  {'value': 'Parking Enforcement', 'count': 14},
-  {'value': 'Graffiti Public', 'count': 13},
-]
-```
-
-Real DataSF call, real geocode to SF City Hall, real `within_circle(point, lat, lon, 300)` filter.
+The query routes to `deployments/sf/` because the geocoded point falls in
+its `coverage:` bounding box. The output shown here before was recorded
+with an older briefing shape and is removed. The briefing now opens with a
+scope line, has one section per Stone with evidence, and the `sf_311`
+sentence says how many of the fetched records were kept and whether the
+filter ran. Run the command above to see the current output; it calls live
+DataSF, NWS and NOAA endpoints, so the counts change from run to run.
 
 ## What had to change in code (still ~190 LOC total since Chicago)
 
@@ -112,12 +100,12 @@ same registry-driven `run()`. The deployments are pure manifest work.
 
 ## Known per-city quirks
 
-- **Seattle CSR 311 (`5ngg-rpne`) has no Point geometry.** The `location`
-  field is an address string; `x_value`/`y_value` are coordinate strings
-  not stored as a Socrata Location type, so `within_circle` doesn't
-  work. Seattle's deployment runs on federal pebbles only. Future fix:
-  extend `socrata_records` to support bbox filtering on x/y numeric
-  fields, or find a different Seattle 311 export.
+- **Seattle CSR 311 (`5ngg-rpne`) gives only a category name.**
+  `seattle_311` queries the `latitude_longitude` field within 300 m and
+  keeps records through a reviewed category table on
+  `webintakeservicerequests`. Only "Clogged Storm Drain" is flood-related;
+  the feed has no street-flooding or sewer-backup category. Seattle has 6
+  pebbles: the four federal ones, `seattle_311` and a water-level gauge.
 
 - **Albany, NY has no open-data 311 export.** Its 311 intake runs on
   SeeClickFix, so `albany_311` calls the SeeClickFix public API through
@@ -176,13 +164,14 @@ across NYC and Boston deployments.
 
 > Riprap is an open-source climate briefing tool. Deployments are
 > directories of YAML pointing at place-specific data sources. **NYC**
-> is the reference (23 pebbles). **Chicago, Seattle, San Francisco**
+> is the reference (31 pebbles). **Chicago, Seattle, San Francisco**
 > show the framework runs on the Socrata ecosystem; **Boston** runs on a
 > CKAN adapter that uses bbox SQL push-down + haversine refine; **Albany**
 > runs with no open-data portal at all, via the SeeClickFix public API.
 > All five are experimental: federal pebbles plus a 311 feed and/or a
-> water-level gauge, with unfiltered 311 counts in Chicago, SF and
-> Boston. Adding **DC, LA, Austin, Houston, San Diego, or
+> water-level gauge. Chicago and Seattle filter 311 with reviewed category
+> tables; SF, Boston and Albany pass 311 records unfiltered unless locally
+> built classifier weights are installed. Adding **DC, LA, Austin, Houston, San Diego, or
 > Atlanta** (Socrata), **Philadelphia, Toronto, EU portals** (CKAN), or
 > any of the hundreds of SeeClickFix cities is a directory of YAML.
 

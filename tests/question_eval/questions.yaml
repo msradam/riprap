@@ -4,7 +4,8 @@
 # gallery targets and the NYC pebble registry, not collected from users.
 #
 # Fields:
-#   kind                   one of the eight kinds in refactor_2.md
+#   kind                   one of eight kinds: bare_address, flood_history, right_now, asset,
+#                          future, district, out_of_scope, not_covered
 #   expected_intent        single_address | neighborhood | live_now | out_of_scope
 #   must_run               pebbles a competent analyst would need; missing one is a failure
 #   irrelevant             pebbles that are waste for this question (not a failure)

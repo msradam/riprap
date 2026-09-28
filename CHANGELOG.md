@@ -4,6 +4,84 @@ All notable changes to Riprap. The hackathon submission tag is
 `v0.5.0` (build 2026-05-07); subsequent dates record polish work
 that landed on the hackathon-period production deploys.
 
+## [Unreleased] (refactors 2 to 6 and the design pass)
+
+Plain-language summary of the work on branches `refactor/mvp-2` to
+`refactor/mvp-6` and `design/impeccable-pass`, in the order it landed.
+
+### Questions and answers (refactors 2 to 4)
+- Riprap answers a question about a place, not only an address. A
+  planner (an LLM when one is configured, else fixed rules) decides
+  whether there is a question, whether it is in scope, and which sources
+  to run. Some sources always run for a given kind of question.
+- The briefing opens with an Answer section. The default answer mode is
+  extractive: the model picks a lead ("Yes.", "No.", "In part.", a count)
+  and which source sentences answer the question, and those sentences
+  are shown word for word. Guarded mode lets the model write the answer,
+  then checks it against its sources.
+- Deterministic answer checks catch six ways an answer can misstate its
+  evidence: an absence stated against a positive source, "all" over a
+  partial count, a conclusion joining two sources, an omitted count, an
+  elevation without its datum, and a "no" or a zero resting on a source
+  that could not answer. These six answer checks are word patterns and
+  rules. Guarded answers also get an entailment check: a classifier that
+  scores whether the cited text supports a claim, and it misses
+  paraphrased inferences. See `docs/GROUNDING.md`.
+- Named-day forecasts ("will it flood next Tuesday?") and advice
+  (insurance, buying) are refused with fixed text.
+- A 30-question set and a 20-question held-out set with an A/B harness
+  (`scripts/question_eval.py`). The held-out set has since informed
+  several rules and is no longer a clean test.
+- Non-NYC 311 feeds: Chicago and Seattle are filtered to flood-related
+  requests with reviewed category tables. Boston, San Francisco and
+  Albany can use an experimental text classifier when one is installed
+  (`RIPRAP_311_FILTER_PATH`); it is documented as unreliable on live
+  feeds, and without it the count is unfiltered and says so.
+
+### Design pass
+- Citations are reachable from every claim, and the page says which
+  place a briefing covers ("Briefing for:").
+- The answer comes first, the map loads only when needed, and the print
+  packet works.
+- Landmarks, heading order, the skip link and small targets were fixed.
+  Real-usage journeys run in Playwright with an axe check on every
+  state.
+
+### Places, counts and honesty about missing data (refactor 5)
+- Without an LLM, places are resolved from the words that name them: a
+  community district code checked against the 59 real districts, a
+  street address, or a short place name. Before, any question naming a
+  borough resolved to that borough's first neighbourhood. Accuracy on 65
+  test cases went from 15 to 64. An uncertain match is flagged.
+- 311 counts are split by complaint kind. A question about street
+  flooding gets the street flooding count.
+- A source that failed or could not be read is reported as unavailable,
+  never as 0; a true zero says the source answered and nothing matched.
+- Address briefings open with a short cited summary ("In brief"). The
+  three DEP scenario sentences are one, and technical terms (percentile,
+  HAND, TWI) are explained.
+- District pages draw the district outline. Map points are also listed
+  for keyboard users. Evidence cards that repeat the briefing are behind
+  a "Show all evidence cards" button.
+- The print footer names the project's repository; addresses the
+  project does not control were removed. Source links were checked
+  (`scripts/check_links.py`) and the dead USGS link fixed.
+
+### Personal data and final polish (refactor 6)
+- Email addresses and phone numbers are removed from 311 records when
+  they are fetched, before they reach a briefing, a cache, a log or a
+  file. The training pool for the 311 classifier is no longer in the
+  repository and is git-ignored.
+- District and neighbourhood cards show their figure (for example
+  "38.5% inside the 2012 Sandy extent"), and sources not chosen for a
+  question say "Not run".
+- Question pages say each thing once and hide empty sections.
+- Yes or no questions about past flooding get their lead from a rule
+  over the observed-event sources, not from the model.
+- A stream-gauge search with no gauge nearby is a true "none nearby";
+  when no source produces evidence, the briefing names the sources that
+  failed.
+
 ## [Unreleased] (MVP refactor)
 
 - One orchestrator: the Burr app in `riprap/core/burr/app.py` now runs

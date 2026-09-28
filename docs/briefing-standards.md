@@ -1,7 +1,9 @@
 # Riprap Briefing Standards — Compliance Reference
 
-This document is the trust contract enforced on every Riprap briefing
-(both the LLM-tier Granite 4.1 output and the templated-tier output).
+This document lists the rules behind the 13 disclosure checks that run on
+every Riprap briefing, from the no-LLM evidence briefing or from any
+OpenAI-compatible LLM. The checks report which rules pass and fail in the
+`compliance` block of each result; they never block or change a briefing.
 Rules are sourced from established standards in flood-risk communication,
 climate-risk disclosure, environmental site assessment, public-health
 risk communication, and data journalism — they are not invented.
@@ -208,28 +210,24 @@ Source: [SPJ Code of Ethics](https://www.spj.org/spj-code-of-ethics/)
 
 ## Cross-cutting predicate summary
 
-| Predicate | Sources |
-|---|---|
-| `no_will_flood_without_hedge` | FEMA 1.2, AP 6.3 |
-| `no_false_reassurance` | FEMA 1.3, EPA 5.7 |
-| `firm_citation_has_vintage` | FEMA 1.5 |
-| `hundred_year_flood_clarified` | FEMA 1.1 |
-| `likelihood_term_in_whitelist` | IPCC 2.1, 2.2 |
-| `confidence_term_in_whitelist` | IPCC 2.3 |
-| `no_likelihood_confidence_mixup` | IPCC 2.4 |
-| `projection_has_horizon` | TCFD 3.2 |
-| `projection_names_scenario` | TCFD 3.3 |
-| `scope_declaration_present` | ASTM 4.1 |
-| `non_scope_disclaimer_present` | ASTM 4.3 |
-| `data_gap_disclosed_when_probe_offline` | ASTM 4.4, CERC 5.6 |
-| `automation_disclosure_present` | ASTM 4.5 |
-| `informational_disclaimer_present` | ASTM 4.6 |
-| `no_unsupported_causation` | AP 6.4 |
-| `no_rounding_to_false_precision` | AP 6.5 |
-| `no_unrelated_risk_comparisons` | EPA 5.8 |
-| `composite_rating_declares_inputs` | EPA 5.9 |
-| `every_number_cited` | SPJ 7.1, AP 6.1 (existing `citations_dense`) |
-| `every_citation_resolves` | SPJ 7.4 (existing `citations_resolve`) |
+The 13 checks in `ALL_PREDICATES` (`riprap/core/compliance/predicates.py`).
+Rules above without a row here are not checked in code.
+
+| Predicate | Rule | What it checks |
+|---|---|---|
+| `no_will_flood_without_hedge` | FEMA 1.2 | No bare "will flood" or "is inundated" assertions; a hedge is required. |
+| `no_false_reassurance` | FEMA 1.3 / EPA 5.7 | No language asserting absence of flood risk or false reassurance. |
+| `hundred_year_flood_clarified` | FEMA 1.1 | "100-year flood" must come with the 1% annual chance framing. |
+| `firm_citation_has_vintage` | FEMA 1.5 | Sentences citing FEMA flood maps must include the map vintage (year). |
+| `no_uncalibrated_probability_language` | IPCC 2.2 | Uncalibrated hedges ("probably") paired with a numeric probability must use the IPCC AR6 lexicon instead. |
+| `projection_has_horizon` | TCFD 3.2 | Projection sentences must declare a time horizon (short, medium or long term, or an explicit year or duration). |
+| `scope_declaration_present` | ASTM 4.1 | The briefing must declare its scope (an exposure briefing, not a certificate or determination). |
+| `informational_disclaimer_present` | ASTM 4.6 | The briefing must say it is informational, not a substitute for a professional flood, elevation or insurance determination. |
+| `automation_disclosure_present` | ASTM 4.5 | The briefing must disclose that it is automated. |
+| `data_gap_disclosed_when_probe_offline` | ASTM 4.4 / CERC 5.6 | When probes are offline, the briefing must disclose the data gap. |
+| `no_unrelated_risk_comparisons` | EPA 5.8 | Flood risk must not be compared to unrelated everyday risks (lightning, car accidents). |
+| `no_rounding_to_false_precision` | AP 6.5 | Numeric values must be rounded to a precision the source supports. |
+| `every_numeric_claim_cited` | SPJ 7.1 / AP 6.1 | Every sentence with a numeric quantity must carry a `[doc_id]` citation. |
 
 ---
 

@@ -4,8 +4,7 @@ type: reference
 
 # Calibration data
 
-Copied unchanged from the System One experiment on branch
-`experiment/system-one`, commit `06e20e8`, directory
+Copied unchanged from an unpublished experiment (System One), directory
 `experiments/23_system_one/`. The labels are automatic (silver or
 perturbation), not owner judgements.
 
@@ -44,9 +43,9 @@ that git does not ignore.
 2. Build each record's text as the city's manifest does (`text_fields` and
    `join` under `record_filter` in `deployments/<city>/manifests/*_311.yaml`),
    drop records in `task_a.csv`, and keep at most half the pool from any one
-   city, as `prep_distill_pool.py` did on the experiment branch. Write a
-   CSV with `item_id` and `text` columns to a path outside the repository,
-   for example `~/.cache/riprap/distill_pool.csv`.
+   city, as `prep_distill_pool.py` did in the unpublished experiment (System
+   One). Write a CSV with `item_id` and `text` columns to a path outside the
+   repository, for example `~/.cache/riprap/distill_pool.csv`.
 3. Label every record with the teacher: Granite 4.1 8B's option
    probabilities with the A1 readout, as JSON lines
    `{"item_id": ..., "probs": {...}}`. The committed

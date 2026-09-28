@@ -2,8 +2,8 @@
 
     uv run --extra ml python scripts/calibrate_entailment.py [gliclass|guardian] [--test]
 
-data/calibration/task_b.csv is the experiment's Task B (experiment/system-one,
-06e20e8): claims from stored briefings with their cited evidence, plus
+data/calibration/task_b.csv is the Task B of an unpublished experiment
+(System One): claims from stored briefings with their cited evidence, plus
 perturbed copies (changed number, swapped document, flipped direction,
 changed place) labelled unsupported. The split is the experiment's own:
 20% of claims (all variants of a claim together), stratified by label,
@@ -28,7 +28,7 @@ KEEP_TRUE = 0.95
 
 
 def split(df: pd.DataFrame, seed: int = 0) -> np.ndarray:
-    """Copy of experiments/23_system_one/metrics.py:split, grouped by claim."""
+    """Copy of the unpublished experiment's (System One) metrics.py:split, grouped by claim."""
     rng = np.random.default_rng(seed)
     first = df.groupby("group").label.first()
     cal: set = set()

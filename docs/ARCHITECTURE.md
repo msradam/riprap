@@ -6,8 +6,10 @@
 > to the dataset, agency report or model output it came from. NYC/flood is
 > the reference deployment (this document describes it end to end); the
 > same code runs five experimental city deployments (see
-> [`docs/multi-city.md`](multi-city.md)) and heat and air-quality
-> scaffolds (see [`docs/multi-hazard.md`](multi-hazard.md)).
+> [`docs/multi-city.md`](multi-city.md)). Heat and air-quality scaffolds
+> (see [`docs/multi-hazard.md`](multi-hazard.md)) are not reachable today:
+> they have no `coverage:` bounding box, so no query routes to them, and
+> the planner refuses heat and air questions as out of scope.
 >
 > **Who it's for.** Urban planners, journalists on deadline, NYCEM grant
 > writers filing FEMA BRIC sub-applications, agency capital planners,
@@ -107,8 +109,11 @@ Neither is a flood prediction; both are exposure indicators that say
 For a query in any of the intents in [§4](#4-intents), Riprap returns:
 
 1. **A briefing** with one section per Stone that has evidence. In no-LLM
-   mode it is the evidence sentences themselves; in LLM mode it is the
-   claims that survived verification. Every sentence carries `[doc_id]`
+   mode it is the evidence sentences themselves, opened for a bare address
+   by an "In brief" lead (Sandy, FEMA zone, DEP scenarios, 311 count, each
+   part passed through the claim verifier), with the three point DEP
+   scenarios merged into one sentence; in LLM mode it is the claims that
+   passed the citation and number checks. Every sentence carries `[doc_id]`
    citations. A section with no evidence is left out.
 2. **Evidence cards.** One per pebble that returned a value, with the raw
    values and a link to the source dataset.
@@ -175,12 +180,13 @@ assemble_legacy_state   reshapes the DEP scenario values into one dict
 policy_corpus       Granite Embedding query + Flair NER over the corpus
   ▼
 reconcile           evidence from manifest templates, then the no-LLM
-                    briefing or verified LLM claims; disclosure checks
+                    briefing or LLM claims checked in code for citations
+                    and numbers; disclosure checks
 ```
 
 Which pebbles run depends on the intent. Point intents run pebbles with
 `spatial.scope: point`. `neighborhood` and `development_check` run the
-polygon pebbles (`sandy_nta`, `dep_extreme_2080_nta`,
+polygon pebbles (`area_boundary`, `sandy_nta`, `dep_extreme_2080_nta`,
 `dep_moderate_2050_nta`, `dep_moderate_current_nta`, `nyc311_nta`,
 `microtopo_nta`, `dob_permits_nta`). `live_now` runs only the
 `type: live` point pebbles. `compare` is two `single_address` runs merged
@@ -199,10 +205,11 @@ short result summary) that streams to the UI as `step` events on
 
 ### 3.1 NYC pebbles, plain language
 
-The NYC deployment has 19 point pebbles in `deployments/nyc/manifests/`,
-the 7 polygon pebbles listed above, and 4 federal pebbles from
-`deployments/federal/` (`fema_nfhl`, `nws_alerts`, `nws_obs`,
-`usgs_gauges`). Other deployments have their own, smaller, experimental
+The NYC deployment has 31 pebbles: 19 point pebbles in
+`deployments/nyc/manifests/`, the 8 polygon pebbles listed above (in the
+same directory), and 4 federal pebbles from `deployments/federal/`
+(`fema_nfhl`, `nws_alerts`, `nws_obs`, `usgs_gauges`) that are merged into
+every deployment. Other deployments have their own, smaller, experimental
 sets (see [`docs/multi-city.md`](multi-city.md) and
 [`docs/multi-hazard.md`](multi-hazard.md)).
 
@@ -244,8 +251,12 @@ Values from a May 2026 run, to show what the pebbles return:
 | ida_hwm | 0 high-water marks within 800 m |
 | policy_corpus | NPCC4 Ch. 3, MTA resilience roadmap, Comptroller report |
 
-In no-LLM mode each of these becomes one sentence from its manifest
-template, cited to its `doc_id` and grouped under its Stone. Pebbles that
+In no-LLM mode the briefing opens with an "In brief" lead (the Sandy
+footprint, the FEMA zone, the DEP scenarios and the 311 count, each part
+cited and passed through the claim verifier). Then each value becomes one
+sentence from its manifest template, cited to its `doc_id` and grouped
+under its Stone; the three point DEP scenarios are merged into one
+sentence. Pebbles that
 returned nothing (no Ida marks, no alerts) print nothing, so the briefing
 never mentions them.
 
@@ -269,8 +280,9 @@ one LLM call (`app/planner.py`); in no-LLM mode it is a regex heuristic
 
 With a question, only the planner's chosen pebbles and the intent's floor
 run (`riprap/core/burr/stones.py`, `FLOOR` and `select_pebbles`); the
-others are listed as not checked. The LLM briefing then opens with a
-verified answer section (docs/GROUNDING.md, "Questions").
+others are listed as not checked. The LLM briefing then opens with an
+answer section whose lead and claims are checked in code (docs/GROUNDING.md,
+"Questions").
 
 HTTP routes: `/api/agent` (JSON), `/api/agent/stream` (SSE),
 `/api/agent/batch` (up to 25 addresses), `/api/district/{code}`,
@@ -370,6 +382,8 @@ check work with any model and any endpoint.
 | Granite Embedding 278M | 278 M | sentence-transformers, in process on CPU | Embeds the query for `policy_corpus`; the corpus index is built offline by `scripts/build_rag_index.py` into `data/rag_index.npz` | Experimental |
 | Flair NER (`flair/ner-english-ontonotes-fast`) | about 150 MB | flair, in process on CPU | Coarse entity tags on retrieved passages | Experimental |
 | Prithvi-EO 2.0 (`msradam/Prithvi-EO-2.0-NYC-Pluvial` by default) | 300 M | TerraTorch, batch only (`eo` extra) | `scripts/run_eo_batch.py`; the app reads only the baked Ida polygons | Experimental |
+| GLiClass large v3.0 (`knowledgator/gliclass-large-v3.0`) | see model card | gliclass, in process on CPU | Entailment check on guarded answer claims (`riprap/core/burr/entailment.py`); misses paraphrased inferences | Experimental |
+| GLiClass modern-base v3.0, distilled 311 filter | see model card | gliclass, in process on CPU; weights built locally by `scripts/train_311_filter.py`, found through `RIPRAP_311_FILTER_PATH` | Flood filter for SF, Boston and Albany 311 records; unreliable on live feeds | Experimental |
 
 The in-process models need the `ml` extra; without it their pebbles skip
 themselves. TerraMind and the NYC TerraMind adapters are not used by the

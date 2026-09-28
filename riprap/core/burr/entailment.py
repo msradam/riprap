@@ -10,8 +10,8 @@ with the cited evidence as the premise and the claim as the hypothesis.
   RIPRAP_ENTAILMENT=guardian   ibm-granite/granite-guardian-4.1-8b on the GPU
   RIPRAP_ENTAILMENT=off        skip
 
-Both adapters are copied from the System One experiment's round-two code
-(experiments/23_system_one/run.py on experiment/system-one, 06e20e8):
+Both adapters are copied from the round-two code of an unpublished
+experiment (System One), experiments/23_system_one/run.py:
 GLiClass in its documented NLI form, Guardian reading P(no risk) one step
 after a prefilled <score>. Models are pinned by SHA and loaded from
 safetensors only. The models need the `ml` extra; without it, or without

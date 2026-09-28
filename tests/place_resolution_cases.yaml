@@ -128,37 +128,37 @@
   source: heldout.yaml:d02
   district: QN04
 - input: QN12
-  source: dogfood (impeccable_report.md)
+  source: dogfood (design pass, 2026-09-27)
   district: QN12
 - input: QN 12
-  source: dogfood (impeccable_report.md)
+  source: dogfood (design pass, 2026-09-27)
   district: QN12
 - input: Community District 12 Queens
-  source: dogfood (impeccable_report.md)
+  source: dogfood (design pass, 2026-09-27)
   district: QN12
 - input: Queens CD 12
-  source: dogfood (impeccable_report.md)
+  source: dogfood (design pass, 2026-09-27)
   district: QN12
 - input: Queens Community Board 12
-  source: dogfood (impeccable_report.md)
+  source: dogfood (design pass, 2026-09-27)
   district: QN12
 - input: How many street flooding complaints has QN12 had?
-  source: dogfood (impeccable_report.md)
+  source: dogfood (design pass, 2026-09-27)
   district: QN12
 - input: Jamaica, Queens
-  source: dogfood (impeccable_report.md)
+  source: dogfood (design pass, 2026-09-27)
   neighborhood: Jamaica
 - input: Has 90-01 183rd Street, Queens flooded?
-  source: dogfood (impeccable_report.md)
+  source: dogfood (design pass, 2026-09-27)
   address: 90-01 183rd Street, Queens, NY 11423
 - input: flooding near 90-01 183rd Street, Queens
-  source: dogfood (impeccable_report.md)
+  source: dogfood (design pass, 2026-09-27)
   address: 90-01 183rd Street, Queens, NY 11423
 - input: Are the schools near 116-02 Rockaway Beach Boulevard exposed to flooding?
-  source: dogfood (impeccable_report.md)
+  source: dogfood (design pass, 2026-09-27)
   address: 116-02 Rockaway Beach Boulevard, Queens, NY
 - input: Are the schools near 116-02 Rockaway Beach Boulevard, Queens exposed to flooding?
-  source: dogfood (impeccable_report.md)
+  source: dogfood (design pass, 2026-09-27)
   address: 116-02 Rockaway Beach Boulevard, Queens, NY
 - input: What is the flood risk at 79-01 Broadway, Queens?
   source: new, written before running
