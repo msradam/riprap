@@ -46,7 +46,9 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 # Core plus the `ml` extra (in-process TTM, embeddings, NER). torch comes
 # from the CPU wheel index on Linux (see [tool.uv.sources]).
-RUN uv sync --frozen --no-dev --extra ml --no-install-project
+# The cache mount keeps uv's download cache (about 1.7 GB) out of the image.
+RUN --mount=type=cache,target=/root/.cache/uv \
+    UV_LINK_MODE=copy uv sync --frozen --no-dev --extra ml --no-install-project
 
 # App code, manifests (with the policy corpus under deployments/nyc/corpus/) and fixtures.
 COPY app/ ./app/
