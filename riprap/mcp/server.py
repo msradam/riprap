@@ -41,6 +41,13 @@ mcp = MCPServer(
 )
 
 
+def _place_match(out: dict) -> str | None:
+    """"exact" when the place resolved is the one asked for, "closest" for
+    a nearby, similar or neighbourhood-level match that a reader should
+    check before relying on the briefing."""
+    return (out.get("geocode") or {}).get("match")
+
+
 def _evidence_payload(out: dict) -> dict:
     from riprap.core.burr import evidence
 
@@ -49,6 +56,7 @@ def _evidence_payload(out: dict) -> dict:
     heading = {s.id: s.name for s in stones.all()}
     return {
         "place": (out.get("geocode") or {}).get("address"),
+        "place_match": _place_match(out),
         "lat": out.get("lat"),
         "lon": out.get("lon"),
         "deployment": out.get("deployment"),
@@ -132,7 +140,8 @@ def plan_query(question: str, address: str | None = None) -> dict:
     dep = pick_deployment(hit.lat, hit.lon) if hit else None
     deployment = dep.name if dep else "nyc"
     return {
-        "intent": plan["intent"], "targets": plan.get("targets"), "question": plan.get("question"),
+        "intent": plan["intent"], "targets": plan.get("targets"), "place": plan.get("place"),
+        "question": plan.get("question"),
         "focus": plan.get("focus"), "chosen": plan.get("pebbles"),
         "floor": sorted(floor_for(plan)), "deployment": deployment,
         "selected": select_pebbles(plan, get_registry(deployment)),
@@ -156,6 +165,8 @@ def get_briefing(address: str, question: str | None = None) -> dict:
     return {
         "address": address,
         "question": question,
+        "place": (out.get("geocode") or {}).get("address"),
+        "place_match": _place_match(out),
         "deployment": out.get("deployment"),
         "intent": out.get("intent"),
         "paragraph": out.get("paragraph"),

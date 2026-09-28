@@ -28,6 +28,7 @@ from typing import Any
 from burr.core import State, action
 
 from riprap.core.burr.pebble import trace_rec_for
+from riprap.core.burr.place import geocode_matches, resolve_query
 
 # Trailing risk phrases ("... at risk of flooding?", "... flood risk").
 _TRAILING_RE = re.compile(
@@ -125,20 +126,29 @@ def heuristic_plan(query: str) -> dict:
         return {"intent": "compare", "rationale": "Heuristic match: compare.",
                 "targets": [{"type": "address", "text": _address_from_query(a)},
                             {"type": "address", "text": _address_from_query(b)}]}
-    target = _address_from_query(q)
-    has_number = bool(_HOUSE_NUMBER_RE.match(target))
-    if _LIVE_RE.search(q):
-        intent = "live_now"
-        target = target if has_number else "New York City Hall, New York, NY"
-    elif _DEVELOPMENT_RE.search(q) and not has_number and nta.resolve_from_text(q):
-        intent = "development_check"
-    elif not has_number and nta.resolve_from_text(q):
-        intent = "neighborhood"
+    # Find the place from the words that name it (riprap/core/burr/place.py):
+    # a community district, then a street address, then a short place
+    # phrase. Never the whole question: that is how "... Queens ..." once
+    # resolved to Astoria.
+    place = resolve_query(q)
+    if place["kind"] == "invalid":
+        return {"intent": "not_implemented", "rationale": place["message"], "targets": [], "place": place}
+    area_intent = "development_check" if _DEVELOPMENT_RE.search(q) else "neighborhood"
+    if place["kind"] == "district":
+        return {"intent": area_intent, "rationale": f"Heuristic match: community district {place['text']}.",
+                "targets": [{"type": "district", "text": place["text"]}], "place": place}
+    if place["kind"] == "address":
+        intent, target = ("live_now" if _LIVE_RE.search(q) else "single_address"), place["text"]
+    elif _LIVE_RE.search(q):
+        intent, target = "live_now", "New York City Hall, New York, NY"
+    elif place["kind"] == "neighborhood" and nta.resolve(place["text"]):
+        intent, target = area_intent, place["text"]
     else:
-        intent = "single_address"
+        # A landmark or anything else: let the geocoder decide, and fail honestly.
+        intent, target = "single_address", place["text"] or _address_from_query(q)
     kind = "nta" if intent in ("neighborhood", "development_check") else "address"
     return {"intent": intent, "rationale": f"Heuristic match: {intent}.",
-            "targets": [{"type": kind, "text": target}]}
+            "targets": [{"type": kind, "text": target}], "place": place}
 
 
 @action(reads=["query"], writes=["plan", "intent", "first_target", "trace"])
@@ -263,6 +273,9 @@ def geocode_target(state: State) -> State:
             "lon": h.lon,
             "bbl": h.bbl,
             "bin": h.bin,
+            # "exact" when the geocoder returned the house number and street
+            # asked for; "closest" for a landmark or a nearby or similar match.
+            "match": "exact" if geocode_matches(target, h.address) else "closest",
         }
         rec["ok"] = True
         # The UI reads lat/lon out of this trace `result` to drive its
@@ -300,8 +313,9 @@ def resolve_area(state: State) -> State:
     try:
         district = nta.by_district(target) if re.fullmatch(r"\s*(MN|BX|BK|QN|SI)\s*\d{2}\s*", target,
                                                                re.IGNORECASE) else None
-        matches = ([district] if district else []) or (nta.resolve(target) if target else []) \
-            or nta.resolve_from_text(state.get("query") or "")
+        # No whole-question fallback: scanning the question for any place
+        # name matched a borough first ("Queens") and returned Astoria.
+        matches = ([district] if district else []) or (nta.resolve(target) if target else [])
         if not matches:
             rec["ok"], rec["err"] = False, f"no neighborhood matches {target!r}"
             trace.append(rec)
@@ -313,8 +327,10 @@ def resolve_area(state: State) -> State:
                 "bbox": list(t["geometry"].bounds), "n_matches": len(matches)}
         rec["ok"], rec["result"] = True, info
         trace.append(rec)
+        exact = bool(district) or nta._normalize(target) == nta._normalize(t["nta_name"])
         geocode = {"address": f"{t['nta_name']}, {t['borough']}", "borough": t["borough"],
-                   "lat": c.y, "lon": c.x, "bbl": None, "bin": None}
+                   "lat": c.y, "lon": c.x, "bbl": None, "bin": None,
+                   "match": "exact" if exact else "closest"}
         return state.update(geocode=geocode, lat=c.y, lon=c.x, nta=info,
                             polygon_wkt=t["geometry"].wkt, trace=trace)
     finally:

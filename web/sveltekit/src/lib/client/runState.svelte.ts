@@ -232,15 +232,18 @@ export class RunState {
   briefing = $derived(briefingFromFinal(this.finalResult));
 
   /** The place the backend resolved, in its own words, so a reader can
-   *  see at once when the wrong place was looked up. */
+   *  see at once when the wrong place was looked up. A closest-match
+   *  suffix marks a resolution the geocoder was not sure of. */
   resolvedPlace = $derived.by<string | null>(() => {
     const a = this.compareAddressA?.label;
     const b = this.compareAddressB?.label;
     if (a || b) return [a && `A: ${a}`, b && `B: ${b}`].filter(Boolean).join('; ');
     const addr = this.finalResult?.geocode?.address ?? this.address?.label ?? null;
     const nta = this.finalResult?.nta?.nta_name;
-    if (addr && nta && !addr.includes(nta)) return `${addr} (${nta})`;
-    return addr ?? nta ?? null;
+    const place = addr && nta && !addr.includes(nta) ? `${addr} (${nta})` : (addr ?? nta ?? null);
+    if (place && this.finalResult?.geocode?.match === 'closest')
+      return `${place} (closest match; check this is the place you meant)`;
+    return place;
   });
 
   /** Step names whose event reported ok: false, in run order. */
