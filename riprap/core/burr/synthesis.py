@@ -270,7 +270,10 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
             text = c["text"].rstrip(". ")
             if any(i in experimental for i in c["doc_ids"]) and "experimental" not in text.lower():
                 text = f"Experimental: {text}"
-            out.append(f"{text} {''.join(f'[{i}]' for i in c['doc_ids'])}.")
+            if len(c["doc_ids"]) == 1:  # a multi-sentence template fact: cite each numeric sentence
+                out.append(evidence.cite(f"{text}.", c["doc_ids"][0]))
+            else:
+                out.append(f"{text} {''.join(f'[{i}]' for i in c['doc_ids'])}.")
         return " ".join(out)
 
     parts = [_scope_header()]

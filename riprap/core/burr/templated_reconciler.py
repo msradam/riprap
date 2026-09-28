@@ -77,9 +77,12 @@ NON_SCOPE_FOOTER = (
 
 
 # The three point DEP scenarios, in time order, and the words for each.
+# "2050 sea-level rise" (not "2050 sea level") is the phrase the disclosure
+# check reads as a time horizon.
 _DEP_POINT = {"dep_moderate_current": "current sea level with 2.13 in/hr of rain",
-              "dep_moderate_2050": "2050 sea level with 2.13 in/hr",
-              "dep_extreme_2080": "2080 sea level with 3.66 in/hr"}
+              "dep_moderate_2050": "2050 sea-level rise with 2.13 in/hr",
+              "dep_extreme_2080": "2080 sea-level rise with 3.66 in/hr"}
+_DEP_HORIZON = {"dep_moderate_current": "current", "dep_moderate_2050": "2050", "dep_extreme_2080": "2080"}
 
 
 def _dep_sentence(state, items) -> str | None:
@@ -117,12 +120,19 @@ def _lead(state, items) -> str | None:
     if dep:
         ids = [by_pebble[p].doc_id for p in dep]
         wet = [p for p, v in dep.items() if v.get("depth_class")]
+
+        def horizons(ps) -> str:
+            """'current, 2050 and 2080 sea-level rise': the disclosure check needs a horizon."""
+            h = [_DEP_HORIZON[p] for p in ps]
+            if h == ["current"]:
+                return "current sea level (the near term)"
+            return (h[0] if len(h) == 1 else f"{', '.join(h[:-1])} and {h[-1]}") + " sea-level rise"
+
         if not wet:
-            add("", "outside the modeled flooding in every DEP stormwater scenario checked", ids)
+            add("", f"outside the modeled flooding in the DEP stormwater scenarios for {horizons(dep)}", ids)
         else:
-            add("", "inside the modeled flooding in the DEP " + " and ".join(
-                _DEP_POINT[p].split(" sea level")[0] for p in wet) + " stormwater scenario"
-                + ("s" if len(wet) > 1 else ""), [by_pebble[p].doc_id for p in wet])
+            add("", f"inside the modeled flooding in the DEP stormwater scenario{'s' if len(wet) > 1 else ''} "
+                    f"for {horizons(wet)}", [by_pebble[p].doc_id for p in wet])
     n311 = state.get("nyc311")
     if "nyc311" in by_pebble and isinstance(n311, dict) and "n" in n311:
         n = f"{'At least ' if n311.get('capped') else ''}{n311['n']}"
