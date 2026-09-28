@@ -95,8 +95,9 @@ retrieval); without them those sources skip themselves.
 [Ollama](https://ollama.com):
 
 ```bash
-ollama pull granite4:micro
-RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 RIPRAP_LLM_MODEL=granite4:micro \
+ollama pull hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M
+RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 \
+RIPRAP_LLM_MODEL=hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M \
   uv run uvicorn web.main:app --port 7860
 ```
 
