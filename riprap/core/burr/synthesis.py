@@ -216,10 +216,14 @@ def _checks_run(mode: str | None, entail_info: dict) -> list[str]:
 
 
 def _extract(out: dict, question: str, texts: dict[str, str],
-             values: dict | None = None) -> tuple[str, list[str], list[tuple[str, str]]]:
+             values: dict | None = None, focus: dict | None = None) -> tuple[str, list[str], list[tuple[str, str]]]:
     a = out.get("answer") or {}
     lead = a.get("lead") if a.get("lead") in LEADS else "cannot_answer"
     facts = [f for f in dict.fromkeys(a.get("facts") or []) if f in texts]
+    # A yes or no question about past flooding: the rule sets the lead.
+    rule = answer_checks.past_event_lead(question, focus, facts, texts, values)
+    if rule:
+        lead, facts = rule
     return lead, facts, answer_checks.check_lead(lead, facts, question, texts, values)
 # "facts" is set only by code: the facts with no yes or no in front of them.
 LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:",
@@ -371,7 +375,7 @@ def synthesize(state) -> dict:
             kept, failed, entail_info = entailment.check(kept, texts)
             dropped = [*dropped, *failed]
         elif mode == "extractive":
-            lead, facts, lead_hits = _extract(out, question, texts, values)
+            lead, facts, lead_hits = _extract(out, question, texts, values, focus)
             notes = [f"answer lead {lead!r}: {r}" for _, r in lead_hits]
         return kept, dropped, notes, (lead, facts, lead_hits)
 

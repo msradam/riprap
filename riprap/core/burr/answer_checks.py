@@ -321,3 +321,88 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str],
     if rel and rel not in facts and relevant_figure(rel, docs, values, question) is not None:
         hits.append(("dropped_count", f"omits {rel}, the source the question is about"))
     return hits
+
+
+# Refactor 6: the lead of a yes or no question about past flooding is set
+# by rule, not chosen by the model. The model still picks and orders the
+# facts. A rule is simpler than a prompt and can be checked.
+_HAPPENED_RE = re.compile(r"^\W*(has|have|had|did|was|were|is there|are there)\b.*\bflood", re.IGNORECASE)
+_SINCE_RE = re.compile(r"\bsince\s+(?:hurricane\s+|superstorm\s+)?(ida|sandy|(?:19|20)\d\d)\b", re.IGNORECASE)
+_STORM_YEAR = {"ida": 2021, "sandy": 2012}
+_FLOODNET_WINDOW_YEARS = 3
+
+
+def is_past_event_question(question: str, focus: dict | None) -> bool:
+    return ((focus or {}).get("time_frame") == "past" and bool(_HAPPENED_RE.search(question or ""))
+            and not is_count_question(question))
+
+
+def _period_start(question: str) -> int | None:
+    m = _SINCE_RE.search(question or "")
+    if not m:
+        return None
+    w = m.group(1).lower()
+    return _STORM_YEAR.get(w) or int(w)
+
+
+def _event(doc_id: str, v: dict, start: int | None, this_year: int) -> bool | None:
+    """True: the source reports a flood event in the asked period. False: it
+    answered and reports none in the period. None: it cannot say (no value,
+    unavailable, or its window does not cover the period)."""
+    if v.get("available") is False or v.get("error"):
+        return None
+    if doc_id in ("nyc311", "nyc311_nta") and "n" in v:
+        by_year = {int(y): n for y, n in (v.get("by_year") or {}).items()}
+        if start is None:
+            return v["n"] > 0
+        if sum(n for y, n in by_year.items() if y > start):
+            return True
+        # Events in the start year itself may fall before the event named;
+        # and a window that starts after the period cannot show "none".
+        covers = this_year - int(v.get("years") or 0) <= start
+        return None if by_year.get(start) or not covers else False
+    if doc_id == "floodnet" and "n_flood_events_3y" in v:
+        window_start = this_year - _FLOODNET_WINDOW_YEARS
+        if v["n_flood_events_3y"] > 0:
+            return True if start is None or window_start >= start else None
+        return False if start is None or window_start <= start else None
+    if doc_id == "ida_hwm" and "n_within_radius" in v:
+        return v["n_within_radius"] > 0
+    if doc_id == "sandy_inundation" and "inside" in v:
+        return bool(v["inside"])
+    return None
+
+
+def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: dict[str, str],
+                    values: dict | None, this_year: int | None = None) -> tuple[str, list[str]] | None:
+    """(lead, facts) for a yes or no question about past flooding, or None
+    for any other question. `yes` when a relevant observed source reports an
+    event in the asked period; `no` only when every relevant source answered
+    and reported none; `cannot_answer` otherwise. A source the rule relies on is added to
+    the facts when the model left it out, so the lead is always cited."""
+    if not is_past_event_question(question, focus):
+        return None
+    import datetime
+
+    year = this_year or datetime.date.today().year
+    q = (question or "").lower()
+    start = _period_start(question)
+    storm = next((d for w, d in (("ida", "ida_hwm"), ("sandy", "sandy_inundation")) if re.search(rf"\b{w}\b", q)),
+                 None)
+    complaints = "nyc311" if "nyc311" in docs else "nyc311_nta"
+    if storm and start is None:
+        relevant = [storm]  # "during Ida", "inside the area Sandy flooded": the storm's own record
+    elif re.search(r"\bsensors?\b|floodnet", q):
+        relevant = ["floodnet"]  # the question names the source
+    elif re.search(r"\b311\b|complaint", q):
+        relevant = [complaints]
+    else:
+        relevant = [complaints, "floodnet"]
+    verdict = {i: _event(i, v, start, year) for i in relevant
+               if isinstance(v := (values or {}).get(i), dict) and docs.get(i)}
+    positive = [i for i, e in verdict.items() if e is True]
+    if positive:
+        return "yes", facts if set(positive) & set(facts) else [*facts, positive[0]]
+    if len(verdict) == len(relevant) and all(e is False for e in verdict.values()):
+        return "no", facts + [i for i in relevant if i not in facts]
+    return "cannot_answer", []
