@@ -35,8 +35,10 @@ provenance:
   doc_id: floodnet
   citation: >-
     FloodNet NYC, community-led real-time street-flood sensor network.
-    Data CC-BY-NC-SA 4.0 — derivatives must carry the same license.
-    https://www.floodnet.nyc/data-downloads
+    Data CC-BY-NC-SA 4.0; derivatives must carry the same license.
+    Readings come from the FloodNet API (api.floodnet.nyc), which has no
+    stable page per sensor or event, so the link is the project's data
+    download page. https://www.floodnet.nyc/data-downloads
 
 narration:
   short: FloodNet sensors and historical flood events near this address.

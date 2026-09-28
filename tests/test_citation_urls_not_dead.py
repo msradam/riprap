@@ -11,7 +11,9 @@ from pathlib import Path
 
 import yaml
 
-_DEAD_DATASET_IDS = ("d73m-mf6p", "d3qk-pfyz", "i9rv-hdr5", "u3ic-3hcp", "4xj4-2vap")
+# The USGS STN Data Portal page answered 404 in refactor 5; the live check
+# is scripts/check_links.py, which needs the network.
+_DEAD_DATASET_IDS = ("d73m-mf6p", "d3qk-pfyz", "i9rv-hdr5", "u3ic-3hcp", "4xj4-2vap", "STNDataPortal")
 _MANIFESTS = sorted((Path(__file__).resolve().parent.parent / "deployments").glob("*/manifests/*.yaml"))
 
 
