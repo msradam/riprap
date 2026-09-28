@@ -362,12 +362,16 @@ def _event(doc_id: str, v: dict, start: int | None, this_year: int) -> bool | No
         covers = this_year - int(v.get("years") or 0) <= start
         return None if by_year.get(start) or not covers else False
     if doc_id == "floodnet" and "n_flood_events_3y" in v:
+        if v.get("n_sensors") == 0:
+            return None  # no sensor in range: silence, not "no flooding"
         window_start = this_year - _FLOODNET_WINDOW_YEARS
         if v["n_flood_events_3y"] > 0:
             return True if start is None or window_start >= start else None
         return False if start is None or window_start <= start else None
     if doc_id == "ida_hwm" and "n_within_radius" in v:
-        return v["n_within_radius"] > 0
+        # USGS surveyed marks at selected sites only: none nearby does not
+        # show the area stayed dry.
+        return True if v["n_within_radius"] > 0 else None
     if doc_id == "sandy_inundation" and "inside" in v:
         return bool(v["inside"])
     return None
@@ -404,5 +408,7 @@ def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: d
     if positive:
         return "yes", facts if set(positive) & set(facts) else [*facts, positive[0]]
     if len(verdict) == len(relevant) and all(e is False for e in verdict.values()):
-        return "no", facts + [i for i in relevant if i not in facts]
+        # A "no" rests on the relevant sources alone: a positive fact about
+        # something else (a 311 count for a sensor question) is not shown under it.
+        return "no", [f for f in facts if f in relevant] + [i for i in relevant if i not in facts]
     return "cannot_answer", []

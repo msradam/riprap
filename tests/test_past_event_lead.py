@@ -16,7 +16,7 @@ TEXTS = {"nyc311": "82 NYC 311 flood-related complaints ...", "floodnet": "2 Flo
 HOLLIS = {"nyc311": {"n": 82, "years": 5, "by_year": {"2021": 7, "2022": 6, "2025": 28}},
           "floodnet": {"n_flood_events_3y": 14}, "ida_hwm": {"n_within_radius": 2},
           "sandy_inundation": {"inside": False}}
-NONE = {"nyc311": {"n": 0, "years": 5, "by_year": {}}, "floodnet": {"n_flood_events_3y": 0},
+NONE = {"nyc311": {"n": 0, "years": 5, "by_year": {}}, "floodnet": {"n_sensors": 1, "n_flood_events_3y": 0},
         "ida_hwm": {"n_within_radius": 0}}
 
 
@@ -58,7 +58,16 @@ def test_a_storm_question_is_judged_by_that_storm_record():
 
 def test_a_named_source_is_the_only_relevant_one():
     q = "Have street flood sensors recorded flooding near 1 East 161st Street, Bronx?"
-    assert past_event_lead(q, PAST, [], TEXTS, {"floodnet": {"n_flood_events_3y": 0}}, 2026) == ("no", ["floodnet"])
+    zero = {"floodnet": {"n_sensors": 2, "n_flood_events_3y": 0}, "nyc311": HOLLIS["nyc311"]}
+    # The model's positive 311 fact is about something else and is not shown under "No."
+    assert past_event_lead(q, PAST, ["nyc311", "floodnet"], TEXTS, zero, 2026) == ("no", ["floodnet"])
+    no_sensor = {"floodnet": {"n_sensors": 0, "n_flood_events_3y": 0}}
+    assert past_event_lead(q, PAST, [], TEXTS, no_sensor, 2026) == ("cannot_answer", [])
+
+
+def test_no_ida_mark_nearby_does_not_mean_it_stayed_dry():
+    q = "Did the area around 79-01 Broadway, Queens flood during Hurricane Ida?"
+    assert past_event_lead(q, PAST, [], TEXTS, {"ida_hwm": {"n_within_radius": 0}}, 2026) == ("cannot_answer", [])
 
 
 def test_other_questions_are_left_to_the_model():

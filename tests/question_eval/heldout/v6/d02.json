@@ -1,0 +1,186 @@
+{
+ "id": "d02",
+ "kind": "district",
+ "question": "How many flooding complaints has community district QN04 had?",
+ "error": null,
+ "wall_s": 26.3,
+ "intent": "neighborhood",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "neighborhood",
+  "targets": [
+   {
+    "type": "nta",
+    "text": "QN04"
+   }
+  ],
+  "rationale": "The question asks for past flood-related 311 complaints within community district QN04, which is answered by the nyc311_nta source.",
+  "question": "How many flooding complaints has community district QN04 had?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "past",
+   "assets": []
+  },
+  "pebbles": [
+   "nyc311_nta"
+  ],
+  "catalog": [
+   "area_boundary",
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "area_boundary",
+  "dep_moderate_2050_nta",
+  "nyc311_nta",
+  "sandy_nta"
+ ],
+ "consulted": [
+  {
+   "id": "area_boundary",
+   "title": "Area boundary (2020 Neighborhood Tabulation Areas)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "sandy_nta",
+   "title": "Share of the neighborhood inside the 2012 Sandy extent",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050_nta",
+   "title": "DEP Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311_nta",
+   "title": "NYC 311 flood complaints inside the neighborhood",
+   "stone": "touchstone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "dep_extreme_2080_nta",
+   "title": "DEP Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current_nta",
+   "title": "DEP Moderate (2.13 in/hr, current sea level), share of the neighborhood",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo_nta",
+   "title": "Neighborhood terrain from the USGS 3DEP DEM",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dob_permits_nta",
+   "title": "Active DOB construction permits inside the neighborhood",
+   "stone": "keystone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1758,
+  "completion": 124,
+  "seconds": 7.56,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 621,
+  "completion": 236,
+  "seconds": 13.08,
+  "n_calls": 1
+ },
+ "n_documents": 4,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "609 NYC 311 flood-related complaints filed inside this area in the last 3 years: 286 sewer backup, 157 catch basin, 109 street flooding, 57 manhole overflow.",
+   "doc_ids": [
+    "nyc311_nta"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Live Observer",
+   "text": "Community district QN04 has had 609 flood-related complaints filed in the last 3 years, including 286 sewer backup, 157 catch basin, 109 street flooding, and 57 manhole overflow.",
+   "doc_ids": [
+    "nyc311_nta"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Live Observer",
+   "text": "In the last 3 years, 286 of the flood-related complaints in community district QN04 were sewer backups.",
+   "doc_ids": [
+    "nyc311_nta"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Live Observer",
+   "text": "In the last 3 years, 157 of the flood-related complaints in community district QN04 were from catch basins.",
+   "doc_ids": [
+    "nyc311_nta"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 609 NYC 311 flood-related complaints filed inside this area in the last 3 years: 286 sewer backup, 157 catch basin, 109 street flooding, 57 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+ "documents": {
+  "area_boundary": "The outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district.",
+  "sandy_nta": "0.0% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 6.14 km\u00b2).",
+  "dep_moderate_2050_nta": "DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.1% of this area is modeled to flood (2.1% nuisance, over 4 in to 1 ft; 1.1% 1 to 4 ft; 0.0% over 4 ft).",
+  "nyc311_nta": "609 NYC 311 flood-related complaints filed inside this area in the last 3 years: 286 sewer backup, 157 catch basin, 109 street flooding, 57 manhole overflow."
+ },
+ "values": {
+  "area_boundary": {},
+  "sandy_nta": {},
+  "dep_moderate_2050_nta": {},
+  "nyc311_nta": {
+   "n": 609
+  }
+ },
+ "checks": [
+  "citations and numbers on every claim",
+  "lead rules on the answer; no entailment check needed, since the answer is the cited text word for word"
+ ],
+ "entailment": {},
+ "answer_mode": "extractive",
+ "answer_lead": "count",
+ "answer_flags": []
+}

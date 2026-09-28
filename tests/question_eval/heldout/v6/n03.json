@@ -1,0 +1,218 @@
+{
+ "id": "n03",
+ "kind": "right_now",
+ "question": "What is the water level in the harbor near 200 Water Street, Manhattan right now?",
+ "error": null,
+ "wall_s": 25.7,
+ "intent": "live_now",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "live_now",
+  "targets": [
+   {
+    "type": "address",
+    "text": "200 Water Street, Manhattan"
+   }
+  ],
+  "rationale": "The question asks for the current harbor water level near a specific address, requiring a live tide gauge source.",
+  "question": "What is the water level in the harbor near 200 Water Street, Manhattan right now?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "now",
+   "assets": []
+  },
+  "pebbles": [
+   "noaa_tides"
+  ],
+  "catalog": [
+   "area_boundary",
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "floodnet",
+  "noaa_tides",
+  "nws_alerts",
+  "nws_obs"
+ ],
+ "consulted": [
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+   "stone": "touchstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1764,
+  "completion": 123,
+  "seconds": 6.58,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 572,
+  "completion": 318,
+  "seconds": 18.43,
+  "n_calls": 1
+ },
+ "n_documents": 4,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "Latest reading at The Battery, NY: 6.02 ft above MLLW (+1.37 ft vs predicted tide), observed 2026-09-28 08:00.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "answer",
+   "text": "1 FloodNet community sensor(s) within 600 m have logged 2 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 148 mm.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "answer",
+   "text": "Latest METAR at Central Park, NY (8.5 km away): 14.4\u00b0C, no recent precipitation (obs 2026-09-28T11:34).",
+   "doc_ids": [
+    "nws_obs"
+   ],
+   "numbers": []
+  },
+  {
+   "section": "Live Observer",
+   "text": "The harbor near 200 Water Street, Manhattan is currently observed at 6.02 feet above Mean Lower Low Water (MLLW) as of 2026-09-28 08:00.",
+   "doc_ids": [
+    "noaa_tides"
+   ],
+   "numbers": [
+    "6.02",
+    "MLLW",
+    "2026-09-28",
+    "08:00"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "Within 600 meters of 200 Water Street, FloodNet sensors have recorded a peak flood depth of 148 mm in the past three years.",
+   "doc_ids": [
+    "floodnet"
+   ],
+   "numbers": [
+    "148",
+    "mm",
+    "3",
+    "years"
+   ]
+  },
+  {
+   "section": "Live Observer",
+   "text": "At Central Park, located 8.5 km from 200 Water Street, the latest METAR observation (2026-09-28T11:34) reports no recent precipitation and a temperature of 14.4\u00b0C.",
+   "doc_ids": [
+    "nws_obs"
+   ],
+   "numbers": [
+    "14.4",
+    "\u00b0C",
+    "2026-09-28T11:34"
+   ]
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nYes. Latest reading at The Battery, NY: 6.02 ft above MLLW (+1.37 ft vs predicted tide), observed 2026-09-28 08:00 [noaa_tides]. 1 FloodNet community sensor(s) within 600 m have logged 2 above-curb flood event(s) in the last 3 years [floodnet]. Peak depth recorded by these sensors: 148 mm [floodnet]. Latest METAR at Central Park, NY (8.5 km away): 14.4\u00b0C, no recent precipitation (obs 2026-09-28T11:34) [nws_obs].\n\n**Live Observer.**\nThe harbor near 200 Water Street, Manhattan is currently observed at 6.02 feet above Mean Lower Low Water (MLLW) as of 2026-09-28 08:00 [noaa_tides]. Within 600 meters of 200 Water Street, FloodNet sensors have recorded a peak flood depth of 148 mm in the past three years [floodnet]. At Central Park, located 8.5 km from 200 Water Street, the latest METAR observation (2026-09-28T11:34) reports no recent precipitation and a temperature of 14.4\u00b0C [nws_obs].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+ "documents": {
+  "floodnet": "1 FloodNet community sensor(s) within 600 m have logged 2 above-curb flood event(s) in the last 3 years. Peak depth recorded by these sensors: 148 mm.",
+  "nws_obs": "Latest METAR at Central Park, NY (8.5 km away): 14.4\u00b0C, no recent precipitation (obs 2026-09-28T11:34).",
+  "noaa_tides": "Latest reading at The Battery, NY: 6.02 ft above MLLW (+1.37 ft vs predicted tide), observed 2026-09-28 08:00.",
+  "nws_alerts": "1 active NWS alert at this point: Coastal Flood Advisory (Minor)."
+ },
+ "values": {
+  "floodnet": {
+   "n_flood_events_3y": 2
+  },
+  "nws_obs": {
+   "precip_last_hour_mm": 0.0,
+   "precip_last_6h_mm": null
+  },
+  "noaa_tides": {
+   "observed_ft_mllw": 6.02
+  },
+  "nws_alerts": {
+   "n_active": 1
+  }
+ },
+ "checks": [
+  "citations and numbers on every claim",
+  "lead rules on the answer; no entailment check needed, since the answer is the cited text word for word"
+ ],
+ "entailment": {},
+ "answer_mode": "extractive",
+ "answer_lead": "yes",
+ "answer_flags": []
+}
