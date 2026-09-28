@@ -22,6 +22,8 @@ def sandy(polygon) -> dict:
         f"{_pct(v['fraction'])}% of this area lies inside the 2012 Hurricane Sandy "
         f"inundation extent (area {round(v['polygon_area_m2'] / 1e6, 2)} km²)."
     )
+    # The figure the evidence card leads with (the card's big line).
+    v["headline_value"] = f"{_pct(v['fraction'])}% inside the 2012 Sandy extent"
     return v
 
 
@@ -34,6 +36,7 @@ def dep(polygon, scenario: str) -> dict:
         f"{_pct(c.get(3, 0))}% over 4 ft)."
     )
     v["fraction_class"] = {str(k): val for k, val in c.items()}  # JSON-safe keys
+    v["headline_value"] = f"{_pct(v['fraction_any'])}% modeled to flood"
     return v
 
 
@@ -48,8 +51,9 @@ def terrain(polygon) -> dict | None:
     bits = [f"Median ground elevation {v['elev_median_m']} m (10th percentile {v['elev_p10_m']} m)"]
     if v.get("frac_hand_lt1") is not None:
         bits.append(f"{_pct(v['frac_hand_lt1'])}% of the area sits less than 1 m above the "
-                    "nearest drainage (HAND)")
+                    "nearest drainage channel (HAND, height above nearest drainage)")
     v["narrative"] = "; ".join(bits) + "."
+    v["headline_value"] = f"median ground elevation {v['elev_median_m']} m"
     return v
 
 
@@ -60,6 +64,7 @@ def permits(polygon) -> dict:
         f"{v['since']}: {v['n_in_sandy']} inside the 2012 Sandy extent and {v['n_in_dep_any']} "
         "inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise)."
     )
+    v["headline_value"] = f"{v['n_total']} active permit{'s' if v['n_total'] != 1 else ''}"
     return v
 
 

@@ -843,9 +843,10 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
   // absence, not a finding. A step that errored, or ran and returned
   // null, is "Not available"; a step that never ran is "Not run".
   if (value === null || value === undefined) {
+    const notRun = value === undefined && !failed;
     return { ...base, variant: 'headline',
-             absent: value === undefined && !failed ? 'Not run' : 'Not available',
-             sub: m.fallback.message ?? undefined };
+             absent: notRun ? 'Not run' : 'Not available',
+             sub: notRun ? 'Not checked for this question.' : (m.fallback.message ?? undefined) };
   }
   // The source ran and said it has nothing (e.g. a forecast with too
   // little history). Its own reason, when given, beats the manifest's
@@ -865,8 +866,10 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
     const formatted = m.narration.template
       ? formatTemplate(m.narration.template, value)
       : null;
+    // Lead with the pebble's own figure when it gives one ("0.8% inside the
+    // 2012 Sandy extent"); the manifest's short line only describes the source.
     return { ...base,
-             headline: m.narration.short ?? m.title,
+             headline: str(rec?.headline_value) ?? m.narration.short ?? m.title,
              body: formatted ?? (typeof value === 'string' ? value : undefined) };
   }
   if (variant === 'scalars') {
@@ -1203,6 +1206,9 @@ export function applyStepEventToLiveState(
   };
   const key = STEP_TO_STATE[stepName];
   if (!key) return [];
+  // A pebble the planner did not select reports {skipped: ...}: it did not
+  // run, so it has no value (its card says "Not run"), never a finding.
+  if ((result as Record<string, unknown> | null)?.skipped) return [];
 
   // Translate the slim summary shapes the FSM emits into the
   // doc-payload shapes the card builders expect. Mostly identity
