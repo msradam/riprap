@@ -3,8 +3,8 @@
  "neighborhood": "Homecrest, Brooklyn",
  "address": "2017 East 17th Street, Brooklyn, NY 11229",
  "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
- "generated_at": "2026-09-28T12:18Z",
- "riprap_commit": "7304367",
+ "generated_at": "2026-09-28T17:02Z",
+ "riprap_commit": "d7dd5da",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -1143,7 +1143,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1768,
      "completion_tokens": 156,
-     "duration_s": 7.352,
+     "duration_s": 7.199,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1210,7 +1210,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 775,
      "completion_tokens": 124,
-     "duration_s": 6.643,
+     "duration_s": 6.61,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1236,7 +1236,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-28T01:37:58+0000",
-    "retrieved_at": "2026-09-28T12:18Z",
+    "retrieved_at": "2026-09-28T17:02Z",
     "vintage": "2026-09-28T01:37:58+0000",
     "maturity": "production"
    }
@@ -1892,8 +1892,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790597889.411335,
-    "elapsed_s": 0.02,
+    "started_at": 1790614938.341274,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "address": "2017 EAST 17 STREET, Brooklyn, NY, USA",
@@ -1905,7 +1905,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790597889.4268968,
+    "started_at": 1790614938.3468359,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1917,7 +1917,7 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790597889.471189,
+    "started_at": 1790614938.373743,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1927,7 +1927,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790597889.471191,
+    "started_at": 1790614938.373744,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1937,7 +1937,7 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790597889.471191,
+    "started_at": 1790614938.373744,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1947,7 +1947,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790597889.471191,
+    "started_at": 1790614938.373744,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1957,7 +1957,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790597889.4711921,
+    "started_at": 1790614938.373744,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1967,7 +1967,7 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790597889.4711921,
+    "started_at": 1790614938.373745,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1977,7 +1977,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790597889.4711921,
+    "started_at": 1790614938.373745,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1987,7 +1987,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790597889.4711921,
+    "started_at": 1790614938.373745,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1997,7 +1997,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790597889.471193,
+    "started_at": 1790614938.373745,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2007,7 +2007,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790597889.471193,
+    "started_at": 1790614938.373745,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2017,7 +2017,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790597889.471193,
+    "started_at": 1790614938.373746,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2027,7 +2027,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790597889.471193,
+    "started_at": 1790614938.373746,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2037,7 +2037,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790597889.471194,
+    "started_at": 1790614938.373746,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2047,7 +2047,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790597889.471194,
+    "started_at": 1790614938.373746,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2057,7 +2057,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790597889.471194,
+    "started_at": 1790614938.373746,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2067,8 +2067,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790597889.5124989,
-    "elapsed_s": 0.03,
+    "started_at": 1790614938.40055,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "inside": {
@@ -2081,8 +2081,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790597889.512656,
-    "elapsed_s": 0.16,
+    "started_at": 1790614938.405783,
+    "elapsed_s": 0.11,
     "err": null,
     "result": {
      "zone": "X",
@@ -2094,8 +2094,8 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790597889.5154638,
-    "elapsed_s": 0.03,
+    "started_at": 1790614938.4060469,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2105,8 +2105,8 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790597889.521018,
-    "elapsed_s": 0.53,
+    "started_at": 1790614938.4090931,
+    "elapsed_s": 0.44,
     "err": null,
     "result": {
      "n": 34
@@ -2115,8 +2115,8 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790597889.522363,
-    "elapsed_s": 2.3,
+    "started_at": 1790614938.410686,
+    "elapsed_s": 2.16,
     "err": null,
     "result": {
      "n_entrances": 5,
@@ -2127,8 +2127,8 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790597889.53895,
-    "elapsed_s": 0.01,
+    "started_at": 1790614938.409972,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "n_developments": 0,
@@ -2139,8 +2139,8 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790597889.539575,
-    "elapsed_s": 0.11,
+    "started_at": 1790614938.4105542,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "n_schools": 1,
@@ -2151,8 +2151,8 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790597889.54097,
-    "elapsed_s": 0.19,
+    "started_at": 1790614938.41052,
+    "elapsed_s": 0.15,
     "err": null,
     "result": {
      "n_hospitals": 3,
@@ -2163,7 +2163,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790597892.06932,
+    "started_at": 1790614940.806598,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2174,7 +2174,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790597892.0695329,
+    "started_at": 1790614940.806804,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -2184,7 +2184,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 6.73
+    "elapsed_s": 6.69
    }
   ],
   "compliance": {
@@ -2198,7 +2198,7 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 13.995,
+   "total_duration_s": 13.809,
    "tokens": {
     "prompt": 2543,
     "completion": 280,
@@ -2211,7 +2211,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1768,
      "completion_tokens": 156,
-     "duration_s": 7.352,
+     "duration_s": 7.199,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -2222,7 +2222,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 775,
      "completion_tokens": 124,
-     "duration_s": 6.643,
+     "duration_s": 6.61,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"

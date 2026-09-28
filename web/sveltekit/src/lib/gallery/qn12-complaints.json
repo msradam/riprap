@@ -3,8 +3,8 @@
  "neighborhood": "Community district QN12, Queens",
  "address": "QN12",
  "question": "How many street flooding complaints has community district QN12 had?",
- "generated_at": "2026-09-28T12:19Z",
- "riprap_commit": "7304367",
+ "generated_at": "2026-09-28T17:03Z",
+ "riprap_commit": "d7dd5da",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -1138,7 +1138,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1759,
      "completion_tokens": 122,
-     "duration_s": 7.785,
+     "duration_s": 5.799,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1170,9 +1170,9 @@
   },
   "policy_corpus": null,
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n549 street flooding complaints, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4329 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2694 sewer backup, 938 catch basin, 549 street flooding, 148 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n533 street flooding complaints, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4283 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2671 sewer backup, 932 catch basin, 533 street flooding, 147 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n549 street flooding complaints, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4329 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2694 sewer backup, 938 catch basin, 549 street flooding, 148 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n533 street flooding complaints, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4283 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2671 sewer backup, 932 catch basin, 533 street flooding, 147 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
    "dropped": [],
    "tier": "llm"
   },
@@ -1183,7 +1183,7 @@
    "claims": [
     {
      "section": "answer",
-     "text": "4329 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2694 sewer backup, 938 catch basin, 549 street flooding, 148 manhole overflow.",
+     "text": "4283 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2671 sewer backup, 932 catch basin, 533 street flooding, 147 manhole overflow.",
      "doc_ids": [
       "nyc311_nta"
      ],
@@ -1191,12 +1191,12 @@
     },
     {
      "section": "Live Observer",
-     "text": "Community district QN12 has had 549 street flooding complaints in the past three years.",
+     "text": "Community district QN12 has had 533 street flooding complaints in the past three years.",
      "doc_ids": [
       "nyc311_nta"
      ],
      "numbers": [
-      "549"
+      "533"
      ]
     }
    ],
@@ -1211,7 +1211,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 624,
      "completion_tokens": 91,
-     "duration_s": 5.72,
+     "duration_s": 4.41,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1237,7 +1237,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-28T01:37:58+0000",
-    "retrieved_at": "2026-09-28T12:19Z",
+    "retrieved_at": "2026-09-28T17:03Z",
     "vintage": "2026-09-28T01:37:58+0000",
     "maturity": "production"
    }
@@ -1483,28 +1483,28 @@
    "headline_value": "3.3% modeled to flood"
   },
   "nyc311_nta": {
-   "n": 4329,
+   "n": 4283,
    "capped": false,
    "radius_m": null,
    "years": 3,
    "by_year": {
-    "2023": 475,
+    "2023": 429,
     "2024": 1454,
     "2025": 1316,
     "2026": 1084
    },
    "by_descriptor": {
-    "Sewer Backup (Use Comments) (SA)": 2694,
-    "Catch Basin Clogged/Flooding (Use Comments) (SC)": 938,
-    "Street Flooding (SJ)": 475,
-    "Manhole Overflow (Use Comments) (SA1)": 148,
-    "Flooding on Street": 74
+    "Sewer Backup (Use Comments) (SA)": 2671,
+    "Catch Basin Clogged/Flooding (Use Comments) (SC)": 932,
+    "Street Flooding (SJ)": 467,
+    "Manhole Overflow (Use Comments) (SA1)": 147,
+    "Flooding on Street": 66
    },
    "by_kind": {
-    "sewer backup": 2694,
-    "catch basin": 938,
-    "street flooding": 549,
-    "manhole overflow": 148
+    "sewer backup": 2671,
+    "catch basin": 932,
+    "street flooding": 533,
+    "manhole overflow": 147
    },
    "most_recent": [
     {
@@ -1534,11 +1534,11 @@
     }
    ],
    "points": [],
-   "headline_value": "4329 calls",
-   "subhead_text": "2694 sewer backup, 938 catch basin, 549 street flooding, 148 manhole overflow",
-   "narrative": "4329 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2694 sewer backup, 938 catch basin, 549 street flooding, 148 manhole overflow.",
+   "headline_value": "4283 calls",
+   "subhead_text": "2671 sewer backup, 932 catch basin, 533 street flooding, 147 manhole overflow",
+   "narrative": "4283 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2671 sewer backup, 932 catch basin, 533 street flooding, 147 manhole overflow.",
    "histogram": [
-    475,
+    429,
     1454,
     1316,
     1084
@@ -1548,8 +1548,8 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790597927.555864,
-    "elapsed_s": 0.04,
+    "started_at": 1790614971.865046,
+    "elapsed_s": 0.06,
     "err": null,
     "result": {
      "nta_code": "QN12",
@@ -1567,7 +1567,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790597927.597076,
+    "started_at": 1790614971.929586,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1579,7 +1579,7 @@
    {
     "step": "dep_extreme_2080_nta",
     "ok": true,
-    "started_at": 1790597927.626326,
+    "started_at": 1790614971.959105,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1589,7 +1589,7 @@
    {
     "step": "dep_moderate_current_nta",
     "ok": true,
-    "started_at": 1790597927.626326,
+    "started_at": 1790614971.959106,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1599,7 +1599,7 @@
    {
     "step": "microtopo_nta",
     "ok": true,
-    "started_at": 1790597927.626327,
+    "started_at": 1790614971.9591072,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1609,7 +1609,7 @@
    {
     "step": "dob_permits_nta",
     "ok": true,
-    "started_at": 1790597927.626327,
+    "started_at": 1790614971.9591072,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1619,7 +1619,7 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1790597927.6548421,
+    "started_at": 1790614971.988245,
     "elapsed_s": 0.01,
     "err": null,
     "result": {}
@@ -1627,7 +1627,7 @@
    {
     "step": "sandy_nta",
     "ok": true,
-    "started_at": 1790597927.6547892,
+    "started_at": 1790614971.988388,
     "elapsed_s": 0.02,
     "err": null,
     "result": {}
@@ -1635,23 +1635,23 @@
    {
     "step": "dep_moderate_2050_nta",
     "ok": true,
-    "started_at": 1790597927.654655,
-    "elapsed_s": 0.08,
+    "started_at": 1790614971.988665,
+    "elapsed_s": 0.09,
     "err": null,
     "result": {}
    },
    {
     "step": "nyc311_nta",
     "ok": true,
-    "started_at": 1790597927.654892,
-    "elapsed_s": 15.67,
+    "started_at": 1790614971.9889102,
+    "elapsed_s": 18.38,
     "err": null,
     "result": {}
    },
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790597943.572384,
+    "started_at": 1790614990.610338,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1660,7 +1660,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790597943.572507,
+    "started_at": 1790614990.6104598,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -1670,7 +1670,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 5.8
+    "elapsed_s": 4.48
    }
   ],
   "compliance": {
@@ -1684,7 +1684,7 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 13.505,
+   "total_duration_s": 10.209,
    "tokens": {
     "prompt": 2383,
     "completion": 213,
@@ -1697,7 +1697,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1759,
      "completion_tokens": 122,
-     "duration_s": 7.785,
+     "duration_s": 5.799,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1708,7 +1708,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 624,
      "completion_tokens": 91,
-     "duration_s": 5.72,
+     "duration_s": 4.41,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"

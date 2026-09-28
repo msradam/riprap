@@ -3,8 +3,8 @@
  "neighborhood": "Gowanus, Brooklyn",
  "address": "400 Carroll Street, Brooklyn, NY",
  "question": "What does the 2050 stormwater scenario show at 400 Carroll Street, Brooklyn?",
- "generated_at": "2026-09-28T12:18Z",
- "riprap_commit": "7304367",
+ "generated_at": "2026-09-28T17:02Z",
+ "riprap_commit": "d7dd5da",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -1138,7 +1138,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1764,
      "completion_tokens": 141,
-     "duration_s": 6.763,
+     "duration_s": 6.496,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1249,7 +1249,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 594,
      "completion_tokens": 249,
-     "duration_s": 13.482,
+     "duration_s": 11.449,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1285,9 +1285,9 @@
     "title": "FEMA NFHL effective flood-zone polygon and FIRM panel intersecting the address point.",
     "url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-09-28T12:18Z",
-    "retrieved_at": "2026-09-28T12:18Z",
-    "vintage": "2026-09-28T12:18Z",
+    "date_modified": "2026-09-28T17:02Z",
+    "retrieved_at": "2026-09-28T17:02Z",
+    "vintage": "2026-09-28T17:02Z",
     "maturity": "production"
    },
    "dep_moderate_2050": {
@@ -1457,8 +1457,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790597905.669863,
-    "elapsed_s": 0.02,
+    "started_at": 1790614954.09041,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "address": "400 CARROLL STREET, Brooklyn, NY, USA",
@@ -1470,7 +1470,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790597905.6867578,
+    "started_at": 1790614954.0956428,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1482,7 +1482,7 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790597905.7325618,
+    "started_at": 1790614954.1229749,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1492,7 +1492,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790597905.732563,
+    "started_at": 1790614954.122976,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1502,7 +1502,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790597905.732564,
+    "started_at": 1790614954.122976,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1512,7 +1512,7 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790597905.732564,
+    "started_at": 1790614954.122976,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1522,7 +1522,7 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790597905.732564,
+    "started_at": 1790614954.122976,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1532,7 +1532,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790597905.732564,
+    "started_at": 1790614954.122976,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1542,7 +1542,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790597905.732565,
+    "started_at": 1790614954.122977,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1552,7 +1552,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790597905.732565,
+    "started_at": 1790614954.122977,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1562,7 +1562,7 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790597905.732565,
+    "started_at": 1790614954.122977,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1572,7 +1572,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790597905.732565,
+    "started_at": 1790614954.122977,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1582,7 +1582,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790597905.732565,
+    "started_at": 1790614954.122977,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1592,7 +1592,7 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790597905.732566,
+    "started_at": 1790614954.122977,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1602,7 +1602,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790597905.732566,
+    "started_at": 1790614954.122978,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1612,7 +1612,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790597905.732566,
+    "started_at": 1790614954.122978,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1622,7 +1622,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790597905.732566,
+    "started_at": 1790614954.122978,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1632,7 +1632,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790597905.732567,
+    "started_at": 1790614954.122978,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1642,7 +1642,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790597905.732567,
+    "started_at": 1790614954.122978,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1652,7 +1652,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790597905.732567,
+    "started_at": 1790614954.122978,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1662,7 +1662,7 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790597905.768702,
+    "started_at": 1790614954.152574,
     "elapsed_s": 0.04,
     "err": null,
     "result": {
@@ -1676,8 +1676,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790597905.781705,
-    "elapsed_s": 0.04,
+    "started_at": 1790614954.1517382,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {
      "zone": "AE",
@@ -1689,7 +1689,7 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790597905.777827,
+    "started_at": 1790614954.152469,
     "elapsed_s": 0.04,
     "err": null,
     "result": {
@@ -1700,7 +1700,7 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790597905.768561,
+    "started_at": 1790614954.156778,
     "elapsed_s": 0.04,
     "err": null,
     "result": {
@@ -1711,7 +1711,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790597905.782055,
+    "started_at": 1790614954.1644428,
     "elapsed_s": 0.03,
     "err": null,
     "result": {
@@ -1722,7 +1722,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790597906.1223218,
+    "started_at": 1790614954.4409668,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1735,7 +1735,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790597906.12258,
+    "started_at": 1790614954.4411688,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -1745,7 +1745,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 13.56
+    "elapsed_s": 11.52
    }
   ],
   "compliance": {
@@ -1759,7 +1759,7 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 20.245,
+   "total_duration_s": 17.945,
    "tokens": {
     "prompt": 2358,
     "completion": 390,
@@ -1772,7 +1772,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1764,
      "completion_tokens": 141,
-     "duration_s": 6.763,
+     "duration_s": 6.496,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"
@@ -1783,7 +1783,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 594,
      "completion_tokens": 249,
-     "duration_s": 13.482,
+     "duration_s": 11.449,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "energy counters returned no CPU energy on this chip"

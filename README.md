@@ -35,12 +35,12 @@ A real answer, from the gallery entry
 
 > **Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?**
 >
-> Yes. USGS surveyed 2 Hurricane Ida high-water mark(s) within 800 m of this
+> Yes. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this
 > address; the highest stood 0.76 ft above ground; the highest water surface
 > elevation was 48.2 ft NAVD88 [ida_hwm]. […] 82 NYC 311 flood-related complaints
 > filed within 200 m of this location in the last 5 years: 47 sewer backup, 22
 > catch basin, 10 street flooding, 3 manhole overflow [nyc311]. 2 FloodNet
-> community sensor(s) within 600 m have logged 14 above-curb flood event(s) in the
+> community sensors within 600 m have logged 14 above-curb flood events in the
 > last 3 years [floodnet].
 
 The "Yes." is set by a rule, not by the model: at least one observed source
