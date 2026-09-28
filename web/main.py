@@ -236,6 +236,12 @@ def _warm_caches():
             __import__(mod_path)
         except Exception as e:  # noqa: BLE001
             print(f"[startup] {mod_path} pre-import skipped: {type(e).__name__}: {e}", flush=True)
+    if os.environ.get("RIPRAP_WARM", "").lower() in ("1", "true", "yes"):
+        # Load the TTM models, NER and embeddings now and ping the LLM, so the
+        # first query of a demo is not the cold one (refactor 8).
+        from app.models_info import warm
+
+        print(f"[startup] warm models (seconds, -1 = skipped): {warm()}", flush=True)
 
 
 def _stones_pebbles_for_deployment(deployment_name: str | None):
@@ -382,6 +388,16 @@ async def api_print(request: Request) -> Response:
             "Cache-Control": "no-store",
         },
     )
+
+
+@app.get("/api/models")
+def api_models():
+    """The models this process has loaded now, the precomputed Prithvi-EO
+    output, and the LLM endpoint configured. Each briefing's own list is
+    the `models` field of its result."""
+    from app.models_info import loaded
+
+    return loaded()
 
 
 @app.get("/api/backend")

@@ -94,6 +94,19 @@ export type ComparisonSide = {
 
 export type MetaRow = { k: string; v: string };
 
+/** One line of the capstone "Models in this briefing" list. */
+export type ModelLine = {
+  name: string;
+  repo: string;
+  /** Hugging Face page for the repo, or null when it is not a Hugging Face id. */
+  href: string | null;
+  where: string;
+  how: string;
+  latency: string | null;
+  /** Shown for precomputed rows only. */
+  detail: string | null;
+};
+
 export type RasterKind =
   | 'stormwater'
   | 'stormwater-dry'
@@ -186,6 +199,7 @@ export type Card = {
 
   // meta
   metaRows?: MetaRow[];
+  models?: ModelLine[];
 
   // timeseries-ft — fine-tuned-model footer chrome (v0.4.5 §5)
   hfModelCard?: string;

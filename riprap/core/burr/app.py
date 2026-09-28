@@ -169,6 +169,9 @@ def _final(state) -> dict:
             if v is not None and not k.startswith("__"):
                 out[k] = v
     out["trace"] = list(state.get("trace") or [])
+    from app.models_info import for_briefing
+
+    out["models"] = for_briefing(out)  # which models took part, where they ran, how long
     return attach_disclosure_checks(out)
 
 

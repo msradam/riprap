@@ -17,10 +17,10 @@
  * a `meta` card listing whatever scalars it returned.
  */
 import type {
-  Card, CardVariant, FindingsData, StoneKey, StoneMember, StoneTrace
+  Card, CardVariant, FindingsData, ModelLine, StoneKey, StoneMember, StoneTrace
 } from '$lib/types/card';
 import type { TraceNode, TraceStatus } from '$lib/types/trace';
-import { citationList, type FinalResult } from '$lib/client/agentStream';
+import { citationList, type FinalResult, type ModelRow } from '$lib/client/agentStream';
 import { pebbleManifest, type PebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 
 /** Reasonable defaults — when the FSM doesn't supply a vintage, fall
@@ -705,6 +705,33 @@ function buildRasterCard(m: PebbleManifest, value: unknown): Card | null {
   };
 }
 
+const HOW_LABEL: Record<ModelRow['how'], string> = {
+  loaded: 'loaded', precomputed: 'precomputed', endpoint: 'LLM endpoint',
+};
+
+/** Hugging Face page for a repo id ("org/name") or an Ollama "hf.co/org/name:tag" id. */
+function hfHref(repo: string): string | null {
+  const id = repo.startsWith('hf.co/') ? repo.slice(6).split(':')[0] : repo;
+  return id.includes('/') && !id.includes(':') ? `https://huggingface.co/${id}` : null;
+}
+
+/** Shape `final.models` into the capstone card's model list. */
+export function modelLines(rows: ModelRow[] | undefined): ModelLine[] {
+  return (rows ?? []).map((r) => {
+    let latency = r.latency_s != null ? `${r.latency_s.toFixed(1)} s` : null;
+    if (latency && r.calls) latency += ` over ${r.calls} call${r.calls === 1 ? '' : 's'}`;
+    return {
+      name: r.name,
+      repo: r.repo,
+      href: hfHref(r.repo),
+      where: r.where,
+      how: HOW_LABEL[r.how] ?? r.how,
+      latency,
+      detail: r.how === 'precomputed' ? r.detail ?? null : null,
+    };
+  });
+}
+
 function buildCapstoneMeta(final: FinalResult, wallSeconds?: number): Card {
   // How the briefing was produced, read from final.grounding and
   // final.compliance. `compliance` is a set of substring checks for
@@ -733,6 +760,7 @@ function buildCapstoneMeta(final: FinalResult, wallSeconds?: number): Card {
       { k: 'citations resolved', v: `${cites}` },
       { k: 'wall-clock', v: wallSeconds != null ? `${wallSeconds.toFixed(1)} s` : '—' },
     ],
+    models: modelLines(final.models),
     sub: g?.fallback_reason
       ? `The LLM was unavailable (${g.fallback_reason}), so the evidence briefing is shown.`
       : 'Capstone writes prose, not cards. This card records how the briefing was produced.',

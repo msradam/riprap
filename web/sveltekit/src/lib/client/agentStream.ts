@@ -121,6 +121,20 @@ export interface FinalResult {
   not_checked?: SourceRef[];
   /** Neighbourhood and district runs: the area outline (GeoJSON geometry, EPSG:4326). */
   area_boundary?: { geojson?: unknown; narrative?: string } | null;
+  /** Models that contributed to this briefing. Missing on older gallery entries. */
+  models?: ModelRow[];
+}
+
+/** One model row from the backend's `final.models`. */
+export interface ModelRow {
+  name: string;
+  repo: string;
+  where: string;
+  how: 'loaded' | 'precomputed' | 'endpoint';
+  latency_s?: number | null;
+  pebble?: string;
+  detail?: string;
+  calls?: number;
 }
 
 /** Normalise `final.citations` (object keyed by doc_id, or legacy array). */
