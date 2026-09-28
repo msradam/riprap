@@ -1,12 +1,14 @@
 id: prithvi_water
 type: baked
-title: Satellite-detected surface water after Hurricane Ida (experimental)
-answers: "experimental satellite-detected surface water about 14 hours after Hurricane Ida"
+title: New surface water after Hurricane Ida, Prithvi-EO (experimental)
+answers: "experimental satellite-detected new surface water after Hurricane Ida (Sentinel-2, 2021-09-02) near an address, from the Prithvi-EO NYC model"
 stone: cornerstone
 maturity: experimental
 tier: modeled
 adapter: python_call
 
+# Reads the precomputed outputs of scripts/run_eo_batch.py in data/eo/
+# (refactor 8). Nothing runs per request.
 spatial:
   scope: point
   crs: EPSG:4326
@@ -20,29 +22,31 @@ config:
   on_none: offline
 
 trace_summary:
-  nearest_distance_m: nearest_distance_m
-  n_polygons_within_500m: n_polygons_within_500m
+  new_water_m2_within_radius: new_water_m2_within_radius
+  frac_observed_within_radius: frac_observed_within_radius
 
 provenance:
   date_modified: 2021-09-02
-  retrieved_at: 2026-07-11
-  source_name: Prithvi-EO-2.0-300M-TL-Sen1Floods11 (NASA/IBM via TerraTorch), Hurricane Ida pre/post HLS scenes
-  source_url: https://huggingface.co/ibm-nasa-geospatial
-  license: Apache-2.0
+  retrieved_at: 2026-09-28
+  source_name: msradam/Prithvi-EO-2.0-NYC-Pluvial on Copernicus Sentinel-2 L2A (Planetary Computer)
+  source_url: https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial
+  license: Apache-2.0 (model); Copernicus Sentinel data terms (imagery)
   doc_id: prithvi_water
   citation: >-
-    Prithvi-EO-2.0-300M-TL-Sen1Floods11 (NASA/IBM, Apache-2.0, via TerraTorch).
-    Hurricane Ida pre/post diff: pre HLS T18TWK 2021-08-25 (3% cloud),
-    post HLS T18TWK 2021-09-02 (1% cloud, about 14 h after the heaviest rain).
-    Unvalidated surface-water change; not a flood extent.
+    msradam/Prithvi-EO-2.0-NYC-Pluvial (Apache-2.0), run by scripts/run_eo_batch.py
+    on Sentinel-2 L2A scenes from 2021-09-02 (tiles 18TWL, 18TWK, 18TXL), with
+    same-tile scenes from 2021-08-13 masking permanent water. Contains modified
+    Copernicus Sentinel data 2021, via Microsoft Planetary Computer. Experimental:
+    no flood-detection score on held-out events; street and basement flooding
+    is not visible at 10 to 20 m.
 
 narration:
-  short: Satellite-detected surface water about 14 hours after Hurricane Ida near this address (experimental).
+  short: New surface water after Hurricane Ida near this address, from the Prithvi-EO NYC model (experimental).
   template: "{narrative}"
 
 fallback:
   on_offline: skip
-  message: Prithvi Ida water mask unavailable.
+  message: The Prithvi-EO Ida output (data/eo/) is not present.
 
 display:
   variant: raster

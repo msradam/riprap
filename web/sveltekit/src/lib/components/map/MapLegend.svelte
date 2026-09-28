@@ -5,7 +5,7 @@
   import type { StoneKey } from '$lib/types/card';
   import { STONE_META, STONE_ORDER } from '$lib/types/card';
   import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
-  import { AREA_BOUNDARY_LEGEND } from '$lib/client/runState.svelte';
+  import { AREA_BOUNDARY_LEGEND, LAYER_LEGEND_OVERRIDES } from '$lib/client/runState.svelte';
 
   /** v0.4.5 §7 — LAYERS panel restructured to mirror Findings Stones.
    *
@@ -59,8 +59,7 @@
       for (const p of pebbles) {
         if (!p.display.map_layer) continue;
         empty[stone].push({
-          label: p.title,
-          source: p.provenance.source_name,
+          ...(LAYER_LEGEND_OVERRIDES[p.id] ?? { label: p.title, source: p.provenance.source_name }),
           tier: (p.tier ?? 'modeled') as Tier,
           wired: true,
         });

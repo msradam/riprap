@@ -39,4 +39,4 @@ def test_prithvi_water_pebble_matches_legacy(registry):
     result = registry.get("prithvi_water").fetch(SpatialQuery(lat=TEST_LAT, lon=TEST_LON))
     assert result.error is None, result.error
     assert isinstance(result.value, dict)
-    assert result.value == vars(legacy)
+    assert result.value == legacy

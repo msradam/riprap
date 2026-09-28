@@ -183,6 +183,24 @@ def search_scenes(bbox: list[float], start: str, end: str, max_cloud: float = 30
     return sorted(items, key=lambda it: it.properties.get("eo:cloud_cover", 100))
 
 
+def grid(bbox: list[float], crs: str = "EPSG:32618", res: float = 10.0):
+    """An empty 10 m grid covering `bbox` (lon/lat) in `crs`, as a
+    DataArray to pass to read_bands(match=...). NYC is in UTM zone 18N."""
+    import numpy as np
+    import rioxarray  # noqa: F401
+    import xarray as xr
+    from pyproj import Transformer
+    from rasterio.transform import from_origin
+
+    t = Transformer.from_crs("EPSG:4326", crs, always_xy=True)
+    xs, ys = t.transform([bbox[0], bbox[2], bbox[0], bbox[2]], [bbox[1], bbox[1], bbox[3], bbox[3]])
+    x0, y1 = min(xs), max(ys)
+    w, h = int((max(xs) - x0) / res), int((y1 - min(ys)) / res)
+    da = xr.DataArray(np.zeros((h, w), "float32"), dims=("y", "x"),
+                      coords={"y": y1 - res / 2 - res * np.arange(h), "x": x0 + res / 2 + res * np.arange(w)})
+    return da.rio.write_crs(crs).rio.write_transform(from_origin(x0, y1, res, res))
+
+
 def read_bands(item, bbox: list[float], match=None):
     """The six model bands over `bbox` as a (6, H, W) float32 reflectance
     array plus the reference DataArray (grid, transform, CRS). Pass

@@ -1,0 +1,45 @@
+id: prithvi_water_nta
+type: baked
+title: New surface water after Hurricane Ida in the area, Prithvi-EO (experimental)
+answers: "experimental satellite-detected new surface water after Hurricane Ida (Sentinel-2, 2021-09-02) as a share of the neighborhood or district"
+stone: cornerstone
+maturity: experimental
+tier: modeled
+adapter: python_call
+
+spatial:
+  scope: polygon
+  crs: EPSG:4326
+
+config:
+  module: app.flood_layers.prithvi_water
+  function: summary_for_polygon
+  args:
+    - {source: polygon_4326}
+  on_none: offline
+
+provenance:
+  date_modified: 2021-09-02
+  retrieved_at: 2026-09-28
+  source_name: msradam/Prithvi-EO-2.0-NYC-Pluvial on Copernicus Sentinel-2 L2A (Planetary Computer)
+  source_url: https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial
+  license: Apache-2.0 (model); Copernicus Sentinel data terms (imagery)
+  doc_id: prithvi_water_nta
+  citation: >-
+    msradam/Prithvi-EO-2.0-NYC-Pluvial (Apache-2.0), run by scripts/run_eo_batch.py
+    on Sentinel-2 L2A scenes from 2021-09-02, with same-tile scenes from
+    2021-08-13 masking permanent water; share of the area's observed pixels.
+    Contains modified Copernicus Sentinel data 2021, via Microsoft Planetary
+    Computer. Experimental: no flood-detection score on held-out events.
+
+narration:
+  short: New surface water after Hurricane Ida in this area, from the Prithvi-EO NYC model (experimental).
+  template: "{narrative}"
+
+display:
+  order: 45
+  kind: text
+  icon: "🛰️"
+
+fallback:
+  on_offline: skip

@@ -779,16 +779,13 @@ def layer_dep_2080(lat: float, lon: float, r: float = 1500):
 
 @app.get("/api/layers/prithvi_water")
 def layer_prithvi_water(lat: float, lon: float, r: float = 1500):
-    """Prithvi-EO 2.0 (Sen1Floods11) satellite water mask, clipped to a
-    bbox around the address for performance."""
+    """New surface water after Ida from the Prithvi-EO batch (experimental):
+    the new-water pixels of data/eo/ within `r` m of the address, as polygons."""
     key = ("prithvi", round(lat, 4), round(lon, 4), int(r))
     if key not in _LAYER_CACHE:
         from app.flood_layers import prithvi_water as pw
 
-        gdf, _meta = pw._load()
-        if gdf is None:
-            return JSONResponse({"type": "FeatureCollection", "features": []})
-        _LAYER_CACHE[key] = _clip_simplify(gdf, lat, lon, r, props_keep=set(), simplify_ft=4)
+        _LAYER_CACHE[key] = pw.layer_geojson(lat, lon, r)
     return JSONResponse(_LAYER_CACHE[key], headers={"Cache-Control": "public, max-age=3600"})
 
 

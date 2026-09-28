@@ -79,7 +79,7 @@ const STEP_NOTE_KEYS: Record<string, string[]> = {
   ttm_311_forecast: ['forecast_mean', 'forecast_peak'],
   ida_hwm_2021: ['n_within_800m', 'max_height_above_gnd_ft'],
   prithvi_eo_v2: ['nearest_distance_m'],
-  prithvi_water: ['nearest_distance_m', 'n_polygons_within_500m'],
+  prithvi_water: ['new_water_m2_within_radius', 'frac_observed_within_radius'],
   microtopo_lidar: ['elev_m', 'pct_200m', 'relief_m'],
   mta_entrance_exposure: ['n_entrances', 'n_inside_sandy_2012', 'n_in_dep_extreme_2080'],
   nycha_development_exposure: ['n_developments', 'n_inside_sandy_2012', 'n_in_dep_extreme_2080'],
@@ -203,6 +203,15 @@ export function mapPointRows(fc: FeatureCollection | undefined): MapPointRow[] {
 export const AREA_BOUNDARY_LEGEND = {
   label: 'Area boundary (NYC DCP 2020 NTAs)',
   source: 'NYC Department of City Planning'
+};
+
+/** Legend wording for map layers whose manifest title is too long for the
+ *  layers panel. `source` is the sub-note under the label. */
+export const LAYER_LEGEND_OVERRIDES: Record<string, { label: string; source: string }> = {
+  prithvi_water: {
+    label: 'New surface water after Ida (Prithvi-EO, experimental)',
+    source: 'Sentinel-2, 2021-09-02 vs 2021-08-13'
+  }
 };
 
 /** The area outline from a neighbourhood or district run, if the final

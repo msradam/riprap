@@ -1,142 +1,156 @@
-"""Satellite-detected surface water after Hurricane Ida (experimental).
+"""New surface water after Hurricane Ida from the Prithvi-EO batch (experimental).
 
-The 300M-parameter Prithvi-EO foundation model (NASA/IBM, Apache-2.0)
-was run twice offline on Hurricane Ida 2021 pre/post HLS Sentinel-2
-scenes over central NYC:
+Reads the precomputed outputs of scripts/run_eo_batch.py for the Ida event
+(rain ending 2021-09-01): a 10 m Cloud Optimized GeoTIFF of new water
+(1 = water after the storm that was not water before, 0 = no new water,
+255 = no cloud-free scene pair observed the pixel) and a per-NTA
+GeoParquet summary. The model is `msradam/Prithvi-EO-2.0-NYC-Pluvial` run
+on Sentinel-2 L2A scenes from 2021-09-02, with same-tile pre scenes from
+2021-08-13 masking permanent water.
 
-    pre :  HLS.S30.T18TWK.2021237T153809  (2021-08-25,  3% cloud)
-    post:  HLS.S30.T18TWK.2021245T154911  (2021-09-02,  1% cloud,
-                                           ~14 hours after the heaviest rain)
-
-The diff (post-water minus pre-water, filtered to ≥3-cell polygons)
-isolates surface water present about 14 hours after the heaviest rain
-that wasn't present the prior week. Per query we report how many of
-those polygons sit near the address, never an inside/outside verdict.
-The layer is unvalidated (no comparison with Ida HWMs or 311).
-
-Honest scope:
-- Sub-surface flooding (subway entrances, basement apartments — the
-  dominant Ida damage mode in NYC) is not visible to optical satellites.
-- Pluvial street water had largely drained by the Sep 2 16:02Z pass,
-  so the residual Prithvi signal mostly captures marsh ponding,
-  riverside spillover, and low-lying park inundation.
+Per query nothing is inferred: for a point, the new-water area within
+500 m and the share of the surrounding NTA; for an area, the new-water
+share of the polygon. Street and basement flooding drains within hours
+and is not visible at 10 to 20 m, so no water is not evidence of no
+flooding. The model has no flood-detection score on held-out events.
 """
+
 from __future__ import annotations
 
-import json
-import math
-from dataclasses import dataclass
+import os
 from functools import lru_cache
 from pathlib import Path
 
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
-DOC_ID = "prithvi_water"
-CITATION = ("Prithvi-EO-2.0-300M-TL-Sen1Floods11 (NASA/IBM, Apache-2.0, via "
-            "TerraTorch). Hurricane Ida pre/post diff: pre HLS T18TWK "
-            "2021-08-25 (3% cloud), post HLS T18TWK 2021-09-02 (1% cloud, "
-            "~14 h after the heaviest rain).")
+EO_DIR = Path(os.environ.get("RIPRAP_EO_DIR", Path(__file__).resolve().parents[2] / "data" / "eo"))
+EVENT = "2021-09-01"
+MODEL = "msradam/Prithvi-EO-2.0-NYC-Pluvial"
+CAVEAT = ("Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no "
+          "water here is not evidence of no flooding.")
 
 
-@dataclass
-class PrithviSummary:
-    nearest_distance_m: float | None
-    n_polygons_within_500m: int
-    scene_id: str
-    scene_date: str
-    # Normalized rendering fields the type-keyed raster card reads.
-    headline_value: str = ""
-    subhead_text: str = ""
-    narrative: str = ""
-    raster_kind: str = "prithvi"
-    illustrative: bool = False
+def _paths(event: str = EVENT) -> tuple[Path, Path]:
+    stem = EO_DIR / f"prithvi_new_water_{event}"
+    return stem.with_suffix(".tif"), Path(f"{stem}_by_nta.parquet")
 
 
-def _haversine_m(lat1, lon1, lat2, lon2):
-    R = 6371000.0
-    p1, p2 = math.radians(lat1), math.radians(lat2)
-    dp = math.radians(lat2 - lat1); dl = math.radians(lon2 - lon1)
-    a = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
-    return 2 * R * math.asin(math.sqrt(a))
+@lru_cache(maxsize=2)
+def _tags(event: str = EVENT) -> dict:
+    import rasterio
+
+    tif, _ = _paths(event)
+    with rasterio.open(tif) as src:
+        return src.tags()
 
 
-@lru_cache(maxsize=1)
-def _load():
-    """Load the merged Prithvi water mask (combined across NYC MGRS tiles)
-    as a GeoDataFrame in NYC state plane (EPSG:2263) for fast metric
-    distance queries."""
+def _dates(ids: str) -> str:
+    """'S2A_MSIL2A_20210902T154911_R054_T18TWL_...;...' -> '2021-09-02'."""
+    days = sorted({i.split("_")[2][:8] for i in ids.split(";") if i.count("_") >= 2})
+    return ", ".join(f"{d[:4]}-{d[4:6]}-{d[6:]}" for d in days)
+
+
+def _count(geom_4326) -> tuple[float, float, float]:
+    """(new-water m2, observed m2, total m2) inside a WGS84 geometry."""
     import geopandas as gpd
-    # Prefer the Ida flood-event diff (real flood-attribution signal);
-    # fall back to clear-day permanent-water masks if the Ida file is absent.
-    candidates = [
-        DATA_DIR / "prithvi_ida_2021.geojson",
-        DATA_DIR / "prithvi_flood_nyc.geojson",
-    ]
-    candidates += sorted(DATA_DIR.glob("prithvi_flood_*.geojson"), reverse=True)
-    path = next((p for p in candidates if p.exists()), None)
-    if path is None:
-        return None, None
-    with open(path) as f:
-        meta = json.load(f)
-    g = gpd.read_file(path)
-    if g.crs is None:
-        g.set_crs("EPSG:4326", inplace=True)
-    g = g.to_crs("EPSG:2263")
-    return g, meta
+    import numpy as np
+    import rasterio
+    from rasterio.mask import mask
+
+    tif, _ = _paths()
+    with rasterio.open(tif) as src:
+        g = gpd.GeoSeries([geom_4326], crs="EPSG:4326").to_crs(src.crs).iloc[0]
+        arr, _ = mask(src, [g], crop=True, nodata=254, filled=True)
+        px = abs(src.transform.a * src.transform.e)
+    a = arr[0]
+    inside = a != 254
+    return (float(np.sum(a == 1)) * px, float(np.sum(inside & (a != 255))) * px, float(np.sum(inside)) * px)
 
 
-def warm() -> None:
-    _load()
+def _scene_sentence(tags: dict) -> str:
+    return (f"{MODEL} on Sentinel-2 scenes from {_dates(tags.get('post_scene', ''))}, compared with "
+            f"{_dates(tags.get('pre_scene', ''))}")
 
 
-def summary_for_point(lat: float, lon: float) -> PrithviSummary | None:
+def summary_for_point(lat: float, lon: float, radius_m: float = 500) -> dict | None:
+    """New water within `radius_m` of a point and the share of its NTA."""
     import geopandas as gpd
     from shapely.geometry import Point
-    g, meta = _load()
-    if g is None:
+
+    tif, _ = _paths()
+    if not tif.exists():
         return None
-    pt_wgs = gpd.GeoSeries([Point(lon, lat)], crs="EPSG:4326")
-    pt_2263 = pt_wgs.to_crs("EPSG:2263").iloc[0]
-    # nearest distance (feet -> metres)
-    distances_ft = g.geometry.distance(pt_2263)
-    nearest_ft = float(distances_ft.min()) if len(distances_ft) else None
-    nearest_m = round(nearest_ft / 3.281, 1) if nearest_ft is not None else None
+    tags = _tags()
+    circle = gpd.GeoSeries([Point(lon, lat)], crs="EPSG:4326").to_crs("EPSG:32618").buffer(radius_m) \
+        .to_crs("EPSG:4326").iloc[0]
+    new_m2, obs_m2, total_m2 = _count(circle)
+    out = {"new_water_m2_within_radius": round(new_m2), "radius_m": radius_m,
+           "frac_observed_within_radius": round(obs_m2 / total_m2, 3) if total_m2 else 0.0,
+           "post_scene": tags.get("post_scene"), "pre_scene": tags.get("pre_scene"), "model": MODEL,
+           "rain_date": tags.get("rain_date", EVENT), "batch_run": tags.get("batch_run")}
+    # The NTA share comes from the raster itself, the same count as the circle.
+    from app.areas import nta
 
-    within_500m = int((distances_ft <= 500 * 3.281).sum())
-
-    # The Ida pre/post artifact carries pre_/post_ scene info; the clear-day
-    # artifact carries scene_ids[]. Format compactly for either case.
-    if "post_scene_id" in meta:
-        sid = f"pre {meta['pre_scene_id']} | post {meta['post_scene_id']}"
-        sdate = f"pre {meta['pre_scene_date']}, post {meta['post_scene_date']}"
+    g = nta.load()
+    hit = g[g.contains(Point(lon, lat))]
+    if len(hit):
+        n_new, n_obs, n_total = _count(hit.geometry.iloc[0])
+        out.update(nta_name=hit.iloc[0]["ntaname"], nta_frac_new_water=round(n_new / n_obs, 5) if n_obs else 0.0,
+                   nta_frac_observed=round(n_obs / n_total, 3) if n_total else 0.0)
+    if not out["frac_observed_within_radius"]:
+        where = "No cloud-free scene pair covered the area within 500 m of this address, so the model saw nothing here."
     else:
-        sid = meta.get("scene_id") or ", ".join(meta.get("scene_ids", []) or ["unknown"])
-        sdate = meta.get("scene_date") or ", ".join(meta.get("scene_dates", []) or ["unknown"])
+        where = (f"{out['new_water_m2_within_radius']:,} m² of new surface water within {radius_m:.0f} m of this "
+                 f"address ({out['frac_observed_within_radius']:.0%} of that circle observed)")
+        if "nta_name" in out:
+            where += (f"; {out['nta_frac_new_water']:.2%} of {out['nta_name']} showed new water "
+                      f"({out['nta_frac_observed']:.0%} of it observed)")
+        where += "."
+    out["narrative"] = f"Experimental: {_scene_sentence(tags)}: {where} {CAVEAT}"
+    out["headline_value"] = f"{out['new_water_m2_within_radius']:,} m² new water within {radius_m:.0f} m"
+    return out
 
-    # ponytail: no inside/outside verdict on purpose. The polygons are
-    # residual surface water from one pass ~14 h after the rain (mostly
-    # marsh, shoreline and park water), so "outside" would falsely
-    # reassure basement-flood areas. Validate against Ida HWMs and 311
-    # before this layer says anything about a specific address.
-    headline = f"{within_500m} within 500 m"
-    narrative = (
-        "Experimental: satellite-detected surface water about 14 hours after "
-        f"Hurricane Ida (Sentinel-2, 2021-09-02): {within_500m} water polygons "
-        "within 500 m of this address"
-    )
-    if nearest_m is not None:
-        narrative += f", nearest {nearest_m} m away"
-    narrative += (
-        ". Most are marsh, shoreline and park water; street and basement "
-        "flooding had drained by then and is not visible in this layer."
-    )
-    return PrithviSummary(
-        nearest_distance_m=nearest_m,
-        n_polygons_within_500m=within_500m,
-        scene_id=sid,
-        scene_date=sdate,
-        headline_value=headline,
-        subhead_text="surface water after Ida, experimental",
-        narrative=narrative,
-        raster_kind="prithvi",
-        illustrative=False,
-    )
+
+def summary_for_polygon(polygon) -> dict | None:
+    """The new-water share of an area (an NTA or a community district)."""
+    tif, _ = _paths()
+    if not tif.exists():
+        return None
+    tags = _tags()
+    new_m2, obs_m2, total_m2 = _count(polygon)
+    frac = new_m2 / obs_m2 if obs_m2 else 0.0
+    out = {"new_water_m2": round(new_m2), "frac_new_water": round(frac, 5),
+           "frac_observed": round(obs_m2 / total_m2, 3) if total_m2 else 0.0,
+           "post_scene": tags.get("post_scene"), "pre_scene": tags.get("pre_scene"), "model": MODEL,
+           "rain_date": tags.get("rain_date", EVENT), "batch_run": tags.get("batch_run")}
+    if not obs_m2:
+        where = "no cloud-free scene pair covered this area, so the model saw nothing here."
+    else:
+        where = (f"{out['new_water_m2']:,} m² of new surface water, {frac:.2%} of the observed part of this area "
+                 f"({out['frac_observed']:.0%} of it observed).")
+    out["narrative"] = f"Experimental: {_scene_sentence(tags)}: {where} {CAVEAT}"
+    out["headline_value"] = f"{frac:.2%} new water (observed part)"
+    return out
+
+
+def layer_geojson(lat: float, lon: float, r: float = 1500) -> dict:
+    """New-water pixels within `r` m of a point as GeoJSON polygons, for the map."""
+    import geopandas as gpd
+    import rasterio
+    from rasterio.features import shapes
+    from rasterio.windows import from_bounds
+    from shapely.geometry import Point, shape
+
+    tif, _ = _paths()
+    if not tif.exists():
+        return {"type": "FeatureCollection", "features": []}
+    with rasterio.open(tif) as src:
+        c = gpd.GeoSeries([Point(lon, lat)], crs="EPSG:4326").to_crs(src.crs).iloc[0]
+        win = from_bounds(c.x - r, c.y - r, c.x + r, c.y + r, src.transform).round_offsets().round_lengths()
+        a = src.read(1, window=win, boundless=True, fill_value=255)
+        tr = src.window_transform(win)
+        geoms = [shape(g) for g, v in shapes(a, mask=a == 1, transform=tr) if v == 1]
+        crs = src.crs
+    if not geoms:
+        return {"type": "FeatureCollection", "features": []}
+    gdf = gpd.GeoDataFrame(geometry=geoms, crs=crs).to_crs("EPSG:4326")
+    return {"type": "FeatureCollection",
+            "features": [{"type": "Feature", "properties": {}, "geometry": g.__geo_interface__} for g in gdf.geometry]}
