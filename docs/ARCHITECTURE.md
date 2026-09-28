@@ -517,7 +517,8 @@ cd web/sveltekit && pnpm install && pnpm run build
 ```
 
 The HF Space `lablab-ai-amd-developer-hackathon/riprap-nyc` is the frozen
-May 2026 hackathon build with inference disabled.
+May 2026 hackathon build with inference disabled. It belongs to the
+hackathon organisation, not this project, and does not track the code.
 
 ---
 

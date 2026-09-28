@@ -13,7 +13,7 @@ Usage:
     .venv/bin/python scripts/probe_addresses.py
     .venv/bin/python scripts/probe_addresses.py --base http://127.0.0.1:7860
     .venv/bin/python scripts/probe_addresses.py \\
-        --base https://lablab-ai-amd-developer-hackathon-riprap-nyc.hf.space \\
+        --base https://your-deployment.example \\
         --addresses "PS 188, Lower East Side"
     .venv/bin/python scripts/probe_addresses.py --json outputs/probe_addresses.json
 

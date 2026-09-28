@@ -89,7 +89,6 @@ Documentation = "https://github.com/msradam/riprap/blob/main/docs/INDEX.md"
 Repository    = "https://github.com/msradam/riprap"
 Issues        = "https://github.com/msradam/riprap/issues"
 Changelog     = "https://github.com/msradam/riprap/blob/main/CHANGELOG.md"
-"Legacy Demo (frozen, data probes only)" = "https://lablab-ai-amd-developer-hackathon-riprap-nyc.hf.space"
 
 [dependency-groups]
 dev = [

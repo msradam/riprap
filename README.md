@@ -21,7 +21,9 @@ fail. See [`docs/GROUNDING.md`](docs/GROUNDING.md).
 ![Riprap flood-exposure briefing for DUMBO, Brooklyn](assets/screenshots/hero.png)
 
 Run it locally with one command (see the Quickstart). The original
-hackathon demo is frozen at its May 2026 build with inference disabled:
+hackathon demo is frozen at its May 2026 build with inference disabled. It
+is hosted by the AMD x lablab.ai hackathon organisation on Hugging Face, not
+by this project, and does not reflect the current code:
 <https://lablab-ai-amd-developer-hackathon-riprap-nyc.hf.space>.
 
 > **Now an open-source civic-tech framework.** NYC is the reference

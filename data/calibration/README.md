@@ -18,3 +18,8 @@ perturbation), not owner judgements.
 
 The split is the experiment's: 20% of items (Task B: of claims, with all
 of a claim's variants together), stratified by label, seed 0.
+
+Personal email addresses that appeared in the free text of some 311
+records were replaced with `[email removed]` on 2026-09-27 (refactor 5).
+The 311 filter was trained before that change; the redaction changes no
+label.

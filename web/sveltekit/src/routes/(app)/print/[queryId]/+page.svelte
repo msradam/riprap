@@ -348,7 +348,7 @@
         font: 9pt "Overpass Mono"; color: #4E5A6E;
       }
       @bottom-left {
-        content: "riprap.nyc";
+        content: "github.com/msradam/riprap";
         font: 9pt "Overpass Mono"; color: #4E5A6E;
       }
     }
