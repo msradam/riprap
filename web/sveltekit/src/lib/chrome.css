@@ -37,6 +37,8 @@
   gap: 10px;
   min-width: 360px;
   max-width: min(560px, 100%);
+  /* The ⌕ glyph falls back to another font and grew the button by 2px. */
+  min-height: 35px;
   text-align: left;
 }
 /* A long question truncates here; the briefing heading shows it in full. */
@@ -49,7 +51,12 @@
   text-transform: uppercase;
   color: var(--ink-tertiary);
 }
-.app-header-right { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 4px 18px; font-family: var(--font-mono); font-size: 12px; }
+/* One line at every width: the status pill truncates rather than wraps and
+   the print links replace it when the run ends, so the header keeps its
+   height through a live run (a wrap here moved the page, CLS 0.2). The
+   container lets StatusPill drop its step name when the row is narrow. */
+.app-header-right { container-type: inline-size; display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-end; gap: 18px; min-width: 0; min-height: 24px; font-family: var(--font-mono); font-size: 12px; }
+.app-header-right > * { flex: none; }
 .app-header-link { color: var(--ink-secondary); text-decoration: none; border-bottom: 1px solid transparent; display: inline-flex; align-items: center; min-height: 24px; }
 .app-header-link:hover { border-bottom-color: var(--ink); color: var(--ink); }
 .app-header-status { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-tertiary); text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; }
@@ -72,12 +79,16 @@
 /* Tablet: the query moves to its own row so the context and the links
    (methodology, print, export PDF, status) share the first row. */
 @media (max-width: 1100px) {
-  .app-header-inner { grid-template-columns: 1fr auto; gap: 10px 24px; }
+  /* Equal halves, so the pill's changing text never resizes the context. */
+  .app-header-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 24px; }
   .app-header-mid { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
   .app-header-query { min-width: 0; width: 100%; max-width: none; }
 }
 @media (max-width: 720px) {
   .app-header-inner { grid-template-columns: 1fr; gap: 8px; }
+  /* Room for the deployment tag's second line before it loads, so its
+     arrival (and a longer "not in any deployment" tag) moves nothing. */
+  .app-header-left { min-height: 48px; align-content: flex-start; }
   .app-header-mid { grid-row: auto; }
   .app-header-mid, .app-header-right { justify-content: flex-start; }
   .app-header-query { min-width: 0; width: 100%; }

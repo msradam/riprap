@@ -85,7 +85,7 @@
     <span class="status-dot" aria-hidden="true"></span>
     <span class="status-phase">{phaseLabel}</span>
     {#if stepLabel}
-      <span class="status-sep">·</span>
+      <span class="status-sep status-step-sep">·</span>
       <span class="status-step">{stepLabel}</span>
     {/if}
     {#if progress}
@@ -111,10 +111,14 @@
     font-size: 12px;
     color: var(--ink-secondary);
     letter-spacing: 0.04em;
+    line-height: 18px;
     max-width: min(60ch, 50vw);
+    /* Shrinks inside the header row; the step, then the phase, truncate.
+       The full text stays in the DOM, so the live region reads all of it. */
+    flex: 0 1 auto;
+    min-width: 0;
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
   }
   .status[data-kind='err'] {
     border-color: #B91C1C;
@@ -141,19 +145,24 @@
     font-weight: 500;
   }
   .status-phase {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
     color: var(--ink);
     text-transform: lowercase;
     letter-spacing: 0.05em;
     font-weight: 600;
   }
-  .status-sep { color: var(--ink-tertiary); opacity: 0.6; }
+  .status-sep { flex: none; color: var(--ink-tertiary); opacity: 0.6; }
   .status-step {
+    flex: 0 100 auto;
+    min-width: 0;
     color: var(--ink-secondary);
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .status-progress { color: var(--ink); font-weight: 600; }
-  .status-err { color: #B91C1C; }
+  .status-progress { flex: none; color: var(--ink); font-weight: 600; }
+  .status-err { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: #B91C1C; }
   @keyframes pulse {
     0%, 100% { opacity: 0.35; transform: scale(0.85); }
     50%      { opacity: 1; transform: scale(1.1); }
@@ -161,13 +170,20 @@
   @media (prefers-reduced-motion: reduce) {
     .status-dot { animation: none; opacity: 0.7; }
   }
-  /* Phones: the pill has its own header row, so it wraps rather than
-     cutting "stopped: could not resolve the place" to half a word. */
-  @media (max-width: 720px) {
-    .status {
-      max-width: 100%;
-      flex-wrap: wrap;
-      white-space: normal;
+  /* A narrow header row has no room for the step name beside the phase
+     and count, so it is hidden visually but still read by the live region. */
+  @container (max-width: 380px) {
+    .status-step, .status-step-sep {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
     }
+  }
+  /* Phones: the pill may use the whole row beside "methodology". */
+  @media (max-width: 720px) {
+    .status { max-width: 100%; }
   }
 </style>
