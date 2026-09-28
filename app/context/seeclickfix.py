@@ -48,7 +48,7 @@ def records_near(
     url = f"{URL}?lat={lat}&lng={lon}&sort=distance&per_page={_PER_PAGE}&details=false"
     if request_types:
         url += f"&request_types={request_types}"
-    data = fetch_url_json(url, cache_ttl_s=cache_ttl_s, timeout_s=15.0)
+    data = fetch_url_json(url, cache_ttl_s=cache_ttl_s, timeout_s=15.0, personal=True)
     issues = data.get("issues") if isinstance(data, dict) else None
     if not isinstance(issues, list):
         return None

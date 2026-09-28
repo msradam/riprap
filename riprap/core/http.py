@@ -55,6 +55,13 @@ def client() -> httpx.Client:
                         headers={"User-Agent": USER_AGENT})
 
 
+@functools.cache
+def uncached_client() -> httpx.Client:
+    """For responses that may hold personal data (311 free text): never
+    written to the cache file."""
+    return httpx.Client(timeout=TIMEOUT, follow_redirects=True, headers={"User-Agent": USER_AGENT})
+
+
 def _retryable(exc: Exception) -> bool:
     if isinstance(exc, httpx.HTTPStatusError):
         return exc.response.status_code == 429 or exc.response.status_code >= 500
@@ -62,9 +69,16 @@ def _retryable(exc: Exception) -> bool:
 
 
 @stamina.retry(on=_retryable, attempts=3, timeout=30.0)
-def request(method: str, url: str, *, ttl_s: float | None = None, **kwargs) -> httpx.Response:
+def request(method: str, url: str, *, ttl_s: float | None = None, store: bool = True,
+            **kwargs) -> httpx.Response:
     """Send a request through the shared client. `ttl_s` overrides the
-    cache lifetime for this call (0 disables caching for it)."""
+    cache lifetime for this call (0 disables caching for it). With
+    store=False the response never touches the cache file."""
+    if not store:
+        resp = uncached_client().request(method, url, **kwargs)
+        if resp.status_code == 429 or resp.status_code >= 500:
+            resp.raise_for_status()
+        return resp
     extensions = dict(kwargs.pop("extensions", None) or {})
     extensions["hishel_ttl"] = DEFAULT_TTL_S if ttl_s is None else ttl_s
     if ttl_s == 0:

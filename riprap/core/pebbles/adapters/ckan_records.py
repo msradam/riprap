@@ -138,7 +138,7 @@ class CKANRecordsPebble(BasePebble):
 
         try:
             data = fetch_url_json(
-                url, cache_ttl_s=int(cfg.get("cache_ttl_s", 600)), timeout_s=20.0,
+                url, cache_ttl_s=int(cfg.get("cache_ttl_s", 600)), timeout_s=20.0, personal=True,
             )
         except httpx.HTTPError as e:
             return PebbleResult(

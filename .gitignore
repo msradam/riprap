@@ -122,3 +122,8 @@ submission.md
 riprap-triton/
 outputs/handoff/
 Riprap.zip
+
+# 311 training pools hold residents' free text (emails, phone numbers);
+# never commit them (refactor 6)
+data/calibration/distill_pool.csv
+experiments/**/distill_pool.csv

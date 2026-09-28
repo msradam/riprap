@@ -84,7 +84,7 @@ class SocrataRecordsPebble(BasePebble):
 
         try:
             url = base_url + "?" + "&".join(f"{k}={v}" for k, v in params.items())
-            data = fetch_url_json(url, cache_ttl_s=cache_ttl_s, timeout_s=15.0)
+            data = fetch_url_json(url, cache_ttl_s=cache_ttl_s, timeout_s=15.0, personal=True)
         except httpx.HTTPError as e:
             return PebbleResult(
                 pebble_id=self.id, value=None, offline=True,

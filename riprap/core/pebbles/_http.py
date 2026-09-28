@@ -41,9 +41,17 @@ def fetch_url_text(url: str, *, cache_ttl_s: int = 300,
 
 def fetch_url_json(url: str, *, cache_ttl_s: int = 300,
                    headers: dict[str, str] | None = None,
-                   timeout_s: float = 10.0) -> Any:
-    r = http.get(url, headers=_interpolate_headers(headers), timeout=timeout_s, ttl_s=cache_ttl_s)
+                   timeout_s: float = 10.0, personal: bool = False) -> Any:
+    """`personal=True` for records that may hold personal data (311 free
+    text): the response bypasses the HTTP cache and every string is
+    redacted of emails and phone numbers before it is returned."""
+    r = http.get(url, headers=_interpolate_headers(headers), timeout=timeout_s, ttl_s=cache_ttl_s,
+                 store=not personal)
     r.raise_for_status()
+    if personal:
+        from riprap.core.redact import redact
+
+        return redact(r.json())
     return r.json()
 
 
