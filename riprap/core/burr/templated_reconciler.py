@@ -76,19 +76,101 @@ NON_SCOPE_FOOTER = (
 )
 
 
+# The three point DEP scenarios, in time order, and the words for each.
+_DEP_POINT = {"dep_moderate_current": "current sea level with 2.13 in/hr of rain",
+              "dep_moderate_2050": "2050 sea level with 2.13 in/hr",
+              "dep_extreme_2080": "2080 sea level with 3.66 in/hr"}
+
+
+def _dep_sentence(state, items) -> str | None:
+    """The DEP scenario sentences as one sentence naming each scenario's
+    result, each part cited. None unless two or more scenarios ran."""
+    parts = []
+    for pid, words in _DEP_POINT.items():
+        e = next((e for e in items if e.pebble_id == pid), None)
+        v = state.get(pid) if e else None
+        if isinstance(v, dict) and "depth_class" in v:
+            result = "outside the modeled flooding" if not v["depth_class"] else f"{v['depth_label']} flooding"
+            parts.append(f"{words}, {result} [{e.doc_id}]")
+    return f"NYC DEP stormwater scenarios at this address: {'; '.join(parts)}." if len(parts) >= 2 else None
+
+
+def _lead(state, items) -> str | None:
+    """A bare-address briefing's opening: the Sandy footprint, the FEMA
+    zone, the DEP scenarios and the 311 count, each from its verified
+    template sentence's value and cited, then checked by the claim
+    verifier like any claim. Parts that fail the check are left out."""
+    from riprap.core.burr.synthesis import Doc, verify
+
+    by_pebble = {e.pebble_id: e for e in items}
+    claims = []
+
+    def add(pid: str, text: str, ids: list[str] | None = None):
+        claims.append({"section": "lead", "text": text, "doc_ids": ids or [by_pebble[pid].doc_id]})
+
+    if "sandy" in by_pebble and isinstance(state.get("sandy"), dict):
+        add("sandy", f"{'inside' if state['sandy'].get('inside') else 'outside'} the 2012 Sandy inundation footprint")
+    fema = state.get("fema_nfhl")
+    if "fema_nfhl" in by_pebble and isinstance(fema, dict) and fema.get("fld_zone"):
+        add("fema_nfhl", f"in FEMA flood zone {fema['fld_zone']}")
+    dep = {p: state[p] for p in _DEP_POINT if p in by_pebble and isinstance(state.get(p), dict)}
+    if dep:
+        ids = [by_pebble[p].doc_id for p in dep]
+        wet = [p for p, v in dep.items() if v.get("depth_class")]
+        if not wet:
+            add("", "outside the modeled flooding in every DEP stormwater scenario checked", ids)
+        else:
+            add("", "inside the modeled flooding in the DEP " + " and ".join(
+                _DEP_POINT[p].split(" sea level")[0] for p in wet) + " stormwater scenario"
+                + ("s" if len(wet) > 1 else ""), [by_pebble[p].doc_id for p in wet])
+    n311 = state.get("nyc311")
+    if "nyc311" in by_pebble and isinstance(n311, dict) and "n" in n311:
+        n = f"{'At least ' if n311.get('capped') else ''}{n311['n']}"
+        add("nyc311", f"{n} flood-related 311 complaint{'s were' if n311['n'] != 1 else ' was'} filed within "
+                      f"{n311['radius_m']:.0f} m in the last {n311['years']} years")
+    docs = [Doc(e.doc_id, "lead", e.text, False) for e in items]
+    kept, _ = verify(claims, docs)
+    cited = [(c["doc_ids"], f"{c['text']} {''.join(f'[{i}]' for i in c['doc_ids'])}") for c in kept]
+    where = [t for ids, t in cited if "nyc311" not in ids]
+    count = [t for ids, t in cited if "nyc311" in ids]
+    out = []
+    if where:
+        where = where if len(where) < 2 else [*where[:-1], f"and {where[-1]}"]
+        out.append(f"This address is {(', ' if len(where) > 2 else ' ').join(where)}.")
+    out += [f"{t}." for t in count]
+    return " ".join(out) or None
+
+
 def compose_briefing(state) -> tuple[str, dict[str, dict]]:
     """One section per Stone (stones.yaml order), one cited sentence per
-    pebble with a value. Returns (paragraph, citations by doc_id). A
-    not_implemented query gets the planner's explanation instead."""
+    pebble with a value, the DEP scenarios merged into one sentence.
+    A bare-address briefing opens with a short cited lead. Returns
+    (paragraph, citations by doc_id). A not_implemented query gets the
+    planner's explanation instead."""
     if state.get("intent") in ("not_implemented", "out_of_scope"):
         return refusal(state), {}
     stones, registry = evidence.load(state.get("deployment"))
     items = evidence.collect(state, stones, registry)
     sections = [_scope_header()]
+    bare = state.get("intent") == "single_address" and not (state.get("plan") or {}).get("question")
+    lead = _lead(state, items) if bare else None
+    if lead:
+        sections.append(f"**In brief.**\n{lead}")
+    dep, dep_done = _dep_sentence(state, items), False
     for stone in stones.all():
         if stone.id == "capstone":
             continue  # Capstone is the synthesis output, not a data stone
-        body = " ".join(evidence.cite(e.text, e.doc_id) for e in items if e.stone_id == stone.id)
+        out = []
+        for e in items:
+            if e.stone_id != stone.id:
+                continue
+            if dep and e.pebble_id in _DEP_POINT:
+                if not dep_done:  # the merged sentence goes where the first scenario was
+                    out.append(dep)
+                    dep_done = True
+                continue
+            out.append(evidence.cite(e.text, e.doc_id))
+        body = " ".join(out)
         if body:
             sections.append(f"**{evidence.stone_heading(stone)}**\n{body}")
     if len(sections) == 1:

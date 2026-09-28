@@ -12,6 +12,7 @@
 import type { BriefingBlock, Citation } from '$lib/types/claim';
 import { looksLikeQuestion, type RunState } from '$lib/client/runState.svelte';
 import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
+import { modeLine } from '$lib/client/cardAdapter';
 
 export interface PrintSnapshot {
   queryId: string;
@@ -89,12 +90,7 @@ export function snapshotFromRun(
   const blocks = run.briefing.blocks;
   const hasAnswer = blocks.some((b) => b.kind === 'head' && b.label === 'Answer');
   const lists = sourceLists(run);
-  let mode: string | null = null;
-  if (g?.tier === 'llm') {
-    mode = `LLM claims checked against cited sources: ${g.claims?.length ?? 0} kept, ${g.dropped_claims?.length ?? 0} dropped${g.model ? ` (${g.model})` : ''}`;
-  } else if (g) {
-    mode = 'Evidence briefing (no LLM)';
-  }
+  const mode = modeLine(g);
   return {
     queryId,
     queryText,

@@ -720,7 +720,9 @@ function buildCapstoneMeta(final: FinalResult, wallSeconds?: number): Card {
     stone: 'capstone', tier: 'modeled', variant: 'meta',
     source: isLlm ? 'LLM' : 'No LLM',
     agency: isLlm
-      ? `Capstone synthesis · ${g?.model ?? 'LLM'} · claims checked against cited sources`
+      ? `Capstone synthesis · ${g?.model ?? 'LLM'} · ${g?.answer_mode === 'extractive'
+          ? 'answer quoted word for word, other claims checked against cited sources'
+          : 'claims checked against cited sources'}`
       : 'Capstone synthesis · evidence briefing built from source values (no LLM)',
     vintage: RIPRAP_VINTAGE,
     title: 'How this briefing was written',
@@ -1229,4 +1231,20 @@ export function applyStepEventToLiveState(
   }
 
   return [key];
+}
+
+/** What produced the briefing, in words: the mode line on screen and in
+ *  print. An extractive answer is quoted, not model prose, so it does not
+ *  say "LLM claims checked" for it. */
+export function modeLine(g: { tier: string; model?: string; answer_mode?: string;
+                              claims?: unknown[]; dropped_claims?: unknown[] } | null | undefined): string | null {
+  if (!g) return null;
+  if (g.tier !== 'llm') return 'Evidence briefing (no LLM)';
+  const model = g.model ? ` (${g.model})` : '';
+  const counts = `${g.claims?.length ?? 0} kept, ${g.dropped_claims?.length ?? 0} dropped`;
+  if (g.answer_mode === 'extractive') {
+    return `Extractive answer: sentences quoted word for word from the cited sources, chosen by the model${model} ` +
+      `and checked by the lead rules. Other claims checked against cited sources: ${counts}`;
+  }
+  return `LLM claims checked against cited sources: ${counts}${model}`;
 }

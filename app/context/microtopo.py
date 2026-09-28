@@ -133,6 +133,12 @@ def _row_col(transform, lat: float, lon: float) -> tuple[int, int]:
     return row, col
 
 
+def _ordinal(n: int) -> str:
+    """29 -> '29th', 1 -> '1st', 12 -> '12th'."""
+    suffix = "th" if 10 <= n % 100 <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{n}{suffix}"
+
+
 def microtopo_at(lat: float, lon: float, radius_m: int = 750) -> Microtopo | None:
     state = _load_dem()
     if state is None:
@@ -199,14 +205,15 @@ def microtopo_at(lat: float, lon: float, radius_m: int = 750) -> Microtopo | Non
     pct_200_r = round(pct_200, 1)
     relief = round(aoi_max - point_elev, 2)
     bits = [f"Elevation {elev} m"]
-    bits.append(f"; this point sits at the {pct_200_r}th percentile of "
-                f"elevation within a 200 m window (lower percentile = "
-                f"topographic low)")
+    pct = round(pct_200)
+    bits.append(f"; this point is higher than {pct}% of the ground within 200 m (the {_ordinal(pct)} "
+                f"percentile; a low percentile means a local low spot where water collects)")
     if hand_v is not None:
-        bits.append(f"; HAND {hand_v} m above nearest drainage")
+        bits.append(f"; HAND (height above the nearest drainage channel) {hand_v} m")
     if twi_v is not None:
-        bits.append(f"; TWI {twi_v}")
-    bits.append(f". Local basin relief: {relief} m.")
+        bits.append(f"; TWI (topographic wetness index; higher means water tends to collect) {twi_v}")
+    bits.append(f". Local basin relief (the rise from this point to the highest ground within "
+                f"{radius_m} m): {relief} m.")
     narrative = "".join(bits)
     return Microtopo(
         point_elev_m=elev,

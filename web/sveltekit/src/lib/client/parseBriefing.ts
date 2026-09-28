@@ -25,6 +25,8 @@ import { tierForDocId, type Tier } from '$lib/types/tier';
 // place-level sections). Numbered 00 so the four legacy heads keep theirs.
 const CANONICAL_SECTIONS: Array<{ key: string; label: string; n: string; tier?: Tier; aliases: string[] }> = [
   { key: 'answer', label: 'Answer', n: '00', aliases: ['answer'] },
+  // A bare-address briefing's cited lead (no LLM); shown where the Answer goes.
+  { key: 'brief', label: 'In brief', n: '00', aliases: ['in brief'] },
   { key: 'status', label: 'Status', n: '01', aliases: ['status'] },
   { key: 'empirical', label: 'Empirical evidence', n: '02', tier: 'empirical', aliases: ['empirical evidence', 'empirical'] },
   { key: 'modeled', label: 'Modeled scenarios', n: '03', tier: 'modeled', aliases: ['modeled scenarios', 'modeled'] },
@@ -267,12 +269,12 @@ export function parseBriefing(
 /** Display split of parsed blocks. `scope` is the preamble before the first
  *  head (the backend's scope disclosure) and `outOfScope` is the body of the
  *  "Out of scope" section: both are disclosure notes the page shows quietly,
- *  apart from the Answer (`lead`) and the numbered sections (`body`). */
+ *  apart from the Answer or In brief lead (`lead`) and the numbered sections (`body`). */
 export function splitBriefing(blocks: BriefingBlock[]) {
   const firstHead = blocks.findIndex((b) => b.kind === 'head');
   const scope = firstHead < 0 ? [] : blocks.slice(0, firstHead);
   const rest = firstHead < 0 ? blocks : blocks.slice(firstHead);
-  const i = rest.findIndex((b) => b.kind === 'head' && b.label !== 'Answer');
+  const i = rest.findIndex((b) => b.kind === 'head' && b.label !== 'Answer' && b.label !== 'In brief');
   const bodyStart = i < 0 ? rest.length : i;
   const body: BriefingBlock[] = [];
   const outOfScope: BriefingBlock[] = [];

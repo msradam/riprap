@@ -14,6 +14,7 @@
   import { briefingState, sourceLists } from '$lib/stores/briefingState.svelte';
   import { looksLikeQuestion } from '$lib/client/runState.svelte';
   import { splitBriefing } from '$lib/client/parseBriefing';
+  import { modeLine } from '$lib/client/cardAdapter';
   import { browser } from '$app/environment';
   import { page } from '$app/state';
 
@@ -177,7 +178,7 @@
           {#if grounding}
             <p class="region-head-meta grounding-line">
               {#if grounding.tier === 'llm'}
-                LLM claims checked against cited sources: {grounding.claims?.length ?? 0} kept, {grounding.dropped_claims?.length ?? 0} dropped{#if grounding.model}&nbsp;({grounding.model}){/if}
+                {modeLine(grounding)}
               {:else}
                 Evidence briefing (no LLM){#if grounding.fallback_reason}. The LLM was unavailable ({grounding.fallback_reason}), so the evidence briefing is shown.{/if}
               {/if}

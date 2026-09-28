@@ -1,0 +1,55 @@
+"""Bare-address briefings (refactor 5, phase 5): a cited lead built from
+the verified facts, one DEP sentence instead of three, and plain words for
+percentile, HAND and TWI. Offline: the pebble values are given."""
+
+from app.context.microtopo import _ordinal
+from app.context.nyc311 import Complaint, _summarize
+from riprap.core.burr.templated_reconciler import compose_briefing
+from riprap.core.compliance.predicates import every_numeric_claim_cited
+
+
+def _dep(cls, label, scenario):
+    out = "outside the modeled flooding in" if not cls else "models flooding at this address in"
+    return {"depth_class": cls, "depth_label": label, "narrative": f"This address is {out} {scenario}."}
+
+
+STATE = {
+    "intent": "single_address", "deployment": "nyc", "plan": {"question": ""},
+    "sandy": {"inside": False, "inside_phrasing": "sits outside", "inside_or_outside": "outside"},
+    "fema_nfhl": {"fld_zone": "X", "firm_panel": "3604970234F", "effective_year": 2007,
+                  "narrative": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007."},
+    "dep_moderate_current": _dep(0, "outside", "the NYC DEP stormwater scenario (2.13 in/hr, current SLR)"),
+    "dep_moderate_2050": _dep(0, "outside", "the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR)"),
+    "dep_extreme_2080": _dep(3, "Deep Contiguous (>4 ft)", "the NYC DEP stormwater scenario (3.66 in/hr, 2080 SLR)"),
+    "nyc311": _summarize([Complaint("1", "Sewer Backup (Use Comments) (SA)", "2025-01-01", None, None)] * 82,
+                         years=5, radius_m=200),
+}
+
+
+def test_bare_address_opens_with_a_cited_lead():
+    paragraph, _ = compose_briefing(STATE)
+    lead = paragraph.split("**In brief.**\n", 1)[1].split("\n\n", 1)[0]
+    assert lead == ("This address is outside the 2012 Sandy inundation footprint [sandy_inundation], "
+                    "in FEMA flood zone X [fema_nfhl], and inside the modeled flooding in the DEP 2080 "
+                    "stormwater scenario [dep_extreme_2080]. 82 flood-related 311 complaints were filed "
+                    "within 200 m in the last 5 years [nyc311].")
+    assert every_numeric_claim_cited(paragraph)
+
+
+def test_question_briefings_have_no_lead():
+    paragraph, _ = compose_briefing({**STATE, "plan": {"question": "Has this block flooded?"}})
+    assert "**In brief.**" not in paragraph
+
+
+def test_dep_scenarios_are_one_sentence_naming_each_result():
+    paragraph, _ = compose_briefing(STATE)
+    assert "NYC DEP stormwater scenario (" not in paragraph  # the three template sentences are gone
+    assert ("NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, "
+            "outside the modeled flooding [dep_moderate_current]; 2050 sea level with 2.13 in/hr, outside "
+            "the modeled flooding [dep_moderate_2050]; 2080 sea level with 3.66 in/hr, Deep Contiguous "
+            "(>4 ft) flooding [dep_extreme_2080].") in paragraph
+
+
+def test_percentiles_are_ordinals():
+    assert [_ordinal(n) for n in (1, 2, 3, 11, 12, 13, 21, 29, 112)] == \
+        ["1st", "2nd", "3rd", "11th", "12th", "13th", "21st", "29th", "112th"]
