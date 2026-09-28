@@ -10,8 +10,9 @@ files, so the gallery needs no backend (GitHub Pages).
         uv run python scripts/build_gallery.py      # question entries, LLM claims
 
 Entries with a `question` run the question (LLM mode answers it); the
-rest run the bare address. GALLERY_ONLY rebuilds just those slugs and
-keeps every other file and index entry as it is.
+rest run the bare address. Without an LLM configured, question entries
+are kept as they are. GALLERY_ONLY rebuilds just those slugs and keeps
+every other file and index entry as it is.
 
 Each file carries the full result (the same shape as the SSE `final`
 event, trace included), the deployment's stones and pebbles as
@@ -53,12 +54,19 @@ def main() -> int:
     addresses = json.loads((ROOT / "scripts" / "gallery_addresses.json").read_text())
     only = set(filter(None, os.environ.get("GALLERY_ONLY", "").split(",")))
     old_index = {e["slug"]: e for e in json.loads((OUT / "index.json").read_text())} \
-        if only and (OUT / "index.json").exists() else {}
+        if (OUT / "index.json").exists() else {}
+    has_llm = bool(llm.endpoints())
     index = []
     for a in addresses:
         if only and a["slug"] not in only:
             if a["slug"] in old_index:
                 index.append(old_index[a["slug"]])
+            continue
+        if a.get("question") and not has_llm:
+            # A question entry shows an LLM answer: without an endpoint, keep it as it is.
+            if a["slug"] in old_index:
+                index.append(old_index[a["slug"]])
+            print(f"{a['slug']:18s} kept as is (question entries need RIPRAP_LLM_BASE_URL and RIPRAP_LLM_MODEL)")
             continue
         t0 = time.time()
         final = run(a.get("question") or a["address"])

@@ -16,8 +16,8 @@ operations through curation, not mirroring (arxiv.org/html/2507.16044).
 Every tool except get_briefing works without an LLM. Run over stdio (for a
 local MCP client config) or streamable HTTP:
 
-    uv run python -m riprap.mcp.server
-    uv run python -m riprap.mcp.server --http --port 8765
+    uv run riprap-mcp                     # or: uv run python -m riprap.mcp.server
+    uv run riprap-mcp --http --port 8765
 """
 
 from __future__ import annotations

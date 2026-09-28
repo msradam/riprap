@@ -81,10 +81,11 @@ uv run uvicorn web.main:app --port 7860
 
 Open <http://localhost:7860> and type an address (`90-01 183rd Street, Queens`),
 a district (`QN12`) or a question (`Has 80 Pioneer Street, Brooklyn flooded?`).
-The same briefing as JSON:
+Without an LLM, a question gets the cited evidence for its place and a note
+saying it was not answered directly. The same briefing from the command line:
 
 ```bash
-curl -s "http://localhost:7860/api/agent?q=QN12" | python3 -m json.tool | head -40
+curl -s "http://localhost:7860/api/agent?q=QN12" | python3 -c "import json, sys; print(json.load(sys.stdin)['paragraph'])"
 ```
 
 `uv sync --extra ml` adds the optional in-process models (forecasts, policy
@@ -99,19 +100,21 @@ RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 RIPRAP_LLM_MODEL=granite4:micro \
   uv run uvicorn web.main:app --port 7860
 ```
 
-**MCP server.** Seven tools (`get_evidence`, `get_district_summary`,
-`get_briefing`, `nyc311_flood_requests`, `plan_query`, `list_sources`,
-`get_citation`), all but `get_briefing` without an LLM. Try one from the
-command line with the MCP Inspector (needs Node):
+**MCP server.** `uv run riprap-mcp` serves seven tools over stdio
+(`get_evidence`, `get_district_summary`, `get_briefing`,
+`nyc311_flood_requests`, `plan_query`, `list_sources`, `get_citation`); all but
+`get_briefing` work without an LLM. Try one from the command line with the MCP
+Inspector (needs Node):
 
 ```bash
-npx @modelcontextprotocol/inspector --cli uv run python -m riprap.mcp.server \
+npx @modelcontextprotocol/inspector --cli uv run riprap-mcp \
   --method tools/call --tool-name get_district_summary --tool-arg community_district=QN12
 ```
 
-**Gallery.** `uv run python scripts/build_gallery.py` rebuilds the no-LLM
-entries in `web/sveltekit/src/lib/gallery/`. Docker, the Modal host and the
-question entries are in [docs/DEPLOY.md](docs/DEPLOY.md).
+**Gallery.** `uv run python scripts/build_gallery.py` rebuilds the ten address
+entries in `web/sveltekit/src/lib/gallery/`; the four question entries are kept
+unless an LLM is configured. Docker and the Modal host are in
+[docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## How it works
 

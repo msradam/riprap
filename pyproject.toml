@@ -59,6 +59,7 @@ dependencies = [
 
 [project.scripts]
 riprap-register = "riprap.cli.register:main"
+riprap-mcp = "riprap.mcp.server:main"
 
 [project.optional-dependencies]
 # In-process CPU models: TTM forecasts, policy-corpus embeddings, NER.
