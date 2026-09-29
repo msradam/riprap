@@ -233,15 +233,20 @@ def _checks_run(mode: str | None, entail_info: dict) -> list[str]:
 
 
 def _lead_fact(lead: str | None, facts: list[str], kind_lead: bool, rel: str | None, question: str,
-               focus: dict | None, texts: dict[str, str], values: dict | None) -> dict | None:
+               focus: dict | None, texts: dict[str, str], values: dict | None,
+               experimental: frozenset[str] = frozenset()) -> dict | None:
     """Which fact the lead rests on, so the page can set that sentence as the
     key figure. A count lead: the counted kind's lead sentence itself
     (`in_lead`), else the source the question is about, else the first fact
     with a count. A yes or no set by the past-event rule: the source the rule
-    relied on. Any other lead: None (no sentence is singled out)."""
+    relied on. Any other lead: None (no sentence is singled out). An
+    experimental source is never the key fact."""
+    facts = [f for f in facts if f not in experimental]
+    if rel in experimental:
+        rel = None
     if lead == "count":
         if kind_lead:
-            return {"doc_id": rel, "in_lead": True}
+            return {"doc_id": rel, "in_lead": True} if rel else None
         doc = rel if rel in facts else next((f for f in facts if answer_checks.count_numbers(texts[f])), None)
         return {"doc_id": doc, "in_lead": False} if doc else None
     doc = answer_checks.past_event_source(question, focus, lead or "", texts, values)
@@ -484,13 +489,15 @@ def synthesize(state) -> dict:
                                   "doc_ids": facts, "numbers": [],
                                   "reason": "answer check: " + "; ".join(r for _, r in lead_hits)}]
             lead, facts = "cannot_answer", []
+        experimental = frozenset(d.doc_id for d in docs if d.experimental)
+        facts = sorted(facts, key=lambda f: f in experimental)  # experimental sources after all others
         kept = [*({"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts),
                 *kept]
         lead_phrase = LEAD_PHRASES.get(lead, "")
         if lead == "count" and rel in facts and (kl := answer_checks.kind_lead(question, texts, values)):
             lead_phrase = f"{kl} {lead_phrase}"
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
-                               focus, texts, values)
+                               focus, texts, values, experimental)
     checks = _checks_run(mode, entail_info)
     # A bare address opens with the same verified "In brief" lead as no-LLM mode.
     from riprap.core.burr.templated_reconciler import _lead

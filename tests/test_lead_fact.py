@@ -50,3 +50,34 @@ def test_other_leads_single_out_nothing():
                       TEXTS, HOLLIS) is None
     # A yes the rule did not set (not a past-event question) has no key fact either.
     assert past_event_source("Is 80 Pioneer Street in a flood zone?", None, "yes", TEXTS, HOLLIS, 2026) is None
+
+
+# An experimental source never leads the answer and is never the key fact.
+
+def test_experimental_source_is_never_the_key_fact():
+    exp = frozenset({"floodnet"})
+    assert _lead_fact("count", ["floodnet", "nyc311"], False, None, "How many flood events?", None, TEXTS, {},
+                      exp) == {"doc_id": "nyc311", "in_lead": False}
+    assert _lead_fact("count", ["floodnet"], False, "floodnet", "How many flood events?", None, TEXTS, {}, exp) is None
+    assert _lead_fact("no", ["floodnet"], False, None, Q_SENSOR, PAST, TEXTS, NONE, exp) is None
+
+
+def test_extractive_answer_puts_experimental_facts_after_the_others(monkeypatch):
+    from riprap.core.burr import synthesis as syn
+    from riprap.core.burr.synthesis import Doc
+
+    sandy = "This address sits inside the 2012 Hurricane Sandy inundation footprint (NYC OEM)."
+    prithvi = ("Experimental: satellite-detected surface water about 14 hours after Hurricane Ida: "
+               "3 water polygons within 500 m of this address.")
+    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
+    monkeypatch.setattr(syn, "_documents", lambda state: (
+        [Doc("prithvi_water", "Hazard reader", prithvi, True),
+         Doc("sandy_inundation", "Hazard reader", sandy, False)], [], None))
+    monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
+    reply = {"answer": {"lead": "yes", "facts": ["prithvi_water", "sandy_inundation"]}}
+    monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (reply, "scripted"))
+    out = syn.synthesize({"intent": "single_address",
+                          "plan": {"question": "Did this address flood in Hurricane Sandy?"}})
+    answer = [c["doc_ids"][0] for c in out["grounding"]["claims"] if c["section"] == "answer"]
+    assert answer == ["sandy_inundation", "prithvi_water"], out["paragraph"]
+    assert (out["grounding"]["lead_fact"] or {}).get("doc_id") != "prithvi_water"
