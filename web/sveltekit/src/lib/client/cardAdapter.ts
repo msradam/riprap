@@ -555,8 +555,8 @@ const countOf = (n: number, noun: string) => `${n} ${n === 1 ? noun.replace(/s$/
 /** One register's finding as a plain sentence, from the values it
  *  returned: how many listed assets are within its radius, how many sit in
  *  the 2012 Sandy extent and the DEP 2080 scenario, and the nearest ones
- *  by name. The registers list only exposed assets (the manifest titles
- *  say "exposed nearby"), so the count is of exposed assets. */
+ *  by name. Used only when the pebble gave no narrative; it counts the
+ *  listed assets, since some registers hold only flood-exposed ones. */
 export function registerSentence(
   noun: string,
   v: Record<string, unknown>,
@@ -565,7 +565,7 @@ export function registerSentence(
 ): string {
   const radius = num(v.radius_m);
   const within = radius != null ? `within ${radius} m` : 'within range';
-  if (!items.length) return `No exposed ${noun} ${within}.`;
+  if (!items.length) return `No ${noun} listed ${within}.`;
   const sandy = num(v.n_inside_sandy_2012);
   const dep = num(v.n_in_dep_extreme_2080);
   const flags = [
@@ -574,7 +574,7 @@ export function registerSentence(
   ].filter(Boolean).join(' and ');
   const names = listed.map((r) => (r.detail ? `${r.label} (${r.detail})` : r.label)).join(', ');
   const nearest = listed.length < items.length ? `; the nearest ${listed.length}: ${names}` : `: ${names}`;
-  return `${countOf(items.length, `exposed ${noun}`)} ${within}${flags ? `, ${flags}` : ''}${names ? nearest : ''}.`;
+  return `${countOf(items.length, noun)} listed ${within}${flags ? `, ${flags}` : ''}${names ? nearest : ''}.`;
 }
 
 function buildRegisterComposite(
@@ -606,12 +606,17 @@ function buildRegisterComposite(
         label: null, detail: null, sourceId: null,
         note: v.available === false ? unavailable : `0 within ${radius != null ? `${radius} m` : 'range'}`,
       });
-      empty.push(v.available === false ? unavailable : registerSentence(noun, v as Record<string, unknown>, items, []));
+      const said = str((v as Record<string, unknown>).narrative);
+      empty.push(v.available === false ? unavailable
+        : said ? said.replace(/\s*\[[a-z0-9_]+\]/g, '') : registerSentence(noun, v as Record<string, unknown>, items, []));
       continue;
     }
     const listed = items.slice(0, PER_PEBBLE_CAP).map((it) => _itemRow(reg, it));
     rows.push(...listed);
-    found.push(registerSentence(noun, v as Record<string, unknown>, items, listed));
+    // The pebble's own narrative says what the register counts (all assets
+    // in range, or only flood-exposed ones) and is the cited sentence.
+    const said = str((v as Record<string, unknown>).narrative);
+    found.push(said ? said.replace(/\s*\[[a-z0-9_]+\]/g, '') : registerSentence(noun, v as Record<string, unknown>, items, listed));
     const doc = m.provenance.doc_id ?? m.id;
     docIds.push(doc);
     agencies.push(m.provenance.source_name);
@@ -622,7 +627,7 @@ function buildRegisterComposite(
     stone: 'keystone', tier: 'empirical', variant: 'register',
     source: 'Civic OpenData', agency: `${agencies.length} register${agencies.length === 1 ? '' : 's'} · multi-agency join`,
     vintage: RIPRAP_VINTAGE,
-    title: 'Nearby exposed assets',
+    title: 'Nearby assets',
     registers: rows,
     sub: [...found, ...empty].join(' '),
     docId: docIds[0] ?? 'registers',

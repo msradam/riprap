@@ -1,13 +1,13 @@
 {
- "slug": "qn12-complaints",
- "neighborhood": "Community district QN12, Queens",
- "address": "QN12",
- "question": "How many street flooding complaints has community district QN12 had?",
+ "slug": "red-hook-buy",
+ "neighborhood": "Red Hook, Brooklyn",
+ "address": "80 Pioneer Street, Brooklyn, NY",
+ "question": "Should I buy the house at 80 Pioneer Street, Brooklyn?",
  "generated_at": "2026-09-29T16:37Z",
  "riprap_commit": "68d143a",
  "mode": "llm",
- "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
- "quantization": "Q4_K_M",
+ "model": null,
+ "quantization": null,
  "deployment": {
   "name": "nyc",
   "city": "NYC",
@@ -1111,662 +1111,81 @@
   ]
  },
  "final": {
-  "query": "How many street flooding complaints has community district QN12 had?",
-  "intent": "neighborhood",
+  "query": "Should I buy the house at 80 Pioneer Street, Brooklyn?",
+  "intent": "out_of_scope",
   "plan": {
-   "intent": "neighborhood",
-   "targets": [
-    {
-     "type": "nta",
-     "text": "QN12"
-    }
-   ],
-   "rationale": "The question asks for the count of flood-related 311 complaints within community district QN12 over a past period, which is directly provided by the nyc311_nta source.",
-   "question": "How many street flooding complaints has community district QN12 had?",
+   "intent": "out_of_scope",
+   "rationale": "Heuristic match: out of scope.",
    "focus": {
     "hazard": "flood",
-    "time_frame": "past",
+    "time_frame": "any",
     "assets": []
    },
-   "pebbles": [
-    "nyc311_nta"
-   ],
-   "catalog": [
-    "area_boundary",
-    "dep_extreme_2080",
-    "dep_extreme_2080_nta",
-    "dep_moderate_2050",
-    "dep_moderate_2050_nta",
-    "dep_moderate_current",
-    "dep_moderate_current_nta",
-    "fema_nfhl",
-    "ida_hwm",
-    "microtopo",
-    "microtopo_nta",
-    "policy_corpus",
-    "prithvi_water",
-    "prithvi_water_nta",
-    "sandy",
-    "sandy_nta",
-    "dob_permits_nta",
-    "doe_schools",
-    "doh_hospitals",
-    "mta_entrances",
-    "nycha_developments",
-    "floodnet_forecast",
-    "npcc4_slr",
-    "nws_alerts",
-    "ttm_311_forecast",
-    "ttm_battery_surge",
-    "floodnet",
-    "noaa_tides",
-    "nws_obs",
-    "nyc311",
-    "nyc311_nta",
-    "usgs_gauges"
-   ],
-   "llm_calls": [
+   "targets": [
     {
-     "kind": "llm",
-     "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
-     "endpoint": "localhost:11434",
-     "prompt_tokens": 1852,
-     "completion_tokens": 132,
-     "duration_s": 6.323,
-     "energy_status": "unknown",
-     "wh": null,
-     "energy_note": "no energy source configured"
+     "type": "address",
+     "text": "Should I buy the house at 80 Pioneer Street, Brooklyn"
     }
    ]
   },
-  "geocode": {
-   "address": "QN12 Jamaica-St. Albans-Hollis (CD 12 Approximation), Queens",
-   "borough": "Queens",
-   "lat": 40.691953758970016,
-   "lon": -73.77855875897461,
-   "bbl": null,
-   "bin": null,
-   "match": "exact"
-  },
-  "lat": 40.691953758970016,
-  "lon": -73.77855875897461,
-  "nta": {
-   "nta_code": "QN12",
-   "nta_name": "QN12 Jamaica-St. Albans-Hollis (CD 12 Approximation)",
-   "borough": "Queens",
-   "bbox": [
-    -73.81647531193624,
-    40.66645115660537,
-    -73.74359285933764,
-    40.72106344375331
-   ],
-   "n_matches": 1
-  },
+  "geocode": null,
+  "lat": null,
+  "lon": null,
+  "nta": null,
   "policy_corpus": null,
-  "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n538 street flooding complaints, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4278 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2663 sewer backup, 932 catch basin, 538 street flooding, 145 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+  "dep": null,
+  "paragraph": "Riprap does not answer this question. It reports public flood evidence for a place: flood maps, past flood records, live sensors and forecasts, each cited to its source. It does not give advice on buying, renting or insuring property, legal advice, or a prediction for a specific day. For those, consult a licensed professional; for a regulatory flood determination, use FEMA's Flood Map Service Center (msc.fema.gov).",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n538 street flooding complaints, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4278 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2663 sewer backup, 932 catch basin, 538 street flooding, 145 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+   "raw": "Riprap does not answer this question. It reports public flood evidence for a place: flood maps, past flood records, live sensors and forecasts, each cited to its source. It does not give advice on buying, renting or insuring property, legal advice, or a prediction for a specific day. For those, consult a licensed professional; for a regulatory flood determination, use FEMA's Flood Map Service Center (msc.fema.gov).",
    "dropped": [],
    "tier": "llm"
   },
   "grounding": {
    "tier": "llm",
-   "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
-   "attempts": 1,
-   "claims": [
-    {
-     "section": "answer",
-     "text": "4278 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2663 sewer backup, 932 catch basin, 538 street flooding, 145 manhole overflow.",
-     "doc_ids": [
-      "nyc311_nta"
-     ],
-     "numbers": []
-    }
-   ],
+   "claims": [],
    "dropped_claims": [],
-   "retried_claims": [],
-   "n_kept": 1,
-   "n_dropped": 0,
-   "llm_calls": [
-    {
-     "kind": "llm",
-     "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
-     "endpoint": "localhost:11434",
-     "prompt_tokens": 426,
-     "completion_tokens": 24,
-     "duration_s": 1.533,
-     "energy_status": "unknown",
-     "wh": null,
-     "energy_note": "no energy source configured"
-    }
-   ],
-   "question": "How many street flooding complaints has community district QN12 had?",
-   "n_documents": 4,
-   "answer_mode": "extractive",
-   "answer_lead": "count",
-   "lead_fact": {
-    "doc_id": "nyc311_nta",
-    "in_lead": true
-   },
-   "answer_flags": [],
-   "checks": [
-    "citations and numbers on every claim",
-    "lead rules on the answer; no entailment check needed, since the answer is the cited text word for word"
-   ],
-   "entailment": {},
-   "answered": true
+   "attempts": 0
   },
-  "citations": {
-   "nyc311_nta": {
-    "doc_id": "nyc311_nta",
-    "source": "NYC 311 Service Requests (NYC Open Data)",
-    "title": "NYC 311 Service Requests, flood-related complaints inside the neighborhood (3-year window)",
-    "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
-    "license": "NYC Open Data Terms of Use",
-    "date_modified": "2026-09-29T01:44:54+0000",
-    "retrieved_at": "2026-09-29T16:37Z",
-    "vintage": "2026-09-29T01:44:54+0000",
-    "maturity": "production"
-   }
-  },
-  "consulted": [
-   {
-    "id": "area_boundary",
-    "title": "Area boundary (2020 Neighborhood Tabulation Areas)",
-    "stone": "cornerstone"
-   },
-   {
-    "id": "sandy_nta",
-    "title": "Share of the neighborhood inside the 2012 Sandy extent",
-    "stone": "cornerstone"
-   },
-   {
-    "id": "dep_moderate_2050_nta",
-    "title": "DEP Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood",
-    "stone": "cornerstone"
-   },
-   {
-    "id": "nyc311_nta",
-    "title": "NYC 311 flood complaints inside the neighborhood",
-    "stone": "touchstone"
-   }
-  ],
-  "not_checked": [
-   {
-    "id": "dep_extreme_2080_nta",
-    "title": "DEP Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood",
-    "stone": "cornerstone"
-   },
-   {
-    "id": "dep_moderate_current_nta",
-    "title": "DEP Moderate (2.13 in/hr, current sea level), share of the neighborhood",
-    "stone": "cornerstone"
-   },
-   {
-    "id": "prithvi_water_nta",
-    "title": "New surface water after Hurricane Ida in the area, Prithvi-EO (experimental)",
-    "stone": "cornerstone"
-   },
-   {
-    "id": "microtopo_nta",
-    "title": "Neighborhood terrain from the USGS 3DEP DEM",
-    "stone": "cornerstone"
-   },
-   {
-    "id": "dob_permits_nta",
-    "title": "Active DOB construction permits inside the neighborhood",
-    "stone": "keystone"
-   }
-  ],
-  "deployment": "nyc",
-  "area_boundary": {
-   "geojson": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       -73.76031463846735,
-       40.67510997187887
-      ],
-      [
-       -73.75849761429988,
-       40.672648444991296
-      ],
-      [
-       -73.75636239193665,
-       40.67242923710904
-      ],
-      [
-       -73.75643734225946,
-       40.66966637874086
-      ],
-      [
-       -73.75763129530147,
-       40.66645115660537
-      ],
-      [
-       -73.77342462680873,
-       40.66802762009213
-      ],
-      [
-       -73.78940999355977,
-       40.666841158686104
-      ],
-      [
-       -73.79711068874407,
-       40.66694966921819
-      ],
-      [
-       -73.79919649443521,
-       40.66651752683564
-      ],
-      [
-       -73.80163473932281,
-       40.666757554359364
-      ],
-      [
-       -73.80123642352945,
-       40.67136337562343
-      ],
-      [
-       -73.80179295375413,
-       40.67439399109003
-      ],
-      [
-       -73.80717487392037,
-       40.685605273529966
-      ],
-      [
-       -73.81647531193624,
-       40.702450427418526
-      ],
-      [
-       -73.8115285676521,
-       40.70227287487812
-      ],
-      [
-       -73.81201248430207,
-       40.70594494480607
-      ],
-      [
-       -73.80694856263321,
-       40.70736710041278
-      ],
-      [
-       -73.80804630743958,
-       40.70935682763351
-      ],
-      [
-       -73.80548241255212,
-       40.71008885593892
-      ],
-      [
-       -73.80302414674632,
-       40.708139657093334
-      ],
-      [
-       -73.80141416240689,
-       40.709686873022314
-      ],
-      [
-       -73.79870150613023,
-       40.71066337711313
-      ],
-      [
-       -73.79776810067948,
-       40.70914318884339
-      ],
-      [
-       -73.78928913781589,
-       40.71203312368852
-      ],
-      [
-       -73.78657528627528,
-       40.711972493276896
-      ],
-      [
-       -73.77357135168404,
-       40.71512009536888
-      ],
-      [
-       -73.76733228086881,
-       40.717289796810775
-      ],
-      [
-       -73.76446951657488,
-       40.718890392877896
-      ],
-      [
-       -73.7594414294101,
-       40.72106344375331
-      ],
-      [
-       -73.75370834556638,
-       40.713324637241065
-      ],
-      [
-       -73.7461815781834,
-       40.696121925980215
-      ],
-      [
-       -73.74507479956513,
-       40.696390949409384
-      ],
-      [
-       -73.74359285933764,
-       40.69621532530715
-      ],
-      [
-       -73.74467955472021,
-       40.69341226447404
-      ],
-      [
-       -73.75001704218833,
-       40.68589131900592
-      ],
-      [
-       -73.75225828553378,
-       40.68149141147138
-      ],
-      [
-       -73.75484909582539,
-       40.6779288383857
-      ],
-      [
-       -73.75576169139454,
-       40.675885909418795
-      ],
-      [
-       -73.75648885703784,
-       40.67602276208586
-      ],
-      [
-       -73.75691881631015,
-       40.67652887087326
-      ],
-      [
-       -73.76031463846735,
-       40.67510997187887
-      ]
-     ]
-    ]
-   },
-   "narrative": "The outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district."
-  },
-  "sandy_nta": {
-   "overlap_area_m2": 185853.2,
-   "polygon_area_m2": 24698643.1,
-   "fraction": 0.0075,
-   "inside": true,
-   "narrative": "0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 24.7 km\u00b2).",
-   "headline_value": "0.8% inside the 2012 Sandy extent"
-  },
-  "dep_moderate_2050_nta": {
-   "scenario": "dep_moderate_2050",
-   "label": "DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
-   "fraction_any": 0.0332,
-   "fraction_class": {
-    "1": 0.0187,
-    "2": 0.0145,
-    "3": 0.0
-   },
-   "polygon_area_m2": 24698643.1,
-   "narrative": "DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.3% of this area is modeled to flood (1.9% nuisance, over 4 in to 1 ft; 1.5% 1 to 4 ft; 0.0% over 4 ft).",
-   "headline_value": "3.3% modeled to flood"
-  },
-  "nyc311_nta": {
-   "n": 4278,
-   "capped": false,
-   "radius_m": null,
-   "years": 3,
-   "by_year": {
-    "2023": 419,
-    "2024": 1454,
-    "2025": 1316,
-    "2026": 1089
-   },
-   "by_descriptor": {
-    "Sewer Backup (Use Comments) (SA)": 2663,
-    "Catch Basin Clogged/Flooding (Use Comments) (SC)": 932,
-    "Street Flooding (SJ)": 467,
-    "Manhole Overflow (Use Comments) (SA1)": 145,
-    "Flooding on Street": 71
-   },
-   "by_kind": {
-    "sewer backup": 2663,
-    "catch basin": 932,
-    "street flooding": 538,
-    "manhole overflow": 145
-   },
-   "most_recent": [
-    {
-     "date": "2026-09-27",
-     "descriptor": "Flooding on Street",
-     "address": "107-01 160 STREET"
-    },
-    {
-     "date": "2026-09-27",
-     "descriptor": "Flooding on Street",
-     "address": "177-14 110 AVENUE"
-    },
-    {
-     "date": "2026-09-27",
-     "descriptor": "Flooding on Street",
-     "address": "119-20 179 STREET"
-    },
-    {
-     "date": "2026-09-27",
-     "descriptor": "Flooding on Street",
-     "address": "137-22 97 AVENUE"
-    },
-    {
-     "date": "2026-09-27",
-     "descriptor": "Flooding on Street",
-     "address": "116-27 147 STREET"
-    }
-   ],
-   "points": [],
-   "headline_value": "4278 calls",
-   "subhead_text": "2663 sewer backup, 932 catch basin, 538 street flooding, 145 manhole overflow",
-   "narrative": "4278 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2663 sewer backup, 932 catch basin, 538 street flooding, 145 manhole overflow.",
-   "histogram": [
-    419,
-    1454,
-    1316,
-    1089
-   ]
-  },
+  "citations": {},
+  "consulted": null,
+  "not_checked": null,
+  "deployment": null,
   "trace": [
    {
-    "step": "nta_resolve",
-    "ok": true,
-    "started_at": 1790699827.739198,
-    "elapsed_s": 0.01,
-    "err": null,
-    "result": {
-     "nta_code": "QN12",
-     "nta_name": "QN12 Jamaica-St. Albans-Hollis (CD 12 Approximation)",
-     "borough": "Queens",
-     "bbox": [
-      -73.81647531193624,
-      40.66645115660537,
-      -73.74359285933764,
-      40.72106344375331
-     ],
-     "n_matches": 1
-    }
-   },
-   {
-    "step": "select_deployment",
-    "ok": true,
-    "started_at": 1790699827.7466738,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "deployment": "nyc",
-     "city": "New York City",
-     "state": "NY"
-    }
-   },
-   {
-    "step": "dep_extreme_2080_nta",
-    "ok": true,
-    "started_at": 1790699827.8024,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
-    "step": "dep_moderate_current_nta",
-    "ok": true,
-    "started_at": 1790699827.802401,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
-    "step": "prithvi_water_nta",
-    "ok": true,
-    "started_at": 1790699827.802401,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
-    "step": "microtopo_nta",
-    "ok": true,
-    "started_at": 1790699827.802402,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
-    "step": "dob_permits_nta",
-    "ok": true,
-    "started_at": 1790699827.802402,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
-    "step": "area_boundary",
-    "ok": true,
-    "started_at": 1790699827.836617,
-    "elapsed_s": 0.01,
-    "err": null,
-    "result": {}
-   },
-   {
-    "step": "sandy_nta",
-    "ok": true,
-    "started_at": 1790699827.836842,
-    "elapsed_s": 1.06,
-    "err": null,
-    "result": {}
-   },
-   {
-    "step": "dep_moderate_2050_nta",
-    "ok": true,
-    "started_at": 1790699827.8375099,
-    "elapsed_s": 0.22,
-    "err": null,
-    "result": {}
-   },
-   {
-    "step": "nyc311_nta",
-    "ok": true,
-    "started_at": 1790699827.83746,
-    "elapsed_s": 21.27,
-    "err": null,
-    "result": {}
-   },
-   {
-    "step": "assemble_legacy_state",
-    "ok": true,
-    "started_at": 1790699849.3659918,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "scenarios": []
-    }
-   },
-   {
     "step": "reconcile_claims",
-    "started_at": 1790699849.366123,
+    "started_at": 1790699859.968329,
     "ok": true,
     "result": {
      "tier": "llm",
-     "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
-     "attempts": 1,
-     "kept": 1,
+     "model": null,
+     "attempts": 0,
+     "kept": 0,
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 1.64
+    "elapsed_s": 0.0
    }
   ],
-  "models": [
-   {
-    "name": "LLM",
-    "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
-    "where": "Ollama on this machine (localhost:11434)",
-    "how": "endpoint",
-    "latency_s": 7.85,
-    "calls": 2
-   }
-  ],
+  "models": [],
   "compliance": {
-   "passed": true,
-   "n_passed": 13,
-   "n_total": 13,
-   "failed": []
+   "passed": false,
+   "n_passed": 0,
+   "n_total": 0,
+   "failed": [],
+   "note": "no paragraph"
   },
   "emissions": {
-   "n_calls": 2,
+   "n_calls": 0,
    "n_measured": 0,
-   "energy_status": "unknown",
+   "energy_status": "none",
    "total_wh": null,
-   "total_duration_s": 7.856,
+   "total_duration_s": 0,
    "tokens": {
-    "prompt": 2278,
-    "completion": 156,
-    "total": 2434
+    "prompt": null,
+    "completion": null,
+    "total": null
    },
-   "calls": [
-    {
-     "kind": "llm",
-     "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
-     "endpoint": "localhost:11434",
-     "prompt_tokens": 1852,
-     "completion_tokens": 132,
-     "duration_s": 6.323,
-     "energy_status": "unknown",
-     "wh": null,
-     "energy_note": "no energy source configured"
-    },
-    {
-     "kind": "llm",
-     "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
-     "endpoint": "localhost:11434",
-     "prompt_tokens": 426,
-     "completion_tokens": 24,
-     "duration_s": 1.533,
-     "energy_status": "unknown",
-     "wh": null,
-     "energy_note": "no energy source configured"
-    }
-   ],
+   "calls": [],
    "method": "Each LLM call is labelled measured (Apple SoC counters), estimated (declared watts times duration) or unknown; hosted endpoints are always unknown. See app/emissions.py."
   }
  }
