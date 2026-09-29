@@ -30,8 +30,19 @@ const RIPRAP_VINTAGE = '2026-05';
 /** Card-header source: the part of `source_name` before a spaced dash or
  *  an em dash. Splitting on any hyphen cut "NOAA CO-OPS" to "NOAA CO"
  *  and "NYC flood-policy corpus" to "NYC flood". */
+/** The publisher part of a source name: "NOAA CO-OPS, tide gauge water
+ *  level" is "NOAA CO-OPS". Splits at a spaced dash or at the first comma
+ *  outside parentheses (titles use a comma now), never at a hyphen. */
 function shortSource(name: string): string {
-  return name.split(/\s[-–—]\s|—/)[0].trim();
+  const head = name.split(/\s[-–—]\s|—/)[0];
+  let depth = 0;
+  for (let i = 0; i < head.length; i++) {
+    const ch = head[i];
+    if (ch === '(') depth++;
+    else if (ch === ')') depth = Math.max(0, depth - 1);
+    else if (ch === ',' && depth === 0) return head.slice(0, i).trim();
+  }
+  return head.trim();
 }
 
 /** Reader-facing labels for the value fields that scalar and meta cards
@@ -519,7 +530,7 @@ function _regLabelFromManifest(m: PebbleManifest): string {
   // ("MTA — subway/rail entrances register" → "MTA"); else fall back
   // to first capitalized token of the title.
   const src = m.provenance.source_name;
-  const dashIdx = Math.min(...['—', '-', ':'].map(c => {
+  const dashIdx = Math.min(...['—', '-', ':', ','].map(c => {
     const i = src.indexOf(c);
     return i < 0 ? Number.MAX_SAFE_INTEGER : i;
   }));

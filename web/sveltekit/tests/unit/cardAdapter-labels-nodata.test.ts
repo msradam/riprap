@@ -41,8 +41,9 @@ describe('card labels and no-data sources', () => {
   // range is a true zero, stays out of "no data" and says 0.
   const withMta = (mta: Record<string, unknown>) =>
     RunState.fromFinal({ ...final, mta_entrances: mta } as unknown as FinalResult, redHook.address).findingsData;
+  // Each register is its own card now; find the MTA register's row.
   const mtaRow = (d: typeof data) =>
-    d.cards.find((c) => c.variant === 'register')?.registers?.find((r) => r.reg === 'MTA');
+    d.cards.filter((c) => c.variant === 'register').flatMap((c) => c.registers ?? []).find((r) => r.reg === 'MTA');
 
   it('an unreadable register is no data and says unavailable', () => {
     const d = withMta({ available: false });
