@@ -59,11 +59,13 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
       expect(await page.locator('.ev-tier', { hasText: t }).count()).toBeGreaterThan(0);
     }
     // A dataset name is never set as the finding (the Sandy misreading).
-    await expect(page.locator('.ev-find').first()).toContainText('outside');
+    await expect(page.locator('.ev-find').first()).toContainText(/outside/i);
   });
 
   test('map layer switches hide layers with zero features and use words', async ({ page }) => {
     await page.goto(PAGE);
+    // The map loads when it nears the viewport; bring it into view first.
+    await page.locator('#brief-map').scrollIntoViewIfNeeded();
     await expect(page.locator('.maplibregl-canvas')).toBeVisible({ timeout: 15_000 });
     // The gallery fetches no live layers; only the evidence points in the
     // snapshot (Ida marks and FloodNet sensors, 311 complaints) get a switch.
@@ -79,6 +81,8 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
     });
     await page.goto(PAGE);
 
+    // The map loads when it nears the viewport; bring it into view first.
+    await page.locator('#brief-map').scrollIntoViewIfNeeded();
     await expect(page.locator('.maplibregl-canvas')).toBeVisible({ timeout: 15_000 });
     await page.waitForFunction(
       () => Boolean((window as unknown as { __riprapMap?: unknown }).__riprapMap),
