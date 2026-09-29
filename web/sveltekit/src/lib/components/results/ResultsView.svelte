@@ -481,7 +481,7 @@
     margin-left: auto;
   }
   .brief-footer {
-    margin-top: 32px;
+    margin-top: 24px;
     font-size: 14px;
     line-height: 1.45;
   }

@@ -27,10 +27,8 @@
    *  wrapping down the narrow Figure column. */
   const SHORT_LABEL = 16;
 
-  function asOf(vintage: string): string {
-    const d = asOfDate(vintage);
-    return snapshotDate && /^live$/i.test(d.trim()) ? `at snapshot, ${snapshotDate}` : d;
-  }
+  /** A live reading on a gallery page was read when the snapshot was made. */
+  const atSnapshot = (vintage: string) => !!snapshotDate && /^live$/i.test(vintage.trim());
 
   /** Open the linked list if it is a closed disclosure; the link then
    *  scrolls to it as usual. */
@@ -94,8 +92,13 @@
             {TIER_WORDS[c.tier] ?? c.tier}
           </td>
           <td class="ev-asof" headers="{col('asof')} {gid}">
-            <span class="ev-label" aria-hidden="true">Data as of</span>
-            <span class="data" title={c.vintage}>{asOf(c.vintage)}</span>
+            <!-- "at snapshot" is its own label; "Data as of at snapshot" is not English. -->
+            {#if !atSnapshot(c.vintage)}<span class="ev-label" aria-hidden="true">Data as of</span>{/if}
+            {#if atSnapshot(c.vintage)}
+              at snapshot, <span class="data ev-date">{snapshotDate}</span>
+            {:else}
+              <span class="data" title={c.vintage}>{asOfDate(c.vintage)}</span>
+            {/if}
           </td>
           <td class="ev-num ev-cite" headers="{col('cite')} {gid}">
             {#if cit}
@@ -158,7 +161,7 @@
     border-bottom: 1px solid var(--riprap-rule-hairline);
   }
   .ev-source {
-    width: 20%;
+    width: 17%;
     color: var(--ink-secondary);
     overflow-wrap: anywhere;
   }
@@ -189,7 +192,7 @@
     max-width: 14ch;
   }
   .ev-tier,
-  .ev-asof {
+  .ev-date {
     white-space: nowrap;
   }
   .ev-mark {

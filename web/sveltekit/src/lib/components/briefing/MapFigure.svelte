@@ -69,8 +69,7 @@
       />
     </div>
     <figcaption>
-      Figure 1. {plotted.length ? `The place and the evidence plotted around it: ${plotted.join('; ')}.` : 'The place.'}{#if run.areaBoundary}{` The outline is the ${AREA_BOUNDARY_LEGEND.label}.`}{/if}{#if run.radii.length}{` Rings mark the search radii: ${run.radii.map((r) => `${r.label} ${r.radius_m} m`).join(', ')}.`}{/if}
-      Everything on the map is also listed in the briefing and its sources.
+      Figure 1. {plotted.length ? `Plotted: ${plotted.join('; ')}.` : 'The place.'}{#if run.areaBoundary}{` The outline is the ${AREA_BOUNDARY_LEGEND.label}.`}{/if}{#if run.radii.length}{` Search radii (rings): ${run.radii.map((r) => `${r.label} ${r.radius_m} m`).join(', ')}.`}{/if}
     </figcaption>
   </figure>
   {#if shown.length}
@@ -137,9 +136,10 @@
     height: var(--map-h, 360px);
     aspect-ratio: auto;
   }
+  /* 64ch of Small is about 75 characters (the Measure Rule). */
   figcaption {
     margin: 8px 0 0;
-    max-width: 54ch;
+    max-width: 64ch;
     color: var(--ink-secondary);
   }
   .map-layers {
