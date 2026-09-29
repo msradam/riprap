@@ -30,7 +30,14 @@
 
 <svelte:head>
   <title>{entry.neighborhood}: Riprap gallery</title>
-  <meta name="description" content="Precomputed Riprap flood-exposure briefing for {entry.address}." />
+  <!-- A question entry is described by its question: a refusal is not a
+       flood-exposure briefing for the address. -->
+  <meta
+    name="description"
+    content={entry.question
+      ? `Precomputed Riprap gallery entry: ${entry.question}`
+      : `Precomputed Riprap flood-exposure briefing for ${entry.address}.`}
+  />
 </svelte:head>
 
 <ResultsView {run} {queryText} snapshot {meta}>

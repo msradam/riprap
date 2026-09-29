@@ -90,6 +90,7 @@
 
 <svelte:head>
   <title>Riprap briefing: {snapshot?.question || snapshot?.queryText || 'print'}</title>
+  <meta name="description" content="Riprap: cited flood-exposure briefings for New York City places, from public data. Open source, Apache-2.0." />
   <!-- eslint-disable-next-line svelte/no-at-html-tags -- string built from escaped CSS literals above -->
   {@html pageStyle}
 </svelte:head>
