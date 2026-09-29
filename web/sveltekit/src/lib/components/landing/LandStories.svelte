@@ -82,7 +82,7 @@
     line-height: 1.25;
   }
   .stories-note {
-    margin: 6px 0 32px;
+    margin: 8px 0 32px;
     font-size: 14px;
     color: var(--ink-secondary);
   }
@@ -133,7 +133,7 @@
   }
   /* Why the entry is in the gallery, in Small under its headline. */
   .story-reason {
-    margin: 6px 0 0;
+    margin: 4px 0 0;
     max-width: 60ch;
     font-size: 14px;
     line-height: 1.45;
@@ -149,10 +149,12 @@
   .is-top .story-lead {
     font-size: 20px;
   }
+  /* The 13px mono date shares the 14px place name's baseline. */
   .story-byline {
     display: flex;
     flex-wrap: wrap;
-    gap: 2px 16px;
+    align-items: baseline;
+    gap: 4px 16px;
     margin: 8px 0 0;
     font-size: 14px;
     color: var(--ink-secondary);
