@@ -81,6 +81,12 @@ _LIVE_RE = re.compile(r"\b(right now|currently|tonight|at the moment|live condit
 _DEVELOPMENT_RE = re.compile(r"\b(building|construction|permits?|development|projects? underway)\b",
                              re.IGNORECASE)
 _HOUSE_NUMBER_RE = re.compile(r"^\s*\d+(-\d+)?\s+\S")
+# An address that ends in another state's code ("..., San Francisco, CA"): the
+# NYC address span would drop the city ("1 Dr", "1 Civic Plaza"), so the whole
+# address is geocoded and routed to its deployment, or to none.
+_OTHER_STATE_RE = re.compile(
+    r",\s*(?!NY\b)(A[KLRZ]|C[AOT]|D[CE]|FL|GA|HI|I[ADLN]|K[SY]|LA|M[ADEINOST]|N[CDEHJMV]|O[HKR]|PA|RI|S[CD]"
+    r"|T[NX]|UT|V[AT]|W[AIVY])\.?(?:\s+\d{5})?\s*\??\s*$")
 _OUT_OF_SCOPE_RE = re.compile(r"\b(should i (buy|rent|sell|move)|insurance (cost|premium|price|rate)"
                               r"|cost me|sue|lawsuit|lawyer|mortgage)\b", re.IGNORECASE)
 # A forecast for a named future day or date ("Will X flood next Tuesday?").
@@ -153,7 +159,8 @@ def heuristic_plan(query: str) -> dict:
                 "targets": [{"type": "district", "text": place["text"]}], "place": place}
     live = _LIVE_RE.search(q) and not forecast_question(q)
     if place["kind"] == "address":
-        intent, target = ("live_now" if live else "single_address"), place["text"]
+        target = _address_from_query(q) if _OTHER_STATE_RE.search(q) else place["text"]
+        intent = "live_now" if live else "single_address"
     elif live:
         intent, target = "live_now", "New York City Hall, New York, NY"
     elif place["kind"] == "neighborhood" and nta.resolve(place["text"]):
