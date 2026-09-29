@@ -26,7 +26,7 @@ trace_summary:
 provenance:
   date_modified: 2025-12-05
   retrieved_at: 2026-05-07
-  source_name: MTA — subway/rail entrances register
+  source_name: MTA, subway/rail entrances register
   source_url: https://data.ny.gov/Transportation/MTA-Subway-Entrances-and-Exits/i9wp-a4ja
   license: MTA Open Data Terms
   doc_id: mta_entrance_exposure

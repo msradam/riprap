@@ -32,7 +32,7 @@ trace_summary:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: National Weather Service (NOAA) — nearest METAR station
+  source_name: National Weather Service (NOAA), nearest METAR station
   source_url: https://api.weather.gov/
   license: U.S. Public Domain
   doc_id: nws_obs

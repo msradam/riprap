@@ -29,7 +29,7 @@ trace_summary:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: FloodNet NYC — ultrasonic depth sensor network (CUNY/NYU/Brooklyn College)
+  source_name: FloodNet NYC, ultrasonic depth sensor network (CUNY/NYU/Brooklyn College)
   source_url: https://www.floodnet.nyc/data-downloads
   license: CC-BY-NC-SA 4.0
   doc_id: floodnet

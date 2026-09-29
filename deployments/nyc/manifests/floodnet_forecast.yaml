@@ -1,6 +1,6 @@
 id: floodnet_forecast
 type: model
-title: Granite TTM r2 — flood-event recurrence at nearest FloodNet sensor
+title: Granite TTM r2, flood-event recurrence at nearest FloodNet sensor
 answers: "experimental forecast of flood events at the nearest FloodNet sensor (no rainfall input)"
 stone: lodestone
 maturity: experimental
@@ -28,7 +28,7 @@ trace_summary:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: IBM Granite TimeSeries TTM r2 — FloodNet sensor event-recurrence forecast
+  source_name: IBM Granite TimeSeries TTM r2, FloodNet sensor event-recurrence forecast
   source_url: https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2
   license: Apache-2.0
   doc_id: floodnet_forecast

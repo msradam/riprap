@@ -1,6 +1,6 @@
 id: ttm_311_forecast
 type: model
-title: Granite TTM r2 — weekly 311 flood-complaint forecast at this address
+title: Granite TTM r2, weekly 311 flood-complaint forecast at this address
 answers: "experimental forecast of 311 flood complaints near the point (no rainfall input)"
 stone: lodestone
 maturity: experimental
@@ -28,7 +28,7 @@ trace_summary:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: IBM Granite TimeSeries TTM r2 — 311 flood-complaint forecast
+  source_name: IBM Granite TimeSeries TTM r2, 311 flood-complaint forecast
   source_url: https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2
   license: Apache-2.0
   doc_id: ttm_311_forecast

@@ -1,6 +1,6 @@
 id: ida_hwm
 type: baked
-title: Hurricane Ida 2021 — USGS high-water marks
+title: Hurricane Ida 2021, USGS high-water marks
 answers: "high-water marks USGS surveyed after Hurricane Ida (2021) near the point"
 stone: cornerstone
 tier: empirical
@@ -39,9 +39,9 @@ config:
 provenance:
   date_modified: null
   retrieved_at: 2026-07-11
-  source_name: USGS STN — Hurricane Ida 2021 (Event 312, NY)
+  source_name: USGS STN, Hurricane Ida 2021 (Event 312, NY)
   source_url: https://stn.wim.usgs.gov/STNServices/HWMs/FilteredHWMs.json?Event=312&States=NY
-  license: USGS — public domain
+  license: USGS, public domain
   doc_id: ida_hwm
   citation: >-
     USGS STN Hurricane Ida 2021 high-water marks (Event 312, NY). The link is the STN web-service

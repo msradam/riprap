@@ -30,7 +30,7 @@ log = logging.getLogger("riprap.dob_permits")
 
 URL = "https://data.cityofnewyork.us/resource/ipu4-2q9a.json"
 DOC_ID = "dob_permits"
-CITATION = ("NYC DOB Permit Issuance (NYC OpenData ipu4-2q9a) — "
+CITATION = ("NYC DOB Permit Issuance (NYC OpenData ipu4-2q9a): "
             "issued/in-progress construction permits")
 
 JOB_TYPE_LABELS = {

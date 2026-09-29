@@ -1,6 +1,6 @@
 id: water_level
 type: live
-title: Local water level — NOAA Albany, NY (Hudson River, station 8518995)
+title: Local water level, NOAA Albany, NY (Hudson River, station 8518995)
 answers: "latest Hudson River water level at the NOAA Albany gauge"
 stone: touchstone
 maturity: experimental
@@ -30,7 +30,7 @@ trace_summary:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: NOAA CO-OPS — water level (nearest station to Albany)
+  source_name: NOAA CO-OPS, water level (nearest station to Albany)
   source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8518995
   license: U.S. Public Domain
   doc_id: noaa_tides

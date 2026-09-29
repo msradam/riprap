@@ -1,6 +1,6 @@
 id: epa_airnow
 type: live
-title: EPA AirNow — current AQI at this address
+title: EPA AirNow, current AQI at this address
 answers: "current air quality index (AQI) at the nearest EPA AirNow station"
 stone: touchstone
 adapter: rest_json
@@ -22,9 +22,9 @@ config:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: EPA AirNow — current AQI observations (free API)
+  source_name: EPA AirNow, current AQI observations (free API)
   source_url: https://docs.airnowapi.org/
-  license: U.S. Government — open
+  license: U.S. Government, open
   doc_id: epa_airnow
   citation: EPA AirNow current-observation API, nearest reporting station to address.
 

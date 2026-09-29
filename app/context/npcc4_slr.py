@@ -13,7 +13,7 @@ here represents the "likely range" (10th–90th) plus the high-end
 DOC_ID = "npcc4_slr"
 CITATION = (
     "New York City Panel on Climate Change 4th Assessment (NPCC4 2024), "
-    "Chapter 3 — Sea Level Rise, Table 3.2. "
+    "Chapter 3, Sea Level Rise, Table 3.2. "
     "Published by the New York Academy of Sciences. "
     "Reference gauge: NOAA Battery (8518750), baseline 2000–2004."
 )

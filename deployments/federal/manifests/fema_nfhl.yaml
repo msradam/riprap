@@ -1,6 +1,6 @@
 id: fema_nfhl
 type: live
-title: FEMA National Flood Hazard Layer — flood zone at this point
+title: FEMA National Flood Hazard Layer, flood zone at this point
 answers: "the FEMA regulatory flood zone and FIRM panel at the point"
 stone: cornerstone
 tier: modeled
@@ -35,7 +35,7 @@ trace_summary:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: FEMA National Flood Hazard Layer (NFHL) — effective flood zones
+  source_name: FEMA National Flood Hazard Layer (NFHL), effective flood zones
   source_url: https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS
   license: U.S. Public Domain
   doc_id: fema_nfhl

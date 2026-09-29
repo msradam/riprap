@@ -49,7 +49,7 @@ DOC_ID_PREFIX = "floodnet_forecast"
 CITATION = (
     "FloodNet NYC ultrasonic depth sensors (api.floodnet.nyc) + "
     "IBM Granite TimeSeries TTM r2 (Ekambaram et al. 2024, NeurIPS) "
-    "via granite-tsfm — daily flood-event recurrence forecast"
+    "via granite-tsfm: daily flood-event recurrence forecast"
 )
 
 # A sensor with <5 historical events in 512 days has too sparse a

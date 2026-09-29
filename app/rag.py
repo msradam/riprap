@@ -32,7 +32,7 @@ CORPUS_META = {
     },
     "nycha_lessons.pdf": {
         "doc_id": "rag_nycha",
-        "title": "Flood Resilience at NYCHA — Lessons Learned",
+        "title": "Flood Resilience at NYCHA: Lessons Learned",
         "citation": "NYCHA, Flood Resilience: Lessons Learned",
     },
     "coned_22_e_0222.pdf": {
@@ -47,7 +47,7 @@ CORPUS_META = {
     },
     "comptroller_rain_2024.pdf": {
         "doc_id": "rag_comptroller",
-        "title": "NYC Comptroller — Is NYC Ready for Rain? (2024)",
+        "title": "NYC Comptroller: Is NYC Ready for Rain? (2024)",
         "citation": "NYC Comptroller, \"Is New York City Ready for Rain?\" (2024)",
     },
 }

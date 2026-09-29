@@ -28,7 +28,7 @@ provenance:
   retrieved_at: 2026-07-11
   source_name: USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)
   source_url: https://www.usgs.gov/3d-elevation-program
-  license: USGS — public domain
+  license: USGS, public domain
   doc_id: microtopo
   citation: USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)
 

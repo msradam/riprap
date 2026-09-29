@@ -19,7 +19,7 @@ config:
 provenance:
   date_modified: 2024
   retrieved_at: 2026-07-11
-  source_name: NPCC4 — New York City Panel on Climate Change (2024)
+  source_name: NPCC4, New York City Panel on Climate Change (2024)
   source_url: https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15116
   license: CC-BY-NC 4.0 (Annals of the New York Academy of Sciences)
   doc_id: npcc4_slr
@@ -27,11 +27,11 @@ provenance:
     Rosenzweig, C. et al. (eds.). New York City Panel on Climate Change 2024
     Report (NPCC4). Annals of the New York Academy of Sciences, Vol. 1539
     (parent doi:10.1111/nyas.15116). Sea-level rise projections from the
-    NPCC4 climate-science chapter — Battery (NOAA station 8518750) reference.
+    NPCC4 climate-science chapter, Battery (NOAA station 8518750) reference.
 
 narration:
   template: "{narrative}"
-  short: NYC Panel on Climate Change (2024) sea-level rise projections — Battery, NY.
+  short: NYC Panel on Climate Change (2024) sea-level rise projections, Battery, NY.
 
 display:
   variant: tabular

@@ -1,6 +1,6 @@
 id: policy_corpus
 type: baked
-title: NYC flood-policy corpus — agency reports + plans
+title: NYC flood-policy corpus, agency reports + plans
 answers: "passages from NYC agency flood plans and reports related to the place (experimental relevance)"
 stone: cornerstone
 maturity: experimental
@@ -31,7 +31,7 @@ provenance:
   retrieved_at: 2026-07-11
   source_name: NYC flood-policy corpus (Comptroller, DEP, ConEd, MTA, NYCHA)
   source_url: null
-  license: Mixed — see per-document citations
+  license: Mixed, see per-document citations
   doc_id: policy_corpus
   citation: >-
     NYC flood-policy corpus retrieved by Granite-embedding similarity

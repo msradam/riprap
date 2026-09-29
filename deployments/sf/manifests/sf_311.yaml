@@ -41,7 +41,7 @@ config:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: San Francisco Open Data — 311 / service requests (vw6y-z8j6)
+  source_name: San Francisco Open Data, 311 / service requests (vw6y-z8j6)
   source_url: https://data.sf.gov/d/vw6y-z8j6
   license: San Francisco Open Data Terms of Use
   doc_id: sf_311

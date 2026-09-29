@@ -1,6 +1,6 @@
 id: usgs_gauges
 type: live
-title: USGS stream gauge — live stage at the nearest gauge
+title: USGS stream gauge, live stage at the nearest gauge
 answers: "the latest stream stage and discharge at the nearest active USGS gauge, right now"
 stone: touchstone
 tier: empirical

@@ -199,7 +199,7 @@ def blending_note(query_text: str, target: dict) -> str | None:
     other = [p for p in parts if p not in matched]
     return (
         f"**Note on geographic scope.** {' and '.join(matched)} is not its "
-        f"own reporting unit in this data — it is blended into the NYC DCP "
+        f"own reporting unit in this data; it is blended into the NYC DCP "
         f"Neighborhood Tabulation Area \"{name}\" (NTA {target['nta_code']}), "
         f"together with {', '.join(other)}. Every figure below is a "
         f"polygon-wide average or count across that full blended area, not "

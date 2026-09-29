@@ -26,14 +26,14 @@ trace_summary:
 provenance:
   date_modified: 2024-07-03
   retrieved_at: 2026-07-11
-  source_name: NYC DEP Stormwater Flood Map — Moderate (2.13 in/hr, current SLR)
+  source_name: NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current SLR)
   source_url: https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv
   license: NYC Open Data Terms of Use
   doc_id: dep_moderate_current
-  citation: NYC DEP Stormwater Flood Map — Moderate (2.13 in/hr, current SLR)
+  citation: NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current SLR)
 
 narration:
-  short: NYC DEP moderate stormwater scenario at this address — current SLR baseline, near-term horizon.
+  short: NYC DEP moderate stormwater scenario at this address, current SLR baseline, near-term horizon.
   template: "{narrative}"
 
 fallback:

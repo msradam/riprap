@@ -38,7 +38,7 @@ config:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: Seattle Open Data — Customer Service Requests (5ngg-rpne)
+  source_name: Seattle Open Data, Customer Service Requests (5ngg-rpne)
   source_url: https://data.seattle.gov/d/5ngg-rpne
   license: Seattle Open Data Terms of Use
   doc_id: seattle_311

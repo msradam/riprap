@@ -1,6 +1,6 @@
 id: lake_michigan_water_level
 type: live
-title: Lake Michigan water level — Calumet Harbor (NOAA station 9087044)
+title: Lake Michigan water level, Calumet Harbor (NOAA station 9087044)
 answers: "latest Lake Michigan water level at the NOAA Calumet Harbor gauge"
 stone: touchstone
 maturity: experimental
@@ -30,7 +30,7 @@ trace_summary:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: NOAA CO-OPS — Lake Michigan water level (Calumet Harbor / Chicago)
+  source_name: NOAA CO-OPS, Lake Michigan water level (Calumet Harbor / Chicago)
   source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9087044
   license: U.S. Public Domain
   doc_id: noaa_tides

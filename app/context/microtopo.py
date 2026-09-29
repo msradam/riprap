@@ -114,7 +114,7 @@ def _load_dem():
     if hand is not None: note.append(f"HAND {HAND_PATH.name}")
     log.info("microtopo: loaded NYC DEM %s (%dx%d, %s); aux: %s",
              DEM_PATH.name, meta["H"], meta["W"], meta["crs"],
-             ", ".join(note) if note else "(none — algorithmic only)")
+             ", ".join(note) if note else "(none, algorithmic only)")
     return _DEM_CACHE
 
 

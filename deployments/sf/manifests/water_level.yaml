@@ -1,6 +1,6 @@
 id: water_level
 type: live
-title: Local water level — NOAA San Francisco, CA (station 9414290)
+title: Local water level, NOAA San Francisco, CA (station 9414290)
 answers: "latest San Francisco Bay water level at the NOAA gauge"
 stone: touchstone
 maturity: experimental
@@ -29,7 +29,7 @@ trace_summary:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: NOAA CO-OPS — water level (nearest station to SF)
+  source_name: NOAA CO-OPS, water level (nearest station to SF)
   source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414290
   license: U.S. Public Domain
   doc_id: noaa_tides

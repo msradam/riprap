@@ -44,7 +44,7 @@ config:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: Chicago Data Portal — 311 Service Requests (v6vf-nfxy)
+  source_name: Chicago Data Portal, 311 Service Requests (v6vf-nfxy)
   source_url: https://data.cityofchicago.org/Service-Requests/311-Service-Requests/v6vf-nfxy
   license: Chicago Open Data Terms of Use
   doc_id: chicago_311

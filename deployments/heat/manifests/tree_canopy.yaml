@@ -32,11 +32,11 @@ config:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: NYC Forestry — 2015 Street Tree Census
+  source_name: NYC Forestry, 2015 Street Tree Census
   source_url: https://data.cityofnewyork.us/Environment/2015-Street-Tree-Census-Tree-Data/uvpi-gqnh
   license: NYC Open Data Terms of Use
   doc_id: tree_canopy
-  citation: NYC Forestry, 2015 Street Tree Census — tree points within 200 m of address.
+  citation: NYC Forestry, 2015 Street Tree Census, tree points within 200 m of address.
 
 narration:
   short: NYC street trees within 200 m of this address (heat-island mitigation proxy).
