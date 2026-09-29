@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { formatGeneratedAt, modeLabel } from '$lib/client/gallery';
+  import { modeLabel } from '$lib/client/gallery';
   import type { PageProps } from './$types';
 
   let { data }: PageProps = $props();
@@ -28,9 +28,9 @@
   <meta name="description" content="Precomputed Riprap flood-exposure briefings for New York City neighborhoods, served as static pages." />
 </svelte:head>
 
-{#snippet row(place: string, date: string, href: string, label: string, lead: string)}
+{#snippet row(place: string, generatedAt: string, href: string, label: string, lead: string)}
   <span class="gallery-place">{place}</span>
-  <span class="gallery-date">{date}</span>
+  <time class="gallery-date" datetime={generatedAt.slice(0, 10)}>{generatedAt.slice(0, 10)}</time>
   <a class="gallery-link" {href}>{label}</a>
   {#if lead}<p class="gallery-lead">{lead}</p>{/if}
 {/snippet}
@@ -45,19 +45,13 @@
     </p>
 
     <h2 class="gallery-group">Questions</h2>
-    <p class="gallery-note">
-      {#if sharedModel}
-        Each question briefing was made with the language model
-        <span class="gallery-model">{sharedModel}</span>.
-      {/if}
-      {#if sharedNote}{sharedNote}{/if}
-    </p>
+    {#if sharedNote}<p class="gallery-note">{sharedNote}</p>{/if}
     <ul class="gallery-list">
       {#each questions as e (e.slug)}
         <li class="gallery-item">
           {@render row(
             e.neighborhood,
-            formatGeneratedAt(e.generated_at),
+            e.generated_at,
             `${resolve('/(app)/gallery/[slug]', { slug: e.slug })}/`,
             e.question ?? '',
             e.lead
@@ -81,7 +75,7 @@
         <li class="gallery-item">
           {@render row(
             e.neighborhood,
-            formatGeneratedAt(e.generated_at),
+            e.generated_at,
             `${resolve('/(app)/gallery/[slug]', { slug: e.slug })}/`,
             e.address,
             e.lead
@@ -89,14 +83,22 @@
         </li>
       {/each}
     </ul>
+
+    {#if sharedModel}
+      <p class="gallery-colophon">
+        The question briefings were answered with the language model
+        <span class="gallery-model">{sharedModel}</span>.
+      </p>
+    {/if}
   </section>
 </div>
 
 <style>
+  /* The landing's frame: 1040px wide, centred, 32px sides (16px on phones). */
   .gallery-page {
-    max-width: 1600px;
+    max-width: 1040px;
     margin: 0 auto;
-    padding: 32px 28px 64px;
+    padding: 32px 32px 64px;
   }
   /* Kind line and Title, as on a briefing. */
   .gallery-kind {
@@ -192,15 +194,22 @@
   .gallery-meta {
     color: var(--ink-secondary);
   }
+  .gallery-colophon {
+    margin: 32px 0 0;
+    max-width: 54ch;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-secondary);
+  }
   @media (max-width: 720px) {
-    .gallery-page {
-      padding: 20px 16px 32px;
-    }
     .gallery-title {
       font-size: 26px;
     }
   }
   @media (max-width: 640px) {
+    .gallery-page {
+      padding: 20px 16px 32px;
+    }
     .gallery-item {
       grid-template-columns: minmax(0, 1fr);
     }
