@@ -23,14 +23,15 @@ import { tierForDocId, type Tier } from '$lib/types/tier';
 
 // `answer` opens a question briefing (the direct answer, before the
 // place-level sections). Numbered 00 so the four legacy heads keep theirs.
-const CANONICAL_SECTIONS: Array<{ key: string; label: string; n: string; tier?: Tier; aliases: string[] }> = [
+const CANONICAL_SECTIONS: Array<{ key: string; label: string; n?: string; tier?: Tier; aliases: string[] }> = [
   { key: 'answer', label: 'Answer', n: '00', aliases: ['answer'] },
   // A bare-address briefing's cited lead (no LLM); shown where the Answer goes.
   { key: 'brief', label: 'In brief', n: '00', aliases: ['in brief'] },
   { key: 'status', label: 'Status', n: '01', aliases: ['status'] },
   { key: 'empirical', label: 'Empirical evidence', n: '02', tier: 'empirical', aliases: ['empirical evidence', 'empirical'] },
   { key: 'modeled', label: 'Modeled scenarios', n: '03', tier: 'modeled', aliases: ['modeled scenarios', 'modeled'] },
-  { key: 'policy', label: 'Policy context', n: '04', aliases: ['policy context', 'policy'] }
+  // No fixed number: it follows the Stone sections, so it is numbered by position.
+  { key: 'policy', label: 'Policy context', aliases: ['policy context', 'policy'] }
 ];
 
 function findSection(rawTitle: string) {

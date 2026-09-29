@@ -37,9 +37,15 @@ PEBBLE_MODELS: dict[str, list[dict]] = {
 def _prithvi_detail(value: dict | None) -> str:
     if not isinstance(value, dict):
         return ""
-    return (f"batch output for the {value.get('rain_date', '')} event; post scenes "
-            f"{value.get('post_scene', '')}; pre scenes {value.get('pre_scene', '')}; "
-            f"batch run {value.get('batch_run', 'date not recorded')}")
+    def summary(ids: str) -> tuple[str, list[str]]:
+        parts = [i.split("_") for i in (ids or "").split(";") if i.count("_") >= 5]
+        days = sorted({f"{p[2][:4]}-{p[2][4:6]}-{p[2][6:8]}" for p in parts})
+        return ", ".join(days), sorted({p[4][1:] for p in parts})
+
+    post_days, tiles = summary(value.get("post_scene", ""))
+    pre_days, _ = summary(value.get("pre_scene", ""))
+    return (f"batch output for the {value.get('rain_date', '')} event: Sentinel-2 scenes of {post_days} "
+            f"vs {pre_days}, tiles {', '.join(tiles)}; batch run {value.get('batch_run', 'date not recorded')}")
 
 
 def for_briefing(final: dict) -> list[dict]:

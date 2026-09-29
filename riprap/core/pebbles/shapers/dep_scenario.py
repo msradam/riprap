@@ -36,6 +36,8 @@ def shape(value, manifest) -> dict | None:
     paren_end = title.rfind(")")
     scenario = (f"the NYC DEP stormwater scenario ({title[paren_start + 1:paren_end]})"
                 if paren_start >= 0 and paren_end > paren_start else "the NYC DEP stormwater scenario")
+    # "current SLR" names no time horizon; the disclosure check needs one.
+    scenario = scenario.replace("current SLR", "current sea level, near-term")
     if cls == 0:
         # Outside the modeled extent is an answer, not missing data.
         narrative = f"This address is outside the modeled flooding in {scenario}."

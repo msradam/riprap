@@ -115,17 +115,18 @@ def summary_for_point(lat: float, lon: float) -> dict:
         bits = [f"Latest METAR at {o.station_name}"]
         if o.distance_km is not None:
             bits.append(f" ({o.distance_km:.1f} km away)")
-        bits.append(":")
+        facts = []  # joined with commas, so a missing temperature leaves no stray ":,"
         if o.temp_c is not None:
-            bits.append(f" {o.temp_c}°C")
+            facts.append(f"{o.temp_c}°C")
         p1 = o.precip_last_hour_mm
         p6 = o.precip_last_6h_mm
         if p1 is not None and p1 > 0:
-            bits.append(f", {p1} mm precip in the last hour")
+            facts.append(f"{p1} mm precip in the last hour")
         elif p6 is not None and p6 > 0:
-            bits.append(f", {p6} mm precip in the last 6 hours")
+            facts.append(f"{p6} mm precip in the last 6 hours")
         elif p1 == 0 or p6 == 0:
-            bits.append(", no recent precipitation")
+            facts.append("no recent precipitation")
+        bits.append(": " + ", ".join(facts))
         if o.obs_time:
             bits.append(f" (obs {o.obs_time[:16]})")
         narrative = "".join(bits) + "."

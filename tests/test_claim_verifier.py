@@ -99,7 +99,11 @@ def test_render_labels_experimental_and_fills_empty_sections():
     text = _render(kept, DOCS, ["Hazard reader", "Live observer"])
     assert "Experimental: No water polygons" in text
     assert "[prithvi_water]." in text
-    assert "**Live observer.**\nNo grounded evidence for this section." in text
+    # Refactor 8: a section the model left empty shows its sources' own cited
+    # sentences, never "no grounded evidence" over a section that has evidence.
+    live = [d for d in DOCS if d.section == "Live observer"]
+    assert "No grounded evidence" not in text
+    assert all(f"[{d.doc_id}]" in text.split("**Live observer.**\n")[1] for d in live)
 
 
 def test_schema_restricts_doc_ids_to_the_documents_passed():

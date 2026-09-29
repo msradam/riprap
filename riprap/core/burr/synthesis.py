@@ -267,7 +267,7 @@ def _and(items: list[str]) -> str:
 
 
 def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: str = "",
-            lead: str = "", empty: dict[str, list[str]] | None = None) -> str:
+            lead: str = "", empty: dict[str, list[str]] | None = None, brief: str | None = None) -> str:
     """Scope header, then the answer (when a question was asked), then one
     section per Stone that ran, then the footer. Only verified claims.
 
@@ -300,6 +300,8 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
         return " ".join(out)
 
     parts = [_scope_header()]
+    if brief:
+        parts.append(f"**In brief.**\n{brief}")
     if question:
         body = sentences(ANSWER_SECTION)
         parts.append("**Answer.**\n" + ((f"{lead} " if lead else "") + body if body else CANNOT_ANSWER))
@@ -311,6 +313,13 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
             continue
         if not body and question:
             continue  # its facts are in the answer or the evidence cards; the section would only say so
+        if not body:
+            # The model wrote no claim here, but the section has evidence: show the
+            # sources' own template sentences (cited, correct by construction),
+            # never "no evidence" over a section that has some.
+            body = " ".join(evidence.cite(f"Experimental: {d.text}" if d.experimental and "experimental"
+                                          not in d.text.lower() else d.text, d.doc_id)
+                            for d in docs if d.section == sec)
         parts.append(f"**{sec}.**\n" + (body or NO_EVIDENCE_LINE))
     parts.append(NON_SCOPE_FOOTER)
     return "\n\n".join(parts)
@@ -431,10 +440,14 @@ def synthesize(state) -> dict:
         if lead == "count" and rel in facts and (kl := answer_checks.kind_lead(question, texts, values)):
             lead_phrase = f"{kl} {lead_phrase}"
     checks = _checks_run(mode, entail_info)
-    cited = {i for c in kept for i in c["doc_ids"]}
+    # A bare address opens with the same verified "In brief" lead as no-LLM mode.
+    from riprap.core.burr.templated_reconciler import _lead
+
+    brief = _lead(state, items) if not question and state.get("intent") == "single_address" else None
+    paragraph = _render(kept, docs, sections, question, lead_phrase, empty, brief)
+    cited = set(re.findall(r"\[([a-z0-9_]+)\]", paragraph))  # every source the text cites
     return {
-        "paragraph": _render(kept, docs, sections, question, lead_phrase, empty)
-        + f"\n\nChecks run: {'; '.join(checks)}.",
+        "paragraph": paragraph + f"\n\nChecks run: {'; '.join(checks)}.",
         "citations": {k: v for k, v in evidence.citations(items).items() if k in cited},
         "grounding": {"tier": "llm", "model": model, "attempts": attempts,
                       "claims": kept, "dropped_claims": dropped,
