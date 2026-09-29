@@ -671,14 +671,22 @@
     font-weight: 400;
   }
   /* An opaque card so the scale and attribution text keep AA contrast
-     over any tile; attribution links in Federal Blue. */
+     over any tile; attribution links in Federal Blue. The inner text box
+     carries the card too: on a narrow map it overlaps the scale bar, and
+     axe cannot resolve a background it has to look through. */
   .map-frame :global(.maplibregl-ctrl-scale),
-  .map-frame :global(.maplibregl-ctrl-attrib) {
+  .map-frame :global(.maplibregl-ctrl-attrib),
+  .map-frame :global(.maplibregl-ctrl-attrib-inner) {
     background-color: var(--riprap-surface-card);
     color: var(--ink);
   }
   .map-frame :global(.maplibregl-ctrl-attrib a) {
     color: var(--riprap-text-link);
+  }
+  /* The open attribution wraps short of the scale bar (100px at most,
+     from the left edge) instead of sliding under it. */
+  .map-frame :global(.maplibregl-ctrl-bottom-right) {
+    max-width: calc(100% - 132px);
   }
   .link-badge {
     position: absolute;
