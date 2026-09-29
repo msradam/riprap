@@ -317,18 +317,18 @@
              the left; the right column holds the rail (notes, method
              lines, terms, scope note) and under it the sticky map, so
              neither column leaves an empty quadrant. Source order is
-             reading order at every width: the summary, its notes and
-             method lines, the map, then the evidence and sections. -->
+             reading order at every width: the summary, the evidence and
+             sections, then the endnotes, terms, scope note and map. -->
         <div class="brief-grid">
           {@render answerBlock()}
+          <div class="brief-main">
+            {@render evidence()}
+            {@render sections()}
+          </div>
           <div class="brief-side">
             {@render railBlock()}
             {@render afterBlock()}
             {#if showMap}<div class="brief-sticky">{@render map()}</div>{/if}
-          </div>
-          <div class="brief-main">
-            {@render evidence()}
-            {@render sections()}
           </div>
         </div>
       {:else}
@@ -822,13 +822,16 @@
       grid-row: auto;
       padding-top: 4px;
     }
-    /* One column, in source order: the summary, its endnotes and method
-       lines, the map, then the evidence and sections. */
+    /* One column, in source order: the summary, the evidence and
+       sections, then the endnotes, terms, scope note and map. */
     .brief-grid {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: none;
-      grid-template-areas: 'answer' 'side' 'main';
+      grid-template-areas: 'answer' 'main' 'side';
       max-width: var(--text-w);
+    }
+    .brief-side {
+      margin-top: 32px;
     }
     .brief-side .brief-after {
       margin-top: 4px;

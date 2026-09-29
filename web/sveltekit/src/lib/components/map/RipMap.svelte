@@ -402,6 +402,15 @@
 
     map.addControl(new maplibre.NavigationControl({ visualizePitch: false }), 'top-right');
     map.addControl(new maplibre.ScaleControl({ maxWidth: 100, unit: 'imperial' }), 'bottom-left');
+    // On narrow screens the attribution starts folded into its (i)
+    // button, so it does not cover the 300px map. MapLibre opens a compact
+    // attribution once when its text first arrives, so fold it after the
+    // first full render; the button still opens it.
+    if (window.matchMedia('(max-width: 1099px)').matches) {
+      map.once('idle', () => {
+        container?.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
+      });
+    }
 
     map.on('load', () => {
       if (!map) return;
