@@ -21,17 +21,19 @@
    *  answer lead, the map is a figure, the evidence is a table, and how
    *  the briefing was made is recorded once at the end. Shared by the live
    *  route (/q/[queryId]) and the static gallery (/gallery/[slug]).
-   *  `notice` renders beside the jump links (the gallery's print button). */
+   *  `notice` renders at the right end of the jump links row (the
+   *  gallery's print button); `footer` renders after Sources and method. */
   interface Props {
     run: RunState;
     queryText: string;
     notice?: Snippet;
+    footer?: Snippet;
     /** True on precomputed gallery pages. */
     snapshot?: boolean;
     /** Gallery pages: when and from which commit the snapshot was made. */
     meta?: SnapshotMeta;
   }
-  let { run, queryText, notice, snapshot = false, meta }: Props = $props();
+  let { run, queryText, notice, footer, snapshot = false, meta }: Props = $props();
 
   let model = $derived(briefingModel(run, queryText, meta));
   /** A source list longer than this starts closed. */
@@ -62,6 +64,8 @@
   // A place briefing is titled with the place as the reader typed it; the
   // meta line names the place it resolved to.
   let title = $derived(model.question ?? (queryText.trim() || model.place));
+  // Keep house numbers such as "90-01" on one line, as the landing does.
+  let titleParts = $derived(title.split(/(\d+-\d+)/));
   const norm = (t: string) => t.replace(/\s+/g, ' ').trim().toLowerCase();
   let placeRepeats = $derived(!!run.resolvedPlace && norm(run.resolvedPlace) === norm(title));
   let jumps = $derived([
@@ -230,7 +234,7 @@
   <section id="region-briefing" aria-labelledby="brief-h1">
     <header class="brief-head">
       <p class="brief-kind">{kindLine}</p>
-      <h1 id="brief-h1" class="brief-title">{title}</h1>
+      <h1 id="brief-h1" class="brief-title">{#each titleParts as p, i (i)}{#if i % 2}<span class="nowrap">{p}</span>{:else}{p}{/if}{/each}</h1>
       <p class="brief-meta">
         {#if run.resolvedPlace}
           <span class="resolved-place"><span class="brief-meta-label">Briefing for:</span> {placeRepeats ? 'the place named above' : run.resolvedPlace}</span>
@@ -249,7 +253,7 @@
               </ul>
             </nav>
           {/if}
-          {@render notice?.()}
+          {#if notice}<div class="brief-action">{@render notice()}</div>{/if}
         </div>
       {/if}
     </header>
@@ -383,6 +387,7 @@
         <HowMade {model} stones={run.findingsData.stones} bind:open={howOpen} />
       </section>
     {/if}
+    {#if footer}<div class="brief-footer">{@render footer()}</div>{/if}
   </section>
 </article>
 
@@ -436,6 +441,9 @@
     text-wrap: balance;
     overflow-wrap: anywhere;
   }
+  .brief-title .nowrap {
+    white-space: nowrap;
+  }
   .is-question .brief-title {
     max-width: 30ch;
   }
@@ -467,6 +475,15 @@
     align-items: center;
     gap: 4px 24px;
     margin-top: 2px;
+  }
+  /* An action, not a jump: at the row's right end. */
+  .brief-action {
+    margin-left: auto;
+  }
+  .brief-footer {
+    margin-top: 32px;
+    font-size: 14px;
+    line-height: 1.45;
   }
   .brief-jumps {
     display: flex;

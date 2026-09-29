@@ -292,7 +292,9 @@ commit and snapshot time, and the disclaimer once.
 
 ### Jump links
 One row under the meta line: Answer, Evidence, Map, Sources. Plain links
-in Small.
+in Small. An action such as "Print this briefing" sits at the row's right
+end, apart from the jumps; "All gallery entries" is a plain link at the
+end of the page.
 
 ### Experimental badge
 Small, secondary ink, a 1px Soft Rule border, 3px radius, sentence case.

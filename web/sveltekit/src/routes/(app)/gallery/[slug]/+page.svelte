@@ -32,22 +32,15 @@
 
 <ResultsView {run} queryText={entry.address} snapshot {meta}>
   {#snippet notice()}
-    <p class="snapshot-actions">
-      <button type="button" class="snapshot-print" onclick={print}>Print this briefing</button>
-      <a href="{resolve('/(app)/gallery')}/">All gallery entries</a>
-    </p>
+    <button type="button" class="snapshot-print" onclick={print}>Print this briefing</button>
+  {/snippet}
+  {#snippet footer()}
+    <a class="snapshot-all" href="{resolve('/(app)/gallery')}/">All gallery entries</a>
   {/snippet}
 </ResultsView>
 
 <style>
-  .snapshot-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px 16px;
-    margin: 0;
-  }
-  .snapshot-actions a {
+  .snapshot-all {
     display: inline-flex;
     align-items: center;
     min-height: 24px;
