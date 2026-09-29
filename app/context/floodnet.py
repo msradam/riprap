@@ -156,9 +156,11 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
             f"above-curb flood event{'' if n_events == 1 else 's'} in the last 3 years."
         )
         if peak is not None and peak.max_depth_mm is not None:
+            status = next((x.status for x in sensors if x.deployment_id == peak.deployment_id), "")
+            flagged = f", at a sensor FloodNet marks as {status}" if status and status != "good" else ""
             narrative += (
                 f" Peak depth recorded by these sensors: "
-                f"{peak.max_depth_mm} mm."
+                f"{peak.max_depth_mm} mm on {peak.start_time[:10]}{flagged}."
             )
     return {
         "n_sensors": n_sensors,
