@@ -42,6 +42,8 @@ export interface PrintSnapshot {
   lead?: string | null;
   leadLabel?: string;
   answer?: ClaimPart[][];
+  /** The first answer paragraph is the key sentence; the rest support it. */
+  keyed?: boolean;
   scope?: ClaimPart[][];
   body?: Section[];
   outOfScope?: ClaimPart[][];

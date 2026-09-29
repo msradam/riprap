@@ -166,7 +166,7 @@
       <AnswerProse
         parts={isBrief && i === 0 ? boldFirstSentence(parts) : parts}
         citations={model.citationsById}
-        class={isBrief ? 'brief-answer-p is-brief' : 'brief-answer-p'}
+        class={isBrief ? 'brief-answer-p is-brief' : model.keyed && i > 0 ? 'brief-answer-p is-support' : 'brief-answer-p'}
       />
     {/each}
   </section>
@@ -545,6 +545,12 @@
     max-width: 54ch;
     font-size: 20px;
     line-height: 1.5;
+  }
+  /* A keyed answer: the key sentence at the Answer size, the rest of the
+     answer one step smaller (Body) as its support. */
+  .brief :global(.brief-answer-p.is-support) {
+    font-size: 17px;
+    line-height: 1.55;
   }
   /* Brief: the "In brief" paragraph of a place briefing, its first
      sentence in 600. Used only here (DESIGN.md type scale). */

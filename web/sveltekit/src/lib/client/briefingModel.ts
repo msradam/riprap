@@ -84,6 +84,67 @@ export function splitLead(parts: ClaimPart[]): { word: string | null; parts: Cla
   return { word: COUNT_RE.exec(first.text)?.[1] ?? null, parts };
 }
 
+/** Where the backend's own lead sentence ends and the quoted facts begin. */
+const FACTS_PHRASE = 'From the sources consulted:';
+
+/** A sentence ends at closing punctuation followed by a space and a
+ *  capital, a digit or a bracket. parseBriefing splits only before a
+ *  capital, so "[floodnet]. 82 complaints" arrives as one part. */
+const BOUNDARY = /(?<=[.!?]["”')]?)\s+(?=[A-Z0-9(])/;
+const ENDS = /[.!?]["”')]?\s*$/;
+
+/** A paragraph's sentences. A part's citation stays with the words it
+ *  follows: the last sentence the part's text reaches. */
+export function sentencesOf(parts: ClaimPart[]): ClaimPart[][] {
+  const out: ClaimPart[][] = [[]];
+  parts.forEach((p, i) => {
+    if (!p.cite && !p.text.trim() && i > 0 && ENDS.test(parts[i - 1].text)) {
+      out.push([]);
+      return;
+    }
+    const segs = p.text.split(new RegExp(BOUNDARY, 'g'));
+    segs.forEach((text, j) => {
+      if (j) out.push([]);
+      out[out.length - 1].push(j === segs.length - 1 ? { ...p, text } : { text, ...(p.bold && { bold: true }) });
+    });
+  });
+  return out.filter((s) => s.some((p) => p.text.trim() || p.cite));
+}
+
+const joinSentences = (ss: ClaimPart[][]) => ss.flatMap((s, i) => (i ? [{ text: ' ' }, ...s] : s));
+
+/** The answer's key sentence, taken out so it can lead at the answer size,
+ *  and the rest of the answer as support. `in_lead`: the backend's lead
+ *  sentence, before "From the sources consulted:". Otherwise the first
+ *  sentence citing `doc_id`. Null when there is no lead fact or the
+ *  sentence is not found, so nothing is singled out. */
+export function keySentence(
+  answer: ClaimPart[][],
+  fact: { doc_id: string; in_lead: boolean } | null | undefined
+): { key: ClaimPart[]; rest: ClaimPart[][] } | null {
+  if (!fact?.doc_id || !answer.length) return null;
+  if (fact.in_lead) {
+    const [first, ...others] = answer;
+    const k = first.findIndex((p) => p.text.includes(FACTS_PHRASE));
+    if (k < 0) return null;
+    const at = first[k].text.indexOf(FACTS_PHRASE);
+    const head = first[k].text.slice(0, at).trimEnd();
+    const key = [...first.slice(0, k), ...(head ? [{ ...first[k], text: head, cite: undefined }] : [])];
+    if (!key.some((p) => p.text.trim())) return null;
+    const tail = [{ ...first[k], text: first[k].text.slice(at) }, ...first.slice(k + 1)];
+    return { key, rest: [tail, ...others] };
+  }
+  for (let i = 0; i < answer.length; i++) {
+    const ss = sentencesOf(answer[i]);
+    const j = ss.findIndex((s) => s.some((p) => p.cite === fact.doc_id));
+    if (j < 0) continue;
+    const own = joinSentences(ss.filter((_, n) => n !== j));
+    const rest = [...answer.slice(0, i), own, ...answer.slice(i + 1)].filter((p) => p.length);
+    return { key: ss[j], rest };
+  }
+  return null;
+}
+
 /** A refusal's first sentence ("Riprap does not answer this question.")
  *  comes off its first paragraph so it can stand at the answer position. */
 export function splitSentence(parts: ClaimPart[]): { sentence: string; parts: ClaimPart[] } | null {
@@ -222,6 +283,10 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     ? [refusal.parts, ...refusalParas.slice(1)].filter((p) => p.length)
     : leadParas.length ? [first.parts, ...leadParas.slice(1)] : [];
   const leadWord = refusal ? null : first.word;
+  // A question's answer leads with its key sentence; the rest follows,
+  // one size smaller, as support. Place briefings keep their In brief.
+  const keyed = question && !refusal ? keySentence(answer, g?.lead_fact) : null;
+  const answerParas = keyed ? [keyed.key, ...keyed.rest] : answer;
 
   // "Checks run: ..." closes the Out of scope note; it is its own line here.
   const outParas = sections(split.outOfScope).flatMap((s) => s.paras);
@@ -231,7 +296,7 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   const body = refusal ? [] : sections(split.body).map((s) => ({ ...s, label: stoneHead(s.label) }));
 
   const citations: Citation[] = Object.values(run.briefing.citations).sort((a, b) => a.n - b.n);
-  const cited = citedIn(answer);
+  const cited = citedIn(answerParas);
   const allCards: Card[] = run.findingsData.cards;
   const cards = allCards.filter((c) => !c.absent && c.variant !== 'meta');
   const absent = allCards.filter((c) => c.absent);
@@ -247,7 +312,7 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   // for it, else in the snapshot stamp.
   const modelListed = !!modelId && models.some((m) => m.repo === modelId);
   const shownText = [
-    ...answer, ...scope, ...body.flatMap((s) => s.paras), ...outParas
+    ...answerParas, ...scope, ...body.flatMap((s) => s.paras), ...outParas
   ].map(text).join(' ') + ' ' + [...findings.values()].map((x) => (x ? `${x.first} ${x.rest}` : '')).join(' ');
 
   return {
@@ -262,7 +327,9 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     lead: refusal ? refusal.sentence : leadWord && /^[A-Z]/.test(leadWord) ? `${leadWord}.` : leadWord,
     /** The lead is a sentence, not a word or a figure. */
     leadIsSentence: !!refusal,
-    answer,
+    answer: answerParas,
+    /** The first answer paragraph is the key sentence; the rest support it. */
+    keyed: !!keyed,
     scope,
     body,
     outOfScope,
@@ -333,6 +400,7 @@ export function snapshotFromRun(
     lead: m.lead,
     leadLabel: m.leadLabel,
     answer: m.answer,
+    keyed: m.keyed,
     scope: m.scope,
     body: m.body,
     outOfScope: m.outOfScope,

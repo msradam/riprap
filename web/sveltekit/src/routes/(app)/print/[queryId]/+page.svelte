@@ -136,7 +136,7 @@
       <h2 id="print-answer-h" class="visually-hidden">{snapshot.leadLabel}</h2>
       {#if snapshot.lead}<p class="print-lead">{snapshot.lead}</p>{/if}
       {#each snapshot.answer ?? [] as parts, i (i)}
-        <AnswerProse {parts} citations={snapshot.citations} class="print-answer-p" />
+        <AnswerProse {parts} citations={snapshot.citations} class={snapshot.keyed && i > 0 ? 'print-answer-p is-support' : 'print-answer-p'} />
       {/each}
       {#if snapshot.unanswered}
         <p class="print-answer-p">
@@ -294,6 +294,10 @@
     font-size: 18px;
     line-height: 1.5;
   }
+  /* A keyed answer's support, one step under the key sentence. */
+  .print-doc :global(.print-answer-p.is-support) {
+    font-size: 15px;
+  }
   .print-doc :global(.print-quiet) {
     margin: 0 0 6px;
     max-width: 54ch;
@@ -441,6 +445,9 @@
     }
     .print-doc :global(.print-answer-p) {
       font-size: 13pt;
+    }
+    .print-doc :global(.print-answer-p.is-support) {
+      font-size: 10.5pt;
     }
     .print-doc :global(.source-notes),
     .print-doc :global(.source-list),

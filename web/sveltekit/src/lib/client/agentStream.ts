@@ -88,6 +88,10 @@ export interface Grounding {
   answered?: boolean;
   /** "extractive": the answer quotes source sentences under a model-chosen lead. */
   answer_mode?: string;
+  /** The fact the answer's lead rests on (synthesis.py `_lead_fact`):
+   *  `in_lead` when the backend's lead sentence states it, else the doc
+   *  whose first answer sentence does. Null or absent: none singled out. */
+  lead_fact?: { doc_id: string; in_lead: boolean } | null;
   /** Set when LLM mode skipped the LLM because no question was asked. */
   note?: string;
 }
