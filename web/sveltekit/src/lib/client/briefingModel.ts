@@ -461,7 +461,13 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     scope,
     body,
     outOfScope,
-    checks: checks ? text(checks) : null,
+    /** A cannot-answer line cites nothing, so the backend's "answer is the
+     *  cited text word for word" reason is left off. */
+    checks: checks
+      ? g?.answer_lead === 'cannot_answer'
+        ? text(checks).replace(/; no entailment check needed[^.;]*/, '')
+        : text(checks)
+      : null,
     citations,
     /** The page's citations, numbered by first appearance. */
     citationsById,

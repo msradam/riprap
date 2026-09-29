@@ -1306,7 +1306,7 @@ export function applyStepEventToLiveState(
 /** What produced the briefing, in words: the mode line on screen and in
  *  print. An extractive answer is quoted, not model prose, so it does not
  *  say "LLM claims checked" for it. */
-export function modeLine(g: { tier: string; model?: string; answer_mode?: string; note?: string;
+export function modeLine(g: { tier: string; model?: string; answer_mode?: string; answer_lead?: string; note?: string;
                               claims?: unknown[]; dropped_claims?: unknown[]; fallback_reason?: string } | null | undefined): string | null {
   if (!g) return null;
   if (g.tier !== 'llm') {
@@ -1317,6 +1317,11 @@ export function modeLine(g: { tier: string; model?: string; answer_mode?: string
   }
   const model = g.model ? ` (${g.model})` : '';
   const counts = `${g.claims?.length ?? 0} kept, ${g.dropped_claims?.length ?? 0} dropped`;
+  // A cannot-answer line quotes nothing: code sets it when the lead rules
+  // find no source that answers, so it is not described as quoted.
+  if (g.answer_mode === 'extractive' && g.answer_lead === 'cannot_answer') {
+    return 'Extractive answer: no source sentence answers the question, so the answer says so in a line set by the lead rules';
+  }
   if (g.answer_mode === 'extractive') {
     // The answer's facts are listed as claims in section "answer"; say "other
     // claims" only when the model wrote any outside the answer.

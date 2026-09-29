@@ -86,7 +86,7 @@ export interface Grounding {
   fallback_reason?: string;
   question?: string;
   answered?: boolean;
-  /** "extractive": the answer quotes source sentences under a model-chosen lead. */
+  /** "extractive": the answer quotes model-chosen source sentences under a lead set by rule in code. */
   answer_mode?: string;
   /** The fact the answer's lead rests on (synthesis.py `_lead_fact`):
    *  `in_lead` when the backend's lead sentence states it, else the doc

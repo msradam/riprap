@@ -14,10 +14,10 @@
   let models = $derived([...new Set(questions.flatMap((e) => (e.modelName ? [e.modelName] : [])))]);
   let sharedModel = $derived(models.length === 1 ? models[0] : null);
 
-  // The note depends on how each answer was made. In extractive mode the
-  // answer is source sentences quoted under a lead the model chose.
+  // The note depends on how each answer was made. In extractive mode code
+  // sets the lead (and any refusal); the model only picks the quoted sentences.
   const NOTE_EXTRACTIVE =
-    'The model chose the lead and which source sentences answer the question; the sentences are quoted from the sources.';
+    'The lead (Yes, No or a count) is set by rules in code, and so is a refusal or a note that the sources do not answer. The model chose which source sentences answer the question, and they are quoted word for word.';
   const NOTE_WRITTEN = 'Written by a language model, with each claim checked against its cited sources.';
   const note = (mode: string | null) => (mode === 'extractive' ? NOTE_EXTRACTIVE : NOTE_WRITTEN);
   let modes = $derived([...new Set(questions.filter((e) => e.modelName).map((e) => e.answerMode === 'extractive'))]);

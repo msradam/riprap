@@ -13,6 +13,11 @@ describe('mode line', () => {
     expect(line).toMatch(/^Extractive answer: sentences quoted word for word/);
     expect(line).not.toMatch(/^LLM claims/);
   });
+  it('does not call a cannot-answer line quoted', () => {
+    const line = modeLine({ tier: 'llm', answer_mode: 'extractive', answer_lead: 'cannot_answer', claims: [] });
+    expect(line).toMatch(/^Extractive answer: no source sentence answers the question/);
+    expect(line).not.toContain('word for word');
+  });
   it('keeps the guarded and no-LLM wording', () => {
     expect(modeLine({ tier: 'llm', answer_mode: 'guarded', claims: [1], dropped_claims: [1] }))
       .toBe('LLM claims checked against cited sources: 1 kept, 1 dropped');
