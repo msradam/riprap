@@ -3,8 +3,8 @@
  "neighborhood": "Community district QN12, Queens",
  "address": "QN12",
  "question": "How many street flooding complaints has community district QN12 had?",
- "generated_at": "2026-09-28T17:03Z",
- "riprap_commit": "d7dd5da",
+ "generated_at": "2026-09-28T23:47Z",
+ "riprap_commit": "07233b3",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -418,7 +418,7 @@
    {
     "id": "prithvi_water",
     "type": "baked",
-    "title": "Satellite-detected surface water after Hurricane Ida (experimental)",
+    "title": "New surface water after Hurricane Ida, Prithvi-EO (experimental)",
     "stone": "cornerstone",
     "tier": "modeled",
     "maturity": "experimental",
@@ -431,21 +431,54 @@
      "icon": "\ud83d\udef0\ufe0f"
     },
     "narration": {
-     "short": "Satellite-detected surface water about 14 hours after Hurricane Ida near this address (experimental).",
+     "short": "New surface water after Hurricane Ida near this address, from the Prithvi-EO NYC model (experimental).",
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "Prithvi-EO-2.0-300M-TL-Sen1Floods11 (NASA/IBM via TerraTorch), Hurricane Ida pre/post HLS scenes",
-     "source_url": "https://huggingface.co/ibm-nasa-geospatial",
-     "license": "Apache-2.0",
-     "citation": "Prithvi-EO-2.0-300M-TL-Sen1Floods11 (NASA/IBM, Apache-2.0, via TerraTorch). Hurricane Ida pre/post diff: pre HLS T18TWK 2021-08-25 (3% cloud), post HLS T18TWK 2021-09-02 (1% cloud, about 14 h after the heaviest rain). Unvalidated surface-water change; not a flood extent.",
+     "source_name": "msradam/Prithvi-EO-2.0-NYC-Pluvial on Copernicus Sentinel-2 L2A (Planetary Computer)",
+     "source_url": "https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial",
+     "license": "Apache-2.0 (model); Copernicus Sentinel data terms (imagery)",
+     "citation": "msradam/Prithvi-EO-2.0-NYC-Pluvial (Apache-2.0), run by scripts/run_eo_batch.py on Sentinel-2 L2A scenes from 2021-09-02 (tiles 18TWL, 18TWK, 18TXL), with same-tile scenes from 2021-08-13 masking permanent water. Contains modified Copernicus Sentinel data 2021, via Microsoft Planetary Computer. Experimental: no flood-detection score on held-out events; street and basement flooding is not visible at 10 to 20 m.",
      "doc_id": "prithvi_water",
      "date_modified": "2021-09-02",
-     "retrieved_at": "2026-07-11"
+     "retrieved_at": "2026-09-28"
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "Prithvi Ida water mask unavailable."
+     "message": "The Prithvi-EO Ida output (data/eo/) is not present."
+    }
+   },
+   {
+    "id": "prithvi_water_nta",
+    "type": "baked",
+    "title": "New surface water after Hurricane Ida in the area, Prithvi-EO (experimental)",
+    "stone": "cornerstone",
+    "tier": "modeled",
+    "maturity": "experimental",
+    "scope": "polygon",
+    "display": {
+     "order": 45,
+     "kind": "text",
+     "variant": null,
+     "map_layer": false,
+     "icon": "\ud83d\udef0\ufe0f"
+    },
+    "narration": {
+     "short": "New surface water after Hurricane Ida in this area, from the Prithvi-EO NYC model (experimental).",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "msradam/Prithvi-EO-2.0-NYC-Pluvial on Copernicus Sentinel-2 L2A (Planetary Computer)",
+     "source_url": "https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial",
+     "license": "Apache-2.0 (model); Copernicus Sentinel data terms (imagery)",
+     "citation": "msradam/Prithvi-EO-2.0-NYC-Pluvial (Apache-2.0), run by scripts/run_eo_batch.py on Sentinel-2 L2A scenes from 2021-09-02, with same-tile scenes from 2021-08-13 masking permanent water; share of the area's observed pixels. Contains modified Copernicus Sentinel data 2021, via Microsoft Planetary Computer. Experimental: no flood-detection score on held-out events.",
+     "doc_id": "prithvi_water_nta",
+     "date_modified": "2021-09-02",
+     "retrieved_at": "2026-09-28"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": null
     }
    },
    {
@@ -1088,7 +1121,7 @@
      "text": "QN12"
     }
    ],
-   "rationale": "The question asks for past street flooding complaints in a specific community district, which is answered by the nyc311_nta source.",
+   "rationale": "The question asks for the count of flood-related 311 complaints in a specific community district, which is available from the nyc311_nta source.",
    "question": "How many street flooding complaints has community district QN12 had?",
    "focus": {
     "hazard": "flood",
@@ -1112,6 +1145,7 @@
     "microtopo_nta",
     "policy_corpus",
     "prithvi_water",
+    "prithvi_water_nta",
     "sandy",
     "sandy_nta",
     "dob_permits_nta",
@@ -1136,12 +1170,12 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1759,
-     "completion_tokens": 122,
-     "duration_s": 5.799,
+     "prompt_tokens": 1830,
+     "completion_tokens": 126,
+     "duration_s": 11.747,
      "energy_status": "unknown",
      "wh": null,
-     "energy_note": "energy counters returned no CPU energy on this chip"
+     "energy_note": "no energy source configured"
     }
    ]
   },
@@ -1170,9 +1204,9 @@
   },
   "policy_corpus": null,
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n533 street flooding complaints, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4283 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2671 sewer backup, 932 catch basin, 533 street flooding, 147 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n533 street flooding complaints, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4273 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2663 sewer backup, 932 catch basin, 533 street flooding, 145 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n533 street flooding complaints, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4283 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2671 sewer backup, 932 catch basin, 533 street flooding, 147 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n533 street flooding complaints, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4273 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2663 sewer backup, 932 catch basin, 533 street flooding, 145 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
    "dropped": [],
    "tier": "llm"
   },
@@ -1183,7 +1217,7 @@
    "claims": [
     {
      "section": "answer",
-     "text": "4283 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2671 sewer backup, 932 catch basin, 533 street flooding, 147 manhole overflow.",
+     "text": "4273 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2663 sewer backup, 932 catch basin, 533 street flooding, 145 manhole overflow.",
      "doc_ids": [
       "nyc311_nta"
      ],
@@ -1211,10 +1245,10 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 624,
      "completion_tokens": 91,
-     "duration_s": 4.41,
+     "duration_s": 7.65,
      "energy_status": "unknown",
      "wh": null,
-     "energy_note": "energy counters returned no CPU energy on this chip"
+     "energy_note": "no energy source configured"
     }
    ],
    "question": "How many street flooding complaints has community district QN12 had?",
@@ -1237,7 +1271,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-28T01:37:58+0000",
-    "retrieved_at": "2026-09-28T17:03Z",
+    "retrieved_at": "2026-09-28T23:47Z",
     "vintage": "2026-09-28T01:37:58+0000",
     "maturity": "production"
    }
@@ -1273,6 +1307,11 @@
    {
     "id": "dep_moderate_current_nta",
     "title": "DEP Moderate (2.13 in/hr, current sea level), share of the neighborhood",
+    "stone": "cornerstone"
+   },
+   {
+    "id": "prithvi_water_nta",
+    "title": "New surface water after Hurricane Ida in the area, Prithvi-EO (experimental)",
     "stone": "cornerstone"
    },
    {
@@ -1483,28 +1522,28 @@
    "headline_value": "3.3% modeled to flood"
   },
   "nyc311_nta": {
-   "n": 4283,
+   "n": 4273,
    "capped": false,
    "radius_m": null,
    "years": 3,
    "by_year": {
-    "2023": 429,
+    "2023": 419,
     "2024": 1454,
     "2025": 1316,
     "2026": 1084
    },
    "by_descriptor": {
-    "Sewer Backup (Use Comments) (SA)": 2671,
+    "Sewer Backup (Use Comments) (SA)": 2663,
     "Catch Basin Clogged/Flooding (Use Comments) (SC)": 932,
     "Street Flooding (SJ)": 467,
-    "Manhole Overflow (Use Comments) (SA1)": 147,
+    "Manhole Overflow (Use Comments) (SA1)": 145,
     "Flooding on Street": 66
    },
    "by_kind": {
-    "sewer backup": 2671,
+    "sewer backup": 2663,
     "catch basin": 932,
     "street flooding": 533,
-    "manhole overflow": 147
+    "manhole overflow": 145
    },
    "most_recent": [
     {
@@ -1534,11 +1573,11 @@
     }
    ],
    "points": [],
-   "headline_value": "4283 calls",
-   "subhead_text": "2671 sewer backup, 932 catch basin, 533 street flooding, 147 manhole overflow",
-   "narrative": "4283 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2671 sewer backup, 932 catch basin, 533 street flooding, 147 manhole overflow.",
+   "headline_value": "4273 calls",
+   "subhead_text": "2663 sewer backup, 932 catch basin, 533 street flooding, 145 manhole overflow",
+   "narrative": "4273 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2663 sewer backup, 932 catch basin, 533 street flooding, 145 manhole overflow.",
    "histogram": [
-    429,
+    419,
     1454,
     1316,
     1084
@@ -1548,8 +1587,8 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790614971.865046,
-    "elapsed_s": 0.06,
+    "started_at": 1790639239.3803499,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "nta_code": "QN12",
@@ -1567,7 +1606,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790614971.929586,
+    "started_at": 1790639239.382587,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1579,7 +1618,7 @@
    {
     "step": "dep_extreme_2080_nta",
     "ok": true,
-    "started_at": 1790614971.959105,
+    "started_at": 1790639239.408204,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1589,7 +1628,17 @@
    {
     "step": "dep_moderate_current_nta",
     "ok": true,
-    "started_at": 1790614971.959106,
+    "started_at": 1790639239.408205,
+    "elapsed_s": 0.0,
+    "err": null,
+    "result": {
+     "skipped": "not selected for this question"
+    }
+   },
+   {
+    "step": "prithvi_water_nta",
+    "ok": true,
+    "started_at": 1790639239.408205,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1599,7 +1648,7 @@
    {
     "step": "microtopo_nta",
     "ok": true,
-    "started_at": 1790614971.9591072,
+    "started_at": 1790639239.408205,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1609,7 +1658,7 @@
    {
     "step": "dob_permits_nta",
     "ok": true,
-    "started_at": 1790614971.9591072,
+    "started_at": 1790639239.408206,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1619,7 +1668,7 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1790614971.988245,
+    "started_at": 1790639239.4330611,
     "elapsed_s": 0.01,
     "err": null,
     "result": {}
@@ -1627,31 +1676,31 @@
    {
     "step": "sandy_nta",
     "ok": true,
-    "started_at": 1790614971.988388,
-    "elapsed_s": 0.02,
+    "started_at": 1790639239.4339368,
+    "elapsed_s": 1.09,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_2050_nta",
     "ok": true,
-    "started_at": 1790614971.988665,
-    "elapsed_s": 0.09,
+    "started_at": 1790639239.433901,
+    "elapsed_s": 0.2,
     "err": null,
     "result": {}
    },
    {
     "step": "nyc311_nta",
     "ok": true,
-    "started_at": 1790614971.9889102,
-    "elapsed_s": 18.38,
+    "started_at": 1790639239.433843,
+    "elapsed_s": 5.06,
     "err": null,
     "result": {}
    },
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790614990.610338,
+    "started_at": 1790639244.748477,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1660,7 +1709,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790614990.6104598,
+    "started_at": 1790639244.748611,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -1670,7 +1719,17 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 4.48
+    "elapsed_s": 7.69
+   }
+  ],
+  "models": [
+   {
+    "name": "LLM",
+    "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+    "where": "Ollama on this machine (localhost:11434)",
+    "how": "endpoint",
+    "latency_s": 19.4,
+    "calls": 2
    }
   ],
   "compliance": {
@@ -1684,23 +1743,23 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 10.209,
+   "total_duration_s": 19.397,
    "tokens": {
-    "prompt": 2383,
-    "completion": 213,
-    "total": 2596
+    "prompt": 2454,
+    "completion": 217,
+    "total": 2671
    },
    "calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1759,
-     "completion_tokens": 122,
-     "duration_s": 5.799,
+     "prompt_tokens": 1830,
+     "completion_tokens": 126,
+     "duration_s": 11.747,
      "energy_status": "unknown",
      "wh": null,
-     "energy_note": "energy counters returned no CPU energy on this chip"
+     "energy_note": "no energy source configured"
     },
     {
      "kind": "llm",
@@ -1708,10 +1767,10 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 624,
      "completion_tokens": 91,
-     "duration_s": 4.41,
+     "duration_s": 7.65,
      "energy_status": "unknown",
      "wh": null,
-     "energy_note": "energy counters returned no CPU energy on this chip"
+     "energy_note": "no energy source configured"
     }
    ],
    "method": "Each LLM call is labelled measured (Apple SoC counters), estimated (declared watts times duration) or unknown; hosted endpoints are always unknown. See app/emissions.py."

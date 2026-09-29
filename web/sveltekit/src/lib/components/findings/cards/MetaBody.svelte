@@ -64,6 +64,8 @@
     font-family: var(--font-mono);
     font-size: 12px;
     color: var(--ink);
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
   .models { margin-top: var(--s-2); }
   .models-head {
@@ -83,11 +85,11 @@
   }
   .model:last-child { border-bottom: 0; }
   .model-name { font-family: var(--font-sans); font-size: 12px; color: var(--ink); }
+  .model > * { min-width: 0; overflow-wrap: anywhere; }
   .model-repo {
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--ink);
-    overflow-wrap: anywhere;
   }
   .model-meta, .model-detail {
     font-family: var(--font-mono);
