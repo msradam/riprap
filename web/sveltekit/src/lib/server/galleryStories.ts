@@ -28,6 +28,19 @@ export function leadSentence(paragraph: string): string {
     : (sentences[0] ?? '');
 }
 
+const MARKER_RE = /\s*\[[a-z][a-z0-9_]*(?:\s*,\s*[a-z][a-z0-9_]*)*\]/gi;
+
+/** The first sentence of the briefing text that cites `docId`, `[doc_id]`
+ *  markers removed; empty when no sentence cites it. */
+export function featureSentence(paragraph: string, docId: string): string {
+  const cites = new RegExp(`\\[[^\\]]*\\b${docId.replace(/[^a-z0-9_]/gi, '')}\\b[^\\]]*\\]`, 'i');
+  for (const para of paragraph.replace(/\*\*[^*]+\.\*\*/g, '\n').split('\n')) {
+    const hit = para.trim().split(/(?<=[.!?])\s+(?=[A-Z0-9"])/).find((s) => cites.test(s));
+    if (hit) return hit.replace(MARKER_RE, '').replace(/\s+/g, ' ').trim();
+  }
+  return '';
+}
+
 /** The standfirst: with a lead fact, the lead word and the key sentence
  *  the page sets large, chosen by the page's own keyedAnswer; otherwise
  *  leadSentence. */
@@ -39,6 +52,12 @@ export function standfirst(final: Pick<FinalResult, 'paragraph' | 'grounding' | 
   const key = tidy(keyed).map((p) => p.text).join('').replace(/\s+/g, ' ').trim();
   // A count lead keeps its sentence whole, so only a word such as "Yes" is added.
   return first.word && /^[A-Z]/.test(first.word) ? `${first.word}. ${key}` : key;
+}
+
+/** An entry's snippet: the sentence citing its `feature_doc` when it has
+ *  one and the briefing cites it, else the standfirst. */
+export function storyLead(e: Pick<GalleryIndexEntry, 'feature_doc'>, final: Pick<FinalResult, 'paragraph' | 'grounding' | 'citations'>): string {
+  return (e.feature_doc && featureSentence(final.paragraph, e.feature_doc)) || standfirst(final);
 }
 
 /** "<model> (<quant>)", the quantization tag dropped from the name when it
@@ -56,7 +75,7 @@ export async function galleryStories(): Promise<GalleryStory[]> {
     const entry = await loadGalleryEntry(e.slug);
     out.push({
       ...e,
-      lead: entry ? standfirst(entry.final) : '',
+      lead: entry ? storyLead(e, entry.final) : '',
       answerMode: entry?.final.grounding?.answer_mode ?? null
     });
   }

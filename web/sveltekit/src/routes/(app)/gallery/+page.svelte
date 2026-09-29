@@ -28,10 +28,11 @@
   <meta name="description" content="Precomputed Riprap flood-exposure briefings for New York City neighborhoods, served as static pages." />
 </svelte:head>
 
-{#snippet row(place: string, generatedAt: string, href: string, label: string, lead: string)}
+{#snippet row(place: string, generatedAt: string, href: string, label: string, lead: string, reason?: string | null)}
   <span class="gallery-place">{place}</span>
   <time class="gallery-date" datetime={generatedAt.slice(0, 10)}>{generatedAt.slice(0, 10)}</time>
   <a class="gallery-link" {href}>{label}</a>
+  {#if reason}<p class="gallery-reason">{reason}</p>{/if}
   {#if lead}<p class="gallery-lead">{lead}</p>{/if}
 {/snippet}
 
@@ -54,7 +55,8 @@
             e.generated_at,
             `${resolve('/(app)/gallery/[slug]', { slug: e.slug })}/`,
             e.question ?? '',
-            e.lead
+            e.lead,
+            e.reason
           )}
           {#if !sharedModel || !sharedNote}
             <p class="gallery-meta">
@@ -78,7 +80,8 @@
             e.generated_at,
             `${resolve('/(app)/gallery/[slug]', { slug: e.slug })}/`,
             e.address,
-            e.lead
+            e.lead,
+            e.reason
           )}
         </li>
       {/each}
@@ -167,6 +170,7 @@
     white-space: nowrap;
   }
   .gallery-link,
+  .gallery-reason,
   .gallery-lead,
   .gallery-meta {
     grid-column: 1 / -1;
@@ -184,6 +188,7 @@
   .gallery-link:hover {
     text-decoration-thickness: 2px;
   }
+  .gallery-reason,
   .gallery-lead,
   .gallery-meta {
     margin: 2px 0 0;
@@ -191,6 +196,7 @@
     font-size: 14px;
     line-height: 1.45;
   }
+  .gallery-reason,
   .gallery-meta {
     color: var(--ink-secondary);
   }

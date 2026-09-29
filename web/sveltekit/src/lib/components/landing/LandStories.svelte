@@ -12,6 +12,8 @@
     question: string | null;
     generated_at: string;
     lead: string;
+    /** One editorial line on why the entry is in the gallery. */
+    reason?: string | null;
   }
   interface Props { stories: LandStory[] }
   let { stories }: Props = $props();
@@ -33,6 +35,7 @@
             >{:else}{p}{/if}{/each}</a
       >
     </h3>
+    {#if s.reason}<p class="story-reason">{s.reason}</p>{/if}
     {#if s.lead}<p class="story-lead">{s.lead}</p>{/if}
     <p class="story-byline">
       <span>{s.question ? s.neighborhood : s.address}</span>
@@ -61,6 +64,7 @@
           <a href="{resolve('/(app)/gallery/[slug]', { slug: s.slug })}/">{s.neighborhood}</a>
           <span class="place-address">{#each parts(s.address) as p, i (i)}{#if i % 2}<span class="nowrap">{p}</span>{:else}{p}{/if}{/each}</span>
           <time datetime={s.generated_at.slice(0, 10)}>{s.generated_at.slice(0, 10)}</time>
+          {#if s.reason}<p class="place-reason">{s.reason}</p>{/if}
         </li>
       {/each}
     </ul>
@@ -127,6 +131,14 @@
   h3 a:hover {
     text-decoration: underline;
   }
+  /* Why the entry is in the gallery, in Small under its headline. */
+  .story-reason {
+    margin: 6px 0 0;
+    max-width: 60ch;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-secondary);
+  }
   .story-lead {
     margin: 8px 0 0;
     max-width: 60ch;
@@ -181,6 +193,12 @@
     color: var(--ink-secondary);
   }
   .places time {
+    color: var(--ink-secondary);
+  }
+  .place-reason {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 14px;
     color: var(--ink-secondary);
   }
   @media (max-width: 720px) {

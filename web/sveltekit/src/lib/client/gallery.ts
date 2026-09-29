@@ -17,6 +17,10 @@ export interface GalleryIndexEntry {
   question?: string | null;
   model?: string | null;
   quantization?: string | null;
+  /** One editorial line on why the entry is in the gallery. */
+  reason?: string | null;
+  /** A doc id whose first sentence in the briefing is the entry's snippet. */
+  feature_doc?: string | null;
 }
 
 export interface GalleryEntry extends GalleryIndexEntry {

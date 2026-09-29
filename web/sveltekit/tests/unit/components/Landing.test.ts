@@ -11,8 +11,21 @@ import LandHero from '$lib/components/landing/LandHero.svelte';
 import CityPicker from '$lib/components/landing/CityPicker.svelte';
 import UseBand from '$lib/components/landing/UseBand.svelte';
 import LandStones from '$lib/components/landing/LandStones.svelte';
+import LandStories from '$lib/components/landing/LandStories.svelte';
 
 describe('Landing smoke', () => {
+  it('LandStories shows an entry\'s reason under its title only when the index gives one', () => {
+    const base = { neighborhood: 'Red Hook, Brooklyn', address: '80 Pioneer Street', question: null, generated_at: '2026-09-29T12:34Z', lead: '' };
+    const { container } = render(LandStories, {
+      stories: [
+        { ...base, slug: 'red-hook', reason: 'Two NYCHA developments inside the 2012 Sandy extent.' },
+        { ...base, slug: 'gowanus', neighborhood: 'Gowanus, Brooklyn' }
+      ]
+    });
+    const reasons = [...container.querySelectorAll('.place-reason')].map((p) => p.textContent);
+    expect(reasons).toEqual(['Two NYCHA developments inside the 2012 Sandy extent.']);
+  });
+
   it('CityPicker links every shipped city', () => {
     const { container } = render(CityPicker);
     const text = container.textContent ?? '';
