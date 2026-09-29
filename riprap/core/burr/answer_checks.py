@@ -470,7 +470,10 @@ def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: d
     for any other question. `yes` when a relevant observed source reports an
     event in the asked period; `no` only when every relevant source answered
     and reported none; `cannot_answer` otherwise. A source the rule relies on is added to
-    the facts when the model left it out, so the lead is always cited."""
+    the facts when the model left it out, so the lead is always cited. Under
+    `cannot_answer` the facts are the relevant sources that did return a
+    sentence ("No FloodNet sensors deployed within 600 m"), so the reader
+    sees why the sources are silent."""
     if not is_past_event_question(question, focus):
         return None
     relevant, verdict = _past_event_verdict(question, docs, values, this_year)
@@ -481,4 +484,4 @@ def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: d
         # A "no" rests on the relevant sources alone: a positive fact about
         # something else (a 311 count for a sensor question) is not shown under it.
         return "no", [f for f in facts if f in relevant] + [i for i in relevant if i not in facts]
-    return "cannot_answer", []
+    return "cannot_answer", [i for i in relevant if i in verdict and not unavailable(i, docs, values)]

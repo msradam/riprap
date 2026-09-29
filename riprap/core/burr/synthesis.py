@@ -505,7 +505,9 @@ def synthesize(state) -> dict:
         facts = sorted(facts, key=lambda f: f in experimental)  # experimental sources after all others
         kept = [*({"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts),
                 *kept]
-        lead_phrase = LEAD_PHRASES.get(lead, "")
+        # Honest silence still shows what the sources say: facts under a
+        # cannot-answer lead follow the silence line, with no key figure.
+        lead_phrase = CANNOT_ANSWER if lead == "cannot_answer" and facts else LEAD_PHRASES.get(lead, "")
         if lead == "count" and rel in facts and (kl := answer_checks.kind_lead(question, texts, values)):
             lead_phrase = f"{kl} {lead_phrase}"
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
@@ -534,7 +536,8 @@ def synthesize(state) -> dict:
                       "question": question, "n_documents": len(docs), "answer_mode": mode,
                       "answer_lead": lead, "lead_fact": lead_fact,
                       "answer_flags": answer_flags, "checks": checks, "entailment": entail_info,
-                      "answered": any(c["section"] == ANSWER_SECTION for c in kept) if question else None},
+                      "answered": (lead != "cannot_answer" and any(c["section"] == ANSWER_SECTION for c in kept))
+                      if question else None},
     }
 
 

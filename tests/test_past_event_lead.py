@@ -37,10 +37,11 @@ def test_no_only_when_every_relevant_source_answered_none():
 
 
 def test_cannot_answer_when_a_relevant_source_is_missing_or_unavailable():
+    # The facts under the silence line are the relevant sources that did answer.
     partial = {"nyc311": NONE["nyc311"]}  # FloodNet did not answer
-    assert past_event_lead(Q, PAST, [], TEXTS, partial, 2026) == ("cannot_answer", [])
+    assert past_event_lead(Q, PAST, [], TEXTS, partial, 2026) == ("cannot_answer", ["nyc311"])
     down = {**NONE, "floodnet": {"n_flood_events_3y": 0, "error": "HTTP 503"}}
-    assert past_event_lead(Q, PAST, [], TEXTS, down, 2026) == ("cannot_answer", [])
+    assert past_event_lead(Q, PAST, [], TEXTS, down, 2026) == ("cannot_answer", ["nyc311"])
 
 
 def test_zero_in_a_window_that_misses_part_of_the_period_is_not_no():
@@ -63,12 +64,13 @@ def test_a_named_source_is_the_only_relevant_one():
     # The model's positive 311 fact is about something else and is not shown under "No."
     assert past_event_lead(q, PAST, ["nyc311", "floodnet"], TEXTS, zero, 2026) == ("no", ["floodnet"])
     no_sensor = {"floodnet": {"n_sensors": 0, "n_flood_events_3y": 0}}
-    assert past_event_lead(q, PAST, [], TEXTS, no_sensor, 2026) == ("cannot_answer", [])
+    assert past_event_lead(q, PAST, [], TEXTS, no_sensor, 2026) == ("cannot_answer", ["floodnet"])
 
 
 def test_no_ida_mark_nearby_does_not_mean_it_stayed_dry():
     q = "Did the area around 79-01 Broadway, Queens flood during Hurricane Ida?"
-    assert past_event_lead(q, PAST, [], TEXTS, {"ida_hwm": {"n_within_radius": 0}}, 2026) == ("cannot_answer", [])
+    assert past_event_lead(q, PAST, [], TEXTS, {"ida_hwm": {"n_within_radius": 0}}, 2026) == \
+        ("cannot_answer", ["ida_hwm"])
 
 
 def test_other_questions_are_left_to_the_model():
@@ -93,3 +95,26 @@ def test_extractive_answer_uses_the_rule_lead(monkeypatch):
     assert out["grounding"]["answer_lead"] == "yes" and "**Answer.**\nYes. " in out["paragraph"]
     assert out["grounding"]["attempts"] == 1  # no retry: the rule, not the model, set the lead
     assert CANNOT_ANSWER not in out["paragraph"]
+
+
+def test_honest_silence_shows_the_sources_that_answered(monkeypatch):
+    # A sensor question with no sensor in range: the silence line, then FloodNet's own sentence, cited.
+    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
+    q = "Have street flood sensors recorded flooding near 1 East 161st Street, Bronx?"
+    texts = {"floodnet": "No FloodNet sensors deployed within 600 m of this address.",
+             "nyc311": "82 NYC 311 flood-related complaints filed within 200 m in the last 5 years."}
+    docs = [Doc(i, "Live Observer", t, False) for i, t in texts.items()]
+    items = [SimpleNamespace(doc_id=i, pebble_id=i) for i in texts]
+    monkeypatch.setattr(syn, "_documents", lambda state: (docs, items, None))
+    monkeypatch.setattr(syn.evidence, "citations", lambda items: {e.doc_id: {} for e in items})
+    reply = {"answer": {"lead": "no", "facts": ["floodnet"]}}
+    monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (reply, "scripted"))
+    state = {"intent": "single_address", "plan": {"question": q, "focus": PAST},
+             "floodnet": {"n_sensors": 0, "n_flood_events_3y": 0}, "nyc311": HOLLIS["nyc311"]}
+    out = syn.synthesize(state)
+    g = out["grounding"]
+    assert g["answer_lead"] == "cannot_answer" and g["lead_fact"] is None and g["answered"] is False
+    assert (f"**Answer.**\n{CANNOT_ANSWER} No FloodNet sensors deployed within 600 m of this address "
+            "[floodnet].") in out["paragraph"]
+    assert "82 NYC 311" not in out["paragraph"].split("**Answer.**")[1].split("\n\n")[0]
+    assert not g["dropped_claims"]
