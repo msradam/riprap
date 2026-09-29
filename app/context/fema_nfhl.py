@@ -52,6 +52,7 @@ def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> dict[
 
     panel_id: str | None = None
     eff_year: int | None = None
+    eff_date: str | None = None
     try:
         panels = _point_query(_PANEL_LAYER, lat, lon, "FIRM_PAN,EFF_DATE", cache_ttl_s)
         # A point on a panel boundary intersects several panels — cite
@@ -60,7 +61,8 @@ def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> dict[
         if dated:
             latest = max(dated, key=lambda a: a["EFF_DATE"])
             panel_id = latest.get("FIRM_PAN")
-            eff_year = datetime.fromtimestamp(latest["EFF_DATE"] / 1000, UTC).year
+            eff = datetime.fromtimestamp(latest["EFF_DATE"] / 1000, UTC)
+            eff_year, eff_date = eff.year, eff.date().isoformat()
     except httpx.HTTPError:
         pass  # zone still citable; narrative falls back to zone-only
 
@@ -78,5 +80,6 @@ def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> dict[
         "sfha": sfha,
         "firm_panel": panel_id,
         "effective_year": eff_year,
+        "effective_date": eff_date,  # the FIRM panel's; the citation's vintage
         "narrative": "".join(bits),
     }

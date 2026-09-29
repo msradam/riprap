@@ -40,6 +40,8 @@ provenance:
   license: U.S. Public Domain
   doc_id: fema_nfhl
   citation: FEMA NFHL effective flood-zone polygon and FIRM panel intersecting the address point.
+  # The citation's vintage is the FIRM panel's effective date, not the read time.
+  date_modified_field: effective_date
 
 narration:
   short: FEMA National Flood Hazard Layer effective flood zone at this address.

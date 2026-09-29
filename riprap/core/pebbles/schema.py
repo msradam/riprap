@@ -47,6 +47,9 @@ class Provenance(BaseModel):
     retrieved_at: Vintage | None = None
     citation: str | None = None
     doc_id: str | None = None  # short slug used by RAG / citation chips
+    # A value field holding this reading's own vintage, which then replaces
+    # date_modified in the citation (FEMA NFHL: the FIRM panel's effective date).
+    date_modified_field: str | None = None
 
 
 class Narration(BaseModel):

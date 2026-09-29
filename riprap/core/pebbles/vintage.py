@@ -71,12 +71,17 @@ def resolve(prov: Provenance, *, fetched: bool = True) -> dict[str, str | None]:
 
 
 def citation(manifest, *, fetched: bool = True, doc_id: str | None = None,
-             title: str | None = None) -> dict:
+             title: str | None = None, value: dict | None = None) -> dict:
     """The citation record for one pebble, in the shape the frontend
     `Citation` type and MCP clients read. `vintage` is the display string:
-    the source's date_modified, else when our copy was retrieved."""
+    the source's date_modified, else when our copy was retrieved. With the
+    pebble's `value`, a manifest naming `date_modified_field` takes the
+    source's vintage from that field (a FIRM panel's effective date)."""
     prov = manifest.provenance
     v = resolve(prov, fetched=fetched)
+    field = prov.date_modified_field
+    if field and isinstance(value, dict) and value.get(field):
+        v["date_modified"] = str(value[field])
     vintage = v["date_modified"] or (f"retrieved {v['retrieved_at']}" if v["retrieved_at"] else None)
     return {
         "doc_id": doc_id or prov.doc_id or manifest.id,

@@ -36,6 +36,7 @@ class Evidence:
     text: str  # plain sentence(s), no citation markers
     maturity: str
     manifest: Any
+    value: Any = None  # the pebble value the text was filled from
 
 
 def deployment_root(deployment: str | None) -> Path:
@@ -139,7 +140,7 @@ def collect(state, stones: StoneRegistry, registry: Registry) -> list[Evidence]:
             out.append(Evidence(
                 doc_id=p.manifest.provenance.doc_id or p.id, pebble_id=p.id,
                 stone_id=p.stone, text=text, maturity=p.manifest.maturity,
-                manifest=p.manifest,
+                manifest=p.manifest, value=state.get(p.id),
             ))
     return out
 
@@ -170,7 +171,8 @@ def citations(items: list[Evidence]) -> dict[str, dict]:
         if e.doc_id in out:
             continue
         title = e.text.split(":", 1)[0] if e.doc_id.startswith("rag_") else None
-        out[e.doc_id] = citation(e.manifest, doc_id=e.doc_id, title=title)
+        out[e.doc_id] = citation(e.manifest, doc_id=e.doc_id, title=title,
+                                 value=e.value if isinstance(e.value, dict) else None)
     return out
 
 
