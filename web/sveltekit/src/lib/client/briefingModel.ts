@@ -223,6 +223,34 @@ export function evidenceGroups(cards: Card[], cited: string[], firstLabel = 'Beh
   return groups;
 }
 
+/** Citation numbers by first appearance on the page: `order` is every
+ *  doc id the page cites, top to bottom. Sources never cited follow in
+ *  their existing order. Ids and anchors (`cite-{docId}`) do not change. */
+export function numberByAppearance(citations: Record<string, Citation>, order: string[]): Record<string, Citation> {
+  const first = [...new Set(order)].filter((id) => citations[id]);
+  const rest = Object.values(citations)
+    .sort((a, b) => a.n - b.n)
+    .map((c) => c.id)
+    .filter((id) => !first.includes(id));
+  return Object.fromEntries([...first, ...rest].map((id, i) => [id, { ...citations[id], n: i + 1 }]));
+}
+
+/** Several marks on one claim ("[a][b][c]": the claim part, then empty
+ *  cited parts) read in ascending number. */
+export function sortMarks(parts: ClaimPart[], citations: Record<string, Citation>): ClaimPart[] {
+  const out = parts.map((p) => ({ ...p }));
+  const n = (p: Pick<ClaimPart, 'cite'>) => (p.cite && citations[p.cite]?.n) || Infinity;
+  for (let i = 0; i < out.length; i++) {
+    if (!out[i].cite) continue;
+    let j = i + 1;
+    while (j < out.length && out[j].cite && out[j].text === '') j++;
+    const marks = out.slice(i, j).map(({ cite, tier }) => ({ cite, tier })).sort((a, b) => n(a) - n(b));
+    marks.forEach((m, k) => Object.assign(out[i + k], m));
+    i = j - 1;
+  }
+  return out;
+}
+
 function flatten(ms: StoneTrace['members']): StoneTrace['members'] {
   return ms.flatMap((m) => (m.children ? [m, ...flatten(m.children)] : [m]));
 }
@@ -279,23 +307,22 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     : [];
   const refusal = refusalParas.length ? splitSentence(refusalParas[0]) : null;
   const first = splitLead(leadParas[0] ?? []);
-  const answer = refusal
+  const answer0 = refusal
     ? [refusal.parts, ...refusalParas.slice(1)].filter((p) => p.length)
     : leadParas.length ? [first.parts, ...leadParas.slice(1)] : [];
   const leadWord = refusal ? null : first.word;
   // A question's answer leads with its key sentence; the rest follows,
   // one size smaller, as support. Place briefings keep their In brief.
-  const keyed = question && !refusal ? keySentence(answer, g?.lead_fact) : null;
-  const answerParas = keyed ? [keyed.key, ...keyed.rest] : answer;
+  const keyed = question && !refusal ? keySentence(answer0, g?.lead_fact) : null;
+  const answerParas = keyed ? [keyed.key, ...keyed.rest] : answer0;
 
   // "Checks run: ..." closes the Out of scope note; it is its own line here.
   const outParas = sections(split.outOfScope).flatMap((s) => s.paras);
   const checks = outParas.find((p) => text(p).startsWith('Checks run'));
-  const outOfScope = outParas.filter((p) => p !== checks);
-  const scope = sections(split.scope).flatMap((s) => s.paras);
-  const body = refusal ? [] : sections(split.body).map((s) => ({ ...s, label: stoneHead(s.label) }));
+  const outOfScope0 = outParas.filter((p) => p !== checks);
+  const scope0 = sections(split.scope).flatMap((s) => s.paras);
+  const body0 = refusal ? [] : sections(split.body).map((s) => ({ ...s, label: stoneHead(s.label) }));
 
-  const citations: Citation[] = Object.values(run.briefing.citations).sort((a, b) => a.n - b.n);
   const cited = citedIn(answerParas);
   const allCards: Card[] = run.findingsData.cards;
   const cards = allCards.filter((c) => !c.absent && c.variant !== 'meta');
@@ -303,6 +330,24 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   const metaCard = allCards.find((c) => c.variant === 'meta') ?? null;
   const leadLabel = refusal ? 'Response' : lead?.label || (question ? 'Answer' : 'In brief');
   const groups = evidenceGroups(cards, cited, leadLabel === 'In brief' ? 'Behind the summary' : 'Behind the answer');
+
+  // One numbering for the whole page, in reading order: the answer (or In
+  // brief) and its scope note, the evidence table, the report sections,
+  // then the Out of scope note. The print packet reuses it.
+  const raw = run.briefing.citations;
+  const tableIds = groups.flatMap((gr) => gr.cards.flatMap((r) => r.parts ?? [r])).map((c) => citationOf(c, raw)?.id ?? '');
+  const citationsById = numberByAppearance(raw, [
+    ...citedIn([...answerParas, ...scope0]),
+    ...tableIds,
+    ...citedIn(body0.flatMap((s) => s.paras)),
+    ...citedIn(outOfScope0)
+  ]);
+  const citations: Citation[] = Object.values(citationsById).sort((a, b) => a.n - b.n);
+  const sorted = (paras: ClaimPart[][]) => paras.map((p) => sortMarks(p, citationsById));
+  const answer = sorted(answerParas);
+  const scope = sorted(scope0);
+  const body = body0.map((s) => ({ ...s, paras: sorted(s.paras) }));
+  const outOfScope = sorted(outOfScope0);
   const narration = (c: Card) => pebbleManifest.byId[c.id.replace(/^pebble-/, '')]?.narration.short ?? null;
   const findings = new Map(cards.map((c) => [c.id, findingOf(c, narration(c))]));
 
@@ -312,7 +357,7 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   // for it, else in the snapshot stamp.
   const modelListed = !!modelId && models.some((m) => m.repo === modelId);
   const shownText = [
-    ...answerParas, ...scope, ...body.flatMap((s) => s.paras), ...outParas
+    ...answer, ...scope, ...body.flatMap((s) => s.paras), ...outParas
   ].map(text).join(' ') + ' ' + [...findings.values()].map((x) => (x ? `${x.first} ${x.rest}` : '')).join(' ');
 
   return {
@@ -327,7 +372,7 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     lead: refusal ? refusal.sentence : leadWord && /^[A-Z]/.test(leadWord) ? `${leadWord}.` : leadWord,
     /** The lead is a sentence, not a word or a figure. */
     leadIsSentence: !!refusal,
-    answer: answerParas,
+    answer,
     /** The first answer paragraph is the key sentence; the rest support it. */
     keyed: !!keyed,
     scope,
@@ -335,7 +380,8 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     outOfScope,
     checks: checks ? text(checks) : null,
     citations,
-    citationsById: run.briefing.citations,
+    /** The page's citations, numbered by first appearance. */
+    citationsById,
     /** Doc ids the answer cites, in reading order. */
     cited,
     cards,
@@ -387,7 +433,7 @@ export function snapshotFromRun(
     intent: run.plan?.intent ?? null,
     specialists: run.plan?.specialists?.length ?? 0,
     blocks: run.briefing.blocks,
-    citations: run.briefing.citations,
+    citations: m.citationsById,
     generatedAt,
     resolvedPlace: run.resolvedPlace,
     question: m.question,
