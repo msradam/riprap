@@ -66,7 +66,9 @@ def _count(geom_4326) -> tuple[float, float, float]:
 
 
 def _scene_sentence(tags: dict) -> str:
-    return (f"{MODEL} on Sentinel-2 scenes from {_dates(tags.get('post_scene', ''))}, compared with "
+    # The model is named in words; the repository id stays in the source and citation.
+    return (f"a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from "
+            f"{_dates(tags.get('post_scene', ''))}, compared with "
             f"{_dates(tags.get('pre_scene', ''))}")
 
 

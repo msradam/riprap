@@ -45,7 +45,7 @@ def test_point_reports_new_water_nta_share_scenes_and_the_caveat(eo):
     assert 9_000 <= v["new_water_m2_within_radius"] <= 10_000
     assert v["nta_name"] and 0 <= v["nta_frac_new_water"] <= 1  # computed from the raster
     n = v["narrative"]
-    assert n.startswith("Experimental: msradam/Prithvi-EO-2.0-NYC-Pluvial on Sentinel-2 scenes from 2021-09-02, "
+    assert n.startswith("Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, "
                         "compared with 2021-08-13")
     assert "not evidence of no flooding" in n
 
