@@ -60,10 +60,12 @@ def inside_sandy_buffered(lat: float, lon: float, buffer_m: float) -> bool:
 
 def dep_class_buffered(lat: float, lon: float, buffer_m: float,
                         scenario: str) -> tuple[int | None, str | None]:
-    """Max DEP depth class within `buffer_m` of (lat, lon).
+    """Highest DEP Flooding_Category within `buffer_m` of (lat, lon).
 
-    Returns (depth_class, depth_label). Higher class wins on overlap,
-    matching `dep_stormwater.join`'s semantics. A failed join raises.
+    Returns (depth_class, depth_label), from `dep_stormwater.join`. When
+    the buffer touches two classes the higher code is reported; that is a
+    tie-break, not a depth order (class 3 is the future high tide area,
+    not deeper rainfall flooding). A failed join raises.
     """
     import geopandas as gpd
     from shapely.geometry import Point

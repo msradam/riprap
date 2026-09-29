@@ -131,6 +131,7 @@ def summary_for_point(lat: float, lon: float,
     exposure flags read from data/registers/schools.json. The bake
     script runs the buffered point-in-polygon math citywide once;
     per-query work is haversine + dict lookup."""
+    from app.flood_layers.dep_stormwater import class_label
     from app.registers._loader import narrative, nearest_n
     # Every register row in range counts; only the nearest max_schools
     # are listed. None in range is a true zero: the register was read and
@@ -145,11 +146,10 @@ def summary_for_point(lat: float, lon: float,
         microtopo = snap.get("microtopo") or {}
 
         def _depth(scen: str) -> tuple[int | None, str | None]:
-            d = dep.get(scen) or {}
-            cls = d.get("depth_class")
-            lbl = d.get("depth_label")
-            return (int(cls) if cls is not None else None,
-                    str(lbl) if lbl else None)
+            # The label comes from the class, not the register's stored
+            # label, which a bake may have worded differently.
+            cls = (dep.get(scen) or {}).get("depth_class")
+            return (None, None) if cls is None else (int(cls), class_label(int(cls), scen))
 
         d80c, d80l = _depth("dep_extreme_2080")
         d50c, d50l = _depth("dep_moderate_2050")

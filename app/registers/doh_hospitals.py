@@ -122,14 +122,6 @@ def _dep_class(lat: float, lon: float, scenario: str):
     return dep_class_buffered(lat, lon, BUFFER_DOH_HOSPITAL_M, scenario)
 
 
-_DEPTH_LABEL = {
-    0: "outside",
-    1: "Nuisance (>4 in to 1 ft)",
-    2: "Deep & Contiguous (1-4 ft)",
-    3: "Deep Contiguous (>4 ft)",
-}
-
-
 def _exposure_at(lat: float, lon: float) -> tuple[bool, dict]:
     """Use baked Cornerstone rasters for fast per-point exposure lookup.
     Returns (inside_sandy, {scen: (depth_class, depth_label)}). Falls
@@ -145,7 +137,7 @@ def _exposure_at(lat: float, lon: float) -> tuple[bool, dict]:
         deps = {}
         for scen in ("dep_extreme_2080", "dep_moderate_2050"):
             cls = dep_stormwater.join_raster(pt, scen)
-            deps[scen] = (cls, _DEPTH_LABEL.get(cls, "outside"))
+            deps[scen] = (cls, dep_stormwater.class_label(cls, scen))
         return in_sandy, deps
     except Exception:
         log.exception("raster exposure lookup failed; falling back")

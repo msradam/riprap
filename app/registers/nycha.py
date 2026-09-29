@@ -5,7 +5,8 @@ Same pattern as the MTA-entrance specialist, but NYCHA developments are
 
   - % of footprint inside the 2012 Sandy Inundation Zone (empirical)
   - % of footprint inside DEP Extreme-2080 / Moderate-2050 scenarios
-    (modeled, broken out by depth class)
+    (modeled; Flooding_Category 1 and 2 are rainfall depths, 3 the
+    future high tide area)
   - Representative-point elevation, HAND, TWI (proxy)
   - Footprint area (km²)
   - Distance from query point to development boundary
@@ -62,7 +63,7 @@ class DevelopmentFinding:
     rep_elevation_m: float | None
     rep_hand_m: float | None
     inside_sandy_2012: bool
-    dep_extreme_2080_class: int          # 0=outside, 1/2/3 = depth class
+    dep_extreme_2080_class: int          # 0=outside, 1/2/3 = Flooding_Category
     dep_extreme_2080_label: str
     dep_moderate_2050_class: int
     dep_moderate_2050_label: str
@@ -90,19 +91,6 @@ def _load_sandy_2263():
     # changing the footprint at sub-foot precision.
     g["geometry"] = g.geometry.buffer(0)
     return g.geometry.union_all()
-
-
-@lru_cache(maxsize=4)
-def _load_dep_2263(scenario: str):
-    """DEP scenario polygons in EPSG:2263, with depth_class column."""
-    import geopandas as gpd
-    p = DATA / "dep" / f"{scenario}.geojson"
-    if not p.exists():
-        # Fallback to whatever the existing dep_stormwater module loaded.
-        from app.flood_layers import dep_stormwater
-        gdf = dep_stormwater.load(scenario)
-        return gdf.to_crs("EPSG:2263") if gdf.crs is not None else gdf
-    return gpd.read_file(p).to_crs("EPSG:2263")
 
 
 def _haversine_m(lat1, lon1, lat2, lon2) -> float:
@@ -155,53 +143,6 @@ def _developments_near(lat: float, lon: float, radius_m: float):
     return sub, sub.index.tolist()
 
 
-def _overlap_pct(geom_2263, mask_geom_2263) -> float:
-    """% of geom_2263's area that intersects mask_geom_2263."""
-    if mask_geom_2263 is None or mask_geom_2263.is_empty:
-        return 0.0
-    inter = geom_2263.intersection(mask_geom_2263)
-    if inter.is_empty:
-        return 0.0
-    return round(100.0 * inter.area / max(geom_2263.area, 1e-9), 2)
-
-
-def _dep_overlap(geom_2263, scenario: str) -> tuple[float, float]:
-    """Return (pct_any_depth, pct_deep_contiguous) of a polygon's area
-    inside the DEP scenario."""
-    try:
-        gdf = _load_dep_2263(scenario)
-    except Exception:
-        log.exception("DEP load failed for %s", scenario)
-        return 0.0, 0.0
-    if gdf is None or gdf.empty:
-        return 0.0, 0.0
-    # Bbox-prefilter the DEP polygons to those near our development.
-    minx, miny, maxx, maxy = geom_2263.bounds
-    cand = gdf.cx[minx:maxx, miny:maxy]
-    if cand.empty:
-        return 0.0, 0.0
-    # DEP NYC stormwater FGDB uses `Flooding_Category` (int16):
-    # 1=nuisance, 2=shallow, 3=deep contiguous (>4 ft).
-    cat_col = "Flooding_Category" if "Flooding_Category" in cand.columns else None
-    any_geom = cand.geometry.buffer(0).union_all()
-    if cat_col:
-        deep = cand[cand[cat_col] == 3]
-        deep_geom = deep.geometry.buffer(0).union_all() if not deep.empty else None
-    else:
-        deep_geom = None
-    pct_any = _overlap_pct(geom_2263, any_geom)
-    pct_deep = _overlap_pct(geom_2263, deep_geom) if deep_geom is not None else 0.0
-    return pct_any, pct_deep
-
-
-_DEPTH_LABEL = {
-    0: "outside",
-    1: "Nuisance (>4 in to 1 ft)",
-    2: "Deep & Contiguous (1-4 ft)",
-    3: "Deep Contiguous (>4 ft)",
-}
-
-
 def summary_for_point(lat: float, lon: float,
                        radius_m: float = DEFAULT_RADIUS_M,
                        max_developments: int = DEFAULT_MAX_PER_QUERY) -> dict:
@@ -217,6 +158,7 @@ def summary_for_point(lat: float, lon: float,
     "no NYCHA developments at risk within 1 mi" is the honest answer
     for low-exposure queries.
     """
+    from app.flood_layers.dep_stormwater import class_label
     from app.registers._loader import narrative, nearest_n
     # Every register row in range counts; only the nearest
     # max_developments are listed. None in range is a true zero: the
@@ -252,11 +194,11 @@ def summary_for_point(lat: float, lon: float,
             rep_hand_m=round(float(hand), 2) if hand is not None else None,
             inside_sandy_2012=bool(snap.get("sandy")),
             dep_extreme_2080_class=c2080,
-            dep_extreme_2080_label=_DEPTH_LABEL.get(c2080, "outside"),
+            dep_extreme_2080_label=class_label(c2080, "dep_extreme_2080"),
             dep_moderate_2050_class=c2050,
-            dep_moderate_2050_label=_DEPTH_LABEL.get(c2050, "outside"),
+            dep_moderate_2050_label=class_label(c2050, "dep_moderate_2050"),
             dep_moderate_current_class=ccur,
-            dep_moderate_current_label=_DEPTH_LABEL.get(ccur, "outside"),
+            dep_moderate_current_label=class_label(ccur, "dep_moderate_current"),
         ))
 
     n_in_sandy = sum(1 for f in findings if f.inside_sandy_2012)
