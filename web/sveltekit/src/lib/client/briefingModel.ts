@@ -145,6 +145,17 @@ export function keySentence(
   return null;
 }
 
+/** The Answer or In brief section of a parsed briefing, with the lead word
+ *  split off its first paragraph (splitLead). The gallery's standfirsts
+ *  read the same paragraphs, so they pick the key sentence the page sets. */
+export function leadAnswer(blocks: BriefingBlock[]) {
+  const lead = sections(splitBriefing(blocks).lead)[0];
+  const leadParas = lead?.paras ?? [];
+  const first = splitLead(leadParas[0] ?? []);
+  const answer = leadParas.length ? [first.parts, ...leadParas.slice(1)] : [];
+  return { lead, leadParas, first, answer };
+}
+
 /** A refusal's first sentence ("Riprap does not answer this question.")
  *  comes off its first paragraph so it can stand at the answer position. */
 export function splitSentence(parts: ClaimPart[]): { sentence: string; parts: ClaimPart[] } | null {
@@ -297,8 +308,7 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   const isDistrict = !!f?.area_boundary || DISTRICT_RE.test(queryText.trim());
   const kind: Kind = question ? 'question' : isDistrict ? 'district' : 'address';
 
-  const lead = sections(split.lead)[0];
-  const leadParas = lead?.paras ?? [];
+  const { lead, leadParas, first, answer: leadAnswerParas } = leadAnswer(blocks);
   const hasAnswer = blocks.some((b) => b.kind === 'head' && b.label === 'Answer');
   // A refused question has no Answer section, only a statement; it is set
   // where the answer would be, its first sentence as the lead.
@@ -306,10 +316,9 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     ? blocks.flatMap((b) => (b.kind === 'prose' ? [b.parts] : []))
     : [];
   const refusal = refusalParas.length ? splitSentence(refusalParas[0]) : null;
-  const first = splitLead(leadParas[0] ?? []);
   const answer0 = refusal
     ? [refusal.parts, ...refusalParas.slice(1)].filter((p) => p.length)
-    : leadParas.length ? [first.parts, ...leadParas.slice(1)] : [];
+    : leadAnswerParas;
   const leadWord = refusal ? null : first.word;
   // A question's answer leads with its key sentence; the rest follows,
   // one size smaller, as support. Place briefings keep their In brief.

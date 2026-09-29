@@ -1,9 +1,13 @@
 /**
  * Build-time summaries of the static gallery for the landing and the
- * gallery index: each entry's index fields plus its lead sentence and
+ * gallery index: each entry's index fields plus its standfirst and
  * answer mode, so neither page ships the full snapshots.
  */
 import { galleryIndex, loadGalleryEntry, type GalleryIndexEntry } from '$lib/client/gallery';
+import type { FinalResult } from '$lib/client/agentStream';
+import { parseBriefing } from '$lib/client/parseBriefing';
+import { keySentence, leadAnswer } from '$lib/client/briefingModel';
+import { tidy } from '$lib/client/briefingText';
 
 export interface GalleryStory extends GalleryIndexEntry {
   lead: string;
@@ -24,6 +28,18 @@ export function leadSentence(paragraph: string): string {
     : (sentences[0] ?? '');
 }
 
+/** The standfirst: with a lead fact, the lead word and the key sentence
+ *  the page sets large, chosen by the page's own keySentence; otherwise
+ *  leadSentence. */
+export function standfirst(final: Pick<FinalResult, 'paragraph' | 'grounding'>): string {
+  const { first, answer } = leadAnswer(parseBriefing(final.paragraph).blocks);
+  const keyed = keySentence(answer, final.grounding?.lead_fact);
+  if (!keyed) return leadSentence(final.paragraph);
+  const key = tidy(keyed.key).map((p) => p.text).join('').replace(/\s+/g, ' ').trim();
+  // A count lead keeps its sentence whole, so only a word such as "Yes" is added.
+  return first.word && /^[A-Z]/.test(first.word) ? `${first.word}. ${key}` : key;
+}
+
 /** "<model> (<quant>)", the quantization tag dropped from the name when it
  *  repeats it; null for entries made without a language model. */
 export function modelName(e: GalleryIndexEntry): string | null {
@@ -39,7 +55,7 @@ export async function galleryStories(): Promise<GalleryStory[]> {
     const entry = await loadGalleryEntry(e.slug);
     out.push({
       ...e,
-      lead: entry ? leadSentence(entry.final.paragraph) : '',
+      lead: entry ? standfirst(entry.final) : '',
       answerMode: entry?.final.grounding?.answer_mode ?? null
     });
   }

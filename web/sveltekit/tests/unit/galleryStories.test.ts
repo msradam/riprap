@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { leadSentence, modelName } from '$lib/server/galleryStories';
+import { leadSentence, modelName, standfirst } from '$lib/server/galleryStories';
 
 describe('leadSentence', () => {
   it('keeps the sentence after a bare lead word and drops citation markers', () => {
@@ -14,6 +14,25 @@ describe('leadSentence', () => {
 
   it('returns an empty string when there is no answer section', () => {
     expect(leadSentence('No sections here.')).toBe('');
+  });
+});
+
+describe('standfirst', () => {
+  const answer =
+    'Preamble.\n\n**Answer.**\nYes. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this address [ida_hwm]. ' +
+    '82 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years [nyc311].\n\n**Out of scope.** No.';
+
+  it('with a lead fact, sets the lead word before the key sentence the page shows', () => {
+    const lead_fact = { doc_id: 'nyc311', in_lead: false };
+    expect(standfirst({ paragraph: answer, grounding: { lead_fact } as never })).toBe(
+      'Yes. 82 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years.'
+    );
+  });
+
+  it('without a lead fact, falls back to the first sentence', () => {
+    expect(standfirst({ paragraph: answer, grounding: undefined })).toBe(
+      'Yes. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this address.'
+    );
   });
 });
 
