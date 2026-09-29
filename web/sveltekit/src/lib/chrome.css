@@ -79,13 +79,25 @@
   .app-header-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 24px; }
   .app-header-mid { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
   .app-header-query { min-width: 0; width: 100%; max-width: none; }
+  .app-header-mid:empty { display: none; }
 }
 @media (max-width: 720px) {
-  .app-header-inner { grid-template-columns: 1fr; gap: 8px; }
-  /* Room for the deployment tag's second line before it loads, so its
-     arrival (and a longer "not in any deployment" tag) moves nothing. */
-  .app-header-left { min-height: 48px; align-content: flex-start; }
-  .app-header-mid { grid-row: auto; }
-  .app-header-mid, .app-header-right { justify-content: flex-start; }
+  /* The links stay on the first row beside the wordmark; the query, when
+     there is one, takes the second row. */
+  /* The links cell takes the rest: it is a size container, so an auto
+     column would collapse it to zero width. */
+  .app-header-inner { grid-template-columns: auto minmax(0, 1fr); gap: 8px 16px; }
+  .app-header-right { grid-row: 1; grid-column: 2; }
+  .app-header-mid { grid-row: 2; grid-column: 1 / -1; justify-content: flex-start; }
   .app-header-query { min-width: 0; width: 100%; }
+}
+/* Phones: one header row. The context words stay for screen readers. */
+@media (max-width: 479px) {
+  .app-header-inner { padding: 13px 16px; }
+  .app-header-left { min-height: 0; }
+  .app-header-sep { display: none; }
+  .app-header-context {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
 }
