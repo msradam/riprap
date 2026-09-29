@@ -11,7 +11,7 @@ import { citedIn, findingOf, FORECASTS, termsIn } from '$lib/client/briefingText
 import { sourceLists, type PrintSnapshot } from '$lib/stores/briefingState.svelte';
 import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 import { deployment } from '$lib/stores/deployment.svelte';
-import { STONE_META, STONE_ORDER, type Card, type StoneTrace } from '$lib/types/card';
+import { STONE_META, STONE_ORDER, type Card, type ModelLine, type StoneTrace } from '$lib/types/card';
 import type { BriefingBlock, Citation, ClaimPart } from '$lib/types/claim';
 
 export type Kind = 'question' | 'address' | 'district';
@@ -356,6 +356,18 @@ export function runFacts(run: RunState): string[] {
   return facts;
 }
 
+const LOCAL_RE = /\s*(?:on this machine\s*)?\((?:localhost|127\.0\.0\.1):\d+\)/i;
+
+/** A static snapshot names no local endpoint: "Ollama on this machine
+ *  (localhost:11434)" reads "Ollama, run when the snapshot was generated". */
+export function snapshotModels(models: ModelLine[]): ModelLine[] {
+  return models.map((m) => {
+    if (!LOCAL_RE.test(m.where)) return m;
+    const host = m.where.replace(LOCAL_RE, '').trim();
+    return { ...m, where: host ? `${host}, run when the snapshot was generated` : 'Run when the snapshot was generated' };
+  });
+}
+
 export function briefingModel(run: RunState, queryText: string, meta?: SnapshotMeta) {
   const f = run.finalResult;
   const g = f?.grounding;
@@ -422,7 +434,7 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   const narration = (c: Card) => pebbleManifest.byId[c.id.replace(/^pebble-/, '')]?.narration.short ?? null;
   const findings = new Map(cards.map((c) => [c.id, findingOf(c, narration(c))]));
 
-  const models = metaCard?.models ?? [];
+  const models = meta ? snapshotModels(metaCard?.models ?? []) : metaCard?.models ?? [];
   const modelId = g?.model ?? null;
   // The model id is printed once: in the models list when it has a row
   // for it, else in the snapshot stamp.
