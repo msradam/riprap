@@ -670,10 +670,15 @@
     font-size: 13px;
     font-weight: 400;
   }
-  /* An opaque card so the scale text keeps AA contrast over any tile. */
-  .map-frame :global(.maplibregl-ctrl-scale) {
+  /* An opaque card so the scale and attribution text keep AA contrast
+     over any tile; attribution links in Federal Blue. */
+  .map-frame :global(.maplibregl-ctrl-scale),
+  .map-frame :global(.maplibregl-ctrl-attrib) {
     background-color: var(--riprap-surface-card);
     color: var(--ink);
+  }
+  .map-frame :global(.maplibregl-ctrl-attrib a) {
+    color: var(--riprap-text-link);
   }
   .link-badge {
     position: absolute;
