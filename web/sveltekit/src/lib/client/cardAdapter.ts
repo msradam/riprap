@@ -849,9 +849,9 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
     ? explicitVariant
     : KIND_TO_VARIANT[m.display.kind];
   if (variant === null) return null;
-  const tier = m.type === 'model' ? 'modeled'
-             : m.type === 'live'  ? 'empirical'
-             : 'empirical';
+  // The manifest's declared tier is the authority (DEP scenarios are
+  // modeled, 311 is proxy); the type only fills in when none is declared.
+  const tier = m.tier ?? (m.type === 'model' ? 'modeled' : 'empirical');
   const source = shortSource(m.provenance.source_name);
   const vintage = m.provenance.date_modified ?? RIPRAP_VINTAGE;
   const base: Card = {

@@ -16,6 +16,7 @@ import type { ErrorKey } from '$lib/types/states';
 import type { FindingsData } from '$lib/types/card';
 import type { BriefingBlock, Citation } from '$lib/types/claim';
 import { tierForStep } from '$lib/types/tier';
+import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 
 // Mirrors _QUESTION_WORDS in app/planner.py. The heuristic (no-LLM)
 // planner leaves plan.question empty, so the page decides for itself
@@ -53,6 +54,9 @@ export function briefingFromFinal(
       retrieved: c.retrieved_at?.slice(0, 10),
       maturity: c.maturity
     });
+    // The manifest's tier wins over the doc-id heuristic, as on the cards.
+    const tier = pebbleManifest.tierForDoc(docId);
+    if (tier) seed[docId].tier = tier;
   });
   const r = parseBriefing(f.paragraph, seed);
   const citations: Record<string, Citation> = {};

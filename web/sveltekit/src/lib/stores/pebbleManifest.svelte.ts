@@ -187,6 +187,16 @@ class PebbleManifestStore {
     return this.byId[pebbleId];
   }
 
+  /** The manifest's declared tier for a cited doc id (matched on
+   *  provenance.doc_id, then on pebble id), so the evidence table and the
+   *  source notes read one tier. Null when no manifest declares one. */
+  tierForDoc(docId: string): PebbleManifest['tier'] {
+    for (const m of Object.values(this.byId)) {
+      if (m.provenance.doc_id === docId && m.tier) return m.tier;
+    }
+    return this.byId[docId]?.tier ?? null;
+  }
+
   /** Citations[] suitable for Card.cites built from manifest provenance. */
   citationsFor(pebbleId: string): Citation[] {
     const m = this.byId[pebbleId];
