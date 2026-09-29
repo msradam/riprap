@@ -313,24 +313,22 @@
       </div>
     {:else if hasBriefing}
       {#if isPlace && !run.stopped}
-        <div class="brief-place">
+        <!-- Place briefings: In brief, then the evidence and sections, on
+             the left; the right column holds the rail (notes, method
+             lines, terms, scope note) and under it the sticky map, so
+             neither column leaves an empty quadrant. Source order is
+             reading order at every width: the summary, its notes and
+             method lines, the map, then the evidence and sections. -->
+        <div class="brief-grid">
           {@render answerBlock()}
-          <!-- Source order is reading order at every width: the notes and
-               method lines, the map, then the evidence and sections. -->
-          <div class="brief-grid">
-            <div class="brief-main-top">
-              {@render railBlock()}
-              {@render afterBlock()}
-            </div>
-            {#if showMap}
-              <div class="brief-side">
-                <div class="brief-sticky">{@render map()}</div>
-              </div>
-            {/if}
-            <div class="brief-main">
-              {@render evidence()}
-              {@render sections()}
-            </div>
+          <div class="brief-side">
+            {@render railBlock()}
+            {@render afterBlock()}
+            {#if showMap}<div class="brief-sticky">{@render map()}</div>{/if}
+          </div>
+          <div class="brief-main">
+            {@render evidence()}
+            {@render sections()}
           </div>
         </div>
       {:else}
@@ -405,9 +403,6 @@
     font-family: var(--font-sans);
     font-size: 17px;
     line-height: 1.55;
-  }
-  .brief.is-place {
-    max-width: 1344px;
   }
   .brief :global(a) {
     color: var(--riprap-text-link);
@@ -628,20 +623,21 @@
     max-width: none;
   }
 
-  /* Place briefings: notes, evidence and sections left, the map sticky
-     right. The map spans both rows; the flexible second row absorbs its
-     height, so the notes row never grows to match it. */
+  /* Place briefings: In brief, evidence and sections left; the rail and
+     the sticky map right. The right column spans both rows; the flexible
+     second row absorbs its height, so the evidence starts right under
+     In brief whatever the rail's length. */
   .brief-grid {
     display: grid;
     grid-template-columns: minmax(0, 58fr) minmax(0, 42fr);
     grid-template-rows: auto 1fr;
-    grid-template-areas: 'top side' 'main side';
-    column-gap: 48px;
+    grid-template-areas: 'answer side' 'main side';
+    column-gap: var(--col-gap);
     align-items: start;
+    margin-top: 8px;
   }
-  .brief-main-top {
-    grid-area: top;
-    min-width: 0;
+  .brief-grid > .brief-answer {
+    grid-area: answer;
   }
   .brief-main {
     grid-area: main;
@@ -651,9 +647,12 @@
     grid-area: side;
     align-self: stretch;
     min-width: 0;
-    padding-top: 4px;
+  }
+  .brief-side .brief-after {
+    margin-top: 16px;
   }
   .brief-sticky {
+    margin-top: 32px;
     position: sticky;
     top: var(--sticky-top);
     max-height: calc(100vh - var(--sticky-top) - 16px);
@@ -812,27 +811,7 @@
     margin-top: 8px;
   }
 
-  /* Place briefings: the summary on top, then the notes, method lines,
-     evidence and sections beside the sticky map. */
-  .is-place .brief-answer {
-    max-width: var(--text-w);
-    margin-top: 12px;
-  }
-  .is-place .brief-rail {
-    padding-top: 0;
-  }
-  .is-place .brief-rail :global(.source-notes) {
-    columns: 2;
-    column-gap: 32px;
-  }
-  .is-place .brief-rail :global(.source-note) {
-    break-inside: avoid;
-  }
-
   @media (max-width: 1099px) {
-    .is-place .brief-rail :global(.source-notes) {
-      columns: auto;
-    }
     .brief-top {
       grid-template-columns: minmax(0, 1fr);
       max-width: var(--text-w);
@@ -843,16 +822,16 @@
       grid-row: auto;
       padding-top: 4px;
     }
-    /* One column, in source order: the summary's notes and method lines,
-       then the map, then the evidence and sections. */
+    /* One column, in source order: the summary, its endnotes and method
+       lines, the map, then the evidence and sections. */
     .brief-grid {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: none;
-      grid-template-areas: 'top' 'side' 'main';
+      grid-template-areas: 'answer' 'side' 'main';
       max-width: var(--text-w);
     }
-    .brief-side {
-      padding-top: 32px;
+    .brief-side .brief-after {
+      margin-top: 4px;
     }
     .brief-end-grid {
       grid-template-columns: minmax(0, 1fr);
