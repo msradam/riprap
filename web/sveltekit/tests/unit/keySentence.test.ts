@@ -25,6 +25,9 @@ describe('keySentence', () => {
   it('in_lead: the lead sentence before "From the sources consulted:", with the total as support', () => {
     const k = keySentence(answerOf(QN12), { doc_id: 'nyc311_nta', in_lead: true })!;
     expect(words(k.key)).toBe('533 street flooding complaints, counting the 311 descriptors "Street Flooding (SJ)" and "Flooding on Street".');
+    // The count comes from the lead fact's source: the key carries its mark, after the full stop.
+    expect(cites([k.key])).toEqual(['nyc311_nta']);
+    expect(k.key.at(-1)).toEqual({ text: '', cite: 'nyc311_nta' });
     expect(k.rest).toHaveLength(1);
     expect(words(k.rest[0])).toMatch(/^From the sources consulted: 4273 NYC 311/);
     expect(cites(k.rest)).toEqual(['nyc311_nta']);

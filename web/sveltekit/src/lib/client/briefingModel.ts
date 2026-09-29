@@ -115,9 +115,10 @@ const joinSentences = (ss: ClaimPart[][]) => ss.flatMap((s, i) => (i ? [{ text: 
 
 /** The answer's key sentence, taken out so it can lead at the answer size,
  *  and the rest of the answer as support. `in_lead`: the backend's lead
- *  sentence, before "From the sources consulted:". Otherwise the first
- *  sentence citing `doc_id`. Null when there is no lead fact or the
- *  sentence is not found, so nothing is singled out. */
+ *  sentence, before "From the sources consulted:"; its count comes from
+ *  `doc_id`, so it carries that citation mark (no words change).
+ *  Otherwise the first sentence citing `doc_id`. Null when there is no
+ *  lead fact or the sentence is not found, so nothing is singled out. */
 export function keySentence(
   answer: ClaimPart[][],
   fact: { doc_id: string; in_lead: boolean } | null | undefined
@@ -129,8 +130,12 @@ export function keySentence(
     if (k < 0) return null;
     const at = first[k].text.indexOf(FACTS_PHRASE);
     const head = first[k].text.slice(0, at).trimEnd();
-    const key = [...first.slice(0, k), ...(head ? [{ ...first[k], text: head, cite: undefined }] : [])];
+    const key = [...first.slice(0, k), ...(head ? [{ ...first[k], text: head, cite: undefined }] : [])]
+      .filter((p) => p.text.trim() || p.cite);
     if (!key.some((p) => p.text.trim())) return null;
+    // The mark sits right after the closing punctuation, with no space.
+    key[key.length - 1] = { ...key[key.length - 1], text: key[key.length - 1].text.trimEnd() };
+    key.push({ text: '', cite: fact.doc_id });
     const tail = [{ ...first[k], text: first[k].text.slice(at) }, ...first.slice(k + 1)];
     return { key, rest: [tail, ...others] };
   }
