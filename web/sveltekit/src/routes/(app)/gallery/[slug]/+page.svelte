@@ -48,7 +48,8 @@
     margin: 0;
   }
   .snapshot-actions a {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     min-height: 24px;
   }
   .snapshot-print {

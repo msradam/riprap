@@ -10,16 +10,15 @@
   interface Props {
     citations: Citation[];
     label: string;
-    class?: string;
   }
-  let { citations, label, class: className }: Props = $props();
+  let { citations, label }: Props = $props();
 </script>
 
 {#snippet asOf(v: string)}
   {@const a = asOfPhrase(v)}{#if a.date}{a.label} <span class="data">{a.date}</span>{:else}{a.label}{/if}
 {/snippet}
 
-<ol class={['source-notes', className]} aria-label={label}>
+<ol class="source-notes" aria-label={label}>
   {#each citations as c (c.id)}
     <!-- tabindex: an inline citation moves focus here, so the next Tab
          reaches this note's source link. -->
@@ -49,6 +48,7 @@
     color: var(--ink-secondary);
   }
   .source-note {
+    max-width: 54ch;
     position: relative;
     padding: 4px 4px 6px 28px;
     margin-bottom: 8px;

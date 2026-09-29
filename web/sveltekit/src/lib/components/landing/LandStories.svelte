@@ -57,7 +57,7 @@
 
 <style>
   .stories {
-    margin-top: 80px;
+    margin-top: 96px;
   }
   h2 {
     margin: 0;
@@ -86,11 +86,11 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .stories-top {
-    gap: 40px 56px;
-    margin-bottom: 56px;
+    gap: 48px;
+    margin-bottom: 48px;
   }
   .stories-rest {
-    gap: 36px 56px;
+    gap: 32px 48px;
   }
   h3 {
     margin: 0;
@@ -138,7 +138,7 @@
   }
   @media (max-width: 720px) {
     .stories {
-      margin-top: 56px;
+      margin-top: 48px;
     }
     ul {
       grid-template-columns: minmax(0, 1fr);

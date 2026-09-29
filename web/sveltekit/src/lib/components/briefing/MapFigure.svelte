@@ -8,9 +8,8 @@
    *  keyboard list. The frame height comes from `--map-h` on an ancestor. */
   interface Props {
     run: RunState;
-    class?: string;
   }
-  let { run, class: className }: Props = $props();
+  let { run }: Props = $props();
 
   type TierKey = 'empirical' | 'modeled' | 'synthetic' | 'proxy';
   const LAYERS: { key: TierKey; label: string }[] = [
@@ -27,7 +26,7 @@
   let shown = $derived(LAYERS.filter((l) => run.mapFeatureCounts[l.key] > 0));
 </script>
 
-<div class={['map-figure', className]}>
+<div class="map-figure">
   <a class="map-skip" href="#after-map">Skip the map</a>
   <figure class="map-figure-fig">
     <div class="map-figure-frame">

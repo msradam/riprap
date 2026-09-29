@@ -114,18 +114,18 @@
     line-height: 1.45;
     color: var(--ink-secondary);
   }
+  /* One h2 style on every page: Headline. */
   .error-card-headline {
     margin: 0 0 8px;
     max-width: 30ch;
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
+    line-height: 1.25;
     text-wrap: balance;
   }
   .error-card-body {
     margin: 0 0 8px;
-    max-width: 60ch;
+    max-width: 54ch;
     font-size: 17px;
     line-height: 1.55;
   }
@@ -150,10 +150,5 @@
   .error-card a:focus-visible {
     outline: 3px solid var(--riprap-focus);
     outline-offset: 2px;
-  }
-  @media (max-width: 640px) {
-    .error-card-headline {
-      font-size: 24px;
-    }
   }
 </style>

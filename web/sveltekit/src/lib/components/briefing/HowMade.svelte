@@ -66,7 +66,8 @@
     font-size: 14px;
     line-height: 1.45;
     color: var(--ink-secondary);
-    scroll-margin-top: 80px;
+    /* The briefing sets the offset per width; the phone header is taller. */
+    scroll-margin-top: var(--scroll-offset, 80px);
   }
   summary {
     min-height: 24px;

@@ -284,15 +284,19 @@
       {#if isPlace && !run.stopped}
         <div class="brief-place">
           {@render answerBlock()}
+          <!-- Source order is reading order at every width: the notes and
+               method lines, the map, then the evidence and sections. -->
           <div class="brief-grid">
+            <div class="brief-main-top">
+              {@render railBlock()}
+              {@render afterBlock()}
+            </div>
             {#if showMap}
               <div class="brief-side">
                 <div class="brief-sticky">{@render map()}</div>
               </div>
             {/if}
             <div class="brief-main">
-              {@render railBlock()}
-              {@render afterBlock()}
               {@render evidence()}
               {@render sections()}
             </div>
@@ -357,7 +361,7 @@
   .brief {
     --text-w: 680px;
     --rail-w: 280px;
-    --col-gap: 56px;
+    --col-gap: 48px;
     --sticky-top: 68px;
     --scroll-offset: 72px;
     max-width: calc(var(--text-w) + var(--rail-w) + var(--col-gap) + 64px);
@@ -416,9 +420,16 @@
   .brief-meta-label {
     font-weight: 600;
   }
-  .brief-meta a,
-  .brief-jumps a {
+  /* The meta link's text sits at the top of its 24px box, level with the
+     plain text beside it. The jump links centre theirs, as the gallery's
+     print button beside them does, so that row shares one baseline. */
+  .brief-meta a {
     display: inline-block;
+    min-height: 24px;
+  }
+  .brief-jumps a {
+    display: inline-flex;
+    align-items: center;
     min-height: 24px;
   }
   .brief-tools {
@@ -444,7 +455,7 @@
     grid-template-rows: auto 1fr;
     column-gap: var(--col-gap);
     align-items: start;
-    margin-top: 6px;
+    margin-top: 8px;
   }
   .brief-answer,
   .brief-after {
@@ -535,7 +546,7 @@
     line-height: 1.3;
   }
   .brief-block {
-    margin-top: 40px;
+    margin-top: 48px;
   }
 
   /* Figure 1 on question briefings, at the text width */
@@ -553,13 +564,20 @@
     max-width: none;
   }
 
-  /* Place briefings: evidence and sections left, the map sticky right */
+  /* Place briefings: notes, evidence and sections left, the map sticky
+     right. The map spans both rows; the flexible second row absorbs its
+     height, so the notes row never grows to match it. */
   .brief-grid {
     display: grid;
     grid-template-columns: minmax(0, 58fr) minmax(0, 42fr);
-    grid-template-areas: 'main side';
-    column-gap: 40px;
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 'top side' 'main side';
+    column-gap: 48px;
     align-items: start;
+  }
+  .brief-main-top {
+    grid-area: top;
+    min-width: 0;
   }
   .brief-main {
     grid-area: main;
@@ -613,7 +631,7 @@
   }
 
   .brief-end {
-    margin-top: 40px;
+    margin-top: 48px;
   }
   .brief-cited summary {
     min-height: 24px;
@@ -715,7 +733,7 @@
      evidence and sections beside the sticky map. */
   .is-place .brief-answer {
     max-width: var(--text-w);
-    margin-top: 10px;
+    margin-top: 12px;
   }
   .is-place .brief-rail {
     padding-top: 0;
@@ -742,25 +760,15 @@
       grid-row: auto;
       padding-top: 4px;
     }
-    /* One column: the summary's notes and method lines, then the map,
-       then the evidence and sections. */
+    /* One column, in source order: the summary's notes and method lines,
+       then the map, then the evidence and sections. */
     .brief-grid {
       grid-template-columns: minmax(0, 1fr);
-      grid-template-areas: none;
+      grid-template-rows: none;
+      grid-template-areas: 'top' 'side' 'main';
       max-width: var(--text-w);
     }
-    .brief-main {
-      display: contents;
-    }
-    .brief-grid :global(.brief-rail) {
-      order: -3;
-    }
-    .brief-grid :global(.brief-after) {
-      order: -2;
-    }
     .brief-side {
-      order: -1;
-      grid-area: auto;
       padding-top: 32px;
     }
     .brief-end-grid {
@@ -793,7 +801,7 @@
       --map-h: 300px;
     }
     .brief-block {
-      margin-top: 40px;
+      margin-top: 32px;
     }
   }
 </style>

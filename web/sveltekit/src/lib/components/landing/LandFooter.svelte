@@ -25,17 +25,17 @@
 
 <style>
   .land-footer {
-    margin-top: 80px;
+    margin-top: 96px;
     border-top: 1px solid var(--rule-soft);
   }
   .land-footer-inner {
     max-width: 1040px;
     margin: 0 auto;
-    padding: 24px 32px 40px;
+    padding: 24px 32px 48px;
   }
   p {
     margin: 0 0 8px;
-    max-width: 75ch;
+    max-width: 54ch;
     font-size: 14px;
     line-height: 1.5;
     color: var(--ink-secondary);
@@ -56,7 +56,7 @@
   }
   @media (max-width: 640px) {
     .land-footer {
-      margin-top: 56px;
+      margin-top: 48px;
     }
     .land-footer-inner {
       padding: 20px 16px 32px;

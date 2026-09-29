@@ -35,74 +35,87 @@
   {#if lead}<p class="gallery-lead">{lead}</p>{/if}
 {/snippet}
 
-<section class="hero-band">
-  <div class="hero-band-inner">
-    <section class="app-region app-region-brief" aria-labelledby="gallery-h1">
-      <p class="gallery-kind">Gallery</p>
-      <h1 id="gallery-h1" class="brief-h1">Precomputed briefings</h1>
-      <p class="gallery-note">
-        Snapshots generated ahead of time and saved as static pages. Opening one does not contact the
-        Riprap backend, so the data is as of the generation date shown.
-      </p>
+<div class="gallery-page">
+  <section aria-labelledby="gallery-h1">
+    <p class="gallery-kind">Gallery</p>
+    <h1 id="gallery-h1" class="gallery-title">Precomputed briefings</h1>
+    <p class="gallery-note">
+      Snapshots generated ahead of time and saved as static pages. Opening one does not contact the
+      Riprap backend, so the data is as of the generation date shown.
+    </p>
 
-      <h2 class="gallery-group">Questions</h2>
-      <p class="gallery-note">
-        {#if sharedModel}
-          Each question briefing was made with the language model
-          <span class="gallery-model">{sharedModel}</span>.
-        {/if}
-        {#if sharedNote}{sharedNote}{/if}
-      </p>
-      <ul class="gallery-list">
-        {#each questions as e (e.slug)}
-          <li class="gallery-item">
-            {@render row(
-              e.neighborhood,
-              formatGeneratedAt(e.generated_at),
-              `${resolve('/(app)/gallery/[slug]', { slug: e.slug })}/`,
-              e.question ?? '',
-              e.lead
-            )}
-            {#if !sharedModel || !sharedNote}
-              <p class="gallery-meta">
-                {#if !sharedModel}
-                  {#if e.modelName}Language model <span class="gallery-model">{e.modelName}</span>.{:else}{modeLabel(e.mode)}.{/if}
-                {/if}
-                {#if !sharedNote && e.modelName}{note(e.answerMode)}{/if}
-              </p>
-            {/if}
-          </li>
-        {/each}
-      </ul>
+    <h2 class="gallery-group">Questions</h2>
+    <p class="gallery-note">
+      {#if sharedModel}
+        Each question briefing was made with the language model
+        <span class="gallery-model">{sharedModel}</span>.
+      {/if}
+      {#if sharedNote}{sharedNote}{/if}
+    </p>
+    <ul class="gallery-list">
+      {#each questions as e (e.slug)}
+        <li class="gallery-item">
+          {@render row(
+            e.neighborhood,
+            formatGeneratedAt(e.generated_at),
+            `${resolve('/(app)/gallery/[slug]', { slug: e.slug })}/`,
+            e.question ?? '',
+            e.lead
+          )}
+          {#if !sharedModel || !sharedNote}
+            <p class="gallery-meta">
+              {#if !sharedModel}
+                {#if e.modelName}Language model <span class="gallery-model">{e.modelName}</span>.{:else}{modeLabel(e.mode)}.{/if}
+              {/if}
+              {#if !sharedNote && e.modelName}{note(e.answerMode)}{/if}
+            </p>
+          {/if}
+        </li>
+      {/each}
+    </ul>
 
-      <h2 class="gallery-group">Addresses</h2>
-      <p class="gallery-note">Evidence briefings built from cited source values, with no language model.</p>
-      <ul class="gallery-list">
-        {#each addresses as e (e.slug)}
-          <li class="gallery-item">
-            {@render row(
-              e.neighborhood,
-              formatGeneratedAt(e.generated_at),
-              `${resolve('/(app)/gallery/[slug]', { slug: e.slug })}/`,
-              e.address,
-              e.lead
-            )}
-          </li>
-        {/each}
-      </ul>
-    </section>
-  </div>
-</section>
+    <h2 class="gallery-group">Addresses</h2>
+    <p class="gallery-note">Evidence briefings built from cited source values, with no language model.</p>
+    <ul class="gallery-list">
+      {#each addresses as e (e.slug)}
+        <li class="gallery-item">
+          {@render row(
+            e.neighborhood,
+            formatGeneratedAt(e.generated_at),
+            `${resolve('/(app)/gallery/[slug]', { slug: e.slug })}/`,
+            e.address,
+            e.lead
+          )}
+        </li>
+      {/each}
+    </ul>
+  </section>
+</div>
 
 <style>
+  .gallery-page {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 32px 28px 64px;
+  }
+  /* Kind line and Title, as on a briefing. */
   .gallery-kind {
-    margin: 0 0 8px;
-    font-size: 15px;
+    margin: 0 0 2px;
+    font-size: 14px;
+    line-height: 1.45;
     color: var(--ink-secondary);
   }
+  .gallery-title {
+    margin: 0 0 16px;
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+  /* 54ch of Sofia Sans is about 75 characters of prose. */
   .gallery-note {
     margin: 0 0 12px;
-    max-width: 68ch;
+    max-width: 54ch;
     font-size: 15px;
     line-height: 1.5;
     color: var(--ink-secondary);
@@ -118,7 +131,7 @@
     }
   }
   .gallery-group {
-    margin: 40px 0 4px;
+    margin: 48px 0 4px;
     font-size: 22px;
     line-height: 1.25;
     font-weight: 600;
@@ -172,12 +185,20 @@
   .gallery-lead,
   .gallery-meta {
     margin: 2px 0 0;
-    max-width: 68ch;
+    max-width: 54ch;
     font-size: 14px;
     line-height: 1.45;
   }
   .gallery-meta {
     color: var(--ink-secondary);
+  }
+  @media (max-width: 720px) {
+    .gallery-page {
+      padding: 20px 16px 32px;
+    }
+    .gallery-title {
+      font-size: 26px;
+    }
   }
   @media (max-width: 640px) {
     .gallery-item {

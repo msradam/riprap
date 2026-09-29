@@ -205,15 +205,6 @@ export const AREA_BOUNDARY_LEGEND = {
   source: 'NYC Department of City Planning'
 };
 
-/** Legend wording for map layers whose manifest title is too long for the
- *  layers panel. `source` is the sub-note under the label. */
-export const LAYER_LEGEND_OVERRIDES: Record<string, { label: string; source: string }> = {
-  prithvi_water: {
-    label: 'New surface water after Ida (Prithvi-EO, experimental)',
-    source: 'Sentinel-2, 2021-09-02 vs 2021-08-13'
-  }
-};
-
 /** The area outline from a neighbourhood or district run, if the final
  *  payload carries a usable Polygon or MultiPolygon. */
 export function areaBoundaryGeometry(

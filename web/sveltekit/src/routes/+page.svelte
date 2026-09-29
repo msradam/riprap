@@ -78,7 +78,7 @@
   }
   .land-byod {
     margin-top: 64px;
-    max-width: 68ch;
+    max-width: 60ch;
   }
   .land-byod h2 {
     margin: 0 0 8px;

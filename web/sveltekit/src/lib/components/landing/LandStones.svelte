@@ -29,8 +29,8 @@
 
 <style>
   .land-section {
-    margin-top: 80px;
-    max-width: 68ch;
+    margin-top: 64px;
+    max-width: 60ch;
   }
   h2 {
     margin: 0 0 12px;
@@ -65,7 +65,7 @@
   }
   @media (max-width: 640px) {
     .land-section {
-      margin-top: 56px;
+      margin-top: 48px;
     }
   }
 </style>

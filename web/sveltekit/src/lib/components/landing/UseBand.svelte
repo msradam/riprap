@@ -19,7 +19,7 @@
 <style>
   .land-section {
     margin-top: 64px;
-    max-width: 68ch;
+    max-width: 60ch;
   }
   h2 {
     margin: 0 0 8px;

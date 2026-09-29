@@ -153,7 +153,7 @@
 
     {#if answerCites.length}
       <section class="print-notes" aria-labelledby="print-notes-h">
-        <h2 id="print-notes-h" class="print-h3">Sources for the {summary}</h2>
+        <h3 id="print-notes-h" class="print-h3">Sources for the {summary}</h3>
         <SourceNotes citations={answerCites} label="Sources for the {summary}" />
       </section>
     {/if}
@@ -278,7 +278,7 @@
   }
 
   .print-answer {
-    margin-top: 20px;
+    margin-top: 24px;
   }
   .print-lead {
     margin: 0 0 6px;
@@ -289,21 +289,21 @@
     font-variant-numeric: tabular-nums;
   }
   .print-doc :global(.print-answer-p) {
-    margin: 0 0 10px;
-    max-width: 64ch;
+    margin: 0 0 12px;
+    max-width: 54ch;
     font-size: 18px;
     line-height: 1.5;
   }
   .print-doc :global(.print-quiet) {
     margin: 0 0 6px;
-    max-width: 75ch;
+    max-width: 54ch;
     font-size: 14px;
     line-height: 1.45;
     color: var(--ink-secondary);
   }
   .print-doc :global(.print-body) {
-    margin: 0 0 10px;
-    max-width: 68ch;
+    margin: 0 0 12px;
+    max-width: 54ch;
     font-size: 15px;
   }
   .print-doc :global(.inline-cite) {
@@ -335,7 +335,7 @@
     break-after: avoid;
   }
   .print-h3 {
-    margin: 20px 0 6px;
+    margin: 24px 0 8px;
     font-size: 15px;
     font-weight: 600;
     line-height: 1.3;
@@ -348,7 +348,7 @@
     margin-top: 32px;
   }
   .print-rest > .print-block:first-child {
-    margin-top: 40px;
+    margin-top: 48px;
   }
   .print-citations :global(.source-list) {
     columns: 2;
@@ -360,7 +360,7 @@
 
   .print-foot {
     margin-top: 32px;
-    max-width: 75ch;
+    max-width: 54ch;
     font-size: 13px;
     line-height: 1.45;
     color: var(--ink-secondary);

@@ -38,9 +38,10 @@
 </footer>
 
 <style>
-  /* Measure: no footer line runs past 75 characters. */
+  /* Measure: no footer line runs past 75 characters (54ch of Sofia Sans). */
+  .app-footer-guard,
   .app-footer-build,
   .app-footer-credits {
-    max-width: 75ch;
+    max-width: 54ch;
   }
 </style>

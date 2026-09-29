@@ -61,7 +61,7 @@
 /* Footer */
 .app-footer { background: var(--ink); color: var(--paper); }
 .app-footer-inner { max-width: 1600px; margin: 0 auto; padding: 32px 28px; display: flex; flex-direction: column; gap: 12px; }
-.app-footer-guard { font-size: 14px; line-height: 1.5; max-width: 70ch; margin: 0; }
+.app-footer-guard { font-size: 14px; line-height: 1.5; margin: 0; }
 /* Footer text on ink: links in paper with an underline (17:1), secondary
    lines in slate-450 (6.8:1). Blue on ink was 2.65:1. */
 .app-footer-guard a { color: var(--paper); text-decoration: underline; text-underline-offset: 2px; }

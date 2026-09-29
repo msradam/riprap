@@ -63,10 +63,6 @@ export async function fetchDepNta(
   return fetchFc(`/api/layers/dep_clipped?code=${encodeURIComponent(code)}&scenario=${scenario}`);
 }
 
-export async function fetchNtaPolygon(code: string): Promise<FeatureCollection> {
-  return fetchFc(`/api/layers/nta?code=${encodeURIComponent(code)}`);
-}
-
 interface FloodNetSensor {
   type: 'Feature';
   geometry: { type: 'Point'; coordinates: [number, number] };
