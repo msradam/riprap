@@ -10,6 +10,7 @@ typically <60 min old.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from math import asin, cos, radians, sin, sqrt
 
 from riprap.core import http
@@ -128,7 +129,8 @@ def summary_for_point(lat: float, lon: float) -> dict:
             facts.append("no recent precipitation")
         bits.append(": " + ", ".join(facts))
         if o.obs_time:
-            bits.append(f" (obs {o.obs_time[:16]})")
+            t = datetime.fromisoformat(o.obs_time).astimezone(UTC)
+            bits.append(f", observed {t:%Y-%m-%d %H:%M} UTC")
         narrative = "".join(bits) + "."
     return {
         "station_id": o.station_id,

@@ -90,7 +90,7 @@ def summary_for_point(lat: float, lon: float) -> dict[str, Any] | None:
     except Exception:  # noqa: BLE001 - the name is cosmetic
         site_name = f"USGS {site_no}"
 
-    obs_time = nearest["obs_time"].strftime("%Y-%m-%d %H:%M UTC")
+    obs_time = nearest["obs_time"].astimezone(UTC).strftime("%Y-%m-%d %H:%M UTC")
     bits = [
         f"Nearest USGS stream gauge, {site_name} "
         f"({site_no}, {nearest['distance_km']} km away): "

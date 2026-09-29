@@ -94,7 +94,7 @@ def _fetch(station_id: str, product: str) -> dict:
     r = http.get(URL, params={
         "date": "latest", "station": station_id, "product": product,
         "datum": _datum_for(station_id),
-        "units": "english", "time_zone": "lst_ldt",
+        "units": "english", "time_zone": "gmt",  # times in UTC, whatever the station's zone
         "format": "json",
     }, timeout=8.0)
     r.raise_for_status()
@@ -146,7 +146,7 @@ def summary_for_point(lat: float, lon: float) -> dict:
             sign = "+" if r.residual_ft >= 0 else ""
             bits.append(f" ({sign}{r.residual_ft} ft vs predicted tide)")
         if r.obs_time:
-            bits.append(f", observed {r.obs_time}")
+            bits.append(f", observed {r.obs_time} UTC")
         narrative = "".join(bits) + "."
     return {
         "station_id": r.station_id,
