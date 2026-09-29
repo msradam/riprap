@@ -2,7 +2,8 @@
 
 from types import SimpleNamespace
 
-from riprap.core.burr import app, synthesis as syn
+from riprap.core.burr import app
+from riprap.core.burr import synthesis as syn
 from riprap.core.burr.synthesis import Doc
 
 

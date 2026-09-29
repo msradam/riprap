@@ -56,9 +56,23 @@ def test_forecast_answer_keeps_labels_and_has_no_yes(monkeypatch):
     docs = [Doc("ttm_battery_surge", "Projector", surge, True)]
     monkeypatch.setattr(syn, "_documents", lambda state: (docs, [], None))
     monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
-    reply = {"claims": [], "answer": {"lead": "yes", "facts": ["ttm_battery_surge"]}}
+    reply = {"answer": {"lead": "yes", "facts": ["ttm_battery_surge"]}}
     monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (reply, "scripted"))
     out = syn.synthesize({"intent": "single_address", "plan": {"question": Q, "focus": {"time_frame": "future"}}})
     answer = out["paragraph"].split("**Answer.**\n")[1].split("\n\n")[0]
     assert answer.startswith("From the sources consulted: Experimental: a TTM model")
     assert "Use NOAA ETSS or the Stevens Flood Advisory System" in answer and "Yes." not in answer
+
+
+def test_forecast_facts_are_the_forecasts_not_the_flood_zone(monkeypatch):
+    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
+    docs = [Doc("fema_nfhl", "Hazard Reader", "This address sits in FEMA flood zone AE.", False),
+            Doc("npcc4_slr", "Projector", "NPCC4 projects 0.38 m of sea-level rise by the 2050s.", False),
+            Doc("ttm_battery_surge", "Projector", "a TTM model forecasts a peak surge residual of 0.41 m.", True)]
+    monkeypatch.setattr(syn, "_documents", lambda state: (docs, [], None))
+    monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
+    reply = {"answer": {"lead": "cannot_answer", "facts": []}}  # the model declines; the forecasts answer anyway
+    monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (reply, "scripted"))
+    out = syn.synthesize({"intent": "single_address", "plan": {"question": Q, "focus": {"time_frame": "future"}}})
+    answer = out["paragraph"].split("**Answer.**\n")[1].split("\n\n")[0]
+    assert answer.index("[ttm_battery_surge]") < answer.index("[npcc4_slr]") and "fema_nfhl" not in answer

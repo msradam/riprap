@@ -90,7 +90,9 @@ def complaints_near(lat: float, lon: float, radius_m: float = 200,
 
 def summary_for_point(lat: float, lon: float, radius_m: float = 200,
                       years: int = 5) -> dict:
-    since = datetime.now(UTC) - timedelta(days=365 * years)
+    # Midnight UTC, not the current second: the query text (and so the HTTP
+    # cache key) stays the same all day, so a repeat query is served from cache.
+    since = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=365 * years)
     cs = complaints_near(lat, lon, radius_m, since=since, limit=2000)
     return _summarize(cs, years=years, radius_m=radius_m, limit=2000)
 
@@ -140,7 +142,9 @@ def summary_for_polygon(polygon, polygon_crs: str = "EPSG:4326",
                         years: int = 5) -> dict:
     """Polygon-mode aggregation: counts of flood-related 311 complaints
     inside the polygon over the trailing window."""
-    since = datetime.now(UTC) - timedelta(days=365 * years)
+    # Midnight UTC, not the current second: the query text (and so the HTTP
+    # cache key) stays the same all day, so a repeat query is served from cache.
+    since = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=365 * years)
     cs = complaints_in_polygon(polygon, polygon_crs=polygon_crs, since=since, limit=5000)
     return _summarize(cs, years=years, radius_m=None, limit=5000)
 

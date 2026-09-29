@@ -175,6 +175,9 @@ EXTRACTIVE_SYSTEM = """You answer a question about flood exposure at one place b
 
 Return JSON with "answer": "lead" is one of yes, no, partly, count, cannot_answer, and "facts" lists the ids of one to four documents that support the lead, most relevant first. The reader sees a fixed phrase for the lead followed by those documents' text, word for word. Use "no" only when the facts report an absence (outside, none, zero). Use "partly" when some but not all of what was asked about is affected. Use "count" when the question asks how many or how much. Use "cannot_answer" with no facts when the documents do not answer the question. Use only ids from the list."""
 LEADS = ("yes", "no", "partly", "count", "cannot_answer")
+# The facts a forecast question is answered with, in order (refactor 8).
+FORECAST_FACTS = ("ttm_battery_surge", "ttm_311_forecast", "floodnet_forecast", "npcc4_slr",
+                  "dep_moderate_2050", "dep_extreme_2080", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
 # The owner's decision after refactor 3: extractive cannot paraphrase, and
 # it declines honestly when the evidence does not answer.
 DEFAULT_ANSWER_MODE = "extractive"
@@ -238,8 +241,13 @@ def _extract(out: dict, question: str, texts: dict[str, str],
     rule = answer_checks.past_event_lead(question, focus, facts, texts, values)
     if rule:
         lead, facts = rule
-    if (focus or {}).get("time_frame") == "future" and lead in ("yes", "no", "partly"):
-        lead = "facts"  # a forecast or projection is not an observation: no yes or no in front of it
+    if (focus or {}).get("time_frame") == "future":
+        # A forecast question: the facts are the forecasts and projections themselves,
+        # chosen in code (the model tended to pick the flood zone), and the lead is
+        # neutral, since a forecast is not an observation.
+        forecasts = [i for i in FORECAST_FACTS if texts.get(i)]
+        if forecasts:
+            lead, facts = "facts", forecasts[:4]
     return lead, facts, answer_checks.check_lead(lead, facts, question, texts, values)
 # "facts" is set only by code: the facts with no yes or no in front of them.
 LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:",

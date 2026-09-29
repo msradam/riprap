@@ -112,7 +112,7 @@ def flood_events_for(deployment_ids: list[str],
     if not deployment_ids:
         return []
     if since is None:
-        since = datetime.now(UTC) - timedelta(days=365 * 3)
+        since = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=365 * 3)
     d = _gql(_EVENTS_Q, {
         "ids": deployment_ids,
         "since": since.isoformat(timespec="seconds").replace("+00:00", ""),
