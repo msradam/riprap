@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { asOfDate, asOfPhrase, citedIn, figureOf, findingOf, leadClause, sharedStem, snapshotNote, termsIn, tidy, withoutSubject } from '$lib/client/briefingText';
+import { asOfDate, asOfPhrase, citedIn, figureOf, findingOf, keepTogether, leadClause, sharedStem, snapshotNote, termsIn, tidy, withoutSubject } from '$lib/client/briefingText';
 import type { Card } from '$lib/types/card';
 
 const card = (over: Partial<Card>): Card => ({
@@ -156,5 +156,14 @@ describe('snapshotNote', () => {
   it('says nothing for other sources or a live run', () => {
     expect(snapshotNote('sandy_inundation', at)).toBeNull();
     expect(snapshotNote('ttm_battery_surge', null)).toBeNull();
+  });
+});
+
+describe('keepTogether', () => {
+  it('sets a figure with its unit and a date apart, leaving the text unchanged', () => {
+    const text = 'within 200 m of it (2.13 in/hr) from 2021-09-02: 0 m² in 3 years';
+    const parts = keepTogether(text);
+    expect(parts.join('')).toBe(text);
+    expect(parts.filter((_, i) => i % 2)).toEqual(['200 m', '2.13 in/hr', '2021-09-02', '0 m²']);
   });
 });

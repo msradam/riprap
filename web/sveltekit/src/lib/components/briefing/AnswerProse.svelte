@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Citation, ClaimPart } from '$lib/types/claim';
-  import { tidy } from '$lib/client/briefingText';
+  import { keepTogether, tidy } from '$lib/client/briefingText';
   import { activateCitation } from '$lib/stores/citations.svelte';
 
   /** One paragraph of claim parts as plain prose: no tier marks, and a
@@ -17,8 +17,11 @@
   const tidied = $derived(tidy(parts));
 </script>
 
+<!-- A figure with its unit, or a date, stays on one line. -->
+{#snippet words(text: string)}{#each keepTogether(text) as t, k (k)}{#if k % 2}<span class="nowrap">{t}</span>{:else}{t}{/if}{/each}{/snippet}
+
 <p class={className}>
-  {#each tidied as p, i (i)}{#if p.exp}<span class="exp-badge">Experimental</span>{/if}{#if p.bold}<strong>{p.text}</strong>{:else}{p.text}{/if}{#if p.cite && citations[p.cite] && tidied[i + 1]?.cite !== p.cite}{@const c = citations[p.cite]}<a
+  {#each tidied as p, i (i)}{#if p.exp}<span class="exp-badge">Experimental</span>{/if}{#if p.bold}<strong>{@render words(p.text)}</strong>{:else}{@render words(p.text)}{/if}{#if p.cite && citations[p.cite] && tidied[i + 1]?.cite !== p.cite}{@const c = citations[p.cite]}<a
         href="#cite-{c.id}"
         class="inline-cite"
         data-cite={c.id}
@@ -26,3 +29,9 @@
         aria-label="Citation {c.n}: {c.source}, {c.title}"
       ><sup>{c.n}</sup></a>{/if}{/each}
 </p>
+
+<style>
+  .nowrap {
+    white-space: nowrap;
+  }
+</style>

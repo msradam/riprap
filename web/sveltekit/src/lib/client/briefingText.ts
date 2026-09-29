@@ -26,6 +26,17 @@ export function tidy(parts: ClaimPart[]): ClaimPart[] {
   return out;
 }
 
+/** A figure and its unit ("200 m", "2.13 in/hr") or a hyphenated number
+ *  (a date such as 2021-09-02, a house number such as 90-01). */
+const KEEP_RE = /(\d[\d.,]*\s(?:m²|km|mm|cm|ft|in\/hr|m)(?![\w/])|\d+(?:-\d+)+)/;
+
+/** Text split so the odd-indexed pieces can be set on one line: a narrow
+ *  column otherwise breaks "200 m" after the number or a date at its
+ *  hyphen. Joined back, the pieces are the text unchanged. */
+export function keepTogether(text: string): string[] {
+  return text.split(KEEP_RE);
+}
+
 /** Doc ids cited in these paragraphs, in reading order. */
 export function citedIn(paras: ClaimPart[][]): string[] {
   return [...new Set(paras.flat().flatMap((p) => (p.cite ? [p.cite] : [])))];
