@@ -7,7 +7,7 @@ import { looksLikeQuestion, type RunState } from '$lib/client/runState.svelte';
 import { splitBriefing } from '$lib/client/parseBriefing';
 import { modeLine } from '$lib/client/cardAdapter';
 import { formatGeneratedAt } from '$lib/client/gallery';
-import { citedIn, findingOf, termsIn } from '$lib/client/briefingText';
+import { citedIn, findingOf, FORECASTS, termsIn } from '$lib/client/briefingText';
 import { sourceLists, type PrintSnapshot } from '$lib/stores/briefingState.svelte';
 import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 import { deployment } from '$lib/stores/deployment.svelte';
@@ -227,8 +227,6 @@ export function splitSentence(parts: ClaimPart[]): { sentence: string; parts: Cl
 
 /** The DEP stormwater scenarios in reading order (district pages add `_nta`). */
 const DEP_SCENARIOS = ['dep_moderate_current', 'dep_moderate_2050', 'dep_extreme_2080'];
-/** The TTM forecasts: forecasts, not observations, whatever their maturity. */
-const FORECASTS = ['ttm_battery_surge', 'ttm_311_forecast', 'floodnet_forecast'];
 const baseDoc = (docId: string) => docId.replace(/_nta$/, '');
 const scenario = (c: Card) => DEP_SCENARIOS.indexOf(baseDoc(c.docId));
 

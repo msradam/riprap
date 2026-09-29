@@ -127,7 +127,7 @@
         citations={model.citationsById}
         notRun={model.notRun}
         notRunHref={showSources && model.lists.notChecked?.length ? '#not-checked' : undefined}
-        snapshotDate={model.generated?.slice(0, 10)}
+        snapshotAt={model.generated}
         labelledby="brief-evidence-h"
       />
     </section>

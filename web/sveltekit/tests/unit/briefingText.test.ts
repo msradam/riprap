@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { asOfDate, asOfPhrase, citedIn, figureOf, findingOf, leadClause, sharedStem, termsIn, tidy, withoutSubject } from '$lib/client/briefingText';
+import { asOfDate, asOfPhrase, citedIn, figureOf, findingOf, leadClause, sharedStem, snapshotNote, termsIn, tidy, withoutSubject } from '$lib/client/briefingText';
 import type { Card } from '$lib/types/card';
 
 const card = (over: Partial<Card>): Card => ({
@@ -29,6 +29,11 @@ describe('citedIn', () => {
 });
 
 describe('figureOf', () => {
+  it('never shows a temperature', () => {
+    expect(figureOf(card({ scalars: [{ value: '17.0', unit: '°C', label: 'Air temp' }] }))).toBeNull();
+    expect(figureOf(card({ scalars: [{ value: '17.0', label: 'Temperature (C)' }, { value: '0.4', unit: 'in', label: 'Rain' }] }))).toEqual({ value: '0.4 in', label: 'Rain' });
+    expect(figureOf(card({ headline: '17.0°C at JFK' }))).toBeNull();
+  });
   it('prefers the first scalar with its unit and label', () => {
     expect(figureOf(card({ scalars: [{ value: '2', label: 'Sensors nearby' }] }))).toEqual({ value: '2', label: 'Sensors nearby' });
     expect(figureOf(card({ scalars: [{ value: '37', unit: 'cm', label: 'Peak' }] }))?.value).toBe('37 cm');
@@ -135,5 +140,18 @@ describe('sharedStem', () => {
     ])).toBeNull();
     expect(sharedStem([`${dep} (2.13 in/hr, 2050 SLR).`])).toBeNull();
     expect(sharedStem(['No parenthetical.', 'No parenthetical.'])).toBeNull();
+  });
+});
+
+describe('snapshotNote', () => {
+  const at = '2026-09-29 12:34 UTC';
+  it('dates forecasts and NWS alerts to the snapshot', () => {
+    expect(snapshotNote('ttm_311_forecast', at)).toBe('Forecast made at the snapshot, 2026-09-29 12:34 UTC.');
+    expect(snapshotNote('floodnet_forecast', at)).toBe('Forecast made at the snapshot, 2026-09-29 12:34 UTC.');
+    expect(snapshotNote('nws_alerts', at)).toBe('Active at the snapshot, 2026-09-29 12:34 UTC.');
+  });
+  it('says nothing for other sources or a live run', () => {
+    expect(snapshotNote('sandy_inundation', at)).toBeNull();
+    expect(snapshotNote('ttm_battery_surge', null)).toBeNull();
   });
 });

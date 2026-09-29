@@ -2,7 +2,7 @@
   import type { Citation } from '$lib/types/claim';
   import { citationOf, type EvidenceCard } from '$lib/client/briefingModel';
   import { TIER_WORDS } from '$lib/types/tier';
-  import { asOfDate, figureOf, leadClause, sharedStem, withoutSubject } from '$lib/client/briefingText';
+  import { asOfDate, figureOf, leadClause, sharedStem, snapshotNote, withoutSubject } from '$lib/client/briefingText';
   import { activateCitation } from '$lib/stores/citations.svelte';
   import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
 
@@ -23,10 +23,13 @@
     /** Where the page lists the sources not run; the footer then points
      *  there instead of repeating the list. */
     notRunHref?: string;
-    /** Gallery pages: a live reading is dated to the snapshot. */
-    snapshotDate?: string | null;
+    /** Gallery pages: when the snapshot was made ("2026-09-29 12:34 UTC").
+     *  A live reading is dated to it; a forecast or alert says so. */
+    snapshotAt?: string | null;
   }
-  let { groups, findings, citations, notRun, labelledby, notRunHref, snapshotDate = null }: Props = $props();
+  let { groups, findings, citations, notRun, labelledby, notRunHref, snapshotAt = null }: Props = $props();
+
+  let snapshotDate = $derived(snapshotAt?.slice(0, 10) ?? null);
 
   let open = $derived(groups.filter((g) => !g.closed));
   let folded = $derived(groups.filter((g) => g.closed));
@@ -98,6 +101,7 @@
   {@const cit = c.parts ? null : citationOf(c, citations)}
   {@const longLabel = !!fig?.label && fig.label.length > SHORT_LABEL}
   {@const same = oneDate(c)}
+  {@const note = snapshotNote(c.docId, snapshotAt)}
   {@const h = (name: Col) => (gid ? `${col(t, name)} ${gid}` : col(t, name))}
   <tr class="ev-row">
     <td class="ev-source" headers={h('source')}>
@@ -128,6 +132,7 @@
       {:else}
         <div class="ev-measure">
           {#if find}{@render sentence(find.first)}{#if find.rest}{` ${find.rest}`}{/if}{/if}
+          {#if note}<span class="ev-snap">{note}</span>{/if}
           <span class="ev-dataset">{c.title}</span>
           {#if longLabel}<span class="ev-dataset">Figure: {fig?.label}</span>{/if}
         </div>

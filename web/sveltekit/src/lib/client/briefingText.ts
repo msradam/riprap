@@ -34,8 +34,10 @@ export function citedIn(paras: ClaimPart[][]): string[] {
 const FIGURE_RE = /^\d[\d.,]*(?:\s?(?:%|m²|cm|mm|ft|in|m\b|\/wk))?/;
 
 /** A scalar that places or dates the finding ("Distance to station (km)",
- *  "FIRM panel effective year") rather than measuring it. */
-const NOT_FIGURE_RE = /distance|effective|year|date/i;
+ *  "FIRM panel effective year") rather than measuring it, or a temperature,
+ *  which is a frozen weather reading on a snapshot, not flood evidence. */
+const NOT_FIGURE_RE = /distance|effective|year|date|temperature/i;
+const TEMPERATURE_RE = /°/;
 
 /** The evidence table's figure: the finding's own quantity, the first
  *  scalar that is not a distance or a year. With scalars but none of
@@ -43,11 +45,24 @@ const NOT_FIGURE_RE = /distance|effective|year|date/i;
  *  ("82 calls" gives "82"), else nothing. */
 export function figureOf(c: Pick<Card, 'scalars' | 'headline'>): { value: string; label: string | null } | null {
   if (c.scalars?.length) {
-    const s = c.scalars.find((x) => !NOT_FIGURE_RE.test(x.label));
+    const s = c.scalars.find((x) => !NOT_FIGURE_RE.test(x.label) && !TEMPERATURE_RE.test(`${x.value}${x.unit ?? ''}`));
     return s ? { value: s.unit ? `${s.value} ${s.unit}` : s.value, label: s.label } : null;
   }
   const m = c.headline ? FIGURE_RE.exec(c.headline) : null;
-  return m ? { value: m[0].trim(), label: null } : null;
+  return m && !TEMPERATURE_RE.test(c.headline!.charAt(m[0].length)) ? { value: m[0].trim(), label: null } : null;
+}
+
+/** The forecasts, whatever their maturity (district pages add `_nta`). */
+export const FORECASTS = ['ttm_battery_surge', 'ttm_311_forecast', 'floodnet_forecast'];
+
+/** Gallery pages: a forecast or an NWS alert was read when the snapshot
+ *  was made (`at`, "2026-09-29 12:34 UTC"), so its row says when. */
+export function snapshotNote(docId: string, at: string | null | undefined): string | null {
+  if (!at) return null;
+  const id = docId.replace(/_nta$/, '');
+  if (FORECASTS.includes(id)) return `Forecast made at the snapshot, ${at}.`;
+  if (id === 'nws_alerts') return `Active at the snapshot, ${at}.`;
+  return null;
 }
 
 /** The finding sentence(s) for a card, split after the first sentence so
