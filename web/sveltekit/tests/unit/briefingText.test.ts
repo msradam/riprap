@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { asOfDate, asOfPhrase, citedIn, figureOf, findingOf, termsIn, tidy } from '$lib/client/briefingText';
+import { asOfDate, asOfPhrase, citedIn, figureOf, findingOf, leadClause, termsIn, tidy } from '$lib/client/briefingText';
 import type { Card } from '$lib/types/card';
 
 const card = (over: Partial<Card>): Card => ({
@@ -90,5 +90,18 @@ describe('termsIn', () => {
     expect(termsIn('2050 SLR; 14 above-curb flood events', true).map((t) => t.term))
       .toEqual(['SLR', 'above-curb flood event', 'Measured, Modeled, Proxy, Synthetic']);
     expect(termsIn('SLRs and slurry', false)).toEqual([]);
+  });
+});
+
+describe('leadClause', () => {
+  it('ends the lead at the first semicolon or colon outside parentheses', () => {
+    expect(leadClause('Elevation 14.87 m; higher than 29% (the 29th percentile; low); HAND 0.0 m.')).toEqual({
+      lead: 'Elevation 14.87 m;',
+      tail: ' higher than 29% (the 29th percentile; low); HAND 0.0 m.'
+    });
+  });
+  it('skips a short label and keeps a sentence without a break whole', () => {
+    expect(leadClause('Experimental: 34 complaints in 512 days; about 0.3 a week.').lead).toBe('Experimental: 34 complaints in 512 days;');
+    expect(leadClause('This address sits in FEMA flood zone X.')).toEqual({ lead: 'This address sits in FEMA flood zone X.', tail: '' });
   });
 });

@@ -2,7 +2,7 @@
   import type { Citation } from '$lib/types/claim';
   import { citationOf, type EvidenceCard } from '$lib/client/briefingModel';
   import { TIER_WORDS } from '$lib/types/tier';
-  import { asOfDate, figureOf } from '$lib/client/briefingText';
+  import { asOfDate, figureOf, leadClause } from '$lib/client/briefingText';
   import { activateCitation } from '$lib/stores/citations.svelte';
   import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
 
@@ -10,7 +10,10 @@
    *  rows the answer cites first, then one group per Stone. A `closed`
    *  group (experimental and forecast sources) follows the table as its own
    *  folded table. On phones each row is a stacked block; the cells keep
-   *  their table semantics. */
+   *  their table semantics. In a narrow column (a place briefing's main
+   *  column) the Source, Tier and Data as of cells are clipped to one
+   *  pixel for assistive tech and the finding cell shows the same words
+   *  on a line above the finding, so the finding keeps the width. */
   interface Props {
     groups: { key: string; name: string; role: string | null; cards: EvidenceCard[]; closed?: boolean }[];
     findings: Map<string, { first: string; rest: string } | null>;
@@ -69,6 +72,11 @@
   {#if atSnapshot(vintage)}at snapshot, <span class="data ev-date">{snapshotDate}</span>{:else}<span class="data" title={vintage}>{asOfDate(vintage)}</span>{/if}
 {/snippet}
 
+{#snippet sentence(first: string)}
+  {@const lc = leadClause(first)}
+  <span class="ev-find"><span class="ev-lead">{lc.lead}</span>{lc.tail}</span>
+{/snippet}
+
 {#snippet cite(cit: Citation, sup: boolean)}
   <a
     href="#cite-{cit.id}"
@@ -90,6 +98,13 @@
       {#if c.experimental}{c.source} <span class="exp-badge">Experimental</span>{:else}{c.source}{/if}
     </td>
     <td class="ev-finding" headers={h('finding')}>
+      <!-- Shown only in the narrow layout, where the Source, Tier and Data
+           as of cells are clipped; hidden from assistive tech, which reads
+           those cells. -->
+      <span class="ev-source-line" aria-hidden="true">
+        {#if c.experimental}{c.source} <span class="exp-badge">Experimental</span>{:else}{c.source}{/if}
+        <span class="ev-meta"><span class="ev-mark" style:color="var(--tier-{c.tier})"><TierGlyph tier={c.tier} size={11} /></span>{TIER_WORDS[c.tier] ?? c.tier}{#if same}{#if atSnapshot(c.vintage)}, {@render date(c.vintage)}{:else}, data as of {@render date(c.vintage)}{/if}{/if}</span>
+      </span>
       {#if c.parts}
         <!-- One finding per scenario, each with its own citation. -->
         <ul class="ev-scenarios">
@@ -97,13 +112,13 @@
             {@const pf = findings.get(p.id)}
             {@const pc = citationOf(p, citations)}
             <li>
-              {#if pf}<span class="ev-find">{pf.first}</span>{#if pf.rest}{` ${pf.rest}`}{/if}{:else}{p.title}{/if}{#if !same}&#32;(data as of {@render date(p.vintage)}){/if}{#if pc}{@render cite(pc, true)}{/if}
+              {#if pf}{@render sentence(pf.first)}{#if pf.rest}{` ${pf.rest}`}{/if}{:else}{p.title}{/if}{#if !same}&#32;(data as of {@render date(p.vintage)}){/if}{#if pc}{@render cite(pc, true)}{/if}
             </li>
           {/each}
         </ul>
       {:else}
         <div class="ev-measure">
-          {#if find}<span class="ev-find">{find.first}</span>{#if find.rest}{` ${find.rest}`}{/if}{/if}
+          {#if find}{@render sentence(find.first)}{#if find.rest}{` ${find.rest}`}{/if}{/if}
           <span class="ev-dataset">{c.title}</span>
           {#if longLabel}<span class="ev-dataset">Figure: {fig?.label}</span>{/if}
         </div>
@@ -136,6 +151,7 @@
   </tr>
 {/snippet}
 
+<div class="ev-wrap">
 <table class="ev-table" aria-labelledby={labelledby}>
   {@render head('main')}
   {#each open as g, gi (g.key)}
@@ -169,8 +185,12 @@
 {:else if notRun.length}
   <p class="ev-not-run">Not run for this question: {notRun.join(', ')}.</p>
 {/if}
+</div>
 
 <style>
+  .ev-wrap {
+    container: ev / inline-size;
+  }
   .ev-table {
     width: 100%;
     border-collapse: collapse;
@@ -280,7 +300,8 @@
   .ev-cite a:focus-visible {
     text-decoration: underline;
   }
-  .ev-label {
+  .ev-label,
+  .ev-source-line {
     display: none;
   }
   .ev-not-run {
@@ -289,6 +310,54 @@
     font-size: 14px;
     line-height: 1.45;
     color: var(--ink-secondary);
+  }
+
+  /* Narrow column on a wider screen (a place briefing's main column; the
+     question page's full-width table and phones keep their layouts): the
+     Source, Tier and Data as of columns shrink to a clipped pixel that
+     assistive tech still reads, and the finding cell shows the source,
+     tier and date on one secondary line above the finding. Only the
+     finding's first clause is heavy. */
+  @media screen and (min-width: 641px) {
+    @container ev (max-width: 760px) {
+      .ev-table {
+        table-layout: fixed;
+      }
+      thead th:nth-child(1),
+      thead th:nth-child(4),
+      thead th:nth-child(5),
+      .ev-source,
+      .ev-tier,
+      .ev-asof {
+        width: 1px;
+        padding: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        clip-path: inset(50%);
+      }
+      thead th.ev-num:nth-child(3) {
+        width: 88px;
+      }
+      thead th.ev-num:nth-child(6) {
+        width: 36px;
+      }
+      .ev-source-line {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--ink-secondary);
+        overflow-wrap: anywhere;
+      }
+      /* The tier mark separates the source from its tier and date. */
+      .ev-meta .ev-mark {
+        margin-left: 4px;
+      }
+      .ev-find {
+        font-weight: 400;
+      }
+      .ev-lead {
+        font-weight: 600;
+      }
+    }
   }
 
   /* Phone: each row becomes a stacked block. Source, then the finding,

@@ -64,6 +64,23 @@ export function findingOf(c: Card, narration?: string | null): { first: string; 
   return m ? { first: t.slice(0, m.index), rest: t.slice(m.index + m[0].length) } : { first: t, rest: '' };
 }
 
+/** A finding sentence split after its first clause, at the first ";" or
+ *  ":" outside parentheses, so a narrow table can set only that clause
+ *  heavier. A label that short ("Experimental:") is not a clause; a
+ *  sentence with no such break is all lead. */
+export function leadClause(s: string): { lead: string; tail: string } {
+  let depth = 0;
+  for (let i = 0; i < s.length - 1; i++) {
+    const ch = s[i];
+    if (ch === '(') depth++;
+    else if (ch === ')') depth = Math.max(0, depth - 1);
+    else if (depth === 0 && (ch === ';' || ch === ':') && s[i + 1] === ' ' && i >= 16) {
+      return { lead: s.slice(0, i + 1), tail: s.slice(i + 1) };
+    }
+  }
+  return { lead: s, tail: '' };
+}
+
 /** ISO timestamps show their date; "retrieved 2026-07-11" shows the
  *  date; other vintages ("live", "2024-Q3") stay as they are. */
 export function asOfDate(v: string): string {
