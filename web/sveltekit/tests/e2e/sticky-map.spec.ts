@@ -18,6 +18,8 @@ const PAGE = `${STATIC}/gallery/hollis/`;
 async function mapReady(page: import('@playwright/test').Page) {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(PAGE);
+  // The map loads lazily and starts under the rail, below the fold.
+  await page.locator('#brief-map').scrollIntoViewIfNeeded();
   await page.waitForFunction(
     () => Boolean((window as unknown as { __riprapMap?: unknown }).__riprapMap),
     undefined,

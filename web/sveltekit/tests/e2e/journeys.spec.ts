@@ -176,6 +176,8 @@ test.describe('journeys', () => {
   async function openMapList(page: Page) {
     await page.route('**/api/**', (route) => route.abort());
     await page.goto(`${STATIC}/gallery/hollis/`);
+    // The map loads lazily and sits beside the evidence, below the fold.
+    await page.locator('#brief-map').scrollIntoViewIfNeeded();
     await expect(page.locator('.maplibregl-canvas')).toBeVisible({ timeout: 30_000 });
     const summary = page.locator('summary', { hasText: 'Map points as a list' });
     await summary.click();
