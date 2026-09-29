@@ -92,6 +92,15 @@ def main() -> int:
                                             "generated_at", "mode", "model", "quantization")})
         print(f"{a['slug']:18s} {entry['mode']:7s} kept={len(g.get('claims') or [])} "
               f"dropped={len(g.get('dropped_claims') or [])} {time.time() - t0:.1f}s", flush=True)
+    # Editorial fields come from the address list every run, so a kept entry
+    # picks up a new reason or featured source without being regenerated.
+    by_slug = {a["slug"]: a for a in addresses}
+    for e in index:
+        for k in ("reason", "feature_doc"):
+            if by_slug.get(e["slug"], {}).get(k):
+                e[k] = by_slug[e["slug"]][k]
+            else:
+                e.pop(k, None)
     (OUT / "index.json").write_text(json.dumps(index, indent=1) + "\n")
     return 0
 

@@ -101,6 +101,24 @@ def _fetch(station_id: str, product: str) -> dict:
     return r.json()
 
 
+def _prediction_at(pred: list[dict], obs_time: str | None) -> dict | None:
+    """The prediction nearest the observation's time ("YYYY-MM-DD HH:MM"),
+    so the residual compares like with like; the first one when the
+    observation has no time."""
+    from datetime import datetime
+
+    if not pred:
+        return None
+    if not obs_time:
+        return pred[0]
+    fmt = "%Y-%m-%d %H:%M"
+    try:
+        t = datetime.strptime(obs_time, fmt)
+        return min(pred, key=lambda p: abs((datetime.strptime(p["t"], fmt) - t).total_seconds()))
+    except (KeyError, ValueError):
+        return pred[0]
+
+
 def reading_at(lat: float, lon: float) -> TideReading:
     sid, name, slat, slon = _nearest_station(lat, lon)
     dist_km = round(_haversine_km(lat, lon, slat, slon), 1)
@@ -119,8 +137,9 @@ def reading_at(lat: float, lon: float) -> TideReading:
         # predictions fetch to avoid a 400 on every Chicago run.
         if not is_great_lakes:
             pred = _fetch(sid, "predictions").get("predictions") or []
-            if pred:
-                out.predicted_ft = round(float(pred[0]["v"]), 2)
+            p = _prediction_at(pred, out.obs_time)
+            if p is not None:
+                out.predicted_ft = round(float(p["v"]), 2)
             if out.observed_ft is not None and out.predicted_ft is not None:
                 out.residual_ft = round(out.observed_ft - out.predicted_ft, 2)
     except Exception as e:
