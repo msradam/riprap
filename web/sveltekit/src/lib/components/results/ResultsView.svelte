@@ -14,7 +14,7 @@
   import SkeletonBriefing from '$lib/components/states/SkeletonBriefing.svelte';
   import ErrorCard from '$lib/components/states/ErrorCard.svelte';
   import type { RunState } from '$lib/client/runState.svelte';
-  import { briefingModel, type SnapshotMeta } from '$lib/client/briefingModel';
+  import { boldFirstSentence, briefingModel, type SnapshotMeta } from '$lib/client/briefingModel';
   import { briefingState } from '$lib/stores/briefingState.svelte';
 
   /** One briefing, laid out as a public report: the question and its
@@ -41,6 +41,8 @@
   let hasBriefing = $derived(!!run.finalResult);
   let isCompare = $derived(run.plan?.intent === 'compare' && run.finalResult?.targets?.length === 2);
   let isPlace = $derived(model.kind !== 'question');
+  /** A place briefing's "In brief" paragraph, set in the Brief style. */
+  let isBrief = $derived(model.leadLabel === 'In brief');
   // Compare briefings carry their own source notes; the full list then
   // needs no citation targets of its own.
   let sourceNoted = $derived(isCompare ? model.citations.map((c) => c.id) : model.cited);
@@ -126,10 +128,10 @@
   {/if}
 {/snippet}
 
-{#snippet sections()}
+{#snippet sectionList(level: 'h2' | 'h3')}
   {#each model.body as s, i (i)}
-    <section class="brief-block brief-section" aria-labelledby={s.label ? `brief-sec-${i}` : undefined}>
-      {#if s.label}<h2 id="brief-sec-{i}" class="brief-h2">{s.label}</h2>{/if}
+    <section class={['brief-section', level === 'h2' && 'brief-block']} aria-labelledby={s.label ? `brief-sec-${i}` : undefined}>
+      {#if s.label}<svelte:element this={level} id="brief-sec-{i}" class="brief-{level}">{s.label}</svelte:element>{/if}
       {#each s.paras as parts, j (j)}
         <AnswerProse {parts} citations={model.citationsById} class="brief-body" />
       {/each}
@@ -137,21 +139,46 @@
   {/each}
 {/snippet}
 
+{#snippet sections()}
+  <!-- Place briefings: the sections restate the evidence table, so they
+       wait in one closed disclosure after it. Questions keep them open. -->
+  {#if isPlace && model.body.length}
+    <details class="brief-block brief-written">
+      <summary><h2 class="brief-h2">The written briefing, section by section</h2></summary>
+      {@render sectionList('h3')}
+    </details>
+  {:else}
+    {@render sectionList('h2')}
+  {/if}
+{/snippet}
+
 {#snippet answerBlock()}
   <section id="brief-answer" class="brief-answer" aria-labelledby="brief-answer-h">
     <h2 id="brief-answer-h" class="visually-hidden">{model.leadLabel}</h2>
     {#if model.lead}<p class={['brief-lead', model.leadIsSentence && 'is-sentence', !snapshot && 'is-arriving']}>{model.lead}</p>{/if}
     {#each model.answer as parts, i (i)}
-      <AnswerProse {parts} citations={model.citationsById} class="brief-answer-p" />
+      <AnswerProse
+        parts={isBrief && i === 0 ? boldFirstSentence(parts) : parts}
+        citations={model.citationsById}
+        class={isBrief ? 'brief-answer-p is-brief' : 'brief-answer-p'}
+      />
     {/each}
   </section>
 {/snippet}
 
 {#snippet railBlock()}
-  {#if answerCites.length || showTerms}
-    <aside class="brief-rail" aria-label="Sources for the {model.leadLabel === 'In brief' ? 'summary' : 'answer'}, and terms">
+  {#if answerCites.length || showTerms || model.checks || model.modeLine}
+    <aside class="brief-rail" aria-label="Sources for the {isBrief ? 'summary' : 'answer'}, how it was checked, and terms">
       {#if answerCites.length}
-        <SourceNotes citations={answerCites} label="Sources for the {model.leadLabel === 'In brief' ? 'summary' : 'answer'}" />
+        <SourceNotes citations={answerCites} label="Sources for the {isBrief ? 'summary' : 'answer'}" />
+      {/if}
+      <!-- Machinery sits in the margin (endnotes on narrow screens), not
+           under the answer. -->
+      {#if model.checks || model.modeLine}
+        <div class="brief-machinery">
+          {#if model.checks}<p class="brief-quiet">{model.checks}</p>{/if}
+          {#if model.modeLine}<p class="brief-quiet">{model.modeLine}</p>{/if}
+        </div>
       {/if}
       {#if showTerms}
         <section class="brief-terms" aria-labelledby="brief-terms-h">
@@ -169,8 +196,6 @@
 
 {#snippet afterBlock()}
   <div class="brief-after">
-    {#if model.checks}<p class="brief-quiet">{model.checks}</p>{/if}
-    {#if model.modeLine}<p class="brief-quiet">{model.modeLine}</p>{/if}
     {#each model.scope as parts, i (i)}
       <AnswerProse {parts} citations={model.citationsById} class="brief-quiet brief-scope" />
     {/each}
@@ -303,13 +328,15 @@
           </div>
         </div>
       {:else}
+        <!-- Figure 1 sits in the text column beside the rail, so a long
+             rail does not push it down the page. -->
         <div class="brief-top">
           {@render answerBlock()}
           {@render railBlock()}
           {@render afterBlock()}
+          {#if !run.stopped && showMap}{@render map()}{/if}
         </div>
         {#if !run.stopped}
-          {#if showMap}{@render map()}{/if}
           {@render evidence()}
           {@render sections()}
         {:else}
@@ -452,18 +479,19 @@
   .brief-top {
     display: grid;
     grid-template-columns: minmax(0, var(--text-w)) var(--rail-w);
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
     column-gap: var(--col-gap);
     align-items: start;
     margin-top: 8px;
   }
   .brief-answer,
-  .brief-after {
+  .brief-after,
+  .brief-top > .brief-map {
     grid-column: 1;
   }
   .brief-rail {
     grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-row: 1 / span 3;
     padding-top: 10px;
   }
   .brief-lead {
@@ -498,6 +526,16 @@
     max-width: 54ch;
     font-size: 20px;
     line-height: 1.5;
+  }
+  /* Brief: the "In brief" paragraph of a place briefing, its first
+     sentence in 600. Used only here (DESIGN.md type scale). */
+  .brief :global(.brief-answer-p.is-brief) {
+    font-size: 24px;
+    line-height: 1.4;
+    font-weight: 400;
+  }
+  .brief :global(.brief-answer-p.is-brief strong) {
+    font-weight: 600;
   }
   .brief :global(.inline-cite) {
     padding: 0 1px;
@@ -605,6 +643,25 @@
     line-height: 1.55;
   }
 
+  .brief-machinery {
+    margin-top: 16px;
+  }
+  .brief-machinery :global(.brief-quiet:last-child) {
+    margin-bottom: 0;
+  }
+  .brief-written > summary {
+    min-height: 24px;
+    cursor: pointer;
+  }
+  .brief-written > summary .brief-h2 {
+    display: inline;
+  }
+  .brief-written .brief-section {
+    margin-top: 24px;
+  }
+  .brief-written .brief-h3 {
+    margin-top: 0;
+  }
   .brief-terms {
     margin-top: 16px;
     font-size: 14px;
@@ -797,6 +854,9 @@
     }
     .brief-lead.is-sentence {
       font-size: 32px;
+    }
+    .brief :global(.brief-answer-p.is-brief) {
+      font-size: 21px;
     }
     .is-question .brief-map {
       --map-h: 300px;

@@ -181,7 +181,8 @@ self-hosted. PINNED. There is no italic in report content.
 | Lead | Sofia Sans | 64 / 700 / 1.0 (44 on phones) | "Yes.", "No.", a count, or the sentence saying the sources do not answer |
 | Title | Sofia Sans | 34 / 600 / 1.18 (26 on phones), max 30ch | The H1: the question, or the place |
 | Headline | Sofia Sans | 22 / 600 / 1.25 | h2: Evidence, Map, Sources and method, report sections |
-| Answer | Sofia Sans | 20 / 400 / 1.5, max 64ch | The answer, or the "In brief" paragraph |
+| Brief | Sofia Sans | 24 / 400 / 1.4 (21 on phones), first sentence 600 | The "In brief" paragraph of an address or district briefing, and nothing else |
+| Answer | Sofia Sans | 20 / 400 / 1.5, max 64ch | The answer to a question |
 | Body | Sofia Sans | 17 / 400 / 1.55, max 68ch | Report sections |
 | Small | Sofia Sans | 14 to 15 / 400 / 1.45 | Meta line, source notes, table cells, captions, method block |
 | Data | Overpass Mono | 13 to 14 / 400, tabular figures | Figures, dates, doc ids, citation numbers, the commit |
@@ -212,10 +213,12 @@ sections if any, then Sources and method. The lead word sits above y=260 at
 1440 and the whole answer is on the first screen.
 
 ### Address and district briefings
-The same top (title is the place, the "In brief" paragraph takes the lead
-slot). Below it a two-column grid at 1100px and wider: the evidence table
-and report sections in the main column (about 58%), the map in a sticky
-right column (about 42%, 460px tall). Below 1100px everything is one
+The same top (title is the place, the "In brief" paragraph in the Brief
+style takes the lead slot). Below it a two-column grid at 1100px and wider:
+the evidence table in the main column (about 58%), then the report sections
+in one closed disclosure, "The written briefing, section by section", since
+they restate the table; the map in a sticky right column (about 42%, 460px
+tall). Below 1100px everything is one
 column and the map comes after the answer at 300px.
 
 ### Phone (390)
@@ -245,8 +248,10 @@ side stripes, no boxes around blocks of text.
   intact below it.
 - **Citations:** a small superscript number in Federal Blue after the
   sentence's closing punctuation, never before it. No tier mark in prose.
-- **Beside it:** the checks-ran line and the mode line in Small secondary
-  ink, then the scope disclosure.
+- **Below it:** the scope disclosure and the resident pointer.
+- **In the margin:** the checks-ran line and the mode line in Small
+  secondary ink, under the source notes (after the endnotes below 1100px).
+  Machinery never sits directly under the answer.
 
 ### Source note (margin rail, endnote on phones)
 Number in Data, then the source name as the link (Small, 600, underline on

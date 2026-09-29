@@ -40,6 +40,36 @@ function sections(blocks: BriefingBlock[]): Section[] {
 const text = (parts: ClaimPart[]) => parts.map((p) => p.text).join('');
 const sentence = (s: string | null) => (s && !s.endsWith('.') ? `${s}.` : s);
 
+/** A report section head named after a Stone's role ("Hazard Reader")
+ *  takes the Stone's name with it ("Cornerstone, the hazard reader"), as
+ *  the evidence table's group rows do. Other heads stay as written. */
+export function stoneHead(label: string): string {
+  const l = label.replace(/\.$/, '').trim().toLowerCase();
+  const m = Object.values(STONE_META).find((s) => s.role.replace(/^the /, '') === l);
+  return m ? `${m.name}, ${m.role}` : label;
+}
+
+/** The first sentence of a paragraph marked bold, split inside the part
+ *  where it ends. Used for the "In brief" paragraph. */
+export function boldFirstSentence(parts: ClaimPart[]): ClaimPart[] {
+  const out: ClaimPart[] = [];
+  let done = false;
+  for (const p of parts) {
+    if (done) { out.push(p); continue; }
+    const m = /[.!?](?=\s|$)/.exec(p.text);
+    if (!m) { out.push({ ...p, bold: true }); continue; }
+    const end = m.index + 1;
+    const rest = p.text.slice(end);
+    // The cite stays with the words it covers: on the head unless words
+    // of this part follow it.
+    const tail = !!rest.trim();
+    out.push({ ...p, text: p.text.slice(0, end), bold: true, cite: tail ? undefined : p.cite });
+    if (rest) out.push({ ...p, text: rest, cite: tail ? p.cite : undefined });
+    done = true;
+  }
+  return out;
+}
+
 /** "Yes." comes off the first answer part and is set large on its own. A
  *  count is set large too, but its sentence stays whole below it. */
 export function splitLead(parts: ClaimPart[]): { word: string | null; parts: ClaimPart[] } {
@@ -147,7 +177,7 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   const checks = outParas.find((p) => text(p).startsWith('Checks run'));
   const outOfScope = outParas.filter((p) => p !== checks);
   const scope = sections(split.scope).flatMap((s) => s.paras);
-  const body = refusal ? [] : sections(split.body);
+  const body = refusal ? [] : sections(split.body).map((s) => ({ ...s, label: stoneHead(s.label) }));
 
   const citations: Citation[] = Object.values(run.briefing.citations).sort((a, b) => a.n - b.n);
   const cited = citedIn(answer);

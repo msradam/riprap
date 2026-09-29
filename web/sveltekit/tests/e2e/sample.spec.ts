@@ -16,10 +16,11 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
     await expect(page.locator('.riprap-wordmark')).toContainText('riprap');
     await expect(page.locator('h1.brief-title')).toContainText('183');
 
-    // Four report sections, each under one h2 style, unnumbered.
-    const heads = page.locator('.brief-section h2.brief-h2');
+    // Four report sections in one closed disclosure after the evidence
+    // table, each headed with its Stone name and role, unnumbered.
+    const heads = page.locator('.brief-written .brief-section h3');
     await expect(heads).toHaveCount(4);
-    await expect(heads.nth(0)).toHaveText('Hazard Reader');
+    await expect(heads.nth(0)).toHaveText('Cornerstone, the hazard reader');
 
     // Tier marks moved out of the prose into the evidence table.
     expect(await page.locator('.ev-mark svg').count()).toBeGreaterThan(5);
