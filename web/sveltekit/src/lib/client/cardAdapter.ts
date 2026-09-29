@@ -480,11 +480,10 @@ function buildTimeseriesForecast(m: PebbleManifest, value: unknown): Card | null
   };
 }
 
-// ── Type-keyed composite register card renderer ─────────────────
+// ── Type-keyed register card renderer ───────────────────────────
 //
-// Multi-pebble dispatch: when several pebbles in the same stone
-// declare `display.variant: register`, this renderer collects rows
-// from ALL of them into a single card (vs one card per pebble).
+// One card per pebble that declares `display.variant: register`, so each
+// register is its own evidence row with its own source, citation and date.
 //
 // Per-pebble item-extraction heuristic: the adapter emits its rows
 // under whichever field name fits the asset class (entrances /
@@ -577,65 +576,44 @@ export function registerSentence(
   return `${countOf(items.length, noun)} listed ${within}${flags ? `, ${flags}` : ''}${names ? nearest : ''}.`;
 }
 
-function buildRegisterComposite(
-  registerManifests: PebbleManifest[],
-  state: Final,
-): Card | null {
-  if (!registerManifests.length) return null;
-  const rows: NonNullable<Card['registers']> = [];
-  const docIds: string[] = [];
-  const agencies: string[] = [];
-  // Registers with items read first, then the empty and unavailable ones.
-  const found: string[] = [];
-  const empty: string[] = [];
-  // Per-pebble cap so one super-dense register doesn't dominate.
-  const PER_PEBBLE_CAP = 4;
-  for (const m of registerManifests) {
-    const v = (state as Record<string, unknown>)[m.id] as RegisterValue | undefined;
-    if (!v) continue;
-    const reg = _regLabelFromManifest(m);
-    const items = _itemsFromRegisterValue(v);
-    const noun = m.title.replace(/\s+exposed nearby$/i, '');
-    const unavailable = m.fallback.message ?? `The ${reg} list was not available when this briefing ran.`;
-    if (v.available === false || items.length === 0) {
-      // Unavailable is not zero: only a register that could not be read
-      // says so; one read with nothing in range reports 0.
-      const radius = num((v as Record<string, unknown>).radius_m);
-      rows.push({
-        reg, tier: 'empirical',
-        label: null, detail: null, sourceId: null,
-        note: v.available === false ? unavailable : `0 within ${radius != null ? `${radius} m` : 'range'}`,
-      });
-      const said = str((v as Record<string, unknown>).narrative);
-      empty.push(v.available === false ? unavailable
-        : said ? said.replace(/\s*\[[a-z0-9_]+\]/g, '') : registerSentence(noun, v as Record<string, unknown>, items, []));
-      continue;
-    }
-    const listed = items.slice(0, PER_PEBBLE_CAP).map((it) => _itemRow(reg, it));
-    rows.push(...listed);
-    // The pebble's own narrative says what the register counts (all assets
-    // in range, or only flood-exposed ones) and is the cited sentence.
-    const said = str((v as Record<string, unknown>).narrative);
-    found.push(said ? said.replace(/\s*\[[a-z0-9_]+\]/g, '') : registerSentence(noun, v as Record<string, unknown>, items, listed));
-    const doc = m.provenance.doc_id ?? m.id;
-    docIds.push(doc);
-    agencies.push(m.provenance.source_name);
-  }
-  if (!rows.length) return null;
-  return {
-    id: 'fsm-registers',
-    stone: 'keystone', tier: 'empirical', variant: 'register',
-    source: 'Civic OpenData', agency: `${agencies.length} register${agencies.length === 1 ? '' : 's'} · multi-agency join`,
-    vintage: RIPRAP_VINTAGE,
-    title: 'Nearby assets',
-    registers: rows,
-    // Pebble narratives carry no closing stop; without one the sentences
-    // run together and findingOf cannot split the first from the rest.
-    sub: [...found, ...empty].map((s) => (/[.!?]$/.test(s.trim()) ? s.trim() : `${s.trim()}.`)).join(' '),
-    docId: docIds[0] ?? 'registers',
-    citeId: 'registers',
+/** One register's card: its listed assets (up to four), its finding (the
+ *  pebble's own narrative, which says whether it counts every asset in
+ *  range or only flood-exposed ones) and its own citation and date. A
+ *  register that could not be read is a muted absence, not a finding; one
+ *  read with nothing in range reports 0. */
+function buildRegisterCard(m: PebbleManifest, value: unknown): Card | null {
+  const v = obj(value) as (RegisterValue & Record<string, unknown>) | null;
+  if (!v) return null;
+  const reg = _regLabelFromManifest(m);
+  const items = _itemsFromRegisterValue(v);
+  const noun = m.title.replace(/\s+exposed nearby$/i, '');
+  const unavailable = v.available === false;
+  const radius = num(v.radius_m);
+  const listed = items.slice(0, 4).map((it) => _itemRow(reg, it));
+  const registers: NonNullable<Card['registers']> = items.length && !unavailable ? listed : [{
+    reg, tier: 'empirical', label: null, detail: null, sourceId: null,
+    note: unavailable
+      ? m.fallback.message ?? `The ${reg} list was not available when this briefing ran.`
+      : `0 within ${radius != null ? `${radius} m` : 'range'}`,
+  }];
+  const said = str(v.narrative)?.replace(/\s*\[[a-z0-9_]+\]/g, '').trim();
+  const sentence = said || registerSentence(noun, v, items, listed);
+  const doc = m.provenance.doc_id ?? m.id;
+  const card: Card = {
+    id: `fsm-${m.id.replace(/_/g, '-')}`,
+    stone: m.stone, tier: (m.tier ?? 'empirical') as Card['tier'], variant: 'register',
+    source: shortSource(m.provenance.source_name), agency: m.provenance.source_name,
+    vintage: m.provenance.date_modified
+      ?? (m.provenance.retrieved_at ? `retrieved ${m.provenance.retrieved_at}` : RIPRAP_VINTAGE),
+    title: m.title,
+    registers,
+    // Pebble narratives carry no closing stop.
+    sub: /[.!?]$/.test(sentence) ? sentence : `${sentence}.`,
+    docId: doc,
+    citeId: doc,
     mapLayer: 'registers',
   };
+  return unavailable ? { ...card, absent: 'Not available', sub: registers[0].note ?? undefined } : card;
 }
 
 // ── Type-keyed histogram card renderer ──────────────────────────
@@ -1160,7 +1138,6 @@ export function adaptFinalToFindings(
   // curated special-builder card. New BYOD pebbles defined only in YAML
   // appear here automatically.
   const templatedCards: Card[] = [];
-  const handledIds = new Set<string>();
   // Sources that ran and came back empty or marked unavailable: the same
   // pebbles the muted "Not available" cards and silent register rows show.
   // Failed steps are left out; the sources list flags those already.
@@ -1176,32 +1153,17 @@ export function adaptFinalToFindings(
   const inScope = (stoneId: string) =>
     (pebbleManifest.byStone[stoneId] ?? []).filter((m) => pebbleInScope(m, intent));
   for (const stone of pebbleManifest.stones) {
-    // Multi-pebble composite dispatch: collect all variant: register
-    // pebbles in this stone, render once via buildRegisterComposite.
-    // Each register pebble is marked handled so the per-pebble loop
-    // below skips it.
-    const registerMs = inScope(stone.id)
-      .filter(m => m.display.variant === 'register'
-                   && !SPECIAL_BUILT_IDS.has(m.id));
-    if (registerMs.length) {
-      const composite = buildRegisterComposite(registerMs, f);
-      if (composite) {
-        composite.experimental = registerMs.some((m) => m.maturity === 'experimental');
-        templatedCards.push(composite);
-      }
-      for (const m of registerMs) {
-        handledIds.add(m.id);
-        const v = obj((f as Record<string, unknown>)[m.id]);
-        if (v?.available === false && !failedIds.has(m.id)) noData.push({ id: m.id, title: m.title });
-      }
-    }
     // Per-pebble loop — single-pebble bespoke variants + the generic
     // templated fallback. Type-keyed dispatch by display.variant.
     for (const m of inScope(stone.id)) {
-      if (SPECIAL_BUILT_IDS.has(m.id) || handledIds.has(m.id)) continue;
+      if (SPECIAL_BUILT_IDS.has(m.id)) continue;
       const value = (f as Record<string, unknown>)[m.id];
       let card: Card | null = null;
-      if (m.display.variant === 'timeseries' || m.display.variant === 'timeseries-ft') {
+      if (m.display.variant === 'register') {
+        // A register that did not run has no card (it never had one).
+        card = buildRegisterCard(m, value);
+        if (!card) continue;
+      } else if (m.display.variant === 'timeseries' || m.display.variant === 'timeseries-ft') {
         card = buildTimeseriesForecast(m, value);
       } else if (m.display.variant === 'raster' || m.display.variant === 'raster-pred') {
         card = buildRasterCard(m, value);

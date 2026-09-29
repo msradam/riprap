@@ -1,7 +1,9 @@
 /**
- * The register row reads each pebble's own narrative, which says whether
- * it counts every asset in range or only flood-exposed ones (gallery
- * critique: "8 exposed MTA entrances" when 40 were in range).
+ * Each register is its own evidence row: its own finding (the pebble's
+ * narrative, which says whether it counts every asset in range or only
+ * flood-exposed ones), its own citation and its own date (gallery
+ * critique: one row cited only NYCHA for four registers, and said
+ * "8 exposed MTA entrances" when 40 were in range).
  */
 import { describe, it, expect } from 'vitest';
 import { RunState } from '$lib/client/runState.svelte';
@@ -9,30 +11,30 @@ import { pebbleManifest, type PebbleManifestResponse } from '$lib/stores/pebbleM
 import type { FinalResult } from '$lib/client/agentStream';
 import g from '$lib/gallery/brooklyn-heights.json';
 
-describe('register row', () => {
-  pebbleManifest.setFromResponse(g.pebbles as unknown as PebbleManifestResponse, 'nyc');
-  const card = RunState.fromFinal(g.final as unknown as FinalResult, g.address).findingsData.cards
-    .find((c) => c.id === 'fsm-registers');
-  const text = JSON.stringify(card);
+pebbleManifest.setFromResponse(g.pebbles as unknown as PebbleManifestResponse, 'nyc');
+const cards = RunState.fromFinal(g.final as unknown as FinalResult, g.address).findingsData.cards
+  .filter((c) => c.variant === 'register');
+
+describe('register rows', () => {
+  it('gives each register its own row, citation and date', () => {
+    expect(cards.length).toBeGreaterThan(1);
+    const cites = cards.map((c) => c.citeId);
+    expect(new Set(cites).size).toBe(cards.length);
+    for (const c of cards) expect(c.vintage).toBeTruthy();
+  });
 
   it('states the MTA count the pebble reported, not the listed rows', () => {
     const n = (g.final as unknown as { mta_entrances: { n_entrances: number } }).mta_entrances.n_entrances;
-    expect(text).toContain(`${n} MTA subway entrances within 800 m`);
-    expect(text).not.toMatch(/exposed MTA/);
+    const mta = cards.find((c) => /MTA/.test(c.sub ?? ''));
+    expect(mta?.sub).toContain(`${n} MTA subway entrances within 800 m`);
+    expect(mta?.sub).not.toMatch(/exposed MTA/);
   });
 
   it('says the school register lists only flood-exposed schools', () => {
-    expect(text).toMatch(/flood-exposed NYC DOE schools/);
+    expect(cards.some((c) => /flood-exposed NYC DOE schools/.test(c.sub ?? ''))).toBe(true);
   });
-});
 
-describe('register row sentences', () => {
-  it('closes each register sentence, so they do not run together', () => {
-    pebbleManifest.setFromResponse(g.pebbles as unknown as PebbleManifestResponse, 'nyc');
-    const card = RunState.fromFinal(g.final as unknown as FinalResult, g.address).findingsData.cards
-      .find((c) => c.id === 'fsm-registers');
-    const sentences = (card?.sub ?? '').split(/(?<=\.)\s+(?=[A-Z0-9])/);
-    expect(sentences.length).toBeGreaterThan(1);
-    for (const s of sentences) expect(s).toMatch(/[.!?]$/);
+  it('closes each register sentence', () => {
+    for (const c of cards) if (!c.absent) expect(c.sub).toMatch(/[.!?]$/);
   });
 });

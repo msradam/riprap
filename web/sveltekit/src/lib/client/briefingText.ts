@@ -79,7 +79,7 @@ export function snapshotNote(docId: string, at: string | null | undefined, findi
 }
 
 /** The space after a full stop that starts a new sentence. */
-export const SENTENCE_GAP = /(?<=\.)\s+(?=[A-Z0-9])/;
+const SENTENCE_GAP = /(?<=\.)\s+(?=[A-Z0-9])/;
 
 /** The finding sentence(s) for a card, split after the first sentence so
  *  the table can set the first one heavier. The body or sub line (the
