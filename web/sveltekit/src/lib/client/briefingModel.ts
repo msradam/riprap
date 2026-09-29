@@ -270,7 +270,9 @@ export function mergeDepScenarios(cards: Card[]): EvidenceRow[] {
 export function withDatasetDate(c: Card, citations: Record<string, Citation>): Card {
   const v = citationOf(c, citations)?.vintage;
   const cardHasDate = !!c.vintage && /^\d{4}/.test(c.vintage.replace(/^retrieved\s+/i, ''));
-  return !cardHasDate && v && /^\d{4}/.test(v) ? { ...c, vintage: v } : c;
+  // A dataset date is a plain date ("2007-09-05", "2024"); a fetch time
+  // ("2026-09-29T21:38Z") is a live reading and stays "at snapshot".
+  return !cardHasDate && v && /^\d{4}(-\d{2}){0,2}$/.test(v.trim()) ? { ...c, vintage: v } : c;
 }
 
 export function evidenceGroups(cards: Card[], cited: string[], firstLabel = 'Behind the answer'): EvidenceGroup[] {

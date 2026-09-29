@@ -14,5 +14,7 @@ describe('withDatasetDate', () => {
   it('keeps a card date it already has, and a live source with no dataset date', () => {
     expect(withDatasetDate(card('2024-07-03'), cites).vintage).toBe('2024-07-03');
     expect(withDatasetDate(card('live'), { fema_nfhl: { id: 'fema_nfhl', vintage: 'live' } as Citation }).vintage).toBe('live');
+    // A live source's fetch time is not a dataset date.
+    expect(withDatasetDate(card('live'), { fema_nfhl: { id: 'fema_nfhl', vintage: '2026-09-29T21:38Z' } as Citation }).vintage).toBe('live');
   });
 });
