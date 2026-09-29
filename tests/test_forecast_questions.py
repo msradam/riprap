@@ -75,7 +75,8 @@ def test_forecast_facts_are_the_forecasts_not_the_flood_zone(monkeypatch):
     monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (reply, "scripted"))
     out = syn.synthesize({"intent": "single_address", "plan": {"question": Q, "focus": {"time_frame": "future"}}})
     answer = out["paragraph"].split("**Answer.**\n")[1].split("\n\n")[0]
-    assert answer.index("[ttm_battery_surge]") < answer.index("[npcc4_slr]") and "fema_nfhl" not in answer
+    # The experimental surge forecast comes after the NPCC4 projection.
+    assert answer.index("[npcc4_slr]") < answer.index("[ttm_battery_surge]") and "fema_nfhl" not in answer
 
 
 def test_a_scenario_question_keeps_the_model_facts(monkeypatch):
