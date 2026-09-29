@@ -27,6 +27,7 @@
   .land-footer {
     margin-top: 96px;
     border-top: 1px solid var(--rule-soft);
+    background: var(--paper-deep);
   }
   .land-footer-inner {
     max-width: 1040px;

@@ -58,19 +58,17 @@
 .app-header-link { color: var(--ink-secondary); text-decoration: none; border-bottom: 1px solid transparent; display: inline-flex; align-items: center; min-height: 24px; }
 .app-header-link:hover { border-bottom-color: var(--ink); color: var(--ink); }
 
-/* Footer */
-.app-footer { background: var(--ink); color: var(--paper); }
+/* Footer: on sunken paper under a hairline, the lightest mass on the
+   page (DESIGN.md, depth from paper tones). */
+.app-footer { background: var(--paper-deep); color: var(--ink); border-top: 1px solid var(--rule-soft); }
 .app-footer-inner { max-width: 1600px; margin: 0 auto; padding: 32px 28px; display: flex; flex-direction: column; gap: 12px; }
 .app-footer-guard { font-size: 14px; line-height: 1.5; margin: 0; }
-/* Footer text on ink: links in paper with an underline (17:1), secondary
-   lines in slate-450 (6.8:1). Blue on ink was 2.65:1. */
-.app-footer-guard a { color: var(--paper); text-decoration: underline; text-underline-offset: 2px; }
-.app-footer-guard a:hover { text-decoration-thickness: 2px; }
+.app-footer-guard a,
+.app-footer-credits a { color: var(--riprap-text-link); text-decoration: underline; text-underline-offset: 2px; }
+.app-footer-guard a:hover,
+.app-footer-credits a:hover { text-decoration-thickness: 2px; }
 .app-footer-build,
-.app-footer-credits { font-size: 14px; line-height: 1.5; color: var(--riprap-slate-450); margin: 0; }
-.app-footer-credits a { color: var(--paper); text-decoration: underline dotted; text-underline-offset: 2px; }
-.app-footer-credits a:hover { text-decoration-style: solid; }
-.app-footer :focus-visible { outline-color: var(--paper); }
+.app-footer-credits { font-size: 14px; line-height: 1.5; color: var(--ink-secondary); margin: 0; }
 
 /* Tablet: the query moves to its own row so the context and the links
    (methodology, print, export PDF, status) share the first row. */
