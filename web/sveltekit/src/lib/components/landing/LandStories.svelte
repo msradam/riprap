@@ -104,17 +104,18 @@
   .stories-rest {
     gap: 32px 48px;
   }
+  /* Headlines wrap to two to four lines, so they get 1.3 leading. */
   h3 {
     margin: 0;
     font-size: 22px;
     font-weight: 600;
-    line-height: 1.25;
+    line-height: 1.3;
     text-wrap: balance;
   }
   .is-top h3 {
     font-size: 28px;
     font-weight: 700;
-    line-height: 1.18;
+    line-height: 1.3;
   }
   h3 a {
     color: var(--ink);
