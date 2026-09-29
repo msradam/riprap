@@ -1,1 +1,0 @@
-import{aa as s,Q as i,t as o,T as r}from"./coM4rHs0.js";function c(n,e){var a=void 0,t;s(()=>{a!==(a=e())&&(t&&(i(t),t=null),a&&(t=o(()=>{r(()=>a(n))})))})}const f="90-01 183rd Street, Queens",S=[{kind:"Address",q:f},{kind:"Question",q:"How many flooding complaints near 2017 East 17th Street, Brooklyn?"},{kind:"District",q:"QN 12"}];export{S as E,f as S,c as a};

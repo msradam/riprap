@@ -11,7 +11,9 @@
  */
 import { test, expect } from '@playwright/test';
 
-const PAGE = '/gallery/hollis/';
+// The backend does not serve the gallery; the static build does (as in journeys.spec.ts).
+const STATIC = process.env.RIPRAP_STATIC_URL || 'http://127.0.0.1:4179';
+const PAGE = `${STATIC}/gallery/hollis/`;
 
 async function mapReady(page: import('@playwright/test').Page) {
   await page.setViewportSize({ width: 1440, height: 900 });
