@@ -13,6 +13,9 @@
   let entry = $derived(data.entry);
   // Rebuilt from the saved `final` payload: no EventSource, no fetch.
   let run = $derived(RunState.fromFinal(entry.final, entry.address));
+  // A question entry is titled with its question, which a refusal's
+  // `final` does not carry (no plan question, no grounding question).
+  let queryText = $derived(entry.question ?? entry.address);
   let meta = $derived({ generatedAt: entry.generated_at, commit: entry.riprap_commit, stamp: llmStamp(entry) });
 
   /** Save this entry as a print snapshot and open the print route. The
@@ -20,7 +23,7 @@
    *  print route's "run this briefing" fallback leads somewhere sensible. */
   function print() {
     const id = entry.question ?? entry.address;
-    persistSnapshot(snapshotFromRun(run, id, entry.address, entry.generated_at, 'gallery'));
+    persistSnapshot(snapshotFromRun(run, id, queryText, entry.generated_at, 'gallery'));
     goto(resolve('/(app)/print/[queryId]', { queryId: encodeURIComponent(id) }));
   }
 </script>
@@ -30,7 +33,7 @@
   <meta name="description" content="Precomputed Riprap flood-exposure briefing for {entry.address}." />
 </svelte:head>
 
-<ResultsView {run} queryText={entry.address} snapshot {meta}>
+<ResultsView {run} {queryText} snapshot {meta}>
   {#snippet notice()}
     <button type="button" class="snapshot-print" onclick={print}>Print this briefing</button>
   {/snippet}

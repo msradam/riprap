@@ -477,8 +477,9 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     models,
     modelId,
     lists: sourceLists(run),
-    /** The mode line without the model id, which the method block prints once. */
-    modeLine: sentence(g ? modeLine({ ...g, model: undefined }) : null),
+    /** The mode line without the model id, which the method block prints
+     *  once. A refusal checked no claims, so it has none. */
+    modeLine: sentence(g && !run.refused ? modeLine({ ...g, model: undefined }) : null),
     dropped: g?.dropped_claims ?? [],
     unanswered: !!question && !!f && !run.stopped && !hasAnswer && g?.tier !== 'llm',
     generated: meta ? formatGeneratedAt(meta.generatedAt) : null,
@@ -523,7 +524,7 @@ export function snapshotFromRun(
     generatedAt,
     resolvedPlace: run.resolvedPlace,
     question: m.question,
-    mode: modeLine(g),
+    mode: run.refused ? null : modeLine(g),
     unanswered: m.unanswered,
     consulted: m.lists.consulted?.map(({ title, failed }) => ({ title, failed })),
     noData: m.lists.noData,

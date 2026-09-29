@@ -9,8 +9,9 @@
   let addresses = $derived(data.entries.filter((e) => !e.question));
 
   // The model is named once when every question briefing used the same one;
-  // otherwise each entry says how it was made.
-  let models = $derived([...new Set(questions.map((e) => e.modelName))]);
+  // otherwise each entry says how it was made. A refusal ran no model and
+  // does not count.
+  let models = $derived([...new Set(questions.flatMap((e) => (e.modelName ? [e.modelName] : [])))]);
   let sharedModel = $derived(models.length === 1 ? models[0] : null);
 
   // The note depends on how each answer was made. In extractive mode the
@@ -61,7 +62,7 @@
           {#if !sharedModel || !sharedNote}
             <p class="gallery-meta">
               {#if !sharedModel}
-                {#if e.modelName}Language model <span class="gallery-model">{e.modelName}</span>.{:else}{modeLabel(e.mode)}.{/if}
+                {#if e.modelName}Language model <span class="gallery-model">{e.modelName}</span>.{:else if e.mode !== 'llm'}{modeLabel(e.mode)}.{/if}
               {/if}
               {#if !sharedNote && e.modelName}{note(e.answerMode)}{/if}
             </p>
