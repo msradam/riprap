@@ -391,9 +391,9 @@ type ForecastValue = {
 function buildTimeseriesForecast(m: PebbleManifest, value: unknown): Card | null {
   const t = value as ForecastValue | null;
   if (!t || !t.available) return null;
-  // `interesting` is the explicit-hide gate (surge floor). If absent,
-  // default to showing the card: every available forecast should surface.
-  if (t.interesting === false) return null;
+  // Every available forecast gets its row, including a small surge
+  // (`interesting` false): the written briefing cites it, so its evidence
+  // row must exist; it sits in the folded forecast group.
   // Detect unit from which fields the adapter populated. Each branch is
   // its own pebble-family contract:
   //   ft + minutes_ahead       → surge (zero-shot)
