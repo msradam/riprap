@@ -205,7 +205,7 @@ _DEPTH_LABEL = {
 def summary_for_point(lat: float, lon: float,
                        radius_m: float = DEFAULT_RADIUS_M,
                        max_developments: int = DEFAULT_MAX_PER_QUERY) -> dict:
-    """Return the N nearest tier-1-3 NYCHA developments to (lat, lon)
+    """Return the tier-1-3 NYCHA developments near (lat, lon)
     within radius_m, with their pre-computed exposure flags from the
     register catalog at data/registers/nycha.json.
 
@@ -217,16 +217,12 @@ def summary_for_point(lat: float, lon: float,
     "no NYCHA developments at risk within 1 mi" is the honest answer
     for low-exposure queries.
     """
-    from app.registers._loader import nearest_n
-    hits = nearest_n("nycha", lat, lon, radius_m, max_developments)
-    if not hits:
-        # None nearby is a true zero: the register was read and nothing is
-        # in range, so the template reports zeros. A register that cannot
-        # be read raises instead, and the step is reported as failed.
-        return {"available": True,
-                "n_developments": 0, "n_inside_sandy_2012": 0, "n_in_dep_extreme_2080": 0,
-                "radius_m": radius_m,
-                "developments": []}
+    from app.registers._loader import narrative, nearest_n
+    # Every register row in range counts; only the nearest
+    # max_developments are listed. None in range is a true zero: the
+    # register was read and nothing is near. A register that cannot be
+    # read raises instead, and the step is reported as failed.
+    hits = nearest_n("nycha", lat, lon, radius_m, None)
 
     findings: list[DevelopmentFinding] = []
     for distance_m, row in hits:
@@ -271,7 +267,13 @@ def summary_for_point(lat: float, lon: float,
         "radius_m": radius_m,
         "n_inside_sandy_2012": n_in_sandy,
         "n_in_dep_extreme_2080": n_in_2080,
-        "developments": [vars(f) for f in findings],
+        # The register holds only exposed developments, so the count says so.
+        "narrative": narrative(
+            "flood-exposed NYCHA development", "flood-exposed NYCHA developments",
+            len(findings), radius_m, n_in_sandy, n_in_2080,
+            scope=" (the register lists only developments found inside the 2012 Sandy "
+                  "extent or a DEP stormwater scenario, not every development)"),
+        "developments": [vars(f) for f in findings[:max_developments]],
         "citation": ("Pre-computed from NYC Open Data NYCHA Developments "
                      "(phvi-damg) joined to Sandy 2012 Inundation Zone "
                      "(5xsi-dfpx) + NYC DEP Stormwater Flood Maps + "

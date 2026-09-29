@@ -29,6 +29,7 @@ from app.registers._footprint import (
     dep_class_buffered,
     inside_sandy_buffered,
 )
+from app.registers._loader import narrative
 
 _ROOT = Path(__file__).resolve().parents[2]
 if str(_ROOT) not in sys.path:
@@ -165,15 +166,11 @@ def summary_for_point(lat: float, lon: float,
     (small enough at ~150 entries to not need one), so we read the
     full GeoJSON and sample the rasters per-hit. Sub-ms per query."""
     near = _hospitals_near(lat, lon, radius_m)
-    if near.empty:
-        # None nearby is a true zero: the register was read and nothing is
-        # in range, so the template reports zeros. A register that cannot
-        # be read raises instead, and the step is reported as failed.
-        return {"available": True,
-                "n_hospitals": 0, "n_inside_sandy_2012": 0, "n_in_dep_extreme_2080": 0,
-                "radius_m": radius_m,
-                "hospitals": []}
-
+    # None in range is a true zero: the layer was read and nothing is
+    # near. A layer that cannot be read raises instead, and the step is
+    # reported as failed. The count is every hospital in range; exposure
+    # is checked for the nearest max_hospitals only.
+    n_in_range = len(near)
     near = near.head(max_hospitals)
     findings: list[HospitalFinding] = []
     for _, row in near.iterrows():
@@ -207,11 +204,14 @@ def summary_for_point(lat: float, lon: float,
                        if (f.dep_extreme_2080_class or 0) > 0)
     return {
         "available": True,
-        "n_hospitals": len(findings),
+        "n_hospitals": n_in_range,
+        "n_checked": len(findings),
         "radius_m": radius_m,
         "footprint_buffer_m": BUFFER_DOH_HOSPITAL_M,
         "n_inside_sandy_2012": n_in_sandy,
         "n_in_dep_extreme_2080": n_dep_2080,
+        "narrative": narrative("hospital", "hospitals", n_in_range, radius_m,
+                               n_in_sandy, n_dep_2080, n_checked=len(findings)),
         "hospitals": [vars(f) for f in findings],
         "citation": ("NYS DOH Health Facility Certification (vn5v-hh5r) + "
                      "NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + "

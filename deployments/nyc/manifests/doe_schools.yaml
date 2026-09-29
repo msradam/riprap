@@ -1,7 +1,7 @@
 id: doe_schools
 type: baked
 title: NYC DOE schools exposed nearby
-answers: "public schools nearby and how many sit in the Sandy extent or the DEP 2080 scenario"
+answers: "flood-exposed public schools nearby (the register lists only exposed schools) and how many sit in the Sandy extent or the DEP 2080 scenario"
 stone: keystone
 tier: empirical
 adapter: python_call
@@ -33,8 +33,8 @@ provenance:
   citation: NYC DOE schools, cross-referenced with Sandy 2012 + DEP extreme 2080.
 
 narration:
-  template: "{n_schools} NYC DOE schools within {radius_m} m of this address: {n_inside_sandy_2012} inside the 2012 Sandy inundation extent and {n_in_dep_extreme_2080} inside the DEP extreme stormwater scenario (2080 sea-level rise)."
-  short: NYC DOE schools within range of this address and their flood exposure.
+  template: "{narrative}"
+  short: Flood-exposed NYC DOE schools within range of this address, from a register that lists only exposed schools.
 
 display:
   variant: register

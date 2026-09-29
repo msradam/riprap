@@ -47,6 +47,7 @@ from app.registers._footprint import (
     dep_class_buffered,
     inside_sandy_buffered,
 )
+from app.registers._loader import narrative
 
 # Ensure `app/` is importable when this experiment is invoked directly
 # from its own subdir.
@@ -170,15 +171,11 @@ def summary_for_point(lat: float, lon: float,
     enriched with flood-exposure fields. Empty list when no entrances
     are nearby (silence over confabulation)."""
     near = _entrances_near(lat, lon, radius_m)
-    if near.empty:
-        # None nearby is a true zero: the register was read and nothing is
-        # in range, so the template reports zeros. A register that cannot
-        # be read raises instead, and the step is reported as failed.
-        return {"available": True,
-                "n_entrances": 0, "n_inside_sandy_2012": 0, "n_in_dep_extreme_2080": 0,
-                "radius_m": radius_m,
-                "entrances": []}
-
+    # None in range is a true zero: the layer was read and nothing is
+    # near. A layer that cannot be read raises instead, and the step is
+    # reported as failed. The count is every entrance in range; exposure
+    # is checked for the nearest max_entrances only.
+    n_in_range = len(near)
     near = near.head(max_entrances)
     findings: list[EntranceFinding] = []
     for _, row in near.iterrows():
@@ -214,11 +211,14 @@ def summary_for_point(lat: float, lon: float,
     n_ada = sum(1 for f in findings if f.ada_accessible)
     return {
         "available": True,
-        "n_entrances": len(findings),
+        "n_entrances": n_in_range,
+        "n_checked": len(findings),
         "radius_m": radius_m,
         "footprint_buffer_m": BUFFER_MTA_ENTRANCE_M,
         "n_inside_sandy_2012": n_in_sandy,
         "n_in_dep_extreme_2080": n_in_dep_2080,
+        "narrative": narrative("MTA subway entrance", "MTA subway entrances", n_in_range, radius_m,
+                               n_in_sandy, n_in_dep_2080, n_checked=len(findings)),
         "n_ada_accessible": n_ada,
         "entrances": [vars(f) for f in findings],
         "citation": ("MTA Open Data subway entrances + NYC OEM Sandy 2012 "

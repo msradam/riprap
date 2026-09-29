@@ -33,7 +33,7 @@ provenance:
   citation: NYS DOH Health Facility General Information (vn5v-hh5r) hospitals in NYC, cross-referenced with Sandy 2012 + DEP extreme 2080.
 
 narration:
-  template: "{n_hospitals} hospitals within {radius_m} m of this address: {n_inside_sandy_2012} inside the 2012 Sandy inundation extent and {n_in_dep_extreme_2080} inside the DEP extreme stormwater scenario (2080 sea-level rise)."
+  template: "{narrative}"
   short: NYC DOH-licensed hospitals within range of this address and their flood exposure.
 
 display:

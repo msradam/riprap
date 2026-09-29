@@ -127,20 +127,16 @@ def _dep_class(lat: float, lon: float, scenario: str):
 def summary_for_point(lat: float, lon: float,
                        radius_m: float = DEFAULT_RADIUS_M,
                        max_schools: int = DEFAULT_MAX_PER_QUERY) -> dict:
-    """N nearest tier-1-3 DOE schools to (lat, lon), with pre-computed
+    """Tier-1-3 DOE schools within radius_m of (lat, lon), with pre-computed
     exposure flags read from data/registers/schools.json. The bake
     script runs the buffered point-in-polygon math citywide once;
     per-query work is haversine + dict lookup."""
-    from app.registers._loader import nearest_n
-    hits = nearest_n("schools", lat, lon, radius_m, max_schools)
-    if not hits:
-        # None nearby is a true zero: the register was read and nothing is
-        # in range, so the template reports zeros. A register that cannot
-        # be read raises instead, and the step is reported as failed.
-        return {"available": True,
-                "n_schools": 0, "n_inside_sandy_2012": 0, "n_in_dep_extreme_2080": 0,
-                "radius_m": radius_m,
-                "schools": []}
+    from app.registers._loader import narrative, nearest_n
+    # Every register row in range counts; only the nearest max_schools
+    # are listed. None in range is a true zero: the register was read and
+    # nothing is near. A register that cannot be read raises instead, and
+    # the step is reported as failed.
+    hits = nearest_n("schools", lat, lon, radius_m, None)
 
     findings: list[SchoolFinding] = []
     for distance_m, row in hits:
@@ -190,7 +186,13 @@ def summary_for_point(lat: float, lon: float,
         "footprint_buffer_m": BUFFER_DOE_SCHOOL_M,
         "n_inside_sandy_2012": n_in_sandy,
         "n_in_dep_extreme_2080": n_dep_2080,
-        "schools": [vars(f) for f in findings],
+        # The register holds only exposed schools, so the count says so.
+        "narrative": narrative(
+            "flood-exposed NYC DOE school", "flood-exposed NYC DOE schools",
+            len(findings), radius_m, n_in_sandy, n_dep_2080,
+            scope=" (the register lists only schools found inside the 2012 Sandy "
+                  "extent or a DEP stormwater scenario, not every school)"),
+        "schools": [vars(f) for f in findings[:max_schools]],
         "citation": ("Pre-computed from NYC DOE Locations Points joined "
                      "to Sandy 2012 Inundation Zone (5xsi-dfpx) + "
                      "NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. "

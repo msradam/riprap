@@ -48,9 +48,9 @@ def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 
 def nearest_n(asset_class: str, lat: float, lon: float,
-              radius_m: float, n: int) -> list[tuple[float, dict]]:
-    """Return up to N rows within radius_m of (lat, lon), sorted by
-    distance ascending. Each entry is (distance_m, row)."""
+              radius_m: float, n: int | None) -> list[tuple[float, dict]]:
+    """Return up to N rows (all rows when n is None) within radius_m of
+    (lat, lon), sorted by distance ascending. Each entry is (distance_m, row)."""
     rows = load_register(asset_class)
     if not rows:
         return []
@@ -65,3 +65,16 @@ def nearest_n(asset_class: str, lat: float, lon: float,
             candidates.append((d, r))
     candidates.sort(key=lambda t: t[0])
     return candidates[:n]
+
+
+def narrative(one: str, many: str, n: int, radius_m: float, n_sandy: int, n_dep: int,
+              *, scope: str = "", n_checked: int | None = None) -> str:
+    """The register sentence. `scope` says what an exposed-only register
+    counted, so its count does not read as every asset in range; when
+    `n_checked` is below `n`, the exposure counts cover only the nearest
+    `n_checked`. The shape "N ... within R m ...: a inside the 2012 Sandy
+    ... b inside the DEP" is what answer_checks._REGISTER_RE parses."""
+    of = f"; of the nearest {n_checked}" if n_checked is not None and n_checked < n else ""
+    return (f"{n} {one if n == 1 else many} within {radius_m:g} m of this address{scope}{of}: "
+            f"{n_sandy} inside the 2012 Sandy inundation extent and {n_dep} inside the DEP "
+            "extreme stormwater scenario (2080 sea-level rise)")
