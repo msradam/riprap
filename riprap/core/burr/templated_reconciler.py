@@ -117,7 +117,10 @@ def _lead(state, items) -> str | None:
         add("sandy", f"{'inside' if state['sandy'].get('inside') else 'outside'} the 2012 Sandy inundation footprint")
     fema = state.get("fema_nfhl")
     if "fema_nfhl" in by_pebble and isinstance(fema, dict) and fema.get("fld_zone"):
-        add("fema_nfhl", f"in FEMA flood zone {fema['fld_zone']}")
+        from app.context.fema_nfhl import zone_reading
+
+        reading = None if fema.get("sfha") else zone_reading(fema.get("zone_subty"))
+        add("fema_nfhl", f"in FEMA flood zone {fema['fld_zone']}" + (f" ({reading})" if reading else ""))
     dep = {p: state[p] for p in _DEP_POINT if p in by_pebble and isinstance(state.get(p), dict)}
     if dep:
         ids = [by_pebble[p].doc_id for p in dep]

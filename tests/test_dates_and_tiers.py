@@ -56,3 +56,11 @@ def test_dem_label_states_no_resolution_the_raster_does_not_have():
 
 def test_policy_corpus_is_not_tiered_as_a_measurement():
     assert NYC.get("policy_corpus").manifest.tier == "proxy"
+
+
+def test_zone_x_subtype_is_read_out():
+    from app.context.fema_nfhl import zone_reading
+
+    assert zone_reading("0.2 PCT ANNUAL CHANCE FLOOD HAZARD") == "the 0.2% annual chance, or 500-year, floodplain"
+    assert zone_reading("AREA OF MINIMAL FLOOD HAZARD") == "an area of minimal flood hazard"
+    assert zone_reading(None) is None and zone_reading("  ") is None

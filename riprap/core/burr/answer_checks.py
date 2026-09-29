@@ -234,7 +234,9 @@ def kind_lead(question: str, docs: dict[str, str], values: dict | None) -> str |
         return None
     k = value["by_kind"].get(kind, 0)  # type: ignore[index]
     names = " and ".join(f'"{d}"' for d, kd in KIND.items() if kd == kind)
-    return (f"{k} {kind} complaint{'s' if k != 1 else ''}, counting the 311 "
+    years = value.get("years")  # type: ignore[union-attr]
+    window = f" in the last {years} year{'s' if years != 1 else ''}" if isinstance(years, int) else ""
+    return (f"{k} {kind} complaint{'s' if k != 1 else ''}{window}, counting the 311 "
             f"descriptor{'s' if ' and ' in names else ''} {names}.")
 
 
@@ -348,12 +350,27 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str],
 _HAPPENED_RE = re.compile(r"^\W*(has|have|had|did|was|were|is there|are there)\b.*\bflood", re.IGNORECASE)
 _SINCE_RE = re.compile(r"\bsince\s+(?:hurricane\s+|superstorm\s+)?(ida|sandy|(?:19|20)\d\d)\b", re.IGNORECASE)
 _STORM_YEAR = {"ida": 2021, "sandy": 2012}
+# The day each named storm struck NYC, so "since Ida" starts on its date,
+# not on January 1 of its year.
+_STORM_DATE = {"ida": (2021, 9, 1), "sandy": (2012, 10, 29)}
 _FLOODNET_WINDOW_YEARS = 3
 
 
 def is_past_event_question(question: str, focus: dict | None) -> bool:
     return ((focus or {}).get("time_frame") == "past" and bool(_HAPPENED_RE.search(question or ""))
             and not is_count_question(question))
+
+
+def _period_start_date(question: str):
+    """The first day of the asked period: a named storm's date, or January 1
+    of a named year. None when the question names no period."""
+    import datetime
+
+    m = _SINCE_RE.search(question or "")
+    if not m:
+        return None
+    w = m.group(1).lower()
+    return datetime.date(*_STORM_DATE[w]) if w in _STORM_DATE else datetime.date(int(w), 1, 1)
 
 
 def _period_start(question: str) -> int | None:
@@ -364,7 +381,7 @@ def _period_start(question: str) -> int | None:
     return _STORM_YEAR.get(w) or int(w)
 
 
-def _event(doc_id: str, v: dict, start: int | None, this_year: int) -> bool | None:
+def _event(doc_id: str, v: dict, start: int | None, this_year: int, start_date=None, today=None) -> bool | None:
     """True: the source reports a flood event in the asked period. False: it
     answered and reports none in the period. None: it cannot say (no value,
     unavailable, or its window does not cover the period)."""
@@ -378,7 +395,17 @@ def _event(doc_id: str, v: dict, start: int | None, this_year: int) -> bool | No
             return True
         # Events in the start year itself may fall before the event named;
         # and a window that starts after the period cannot show "none".
-        covers = this_year - int(v.get("years") or 0) <= start
+        years = int(v.get("years") or 0)
+        if start_date and today:
+            # The window runs back `years` from today: it covers the period
+            # only if it starts on or before the period's first day.
+            try:
+                window_start = today.replace(year=today.year - years)
+            except ValueError:  # February 29
+                window_start = today.replace(year=today.year - years, day=28)
+            covers = window_start <= start_date
+        else:
+            covers = this_year - years <= start
         return None if by_year.get(start) or not covers else False
     if doc_id == "floodnet" and "n_flood_events_3y" in v:
         if v.get("n_sensors") == 0:
@@ -415,8 +442,12 @@ def _past_event_verdict(question: str, docs: dict[str, str], values: dict | None
     elif re.search(r"\b311\b|complaint", q):
         relevant = [complaints]
     else:
-        relevant = [complaints, "floodnet"]
-    verdict = {i: _event(i, v, start, year) for i in relevant
+        relevant = ["floodnet", complaints]  # measured before proxy: FloodNet leads when it answers
+    start_date = _period_start_date(question)
+    today = datetime.date.today()
+    if this_year:
+        today = today.replace(year=this_year, day=min(today.day, 28))
+    verdict = {i: _event(i, v, start, year, start_date, today) for i in relevant
                if isinstance(v := (values or {}).get(i), dict) and docs.get(i)}
     return relevant, verdict
 

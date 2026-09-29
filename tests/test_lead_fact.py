@@ -34,10 +34,13 @@ def test_count_lead_falls_back_to_the_first_fact_with_a_count():
 
 
 def test_rule_set_yes_rests_on_the_first_relevant_source_reporting_an_event():
-    # "since Ida": complaints come first in the rule's precedence and report events after 2021.
-    assert past_event_source(Q_IDA, PAST, "yes", TEXTS, HOLLIS, 2026) == "nyc311"
+    # "since Ida": the measured FloodNet record comes first in the rule's precedence and reports events.
+    assert past_event_source(Q_IDA, PAST, "yes", TEXTS, HOLLIS, 2026) == "floodnet"
     assert _lead_fact("yes", ["ida_hwm", "floodnet", "nyc311"], False, None, Q_IDA, PAST, TEXTS, HOLLIS) == \
-        {"doc_id": "nyc311", "in_lead": False}
+        {"doc_id": "floodnet", "in_lead": False}
+    # Without a FloodNet event the proxy 311 record carries the yes.
+    only_311 = {**HOLLIS, "floodnet": {"n_sensors": 2, "n_flood_events_3y": 0}}
+    assert past_event_source(Q_IDA, PAST, "yes", TEXTS, only_311, 2026) == "nyc311"
 
 
 def test_rule_set_no_rests_on_the_source_the_question_names():
@@ -126,3 +129,16 @@ def test_scenario_question_drops_the_dep_scenarios_it_did_not_ask_about():
     # The scenario asked about is not among the facts: nothing is dropped.
     out = {"answer": {"lead": "yes", "facts": ["dep_extreme_2080", "fema_nfhl"]}}
     assert _extract(out, Q_2050, GOWANUS, {}, FUTURE)[1] == ["dep_extreme_2080", "fema_nfhl"]
+
+
+def test_since_ida_needs_a_window_that_starts_on_or_before_ida():
+    from riprap.core.burr.answer_checks import past_event_lead
+
+    q = "Have people near 355 Food Center Drive, Bronx reported flooding to 311 since Hurricane Ida?"
+    # A 4-year window read in 2026 starts in 2022, after Ida: it cannot say "no".
+    zero4 = {"nyc311": {"n": 0, "years": 4, "by_year": {}}}
+    assert past_event_lead(q, PAST, [], {"nyc311": "0 complaints."}, zero4, 2026)[0] == "cannot_answer"
+    zero = {"nyc311": {"n": 0, "years": 5, "by_year": {}}}
+    # "since 2022" starts inside the window: every source answered none, so the answer is no.
+    q22 = q.replace("since Hurricane Ida", "since 2022")
+    assert past_event_lead(q22, PAST, [], {"nyc311": "0 complaints."}, zero, 2026)[0] == "no"

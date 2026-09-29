@@ -26,8 +26,9 @@ def test_yes_when_an_observed_source_reports_an_event_in_the_period():
 
 
 def test_yes_adds_the_positive_source_when_the_model_left_it_out():
+    # FloodNet, the measured record, comes first in the rule's precedence.
     assert past_event_lead(Q_IDA, PAST, ["sandy_inundation"], TEXTS, HOLLIS, 2026) == \
-        ("yes", ["sandy_inundation", "nyc311"])
+        ("yes", ["sandy_inundation", "floodnet"])
 
 
 def test_no_only_when_every_relevant_source_answered_none():

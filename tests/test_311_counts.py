@@ -38,7 +38,7 @@ def test_kind_question_uses_that_kind_count():
     docs, values = {"nyc311_nta": V["narrative"]}, {"nyc311_nta": V}
     assert ac.relevant_figure("nyc311_nta", docs, values, Q) == 4
     assert ac.relevant_figure("nyc311_nta", docs, values, "How many 311 flood complaints?") == 6
-    assert ac.kind_lead(Q, docs, values) == ('4 street flooding complaints, counting the 311 descriptors '
+    assert ac.kind_lead(Q, docs, values) == ('4 street flooding complaints in the last 3 years, counting the 311 descriptors '
                                              '"Street Flooding (SJ)" and "Flooding on Street".')
 
 
@@ -51,5 +51,5 @@ def test_extractive_count_answer_leads_with_the_kind(monkeypatch):
     reply = {"claims": [], "answer": {"lead": "count", "facts": ["nyc311_nta"]}}
     monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (reply, "scripted"))
     out = syn.synthesize({"intent": "neighborhood", "plan": {"question": Q}, "nyc311_nta": V})
-    assert "**Answer.**\n4 street flooding complaints, counting the 311 descriptors" in out["paragraph"]
+    assert "**Answer.**\n4 street flooding complaints in the last 3 years, counting the 311 descriptors" in out["paragraph"]
     assert "4 street flooding, 2 sewer backup [nyc311_nta]." in out["paragraph"]

@@ -41,6 +41,22 @@ def _point_query(
     return data.get("features") or []
 
 
+# Zone X covers both the 0.2% annual chance floodplain and areas of minimal
+# hazard; the subtype tells them apart, so it is read out plainly.
+_SUBTYPE_READING = {
+    "0.2 PCT ANNUAL CHANCE FLOOD HAZARD": "the 0.2% annual chance, or 500-year, floodplain",
+    "AREA OF MINIMAL FLOOD HAZARD": "an area of minimal flood hazard",
+}
+
+
+def zone_reading(subtype: str | None) -> str | None:
+    """A plain reading of a FEMA zone subtype, or None when there is none."""
+    if not subtype or not subtype.strip():
+        return None
+    s = subtype.strip()
+    return _SUBTYPE_READING.get(s.upper(), s.lower())
+
+
 def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> dict[str, Any] | None:
     try:
         zones = _point_query(_ZONE_LAYER, lat, lon, "FLD_ZONE,ZONE_SUBTY,SFHA_TF", cache_ttl_s)
@@ -71,6 +87,8 @@ def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> dict[
     bits = [f"This address sits in FEMA flood zone {fld_zone}"]
     if sfha:
         bits.append(" (a Special Flood Hazard Area)")
+    elif (reading := zone_reading(zone.get("ZONE_SUBTY"))):
+        bits.append(f" ({reading})")
     if panel_id and eff_year:
         bits.append(f", per NFHL FIRM panel {panel_id}, effective {eff_year}")
     bits.append(".")
