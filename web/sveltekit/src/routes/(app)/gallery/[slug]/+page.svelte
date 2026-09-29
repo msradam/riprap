@@ -20,7 +20,7 @@
    *  print route's "run this briefing" fallback leads somewhere sensible. */
   function print() {
     const id = entry.question ?? entry.address;
-    persistSnapshot(snapshotFromRun(run, id, entry.address, entry.generated_at));
+    persistSnapshot(snapshotFromRun(run, id, entry.address, entry.generated_at, 'gallery'));
     goto(resolve('/(app)/print/[queryId]', { queryId: encodeURIComponent(id) }));
   }
 </script>

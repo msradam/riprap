@@ -416,20 +416,23 @@ const evidenceCard = ({ id, source, experimental, title, tier, vintage, citeId, 
   ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline, ...(parts && { parts: parts.map(evidenceCard) }) });
 
 /** Build the print snapshot from a finished run: the live route calls it
- *  when the stream ends, the gallery when a reader presses Print. It
- *  carries the report as the briefing page sets it, so the print route
+ *  when the stream ends, the gallery when a reader presses Print
+ *  (`origin: 'gallery'`, so live readings print dated to the snapshot).
+ *  It carries the report as the briefing page sets it, so the print route
  *  needs no RunState. */
 export function snapshotFromRun(
   run: RunState,
   queryId: string,
   queryText: string,
   generatedAt: string = new Date().toISOString(),
+  origin: 'gallery' | 'live' = 'live',
 ): PrintSnapshot {
   const m = briefingModel(run, queryText);
   const g = run.finalResult?.grounding;
   return {
     queryId,
     queryText,
+    origin,
     intent: run.plan?.intent ?? null,
     specialists: run.plan?.specialists?.length ?? 0,
     blocks: run.briefing.blocks,

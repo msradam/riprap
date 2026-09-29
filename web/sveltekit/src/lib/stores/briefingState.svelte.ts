@@ -17,6 +17,9 @@ import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 export interface PrintSnapshot {
   queryId: string;
   queryText: string;
+  /** A gallery snapshot or a live run. Older snapshots lack it and print
+   *  their live readings as "live". */
+  origin?: 'gallery' | 'live';
   intent: string | null;
   specialists: number;
   blocks: BriefingBlock[];

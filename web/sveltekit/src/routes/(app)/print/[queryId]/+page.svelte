@@ -168,6 +168,7 @@
             citations={snapshot.citations}
             notRun={snapshot.evidence.notRun}
             labelledby="print-evidence-h"
+            snapshotDate={snapshot.origin === 'gallery' ? generated.slice(0, 10) : null}
           />
         </section>
       {/if}
