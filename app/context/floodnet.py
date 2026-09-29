@@ -129,6 +129,18 @@ def flood_events_for(deployment_ids: list[str],
     ]
 
 
+def is_good(status: str) -> bool:
+    """FloodNet's own status codes: "good" and its variants ("good - fs")
+    mark a sensor in working order; every other code ("noisy",
+    "needs_driverail", "non-ota", "dead") is a maintenance flag."""
+    return (status or "").strip().lower().startswith("good")
+
+
+def status_words(status: str) -> str:
+    """A FloodNet status code in words, for anything a reader sees."""
+    return "in good working order" if is_good(status) else "flagged by FloodNet for maintenance"
+
+
 def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
     """One-shot summary used by the FSM node and the cited paragraph."""
     sensors = sensors_near(lat, lon, radius_m)
@@ -137,8 +149,12 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
     by_dep: dict[str, list[FloodEvent]] = {}
     for e in events:
         by_dep.setdefault(e.deployment_id, []).append(e)
-    peak = max((e for e in events if e.max_depth_mm is not None),
+    # The peak depth comes only from sensors in good working order: a
+    # flagged sensor's reading (a noisy 1172 mm) is not reported as the peak.
+    good = {s.deployment_id for s in sensors if is_good(s.status)}
+    peak = max((e for e in events if e.max_depth_mm is not None and e.deployment_id in good),
                key=lambda e: e.max_depth_mm or 0, default=None)
+    flagged = {s.deployment_id for s in sensors if not is_good(s.status)} & set(by_dep)
     n_sensors = len(sensors)
     n_events = len(events)
     # Templatable narrative for the manifest's narration.template.
@@ -156,15 +172,18 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
             f"above-curb flood event{'' if n_events == 1 else 's'} in the last 3 years."
         )
         if peak is not None and peak.max_depth_mm is not None:
-            status = next((x.status for x in sensors if x.deployment_id == peak.deployment_id), "")
-            flagged = f", at a sensor FloodNet marks as {status}" if status and status != "good" else ""
             narrative += (
-                f" Peak depth recorded by these sensors: "
-                f"{peak.max_depth_mm} mm on {peak.start_time[:10]}{flagged}."
+                f" Peak depth recorded by the sensors in good working order: "
+                f"{peak.max_depth_mm} mm on {peak.start_time[:10]}."
             )
+        if flagged:
+            k = len(flagged)
+            narrative += (f" {k} of the sensors that logged events {'is' if k == 1 else 'are'} flagged by "
+                          f"FloodNet for maintenance, so {'its' if k == 1 else 'their'} depths are not "
+                          f"used for the peak.")
     return {
         "n_sensors": n_sensors,
-        "sensors": [vars(s) for s in sensors],
+        "sensors": [{**vars(s), "status_words": status_words(s.status)} for s in sensors],
         "n_flood_events_3y": n_events,
         "n_sensors_with_events": len(by_dep),
         "peak_event": vars(peak) if peak else None,
