@@ -61,11 +61,6 @@ const EXEMPT_FILES = new Set<string>([
   // gated on the per-query manifest's display.map_layer flag, so
   // these strings only render when their data source is active.
   'map/RipMap.svelte',
-  // ColdStart copy mentions Sandy/NYCHA proximity as an example query
-  // type for the analyst's empty state. Pre-deployment-pick render,
-  // hazard-agnostic context; the per-query chip overrides downstream.
-  // TODO(post-launch): rotate the example query per active deployment.
-  'shell/ColdStart.svelte',
 ]);
 
 function walk(dir: string): string[] {

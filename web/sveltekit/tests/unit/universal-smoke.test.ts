@@ -22,10 +22,7 @@ import AppFooter from '$lib/components/shell/AppFooter.svelte';
 import StatusPill from '$lib/components/shell/StatusPill.svelte';
 import RipMark from '$lib/components/shell/RipMark.svelte';
 import SkipLink from '$lib/components/shell/SkipLink.svelte';
-import ColdStart from '$lib/components/shell/ColdStart.svelte';
 // Briefing
-import Briefing from '$lib/components/briefing/Briefing.svelte';
-import SectionHead from '$lib/components/briefing/SectionHead.svelte';
 import AnswerProse from '$lib/components/briefing/AnswerProse.svelte';
 import SourceNotes from '$lib/components/briefing/SourceNotes.svelte';
 import SourceList from '$lib/components/briefing/SourceList.svelte';
@@ -39,15 +36,9 @@ import { briefingModel } from '$lib/client/briefingModel';
 // States
 import ErrorCard from '$lib/components/states/ErrorCard.svelte';
 import SkeletonBriefing from '$lib/components/states/SkeletonBriefing.svelte';
-// Trace
-import TraceUI from '$lib/components/trace/TraceUI.svelte';
-import StatusGlyph from '$lib/components/trace/StatusGlyph.svelte';
 // Glyphs
-import AssetPin from '$lib/components/glyphs/AssetPin.svelte';
-import TierBadge from '$lib/components/glyphs/TierBadge.svelte';
 import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
 import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
-import SeverityMark from '$lib/components/glyphs/SeverityMark.svelte';
 
 const CITATION = {
   id: 'sandy', n: 1, tier: 'empirical' as const, source: 'Open Data', title: 'Inundation extent',
@@ -67,13 +58,8 @@ const CASES: SmokeCase[] = [
   { name: 'StatusPill',        Component: StatusPill,        props: {} },
   { name: 'RipMark',           Component: RipMark,           props: {} },
   { name: 'SkipLink',          Component: SkipLink,          props: {} },
-  { name: 'ColdStart',         Component: ColdStart,         props: {} },
 
   // Briefing
-  { name: 'Briefing',          Component: Briefing,
-    props: { blocks: [], citations: {} } },
-  { name: 'SectionHead',       Component: SectionHead,
-    props: { n: '01', label: 'Test', title: 'Test section' } },
   { name: 'AnswerProse',       Component: AnswerProse,
     props: { parts: [{ text: 'Outside the extent.', cite: 'sandy' }], citations: { sandy: CITATION } } },
   { name: 'SourceNotes',       Component: SourceNotes,
@@ -96,27 +82,11 @@ const CASES: SmokeCase[] = [
     props: { state: 'geocoder' } },
   { name: 'SkeletonBriefing',  Component: SkeletonBriefing,  props: {} },
 
-  // Trace
-  { name: 'TraceUI',           Component: TraceUI,
-    props: { root: {
-      id: 'root', name: 'root', status: 'ok' as const, ms: 0, tier: null,
-    } } },
-  { name: 'StatusGlyph',       Component: StatusGlyph,
-    props: { status: 'ok' as const } },
-
   // Glyphs
-  { name: 'AssetPin',          Component: AssetPin,
-    props: { kind: 'SCH' as const, size: 10 } },
-  { name: 'TierBadge',         Component: TierBadge,
-    props: { tier: 'empirical' as const } },
   { name: 'TierGlyph',         Component: TierGlyph,
     props: { tier: 'empirical' as const, size: 11, color: 'var(--tier-empirical)' } },
   { name: 'EvidenceMark',      Component: EvidenceMark,
     props: { tier: 'empirical' as const, size: 11 } },
-  { name: 'SeverityMark',      Component: SeverityMark,
-    // scoreTier 0 renders nothing by design (tested separately below) —
-    // use 1 here so the smoke suite's "produced some DOM" floor holds.
-    props: { scoreTier: 1 as const, size: 11 } },
 ];
 
 beforeEach(() => {

@@ -27,11 +27,11 @@
   let routeId = $derived(page.route.id ?? '');
   let isPrint = $derived(routeId.startsWith('/(app)/print/'));
   let chromeFree = $derived(isPrint || routeId === '/');
-  // Gallery and lab pages are static snapshots: the header must not call /api/*.
+  // Gallery pages are static snapshots: the header must not call /api/*.
   // Briefing pages carry the disclaimer in their scope note; the footer
   // does not repeat it.
   let isBriefing = $derived(routeId.startsWith('/(app)/q/') || routeId === '/(app)/gallery/[slug]');
-  let isGallery = $derived(routeId.startsWith('/(app)/gallery') || routeId.startsWith('/(app)/lab'));
+  let isGallery = $derived(routeId.startsWith('/(app)/gallery'));
 
   // The run status lives in a module store that outlives the /q/ page, so
   // a refused run's "stopped" pill followed the reader into the gallery.
