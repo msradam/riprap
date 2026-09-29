@@ -109,8 +109,8 @@ async function parseGeoJsonOrJson(file: File): Promise<ParsedFile> {
       size: file.size,
       detected: 'geojson_polygons',
       reason: polygonish
-        ? `FeatureCollection with ${features.length} features, contains polygons`
-        : `FeatureCollection with ${features.length} features`,
+        ? `FeatureCollection with ${features.length} feature${features.length === 1 ? '' : 's'}, contains polygons`
+        : `FeatureCollection with ${features.length} feature${features.length === 1 ? '' : 's'}`,
       preview: sample,
       rowCount: features.length,
       raw: data,
@@ -216,7 +216,7 @@ export function generateManifest(parsed: ParsedFile, mapping: PebbleMapping): Re
       source_name: `User-supplied · ${parsed.filename}`,
       license: 'User-provided',
       doc_id: mapping.pebbleName,
-      citation: `BYOD pebble: ${parsed.filename} (${parsed.rowCount.toLocaleString()} records)`,
+      citation: `BYOD pebble: ${parsed.filename} (${parsed.rowCount.toLocaleString()} record${parsed.rowCount === 1 ? '' : 's'})`,
     },
     narration: {
       short: `${mapping.title} (user-supplied via BYOD).`,

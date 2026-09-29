@@ -536,11 +536,9 @@ function _itemRow(reg: string, item: RegisterItem): NonNullable<Card['registers'
                 ?? str(item.label) ?? str(item.name) ?? 'item');
   const distance = num(item.distance_m);
   const detail_bits: string[] = [];
-  if (distance != null) detail_bits.push(`${distance} m`);
-  const borough = str(item.borough);
+  if (distance != null) detail_bits.push(`${Math.round(distance)} m`);
   const routes = str(item.daytime_routes);
   if (routes) detail_bits.push(routes);
-  else if (borough) detail_bits.push(borough);
   const sourceId = (str(item.station_id) ?? str(item.tds_num)
                     ?? str(item.loc_code) ?? str(item.fac_id)
                     ?? str(item.source_id) ?? null);
@@ -551,6 +549,34 @@ function _itemRow(reg: string, item: RegisterItem): NonNullable<Card['registers'
   };
 }
 
+/** "2 NYCHA developments", "1 NYCHA development". */
+const countOf = (n: number, noun: string) => `${n} ${n === 1 ? noun.replace(/s$/, '') : noun}`;
+
+/** One register's finding as a plain sentence, from the values it
+ *  returned: how many listed assets are within its radius, how many sit in
+ *  the 2012 Sandy extent and the DEP 2080 scenario, and the nearest ones
+ *  by name. The registers list only exposed assets (the manifest titles
+ *  say "exposed nearby"), so the count is of exposed assets. */
+export function registerSentence(
+  noun: string,
+  v: Record<string, unknown>,
+  items: RegisterItem[],
+  listed: NonNullable<Card['registers']>,
+): string {
+  const radius = num(v.radius_m);
+  const within = radius != null ? `within ${radius} m` : 'within range';
+  if (!items.length) return `No exposed ${noun} ${within}.`;
+  const sandy = num(v.n_inside_sandy_2012);
+  const dep = num(v.n_in_dep_extreme_2080);
+  const flags = [
+    sandy != null && `${sandy} inside the 2012 Sandy extent`,
+    dep != null && `${dep} in the DEP 2080 scenario`,
+  ].filter(Boolean).join(' and ');
+  const names = listed.map((r) => (r.detail ? `${r.label} (${r.detail})` : r.label)).join(', ');
+  const nearest = listed.length < items.length ? `; the nearest ${listed.length}: ${names}` : `: ${names}`;
+  return `${countOf(items.length, `exposed ${noun}`)} ${within}${flags ? `, ${flags}` : ''}${names ? nearest : ''}.`;
+}
+
 function buildRegisterComposite(
   registerManifests: PebbleManifest[],
   state: Final,
@@ -559,6 +585,9 @@ function buildRegisterComposite(
   const rows: NonNullable<Card['registers']> = [];
   const docIds: string[] = [];
   const agencies: string[] = [];
+  // Registers with items read first, then the empty and unavailable ones.
+  const found: string[] = [];
+  const empty: string[] = [];
   // Per-pebble cap so one super-dense register doesn't dominate.
   const PER_PEBBLE_CAP = 4;
   for (const m of registerManifests) {
@@ -566,6 +595,8 @@ function buildRegisterComposite(
     if (!v) continue;
     const reg = _regLabelFromManifest(m);
     const items = _itemsFromRegisterValue(v);
+    const noun = m.title.replace(/\s+exposed nearby$/i, '');
+    const unavailable = m.fallback.message ?? `The ${reg} list was not available when this briefing ran.`;
     if (v.available === false || items.length === 0) {
       // Unavailable is not zero: only a register that could not be read
       // says so; one read with nothing in range reports 0.
@@ -573,21 +604,19 @@ function buildRegisterComposite(
       rows.push({
         reg, tier: 'empirical',
         label: null, detail: null, sourceId: null,
-        note: v.available === false
-          ? (m.fallback.message ?? `The ${reg} list was not available when this briefing ran.`)
-          : `0 within ${radius != null ? `${radius} m` : 'range'}`,
+        note: v.available === false ? unavailable : `0 within ${radius != null ? `${radius} m` : 'range'}`,
       });
+      empty.push(v.available === false ? unavailable : registerSentence(noun, v as Record<string, unknown>, items, []));
       continue;
     }
-    for (const it of items.slice(0, PER_PEBBLE_CAP)) {
-      rows.push(_itemRow(reg, it));
-    }
+    const listed = items.slice(0, PER_PEBBLE_CAP).map((it) => _itemRow(reg, it));
+    rows.push(...listed);
+    found.push(registerSentence(noun, v as Record<string, unknown>, items, listed));
     const doc = m.provenance.doc_id ?? m.id;
     docIds.push(doc);
     agencies.push(m.provenance.source_name);
   }
   if (!rows.length) return null;
-  const fired = rows.filter(r => r.label).length;
   return {
     id: 'fsm-registers',
     stone: 'keystone', tier: 'empirical', variant: 'register',
@@ -595,7 +624,7 @@ function buildRegisterComposite(
     vintage: RIPRAP_VINTAGE,
     title: 'Nearby exposed assets',
     registers: rows,
-    sub: `${fired} of ${rows.length} register rows have items, joined within range`,
+    sub: [...found, ...empty].join(' '),
     docId: docIds[0] ?? 'registers',
     citeId: 'registers',
     mapLayer: 'registers',
@@ -628,7 +657,7 @@ function buildHistogramCard(m: PebbleManifest, value: unknown): Card | null {
   // Honest negative ("0 calls") still surfaces — same all-clear contract
   // as the NWS / ida_hwm cards. The narrative explains the zero.
   const hist = Array.isArray(t.histogram) ? t.histogram : [];
-  const headline = t.headline_value ?? `${n} calls`;
+  const headline = t.headline_value ?? `${n} call${n === 1 ? '' : 's'}`;
   const radius = num(t.radius_m);
   const years = num(t.years);
   const sparkSub = (radius != null && years != null)

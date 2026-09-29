@@ -298,10 +298,10 @@ export function runFacts(run: RunState): string[] {
     count('silent_by_design') && `${count('silent_by_design')} ran with nothing to report`,
     count('warned') && `${count('warned')} returned a warning`,
     count('errored') && `${count('errored')} failed`,
-    count('not_invoked') && `${count('not_invoked')} were not run`
+    count('not_invoked') && `${count('not_invoked')} ${count('not_invoked') === 1 ? 'was' : 'were'} not run`
   ].filter(Boolean);
   const facts = [
-    `${d.stones.length} Stones, ${all.length} registered source functions: ${parts.join(', ')}.`
+    `${d.stones.length} Stone${d.stones.length === 1 ? '' : 's'}, ${all.length} registered source function${all.length === 1 ? '' : 's'}: ${parts.join(', ')}.`
   ];
   const wall = d.wallSeconds ?? run.runWallSeconds;
   if (wall != null && Number.isFinite(wall)) facts.push(`The run took ${wall < 1 ? `${Math.round(wall * 1000)} ms` : `${wall.toFixed(1)} s`}.`);
