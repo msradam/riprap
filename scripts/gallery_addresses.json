@@ -3,7 +3,8 @@
   "slug": "brooklyn-heights",
   "neighborhood": "Brooklyn Heights, Brooklyn",
   "address": "189 Atlantic Avenue, Brooklyn, NY",
-  "reason": "A dry control: outside the Sandy extent, in FEMA zone X and outside all three DEP scenarios."
+  "reason": "Dry on the maps: outside the Sandy extent, in FEMA zone X and outside all three DEP scenarios, yet 311 flood complaints were filed within 200 m.",
+  "feature_doc": "nyc311"
  },
  {
   "slug": "hollis",
@@ -17,13 +18,13 @@
   "neighborhood": "Gerritsen Beach, Brooklyn",
   "address": "35 Seba Avenue, Brooklyn, NY",
   "reason": "Inside the Sandy extent, yet mapped in zone X's 0.2% annual chance, or 500-year, floodplain.",
-  "feature_doc": "fema_nfhl"
+  "feature_doc": "nyc311"
  },
  {
   "slug": "broad-channel",
   "neighborhood": "Broad Channel, Queens",
   "address": "20 West 12th Road, Queens, NY",
-  "reason": "An island community inside the Sandy extent and zone AE, with 39 FloodNet flood events in three years.",
+  "reason": "An island community inside the Sandy extent and zone AE, where FloodNet sensors log street flooding.",
   "feature_doc": "floodnet"
  },
  {
@@ -45,13 +46,13 @@
   "neighborhood": "Rockaway Park, Queens",
   "address": "116-02 Rockaway Beach Boulevard, Queens, NY",
   "reason": "Inside the Sandy extent, yet in FEMA zone X on the 2007 flood map.",
-  "feature_doc": "sandy_inundation"
+  "feature_doc": "fema_nfhl"
  },
  {
   "slug": "midland-beach",
   "neighborhood": "Midland Beach, Staten Island",
   "address": "801 Father Capodanno Boulevard, Staten Island, NY",
-  "reason": "Staten Island's east shore: inside the Sandy extent, with 36 FloodNet flood events in three years.",
+  "reason": "Staten Island's east shore: inside the Sandy extent, with FloodNet sensors that log flood events.",
   "feature_doc": "floodnet"
  },
  {
@@ -73,13 +74,13 @@
   "neighborhood": "South Street Seaport, Manhattan",
   "address": "19 Fulton Street, Manhattan, NY",
   "reason": "Lower Manhattan's waterfront: inside the Sandy extent, zone AE and the future high tide area of the DEP 2080 scenario.",
-  "feature_doc": "sandy_inundation"
+  "feature_doc": "dep_extreme_2080"
  },
  {
   "slug": "inwood",
   "neighborhood": "Inwood, Manhattan",
   "address": "4970 Broadway, Manhattan, NY",
-  "reason": "Upper Manhattan: outside every flood map, with 4 Ida high-water marks within 800 m and 8 FloodNet flood events in three years.",
+  "reason": "Upper Manhattan: outside every flood map, with Ida high-water marks surveyed within 800 m and FloodNet flood events logged nearby.",
   "feature_doc": "ida_hwm"
  },
  {

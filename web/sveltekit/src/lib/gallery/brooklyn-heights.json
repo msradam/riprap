@@ -3,8 +3,8 @@
  "neighborhood": "Brooklyn Heights, Brooklyn",
  "address": "189 Atlantic Avenue, Brooklyn, NY",
  "question": null,
- "generated_at": "2026-09-29T18:23Z",
- "riprap_commit": "f8c6e20",
+ "generated_at": "2026-09-29T21:38Z",
+ "riprap_commit": "1001427",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -105,7 +105,7 @@
      "template": "This address {inside_phrasing} the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM)."
     },
     "provenance": {
-     "source_name": "NYC Open Data \u2014 Sandy Inundation Zone",
+     "source_name": "NYC Open Data, Sandy Inundation Zone",
      "source_url": "https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/uyj8-7rv5",
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC Sandy Inundation Zone (NYC OpenData uyj8-7rv5, empirical 2012 extent)",
@@ -154,7 +154,7 @@
    {
     "id": "fema_nfhl",
     "type": "live",
-    "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+    "title": "FEMA National Flood Hazard Layer, flood zone at this point",
     "stone": "cornerstone",
     "tier": "modeled",
     "maturity": "production",
@@ -171,7 +171,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "FEMA National Flood Hazard Layer (NFHL) \u2014 effective flood zones",
+     "source_name": "FEMA National Flood Hazard Layer (NFHL), effective flood zones",
      "source_url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
      "license": "U.S. Public Domain",
      "citation": "FEMA NFHL effective flood-zone polygon and FIRM panel intersecting the address point.",
@@ -237,10 +237,10 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NYC DEP Stormwater Flood Map \u2014 Extreme (3.66 in/hr, 2080 SLR)",
+     "source_name": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 SLR)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map \u2014 Extreme (3.66 in/hr, 2080 SLR)",
+     "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 SLR)",
      "doc_id": "dep_extreme_2080",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -303,10 +303,10 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
+     "source_name": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 SLR)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
+     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 SLR)",
      "doc_id": "dep_moderate_2050",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -365,14 +365,14 @@
      "icon": "\ud83d\udca7"
     },
     "narration": {
-     "short": "NYC DEP moderate stormwater scenario at this address \u2014 current SLR baseline, near-term horizon.",
+     "short": "NYC DEP moderate stormwater scenario at this address, current SLR baseline, near-term horizon.",
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, current SLR)",
+     "source_name": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current SLR)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, current SLR)",
+     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current SLR)",
      "doc_id": "dep_moderate_current",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -385,7 +385,7 @@
    {
     "id": "ida_hwm",
     "type": "baked",
-    "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
+    "title": "Hurricane Ida 2021, USGS high-water marks",
     "stone": "cornerstone",
     "tier": "empirical",
     "maturity": "production",
@@ -402,9 +402,9 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "USGS STN \u2014 Hurricane Ida 2021 (Event 312, NY)",
+     "source_name": "USGS STN, Hurricane Ida 2021 (Event 312, NY)",
      "source_url": "https://stn.wim.usgs.gov/STNServices/HWMs/FilteredHWMs.json?Event=312&States=NY",
-     "license": "USGS \u2014 public domain",
+     "license": "USGS, public domain",
      "citation": "USGS STN Hurricane Ida 2021 high-water marks (Event 312, NY). The link is the STN web-service query that returns these marks; the retired STN Data Portal page no longer exists.",
      "doc_id": "ida_hwm",
      "date_modified": null,
@@ -503,7 +503,7 @@
     "provenance": {
      "source_name": "USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)",
      "source_url": "https://www.usgs.gov/3d-elevation-program",
-     "license": "USGS \u2014 public domain",
+     "license": "USGS, public domain",
      "citation": "USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)",
      "doc_id": "microtopo",
      "date_modified": null,
@@ -550,7 +550,7 @@
    {
     "id": "policy_corpus",
     "type": "baked",
-    "title": "NYC flood-policy corpus \u2014 agency reports + plans",
+    "title": "NYC flood-policy corpus, agency reports + plans",
     "stone": "cornerstone",
     "tier": "proxy",
     "maturity": "experimental",
@@ -569,7 +569,7 @@
     "provenance": {
      "source_name": "NYC flood-policy corpus (Comptroller, DEP, ConEd, MTA, NYCHA)",
      "source_url": null,
-     "license": "Mixed \u2014 see per-document citations",
+     "license": "Mixed, see per-document citations",
      "citation": "NYC flood-policy corpus retrieved by Granite-embedding similarity search over Comptroller \"Rain to Resilience\" (2024), ConEd Storm Hardening (2022), DEP Wastewater Resiliency Plan (2013), MTA Resilience Plan (2025), NYCHA \"Lessons from Sandy\".",
      "doc_id": "policy_corpus",
      "date_modified": null,
@@ -600,7 +600,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "FloodNet NYC \u2014 ultrasonic depth sensor network (CUNY/NYU/Brooklyn College)",
+     "source_name": "FloodNet NYC, ultrasonic depth sensor network (CUNY/NYU/Brooklyn College)",
      "source_url": "https://www.floodnet.nyc/data-downloads",
      "license": "CC-BY-NC-SA 4.0",
      "citation": "FloodNet NYC, community-led real-time street-flood sensor network. Data CC-BY-NC-SA 4.0; derivatives must carry the same license. Readings come from the FloodNet API (api.floodnet.nyc), which has no stable page per sensor or event, so the link is the project's data download page. https://www.floodnet.nyc/data-downloads",
@@ -699,7 +699,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "National Weather Service (NOAA) \u2014 nearest METAR station",
+     "source_name": "National Weather Service (NOAA), nearest METAR station",
      "source_url": "https://api.weather.gov/",
      "license": "U.S. Public Domain",
      "citation": "NWS hourly METAR observations, nearest station to address.",
@@ -732,7 +732,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NOAA CO-OPS \u2014 tide gauge water level (nearest station)",
+     "source_name": "NOAA CO-OPS, tide gauge water level (nearest station)",
      "source_url": "https://tidesandcurrents.noaa.gov/",
      "license": "U.S. Public Domain",
      "citation": "NOAA CO-OPS tide-gauge water level observations, nearest station to address.",
@@ -748,7 +748,7 @@
    {
     "id": "usgs_gauges",
     "type": "live",
-    "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+    "title": "USGS stream gauge, live stage at the nearest gauge",
     "stone": "touchstone",
     "tier": "empirical",
     "maturity": "production",
@@ -798,7 +798,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "MTA \u2014 subway/rail entrances register",
+     "source_name": "MTA, subway/rail entrances register",
      "source_url": "https://data.ny.gov/Transportation/MTA-Subway-Entrances-and-Exits/i9wp-a4ja",
      "license": "MTA Open Data Terms",
      "citation": "MTA subway/rail entrances, cross-referenced with Sandy 2012 + DEP extreme 2080.",
@@ -897,7 +897,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NYC DOE \u2014 schools register",
+     "source_name": "NYC DOE, schools register",
      "source_url": "https://data.cityofnewyork.us/Education/2019-2020-School-Locations/wg9x-4ke6",
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC DOE schools, cross-referenced with Sandy 2012 + DEP extreme 2080.",
@@ -963,7 +963,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "National Weather Service (NOAA) \u2014 active alerts at point",
+     "source_name": "National Weather Service (NOAA), active alerts at point",
      "source_url": "https://api.weather.gov/",
      "license": "U.S. Public Domain",
      "citation": "NWS active alerts at address (flood / coastal / wind).",
@@ -979,7 +979,7 @@
    {
     "id": "ttm_battery_surge",
     "type": "model",
-    "title": "Granite TTM r2 Battery Surge \u2014 96 h hourly nowcast (fine-tune)",
+    "title": "Granite TTM r2 Battery Surge, 96 h hourly nowcast (fine-tune)",
     "stone": "lodestone",
     "tier": "modeled",
     "maturity": "experimental",
@@ -1012,7 +1012,7 @@
    {
     "id": "ttm_311_forecast",
     "type": "model",
-    "title": "Granite TTM r2 \u2014 weekly 311 flood-complaint forecast at this address",
+    "title": "Granite TTM r2, weekly 311 flood-complaint forecast at this address",
     "stone": "lodestone",
     "tier": "modeled",
     "maturity": "experimental",
@@ -1029,7 +1029,7 @@
      "template": "Experimental: {history_total_complaints} flood-related 311 complaints within {radius_m} m over the last {days_context} days; a zero-shot TTM forecast with no rainfall input and no backtest projects about {forecast_weekly_equivalent} per week for the next {days_horizon} days."
     },
     "provenance": {
-     "source_name": "IBM Granite TimeSeries TTM r2 \u2014 311 flood-complaint forecast",
+     "source_name": "IBM Granite TimeSeries TTM r2, 311 flood-complaint forecast",
      "source_url": "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2",
      "license": "Apache-2.0",
      "citation": "Granite TimeSeries TTM r2 (IBM Granite, Apache-2.0) zero-shot forecast on weekly NYC 311 flood-complaint counts at the queried address (200 m radius).",
@@ -1045,7 +1045,7 @@
    {
     "id": "floodnet_forecast",
     "type": "model",
-    "title": "Granite TTM r2 \u2014 flood-event recurrence at nearest FloodNet sensor",
+    "title": "Granite TTM r2, flood-event recurrence at nearest FloodNet sensor",
     "stone": "lodestone",
     "tier": "modeled",
     "maturity": "experimental",
@@ -1062,7 +1062,7 @@
      "template": "Experimental: the nearest FloodNet sensor ({sensor_name}, {distance_from_query_m} m away) recorded {history_total_events} flood events in the last {history_window_days} days; a zero-shot TTM forecast with no rainfall input expects {forecast_28d_expected_events} events in the next 28 days."
     },
     "provenance": {
-     "source_name": "IBM Granite TimeSeries TTM r2 \u2014 FloodNet sensor event-recurrence forecast",
+     "source_name": "IBM Granite TimeSeries TTM r2, FloodNet sensor event-recurrence forecast",
      "source_url": "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2",
      "license": "Apache-2.0",
      "citation": "Granite TimeSeries TTM r2 (IBM Granite, Apache-2.0) zero-shot forecast on daily flood-event counts at the nearest FloodNet ultrasonic depth sensor.",
@@ -1091,14 +1091,14 @@
      "icon": "\ud83c\udf0a"
     },
     "narration": {
-     "short": "NYC Panel on Climate Change (2024) sea-level rise projections \u2014 Battery, NY.",
+     "short": "NYC Panel on Climate Change (2024) sea-level rise projections, Battery, NY.",
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NPCC4 \u2014 New York City Panel on Climate Change (2024)",
+     "source_name": "NPCC4, New York City Panel on Climate Change (2024)",
      "source_url": "https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15116",
      "license": "CC-BY-NC 4.0 (Annals of the New York Academy of Sciences)",
-     "citation": "Rosenzweig, C. et al. (eds.). New York City Panel on Climate Change 2024 Report (NPCC4). Annals of the New York Academy of Sciences, Vol. 1539 (parent doi:10.1111/nyas.15116). Sea-level rise projections from the NPCC4 climate-science chapter \u2014 Battery (NOAA station 8518750) reference.",
+     "citation": "Rosenzweig, C. et al. (eds.). New York City Panel on Climate Change 2024 Report (NPCC4). Annals of the New York Academy of Sciences, Vol. 1539 (parent doi:10.1111/nyas.15116). Sea-level rise projections from the NPCC4 climate-science chapter, Battery (NOAA station 8518750) reference.",
      "doc_id": "npcc4_slr",
      "date_modified": "2024",
      "retrieved_at": "2026-07-11"
@@ -1201,25 +1201,25 @@
    "dep_extreme_2080": {
     "depth_class": 0,
     "depth_label": "outside",
-    "citation": "NYC DEP Stormwater Flood Map \u2014 Extreme (3.66 in/hr, 2080 SLR)",
+    "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 SLR)",
     "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (3.66 in/hr, 2080 SLR)."
    },
    "dep_moderate_2050": {
     "depth_class": 0,
     "depth_label": "outside",
-    "citation": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
+    "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 SLR)",
     "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR)."
    },
    "dep_moderate_current": {
     "depth_class": 0,
     "depth_label": "outside",
-    "citation": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, current SLR)",
+    "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current SLR)",
     "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, current sea level, near-term)."
    }
   },
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThis address is outside the 2012 Sandy inundation footprint [sandy_inundation], in FEMA flood zone X (an area of minimal flood hazard) [fema_nfhl], and outside the modeled flooding in the DEP stormwater scenarios for current, 2050 and 2080 sea-level rise [dep_moderate_current][dep_moderate_2050][dep_extreme_2080]. 22 flood-related 311 complaints were filed within 200 m in the last 5 years [nyc311].\n\n**Hazard Reader.**\nThis address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone X (an area of minimal flood hazard), per NFHL FIRM panel 3604970203F, effective 2007 [fema_nfhl]. NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, outside the modeled flooding [dep_extreme_2080]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address [ida_hwm]. Nearest USGS-surveyed mark: Intersection of Carroll St. and Nevins St., Gowanus, Brooklyn (1417 m away) [ida_hwm]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.00% of Brooklyn Heights showed new water (100% of it observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water]. Elevation 16.89 m; this point is higher than 58% of the ground within 200 m (the 58th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 16.76 m; TWI (topographic wetness index; higher means water tends to collect) 7.1 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 10.51 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 1 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\nNo FloodNet sensors deployed within 600 m of this address [floodnet]. 22 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 10 catch basin, 9 sewer backup, 2 street flooding, 1 manhole overflow [nyc311]. Latest METAR at Central Park, NY (10.1 km away): 20.0\u00b0C, observed 2026-09-29 17:51 UTC [nws_obs]. Latest reading at The Battery, NY: 2.77 ft above MLLW (+0.48 ft vs predicted tide), observed 2026-09-29 18:18 UTC [noaa_tides]. No active USGS stream gauge reported a stage reading in the last 2 days within about 10 to 14 km of this address [usgs_gauges].\n\n**Asset Register.**\n40 MTA subway entrances within 800 m of this address; of the nearest 8: 0 inside the 2012 Sandy inundation extent and 4 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 1 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 0 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doe_school_exposure]. 4 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood / coastal / wind alerts at this point [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.23 m at The Battery about 13 h ahead [ttm_battery_surge]. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions. Experimental: 2 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.01 per week for the next 96 days [ttm_311_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThis address is outside the 2012 Sandy inundation footprint [sandy_inundation], in FEMA flood zone X (an area of minimal flood hazard) [fema_nfhl], and outside the modeled flooding in the DEP stormwater scenarios for current, 2050 and 2080 sea-level rise [dep_moderate_current][dep_moderate_2050][dep_extreme_2080]. 22 flood-related 311 complaints were filed within 200 m in the last 5 years [nyc311].\n\n**Hazard Reader.**\nThis address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone X (an area of minimal flood hazard), per NFHL FIRM panel 3604970203F, effective 2007 [fema_nfhl]. NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, outside the modeled flooding [dep_extreme_2080]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address [ida_hwm]. Nearest USGS-surveyed mark: Intersection of Carroll St. and Nevins St., Gowanus, Brooklyn (1417 m away) [ida_hwm]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.00% of Brooklyn Heights showed new water (100% of it observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water]. Elevation 16.89 m; this point is higher than 58% of the ground within 200 m (the 58th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 16.76 m; TWI (topographic wetness index; higher means water tends to collect) 7.1 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 10.51 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 1 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\nNo FloodNet sensors deployed within 600 m of this address [floodnet]. 22 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 10 catch basin, 9 sewer backup, 2 street flooding, 1 manhole overflow [nyc311]. Latest METAR at Central Park, NY (10.1 km away): 19.4\u00b0C, observed 2026-09-29 20:51 UTC [nws_obs]. Latest reading at The Battery, NY: 0.63 ft above MLLW (+0.4 ft vs predicted tide), observed 2026-09-29 21:30 UTC [noaa_tides]. No active USGS stream gauge reported a stage reading in the last 2 days within about 10 to 14 km of this address [usgs_gauges].\n\n**Asset Register.**\n40 MTA subway entrances within 800 m of this address; of the nearest 8: 0 inside the 2012 Sandy inundation extent and 4 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 1 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 0 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doe_school_exposure]. 4 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood / coastal / wind alerts at this point [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.2 m at The Battery about 62 h ahead [ttm_battery_surge]. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions. Experimental: 2 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.01 per week for the next 96 days [ttm_311_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThis address is outside the 2012 Sandy inundation footprint [sandy_inundation], in FEMA flood zone X (an area of minimal flood hazard) [fema_nfhl], and outside the modeled flooding in the DEP stormwater scenarios for current, 2050 and 2080 sea-level rise [dep_moderate_current][dep_moderate_2050][dep_extreme_2080]. 22 flood-related 311 complaints were filed within 200 m in the last 5 years [nyc311].\n\n**Hazard Reader.**\nThis address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone X (an area of minimal flood hazard), per NFHL FIRM panel 3604970203F, effective 2007 [fema_nfhl]. NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, outside the modeled flooding [dep_extreme_2080]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address [ida_hwm]. Nearest USGS-surveyed mark: Intersection of Carroll St. and Nevins St., Gowanus, Brooklyn (1417 m away) [ida_hwm]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.00% of Brooklyn Heights showed new water (100% of it observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water]. Elevation 16.89 m; this point is higher than 58% of the ground within 200 m (the 58th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 16.76 m; TWI (topographic wetness index; higher means water tends to collect) 7.1 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 10.51 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 1 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\nNo FloodNet sensors deployed within 600 m of this address [floodnet]. 22 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 10 catch basin, 9 sewer backup, 2 street flooding, 1 manhole overflow [nyc311]. Latest METAR at Central Park, NY (10.1 km away): 20.0\u00b0C, observed 2026-09-29 17:51 UTC [nws_obs]. Latest reading at The Battery, NY: 2.77 ft above MLLW (+0.48 ft vs predicted tide), observed 2026-09-29 18:18 UTC [noaa_tides]. No active USGS stream gauge reported a stage reading in the last 2 days within about 10 to 14 km of this address [usgs_gauges].\n\n**Asset Register.**\n40 MTA subway entrances within 800 m of this address; of the nearest 8: 0 inside the 2012 Sandy inundation extent and 4 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 1 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 0 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doe_school_exposure]. 4 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood / coastal / wind alerts at this point [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.23 m at The Battery about 13 h ahead [ttm_battery_surge]. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions. Experimental: 2 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.01 per week for the next 96 days [ttm_311_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThis address is outside the 2012 Sandy inundation footprint [sandy_inundation], in FEMA flood zone X (an area of minimal flood hazard) [fema_nfhl], and outside the modeled flooding in the DEP stormwater scenarios for current, 2050 and 2080 sea-level rise [dep_moderate_current][dep_moderate_2050][dep_extreme_2080]. 22 flood-related 311 complaints were filed within 200 m in the last 5 years [nyc311].\n\n**Hazard Reader.**\nThis address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone X (an area of minimal flood hazard), per NFHL FIRM panel 3604970203F, effective 2007 [fema_nfhl]. NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, outside the modeled flooding [dep_extreme_2080]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address [ida_hwm]. Nearest USGS-surveyed mark: Intersection of Carroll St. and Nevins St., Gowanus, Brooklyn (1417 m away) [ida_hwm]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.00% of Brooklyn Heights showed new water (100% of it observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water]. Elevation 16.89 m; this point is higher than 58% of the ground within 200 m (the 58th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 16.76 m; TWI (topographic wetness index; higher means water tends to collect) 7.1 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 10.51 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 1 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\nNo FloodNet sensors deployed within 600 m of this address [floodnet]. 22 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 10 catch basin, 9 sewer backup, 2 street flooding, 1 manhole overflow [nyc311]. Latest METAR at Central Park, NY (10.1 km away): 19.4\u00b0C, observed 2026-09-29 20:51 UTC [nws_obs]. Latest reading at The Battery, NY: 0.63 ft above MLLW (+0.4 ft vs predicted tide), observed 2026-09-29 21:30 UTC [noaa_tides]. No active USGS stream gauge reported a stage reading in the last 2 days within about 10 to 14 km of this address [usgs_gauges].\n\n**Asset Register.**\n40 MTA subway entrances within 800 m of this address; of the nearest 8: 0 inside the 2012 Sandy inundation extent and 4 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 1 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 0 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doe_school_exposure]. 4 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood / coastal / wind alerts at this point [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.2 m at The Battery about 62 h ahead [ttm_battery_surge]. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions. Experimental: 2 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.01 per week for the next 96 days [ttm_311_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -1231,7 +1231,7 @@
   "citations": {
    "sandy_inundation": {
     "doc_id": "sandy_inundation",
-    "source": "NYC Open Data \u2014 Sandy Inundation Zone",
+    "source": "NYC Open Data, Sandy Inundation Zone",
     "title": "NYC Sandy Inundation Zone (NYC OpenData uyj8-7rv5, empirical 2012 extent)",
     "url": "https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/uyj8-7rv5",
     "license": "NYC Open Data Terms of Use",
@@ -1242,19 +1242,19 @@
    },
    "fema_nfhl": {
     "doc_id": "fema_nfhl",
-    "source": "FEMA National Flood Hazard Layer (NFHL) \u2014 effective flood zones",
+    "source": "FEMA National Flood Hazard Layer (NFHL), effective flood zones",
     "title": "FEMA NFHL effective flood-zone polygon and FIRM panel intersecting the address point.",
     "url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
     "license": "U.S. Public Domain",
     "date_modified": "2007-09-05",
-    "retrieved_at": "2026-09-29T18:23Z",
+    "retrieved_at": "2026-09-29T21:38Z",
     "vintage": "2007-09-05",
     "maturity": "production"
    },
    "dep_extreme_2080": {
     "doc_id": "dep_extreme_2080",
-    "source": "NYC DEP Stormwater Flood Map \u2014 Extreme (3.66 in/hr, 2080 SLR)",
-    "title": "NYC DEP Stormwater Flood Map \u2014 Extreme (3.66 in/hr, 2080 SLR)",
+    "source": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 SLR)",
+    "title": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 SLR)",
     "url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2024-07-03",
@@ -1264,8 +1264,8 @@
    },
    "dep_moderate_2050": {
     "doc_id": "dep_moderate_2050",
-    "source": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
-    "title": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
+    "source": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 SLR)",
+    "title": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 SLR)",
     "url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2024-07-03",
@@ -1275,8 +1275,8 @@
    },
    "dep_moderate_current": {
     "doc_id": "dep_moderate_current",
-    "source": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, current SLR)",
-    "title": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, current SLR)",
+    "source": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current SLR)",
+    "title": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current SLR)",
     "url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2024-07-03",
@@ -1286,10 +1286,10 @@
    },
    "ida_hwm": {
     "doc_id": "ida_hwm",
-    "source": "USGS STN \u2014 Hurricane Ida 2021 (Event 312, NY)",
+    "source": "USGS STN, Hurricane Ida 2021 (Event 312, NY)",
     "title": "USGS STN Hurricane Ida 2021 high-water marks (Event 312, NY). The link is the STN web-service query that returns these marks; the retired STN Data Portal page no longer exists.",
     "url": "https://stn.wim.usgs.gov/STNServices/HWMs/FilteredHWMs.json?Event=312&States=NY",
-    "license": "USGS \u2014 public domain",
+    "license": "USGS, public domain",
     "date_modified": null,
     "retrieved_at": "2026-07-11",
     "vintage": "retrieved 2026-07-11",
@@ -1311,7 +1311,7 @@
     "source": "USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)",
     "title": "USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)",
     "url": "https://www.usgs.gov/3d-elevation-program",
-    "license": "USGS \u2014 public domain",
+    "license": "USGS, public domain",
     "date_modified": null,
     "retrieved_at": "2026-07-11",
     "vintage": "retrieved 2026-07-11",
@@ -1322,7 +1322,7 @@
     "source": "NYC flood-policy corpus (Comptroller, DEP, ConEd, MTA, NYCHA)",
     "title": "NYC flood-policy corpus retrieved by Granite-embedding similarity search over Comptroller \"Rain to Resilience\" (2024), ConEd Storm Hardening (2022), DEP Wastewater Resiliency Plan (2013), MTA Resilience Plan (2025), NYCHA \"Lessons from Sandy\".",
     "url": null,
-    "license": "Mixed \u2014 see per-document citations",
+    "license": "Mixed, see per-document citations",
     "date_modified": null,
     "retrieved_at": "2026-07-11",
     "vintage": "retrieved 2026-07-11",
@@ -1330,13 +1330,13 @@
    },
    "floodnet": {
     "doc_id": "floodnet",
-    "source": "FloodNet NYC \u2014 ultrasonic depth sensor network (CUNY/NYU/Brooklyn College)",
+    "source": "FloodNet NYC, ultrasonic depth sensor network (CUNY/NYU/Brooklyn College)",
     "title": "FloodNet NYC, community-led real-time street-flood sensor network. Data CC-BY-NC-SA 4.0; derivatives must carry the same license. Readings come from the FloodNet API (api.floodnet.nyc), which has no stable page per sensor or event, so the link is the project's data download page. https://www.floodnet.nyc/data-downloads",
     "url": "https://www.floodnet.nyc/data-downloads",
     "license": "CC-BY-NC-SA 4.0",
-    "date_modified": "2026-09-29T18:23Z",
-    "retrieved_at": "2026-09-29T18:23Z",
-    "vintage": "2026-09-29T18:23Z",
+    "date_modified": "2026-09-29T21:38Z",
+    "retrieved_at": "2026-09-29T21:38Z",
+    "vintage": "2026-09-29T21:38Z",
     "maturity": "production"
    },
    "nyc311": {
@@ -1346,30 +1346,30 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-29T01:44:54+0000",
-    "retrieved_at": "2026-09-29T18:23Z",
+    "retrieved_at": "2026-09-29T21:38Z",
     "vintage": "2026-09-29T01:44:54+0000",
     "maturity": "production"
    },
    "nws_obs": {
     "doc_id": "nws_obs",
-    "source": "National Weather Service (NOAA) \u2014 nearest METAR station",
+    "source": "National Weather Service (NOAA), nearest METAR station",
     "title": "NWS hourly METAR observations, nearest station to address.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-09-29T18:23Z",
-    "retrieved_at": "2026-09-29T18:23Z",
-    "vintage": "2026-09-29T18:23Z",
+    "date_modified": "2026-09-29T21:38Z",
+    "retrieved_at": "2026-09-29T21:38Z",
+    "vintage": "2026-09-29T21:38Z",
     "maturity": "production"
    },
    "noaa_tides": {
     "doc_id": "noaa_tides",
-    "source": "NOAA CO-OPS \u2014 tide gauge water level (nearest station)",
+    "source": "NOAA CO-OPS, tide gauge water level (nearest station)",
     "title": "NOAA CO-OPS tide-gauge water level observations, nearest station to address.",
     "url": "https://tidesandcurrents.noaa.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-09-29T18:23Z",
-    "retrieved_at": "2026-09-29T18:23Z",
-    "vintage": "2026-09-29T18:23Z",
+    "date_modified": "2026-09-29T21:38Z",
+    "retrieved_at": "2026-09-29T21:38Z",
+    "vintage": "2026-09-29T21:38Z",
     "maturity": "production"
    },
    "usgs_gauges": {
@@ -1378,14 +1378,14 @@
     "title": "USGS Water Data latest continuous values, nearest active stream gauge to address.",
     "url": "https://api.waterdata.usgs.gov/ogcapi/v1/collections/latest-continuous",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-09-29T18:23Z",
-    "retrieved_at": "2026-09-29T18:23Z",
-    "vintage": "2026-09-29T18:23Z",
+    "date_modified": "2026-09-29T21:38Z",
+    "retrieved_at": "2026-09-29T21:38Z",
+    "vintage": "2026-09-29T21:38Z",
     "maturity": "production"
    },
    "mta_entrance_exposure": {
     "doc_id": "mta_entrance_exposure",
-    "source": "MTA \u2014 subway/rail entrances register",
+    "source": "MTA, subway/rail entrances register",
     "title": "MTA subway/rail entrances, cross-referenced with Sandy 2012 + DEP extreme 2080.",
     "url": "https://data.ny.gov/Transportation/MTA-Subway-Entrances-and-Exits/i9wp-a4ja",
     "license": "MTA Open Data Terms",
@@ -1407,7 +1407,7 @@
    },
    "doe_school_exposure": {
     "doc_id": "doe_school_exposure",
-    "source": "NYC DOE \u2014 schools register",
+    "source": "NYC DOE, schools register",
     "title": "NYC DOE schools, cross-referenced with Sandy 2012 + DEP extreme 2080.",
     "url": "https://data.cityofnewyork.us/Education/2019-2020-School-Locations/wg9x-4ke6",
     "license": "NYC Open Data Terms of Use",
@@ -1429,13 +1429,13 @@
    },
    "nws_alerts": {
     "doc_id": "nws_alerts",
-    "source": "National Weather Service (NOAA) \u2014 active alerts at point",
+    "source": "National Weather Service (NOAA), active alerts at point",
     "title": "NWS active alerts at address (flood / coastal / wind).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-09-29T18:23Z",
-    "retrieved_at": "2026-09-29T18:23Z",
-    "vintage": "2026-09-29T18:23Z",
+    "date_modified": "2026-09-29T21:38Z",
+    "retrieved_at": "2026-09-29T21:38Z",
+    "vintage": "2026-09-29T21:38Z",
     "maturity": "production"
    },
    "ttm_battery_surge": {
@@ -1444,26 +1444,26 @@
     "title": "Granite TTM r2 fine-tune (msradam/Granite-TTM-r2-Battery-Surge, Apache-2.0, trained on AMD MI300X). 96 h hourly Battery storm-surge nowcast.",
     "url": "https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge",
     "license": "Apache-2.0",
-    "date_modified": "2026-09-29T18:23Z",
-    "retrieved_at": "2026-09-29T18:23Z",
-    "vintage": "2026-09-29T18:23Z",
+    "date_modified": "2026-09-29T21:38Z",
+    "retrieved_at": "2026-09-29T21:38Z",
+    "vintage": "2026-09-29T21:38Z",
     "maturity": "experimental"
    },
    "ttm_311_forecast": {
     "doc_id": "ttm_311_forecast",
-    "source": "IBM Granite TimeSeries TTM r2 \u2014 311 flood-complaint forecast",
+    "source": "IBM Granite TimeSeries TTM r2, 311 flood-complaint forecast",
     "title": "Granite TimeSeries TTM r2 (IBM Granite, Apache-2.0) zero-shot forecast on weekly NYC 311 flood-complaint counts at the queried address (200 m radius).",
     "url": "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2",
     "license": "Apache-2.0",
-    "date_modified": "2026-09-29T18:23Z",
-    "retrieved_at": "2026-09-29T18:23Z",
-    "vintage": "2026-09-29T18:23Z",
+    "date_modified": "2026-09-29T21:38Z",
+    "retrieved_at": "2026-09-29T21:38Z",
+    "vintage": "2026-09-29T21:38Z",
     "maturity": "experimental"
    },
    "npcc4_slr": {
     "doc_id": "npcc4_slr",
-    "source": "NPCC4 \u2014 New York City Panel on Climate Change (2024)",
-    "title": "Rosenzweig, C. et al. (eds.). New York City Panel on Climate Change 2024 Report (NPCC4). Annals of the New York Academy of Sciences, Vol. 1539 (parent doi:10.1111/nyas.15116). Sea-level rise projections from the NPCC4 climate-science chapter \u2014 Battery (NOAA station 8518750) reference.",
+    "source": "NPCC4, New York City Panel on Climate Change (2024)",
+    "title": "Rosenzweig, C. et al. (eds.). New York City Panel on Climate Change 2024 Report (NPCC4). Annals of the New York Academy of Sciences, Vol. 1539 (parent doi:10.1111/nyas.15116). Sea-level rise projections from the NPCC4 climate-science chapter, Battery (NOAA station 8518750) reference.",
     "url": "https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15116",
     "license": "CC-BY-NC 4.0 (Annals of the New York Academy of Sciences)",
     "date_modified": "2024",
@@ -1480,7 +1480,7 @@
    },
    {
     "id": "fema_nfhl",
-    "title": "FEMA National Flood Hazard Layer \u2014 flood zone at this point",
+    "title": "FEMA National Flood Hazard Layer, flood zone at this point",
     "stone": "cornerstone"
    },
    {
@@ -1500,7 +1500,7 @@
    },
    {
     "id": "ida_hwm",
-    "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
+    "title": "Hurricane Ida 2021, USGS high-water marks",
     "stone": "cornerstone"
    },
    {
@@ -1535,7 +1535,7 @@
    },
    {
     "id": "usgs_gauges",
-    "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+    "title": "USGS stream gauge, live stage at the nearest gauge",
     "stone": "touchstone"
    },
    {
@@ -1565,17 +1565,17 @@
    },
    {
     "id": "ttm_battery_surge",
-    "title": "Granite TTM r2 Battery Surge \u2014 96 h hourly nowcast (fine-tune)",
+    "title": "Granite TTM r2 Battery Surge, 96 h hourly nowcast (fine-tune)",
     "stone": "lodestone"
    },
    {
     "id": "ttm_311_forecast",
-    "title": "Granite TTM r2 \u2014 weekly 311 flood-complaint forecast at this address",
+    "title": "Granite TTM r2, weekly 311 flood-complaint forecast at this address",
     "stone": "lodestone"
    },
    {
     "id": "floodnet_forecast",
-    "title": "Granite TTM r2 \u2014 flood-event recurrence at nearest FloodNet sensor",
+    "title": "Granite TTM r2, flood-event recurrence at nearest FloodNet sensor",
     "stone": "lodestone"
    },
    {
@@ -1585,7 +1585,7 @@
    },
    {
     "id": "policy_corpus",
-    "title": "NYC flood-policy corpus \u2014 agency reports + plans",
+    "title": "NYC flood-policy corpus, agency reports + plans",
     "stone": "cornerstone"
    }
   ],
@@ -1608,19 +1608,19 @@
   "dep_extreme_2080": {
    "depth_class": 0,
    "depth_label": "outside",
-   "citation": "NYC DEP Stormwater Flood Map \u2014 Extreme (3.66 in/hr, 2080 SLR)",
+   "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 SLR)",
    "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (3.66 in/hr, 2080 SLR)."
   },
   "dep_moderate_2050": {
    "depth_class": 0,
    "depth_label": "outside",
-   "citation": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
+   "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 SLR)",
    "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR)."
   },
   "dep_moderate_current": {
    "depth_class": 0,
    "depth_label": "outside",
-   "citation": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, current SLR)",
+   "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current SLR)",
    "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, current sea level, near-term)."
   },
   "ida_hwm": {
@@ -1895,12 +1895,12 @@
    "station_id": "KNYC",
    "station_name": "Central Park, NY",
    "distance_km": 10.1,
-   "obs_time": "2026-09-29T17:51:00+00:00",
-   "temp_c": 20.0,
+   "obs_time": "2026-09-29T20:51:00+00:00",
+   "temp_c": 19.4,
    "precip_last_hour_mm": null,
    "precip_last_3h_mm": null,
    "precip_last_6h_mm": null,
-   "narrative": "Latest METAR at Central Park, NY (10.1 km away): 20.0\u00b0C, observed 2026-09-29 17:51 UTC.",
+   "narrative": "Latest METAR at Central Park, NY (10.1 km away): 19.4\u00b0C, observed 2026-09-29 20:51 UTC.",
    "error": null
   },
   "noaa_tides": {
@@ -1910,12 +1910,12 @@
    "station_lon": -74.0142,
    "distance_km": 2.1,
    "datum": "MLLW",
-   "observed_ft": 2.77,
-   "observed_ft_mllw": 2.77,
-   "predicted_ft_mllw": 2.29,
-   "residual_ft": 0.48,
-   "obs_time": "2026-09-29 18:18",
-   "narrative": "Latest reading at The Battery, NY: 2.77 ft above MLLW (+0.48 ft vs predicted tide), observed 2026-09-29 18:18 UTC.",
+   "observed_ft": 0.63,
+   "observed_ft_mllw": 0.63,
+   "predicted_ft_mllw": 0.23,
+   "residual_ft": 0.4,
+   "obs_time": "2026-09-29 21:30",
+   "narrative": "Latest reading at The Battery, NY: 0.63 ft above MLLW (+0.4 ft vs predicted tide), observed 2026-09-29 21:30 UTC.",
    "error": null
   },
   "usgs_gauges": {
@@ -2218,115 +2218,115 @@
    "station_name": "The Battery, NY",
    "context_hours": 1024,
    "horizon_hours": 96,
-   "history_recent_m": 0.184,
+   "history_recent_m": 0.118,
    "history_peak_abs_m": 1.095,
-   "forecast_peak_m": 0.23,
-   "forecast_peak_hours_ahead": 13,
-   "forecast_peak_time_utc": "2026-09-30T06:00",
+   "forecast_peak_m": 0.2,
+   "forecast_peak_hours_ahead": 62,
+   "forecast_peak_time_utc": "2026-10-02T11:00",
    "forecast_array_m": [
-    0.1979,
-    0.1944,
-    0.1868,
-    0.178,
-    0.1709,
-    0.1613,
-    0.164,
-    0.1676,
-    0.176,
-    0.1835,
-    0.1909,
-    0.208,
-    0.2279,
-    0.2244,
-    0.2056,
-    0.1847,
-    0.1799,
-    0.1732,
-    0.1566,
-    0.1471,
-    0.1533,
-    0.1629,
-    0.1764,
-    0.1692,
-    0.1632,
-    0.1605,
-    0.1584,
-    0.1555,
-    0.1505,
-    0.1438,
-    0.1495,
-    0.1513,
-    0.1548,
-    0.1598,
-    0.1696,
-    0.1883,
-    0.2076,
-    0.208,
-    0.1998,
-    0.191,
-    0.1934,
-    0.1934,
-    0.1877,
-    0.1834,
-    0.1858,
-    0.1865,
-    0.1943,
-    0.1856,
-    0.1782,
-    0.1754,
-    0.1782,
-    0.1845,
-    0.1835,
-    0.1752,
-    0.1798,
-    0.1796,
-    0.1765,
-    0.1691,
-    0.1678,
-    0.1825,
-    0.2003,
-    0.1959,
-    0.1852,
-    0.1791,
-    0.1859,
-    0.1876,
-    0.1813,
-    0.178,
-    0.1797,
-    0.1748,
-    0.1765,
-    0.1653,
-    0.1562,
-    0.1499,
-    0.1485,
-    0.1559,
-    0.159,
-    0.1534,
-    0.1576,
-    0.161,
-    0.1591,
-    0.1485,
-    0.1413,
+    0.139,
+    0.1238,
+    0.1153,
+    0.1157,
+    0.1215,
+    0.1215,
+    0.1303,
     0.1529,
-    0.1714,
-    0.1647,
-    0.148,
-    0.1386,
-    0.1479,
+    0.1758,
+    0.1792,
+    0.1615,
+    0.1521,
+    0.1573,
     0.1536,
-    0.1496,
-    0.1481,
-    0.1548,
+    0.1392,
+    0.1251,
+    0.1233,
+    0.1334,
+    0.134,
+    0.127,
+    0.1282,
+    0.1216,
+    0.1261,
+    0.1255,
+    0.1208,
+    0.1187,
+    0.1147,
+    0.1162,
+    0.1184,
+    0.1128,
+    0.1173,
+    0.1379,
+    0.1627,
+    0.1734,
+    0.1648,
+    0.165,
+    0.1787,
+    0.1858,
+    0.1814,
+    0.1714,
+    0.1654,
+    0.1687,
+    0.1648,
+    0.1543,
+    0.1537,
+    0.1486,
+    0.1561,
+    0.1623,
+    0.1656,
+    0.1712,
+    0.1717,
+    0.1755,
+    0.1734,
+    0.1579,
     0.1508,
-    0.1505,
-    0.137
+    0.1623,
+    0.1803,
+    0.1857,
+    0.1752,
+    0.1758,
+    0.1904,
+    0.196,
+    0.1915,
+    0.1828,
+    0.1776,
+    0.1784,
+    0.1688,
+    0.1539,
+    0.1501,
+    0.142,
+    0.1472,
+    0.1511,
+    0.1509,
+    0.1537,
+    0.1523,
+    0.1573,
+    0.1569,
+    0.1405,
+    0.1296,
+    0.1391,
+    0.155,
+    0.1552,
+    0.1397,
+    0.1384,
+    0.1544,
+    0.1612,
+    0.1581,
+    0.1524,
+    0.1512,
+    0.1549,
+    0.1446,
+    0.1246,
+    0.1176,
+    0.1051,
+    0.1072,
+    0.1114
    ],
    "hf_model_card": "huggingface.co/msradam/Granite-TTM-r2-Battery-Surge",
    "rmse_m": 0.157,
    "skill_vs_persistence": "35% lower RMSE than persistence, a weak baseline, on mostly calm 2023-2024 test windows; not evaluated on storms or against NOAA ETSS",
    "spatial_note": "regional \u00b7 The Battery, NY, not point-of-query",
    "compute": "local CPU",
-   "elapsed_s": 0.33
+   "elapsed_s": 2.56
   },
   "ttm_311_forecast": {
    "available": true,
@@ -2397,7 +2397,7 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790706228.49844,
+    "started_at": 1790717915.292737,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -2410,7 +2410,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790706228.51934,
+    "started_at": 1790717915.315642,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2422,8 +2422,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790706230.358167,
-    "elapsed_s": 0.17,
+    "started_at": 1790717917.921963,
+    "elapsed_s": 0.19,
     "err": null,
     "result": {
      "inside": {
@@ -2436,8 +2436,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790706230.3578508,
-    "elapsed_s": 0.27,
+    "started_at": 1790717917.922092,
+    "elapsed_s": 0.08,
     "err": null,
     "result": {
      "zone": "X",
@@ -2449,8 +2449,8 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790706230.357714,
-    "elapsed_s": 0.18,
+    "started_at": 1790717917.923188,
+    "elapsed_s": 0.2,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2460,8 +2460,8 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790706230.358141,
-    "elapsed_s": 0.18,
+    "started_at": 1790717917.923143,
+    "elapsed_s": 0.2,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2471,8 +2471,8 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790706230.3581078,
-    "elapsed_s": 0.18,
+    "started_at": 1790717917.923115,
+    "elapsed_s": 0.21,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2482,7 +2482,7 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790706230.358646,
+    "started_at": 1790717917.923248,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2494,8 +2494,8 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790706230.35859,
-    "elapsed_s": 0.24,
+    "started_at": 1790717917.923166,
+    "elapsed_s": 0.27,
     "err": null,
     "result": {
      "new_water_m2_within_radius": 0,
@@ -2505,8 +2505,8 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790706230.3591092,
-    "elapsed_s": 0.47,
+    "started_at": 1790717917.923042,
+    "elapsed_s": 0.51,
     "err": null,
     "result": {
      "elev_m": 16.89,
@@ -2517,8 +2517,8 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790706230.359082,
-    "elapsed_s": 0.21,
+    "started_at": 1790717917.923485,
+    "elapsed_s": 0.23,
     "err": null,
     "result": {
      "n_sensors": 0,
@@ -2528,8 +2528,8 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790706230.35934,
-    "elapsed_s": 0.88,
+    "started_at": 1790717917.923872,
+    "elapsed_s": 0.48,
     "err": null,
     "result": {
      "n": 22
@@ -2538,8 +2538,8 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790706230.36028,
-    "elapsed_s": 0.26,
+    "started_at": 1790717917.924865,
+    "elapsed_s": 0.14,
     "err": null,
     "result": {
      "station": "KNYC",
@@ -2550,20 +2550,20 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790706230.359912,
-    "elapsed_s": 0.35,
+    "started_at": 1790717917.926377,
+    "elapsed_s": 0.37,
     "err": null,
     "result": {
      "station": "8518750",
-     "observed_ft_mllw": 2.77,
-     "residual_ft": 0.48
+     "observed_ft_mllw": 0.63,
+     "residual_ft": 0.4
     }
    },
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790706230.361781,
-    "elapsed_s": 1.57,
+    "started_at": 1790717917.92452,
+    "elapsed_s": 1.9,
     "err": null,
     "result": {
      "station": null,
@@ -2574,8 +2574,8 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790706230.360802,
-    "elapsed_s": 2.3,
+    "started_at": 1790717917.92535,
+    "elapsed_s": 2.4,
     "err": null,
     "result": {
      "n_entrances": 40,
@@ -2586,7 +2586,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790706230.360838,
+    "started_at": 1790717917.925287,
     "elapsed_s": 0.04,
     "err": null,
     "result": {
@@ -2598,7 +2598,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790706230.397863,
+    "started_at": 1790717917.968214,
     "elapsed_s": 0.01,
     "err": null,
     "result": {
@@ -2610,8 +2610,8 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790706230.4078999,
-    "elapsed_s": 0.16,
+    "started_at": 1790717917.9748979,
+    "elapsed_s": 0.18,
     "err": null,
     "result": {
      "n_hospitals": 4,
@@ -2622,8 +2622,8 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790706230.532844,
-    "elapsed_s": 0.71,
+    "started_at": 1790717918.007147,
+    "elapsed_s": 0.18,
     "err": null,
     "result": {
      "n_active": 0
@@ -2632,22 +2632,22 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790706230.5356128,
-    "elapsed_s": 0.33,
+    "started_at": 1790717918.06188,
+    "elapsed_s": 2.56,
     "err": null,
     "result": {
      "context_h": 1024,
      "horizon_h": 96,
-     "forecast_peak_m": 0.23,
-     "forecast_peak_hours_ahead": 13,
+     "forecast_peak_m": 0.2,
+     "forecast_peak_hours_ahead": 62,
      "interesting": false
     }
    },
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790706230.5374799,
-    "elapsed_s": 1.41,
+    "started_at": 1790717918.11396,
+    "elapsed_s": 1.72,
     "err": null,
     "result": {
      "history_total": 2,
@@ -2659,8 +2659,8 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790706230.538597,
-    "elapsed_s": 0.2,
+    "started_at": 1790717918.1268458,
+    "elapsed_s": 0.11,
     "err": null,
     "result": {
      "sensor_id": "loudly-warm-rhino",
@@ -2672,15 +2672,15 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790706230.564244,
-    "elapsed_s": 0.0,
+    "started_at": 1790717918.126959,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790706232.879183,
+    "started_at": 1790717920.8493261,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2694,8 +2694,8 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790706232.879296,
-    "elapsed_s": 4.0526,
+    "started_at": 1790717920.849463,
+    "elapsed_s": 5.032,
     "err": null,
     "result": {
      "n_hits": 1,
@@ -2704,15 +2704,15 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790706236.932139,
+    "started_at": 1790717925.881732,
     "ok": true,
     "result": {
-     "n_chars": 5051,
+     "n_chars": 5049,
      "n_citations": 22,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0363
+    "elapsed_s": 0.1649
    }
   ],
   "models": [
@@ -2722,7 +2722,7 @@
     "where": "Apple GPU (MPS), in the batch run",
     "how": "precomputed",
     "pebble": "prithvi_water",
-    "latency_s": 0.24,
+    "latency_s": 0.27,
     "detail": "batch output for the 2021-09-01 event: Sentinel-2 scenes of 2021-09-02 vs 2021-08-13, tiles 18TWK, 18TWL, 18TXK, 18TXL; batch run 2026-09-28"
    },
    {
@@ -2731,7 +2731,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "ttm_battery_surge",
-    "latency_s": 0.33
+    "latency_s": 2.56
    },
    {
     "name": "Granite TTM r2",
@@ -2739,7 +2739,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "ttm_311_forecast",
-    "latency_s": 1.41
+    "latency_s": 1.72
    },
    {
     "name": "Granite TTM r2",
@@ -2747,7 +2747,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "floodnet_forecast",
-    "latency_s": 0.2
+    "latency_s": 0.11
    },
    {
     "name": "Granite Embedding 278M",
@@ -2755,7 +2755,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "policy_corpus",
-    "latency_s": 4.0526
+    "latency_s": 5.032
    },
    {
     "name": "Flair NER (OntoNotes, fast)",
@@ -2763,7 +2763,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "policy_corpus",
-    "latency_s": 4.0526
+    "latency_s": 5.032
    }
   ],
   "compliance": {
