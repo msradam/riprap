@@ -213,13 +213,16 @@ sections if any, then Sources and method. The lead word sits above y=260 at
 1440 and the whole answer is on the first screen.
 
 ### Address and district briefings
-The same top (title is the place, the "In brief" paragraph in the Brief
-style takes the lead slot). Below it a two-column grid at 1100px and wider:
-the evidence table in the main column (about 58%), then the report sections
-in one closed disclosure, "The written briefing, section by section", since
-they restate the table; the map in a sticky right column (about 42%, 460px
-tall). Below 1100px everything is one
-column and the map comes after the answer at 300px.
+The question page's frame (about 1008px) and title. At 1100px and wider the
+page below the title is one two-column grid: the main column (about 58%)
+holds the "In brief" paragraph in the Brief style, then the evidence table
+directly under it, then the report sections in one closed disclosure, "The
+written briefing, section by section", since they restate the table; the
+right column (about 42%) holds the source notes, the checks-ran and mode
+lines, the terms, the scope note and the resident pointer, then the map,
+sticky, 460px tall, beside the table. Neither column leaves an empty
+quadrant at the top. Below 1100px everything is one column: the summary,
+the endnotes, the scope note, the map at 300px, then the evidence.
 
 ### Phone (390)
 One column, 16px gutters, no horizontal scroll. Source notes become
