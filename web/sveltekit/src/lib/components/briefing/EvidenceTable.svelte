@@ -1,16 +1,18 @@
 <script lang="ts">
   import type { Citation } from '$lib/types/claim';
-  import type { EvidenceCard } from '$lib/client/briefingModel';
+  import { citationOf, type EvidenceCard } from '$lib/client/briefingModel';
   import { TIER_WORDS } from '$lib/types/tier';
   import { asOfDate, figureOf } from '$lib/client/briefingText';
   import { activateCitation } from '$lib/stores/citations.svelte';
   import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
 
   /** The evidence exhibit: one row per source that found something, the
-   *  rows the answer cites first, then one group per Stone. On phones each
-   *  row is a stacked block; the cells keep their table semantics. */
+   *  rows the answer cites first, then one group per Stone. A `closed`
+   *  group (experimental and forecast sources) follows the table as its own
+   *  folded table. On phones each row is a stacked block; the cells keep
+   *  their table semantics. */
   interface Props {
-    groups: { key: string; name: string; role: string | null; cards: EvidenceCard[] }[];
+    groups: { key: string; name: string; role: string | null; cards: EvidenceCard[]; closed?: boolean }[];
     findings: Map<string, { first: string; rest: string } | null>;
     citations: Record<string, Citation>;
     notRun: string[];
@@ -22,6 +24,9 @@
     snapshotDate?: string | null;
   }
   let { groups, findings, citations, notRun, labelledby, notRunHref, snapshotDate = null }: Props = $props();
+
+  let open = $derived(groups.filter((g) => !g.closed));
+  let folded = $derived(groups.filter((g) => g.closed));
 
   /** A figure label longer than this reads in the finding cell instead of
    *  wrapping down the narrow Figure column. */
@@ -38,84 +43,125 @@
   }
 
   // Explicit headers: the group heading is a second level of th, which
-  // scope alone does not resolve for every checker.
+  // scope alone does not resolve for every checker. Each table has its
+  // own column ids.
   const uid = $props.id();
-  const col = (name: 'source' | 'finding' | 'figure' | 'tier' | 'asof' | 'cite') => `${uid}-col-${name}`;
-
-  function citationOf(c: EvidenceCard): Citation | null {
-    return (c.citeId && citations[c.citeId]) || citations[c.docId] || null;
-  }
+  type Col = 'source' | 'finding' | 'figure' | 'tier' | 'asof' | 'cite';
+  const col = (t: string, name: Col) => `${uid}-${t}-col-${name}`;
+  /** A merged row's parts share one date column only when they share a date. */
+  const oneDate = (c: EvidenceCard) => !c.parts || new Set(c.parts.map((p) => p.vintage)).size === 1;
 </script>
 
-<table class="ev-table" aria-labelledby={labelledby}>
+{#snippet head(t: string)}
   <thead>
     <tr>
-      <th scope="col" id={col('source')}>Source</th>
-      <th scope="col" id={col('finding')}>Finding</th>
-      <th scope="col" class="ev-num" id={col('figure')}>Figure</th>
-      <th scope="col" id={col('tier')}>Tier</th>
-      <th scope="col" id={col('asof')}>Data as of</th>
-      <th scope="col" class="ev-num" id={col('cite')}>Cite</th>
+      <th scope="col" id={col(t, 'source')}>Source</th>
+      <th scope="col" id={col(t, 'finding')}>Finding</th>
+      <th scope="col" class="ev-num" id={col(t, 'figure')}>Figure</th>
+      <th scope="col" id={col(t, 'tier')}>Tier</th>
+      <th scope="col" id={col(t, 'asof')}>Data as of</th>
+      <th scope="col" class="ev-num" id={col(t, 'cite')}>Cite</th>
     </tr>
   </thead>
-  {#each groups as g, gi (g.key)}
+{/snippet}
+
+{#snippet date(vintage: string)}
+  {#if atSnapshot(vintage)}at snapshot, <span class="data ev-date">{snapshotDate}</span>{:else}<span class="data" title={vintage}>{asOfDate(vintage)}</span>{/if}
+{/snippet}
+
+{#snippet cite(cit: Citation, sup: boolean)}
+  <a
+    href="#cite-{cit.id}"
+    class={sup ? 'inline-cite' : 'data'}
+    onclick={(e) => activateCitation(e, cit.id)}
+    aria-label="Citation {cit.n}: {cit.source}, {cit.title}"
+  >{#if sup}<sup>{cit.n}</sup>{:else}{cit.n}{/if}</a>
+{/snippet}
+
+{#snippet row(c: EvidenceCard, t: string, gid: string | null)}
+  {@const fig = figureOf(c)}
+  {@const find = findings.get(c.id)}
+  {@const cit = c.parts ? null : citationOf(c, citations)}
+  {@const longLabel = !!fig?.label && fig.label.length > SHORT_LABEL}
+  {@const same = oneDate(c)}
+  {@const h = (name: Col) => (gid ? `${col(t, name)} ${gid}` : col(t, name))}
+  <tr class="ev-row">
+    <td class="ev-source" headers={h('source')}>
+      {#if c.experimental}{c.source} <span class="exp-badge">Experimental</span>{:else}{c.source}{/if}
+    </td>
+    <td class="ev-finding" headers={h('finding')}>
+      {#if c.parts}
+        <!-- One finding per scenario, each with its own citation. -->
+        <ul class="ev-scenarios">
+          {#each c.parts as p (p.id)}
+            {@const pf = findings.get(p.id)}
+            {@const pc = citationOf(p, citations)}
+            <li>
+              {#if pf}<span class="ev-find">{pf.first}</span>{#if pf.rest}{` ${pf.rest}`}{/if}{:else}{p.title}{/if}{#if !same}&#32;(data as of {@render date(p.vintage)}){/if}{#if pc}{@render cite(pc, true)}{/if}
+            </li>
+          {/each}
+        </ul>
+      {:else}
+        <div class="ev-measure">
+          {#if find}<span class="ev-find">{find.first}</span>{#if find.rest}{` ${find.rest}`}{/if}{/if}
+          <span class="ev-dataset">{c.title}</span>
+          {#if longLabel}<span class="ev-dataset">Figure: {fig?.label}</span>{/if}
+        </div>
+      {/if}
+    </td>
+    <td class={['ev-num', 'ev-figure', !fig && 'is-empty']} headers={h('figure')}>
+      {#if fig}
+        <span class="ev-label" aria-hidden="true">Figure</span>
+        <span class="data ev-fig">{fig.value}</span>
+        {#if fig.label && !longLabel}<span class="ev-fig-label">{fig.label}</span>{/if}
+      {/if}
+    </td>
+    <td class="ev-tier" headers={h('tier')}>
+      <span class="ev-mark" style:color="var(--tier-{c.tier})" aria-hidden="true"><TierGlyph tier={c.tier} size={11} /></span>
+      {TIER_WORDS[c.tier] ?? c.tier}
+    </td>
+    <td class={['ev-asof', !same && 'is-empty']} headers={h('asof')}>
+      {#if same}
+        <!-- "at snapshot" is its own label; "Data as of at snapshot" is not English. -->
+        {#if !atSnapshot(c.vintage)}<span class="ev-label" aria-hidden="true">Data as of</span>{/if}
+        {@render date(c.vintage)}
+      {/if}
+    </td>
+    <td class={['ev-num', 'ev-cite', !cit && 'is-empty']} headers={h('cite')}>
+      {#if cit}
+        <span class="ev-label" aria-hidden="true">Cite</span>
+        {@render cite(cit, false)}
+      {/if}
+    </td>
+  </tr>
+{/snippet}
+
+<table class="ev-table" aria-labelledby={labelledby}>
+  {@render head('main')}
+  {#each open as g, gi (g.key)}
     {@const gid = `${uid}-group-${gi}`}
     <tbody>
       <tr class="ev-group">
         <th colspan="6" scope="rowgroup" id={gid}>{g.name}{#if g.role}, {g.role}{/if}</th>
       </tr>
-      {#each g.cards as c (c.id)}
-        {@const fig = figureOf(c)}
-        {@const find = findings.get(c.id)}
-        {@const cit = citationOf(c)}
-        {@const longLabel = !!fig?.label && fig.label.length > SHORT_LABEL}
-        <tr class="ev-row">
-          <td class="ev-source" headers="{col('source')} {gid}">
-            {#if c.experimental}{c.source} <span class="exp-badge">Experimental</span>{:else}{c.source}{/if}
-          </td>
-          <td class="ev-finding" headers="{col('finding')} {gid}">
-            <div class="ev-measure">
-              {#if find}<span class="ev-find">{find.first}</span>{#if find.rest}{` ${find.rest}`}{/if}{/if}
-              <span class="ev-dataset">{c.title}</span>
-              {#if longLabel}<span class="ev-dataset">Figure: {fig?.label}</span>{/if}
-            </div>
-          </td>
-          <td class={['ev-num', 'ev-figure', !fig && 'is-empty']} headers="{col('figure')} {gid}">
-            {#if fig}
-              <span class="ev-label" aria-hidden="true">Figure</span>
-              <span class="data ev-fig">{fig.value}</span>
-              {#if fig.label && !longLabel}<span class="ev-fig-label">{fig.label}</span>{/if}
-            {/if}
-          </td>
-          <td class="ev-tier" headers="{col('tier')} {gid}">
-            <span class="ev-mark" style:color="var(--tier-{c.tier})" aria-hidden="true"><TierGlyph tier={c.tier} size={11} /></span>
-            {TIER_WORDS[c.tier] ?? c.tier}
-          </td>
-          <td class="ev-asof" headers="{col('asof')} {gid}">
-            <!-- "at snapshot" is its own label; "Data as of at snapshot" is not English. -->
-            {#if !atSnapshot(c.vintage)}<span class="ev-label" aria-hidden="true">Data as of</span>{/if}
-            {#if atSnapshot(c.vintage)}
-              at snapshot, <span class="data ev-date">{snapshotDate}</span>
-            {:else}
-              <span class="data" title={c.vintage}>{asOfDate(c.vintage)}</span>
-            {/if}
-          </td>
-          <td class="ev-num ev-cite" headers="{col('cite')} {gid}">
-            {#if cit}
-              <span class="ev-label" aria-hidden="true">Cite</span>
-              <a
-                href="#cite-{cit.id}"
-                class="data"
-                onclick={(e) => activateCitation(e, cit.id)}
-                aria-label="Citation {cit.n}: {cit.source}, {cit.title}"
-              >{cit.n}</a>
-            {/if}
-          </td>
-        </tr>
-      {/each}
+      {#each g.cards as c (c.id)}{@render row(c, 'main', gid)}{/each}
     </tbody>
   {/each}
 </table>
+<!-- Experimental and forecast sources the answer does not cite: worth
+     seeing, folded so they do not sit at the weight of the records. A
+     citation mark pointing inside opens it (activateCitation). -->
+{#each folded as g (g.key)}
+  <details class="ev-folded">
+    <summary id="{uid}-{g.key}-h">{g.name}</summary>
+    <table class="ev-table" aria-labelledby="{uid}-{g.key}-h">
+      {@render head(g.key)}
+      <tbody>
+        {#each g.cards as c (c.id)}{@render row(c, g.key, null)}{/each}
+      </tbody>
+    </table>
+  </details>
+{/each}
 {#if notRun.length && notRunHref}
   <p class="ev-not-run">
     Sources not run for this question are listed under <a href={notRunHref} onclick={openTarget}>Sources and method</a>.
@@ -200,6 +246,28 @@
     margin-right: 4px;
     vertical-align: -1px;
   }
+  .ev-scenarios {
+    max-width: 54ch;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ev-scenarios li + li {
+    margin-top: 4px;
+  }
+  .ev-folded {
+    margin-top: 16px;
+  }
+  .ev-folded > summary {
+    min-height: 24px;
+    padding: 4px 0;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .ev-folded > .ev-table {
+    margin-top: 8px;
+  }
   .ev-cite a {
     display: inline-block;
     min-width: 24px;
@@ -265,7 +333,9 @@
       margin-right: 16px;
       white-space: normal;
     }
-    .ev-figure.is-empty {
+    .ev-figure.is-empty,
+    .ev-asof.is-empty,
+    .ev-cite.is-empty {
       display: none;
     }
     .ev-fig,

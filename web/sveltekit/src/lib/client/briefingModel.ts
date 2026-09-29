@@ -17,9 +17,13 @@ import type { BriefingBlock, Citation, ClaimPart } from '$lib/types/claim';
 export type Kind = 'question' | 'address' | 'district';
 export type Section = { label: string; paras: ClaimPart[][] };
 export type SnapshotMeta = { generatedAt: string; commit: string; stamp: string | null };
-export type EvidenceGroup = { key: string; name: string; role: string | null; cards: Card[] };
+/** An evidence table row: a card, or several cards merged into one row
+ *  (`parts`, the DEP stormwater scenarios), one finding per part. */
+export type EvidenceRow = Card & { parts?: Card[] };
+/** `closed` groups (experimental and forecast sources) start folded. */
+export type EvidenceGroup = { key: string; name: string; role: string | null; cards: EvidenceRow[]; closed?: boolean };
 /** The card fields the evidence table prints. */
-export type EvidenceCard = Pick<Card, 'id' | 'source' | 'experimental' | 'title' | 'tier' | 'vintage' | 'citeId' | 'docId' | 'scalars' | 'headline'>;
+export type EvidenceCard = Pick<Card, 'id' | 'source' | 'experimental' | 'title' | 'tier' | 'vintage' | 'citeId' | 'docId' | 'scalars' | 'headline'> & { parts?: EvidenceCard[] };
 
 const LEAD_RE = /^(Yes|No|Partly|In part|Not clear|Unclear)\.\s*/;
 const COUNT_RE = /^([\d,]+(?:\.\d+)?%?)\s+/;
@@ -90,23 +94,70 @@ export function splitSentence(parts: ClaimPart[]): { sentence: string; parts: Cl
   return { sentence: m[1], parts: tail };
 }
 
+/** The DEP stormwater scenarios in reading order (district pages add `_nta`). */
+const DEP_SCENARIOS = ['dep_moderate_current', 'dep_moderate_2050', 'dep_extreme_2080'];
+/** The TTM forecasts: forecasts, not observations, whatever their maturity. */
+const FORECASTS = ['ttm_battery_surge', 'ttm_311_forecast', 'floodnet_forecast'];
+const baseDoc = (docId: string) => docId.replace(/_nta$/, '');
+const scenario = (c: Card) => DEP_SCENARIOS.indexOf(baseDoc(c.docId));
+
+/** An experimental or forecast source. NPCC4 and the NWS alerts are
+ *  neither: they stay in the open table. */
+export const isExperimentalRow = (c: Card) => !!c.experimental || FORECASTS.includes(baseDoc(c.docId));
+
+/** The citation a row's Cite column links to. */
+export function citationOf(c: Pick<Card, 'citeId' | 'docId'>, citations: Record<string, Citation>): Citation | null {
+  return (c.citeId && citations[c.citeId]) || citations[c.docId] || null;
+}
+
+/** Two or more DEP stormwater scenario cards become one row where the
+ *  first of them stood, its findings in scenario order (current, 2050,
+ *  2080), each keeping its own citation and date. */
+export function mergeDepScenarios(cards: Card[]): EvidenceRow[] {
+  const dep = cards.filter((c) => scenario(c) >= 0);
+  if (dep.length < 2) return cards;
+  const parts = [...dep].sort((a, b) => scenario(a) - scenario(b));
+  const row: EvidenceRow = {
+    ...parts[0],
+    id: 'dep-scenarios',
+    // District cards name their scenario after a comma; the row names the map.
+    source: parts[0].source.split(',')[0],
+    tier: 'modeled',
+    scalars: undefined,
+    headline: undefined,
+    parts
+  };
+  return cards.flatMap((c) => (c === dep[0] ? [row] : scenario(c) >= 0 ? [] : [c]));
+}
+
 /** The first found cards cite what the answer cites (in the answer's
- *  order); the rest follow grouped by Stone. Absent and meta cards are not
+ *  order); the rest follow grouped by Stone, and experimental and forecast
+ *  sources the answer does not cite close the table in one folded group.
+ *  The DEP scenarios share one row. Absent and meta cards are not
  *  evidence and are left out by the caller. */
 export function evidenceGroups(cards: Card[], cited: string[], firstLabel = 'Behind the answer'): EvidenceGroup[] {
-  const rank = (c: Card) => {
+  const rankOne = (c: Card) => {
     const i = cited.indexOf(c.docId);
     const j = c.citeId ? cited.indexOf(c.citeId) : -1;
     return i < 0 ? j : j < 0 ? i : Math.min(i, j);
   };
-  const behind = cards.filter((c) => rank(c) >= 0).sort((a, b) => rank(a) - rank(b));
-  const rest = cards.filter((c) => rank(c) < 0);
+  const rank = (r: EvidenceRow) => {
+    const ranks = (r.parts ?? [r]).map(rankOne).filter((n) => n >= 0);
+    return ranks.length ? Math.min(...ranks) : -1;
+  };
+  const rows = mergeDepScenarios(cards);
+  const behind = rows.filter((c) => rank(c) >= 0).sort((a, b) => rank(a) - rank(b));
+  const rest = rows.filter((c) => rank(c) < 0);
   const groups: EvidenceGroup[] = behind.length
     ? [{ key: 'answer', name: firstLabel, role: null, cards: behind }]
     : [];
   for (const key of STONE_ORDER) {
-    const inStone = rest.filter((c) => c.stone === key);
+    const inStone = rest.filter((c) => c.stone === key && !isExperimentalRow(c));
     if (inStone.length) groups.push({ key, name: STONE_META[key].name, role: STONE_META[key].role, cards: inStone });
+  }
+  const trial = STONE_ORDER.flatMap((key) => rest.filter((c) => c.stone === key && isExperimentalRow(c)));
+  if (trial.length) {
+    groups.push({ key: 'experimental', name: `Experimental and forecast sources (${trial.length})`, role: null, cards: trial, closed: true });
   }
   return groups;
 }
@@ -248,8 +299,8 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
 
 export type BriefingModel = ReturnType<typeof briefingModel>;
 
-const evidenceCard = ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline }: Card): EvidenceCard =>
-  ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline });
+const evidenceCard = ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline, parts }: EvidenceRow): EvidenceCard =>
+  ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline, ...(parts && { parts: parts.map(evidenceCard) }) });
 
 /** Build the print snapshot from a finished run: the live route calls it
  *  when the stream ends, the gallery when a reader presses Print. It

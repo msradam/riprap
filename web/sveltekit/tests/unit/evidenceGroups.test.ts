@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { evidenceGroups, splitLead } from '$lib/client/briefingModel';
+import { evidenceGroups, mergeDepScenarios, splitLead } from '$lib/client/briefingModel';
 import type { Card, StoneKey } from '$lib/types/card';
 
 const card = (id: string, stone: StoneKey, citeId?: string): Card => ({
@@ -34,6 +34,59 @@ describe('evidenceGroups', () => {
   it('has no first group when the answer cites nothing, and takes a label', () => {
     expect(evidenceGroups(cards, [])[0].key).toBe('cornerstone');
     expect(evidenceGroups(cards, ['sandy'], 'Behind the summary')[0].name).toBe('Behind the summary');
+  });
+});
+
+describe('DEP scenarios and experimental sources', () => {
+  const dep = (docId: string, vintage = '2024-07-03'): Card => ({
+    ...card(`pebble-${docId}`, 'cornerstone'), docId, tier: 'modeled', vintage, source: 'NYC DEP Stormwater Flood Map, Moderate'
+  });
+  const exp = (id: string, stone: StoneKey, experimental = true): Card => ({ ...card(id, stone), experimental });
+
+  it('merges the DEP scenario cards into one Modeled row in scenario order, where the first stood', () => {
+    const rows = mergeDepScenarios([card('sandy', 'cornerstone'), dep('dep_extreme_2080'), card('ida', 'cornerstone'), dep('dep_moderate_current'), dep('dep_moderate_2050')]);
+    expect(rows.map((r) => r.id)).toEqual(['sandy', 'dep-scenarios', 'ida']);
+    const row = rows[1];
+    expect(row.parts?.map((p) => p.docId)).toEqual(['dep_moderate_current', 'dep_moderate_2050', 'dep_extreme_2080']);
+    expect(row).toMatchObject({ tier: 'modeled', source: 'NYC DEP Stormwater Flood Map', headline: undefined, scalars: undefined });
+  });
+
+  it('merges the district (_nta) variants and leaves a single scenario alone', () => {
+    expect(mergeDepScenarios([dep('dep_moderate_2050_nta'), dep('dep_extreme_2080_nta')])[0].parts?.length).toBe(2);
+    expect(mergeDepScenarios([dep('dep_moderate_2050')]).map((r) => r.id)).toEqual(['pebble-dep_moderate_2050']);
+  });
+
+  it('puts the merged row behind the answer when the answer cites any scenario', () => {
+    const groups = evidenceGroups([card('sandy', 'cornerstone'), dep('dep_moderate_current'), dep('dep_moderate_2050')], ['dep_moderate_2050']);
+    expect(groups[0].cards.map((c) => c.id)).toEqual(['dep-scenarios']);
+    expect(groups[1].cards.map((c) => c.id)).toEqual(['sandy']);
+  });
+
+  it('closes the table with one folded group of experimental and forecast sources, counted', () => {
+    const cards = [
+      card('sandy', 'cornerstone'),
+      exp('prithvi', 'cornerstone'),
+      exp('policy', 'cornerstone'),
+      { ...card('ttm-311', 'lodestone'), docId: 'ttm_311_forecast' },
+      { ...card('npcc4', 'lodestone'), docId: 'npcc4_slr' },
+      { ...card('alerts', 'lodestone'), docId: 'nws_alerts' }
+    ];
+    const groups = evidenceGroups(cards, []);
+    const last = groups[groups.length - 1];
+    expect(last).toMatchObject({ key: 'experimental', name: 'Experimental and forecast sources (3)', closed: true });
+    expect(last.cards.map((c) => c.id)).toEqual(['prithvi', 'policy', 'ttm-311']);
+    // NPCC4 and the NWS alerts stay open; nothing is lost.
+    expect(groups.find((g) => g.key === 'lodestone')?.cards.map((c) => c.id)).toEqual(['npcc4', 'alerts']);
+    expect(groups.flatMap((g) => g.cards).length).toBe(cards.length);
+    expect(groups.filter((g) => g.closed).length).toBe(1);
+  });
+
+  it('keeps an experimental source the answer cites behind the answer, open', () => {
+    const groups = evidenceGroups([exp('prithvi', 'cornerstone'), exp('policy', 'cornerstone')], ['prithvi']);
+    expect(groups[0]).toMatchObject({ key: 'answer' });
+    expect(groups[0].closed).toBeUndefined();
+    expect(groups[0].cards.map((c) => c.id)).toEqual(['prithvi']);
+    expect(groups[1]).toMatchObject({ name: 'Experimental and forecast sources (1)', closed: true });
   });
 });
 

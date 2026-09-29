@@ -49,7 +49,7 @@ export interface PrintSnapshot {
   /** Doc ids the answer cites, in reading order. */
   cited?: string[];
   evidence?: {
-    groups: { key: string; name: string; role: string | null; cards: EvidenceCard[] }[];
+    groups: { key: string; name: string; role: string | null; cards: EvidenceCard[]; closed?: boolean }[];
     findings: Record<string, { first: string; rest: string } | null>;
     notRun: string[];
   };
