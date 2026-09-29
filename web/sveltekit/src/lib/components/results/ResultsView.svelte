@@ -225,9 +225,11 @@
 {#snippet map()}
   <!-- ponytail: map shown only once the run has finished; a live map
        during generation would need the loading skeleton to hold its space. -->
-  <div id="brief-map" class="brief-map">
+  <!-- The "Map" jump link's target, headed like the answer (a hidden h2). -->
+  <section id="brief-map" class="brief-map" aria-labelledby="brief-map-h">
+    <h2 id="brief-map-h" class="visually-hidden">Map</h2>
     <MapFigure {run} />
-  </div>
+  </section>
 {/snippet}
 
 <article class={['brief', isPlace ? 'is-place' : 'is-question']}>
