@@ -176,12 +176,12 @@ export function keySentence(
 const EXP_LABEL = /^\s*Experimental:\s+/;
 
 /** A paragraph from an experimental source opens with the badge part; the
- *  badge replaces the sentence's own "Experimental:" label. */
+ *  badge replaces the sentence's own "Experimental:" label. The space
+ *  after the badge is in the text, where the template cannot trim it. */
 function badged(parts: ClaimPart[]): ClaimPart[] {
   const [first, ...rest] = parts;
-  const t = first.text.replace(EXP_LABEL, '');
-  const head = t === first.text ? first : { ...first, text: t.charAt(0).toUpperCase() + t.slice(1) };
-  return [{ text: '', exp: true }, head, ...rest];
+  const t = first.text.replace(EXP_LABEL, '').trimStart();
+  return [{ text: '', exp: true }, { ...first, text: ` ${t.charAt(0).toUpperCase()}${t.slice(1)}` }, ...rest];
 }
 
 /** A question's answer with a lead fact: the key sentence (keySentence),

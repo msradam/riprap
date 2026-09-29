@@ -18,7 +18,7 @@
 </script>
 
 <p class={className}>
-  {#each tidied as p, i (i)}{#if p.exp}<span class="exp-badge">Experimental</span>&#32;{/if}{#if p.bold}<strong>{p.text}</strong>{:else}{p.text}{/if}{#if p.cite && citations[p.cite] && tidied[i + 1]?.cite !== p.cite}{@const c = citations[p.cite]}<a
+  {#each tidied as p, i (i)}{#if p.exp}<span class="exp-badge">Experimental</span>{/if}{#if p.bold}<strong>{p.text}</strong>{:else}{p.text}{/if}{#if p.cite && citations[p.cite] && tidied[i + 1]?.cite !== p.cite}{@const c = citations[p.cite]}<a
         href="#cite-{c.id}"
         class="inline-cite"
         data-cite={c.id}
