@@ -447,8 +447,8 @@
   .brief-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 20px;
-    margin: 6px 0 0;
+    gap: 0 24px;
+    margin: 4px 0 0;
     overflow-wrap: anywhere;
   }
   .brief-meta-label {
@@ -471,7 +471,7 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 4px 24px;
-    margin-top: 2px;
+    margin-top: 4px;
   }
   /* An action, not a jump: at the row's right end. Without jump links (a
      refusal) there is no row to end, so it keeps the text's left edge. */
@@ -579,7 +579,7 @@
     margin-top: 4px;
   }
   .brief :global(.brief-quiet) {
-    margin: 0 0 6px;
+    margin: 0 0 8px;
     max-width: 54ch;
     font-size: 14px;
     line-height: 1.45;

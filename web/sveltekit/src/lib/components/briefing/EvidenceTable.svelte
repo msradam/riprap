@@ -399,7 +399,7 @@
       padding: 10px 0;
     }
     .ev-group th {
-      padding: 20px 0 0;
+      padding: 24px 0 0;
     }
     td,
     .ev-num,
