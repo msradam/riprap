@@ -42,4 +42,4 @@ display:
 
 fallback:
   on_offline: error
-  message: NPCC4 SLR table missing.
+  message: The NPCC4 sea-level rise table was not available when this briefing ran.

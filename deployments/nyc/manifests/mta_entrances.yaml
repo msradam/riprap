@@ -45,4 +45,4 @@ display:
 
 fallback:
   on_offline: skip
-  message: MTA entrance register unavailable.
+  message: The MTA subway entrances list was not available when this briefing ran.

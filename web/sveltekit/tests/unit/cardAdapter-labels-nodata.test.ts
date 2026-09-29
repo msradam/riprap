@@ -47,7 +47,7 @@ describe('card labels and no-data sources', () => {
   it('an unreadable register is no data and says unavailable', () => {
     const d = withMta({ available: false });
     expect((d.noData ?? []).map((s) => s.id)).toContain('mta_entrances');
-    expect(mtaRow(d)?.note).toMatch(/unavailable/);
+    expect(mtaRow(d)?.note).toMatch(/was not available/);
   });
 
   it('a register read with nothing in range says 0 and is not no data', () => {

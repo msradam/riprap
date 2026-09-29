@@ -38,7 +38,7 @@ narration:
 
 fallback:
   on_offline: skip
-  message: DEM unavailable.
+  message: The elevation data was not available when this briefing ran.
 
 display:
   variant: scalars

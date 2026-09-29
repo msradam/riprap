@@ -40,7 +40,7 @@ narration:
 
 fallback:
   on_offline: skip
-  message: NOAA tidesandcurrents endpoint unreachable.
+  message: NOAA Tides and Currents did not respond when this briefing ran.
 
 display:
   variant: scalars

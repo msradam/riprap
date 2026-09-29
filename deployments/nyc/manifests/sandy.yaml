@@ -44,7 +44,7 @@ narration:
 
 fallback:
   on_offline: skip
-  message: Sandy raster + GeoJSON both unavailable.
+  message: The 2012 Sandy inundation data was not available when this briefing ran.
 
 display:
   variant: headline

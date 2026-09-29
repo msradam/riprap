@@ -46,7 +46,7 @@ narration:
 
 fallback:
   on_offline: skip
-  message: FloodNet GraphQL endpoint unreachable.
+  message: FloodNet did not respond when this briefing ran.
 
 display:
   variant: scalars

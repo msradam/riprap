@@ -45,4 +45,4 @@ display:
 
 fallback:
   on_offline: skip
-  message: NYCHA developments register unavailable.
+  message: The NYCHA developments list was not available when this briefing ran.

@@ -42,7 +42,7 @@ narration:
 
 fallback:
   on_offline: skip
-  message: TTM 311 forecast offline.
+  message: The 311 complaint forecast model was not loaded when this briefing ran.
 
 display:
   variant: timeseries

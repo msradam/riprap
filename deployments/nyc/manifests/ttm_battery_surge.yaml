@@ -42,7 +42,7 @@ narration:
 
 fallback:
   on_offline: skip
-  message: TTM Battery surge forecast offline.
+  message: The Battery surge forecast model was not loaded when this briefing ran.
 
 display:
   variant: timeseries-ft

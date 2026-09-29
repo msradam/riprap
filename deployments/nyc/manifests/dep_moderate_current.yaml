@@ -38,7 +38,7 @@ narration:
 
 fallback:
   on_offline: skip
-  message: DEP moderate current raster + GDB both unavailable.
+  message: The DEP current stormwater scenario data was not available when this briefing ran.
 
 display:
   variant: headline

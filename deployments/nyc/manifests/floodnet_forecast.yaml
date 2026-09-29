@@ -42,7 +42,7 @@ narration:
 
 fallback:
   on_offline: skip
-  message: TTM FloodNet forecast offline.
+  message: The FloodNet forecast model was not loaded when this briefing ran.
 
 display:
   variant: timeseries

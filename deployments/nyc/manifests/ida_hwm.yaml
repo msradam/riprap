@@ -53,7 +53,7 @@ narration:
 
 fallback:
   on_offline: skip
-  message: Ida HWM data file unavailable.
+  message: The Hurricane Ida high-water mark data was not available when this briefing ran.
 
 display:
   variant: headline

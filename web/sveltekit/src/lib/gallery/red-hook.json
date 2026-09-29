@@ -115,7 +115,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "Sandy raster + GeoJSON both unavailable."
+     "message": "The 2012 Sandy inundation data was not available when this briefing ran."
     }
    },
    {
@@ -247,7 +247,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "DEP extreme 2080 raster + GDB both unavailable."
+     "message": "The DEP 2080 stormwater scenario data was not available when this briefing ran."
     }
    },
    {
@@ -313,7 +313,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "DEP moderate 2050 raster + GDB both unavailable."
+     "message": "The DEP 2050 stormwater scenario data was not available when this briefing ran."
     }
    },
    {
@@ -379,7 +379,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "DEP moderate current raster + GDB both unavailable."
+     "message": "The DEP current stormwater scenario data was not available when this briefing ran."
     }
    },
    {
@@ -412,7 +412,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "Ida HWM data file unavailable."
+     "message": "The Hurricane Ida high-water mark data was not available when this briefing ran."
     }
    },
    {
@@ -445,7 +445,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "The Prithvi-EO Ida output (data/eo/) is not present."
+     "message": "The Prithvi-EO satellite output for Ida was not available when this briefing ran."
     }
    },
    {
@@ -511,7 +511,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "DEM unavailable."
+     "message": "The elevation data was not available when this briefing ran."
     }
    },
    {
@@ -577,7 +577,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "Policy-corpus index unavailable (RAG embeddings or NER model offline)."
+     "message": "The policy document search was not available when this briefing ran."
     }
    },
    {
@@ -610,7 +610,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "FloodNet GraphQL endpoint unreachable."
+     "message": "FloodNet did not respond when this briefing ran."
     }
    },
    {
@@ -643,7 +643,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "NYC 311 SOQL endpoint unreachable."
+     "message": "NYC Open Data (311) did not respond when this briefing ran."
     }
    },
    {
@@ -742,7 +742,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "NOAA tidesandcurrents endpoint unreachable."
+     "message": "NOAA Tides and Currents did not respond when this briefing ran."
     }
    },
    {
@@ -808,7 +808,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "MTA entrance register unavailable."
+     "message": "The MTA subway entrances list was not available when this briefing ran."
     }
    },
    {
@@ -841,7 +841,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "NYCHA developments register unavailable."
+     "message": "The NYCHA developments list was not available when this briefing ran."
     }
    },
    {
@@ -907,7 +907,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "DOE schools register unavailable."
+     "message": "The DOE schools list was not available when this briefing ran."
     }
    },
    {
@@ -940,7 +940,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "DOH hospitals register unavailable."
+     "message": "The DOH hospitals list was not available when this briefing ran."
     }
    },
    {
@@ -1006,7 +1006,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "TTM Battery surge forecast offline."
+     "message": "The Battery surge forecast model was not loaded when this briefing ran."
     }
    },
    {
@@ -1039,7 +1039,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "TTM 311 forecast offline."
+     "message": "The 311 complaint forecast model was not loaded when this briefing ran."
     }
    },
    {
@@ -1072,7 +1072,7 @@
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "TTM FloodNet forecast offline."
+     "message": "The FloodNet forecast model was not loaded when this briefing ran."
     }
    },
    {
@@ -1105,7 +1105,7 @@
     },
     "fallback": {
      "on_offline": "error",
-     "message": "NPCC4 SLR table missing."
+     "message": "The NPCC4 sea-level rise table was not available when this briefing ran."
     }
    }
   ]

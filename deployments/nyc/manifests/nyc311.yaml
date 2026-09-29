@@ -39,7 +39,7 @@ narration:
 
 fallback:
   on_offline: skip
-  message: NYC 311 SOQL endpoint unreachable.
+  message: NYC Open Data (311) did not respond when this briefing ran.
 
 display:
   variant: histogram

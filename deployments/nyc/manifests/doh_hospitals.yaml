@@ -45,4 +45,4 @@ display:
 
 fallback:
   on_offline: skip
-  message: DOH hospitals register unavailable.
+  message: The DOH hospitals list was not available when this briefing ran.

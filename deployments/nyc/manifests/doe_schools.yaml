@@ -45,4 +45,4 @@ display:
 
 fallback:
   on_offline: skip
-  message: DOE schools register unavailable.
+  message: The DOE schools list was not available when this briefing ran.

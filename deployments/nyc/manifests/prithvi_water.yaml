@@ -46,7 +46,7 @@ narration:
 
 fallback:
   on_offline: skip
-  message: The Prithvi-EO Ida output (data/eo/) is not present.
+  message: The Prithvi-EO satellite output for Ida was not available when this briefing ran.
 
 display:
   variant: raster

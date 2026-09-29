@@ -574,7 +574,7 @@ function buildRegisterComposite(
         reg, tier: 'empirical',
         label: null, detail: null, sourceId: null,
         note: v.available === false
-          ? (m.fallback.message ?? `${reg} register unavailable`)
+          ? (m.fallback.message ?? `The ${reg} list was not available when this briefing ran.`)
           : `0 within ${radius != null ? `${radius} m` : 'range'}`,
       });
       continue;

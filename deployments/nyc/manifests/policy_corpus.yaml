@@ -52,4 +52,4 @@ display:
 
 fallback:
   on_offline: skip
-  message: Policy-corpus index unavailable (RAG embeddings or NER model offline).
+  message: The policy document search was not available when this briefing ran.
