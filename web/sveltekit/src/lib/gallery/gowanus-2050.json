@@ -3,8 +3,8 @@
  "neighborhood": "Gowanus, Brooklyn",
  "address": "400 Carroll Street, Brooklyn, NY",
  "question": "What does the 2050 stormwater scenario show at 400 Carroll Street, Brooklyn?",
- "generated_at": "2026-09-29T01:41Z",
- "riprap_commit": "db77ee8",
+ "generated_at": "2026-09-29T12:35Z",
+ "riprap_commit": "a477db4",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -638,7 +638,7 @@
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC 311 Service Requests, flood-related complaints (5-year window).",
      "doc_id": "nyc311",
-     "date_modified": "2026-09-28T01:37:58+0000",
+     "date_modified": "2026-09-29T01:44:54+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -671,7 +671,7 @@
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC 311 Service Requests, flood-related complaints inside the neighborhood (3-year window)",
      "doc_id": "nyc311_nta",
-     "date_modified": "2026-09-28T01:37:58+0000",
+     "date_modified": "2026-09-29T01:44:54+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -1172,7 +1172,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1835,
      "completion_tokens": 141,
-     "duration_s": 12.479,
+     "duration_s": 6.616,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1267,7 +1267,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 601,
      "completion_tokens": 47,
-     "duration_s": 3.525,
+     "duration_s": 3.126,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1277,6 +1277,7 @@
    "n_documents": 8,
    "answer_mode": "extractive",
    "answer_lead": "facts",
+   "lead_fact": null,
    "answer_flags": [],
    "checks": [
     "citations and numbers on every claim",
@@ -1303,9 +1304,9 @@
     "title": "FEMA NFHL effective flood-zone polygon and FIRM panel intersecting the address point.",
     "url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-09-29T01:41Z",
-    "retrieved_at": "2026-09-29T01:41Z",
-    "vintage": "2026-09-29T01:41Z",
+    "date_modified": "2026-09-29T12:35Z",
+    "retrieved_at": "2026-09-29T12:35Z",
+    "vintage": "2026-09-29T12:35Z",
     "maturity": "production"
    },
    "dep_extreme_2080": {
@@ -1484,121 +1485,121 @@
   },
   "ttm_battery_surge": {
    "available": true,
-   "interesting": true,
+   "interesting": false,
    "model": "msradam/Granite-TTM-r2-Battery-Surge",
    "station_id": "8518750",
    "station_name": "The Battery, NY",
    "context_hours": 1024,
    "horizon_hours": 96,
-   "history_recent_m": 0.262,
+   "history_recent_m": 0.233,
    "history_peak_abs_m": 1.095,
-   "forecast_peak_m": 0.37,
-   "forecast_peak_hours_ahead": 5,
-   "forecast_peak_time_utc": "2026-09-29T06:00",
+   "forecast_peak_m": 0.27,
+   "forecast_peak_hours_ahead": 4,
+   "forecast_peak_time_utc": "2026-09-29T16:00",
    "forecast_array_m": [
-    0.3176,
-    0.3191,
-    0.33,
-    0.3543,
-    0.3709,
-    0.3612,
-    0.3289,
-    0.3117,
-    0.3068,
-    0.2961,
-    0.2768,
-    0.2769,
-    0.287,
-    0.2881,
-    0.2868,
-    0.2782,
-    0.266,
-    0.2548,
-    0.243,
-    0.2416,
-    0.2315,
-    0.222,
-    0.2191,
-    0.2183,
-    0.2186,
-    0.2104,
-    0.2109,
-    0.23,
-    0.2498,
-    0.2497,
-    0.2242,
-    0.2141,
-    0.2183,
-    0.215,
+    0.254,
+    0.2593,
+    0.2667,
+    0.2718,
+    0.2711,
+    0.2621,
+    0.2552,
+    0.2569,
+    0.2581,
+    0.2484,
+    0.2412,
+    0.2443,
+    0.2555,
+    0.2472,
+    0.2391,
+    0.2335,
+    0.2417,
+    0.2521,
+    0.2441,
+    0.231,
+    0.2252,
+    0.228,
+    0.2323,
+    0.2182,
+    0.2103,
+    0.2088,
+    0.205,
+    0.2012,
     0.1965,
-    0.1913,
-    0.1967,
-    0.1958,
-    0.1913,
-    0.1794,
-    0.1655,
-    0.1589,
-    0.154,
-    0.1583,
-    0.1565,
-    0.1536,
-    0.1542,
-    0.1522,
-    0.1512,
-    0.1425,
-    0.1412,
-    0.1602,
-    0.1811,
-    0.1863,
-    0.1668,
-    0.1615,
-    0.1746,
-    0.1818,
-    0.1714,
-    0.1691,
-    0.173,
-    0.1687,
-    0.1627,
-    0.1509,
-    0.1399,
-    0.1392,
-    0.1389,
-    0.1461,
-    0.147,
-    0.1503,
-    0.1572,
-    0.1589,
-    0.1548,
-    0.144,
-    0.1389,
-    0.1512,
-    0.1666,
+    0.187,
+    0.1805,
+    0.185,
+    0.1939,
+    0.1942,
+    0.1927,
+    0.1962,
+    0.2068,
+    0.1999,
+    0.1916,
+    0.1849,
+    0.1901,
+    0.2007,
+    0.196,
+    0.1854,
+    0.1852,
+    0.1974,
+    0.2115,
+    0.208,
+    0.2085,
+    0.2125,
+    0.2079,
+    0.1991,
+    0.1859,
+    0.1685,
+    0.1552,
+    0.1574,
     0.1705,
-    0.1512,
-    0.1471,
-    0.1569,
+    0.1791,
+    0.1859,
+    0.1954,
+    0.2086,
+    0.2011,
+    0.1904,
+    0.1789,
+    0.182,
+    0.1911,
+    0.1822,
+    0.1681,
+    0.1662,
+    0.1797,
+    0.1957,
+    0.1929,
+    0.1901,
+    0.1923,
+    0.1879,
+    0.1801,
+    0.1687,
+    0.1544,
+    0.141,
+    0.1421,
+    0.15,
+    0.1537,
+    0.1577,
+    0.1663,
+    0.1803,
+    0.1732,
+    0.1641,
+    0.1547,
+    0.1588,
+    0.1683,
+    0.1598,
+    0.1418,
+    0.1356,
+    0.1458,
     0.1638,
-    0.1559,
-    0.1565,
-    0.1614,
-    0.1566,
-    0.1506,
-    0.1379,
-    0.1273,
-    0.1267,
-    0.1308,
-    0.14,
-    0.1401,
-    0.1409,
-    0.1478,
-    0.1505
+    0.165
    ],
    "hf_model_card": "huggingface.co/msradam/Granite-TTM-r2-Battery-Surge",
    "rmse_m": 0.157,
    "skill_vs_persistence": "35% lower RMSE than persistence, a weak baseline, on mostly calm 2023-2024 test windows; not evaluated on storms or against NOAA ETSS",
    "spatial_note": "regional \u00b7 The Battery, NY, not point-of-query",
    "compute": "local CPU",
-   "elapsed_s": 0.45
+   "elapsed_s": 0.29
   },
   "ttm_311_forecast": {
    "available": true,
@@ -1669,8 +1670,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790646107.3453288,
-    "elapsed_s": 0.01,
+    "started_at": 1790685324.6428008,
+    "elapsed_s": 0.1,
     "err": null,
     "result": {
      "address": "400 CARROLL STREET, Brooklyn, NY, USA",
@@ -1682,7 +1683,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790646107.3592808,
+    "started_at": 1790685324.745687,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1694,7 +1695,7 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790646107.3933198,
+    "started_at": 1790685324.7775948,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1704,7 +1705,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790646107.393322,
+    "started_at": 1790685324.7775948,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1714,7 +1715,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790646107.393322,
+    "started_at": 1790685324.777596,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1724,7 +1725,7 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790646107.393322,
+    "started_at": 1790685324.777596,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1734,7 +1735,7 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790646107.393323,
+    "started_at": 1790685324.777596,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1744,7 +1745,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790646107.393323,
+    "started_at": 1790685324.777596,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1754,7 +1755,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790646107.393323,
+    "started_at": 1790685324.777596,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1764,7 +1765,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790646107.393323,
+    "started_at": 1790685324.777597,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1774,7 +1775,7 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790646107.393323,
+    "started_at": 1790685324.777597,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1784,7 +1785,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790646107.3933241,
+    "started_at": 1790685324.777597,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1794,7 +1795,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790646107.3933241,
+    "started_at": 1790685324.777597,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1804,7 +1805,7 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790646107.3933241,
+    "started_at": 1790685324.777597,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1814,7 +1815,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790646107.3933241,
+    "started_at": 1790685324.777597,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1824,7 +1825,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790646107.3933241,
+    "started_at": 1790685324.777598,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1834,8 +1835,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790646109.2413812,
-    "elapsed_s": 0.19,
+    "started_at": 1790685324.802306,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "inside": {
@@ -1848,8 +1849,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790646109.2421,
-    "elapsed_s": 0.16,
+    "started_at": 1790685324.811585,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {
      "zone": "AE",
@@ -1861,8 +1862,8 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790646109.241416,
-    "elapsed_s": 0.19,
+    "started_at": 1790685324.804597,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "depth_label": "Deep Contiguous (>4 ft)",
@@ -1872,8 +1873,8 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790646109.2413042,
-    "elapsed_s": 0.19,
+    "started_at": 1790685324.803102,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "depth_label": "Deep Contiguous (>4 ft)",
@@ -1883,8 +1884,8 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790646109.242202,
-    "elapsed_s": 0.19,
+    "started_at": 1790685324.81248,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -1894,22 +1895,22 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790646109.242235,
-    "elapsed_s": 0.45,
+    "started_at": 1790685324.813876,
+    "elapsed_s": 0.31,
     "err": null,
     "result": {
      "context_h": 1024,
      "horizon_h": 96,
-     "forecast_peak_m": 0.37,
-     "forecast_peak_hours_ahead": 5,
-     "interesting": true
+     "forecast_peak_m": 0.27,
+     "forecast_peak_hours_ahead": 4,
+     "interesting": false
     }
    },
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790646109.2420669,
-    "elapsed_s": 0.35,
+    "started_at": 1790685324.8121018,
+    "elapsed_s": 0.21,
     "err": null,
     "result": {
      "history_total": 15,
@@ -1921,8 +1922,8 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790646109.242483,
-    "elapsed_s": 0.25,
+    "started_at": 1790685324.819577,
+    "elapsed_s": 0.09,
     "err": null,
     "result": {
      "sensor_id": "terrible_white_fireant",
@@ -1934,15 +1935,15 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790646109.242718,
-    "elapsed_s": 0.0,
+    "started_at": 1790685324.819255,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {}
    },
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790646109.920737,
+    "started_at": 1790685325.3401542,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1955,7 +1956,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790646109.920946,
+    "started_at": 1790685325.3403552,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -1965,7 +1966,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 3.55
+    "elapsed_s": 3.16
    }
   ],
   "models": [
@@ -1975,7 +1976,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "ttm_battery_surge",
-    "latency_s": 0.45
+    "latency_s": 0.31
    },
    {
     "name": "Granite TTM r2",
@@ -1983,7 +1984,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "ttm_311_forecast",
-    "latency_s": 0.35
+    "latency_s": 0.21
    },
    {
     "name": "Granite TTM r2",
@@ -1991,14 +1992,14 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "floodnet_forecast",
-    "latency_s": 0.25
+    "latency_s": 0.09
    },
    {
     "name": "LLM",
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 16.0,
+    "latency_s": 9.75,
     "calls": 2
    }
   ],
@@ -2013,7 +2014,7 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 16.004,
+   "total_duration_s": 9.742,
    "tokens": {
     "prompt": 2436,
     "completion": 188,
@@ -2026,7 +2027,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1835,
      "completion_tokens": 141,
-     "duration_s": 12.479,
+     "duration_s": 6.616,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -2037,7 +2038,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 601,
      "completion_tokens": 47,
-     "duration_s": 3.525,
+     "duration_s": 3.126,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"

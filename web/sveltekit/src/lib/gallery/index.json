@@ -4,7 +4,7 @@
   "neighborhood": "Brooklyn Heights, Brooklyn",
   "address": "189 Atlantic Avenue, Brooklyn, NY",
   "question": null,
-  "generated_at": "2026-09-29T01:39Z",
+  "generated_at": "2026-09-29T12:34Z",
   "mode": "no_llm",
   "model": null,
   "quantization": null
@@ -14,7 +14,7 @@
   "neighborhood": "Hollis, Queens",
   "address": "90-01 183rd Street, Queens, NY 11423",
   "question": null,
-  "generated_at": "2026-09-29T01:39Z",
+  "generated_at": "2026-09-29T12:34Z",
   "mode": "no_llm",
   "model": null,
   "quantization": null
@@ -24,7 +24,7 @@
   "neighborhood": "Homecrest, Brooklyn",
   "address": "2017 East 17th Street, Brooklyn, NY 11229",
   "question": null,
-  "generated_at": "2026-09-29T01:39Z",
+  "generated_at": "2026-09-29T12:34Z",
   "mode": "no_llm",
   "model": null,
   "quantization": null
@@ -34,7 +34,7 @@
   "neighborhood": "Red Hook, Brooklyn",
   "address": "80 Pioneer Street, Brooklyn, NY",
   "question": null,
-  "generated_at": "2026-09-29T01:39Z",
+  "generated_at": "2026-09-29T12:34Z",
   "mode": "no_llm",
   "model": null,
   "quantization": null
@@ -44,7 +44,7 @@
   "neighborhood": "Gowanus, Brooklyn",
   "address": "400 Carroll Street, Brooklyn, NY",
   "question": null,
-  "generated_at": "2026-09-29T01:39Z",
+  "generated_at": "2026-09-29T12:34Z",
   "mode": "no_llm",
   "model": null,
   "quantization": null
@@ -54,7 +54,7 @@
   "neighborhood": "Rockaway Park, Queens",
   "address": "116-02 Rockaway Beach Boulevard, Queens, NY",
   "question": null,
-  "generated_at": "2026-09-29T01:39Z",
+  "generated_at": "2026-09-29T12:34Z",
   "mode": "no_llm",
   "model": null,
   "quantization": null
@@ -64,7 +64,7 @@
   "neighborhood": "Midland Beach, Staten Island",
   "address": "801 Father Capodanno Boulevard, Staten Island, NY",
   "question": null,
-  "generated_at": "2026-09-29T01:39Z",
+  "generated_at": "2026-09-29T12:34Z",
   "mode": "no_llm",
   "model": null,
   "quantization": null
@@ -74,7 +74,7 @@
   "neighborhood": "Lower East Side, Manhattan",
   "address": "560 Grand Street, Manhattan, NY",
   "question": null,
-  "generated_at": "2026-09-29T01:40Z",
+  "generated_at": "2026-09-29T12:34Z",
   "mode": "no_llm",
   "model": null,
   "quantization": null
@@ -84,7 +84,7 @@
   "neighborhood": "Hunts Point, Bronx",
   "address": "355 Food Center Drive, Bronx, NY",
   "question": null,
-  "generated_at": "2026-09-29T01:40Z",
+  "generated_at": "2026-09-29T12:34Z",
   "mode": "no_llm",
   "model": null,
   "quantization": null
@@ -94,7 +94,7 @@
   "neighborhood": "Jamaica, Queens",
   "address": "153-09 90th Avenue, Queens, NY",
   "question": null,
-  "generated_at": "2026-09-29T01:40Z",
+  "generated_at": "2026-09-29T12:34Z",
   "mode": "no_llm",
   "model": null,
   "quantization": null
@@ -104,7 +104,7 @@
   "neighborhood": "Hollis, Queens",
   "address": "90-01 183rd Street, Queens, NY 11423",
   "question": "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?",
-  "generated_at": "2026-09-29T01:40Z",
+  "generated_at": "2026-09-29T12:35Z",
   "mode": "llm",
   "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
   "quantization": "Q4_K_M"
@@ -114,7 +114,7 @@
   "neighborhood": "Homecrest, Brooklyn",
   "address": "2017 East 17th Street, Brooklyn, NY 11229",
   "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
-  "generated_at": "2026-09-29T01:40Z",
+  "generated_at": "2026-09-29T12:35Z",
   "mode": "llm",
   "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
   "quantization": "Q4_K_M"
@@ -124,7 +124,7 @@
   "neighborhood": "Gowanus, Brooklyn",
   "address": "400 Carroll Street, Brooklyn, NY",
   "question": "What does the 2050 stormwater scenario show at 400 Carroll Street, Brooklyn?",
-  "generated_at": "2026-09-29T01:41Z",
+  "generated_at": "2026-09-29T12:35Z",
   "mode": "llm",
   "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
   "quantization": "Q4_K_M"
@@ -134,7 +134,7 @@
   "neighborhood": "Community district QN12, Queens",
   "address": "QN12",
   "question": "How many street flooding complaints has community district QN12 had?",
-  "generated_at": "2026-09-29T01:40Z",
+  "generated_at": "2026-09-29T12:35Z",
   "mode": "llm",
   "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
   "quantization": "Q4_K_M"
