@@ -43,8 +43,8 @@
   /** Export the completed briefing to PDF via the server-side route.
    *  The PrintSnapshot in localStorage is transformed into the body
    *  /api/print expects; the response is opened in a new tab as a
-   *  blob URL. Hidden until briefingState.ready — we don't want users
-   *  exporting a half-streamed report. */
+   *  blob URL. Hidden until briefingState.ready, so readers do not
+   *  export a half-streamed report. */
   async function exportPdf() {
     if (typeof window === 'undefined') return;
     const id = page.params.queryId;
@@ -142,8 +142,8 @@
     background: #FEF3C7;
     border-top: 1px solid var(--accent-warn);
     color: var(--ink);
-    font-family: var(--font-mono);
-    font-size: 12px;
+    font-family: var(--font-sans);
+    font-size: 14px;
     padding: 8px 14px;
   }
   .app-header-toast a {
@@ -162,21 +162,9 @@
     font: inherit;
     cursor: pointer;
   }
-  /* City-pill on the chip — small federal-blue tag that ties the
-     header to the active deployment. Quiet, not competing with
-     the wordmark. */
+  /* The active deployment, in words after the context. */
   .app-header-city-pill {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 400;
-    letter-spacing: 0.04em;
-    color: var(--accent);
-    background: var(--reference-bg);
-    border: 1px solid var(--reference-line);
-    border-radius: 3px;
-    padding: 2px 7px;
-    margin-left: 6px;
-    text-transform: none;
-    line-height: 1.3;
+    font-weight: 600;
+    color: var(--ink);
   }
 </style>

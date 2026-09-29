@@ -1,8 +1,8 @@
 <script lang="ts">
   import { deployment } from '$lib/stores/deployment.svelte';
   import { APP_VERSION } from '$lib/version';
-  // NYC-only "for residents, see…" resource links. Only render when
-  // the active deployment is NYC — under a Boston / Chicago / SF /
+  // NYC-only "for residents, see" resource links. Only render when
+  // the active deployment is NYC. Under a Boston / Chicago / SF /
   // Seattle / out-of-coverage chip these resources would be either
   // out of scope (FloodHelpNY is a NY-state nonprofit) or
   // misdirection (FloodNet NYC has no Boston coverage).
@@ -24,11 +24,12 @@
           <!-- nyc-leak-ok: links gated on showNycResources (deployment === 'nyc') -->
           <a href="https://www.floodhelpny.org">FloodHelpNY</a>
           <!-- nyc-leak-ok: same gate as the FloodHelpNY link above -->
-          · <a href="https://www.floodnet.nyc">FloodNet NYC</a>.{/if}
+          and <a href="https://www.floodnet.nyc">FloodNet NYC</a>.{/if}
       </p>
     {/if}
     <p class="app-footer-build">
-      All foundation models Apache-2.0 · All data from public-record federal, state, and city sources · No commercial APIs contacted at runtime · Riprap v{APP_VERSION}
+      All foundation models are Apache-2.0. All data comes from public-record federal, state
+      and city sources. No commercial APIs are contacted at runtime. Riprap <span class="data">v{APP_VERSION}</span>.
     </p>
     <p class="app-footer-credits">
       Dam mark: <a href="https://thenounproject.com/icon/dam-4516918/">"Dam" by Chintuza</a> via the Noun Project, CC-BY 3.0.

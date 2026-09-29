@@ -123,7 +123,7 @@ function summarizeStepNote(
       }
     }
   }
-  return pairs.join(' · ') || undefined;
+  return pairs.join(', ') || undefined;
 }
 
 function countAllNodes(n: TraceNode): number {

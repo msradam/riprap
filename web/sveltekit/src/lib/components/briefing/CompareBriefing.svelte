@@ -1,6 +1,8 @@
 <script lang="ts">
-  import Briefing from './Briefing.svelte';
+  import AnswerProse from './AnswerProse.svelte';
+  import SourceNotes from './SourceNotes.svelte';
   import { parseBriefing } from '$lib/client/parseBriefing';
+  import { citedIn } from '$lib/client/briefingText';
   import type { Citation } from '$lib/types/claim';
 
   interface Target {
@@ -43,6 +45,12 @@
     ...parsedA.citations,
     ...parsedB.citations
   });
+  // The sources both columns cite, in reading order, as one set of notes.
+  const notes = $derived(
+    citedIn([parsedA, parsedB].flatMap((p) => p.blocks.flatMap((b) => (b.kind === 'prose' ? [b.parts] : [])))).flatMap(
+      (id) => (allCitations[id] ? [allCitations[id]] : [])
+    )
+  );
 
   interface DeltaRow {
     label: string;
@@ -112,150 +120,139 @@
 
 <div class="compare-layout">
   {#if deltaRows.length > 0}
-    <div class="compare-delta-bar" role="group" aria-label="Key differences">
-      <span class="compare-delta-title">Key differences</span>
-      <div class="compare-delta-rows">
-        {#each deltaRows as row, j (j)}
-          <div class="compare-delta-row">
-            <span class="compare-delta-section">{row.label}</span>
-            <span class="compare-delta-claim">
-              {#if row.ctx}<span class="compare-delta-ctx">{row.ctx}:</span>{/if}
-              <strong class="compare-delta-a">{row.aVal}</strong>
-              <span class="compare-delta-vs"> vs </span>
-              <strong class="compare-delta-b">{row.bVal}</strong>
-            </span>
-          </div>
-        {/each}
-      </div>
-    </div>
+    <section class="compare-delta-bar" aria-labelledby="compare-delta-h">
+      <h2 id="compare-delta-h" class="compare-delta-title">Key differences</h2>
+      <table class="compare-delta-table">
+        <thead>
+          <tr>
+            <th scope="col">Measure</th>
+            <th scope="col">{halves[0]?.address ?? 'Place A'}</th>
+            <th scope="col">{halves[1]?.address ?? 'Place B'}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each deltaRows as row, j (j)}
+            <tr>
+              <th scope="row">{row.label}{#if row.ctx}, {row.ctx}{/if}</th>
+              <td class="data">{row.aVal}</td>
+              <td class="data">{row.bVal}</td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </section>
   {/if}
 
   <div class="compare-cols">
     {#each halves as half, i (i)}
-      <div class="compare-col">
-        <h2 class="compare-address-header address-header">
-          {halves[i].address}
-        </h2>
-        <Briefing
-          blocks={i === 0 ? parsedA.blocks : parsedB.blocks}
-          citations={allCitations}
-          streaming={false}
-        />
-      </div>
-      {#if i === 0}
-        <div class="compare-divider" role="separator" aria-hidden="true"></div>
-      {/if}
+      <section class="compare-col" aria-labelledby="compare-place-{i}">
+        <h2 id="compare-place-{i}" class="compare-address-header address-header">{half.address}</h2>
+        {#each (i === 0 ? parsedA : parsedB).blocks as block, j (j)}
+          {#if block.kind === 'head'}
+            <h3 class="briefing-section-head">{block.label}</h3>
+          {:else if block.kind === 'prose'}
+            <AnswerProse parts={block.parts} citations={allCitations} class="compare-para" />
+          {/if}
+        {/each}
+      </section>
     {/each}
   </div>
+
+  {#if notes.length}
+    <section class="compare-notes" aria-labelledby="compare-notes-h">
+      <h2 id="compare-notes-h" class="compare-notes-h">Sources for the comparison</h2>
+      <SourceNotes citations={notes} label="Sources for the comparison" />
+    </section>
+  {/if}
 </div>
 
 <style>
   .compare-layout {
     width: 100%;
   }
-
-  /* Delta summary bar — above both columns */
   .compare-delta-bar {
-    border: 1px solid var(--rule-soft);
-    background: var(--paper-deep);
-    padding: var(--s-3) var(--s-4);
-    margin-bottom: var(--s-5);
-    display: flex;
-    gap: var(--s-4);
-    align-items: flex-start;
-    flex-wrap: wrap;
+    margin-bottom: 32px;
   }
-  .compare-delta-title {
-    font-family: var(--font-mono);
-    font-size: 12px;
+  .compare-delta-title,
+  .compare-notes-h {
+    margin: 0 0 8px;
+    font-size: 22px;
     font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-tertiary);
-    flex-shrink: 0;
-    padding-top: 1px;
+    line-height: 1.25;
   }
-  .compare-delta-rows {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-2) var(--s-5);
-    flex: 1;
+  .compare-delta-table {
+    border-collapse: collapse;
+    font-size: 14px;
+    line-height: 1.45;
   }
-  .compare-delta-row {
-    display: inline-flex;
-    align-items: baseline;
-    gap: var(--s-2);
-    font-family: var(--font-mono);
-    font-size: 12px;
+  .compare-delta-table th,
+  .compare-delta-table td {
+    padding: 8px 24px 8px 0;
+    text-align: left;
+    vertical-align: top;
   }
-  .compare-delta-section {
-    color: var(--ink-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 12px;
-    flex-shrink: 0;
-  }
-  .compare-delta-claim {
-    color: var(--ink);
-    display: inline-flex;
-    align-items: baseline;
-    gap: 3px;
-  }
-  .compare-delta-ctx {
+  .compare-delta-table thead th {
+    padding-top: 0;
+    font-weight: 600;
     color: var(--ink-secondary);
-    margin-right: 2px;
   }
-  .compare-delta-a,
-  .compare-delta-b {
-    color: var(--accent);
+  .compare-delta-table tr {
+    border-bottom: 1px solid var(--riprap-rule-hairline);
+  }
+  .compare-delta-table thead tr {
+    border-bottom-color: var(--rule-soft);
+  }
+  .compare-delta-table tbody th {
     font-weight: 600;
-  }
-  .compare-delta-vs {
-    color: var(--ink-tertiary);
-    font-style: italic;
   }
 
-  /* Two-column layout on desktop */
   .compare-cols {
     display: grid;
-    grid-template-columns: 1fr 1px 1fr;
-    gap: 0 var(--s-5);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 48px;
     align-items: start;
   }
   .compare-col {
     min-width: 0;
   }
-  /* Vertical rule between the two columns */
-  .compare-divider {
-    background: var(--rule-soft);
-    align-self: stretch;
-  }
-
-  /* Address header — same mono treatment as .region-head-meta but larger */
   .compare-address-header {
-    font-family: var(--font-mono);
-    font-size: 13px;
+    margin: 0 0 12px;
+    font-size: 22px;
     font-weight: 600;
-    letter-spacing: 0.04em;
-    color: var(--ink);
-    border-bottom: 1px solid var(--rule-soft);
-    padding-bottom: var(--s-2);
-    margin-top: 0;
-    margin-bottom: var(--s-4);
-    line-height: 1.4;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+  .briefing-section-head {
+    margin: 24px 0 6px;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .compare-col :global(.compare-para) {
+    margin: 0 0 12px;
+    max-width: 60ch;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .compare-notes {
+    margin-top: 32px;
+  }
+  .compare-notes :global(.source-notes) {
+    columns: 2;
+    column-gap: 48px;
+  }
+  .compare-notes :global(.source-note) {
+    break-inside: avoid;
   }
 
-  /* Narrow viewport (< 900 px): stack columns vertically */
+  /* Narrow viewport (under 900 px): the columns stack. */
   @media (max-width: 899px) {
     .compare-cols {
-      grid-template-columns: 1fr;
-      gap: 0;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 32px;
     }
-    .compare-divider {
-      width: 100%;
-      height: 1px;
-      margin: var(--s-5) 0;
-      align-self: auto;
+    .compare-notes :global(.source-notes) {
+      columns: auto;
     }
   }
 </style>

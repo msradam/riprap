@@ -29,8 +29,8 @@
     padding: 8px 12px;
     background: var(--ink);
     color: var(--paper);
-    font-family: var(--font-mono);
-    font-size: 13px;
+    font-family: var(--font-sans);
+    font-size: 15px;
     z-index: 1000;
     text-decoration: none;
   }

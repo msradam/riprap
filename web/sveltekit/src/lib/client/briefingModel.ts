@@ -8,7 +8,7 @@ import { splitBriefing } from '$lib/client/parseBriefing';
 import { modeLine } from '$lib/client/cardAdapter';
 import { formatGeneratedAt } from '$lib/client/gallery';
 import { citedIn, findingOf, termsIn } from '$lib/client/briefingText';
-import { sourceLists } from '$lib/stores/briefingState.svelte';
+import { sourceLists, type PrintSnapshot } from '$lib/stores/briefingState.svelte';
 import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 import { deployment } from '$lib/stores/deployment.svelte';
 import { STONE_META, STONE_ORDER, type Card, type StoneTrace } from '$lib/types/card';
@@ -18,6 +18,8 @@ export type Kind = 'question' | 'address' | 'district';
 export type Section = { label: string; paras: ClaimPart[][] };
 export type SnapshotMeta = { generatedAt: string; commit: string; stamp: string | null };
 export type EvidenceGroup = { key: string; name: string; role: string | null; cards: Card[] };
+/** The card fields the evidence table prints. */
+export type EvidenceCard = Pick<Card, 'id' | 'source' | 'experimental' | 'title' | 'tier' | 'vintage' | 'citeId' | 'docId' | 'scalars' | 'headline'>;
 
 const LEAD_RE = /^(Yes|No|Partly|In part|Not clear|Unclear)\.\s*/;
 const COUNT_RE = /^([\d,]+(?:\.\d+)?%?)\s+/;
@@ -46,6 +48,16 @@ export function splitLead(parts: ClaimPart[]): { word: string | null; parts: Cla
   const yes = LEAD_RE.exec(first.text);
   if (yes) return { word: yes[1], parts: [{ ...first, text: first.text.slice(yes[0].length) }, ...rest] };
   return { word: COUNT_RE.exec(first.text)?.[1] ?? null, parts };
+}
+
+/** A refusal's first sentence ("Riprap does not answer this question.")
+ *  comes off its first paragraph so it can stand at the answer position. */
+export function splitSentence(parts: ClaimPart[]): { sentence: string; parts: ClaimPart[] } | null {
+  const [first, ...rest] = parts;
+  const m = first && !first.cite ? /^([^.]+\.)\s*/.exec(first.text) : null;
+  if (!m) return null;
+  const tail = [{ ...first, text: first.text.slice(m[0].length) }, ...rest].filter((p) => p.text || p.cite);
+  return { sentence: m[1], parts: tail };
 }
 
 /** The first found cards cite what the answer cites (in the answer's
@@ -118,16 +130,24 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   const lead = sections(split.lead)[0];
   const leadParas = lead?.paras ?? [];
   const hasAnswer = blocks.some((b) => b.kind === 'head' && b.label === 'Answer');
+  // A refused question has no Answer section, only a statement; it is set
+  // where the answer would be, its first sentence as the lead.
+  const refusalParas = run.refused && !leadParas.length
+    ? blocks.flatMap((b) => (b.kind === 'prose' ? [b.parts] : []))
+    : [];
+  const refusal = refusalParas.length ? splitSentence(refusalParas[0]) : null;
   const first = splitLead(leadParas[0] ?? []);
-  const answer = leadParas.length ? [first.parts, ...leadParas.slice(1)] : [];
-  const leadWord = first.word;
+  const answer = refusal
+    ? [refusal.parts, ...refusalParas.slice(1)].filter((p) => p.length)
+    : leadParas.length ? [first.parts, ...leadParas.slice(1)] : [];
+  const leadWord = refusal ? null : first.word;
 
   // "Checks run: ..." closes the Out of scope note; it is its own line here.
   const outParas = sections(split.outOfScope).flatMap((s) => s.paras);
   const checks = outParas.find((p) => text(p).startsWith('Checks run'));
   const outOfScope = outParas.filter((p) => p !== checks);
   const scope = sections(split.scope).flatMap((s) => s.paras);
-  const body = sections(split.body);
+  const body = refusal ? [] : sections(split.body);
 
   const citations: Citation[] = Object.values(run.briefing.citations).sort((a, b) => a.n - b.n);
   const cited = citedIn(answer);
@@ -135,7 +155,7 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   const cards = allCards.filter((c) => !c.absent && c.variant !== 'meta');
   const absent = allCards.filter((c) => c.absent);
   const metaCard = allCards.find((c) => c.variant === 'meta') ?? null;
-  const leadLabel = lead?.label || (question ? 'Answer' : 'In brief');
+  const leadLabel = refusal ? 'Response' : lead?.label || (question ? 'Answer' : 'In brief');
   const groups = evidenceGroups(cards, cited, leadLabel === 'In brief' ? 'Behind the summary' : 'Behind the answer');
   const narration = (c: Card) => pebbleManifest.byId[c.id.replace(/^pebble-/, '')]?.narration.short ?? null;
   const findings = new Map(cards.map((c) => [c.id, findingOf(c, narration(c))]));
@@ -156,8 +176,11 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     leadLabel,
     hasAnswer,
     leadWord,
-    /** "Yes." keeps its full stop; a count is set bare. */
-    lead: leadWord && /^[A-Z]/.test(leadWord) ? `${leadWord}.` : leadWord,
+    /** "Yes." keeps its full stop; a count is set bare; a refusal leads
+     *  with its first sentence. */
+    lead: refusal ? refusal.sentence : leadWord && /^[A-Z]/.test(leadWord) ? `${leadWord}.` : leadWord,
+    /** The lead is a sentence, not a word or a figure. */
+    leadIsSentence: !!refusal,
     answer,
     scope,
     body,
@@ -194,3 +217,50 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
 }
 
 export type BriefingModel = ReturnType<typeof briefingModel>;
+
+const evidenceCard = ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline }: Card): EvidenceCard =>
+  ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline });
+
+/** Build the print snapshot from a finished run: the live route calls it
+ *  when the stream ends, the gallery when a reader presses Print. It
+ *  carries the report as the briefing page sets it, so the print route
+ *  needs no RunState. */
+export function snapshotFromRun(
+  run: RunState,
+  queryId: string,
+  queryText: string,
+  generatedAt: string = new Date().toISOString(),
+): PrintSnapshot {
+  const m = briefingModel(run, queryText);
+  const g = run.finalResult?.grounding;
+  return {
+    queryId,
+    queryText,
+    intent: run.plan?.intent ?? null,
+    specialists: run.plan?.specialists?.length ?? 0,
+    blocks: run.briefing.blocks,
+    citations: run.briefing.citations,
+    generatedAt,
+    resolvedPlace: run.resolvedPlace,
+    question: m.question,
+    mode: modeLine(g),
+    unanswered: m.unanswered,
+    consulted: m.lists.consulted?.map(({ title, failed }) => ({ title, failed })),
+    noData: m.lists.noData,
+    notChecked: m.lists.notChecked,
+    kind: m.kind,
+    lead: m.lead,
+    leadLabel: m.leadLabel,
+    answer: m.answer,
+    scope: m.scope,
+    body: m.body,
+    outOfScope: m.outOfScope,
+    checks: m.checks,
+    cited: m.cited,
+    evidence: {
+      groups: m.evidenceGroups.map((gr) => ({ ...gr, cards: gr.cards.map(evidenceCard) })),
+      findings: Object.fromEntries(m.findings),
+      notRun: m.notRun,
+    },
+  };
+}

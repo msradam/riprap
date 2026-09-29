@@ -52,8 +52,7 @@
   }
   .map-placeholder p {
     margin: 0;
-    font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 14px;
     color: var(--ink-secondary);
   }
 </style>

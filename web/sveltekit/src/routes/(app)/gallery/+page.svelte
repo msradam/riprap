@@ -24,7 +24,7 @@
 </script>
 
 <svelte:head>
-  <title>Gallery · Riprap</title>
+  <title>Riprap gallery</title>
   <meta name="description" content="Precomputed Riprap flood-exposure briefings for New York City neighborhoods, served as static pages." />
 </svelte:head>
 

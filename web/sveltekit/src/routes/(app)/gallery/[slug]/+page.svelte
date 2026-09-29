@@ -4,7 +4,8 @@
   import ResultsView from '$lib/components/results/ResultsView.svelte';
   import { RunState } from '$lib/client/runState.svelte';
   import { llmStamp } from '$lib/client/gallery';
-  import { persistSnapshot, snapshotFromRun } from '$lib/stores/briefingState.svelte';
+  import { persistSnapshot } from '$lib/stores/briefingState.svelte';
+  import { snapshotFromRun } from '$lib/client/briefingModel';
   import type { PageProps } from './$types';
 
   let { data }: PageProps = $props();
@@ -25,7 +26,7 @@
 </script>
 
 <svelte:head>
-  <title>{entry.neighborhood} · Riprap gallery</title>
+  <title>{entry.neighborhood}: Riprap gallery</title>
   <meta name="description" content="Precomputed Riprap flood-exposure briefing for {entry.address}." />
 </svelte:head>
 

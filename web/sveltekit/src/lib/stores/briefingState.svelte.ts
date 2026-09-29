@@ -9,10 +9,10 @@
  * `riprap:print:<queryId>` so the dedicated print tab (opened with
  * `window.open`) can hydrate from it without re-running the pipeline.
  */
-import type { BriefingBlock, Citation } from '$lib/types/claim';
-import { looksLikeQuestion, type RunState } from '$lib/client/runState.svelte';
+import type { BriefingBlock, Citation, ClaimPart } from '$lib/types/claim';
+import type { RunState } from '$lib/client/runState.svelte';
+import type { EvidenceCard, Kind, Section } from '$lib/client/briefingModel';
 import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
-import { modeLine } from '$lib/client/cardAdapter';
 
 export interface PrintSnapshot {
   queryId: string;
@@ -36,6 +36,23 @@ export interface PrintSnapshot {
   /** Sources that ran but returned no data or were unavailable. */
   noData?: string[];
   notChecked?: string[];
+  /** The report as the briefing page sets it (briefingModel). Snapshots
+   *  saved before the report layout lack these and print as missing. */
+  kind?: Kind;
+  lead?: string | null;
+  leadLabel?: string;
+  answer?: ClaimPart[][];
+  scope?: ClaimPart[][];
+  body?: Section[];
+  outOfScope?: ClaimPart[][];
+  checks?: string | null;
+  /** Doc ids the answer cites, in reading order. */
+  cited?: string[];
+  evidence?: {
+    groups: { key: string; name: string; role: string | null; cards: EvidenceCard[] }[];
+    findings: Record<string, { first: string; rest: string } | null>;
+    notRun: string[];
+  };
 }
 
 /** The three source lists shown above the briefing body and in print.
@@ -71,41 +88,6 @@ export function sourceLists(run: RunState) {
     hasConsultedList: !!f?.consulted,
     noData,
     notChecked: f?.not_checked?.map((c) => c.title),
-  };
-}
-
-/** Build the print snapshot from a finished run: the live route calls it
- *  when the stream ends, the gallery when a reader presses Print. Mirrors
- *  what ResultsView shows above the briefing body. */
-export function snapshotFromRun(
-  run: RunState,
-  queryId: string,
-  queryText: string,
-  generatedAt: string = new Date().toISOString(),
-): PrintSnapshot {
-  const f = run.finalResult;
-  const g = f?.grounding;
-  const question =
-    run.plan?.question || g?.question || (looksLikeQuestion(queryText) ? queryText : '');
-  const blocks = run.briefing.blocks;
-  const hasAnswer = blocks.some((b) => b.kind === 'head' && b.label === 'Answer');
-  const lists = sourceLists(run);
-  const mode = modeLine(g);
-  return {
-    queryId,
-    queryText,
-    intent: run.plan?.intent ?? null,
-    specialists: run.plan?.specialists?.length ?? 0,
-    blocks,
-    citations: run.briefing.citations,
-    generatedAt,
-    resolvedPlace: run.resolvedPlace,
-    question: question || null,
-    mode,
-    unanswered: !!question && !hasAnswer && g?.tier !== 'llm',
-    consulted: lists.consulted?.map(({ title, failed }) => ({ title, failed })),
-    noData: lists.noData,
-    notChecked: lists.notChecked,
   };
 }
 

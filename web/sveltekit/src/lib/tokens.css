@@ -70,11 +70,8 @@
      Sofia Sans + Overpass Mono everywhere; IBM Plex retired. No serif:
      HANDOFF.md explicitly rejects the "serif headline + sans body" combo
      as a current AI-generated-site trope, so --font-serif now aliases
-     Sofia Sans too — existing font-style:italic call sites synthesize
-     italic rather than using a real italic face (Sofia Sans's italic
-     weights aren't vendored). If that reads wrong on a specific
-     headline, that's a design call for a follow-up pass, not a silent
-     fix here. */
+     Sofia Sans too. There is no italic in the app (DESIGN.md), and no
+     italic face is vendored. */
   --font-sans: "Sofia Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --font-mono: "Overpass Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --font-serif: "Sofia Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
@@ -127,7 +124,8 @@ html, body {
 
 /* Underlines sit clear of descenders; a hover thickens them. Component
    rules that set their own offset or hover still win. */
-a { text-underline-offset: 0.2em; }
+/* Links take Federal Blue everywhere, never the browser's blue or purple. */
+a { color: var(--riprap-text-link); text-underline-offset: 0.2em; }
 a:hover { text-decoration-thickness: 2px; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -188,16 +186,6 @@ a:hover { text-decoration-thickness: 2px; }
 .exp-badge { display: inline-block; font-family: var(--font-sans); font-size: 14px; font-weight: 400; line-height: 1.3; color: var(--ink-secondary); border: 1px solid var(--rule-soft); border-radius: 3px; padding: 0 5px; white-space: nowrap; }
 /* Mono Means Data: figures, identifiers, dates and citation numbers. */
 .data { font-family: var(--font-mono); font-size: 13px; font-weight: 400; font-variant-numeric: tabular-nums; }
-
-/* ── Generic section labels ── */
-.section-label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-tertiary);
-}
 
 .rule-thin {
   border: 0;

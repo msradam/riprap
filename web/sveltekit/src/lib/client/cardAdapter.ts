@@ -291,7 +291,7 @@ function buildTerramindBuildings(state: Final): Card | null {
     rasterKind: 'buildings',
     headline: `${num(tmb.pct_buildings) ?? 0}%`,
     subhead: 'building-footprint coverage in chip',
-    sub: `${num(tmb.n_building_components) ?? 0} distinct components · test mIoU 0.5511`,
+    sub: `${num(tmb.n_building_components) ?? 0} distinct components, test mIoU 0.5511`,
     illustrative: true,
     docId: 'tm_buildings', citeId: 'tm_buildings', mapLayer: 'buildings',
   };
@@ -336,7 +336,7 @@ function buildTerramindLulc(state: Final): Card | null {
     stone: 'touchstone', tier: 'synthetic', variant: 'lulc',
     source: 'TerraMind v1.2', agency: 'IBM TerraMind v1.2 · Sentinel-2 inputs',
     vintage: 'Sentinel-2',
-    title: 'Land use / land cover · TerraMind v1.2',
+    title: 'Land use / land cover, TerraMind v1.2',
     rasterKind: 'lulc',
     classMix: classMix.length ? classMix : undefined,
     sub: 'Synthetic prior. LULC palette is a layer convention, not a tier signal.',
@@ -546,7 +546,7 @@ function _itemRow(reg: string, item: RegisterItem): NonNullable<Card['registers'
                     ?? str(item.source_id) ?? null);
   return {
     reg, tier: 'empirical',
-    label, detail: detail_bits.join(' · ') || null,
+    label, detail: detail_bits.join(', ') || null,
     sourceId, note: null,
   };
 }
@@ -595,7 +595,7 @@ function buildRegisterComposite(
     vintage: RIPRAP_VINTAGE,
     title: 'Nearby exposed assets',
     registers: rows,
-    sub: `${fired} of ${rows.length} register rows have items · joined within range`,
+    sub: `${fired} of ${rows.length} register rows have items, joined within range`,
     docId: docIds[0] ?? 'registers',
     citeId: 'registers',
     mapLayer: 'registers',
@@ -632,7 +632,7 @@ function buildHistogramCard(m: PebbleManifest, value: unknown): Card | null {
   const radius = num(t.radius_m);
   const years = num(t.years);
   const sparkSub = (radius != null && years != null)
-    ? `Within ${radius} m · ${years} y window. Filtered to flood-relevant descriptors.`
+    ? `Within ${radius} m, ${years} y window. Filtered to flood-relevant descriptors.`
     : undefined;
   const tier = (m.tier ?? 'proxy') as Card['tier'];
   const source = shortSource(m.provenance.source_name);
@@ -747,10 +747,10 @@ function buildCapstoneMeta(final: FinalResult, wallSeconds?: number): Card {
     stone: 'capstone', tier: 'modeled', variant: 'meta',
     source: isLlm ? 'LLM' : 'No LLM',
     agency: isLlm
-      ? `Capstone synthesis · ${g?.model ?? 'LLM'} · ${g?.answer_mode === 'extractive'
+      ? `Capstone synthesis with ${g?.model ?? 'LLM'}: ${g?.answer_mode === 'extractive'
           ? 'answer quoted word for word, other claims checked against cited sources'
           : 'claims checked against cited sources'}`
-      : 'Capstone synthesis · evidence briefing built from source values (no LLM)',
+      : 'Capstone synthesis: evidence briefing built from source values (no LLM)',
     vintage: RIPRAP_VINTAGE,
     title: 'How this briefing was written',
     metaRows: [

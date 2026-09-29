@@ -3,8 +3,8 @@
  *  - the header button is hidden until the briefing is ready
  *  - on /q/sample (prerendered) it appears immediately on mount
  *  - clicking it opens /print/<id> in a new tab
- *  - that route renders the curated artifact: title, briefing prose,
- *    citation list. No app header, no map, no trace, no evidence.
+ *  - that route renders the report: title, answer and its source notes,
+ *    then the evidence table and the source lists. No app header, no map.
  *  - the route auto-fires window.print()
  */
 import { test, expect } from '@playwright/test';
@@ -41,9 +41,12 @@ test.describe('export-PDF curated print flow', () => {
 
     // The curated artifact renders.
     await expect(page.locator('.print-doc')).toBeVisible();
-    await expect(page.locator('.print-title')).toContainText(/Pioneer/i);
-    await expect(page.locator('.briefing-prose')).toBeVisible();
-    await expect(page.locator('.print-citations h2')).toHaveText('Citations');
+    // The title is the query as typed ("sample"); the meta line names the
+    // place it resolved to.
+    await expect(page.locator('.print-title')).toHaveText('sample');
+    await expect(page.locator('.print-meta')).toContainText(/Pioneer/i);
+    await expect(page.locator('.print-answer')).toBeVisible();
+    await expect(page.locator('.print-citations h3')).toHaveText('Sources cited');
 
     // App chrome is excluded (the @-page break breaks out of root layout).
     await expect(page.locator('.app-header')).toHaveCount(0);

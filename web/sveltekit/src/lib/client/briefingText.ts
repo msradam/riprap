@@ -35,7 +35,7 @@ const FIGURE_RE = /^\d[\d.,]*(?:\s?(?:%|m²|cm|mm|ft|in|m\b|\/wk))?/;
 
 /** The evidence table's figure: the first scalar, else a leading number in
  *  the headline ("82 calls" gives "82"), else nothing. */
-export function figureOf(c: Card): { value: string; label: string | null } | null {
+export function figureOf(c: Pick<Card, 'scalars' | 'headline'>): { value: string; label: string | null } | null {
   const s = c.scalars?.[0];
   if (s) return { value: s.unit ? `${s.value} ${s.unit}` : s.value, label: s.label };
   const m = c.headline ? FIGURE_RE.exec(c.headline) : null;

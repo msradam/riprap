@@ -3,7 +3,8 @@
   import { onMount } from 'svelte';
   import ResultsView from '$lib/components/results/ResultsView.svelte';
   import { RunState } from '$lib/client/runState.svelte';
-  import { briefingState, persistSnapshot, snapshotFromRun } from '$lib/stores/briefingState.svelte';
+  import { briefingState, persistSnapshot } from '$lib/stores/briefingState.svelte';
+  import { snapshotFromRun } from '$lib/client/briefingModel';
   import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
   import { deployment } from '$lib/stores/deployment.svelte';
   import { openAgentStream } from '$lib/client/agentStream';

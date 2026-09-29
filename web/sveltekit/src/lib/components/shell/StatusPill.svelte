@@ -1,9 +1,9 @@
 <script lang="ts">
   import { briefingState } from '$lib/stores/briefingState.svelte';
 
-  /** v0.4.5 — live status pill for the AppHeader.
+  /** Live status for the AppHeader.
    *
-   *  Tracks pipeline phase + active step + fired-count so a user staring at a half-rendered briefing knows what's
+   *  Tracks pipeline phase, active step and fired count so a user staring at a half-rendered briefing knows what's
    *  actually being crunched. Reads from the briefingState rune store
    *  which q/[queryId]/+page.svelte writes into from SSE callbacks.
    *
@@ -11,10 +11,8 @@
    *  before a briefing starts and after the streamed run settles.
    */
 
-  // Pretty short labels for FSM step names. Lifted from the legacy
-  // agent.js label set; only the short names land here — the trace
-  // panel still owns the long form. Anything not mapped just shows
-  // its raw step name, which is mono-cased and readable.
+  // Short labels for FSM step names, from the legacy agent.js label
+  // set. Anything not mapped shows its raw step name.
   const SHORT: Record<string, string> = {
     geocode: 'geocoding',
     nta_resolve: 'resolving NTA',
@@ -85,15 +83,14 @@
     <span class="status-dot" aria-hidden="true"></span>
     <span class="status-phase">{phaseLabel}</span>
     {#if stepLabel}
-      <span class="status-sep status-step-sep">·</span>
+      <span class="status-step-sep">:</span>
       <span class="status-step">{stepLabel}</span>
     {/if}
     {#if progress}
-      <span class="status-sep">·</span>
-      <span class="status-progress">{progress}</span>
+      <span class="status-progress data">{progress}</span>
     {/if}
     {#if briefingState.phase === 'error' && briefingState.errorMessage}
-      <span class="status-sep">·</span>
+      <span class="status-sep">:</span>
       <span class="status-err">{briefingState.errorMessage}</span>
     {/if}
   </span>
@@ -102,16 +99,12 @@
 <style>
   .status {
     display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 2px 10px;
-    background: var(--paper-deep);
-    border: 1px solid var(--rule-soft);
-    font-family: var(--font-mono);
-    font-size: 12px;
+    align-items: baseline;
+    gap: 0 6px;
+    font-family: var(--font-sans);
+    font-size: 14px;
     color: var(--ink-secondary);
-    letter-spacing: 0.04em;
-    line-height: 18px;
+    line-height: 20px;
     max-width: min(60ch, 50vw);
     /* Shrinks inside the header row; the step, then the phase, truncate.
        The full text stays in the DOM, so the live region reads all of it. */
@@ -121,10 +114,10 @@
     white-space: nowrap;
   }
   .status[data-kind='err'] {
-    border-color: #B91C1C;
     color: #B91C1C;
   }
   .status-dot {
+    align-self: center;
     width: 7px;
     height: 7px;
     border-radius: 50%;
@@ -149,11 +142,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--ink);
-    text-transform: lowercase;
-    letter-spacing: 0.05em;
     font-weight: 600;
   }
-  .status-sep { flex: none; color: var(--ink-tertiary); opacity: 0.6; }
+  .status-sep,
+  .status-step-sep { flex: none; margin-left: -6px; }
   .status-step {
     flex: 0 100 auto;
     min-width: 0;
@@ -161,7 +153,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .status-progress { flex: none; color: var(--ink); font-weight: 600; }
+  .status-progress { flex: none; color: var(--ink); }
   .status-err { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: #B91C1C; }
   @keyframes pulse {
     0%, 100% { opacity: 0.35; transform: scale(0.85); }

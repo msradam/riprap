@@ -1,38 +1,83 @@
-<script lang="ts">
-  /**
-   * v0.4.2 §11 — t=0 to ~1.4s pulse state for the briefing region.
-   * Shown during the geocode → fan-out window before any reconciler tokens
-   * arrive. Section heads visible-but-empty; pulses respect
-   * prefers-reduced-motion (handled in tokens.css media query).
-   */
-  const SECTIONS: Array<{ n: string; label: string }> = [
-    { n: '01', label: 'Status' },
-    { n: '02', label: 'Empirical evidence' },
-    { n: '03', label: 'Modeled scenarios' },
-    { n: '04', label: 'Policy context' }
-  ];
-</script>
-
-<div
-  class="skeleton-brief"
-  role="status"
-  aria-live="polite"
-  aria-label="Loading briefing — geocode complete, dispatching specialists"
->
-  <div class="skeleton-status">
-    <span class="skeleton-pulse" style:width="62%"></span>
-    <span class="skeleton-pulse skeleton-pulse-meta" style:width="40%"></span>
+<!--
+  Placeholder while the evidence is gathered after the place resolved:
+  the shape of the report that will replace it (the lead, the answer
+  lines, the source notes beside them, then the evidence rows). The
+  status line above it carries the words, so this is hidden from
+  assistive technology.
+-->
+<div class="skeleton-brief" aria-hidden="true">
+  <div class="sk-answer">
+    <span class="sk sk-lead"></span>
+    <span class="sk" style:width="94%"></span>
+    <span class="sk" style:width="88%"></span>
+    <span class="sk" style:width="62%"></span>
   </div>
-  {#each SECTIONS as s (s.n)}
-    <div class="skeleton-section">
-      <div class="skeleton-head">
-        <span class="skeleton-num">{s.n}</span>
-        <span class="skeleton-label">{s.label}</span>
-        <span class="skeleton-spinner" aria-hidden="true">▍</span>
-      </div>
-      <span class="skeleton-pulse" style:width="92%"></span>
-      <span class="skeleton-pulse" style:width="78%"></span>
-      <span class="skeleton-pulse" style:width="85%"></span>
-    </div>
-  {/each}
+  <div class="sk-rail">
+    {#each [70, 84, 58] as w (w)}
+      <span class="sk sk-small" style:width="{w}%"></span>
+      <span class="sk sk-small" style:width="{w - 22}%"></span>
+    {/each}
+  </div>
+  <div class="sk-rows">
+    {#each [92, 80, 86, 74] as w (w)}
+      <span class="sk sk-small" style:width="{w}%"></span>
+    {/each}
+  </div>
 </div>
+
+<style>
+  .skeleton-brief {
+    display: grid;
+    grid-template-columns: minmax(0, 680px) 280px;
+    column-gap: 56px;
+    row-gap: 40px;
+    margin-top: 24px;
+  }
+  .sk-answer,
+  .sk-rail,
+  .sk-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sk-rail {
+    gap: 6px;
+    padding-top: 10px;
+  }
+  .sk-rows {
+    grid-column: 1 / -1;
+    gap: 20px;
+  }
+  .sk {
+    display: block;
+    height: 16px;
+    background: var(--paper-deep);
+    animation: sk-fade 1.6s ease-in-out infinite;
+  }
+  .sk-lead {
+    width: 3.2em;
+    height: 56px;
+    margin-bottom: 8px;
+    font-size: 44px;
+  }
+  .sk-small {
+    height: 12px;
+  }
+  .sk-rail .sk-small:nth-child(2n) {
+    margin-bottom: 10px;
+  }
+  @keyframes sk-fade {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sk { animation: none; }
+  }
+  @media (max-width: 1099px) {
+    .skeleton-brief {
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 680px;
+      row-gap: 24px;
+    }
+  }
+</style>

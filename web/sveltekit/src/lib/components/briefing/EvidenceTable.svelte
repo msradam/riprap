@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Citation } from '$lib/types/claim';
-  import type { Card } from '$lib/types/card';
-  import type { EvidenceGroup } from '$lib/client/briefingModel';
+  import type { EvidenceCard } from '$lib/client/briefingModel';
   import { TIER_WORDS } from '$lib/types/tier';
   import { asOfDate, figureOf } from '$lib/client/briefingText';
   import { activateCitation } from '$lib/stores/citations.svelte';
@@ -11,7 +10,7 @@
    *  rows the answer cites first, then one group per Stone. On phones each
    *  row is a stacked block; the cells keep their table semantics. */
   interface Props {
-    groups: EvidenceGroup[];
+    groups: { key: string; name: string; role: string | null; cards: EvidenceCard[] }[];
     findings: Map<string, { first: string; rest: string } | null>;
     citations: Record<string, Citation>;
     notRun: string[];
@@ -19,7 +18,7 @@
   }
   let { groups, findings, citations, notRun, labelledby }: Props = $props();
 
-  function citationOf(c: Card): Citation | null {
+  function citationOf(c: EvidenceCard): Citation | null {
     return (c.citeId && citations[c.citeId]) || citations[c.docId] || null;
   }
 </script>

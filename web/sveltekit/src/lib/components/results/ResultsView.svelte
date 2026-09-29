@@ -41,6 +41,9 @@
   let hasBriefing = $derived(!!run.finalResult);
   let isCompare = $derived(run.plan?.intent === 'compare' && run.finalResult?.targets?.length === 2);
   let isPlace = $derived(model.kind !== 'question');
+  // Compare briefings carry their own source notes; the full list then
+  // needs no citation targets of its own.
+  let sourceNoted = $derived(isCompare ? model.citations.map((c) => c.id) : model.cited);
   let answerCites = $derived(model.citations.filter((c) => model.cited.includes(c.id)));
   let showSources = $derived(
     hasBriefing && !run.stopped &&
@@ -54,7 +57,11 @@
       ? run.finalResult?.area_boundary ? 'Flood-exposure briefing, district question' : 'Flood-exposure briefing, question'
       : `Flood-exposure briefing, ${model.kind}`
   );
-  let title = $derived(model.question ?? model.place);
+  // A place briefing is titled with the place as the reader typed it; the
+  // meta line names the place it resolved to.
+  let title = $derived(model.question ?? (queryText.trim() || model.place));
+  const norm = (t: string) => t.replace(/\s+/g, ' ').trim().toLowerCase();
+  let placeRepeats = $derived(!!run.resolvedPlace && norm(run.resolvedPlace) === norm(title));
   let jumps = $derived([
     { href: '#brief-answer', label: model.leadLabel === 'In brief' ? 'In brief' : 'Answer' },
     ...(showEvidence ? [{ href: '#brief-evidence', label: 'Evidence' }] : []),
@@ -133,7 +140,7 @@
 {#snippet answerBlock()}
   <section id="brief-answer" class="brief-answer" aria-labelledby="brief-answer-h">
     <h2 id="brief-answer-h" class="visually-hidden">{model.leadLabel}</h2>
-    {#if model.lead}<p class={['brief-lead', !snapshot && 'is-arriving']}>{model.lead}</p>{/if}
+    {#if model.lead}<p class={['brief-lead', model.leadIsSentence && 'is-sentence', !snapshot && 'is-arriving']}>{model.lead}</p>{/if}
     {#each model.answer as parts, i (i)}
       <AnswerProse {parts} citations={model.citationsById} class="brief-answer-p" />
     {/each}
@@ -199,7 +206,7 @@
       <h1 id="brief-h1" class="brief-title">{title}</h1>
       <p class="brief-meta">
         {#if run.resolvedPlace}
-          <span class="resolved-place"><span class="brief-meta-label">Briefing for:</span> {run.resolvedPlace}</span>
+          <span class="resolved-place"><span class="brief-meta-label">Briefing for:</span> {placeRepeats ? 'the place named above' : run.resolvedPlace}</span>
         {/if}
         {#if model.generated}<span>Snapshot <span class="data">{model.generated.slice(0, 10)}</span></span>{/if}
         {#if hasBriefing && !run.stopped}<a href="#how-made" onclick={openHowMade}>How this briefing was made</a>{/if}
@@ -222,8 +229,9 @@
 
     {#if loading}
       <div class="generating-status">
-        <span class="pulse" aria-hidden="true"></span>
-        <span aria-hidden="true">{loadingText}, <span class="data">{elapsed} s</span></span>
+        <p class="generating-line" aria-hidden="true">
+          <span class="pulse"></span>{loadingText}, <span class="data">{elapsed}</span> s
+        </p>
         <span class="visually-hidden" aria-live="polite">{srStatus}</span>
         <p class="generating-expect">
           Briefings take from a few seconds to a few minutes; questions answered by a
@@ -317,10 +325,10 @@
                 <!-- A long list starts closed; following a citation mark opens it. -->
                 <details class="brief-cited">
                   <summary>All {model.citations.length} sources, with titles and document ids</summary>
-                  <SourceList citations={model.citations} noted={isCompare ? [] : model.cited} />
+                  <SourceList citations={model.citations} noted={sourceNoted} />
                 </details>
               {:else}
-                <SourceList citations={model.citations} noted={isCompare ? [] : model.cited} />
+                <SourceList citations={model.citations} noted={sourceNoted} />
               {/if}
             </div>
           {/if}
@@ -329,7 +337,9 @@
               <h3 class="brief-h3">What was checked</h3>
               <SourcesChecked lists={model.lists} />
             {/if}
-            {#if model.outOfScope.length}
+            <!-- Compare columns carry their own Out of scope note; the merged
+                 text would print the second place's heading raw. -->
+            {#if model.outOfScope.length && !isCompare}
               <h3 class="brief-h3">Out of scope</h3>
               {#each model.outOfScope as parts, i (i)}
                 <AnswerProse {parts} citations={model.citationsById} class="brief-quiet" />
@@ -456,6 +466,14 @@
   /* A live answer's lead word arrives once, over 150 ms. */
   .brief-lead.is-arriving {
     animation: lead-in 150ms ease-out both;
+  }
+  /* A refusal leads with a sentence: the lead's weight, a smaller size. */
+  .brief-lead.is-sentence {
+    max-width: 22ch;
+    font-size: 44px;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
   }
   @keyframes lead-in {
     from { opacity: 0; }
@@ -615,22 +633,35 @@
   }
 
   /* Live run: generating status */
+  /* Where the answer will be: what is happening and how long it has taken,
+     in the answer's size, then what to expect in Small. */
   .generating-status {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 12px;
-    margin-top: 24px;
+    margin-top: 16px;
+    max-width: var(--text-w);
     font-size: 14px;
     line-height: 1.45;
     color: var(--ink-secondary);
   }
+  .generating-line {
+    margin: 0 0 4px;
+    font-size: 20px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .generating-line .data {
+    font-size: 18px;
+  }
+  .generating-line .pulse {
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: 0.15em;
+  }
   .generating-expect {
-    flex-basis: 100%;
     margin: 0;
     max-width: 54ch;
   }
   .pulse {
+    flex: none;
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -645,7 +676,7 @@
     .pulse { animation: none; opacity: 0.7; }
   }
   .plan-details {
-    flex-basis: 100%;
+    margin-top: 8px;
   }
   .plan-details summary {
     min-height: 24px;
@@ -754,6 +785,9 @@
     }
     .brief-lead {
       font-size: 44px;
+    }
+    .brief-lead.is-sentence {
+      font-size: 32px;
     }
     .is-question .brief-map {
       --map-h: 300px;

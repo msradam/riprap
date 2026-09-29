@@ -199,7 +199,7 @@
           onchange={onFileChange}
         />
         <p class="byod-supported">
-          Supported: <code>.csv</code> · <code>.json</code> · <code>.geojson</code> · <code>.yaml</code> · <code>.yml</code>
+          Supported: <code>.csv</code>, <code>.json</code>, <code>.geojson</code>, <code>.yaml</code>, <code>.yml</code>
         </p>
         {#if parseError}
           <p class="byod-error">{parseError}</p>
@@ -210,7 +210,7 @@
       {:else}
         <div class="byod-loaded">
           <strong>{parsed.filename}</strong>
-          <span>· {parsed.rowCount.toLocaleString()} records · {(parsed.size / 1024).toFixed(1)} KB</span>
+          <span><span class="data">{parsed.rowCount.toLocaleString()}</span> records, <span class="data">{(parsed.size / 1024).toFixed(1)}</span> KB</span>
           <button type="button" class="byod-relink" onclick={reset}>Choose a different file</button>
         </div>
       {/if}
@@ -366,11 +366,9 @@
   }
   .byod-step {
     display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-tertiary);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
     margin-bottom: 8px;
   }
   .byod-drop {
@@ -401,28 +399,26 @@
     gap: 2px;
   }
   .byod-drop-text strong { font-size: 14px; color: var(--ink); }
-  .byod-drop-text span { font-size: 12px; color: var(--ink-tertiary); }
+  .byod-drop-text span { font-size: 14px; color: var(--ink-secondary); }
   .byod-supported {
     margin: 10px 0 0;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink-tertiary);
+    font-size: 14px;
+    color: var(--ink-secondary);
   }
-  .byod-supported code {
-    background: var(--paper-deep);
-    padding: 1px 5px;
-    border: 1px solid var(--rule-soft);
-    margin: 0 2px;
+  .byod-supported code,
+  .byod-hint code {
+    font-family: var(--font-mono);
+    font-size: 13px;
   }
   .byod-error {
     margin: 10px 0 0;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--accent-alert);
   }
   .byod-status {
     margin: 10px 0 0;
-    font-size: 12px;
-    color: var(--ink-tertiary);
+    font-size: 14px;
+    color: var(--ink-secondary);
   }
   .byod-loaded {
     display: flex;
@@ -435,14 +431,15 @@
     padding: 8px 12px;
   }
   .byod-loaded strong { color: var(--ink); }
-  .byod-loaded span { color: var(--ink-tertiary); }
+  .byod-loaded span { color: var(--ink-secondary); }
   .byod-relink {
     margin-left: auto;
+    min-height: 24px;
     background: transparent;
     border: 1px solid var(--accent);
     color: var(--accent);
-    font-family: var(--font-mono);
-    font-size: 11px;
+    font-family: var(--font-sans);
+    font-size: 14px;
     padding: 3px 10px;
     cursor: pointer;
   }
@@ -472,11 +469,9 @@
     gap: 4px;
   }
   .byod-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.04em;
-    color: var(--ink-secondary);
-    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
   }
   .byod-field input, .byod-field select {
     font-family: var(--font-sans);
@@ -492,14 +487,8 @@
     border-color: var(--accent);
   }
   .byod-hint {
-    font-family: var(--font-mono);
-    font-size: 10.5px;
-    color: var(--ink-tertiary);
-  }
-  .byod-hint code {
-    background: var(--paper-deep);
-    padding: 0 4px;
-    border: 1px solid var(--rule-soft);
+    font-size: 13px;
+    color: var(--ink-secondary);
   }
 
   .byod-preview {
@@ -510,15 +499,13 @@
   }
   .byod-preview summary {
     cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-tertiary);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
   }
   .byod-preview pre {
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: 13px;
     line-height: 1.45;
     margin: 10px 0 0;
     padding: 10px 12px;
