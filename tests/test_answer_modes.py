@@ -127,8 +127,9 @@ def test_extractive_q05_missing_source_is_appended(run):
 HOSP = ("3 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent "
         "and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise).")
 SANDY_IN = "This address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM)."
-SHARE = ("DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.1% of this area is modeled to flood "
-         "(2.1% nuisance, over 4 in to 1 ft; 1.1% 1 to 4 ft; 0.0% over 4 ft).")
+SHARE = ("DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.2% of this area is modeled to flood from rainfall, "
+         "2.1% as nuisance flooding (4 in to under 1 ft) and 1.1% as deep and contiguous flooding (1 ft or more); "
+         "0.0% is in the future high tide area (coastal tidal inundation projected for 2050).")
 
 
 def test_a04_partly_is_invalid_when_the_asked_source_reports_none():

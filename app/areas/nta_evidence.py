@@ -30,13 +30,22 @@ def sandy(polygon) -> dict:
 def dep(polygon, scenario: str) -> dict:
     v = dep_stormwater.coverage_for_polygon(polygon, scenario)
     c = v["fraction_class"]
+    rain = _pct(c.get(1, 0) + c.get(2, 0))
+    label = dep_stormwater.class_label
     v["narrative"] = (
-        f"{v['label']}: {_pct(v['fraction_any'])}% of this area is modeled to flood "
-        f"({_pct(c.get(1, 0))}% nuisance, over 4 in to 1 ft; {_pct(c.get(2, 0))}% 1 to 4 ft; "
-        f"{_pct(c.get(3, 0))}% over 4 ft)."
+        f"{v['label']}: {rain}% of this area is modeled to flood from rainfall, "
+        f"{_pct(c.get(1, 0))}% as {label(1, scenario)} and {_pct(c.get(2, 0))}% as {label(2, scenario)}"
     )
+    v["headline_value"] = f"{rain}% modeled to flood from rainfall"
+    # Class 3 is the scenario's future high tide area, not deeper rainfall
+    # flooding; the current-sea-level file has none.
+    if dep_stormwater.SCENARIOS[scenario]["year"]:
+        tide = _pct(c.get(3, 0))
+        v["narrative"] += (f"; {tide}% is in the future high tide area "
+                           f"({dep_stormwater.tide_words(scenario)})")
+        v["headline_value"] += f", {tide}% future high tide"
+    v["narrative"] += "."
     v["fraction_class"] = {str(k): val for k, val in c.items()}  # JSON-safe keys
-    v["headline_value"] = f"{_pct(v['fraction_any'])}% modeled to flood"
     return v
 
 

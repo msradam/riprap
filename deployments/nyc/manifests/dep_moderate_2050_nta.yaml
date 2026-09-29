@@ -1,7 +1,7 @@
 id: dep_moderate_2050_nta
 type: baked
 title: DEP Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood
-answers: "share of the area modeled to flood in the DEP moderate rainstorm with 2050 sea level"
+answers: "share of the area modeled to flood from rainfall, and share in the future high tide area, in the DEP moderate rainstorm with 2050 sea level"
 stone: cornerstone
 tier: modeled
 adapter: python_call
@@ -27,7 +27,7 @@ provenance:
   source_url: https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv
   license: NYC Open Data Terms of Use
   doc_id: dep_moderate_2050_nta
-  citation: NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by depth class
+  citation: NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by flooding category
 
 narration:
   short: Share of this neighborhood in the DEP Moderate (2.13 in/hr, 2050 sea level) scenario.

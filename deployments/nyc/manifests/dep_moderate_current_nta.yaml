@@ -27,7 +27,7 @@ provenance:
   source_url: https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv
   license: NYC Open Data Terms of Use
   doc_id: dep_moderate_current_nta
-  citation: NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level), share of the neighborhood by depth class
+  citation: NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level), share of the neighborhood by flooding category
 
 narration:
   short: Share of this neighborhood in the DEP Moderate (2.13 in/hr, current sea level) scenario.
