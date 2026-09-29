@@ -18,6 +18,14 @@ _DEPTH_CLASS_LABELS = {
     2: "Deep & Contiguous (1-4 ft)",
     3: "Deep Contiguous (>4 ft)",
 }
+# The classes in plain words for narration, with DEP's thresholds (see
+# app/flood_layers/dep_stormwater.py): 1 is over 4 in and up to 1 ft,
+# 2 over 1 ft and up to 4 ft, 3 over 4 ft.
+PLAIN = {
+    1: "nuisance flooding (more than 4 in, up to 1 ft deep)",
+    2: "deep flooding (more than 1 ft, up to 4 ft deep)",
+    3: "deep flooding (more than 4 ft deep)",
+}
 
 
 def shape(value, manifest) -> dict | None:
@@ -42,7 +50,7 @@ def shape(value, manifest) -> dict | None:
         # Outside the modeled extent is an answer, not missing data.
         narrative = f"This address is outside the modeled flooding in {scenario}."
     else:
-        narrative = f"{scenario[0].upper()}{scenario[1:]} models flooding at this address: {label}."
+        narrative = f"{scenario[0].upper()}{scenario[1:]} models {PLAIN.get(cls, 'flooding')} at this address."
     return {
         "depth_class": cls,
         "depth_label": label,

@@ -57,8 +57,23 @@ def test_dep_scenarios_are_one_sentence_naming_each_result():
     assert "NYC DEP stormwater scenario (" not in paragraph  # the three template sentences are gone
     assert ("NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, "
             "outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside "
-            "the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, Deep Contiguous "
-            "(>4 ft) flooding [dep_extreme_2080].") in paragraph
+            "the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, deep flooding "
+            "(more than 4 ft deep) [dep_extreme_2080].") in paragraph
+    assert [r.name for r in check_briefing(paragraph).failed] == []
+
+
+def test_dep_scenario_narration_uses_plain_class_words():
+    from types import SimpleNamespace
+
+    from riprap.core.pebbles.shapers.dep_scenario import shape
+
+    m = SimpleNamespace(title="NYC DEP stormwater (2.13 in/hr, 2050 SLR)",
+                        provenance=SimpleNamespace(citation="DEP"))
+    assert shape(3, m)["narrative"] == ("The NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) models deep "
+                                        "flooding (more than 4 ft deep) at this address.")
+    assert "nuisance flooding (more than 4 in, up to 1 ft deep)" in shape(1, m)["narrative"]
+    assert "deep flooding (more than 1 ft, up to 4 ft deep)" in shape(2, m)["narrative"]
+    assert shape(3, m)["depth_label"] == "Deep Contiguous (>4 ft)"  # the data label is unchanged
 
 
 def test_percentiles_are_ordinals():

@@ -24,6 +24,7 @@ import time
 from burr.core import State, action
 
 from riprap.core.burr import evidence
+from riprap.core.pebbles.shapers.dep_scenario import PLAIN
 
 
 def _scope_header() -> str:
@@ -93,7 +94,8 @@ def _dep_sentence(state, items) -> str | None:
         e = next((e for e in items if e.pebble_id == pid), None)
         v = state.get(pid) if e else None
         if isinstance(v, dict) and "depth_class" in v:
-            result = "outside the modeled flooding" if not v["depth_class"] else f"{v['depth_label']} flooding"
+            result = ("outside the modeled flooding" if not v["depth_class"]
+                      else PLAIN.get(v["depth_class"], f"{v['depth_label']} flooding"))
             parts.append(f"{words}, {result} [{e.doc_id}]")
     return f"NYC DEP stormwater scenarios at this address: {'; '.join(parts)}." if len(parts) >= 2 else None
 
