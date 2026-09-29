@@ -33,11 +33,19 @@ export function citedIn(paras: ClaimPart[][]): string[] {
 
 const FIGURE_RE = /^\d[\d.,]*(?:\s?(?:%|m²|cm|mm|ft|in|m\b|\/wk))?/;
 
-/** The evidence table's figure: the first scalar, else a leading number in
- *  the headline ("82 calls" gives "82"), else nothing. */
+/** A scalar that places or dates the finding ("Distance to station (km)",
+ *  "FIRM panel effective year") rather than measuring it. */
+const NOT_FIGURE_RE = /distance|effective|year|date/i;
+
+/** The evidence table's figure: the finding's own quantity, the first
+ *  scalar that is not a distance or a year. With scalars but none of
+ *  those, nothing. Without scalars, a leading number in the headline
+ *  ("82 calls" gives "82"), else nothing. */
 export function figureOf(c: Pick<Card, 'scalars' | 'headline'>): { value: string; label: string | null } | null {
-  const s = c.scalars?.[0];
-  if (s) return { value: s.unit ? `${s.value} ${s.unit}` : s.value, label: s.label };
+  if (c.scalars?.length) {
+    const s = c.scalars.find((x) => !NOT_FIGURE_RE.test(x.label));
+    return s ? { value: s.unit ? `${s.value} ${s.unit}` : s.value, label: s.label } : null;
+  }
   const m = c.headline ? FIGURE_RE.exec(c.headline) : null;
   return m ? { value: m[0].trim(), label: null } : null;
 }

@@ -33,6 +33,19 @@ describe('figureOf', () => {
     expect(figureOf(card({ scalars: [{ value: '2', label: 'Sensors nearby' }] }))).toEqual({ value: '2', label: 'Sensors nearby' });
     expect(figureOf(card({ scalars: [{ value: '37', unit: 'cm', label: 'Peak' }] }))?.value).toBe('37 cm');
   });
+  it('skips a distance to a station or a year and takes the next scalar', () => {
+    const gauge = card({
+      scalars: [
+        { value: '5.7', label: 'Distance to station (km)' },
+        { value: '0.33', unit: 'ft', label: 'Stage' }
+      ]
+    });
+    expect(figureOf(gauge)).toEqual({ value: '0.33 ft', label: 'Stage' });
+  });
+  it('leaves the figure empty when only a distance or a year is left', () => {
+    expect(figureOf(card({ scalars: [{ value: '7.8', label: 'Distance to station (km)' }] }))).toBeNull();
+    expect(figureOf(card({ scalars: [{ value: '2007', label: 'FIRM panel effective year' }], headline: '2007 panel' }))).toBeNull();
+  });
   it('falls back to a leading number in the headline', () => {
     expect(figureOf(card({ headline: '82 calls' }))?.value).toBe('82');
     expect(figureOf(card({ headline: '0 m² new water within 500 m' }))?.value).toBe('0 m²');
