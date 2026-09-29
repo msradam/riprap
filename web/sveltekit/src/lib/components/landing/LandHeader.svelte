@@ -26,7 +26,7 @@
   .land-header-nav {
     display: flex;
     gap: 20px;
-    font-size: 15px;
+    font-size: 14px;
   }
   .land-header-nav a {
     display: inline-flex;

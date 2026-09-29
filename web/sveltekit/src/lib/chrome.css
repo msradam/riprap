@@ -19,7 +19,7 @@
   align-items: center;
   gap: 24px;
 }
-.app-header-left { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-family: var(--font-sans); font-size: 15px; }
+.app-header-left { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-family: var(--font-sans); font-size: 14px; }
 .app-header-sep { color: var(--ink-tertiary); }
 .app-header-context { color: var(--ink-secondary); }
 /* min-width 0: a long query truncates instead of widening the grid. */
@@ -53,7 +53,7 @@
    the print links replace it when the run ends, so the header keeps its
    height through a live run (a wrap here moved the page, CLS 0.2). The
    container lets StatusPill drop its step name when the row is narrow. */
-.app-header-right { container-type: inline-size; display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-end; gap: 18px; min-width: 0; min-height: 24px; font-family: var(--font-sans); font-size: 15px; }
+.app-header-right { container-type: inline-size; display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-end; gap: 18px; min-width: 0; min-height: 24px; font-family: var(--font-sans); font-size: 14px; }
 .app-header-right > * { flex: none; }
 .app-header-link { color: var(--ink-secondary); text-decoration: none; border-bottom: 1px solid transparent; display: inline-flex; align-items: center; min-height: 24px; }
 .app-header-link:hover { border-bottom-color: var(--ink); color: var(--ink); }

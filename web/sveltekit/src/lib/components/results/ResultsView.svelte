@@ -506,6 +506,7 @@
   .brief :global(.inline-cite sup) {
     font-family: var(--font-mono);
     font-size: 13px;
+    font-weight: 400;
     line-height: 0;
     padding-left: 0.15em;
   }

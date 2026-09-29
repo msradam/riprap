@@ -67,7 +67,7 @@
   }
   .stories-note {
     margin: 6px 0 32px;
-    font-size: 15px;
+    font-size: 14px;
     color: var(--ink-secondary);
   }
   a {
@@ -94,7 +94,7 @@
   }
   h3 {
     margin: 0;
-    font-size: 23px;
+    font-size: 22px;
     font-weight: 600;
     line-height: 1.25;
     text-wrap: balance;
@@ -122,7 +122,7 @@
     text-wrap: pretty;
   }
   .is-top .story-lead {
-    font-size: 19px;
+    font-size: 20px;
   }
   .story-byline {
     display: flex;

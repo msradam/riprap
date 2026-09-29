@@ -79,7 +79,7 @@
   }
   .land-kind {
     margin: 0 0 12px;
-    font-size: 15px;
+    font-size: 14px;
     color: var(--ink-secondary);
   }
   h1 {
@@ -116,7 +116,7 @@
   label {
     display: block;
     margin-bottom: 8px;
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
   }
   .land-query-row {
@@ -163,14 +163,14 @@
 
   .land-try-head {
     margin: 20px 0 4px;
-    font-size: 15px;
+    font-size: 14px;
     color: var(--ink-secondary);
   }
   .land-try {
     margin: 0;
     padding: 0;
     list-style: none;
-    font-size: 16px;
+    font-size: 17px;
   }
   .land-try li {
     padding: 2px 0;
@@ -190,7 +190,7 @@
   }
   .land-note {
     margin: 0;
-    font-size: 15px;
+    font-size: 14px;
     color: var(--ink-secondary);
   }
 

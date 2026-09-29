@@ -606,11 +606,11 @@
     box-shadow: 0 0 0 3px var(--riprap-focus);
   }
   /* Twelve Pixel Floor: MapLibre's scale and attribution text in the
-     data face at 12px. */
+     data face at 13px. */
   .map-frame :global(.maplibregl-ctrl-scale),
   .map-frame :global(.maplibregl-ctrl-attrib) {
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 400;
   }
   /* An opaque card so the scale text keeps AA contrast over any tile. */

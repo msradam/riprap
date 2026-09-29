@@ -80,7 +80,7 @@
   .prov-pip {
     flex: 0 0 14px;
     text-align: center;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1;
   }
   .prov-id,

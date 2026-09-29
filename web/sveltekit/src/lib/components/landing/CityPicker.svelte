@@ -54,7 +54,7 @@
     margin: 0;
     padding: 0;
     list-style: none;
-    font-size: 16px;
+    font-size: 17px;
   }
   li {
     padding: 2px 0;

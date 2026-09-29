@@ -45,7 +45,8 @@
   }
   time {
     font-family: var(--font-mono);
-    font-size: 15px;
+    font-size: 13px;
+    font-weight: 400;
   }
   dl {
     margin: 20px 0 0;
@@ -60,7 +61,7 @@
   }
   dd {
     margin: 2px 0 0;
-    font-size: 16px;
+    font-size: 17px;
     color: var(--ink-secondary);
   }
   @media (max-width: 640px) {

@@ -30,7 +30,7 @@
     background: var(--ink);
     color: var(--paper);
     font-family: var(--font-sans);
-    font-size: 15px;
+    font-size: 14px;
     z-index: 1000;
     text-decoration: none;
   }
