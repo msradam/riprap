@@ -45,7 +45,7 @@ RIPRAP_RECONCILER_TIER=no_llm \
 
 ```
 This is an automated heat-exposure briefing produced by Riprap from
-live and baked data sources. It is informational only and not a
+live and precomputed data sources. It is informational only and not a
 substitute for a professional risk assessment.
 
 **Heat Hazard Reader.**

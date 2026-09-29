@@ -38,7 +38,7 @@ def _scope_header() -> str:
     scope_kind = os.environ.get("RIPRAP_BRIEFING_SCOPE", "hazard-exposure")
     return (
         f"This is an automated {scope_kind} briefing produced by Riprap from "
-        "live and baked data sources. It is informational only and not a "
+        "live and precomputed data sources. It is informational only and not a "
         "substitute for a professional risk assessment."
     )
 

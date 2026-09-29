@@ -98,3 +98,10 @@ def test_llm_render_cites_every_numeric_sentence_of_a_quoted_fact():
     out = _render(kept, [Doc("ida_hwm", "Hazard Reader", fact, False)], ["Hazard Reader"], "q?", "Yes.")
     assert "within 800 m of this address [ida_hwm]." in out and "(174 m away) [ida_hwm]." in out
     assert every_numeric_claim_cited(out)
+
+
+def test_scope_header_says_precomputed_not_baked():
+    from riprap.core.burr.templated_reconciler import _scope_header
+
+    h = _scope_header()
+    assert "from live and precomputed data sources" in h and "baked" not in h
