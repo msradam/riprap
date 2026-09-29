@@ -516,10 +516,17 @@ def synthesize(state) -> dict:
 
     brief = _lead(state, items) if not question and state.get("intent") == "single_address" else None
     paragraph = _render(kept, docs, sections, question, lead_phrase, empty, brief)
-    cited = set(re.findall(r"\[([a-z0-9_]+)\]", paragraph))  # every source the text cites
+    # Every consulted source with a value is citable (its evidence row gets a
+    # number), the ones the text cites first, in order of appearance, so the
+    # numbering still starts with the answer. An uncited policy passage has
+    # no row and is left out.
+    cited = list(dict.fromkeys(re.findall(r"\[([a-z0-9_]+)\]", paragraph)))
+    every = evidence.citations(items)
+    citations = {k: every[k] for k in cited if k in every}
+    citations.update({k: v for k, v in every.items() if k not in citations and not k.startswith("rag_")})
     return {
         "paragraph": paragraph + f"\n\nChecks run: {'; '.join(checks)}.",
-        "citations": {k: v for k, v in evidence.citations(items).items() if k in cited},
+        "citations": citations,
         "grounding": {"tier": "llm", "model": model, "attempts": attempts,
                       "claims": kept, "dropped_claims": dropped,
                       "retried_claims": first_dropped if attempts == 2 else [],
