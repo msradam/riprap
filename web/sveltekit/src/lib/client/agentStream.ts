@@ -92,6 +92,8 @@ export interface Grounding {
    *  `in_lead` when the backend's lead sentence states it, else the doc
    *  whose first answer sentence does. Null or absent: none singled out. */
   lead_fact?: { doc_id: string; in_lead: boolean } | null;
+  /** The kind of lead the answer takes: "yes", "no", "count" and so on. */
+  answer_lead?: string;
   /** Set when LLM mode skipped the LLM because no question was asked. */
   note?: string;
 }

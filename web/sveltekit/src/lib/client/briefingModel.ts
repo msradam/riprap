@@ -84,6 +84,13 @@ export function splitLead(parts: ClaimPart[]): { word: string | null; parts: Cla
   return { word: COUNT_RE.exec(first.text)?.[1] ?? null, parts };
 }
 
+/** A count lead taken from a key sentence: its first number ("From the
+ *  sources consulted: 34 NYC 311 ..." gives "34"). The sentence stays
+ *  whole below the lead. */
+export function countLead(key: ClaimPart[]): string | null {
+  return /\d[\d,]*(?:\.\d+)?%?/.exec(text(key))?.[0] ?? null;
+}
+
 /** Where the backend's own lead sentence ends and the quoted facts begin. */
 const FACTS_PHRASE = 'From the sources consulted:';
 
@@ -340,12 +347,13 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   const answer0 = refusal
     ? [refusal.parts, ...refusalParas.slice(1)].filter((p) => p.length)
     : leadAnswerParas;
-  const leadWord = refusal ? null : first.word;
   // A question's answer leads with its key sentence; the rest follows,
   // one size smaller, as support, one short paragraph per cited source.
   // Place briefings keep their In brief.
   const keyed = question && !refusal ? keySentence(answer0, g?.lead_fact) : null;
   const answerParas = keyed ? [keyed.key, ...keyed.rest.flatMap(bySource)] : answer0;
+  // A count answer whose count sits inside its key sentence leads with that count.
+  const leadWord = refusal ? null : first.word ?? (keyed && g?.answer_lead === 'count' ? countLead(keyed.key) : null);
 
   // "Checks run: ..." closes the Out of scope note; it is its own line here.
   const outParas = sections(split.outOfScope).flatMap((s) => s.paras);
