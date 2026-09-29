@@ -96,7 +96,7 @@ def step_policy_corpus(state: State) -> State:
             bits.append("inside Hurricane Sandy 2012 inundation zone")
         for v in (dep or {}).values():
             if isinstance(v, dict) and (v.get("depth_class") or 0) > 0:
-                bits.append(f"in {v.get('depth_label', '?')} pluvial scenario")
+                bits.append(f"DEP stormwater scenario: {v.get('depth_label', '?')}")
         bits.append("flood resilience plan, vulnerability, hardening, mitigation")
         query_str = "; ".join(bits)
 

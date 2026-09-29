@@ -72,7 +72,9 @@ def bake_dep(scenario, transform, width, height):
     t0 = time.perf_counter()
     g = dep_stormwater.load(scenario).copy()
     g["Flooding_Category"] = g["Flooding_Category"].astype(int)
-    # rasterize lowest first so highest category wins at overlaps
+    # Rasterize lowest first so the highest code wins where polygons share an
+    # edge; the classes do not overlap in area. A tie-break matching
+    # dep_stormwater.join, not a depth order: class 3 is the future high tide area.
     g = g.sort_values("Flooding_Category", ascending=True)
     out = OUT_DIR / f"{scenario}.tif"
     arr = burn(g, "Flooding_Category", out, transform, width, height)

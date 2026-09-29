@@ -81,7 +81,7 @@ def test_forecast_facts_are_the_forecasts_not_the_flood_zone(monkeypatch):
 
 def test_a_scenario_question_keeps_the_model_facts(monkeypatch):
     monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
-    docs = [Doc("dep_moderate_2050", "Hazard Reader", "The DEP 2050 scenario models Deep Contiguous (>4 ft) flooding here.",
+    docs = [Doc("dep_moderate_2050", "Hazard Reader", "The DEP 2050 scenario models deep and contiguous flooding (1 ft or more) here.",
                 False),
             Doc("ttm_battery_surge", "Projector", "a TTM model forecasts a peak surge residual of 0.41 m.", True)]
     monkeypatch.setattr(syn, "_documents", lambda state: (docs, [], None))

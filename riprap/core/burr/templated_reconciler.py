@@ -24,7 +24,7 @@ import time
 from burr.core import State, action
 
 from riprap.core.burr import evidence
-from riprap.core.pebbles.shapers.dep_scenario import PLAIN
+from riprap.core.pebbles.shapers.dep_scenario import result as dep_result
 
 
 def _scope_header() -> str:
@@ -94,9 +94,7 @@ def _dep_sentence(state, items) -> str | None:
         e = next((e for e in items if e.pebble_id == pid), None)
         v = state.get(pid) if e else None
         if isinstance(v, dict) and "depth_class" in v:
-            result = ("outside the modeled flooding" if not v["depth_class"]
-                      else PLAIN.get(v["depth_class"], f"{v['depth_label']} flooding"))
-            parts.append(f"{words}, {result} [{e.doc_id}]")
+            parts.append(f"{words}, {dep_result(v['depth_class'], pid)} [{e.doc_id}]")
     return f"NYC DEP stormwater scenarios at this address: {'; '.join(parts)}." if len(parts) >= 2 else None
 
 
@@ -105,6 +103,7 @@ def _lead(state, items) -> str | None:
     zone, the DEP scenarios and the 311 count, each from its verified
     template sentence's value and cited, then checked by the claim
     verifier like any claim. Parts that fail the check are left out."""
+    from app.flood_layers.dep_stormwater import TIDE_CLASS
     from riprap.core.burr.synthesis import Doc, verify
 
     by_pebble = {e.pebble_id: e for e in items}
@@ -125,6 +124,10 @@ def _lead(state, items) -> str | None:
     if dep:
         ids = [by_pebble[p].doc_id for p in dep]
         wet = [p for p, v in dep.items() if v.get("depth_class")]
+        # Class 3 is the scenario's future high tide area (tidal inundation),
+        # not its rainfall flooding, so it gets its own clause.
+        rain = [p for p in wet if dep[p]["depth_class"] != TIDE_CLASS]
+        tide = [p for p in wet if dep[p]["depth_class"] == TIDE_CLASS]
 
         def horizons(ps) -> str:
             """'current, 2050 and 2080 sea-level rise': the disclosure check needs a horizon."""
@@ -135,9 +138,13 @@ def _lead(state, items) -> str | None:
 
         if not wet:
             add("", f"outside the modeled flooding in the DEP stormwater scenarios for {horizons(dep)}", ids)
-        else:
-            add("", f"inside the modeled flooding in the DEP stormwater scenario{'s' if len(wet) > 1 else ''} "
-                    f"for {horizons(wet)}", [by_pebble[p].doc_id for p in wet])
+        if rain:
+            add("", f"inside the modeled stormwater flooding in the DEP scenario{'s' if len(rain) > 1 else ''} "
+                    f"for {horizons(rain)}", [by_pebble[p].doc_id for p in rain])
+        if tide:
+            add("", f"inside the future high tide area (coastal tidal inundation, not rainfall flooding) of the "
+                    f"DEP scenario{'s' if len(tide) > 1 else ''} for {horizons(tide)}",
+                [by_pebble[p].doc_id for p in tide])
     n311 = state.get("nyc311")
     if "nyc311" in by_pebble and isinstance(n311, dict) and "n" in n311:
         n = f"{'At least ' if n311.get('capped') else ''}{n311['n']}"

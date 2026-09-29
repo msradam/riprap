@@ -91,10 +91,10 @@ def test_extractive_answer_puts_experimental_facts_after_the_others(monkeypatch)
 Q_2050 = "What does the 2050 stormwater scenario show at 400 Carroll Street, Brooklyn?"
 FUTURE = {"hazard": "flood", "time_frame": "future", "assets": []}
 GOWANUS = {
-    "dep_moderate_2050": "The NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) models flooding at this address: "
-                         "Deep Contiguous (>4 ft).",
-    "dep_extreme_2080": "The NYC DEP stormwater scenario (3.66 in/hr, 2080 SLR) models flooding at this address: "
-                        "Deep Contiguous (>4 ft).",
+    "dep_moderate_2050": "The NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) models deep and contiguous "
+                         "flooding (1 ft or more) from rainfall at this address.",
+    "dep_extreme_2080": "The NYC DEP stormwater scenario (3.66 in/hr, 2080 SLR) models deep and contiguous "
+                        "flooding (1 ft or more) from rainfall at this address.",
     "fema_nfhl": "This address sits in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel "
                  "3604970211F, effective 2007.",
     "sandy_inundation": "This address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",

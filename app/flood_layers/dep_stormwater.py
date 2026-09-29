@@ -1,9 +1,14 @@
-"""NYC DEP Stormwater Flood Maps — pluvial scenarios.
+"""NYC DEP Stormwater Flood Maps: rainfall scenarios with future high tides.
 
-Four scenarios, all in EPSG:2263. Polygons are categorized by depth class:
-    1 = Nuisance Flooding (>4" and ≤1 ft)
-    2 = Deep and Contiguous Flooding (>1 ft and ≤4 ft)
-    3 = Deep Contiguous Flooding (>4 ft)
+Three scenarios, all in EPSG:2263. Each polygon carries a
+`Flooding_Category` code from the files' coded-value domain:
+    1 = Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)
+    2 = Deep and Contiguous Flooding (1 ft. and greater)
+    3 = Future High Tides 2050 / 2080 (only in the 2050 and 2080 files)
+Classes 1 and 2 are rainfall flooding from DEP's hydraulic model. Class 3
+is not deeper rainfall flooding: it is coastal tidal inundation from
+sea-level rise (NPCC 90th percentile), taken from the NYC Flood Hazard
+Mapper. `class_label` is the one place these meanings are worded.
 
 Two query paths exist:
     join_raster(point) — fast path. Samples the baked GeoTIFFs in
@@ -35,22 +40,46 @@ SCENARIOS = {
     "dep_extreme_2080": {
         "gdb": "dep_extreme_2080.gdb",
         "label": "DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
+        "year": 2080,
     },
     "dep_moderate_2050": {
         "gdb": "dep_moderate_2050.gdb",
         "label": "DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
+        "year": 2050,
     },
     "dep_moderate_current": {
         "gdb": "dep_moderate_current.gdb",
         "label": "DEP Moderate Stormwater (2.13 in/hr, current SLR)",
+        "year": None,
     },
 }
 
-DEPTH_CLASS = {
-    1: "Nuisance (>4 in to 1 ft)",
-    2: "Deep & Contiguous (1-4 ft)",
-    3: "Deep Contiguous (>4 ft)",
-}
+# Flooding_Category as each file's domain spells it (read from data/dep/*.gdb).
+_DOMAIN = {1: "Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)",
+           2: "Deep and Contiguous Flooding (1 ft. and greater)"}
+RAIN_LABEL = {1: "nuisance flooding (4 in to under 1 ft)",
+              2: "deep and contiguous flooding (1 ft or more)"}
+TIDE_CLASS = 3
+
+
+def domain(scenario: str) -> dict[int, str]:
+    """The file's raw Flooding_Category domain text. The current-sea-level
+    file has no class 3."""
+    year = SCENARIOS[scenario]["year"]
+    return {**_DOMAIN, TIDE_CLASS: f"Future High Tides {year}"} if year else dict(_DOMAIN)
+
+
+def tide_words(scenario: str) -> str:
+    """What class 3 maps, in plain words, for this scenario's year."""
+    year = SCENARIOS.get(scenario, {}).get("year")
+    return f"coastal tidal inundation projected for {year}" if year else "coastal tidal inundation"
+
+
+def class_label(cls: int, scenario: str) -> str:
+    """The plain-words label for a Flooding_Category code; 0 is "outside"."""
+    if cls == TIDE_CLASS:
+        return f"future high tides: {tide_words(scenario)}"
+    return RAIN_LABEL.get(cls, "outside")
 
 
 @lru_cache(maxsize=4)
@@ -64,23 +93,25 @@ def load(scenario: str) -> gpd.GeoDataFrame:
 
 
 def join(assets: gpd.GeoDataFrame, scenario: str) -> gpd.GeoDataFrame:
-    """Per-asset depth class, or 0 if outside scenario.
+    """Per-asset Flooding_Category, or 0 if outside scenario.
 
     Returns a frame indexed like assets with columns: depth_class, depth_label.
-    Higher class wins on overlap.
+    The classes do not overlap in area (class 3 only touches 1 and 2 at
+    edges), so the max below only settles edge and buffered hits. It is a
+    tie-break that matches the baked rasters' burn order, not a depth
+    order: class 3 is tidal, not deeper.
     """
     z = load(scenario)
     a = assets[["geometry"]].copy()
     a["_aid"] = range(len(a))
     j = gpd.sjoin(a, z[["Flooding_Category", "geometry"]],
                   how="left", predicate="intersects")
-    # for each asset, take max category hit (3 dominates 1)
     cat = (j.groupby("_aid")["Flooding_Category"].max()
               .reindex(range(len(a)))
               .fillna(0).astype(int))
     out = a[["_aid"]].copy()
     out["depth_class"] = cat.values
-    out["depth_label"] = out["depth_class"].map(lambda c: DEPTH_CLASS.get(c, "outside"))
+    out["depth_label"] = out["depth_class"].map(lambda c: class_label(c, scenario))
     return out[["depth_class", "depth_label"]].reset_index(drop=True)
 
 
@@ -108,7 +139,7 @@ def _raster_handles():
 
 
 def join_raster(pt_geom_2263, scenario: str) -> int:
-    """Fast path. Returns the integer depth class (0=outside, 1/2/3) for a
+    """Fast path. Returns the Flooding_Category (0=outside, 1/2/3) for a
     single shapely Point in EPSG:2263. Falls back to the GDB join() path
     if baked rasters are missing — emits a one-time warning so local dev
     still works without the bake artifacts."""
@@ -132,13 +163,13 @@ def join_raster(pt_geom_2263, scenario: str) -> int:
 def coverage_for_polygon(polygon, scenario: str,
                          polygon_crs: str = "EPSG:4326") -> dict:
     """Polygon-level summary: what fraction of the input polygon falls into
-    each depth class for a given DEP scenario? Used in neighborhood mode.
+    each Flooding_Category for a given DEP scenario? Used in neighborhood mode.
 
     Returns:
       {
         'scenario':        scenario id,
         'label':           human-readable scenario name,
-        'fraction_any':    fraction of polygon inside any flooded class,
+        'fraction_any':    fraction inside any class (rainfall or tidal),
         'fraction_class':  {1: f, 2: f, 3: f} fraction in each class,
         'polygon_area_m2': total polygon area,
       }

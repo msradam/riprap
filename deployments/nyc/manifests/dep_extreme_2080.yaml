@@ -1,7 +1,7 @@
 id: dep_extreme_2080
 type: baked
 title: NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)
-answers: "whether the point is modeled to flood, and how deep, in the DEP extreme rainstorm with 2080 sea level"
+answers: "whether the point is modeled to flood from rainfall, and how deep, or lies in the future high tide area (coastal tidal inundation), in the DEP extreme rainstorm with 2080 sea level"
 stone: cornerstone
 tier: modeled
 adapter: python_call
