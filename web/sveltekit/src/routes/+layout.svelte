@@ -27,8 +27,8 @@
   let routeId = $derived(page.route.id ?? '');
   let isPrint = $derived(routeId.startsWith('/(app)/print/'));
   let chromeFree = $derived(isPrint || routeId === '/');
-  // Gallery pages are static snapshots: the header must not call /api/*.
-  let isGallery = $derived(routeId.startsWith('/(app)/gallery'));
+  // Gallery and lab pages are static snapshots: the header must not call /api/*.
+  let isGallery = $derived(routeId.startsWith('/(app)/gallery') || routeId.startsWith('/(app)/lab'));
 
   // The run status lives in a module store that outlives the /q/ page, so
   // a refused run's "stopped" pill followed the reader into the gallery.
