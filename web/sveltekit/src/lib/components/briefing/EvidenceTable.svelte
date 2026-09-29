@@ -2,7 +2,7 @@
   import type { Citation } from '$lib/types/claim';
   import { citationOf, type EvidenceCard } from '$lib/client/briefingModel';
   import { TIER_WORDS } from '$lib/types/tier';
-  import { asOfDate, figureOf, leadClause } from '$lib/client/briefingText';
+  import { asOfDate, figureOf, leadClause, sharedStem, withoutSubject } from '$lib/client/briefingText';
   import { activateCitation } from '$lib/stores/citations.svelte';
   import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
 
@@ -53,6 +53,12 @@
   const col = (t: string, name: Col) => `${uid}-${t}-col-${name}`;
   /** A merged row's parts share one date column only when they share a date. */
   const oneDate = (c: EvidenceCard) => !c.parts || new Set(c.parts.map((p) => p.vintage)).size === 1;
+  /** A merged row whose findings differ only in a closing parenthetical
+   *  shows the shared stem once and each scenario's parenthetical. */
+  const stemOf = (c: EvidenceCard) => {
+    const firsts = (c.parts ?? []).map((p) => findings.get(p.id)?.first);
+    return firsts.every((f) => f) ? sharedStem(firsts as string[]) : null;
+  };
 </script>
 
 {#snippet head(t: string)}
@@ -73,7 +79,7 @@
 {/snippet}
 
 {#snippet sentence(first: string)}
-  {@const lc = leadClause(first)}
+  {@const lc = leadClause(withoutSubject(first))}
   <span class="ev-find"><span class="ev-lead">{lc.lead}</span>{lc.tail}</span>
 {/snippet}
 
@@ -106,13 +112,16 @@
         <span class="ev-meta"><span class="ev-mark" style:color="var(--tier-{c.tier})"><TierGlyph tier={c.tier} size={11} /></span>{TIER_WORDS[c.tier] ?? c.tier}{#if same}{#if atSnapshot(c.vintage)}, {@render date(c.vintage)}{:else}, data as of {@render date(c.vintage)}{/if}{/if}</span>
       </span>
       {#if c.parts}
-        <!-- One finding per scenario, each with its own citation. -->
+        {@const st = stemOf(c)}
+        <!-- One finding per scenario, each with its own citation. When the
+             findings share a stem it is set once, above the scenarios. -->
+        {#if st}<div class="ev-stem">{@render sentence(`${st.stem}:`)}</div>{/if}
         <ul class="ev-scenarios">
-          {#each c.parts as p (p.id)}
+          {#each c.parts as p, i (p.id)}
             {@const pf = findings.get(p.id)}
             {@const pc = citationOf(p, citations)}
             <li>
-              {#if pf}{@render sentence(pf.first)}{#if pf.rest}{` ${pf.rest}`}{/if}{:else}{p.title}{/if}{#if !same}&#32;(data as of {@render date(p.vintage)}){/if}{#if pc}{@render cite(pc, true)}{/if}
+              {#if st}{st.tails[i]}{#if pf?.rest}{` ${pf.rest}`}{/if}{:else if pf}{@render sentence(pf.first)}{#if pf.rest}{` ${pf.rest}`}{/if}{:else}{p.title}{/if}{#if !same}&#32;(data as of {@render date(p.vintage)}){/if}{#if pc}{@render cite(pc, true)}{/if}
             </li>
           {/each}
         </ul>
@@ -271,6 +280,10 @@
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+  .ev-stem {
+    max-width: 54ch;
+    margin-bottom: 4px;
   }
   .ev-scenarios li + li {
     margin-top: 4px;

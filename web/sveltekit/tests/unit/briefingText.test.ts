@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { asOfDate, asOfPhrase, citedIn, figureOf, findingOf, leadClause, termsIn, tidy } from '$lib/client/briefingText';
+import { asOfDate, asOfPhrase, citedIn, figureOf, findingOf, leadClause, sharedStem, termsIn, tidy, withoutSubject } from '$lib/client/briefingText';
 import type { Card } from '$lib/types/card';
 
 const card = (over: Partial<Card>): Card => ({
@@ -103,5 +103,37 @@ describe('leadClause', () => {
   it('skips a short label and keeps a sentence without a break whole', () => {
     expect(leadClause('Experimental: 34 complaints in 512 days; about 0.3 a week.').lead).toBe('Experimental: 34 complaints in 512 days;');
     expect(leadClause('This address sits in FEMA flood zone X.')).toEqual({ lead: 'This address sits in FEMA flood zone X.', tail: '' });
+  });
+});
+
+describe('withoutSubject', () => {
+  it('drops a leading subject and capitalises the rest', () => {
+    expect(withoutSubject('This address sits in FEMA flood zone X, per NFHL.')).toBe('In FEMA flood zone X, per NFHL.');
+    expect(withoutSubject('This address is outside the modeled flooding.')).toBe('Outside the modeled flooding.');
+    expect(withoutSubject('This area sits near a sensor.')).toBe('Near a sensor.');
+    expect(withoutSubject('This area is low.')).toBe('Low.');
+  });
+  it('leaves other sentences alone', () => {
+    expect(withoutSubject('82 calls. This address sits in zone X.')).toBe('82 calls. This address sits in zone X.');
+    expect(withoutSubject('this address is low.')).toBe('this address is low.');
+  });
+});
+
+describe('sharedStem', () => {
+  const dep = 'This address is outside the modeled flooding in the NYC DEP stormwater scenario';
+  it('splits the DEP scenarios into one stem and three tails', () => {
+    expect(sharedStem([
+      `${dep} (2.13 in/hr, current sea level).`,
+      `${dep} (2.13 in/hr, 2050 SLR).`,
+      `${dep} (3.66 in/hr, 2080 SLR).`
+    ])).toEqual({ stem: dep, tails: ['2.13 in/hr, current sea level', '2.13 in/hr, 2050 SLR', '3.66 in/hr, 2080 SLR'] });
+  });
+  it('returns null when the stems differ or there is one sentence', () => {
+    expect(sharedStem([
+      `${dep} (2.13 in/hr, current sea level).`,
+      'This address is inside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR).'
+    ])).toBeNull();
+    expect(sharedStem([`${dep} (2.13 in/hr, 2050 SLR).`])).toBeNull();
+    expect(sharedStem(['No parenthetical.', 'No parenthetical.'])).toBeNull();
   });
 });

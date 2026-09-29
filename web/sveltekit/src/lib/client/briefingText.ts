@@ -125,3 +125,26 @@ export function termsIn(text: string, withTiers: boolean): { term: string; readi
   const found = GLOSSARY.filter((g) => g.re.test(text)).map(({ term, reading }) => ({ term, reading }));
   return withTiers ? [...found, TIER_TERM] : found;
 }
+
+const SUBJECT_RE = /^This (?:address|area) (?:sits|is) /;
+
+/** The evidence table drops the repeated subject: "This address sits in
+ *  FEMA flood zone X" reads "In FEMA flood zone X". Other sentences are
+ *  unchanged. */
+export function withoutSubject(s: string): string {
+  const m = SUBJECT_RE.exec(s);
+  if (!m) return s;
+  const r = s.slice(m[0].length);
+  return r.charAt(0).toUpperCase() + r.slice(1);
+}
+
+const STEM_RE = /^(.*) \(([^()]*)\)\.?$/;
+
+/** Sentences that differ only in a closing parenthetical ("... scenario
+ *  (2.13 in/hr, 2050 SLR).") as the shared stem and each parenthetical. */
+export function sharedStem(sentences: string[]): { stem: string; tails: string[] } | null {
+  if (sentences.length < 2) return null;
+  const ms = sentences.map((s) => STEM_RE.exec(s));
+  if (ms.some((m) => !m || m[1] !== ms[0]![1])) return null;
+  return { stem: ms[0]![1], tails: ms.map((m) => m![2]) };
+}
