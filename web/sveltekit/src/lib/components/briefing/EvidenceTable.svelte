@@ -101,7 +101,7 @@
   {@const cit = c.parts ? null : citationOf(c, citations)}
   {@const longLabel = !!fig?.label && fig.label.length > SHORT_LABEL}
   {@const same = oneDate(c)}
-  {@const note = snapshotNote(c.docId, snapshotAt)}
+  {@const note = snapshotNote(c.docId, snapshotAt, find?.first)}
   {@const h = (name: Col) => (gid ? `${col(t, name)} ${gid}` : col(t, name))}
   <tr class="ev-row">
     <td class="ev-source" headers={h('source')}>

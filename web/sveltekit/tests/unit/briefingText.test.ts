@@ -148,7 +148,10 @@ describe('snapshotNote', () => {
   it('dates forecasts and NWS alerts to the snapshot', () => {
     expect(snapshotNote('ttm_311_forecast', at)).toBe('Forecast made at the snapshot, 2026-09-29 12:34 UTC.');
     expect(snapshotNote('floodnet_forecast', at)).toBe('Forecast made at the snapshot, 2026-09-29 12:34 UTC.');
-    expect(snapshotNote('nws_alerts', at)).toBe('Active at the snapshot, 2026-09-29 12:34 UTC.');
+    expect(snapshotNote('nws_alerts', at, '1 active NWS alert: Coastal Flood Advisory.')).toBe('Active at the snapshot, 2026-09-29 12:34 UTC.');
+  });
+  it('says nothing for an alerts row with no active alert', () => {
+    expect(snapshotNote('nws_alerts', at, 'No active NWS flood / coastal / wind alerts at this point.')).toBeNull();
   });
   it('says nothing for other sources or a live run', () => {
     expect(snapshotNote('sandy_inundation', at)).toBeNull();

@@ -56,12 +56,14 @@ export function figureOf(c: Pick<Card, 'scalars' | 'headline'>): { value: string
 export const FORECASTS = ['ttm_battery_surge', 'ttm_311_forecast', 'floodnet_forecast'];
 
 /** Gallery pages: a forecast or an NWS alert was read when the snapshot
- *  was made (`at`, "2026-09-29 12:34 UTC"), so its row says when. */
-export function snapshotNote(docId: string, at: string | null | undefined): string | null {
+ *  was made (`at`, "2026-09-29 12:34 UTC"), so its row says when. The
+ *  alerts row is dated only when its `finding` reports an active alert;
+ *  "No active ..." has nothing to date. */
+export function snapshotNote(docId: string, at: string | null | undefined, finding?: string | null): string | null {
   if (!at) return null;
   const id = docId.replace(/_nta$/, '');
   if (FORECASTS.includes(id)) return `Forecast made at the snapshot, ${at}.`;
-  if (id === 'nws_alerts') return `Active at the snapshot, ${at}.`;
+  if (id === 'nws_alerts') return finding?.trim().startsWith('No active') ? null : `Active at the snapshot, ${at}.`;
   return null;
 }
 
