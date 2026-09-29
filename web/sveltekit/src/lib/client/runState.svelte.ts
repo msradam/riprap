@@ -181,6 +181,83 @@ export function buildRegisterPointsFc(fr: Rec): FeatureCollection {
   return { type: 'FeatureCollection', features };
 }
 
+const num = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+
+/** A step block from `final`, or its district (`_nta`) variant. */
+function block(fr: Rec, key: string): Rec | null {
+  const b = (fr[key] ?? fr[`${key}_nta`]) as Rec | null | undefined;
+  return b && typeof b === 'object' ? b : null;
+}
+
+/** Point features from one list in a `final` block. Each carries `pid`,
+ *  `name` and `detail` (what the point is, in data values), which the map
+ *  popup and the map point list both print. */
+function pointsFc(
+  list: unknown, kind: string, name: (e: Rec) => string, detail: (e: Rec) => string
+): FeatureCollection | undefined {
+  if (!Array.isArray(list)) return undefined;
+  const features: GeoJSON.Feature[] = [];
+  (list as Rec[]).forEach((e, i) => {
+    const la = num(e.lat); const lo = num(e.lon);
+    if (la === null || lo === null) return;
+    features.push({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [lo, la] },
+      properties: { ...e, pid: `${kind}-${i}`, kind, name: name(e), detail: detail(e) }
+    });
+  });
+  return features.length ? { type: 'FeatureCollection', features } : undefined;
+}
+
+const metres = (v: unknown) => (num(v) === null ? null : `${Math.round(v as number)} m`);
+
+/** USGS Hurricane Ida high-water marks (`final.ida_hwm.points`). */
+export function buildIdaHwmFc(fr: Rec): FeatureCollection | undefined {
+  return pointsFc(block(fr, 'ida_hwm')?.points, 'ida', (e) => String(e.site ?? 'High-water mark'), (e) =>
+    ['Ida high-water mark',
+      num(e.height_above_gnd_ft) !== null && `${e.height_above_gnd_ft} ft above ground`,
+      metres(e.distance_m)].filter(Boolean).join(', '));
+}
+
+/** FloodNet street sensors (`final.floodnet.sensors`). */
+export function buildFloodnetFc(fr: Rec): FeatureCollection | undefined {
+  return pointsFc(block(fr, 'floodnet')?.sensors, 'floodnet', (e) => String(e.name ?? 'FloodNet sensor'), (e) =>
+    ['FloodNet flood sensor', e.street && `on ${e.street}`, e.status && `status ${e.status}`]
+      .filter(Boolean).join(', '));
+}
+
+/** NYC 311 flood complaints with coordinates (`final.nyc311.points`). */
+export function build311Fc(fr: Rec): FeatureCollection | undefined {
+  return pointsFc(block(fr, 'nyc311')?.points, 'nyc311', (e) => String(e.address ?? '311 complaint'), (e) =>
+    ['311 complaint', e.descriptor, e.date].filter(Boolean).join(', '));
+}
+
+export interface SearchRadius { label: string; radius_m: number; tier: 'empirical' | 'proxy' }
+
+/** The search radii the answer used, from the blocks that report one. */
+export function searchRadii(fr: Rec): SearchRadius[] {
+  const out: SearchRadius[] = [];
+  const add = (key: string, label: string, tier: SearchRadius['tier']) => {
+    const r = num(block(fr, key)?.radius_m);
+    if (r !== null && r > 0) out.push({ label, radius_m: r, tier });
+  };
+  add('ida_hwm', 'high-water marks', 'empirical');
+  add('floodnet', 'FloodNet sensors', 'empirical');
+  add('nyc311', '311 complaints', 'proxy');
+  return out;
+}
+
+export interface EvidencePointRow { id: string; name: string; meta: string }
+
+/** One list row per plotted evidence point, in the order given. */
+export function evidencePointRows(...fcs: (FeatureCollection | undefined)[]): EvidencePointRow[] {
+  return fcs.flatMap((fc) => (fc?.features ?? []).map((f) => ({
+    id: String(f.properties?.pid),
+    name: String(f.properties?.name ?? '?'),
+    meta: String(f.properties?.detail ?? '')
+  })));
+}
+
 const POINT_SCENARIOS: [string, string][] = [
   ['inside_sandy_2012', 'Sandy 2012 extent'],
   ['dep_extreme_2080', 'DEP 2080 extreme stormwater'],
@@ -251,8 +328,11 @@ export class RunState {
   sandyFc = $state<FeatureCollection | undefined>(undefined);
   depFc = $state<FeatureCollection | undefined>(undefined);
   synFc = $state<FeatureCollection | undefined>(undefined);
+  // Evidence points from `final` (applyFinal), on both routes.
   proxyFc = $state<FeatureCollection | undefined>(undefined);
   idaHwmFc = $state<FeatureCollection | undefined>(undefined);
+  floodnetFc = $state<FeatureCollection | undefined>(undefined);
+  radii = $state<SearchRadius[]>([]);
 
   compareAddressA = $state<Place | null>(null);
   compareAddressB = $state<Place | null>(null);
@@ -283,7 +363,15 @@ export class RunState {
 
   briefing = $derived(briefingFromFinal(this.finalResult));
   areaBoundary = $derived(areaBoundaryGeometry(this.finalResult));
-  mapPoints = $derived(mapPointRows(this.registerPointsFc));
+  /** Every point on the map as a list row: measured evidence, the asset
+   *  register, then 311 complaints. */
+  mapPoints = $derived<EvidencePointRow[]>([
+    ...evidencePointRows(this.idaHwmFc, this.floodnetFc),
+    ...mapPointRows(this.registerPointsFc).map((r) => ({
+      id: r.id, name: r.name, meta: `${r.distance}; scenarios: ${r.scenarios}`
+    })),
+    ...evidencePointRows(this.proxyFc)
+  ]);
 
   /** The place the backend resolved, in its own words, so a reader can
    *  see at once when the wrong place was looked up. A closest-match
@@ -321,7 +409,8 @@ export class RunState {
   /** Per-tier feature counts for the map legend; zero-count layers are
    *  hidden from the legend. */
   mapFeatureCounts = $derived({
-    empirical: (this.sandyFc?.features.length ?? 0) + (this.idaHwmFc?.features.length ?? 0),
+    empirical: (this.sandyFc?.features.length ?? 0) + (this.idaHwmFc?.features.length ?? 0) +
+      (this.floodnetFc?.features.length ?? 0),
     modeled: this.depFc?.features.length ?? 0,
     synthetic: (this.synFc?.features.length ?? 0) + (this.terramindLulcFc?.features.length ?? 0),
     proxy: this.proxyFc?.features.length ?? 0
@@ -415,6 +504,10 @@ export class RunState {
     this.finalResult = f;
     const fr = f as unknown as Rec;
     this.registerPointsFc = buildRegisterPointsFc(fr);
+    this.idaHwmFc = buildIdaHwmFc(fr);
+    this.floodnetFc = buildFloodnetFc(fr);
+    this.proxyFc = build311Fc(fr);
+    this.radii = searchRadii(fr);
     // TerraMind LULC LoRA wins over the synthesis output when both fired.
     this.terramindLulcFc = polygons(fr.terramind_lulc) ?? polygons(fr.terramind) ?? this.terramindLulcFc;
     this.terramindBuildingsFc = polygons(fr.terramind_buildings) ?? this.terramindBuildingsFc;

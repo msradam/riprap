@@ -64,9 +64,10 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
   test('map layer switches hide layers with zero features and use words', async ({ page }) => {
     await page.goto(PAGE);
     await expect(page.locator('.maplibregl-canvas')).toBeVisible({ timeout: 15_000 });
-    // The gallery fetches no live layers, so every tier layer is empty and
-    // no switch is offered (silence over confabulation on the map).
-    await expect(page.locator('.map-layers label')).toHaveCount(0);
+    // The gallery fetches no live layers; only the evidence points in the
+    // snapshot (Ida marks and FloodNet sensors, 311 complaints) get a switch.
+    await expect(page.locator('.map-layers label')).toHaveCount(2);
+    await expect(page.locator('.map-layers label').first()).toContainText('Measured (empirical), 4');
     await expect(page.getByText(/\b(EMP|MOD|PRX|SYN) ON\b/)).toHaveCount(0);
   });
 

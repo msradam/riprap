@@ -24,6 +24,26 @@
    *  run starts with none. */
   let selectedPoint = $derived.by<string | null>(() => (void run, null));
   let shown = $derived(LAYERS.filter((l) => run.mapFeatureCounts[l.key] > 0));
+
+  const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+  /** What is plotted, in counts from the data. */
+  let plotted = $derived.by(() => {
+    const n = (fc: typeof run.idaHwmFc) => fc?.features.length ?? 0;
+    const measured = [
+      n(run.idaHwmFc) && `${count(n(run.idaHwmFc), 'Ida high-water mark', 'Ida high-water marks')} (amber)`,
+      n(run.floodnetFc) && `${count(n(run.floodnetFc), 'FloodNet sensor', 'FloodNet sensors')} (blue)`
+    ].filter(Boolean);
+    const out = measured.length ? [`${measured.join(' and ')}, measured`] : [];
+    const p = n(run.proxyFc);
+    if (p) {
+      const total = (run.finalResult as { nyc311?: { n?: unknown } } | null)?.nyc311?.n;
+      const of = typeof total === 'number' && total > p ? `${p} of the ${total}` : `${p}`;
+      out.push(`${of} ${of === '1' ? 'complaint' : 'complaints'} to 311 (hollow rings, proxy)`);
+    }
+    const a = n(run.registerPointsFc);
+    if (a) out.push(count(a, 'public asset from the register', 'public assets from the register'));
+    return out;
+  });
 </script>
 
 <div class="map-figure">
@@ -38,6 +58,8 @@
         syntheticPrior={run.synFc}
         proxy311={run.proxyFc}
         idaHwm={run.idaHwmFc}
+        floodnet={run.floodnetFc}
+        radii={run.radii}
         registerPoints={run.registerPointsFc}
         terramindLulc={run.terramindLulcFc}
         terramindBuildings={run.terramindBuildingsFc}
@@ -47,7 +69,7 @@
       />
     </div>
     <figcaption>
-      Figure 1. The place and the mapped evidence around it.{#if run.areaBoundary}{` The outline is the ${AREA_BOUNDARY_LEGEND.label}.`}{/if}
+      Figure 1. {plotted.length ? `The place and the evidence plotted around it: ${plotted.join('; ')}.` : 'The place.'}{#if run.areaBoundary}{` The outline is the ${AREA_BOUNDARY_LEGEND.label}.`}{/if}{#if run.radii.length}{` Rings mark the search radii: ${run.radii.map((r) => `${r.label} ${r.radius_m} m`).join(', ')}.`}{/if}
       Everything on the map is also listed in the briefing and its sources.
     </figcaption>
   </figure>
@@ -81,7 +103,7 @@
               onclick={() => (selectedPoint = row.id)}
             >
               <span class="map-point-name">{row.name}</span>
-              <span class="map-point-meta">{row.distance}; scenarios: {row.scenarios}</span>
+              <span class="map-point-meta">{row.meta}</span>
             </button>
           </li>
         {/each}

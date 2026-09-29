@@ -6,8 +6,7 @@
   import { POSITRON_NO_LABELS } from './baseStyle';
   import { registerSynStripe } from './synStripe';
   import { MapboxOverlay } from '@deck.gl/mapbox';
-  import { GeoJsonLayer, ScatterplotLayer } from '@deck.gl/layers';
-  import { HeatmapLayer } from '@deck.gl/aggregation-layers';
+  import { GeoJsonLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
   import { PathStyleExtension } from '@deck.gl/extensions';
 
   /** Reads a --riprap-* custom property (possibly a var()-chain of
@@ -59,6 +58,11 @@
     /** USGS Ida 2021 high-water mark points. Empirical tier; amber fill.
      *  Controlled by EMP master toggle. */
     idaHwm?: GeoJSON.FeatureCollection;
+    /** FloodNet street sensors. Empirical tier; solid tier-blue fill. */
+    floodnet?: GeoJSON.FeatureCollection;
+    /** Search radii around the address, drawn as labelled hairline rings
+     *  and hidden with their tier's layer. */
+    radii?: { label: string; radius_m: number; tier: 'empirical' | 'proxy' }[];
     activeLayers?: { empirical: boolean; modeled: boolean; synthetic: boolean; proxy: boolean };
     /** v0.4.5 §8 — when a Findings card is hovered/focused, its
      *  `mapLayer` key flows in as `linkedKey`. The map root gains
@@ -86,6 +90,8 @@
     terramindBuildings,
     prithviLive,
     idaHwm,
+    floodnet,
+    radii = [],
     activeLayers = { empirical: true, modeled: true, synthetic: true, proxy: true },
     linkedKey = null,
     areaBoundary,
@@ -122,11 +128,22 @@
   /** pid of the register point whose popup is open. */
   let shownPoint: string | null = null;
 
+  const esc = (v: unknown) =>
+    String(v).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
   function registerPopupHtml(p: Record<string, unknown>): string {
-    const name = String(p.name ?? '?');
-    const kind = String(p.kind ?? '?');
+    // Evidence points (Ida marks, FloodNet, 311) carry the list row's words.
+    if (p.detail != null) {
+      return `
+          <div style="font-family: 'Sofia Sans', system-ui; font-size: 12px; max-width: 240px;">
+            <div style="font-weight: 600; color: #0F172A;">${esc(p.name ?? '?')}</div>
+            <div style="color: #334155; font-size: 12px; margin-top: 2px;">${esc(p.detail)}</div>
+          </div>`;
+    }
+    const name = esc(p.name ?? p.site_description ?? '?');
+    const kind = esc(p.kind ?? '?');
     const inside = p.inside_sandy_2012 === true || p.inside_sandy_2012 === 'true';
-    const docId = String(p.doc_id ?? '');
+    const docId = esc(p.doc_id ?? '');
     return `
           <div style="font-family: 'Sofia Sans', system-ui; font-size: 12px;">
             <div style="font-weight: 600; color: #0F172A;">${name}</div>
@@ -187,6 +204,20 @@
    *  handoff's table appears to use "empirical" loosely for "point
    *  data" rather than the strict tier; following the app's own tested
    *  taxonomy rather than silently taking on a tier regression. */
+  type Radius = { label: string; radius_m: number; tier: 'empirical' | 'proxy' };
+  const shownRadii = () => radii.filter((r) => activeLayers[r.tier]);
+  const getPosition = (f: GeoJSON.Feature) => (f.geometry as GeoJSON.Point).coordinates as [number, number];
+
+  /** A click on an evidence point opens its popup and selects its list row. */
+  function pickPoint({ object }: { object?: GeoJSON.Feature }) {
+    if (!object) return;
+    showRegisterPoint(object);
+    onSelectPoint?.(shownPoint || null);
+  }
+
+  /** Every plotted point, for list selection and the initial view. */
+  const pointSets = () => [registerPoints, idaHwm, floodnet, proxy311];
+
   function buildDeckLayers() {
     return [
       new GeoJsonLayer({
@@ -218,10 +249,7 @@
         visible: activeLayers.empirical,
         pickable: true,
         stroked: true,
-        getPosition: (f: GeoJSON.Feature) => {
-          const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
-          return [lon, lat] as [number, number];
-        },
+        getPosition,
         getFillColor: tokenColor('--riprap-amber-800', 235),
         getLineColor: tokenColor('--riprap-white'),
         lineWidthMinPixels: 1.5,
@@ -230,39 +258,62 @@
           return 5 + Math.min(h, 5) * 1.4;
         },
         radiusUnits: 'pixels',
-        onClick: ({ object }: { object?: GeoJSON.Feature }) => {
-          if (!object || !map) return;
-          const p = (object.properties ?? {}) as Record<string, unknown>;
-          const site = String(p.site_description ?? '?');
-          const elev = p.elev_ft != null ? `${Number(p.elev_ft).toFixed(1)} ft NAVD88` : '—';
-          const height = p.height_above_gnd_ft != null ? `${Number(p.height_above_gnd_ft).toFixed(2)} ft above ground` : '—';
-          const html = `
-            <div style="font-family: 'Sofia Sans', system-ui; font-size: 12px; max-width: 220px;">
-              <div style="font-weight: 600; color: #92400E; font-size: 12px;">Ida 2021 high-water mark, USGS</div>
-              <div style="margin-top: 4px; color: #0F172A; font-size: 12px;">${site}</div>
-              <div style="margin-top: 6px; font-family: 'Overpass Mono', monospace; font-size: 12px; color: #4E5A6E;">elev: ${elev}<br>mark: ${height}</div>
-            </div>`;
-          import('maplibre-gl').then(({ Popup }) => {
-            if (!map) return;
-            const coords = (object.geometry as GeoJSON.Point).coordinates as [number, number];
-            new Popup({ closeButton: true, offset: 12 }).setLngLat(coords).setHTML(html).addTo(map);
-          });
-        },
+        onClick: pickPoint,
       }),
-      new HeatmapLayer({
+      new ScatterplotLayer({
+        id: 'deck-floodnet',
+        data: floodnet?.features ?? [],
+        visible: activeLayers.empirical,
+        pickable: true,
+        stroked: true,
+        getPosition,
+        getFillColor: tokenColor('--riprap-tier-empirical'),
+        getLineColor: tokenColor('--riprap-white'),
+        lineWidthMinPixels: 1.5,
+        getRadius: 6,
+        radiusUnits: 'pixels',
+        onClick: pickPoint,
+      }),
+      // Proxy is hollow, as its tier mark is: a ring per 311 complaint.
+      new ScatterplotLayer({
         id: 'deck-proxy-311',
         data: proxy311?.features ?? [],
         visible: activeLayers.proxy,
-        getPosition: (f: GeoJSON.Feature) => {
-          const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
-          return [lon, lat] as [number, number];
-        },
-        getWeight: (f: GeoJSON.Feature) => Number((f.properties as Record<string, unknown> | null)?.count ?? 1),
-        colorRange: [
-          [...tokenColor('--riprap-surface-sunken')].slice(0, 3),
-          [...tokenColor('--riprap-tier-proxy')].slice(0, 3),
-        ] as [number, number, number][],
-        radiusPixels: 40,
+        pickable: true,
+        stroked: true,
+        filled: false,
+        getPosition,
+        getLineColor: tokenColor('--riprap-tier-proxy', 220),
+        lineWidthMinPixels: 1.5,
+        getRadius: 4,
+        radiusUnits: 'pixels',
+        onClick: pickPoint,
+      }),
+      new ScatterplotLayer({
+        id: 'deck-radii',
+        data: shownRadii(),
+        stroked: true,
+        filled: false,
+        getPosition: () => [address.lon, address.lat],
+        getRadius: (r: Radius) => r.radius_m,
+        radiusUnits: 'meters',
+        getLineColor: tokenColor('--riprap-slate-tertiary', 200),
+        lineWidthMinPixels: 1,
+      }),
+      new TextLayer({
+        id: 'deck-radii-labels',
+        data: shownRadii(),
+        // Just inside the top of each ring (1 degree of latitude is about 111 km).
+        getPosition: (r: Radius) => [address.lon, address.lat + r.radius_m / 111_320],
+        getText: (r: Radius) => `${r.label}, ${r.radius_m} m`,
+        getSize: 12,
+        getColor: tokenColor('--riprap-slate-tertiary'),
+        getTextAnchor: 'middle',
+        getAlignmentBaseline: 'top',
+        fontFamily: 'Sofia Sans, system-ui, sans-serif',
+        background: true,
+        getBackgroundColor: tokenColor('--riprap-paper', 220),
+        backgroundPadding: [3, 1],
       }),
     ];
   }
@@ -289,7 +340,7 @@
   $effect(() => {
     const pid = selectedPoint;
     if (!ready || !map || !pid || pid === shownPoint) return;
-    const f = registerPoints?.features.find((x) => x.properties?.pid === pid);
+    const f = pointSets().flatMap((fc) => fc?.features ?? []).find((x) => x.properties?.pid === pid);
     if (!f) return;
     const center = (f.geometry as GeoJSON.Point).coordinates as [number, number];
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -316,19 +367,25 @@
   // visibility changes. deck.gl diffs by layer `id` internally, so this
   // is cheap even though it reconstructs the array each time.
   $effect(() => {
-    void sandyEmpirical; void depModeled; void idaHwm; void proxy311; void activeLayers;
+    void sandyEmpirical; void depModeled; void idaHwm; void floodnet; void proxy311; void radii; void activeLayers;
     if (!overlay || !ready) return;
     overlay.setProps({ layers: buildDeckLayers() });
   });
 
+  // The first view holds the address and the plotted evidence points.
   $effect(() => {
-    if (!map || !ready) return;
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reducedMotion) {
-      map.jumpTo({ center: [address.lon, address.lat], zoom: 15 });
-    } else {
-      map.flyTo({ center: [address.lon, address.lat], zoom: 15, essential: true });
+    if (!map || !ready || areaBoundary) return;
+    const pts: [number, number][] = [[address.lon, address.lat],
+      ...[idaHwm, floodnet, proxy311].flatMap((fc) => (fc?.features ?? []).map(getPosition))];
+    const animate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (pts.length === 1) {
+      if (animate) map.flyTo({ center: pts[0], zoom: 15, essential: true });
+      else map.jumpTo({ center: pts[0], zoom: 15 });
+      return;
     }
+    const xs = pts.map((p) => p[0]); const ys = pts.map((p) => p[1]);
+    map.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]],
+      { padding: 48, maxZoom: 16, animate });
   });
 
   onMount(async () => {
@@ -392,7 +449,7 @@
         paint: { 'line-color': '#2A6FA8', 'line-width': 1.5, 'line-dasharray': [4, 3] }
       });
 
-      // proxy 311 requests: deck.gl HeatmapLayer now (buildDeckLayers).
+      // proxy 311 complaints: deck.gl hollow rings now (buildDeckLayers).
 
       // TerraMind-synthesis LULC categorical fill (synthetic prior tier).
       // Per-feature fill_color property carries class-specific color from

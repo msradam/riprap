@@ -31,23 +31,20 @@
   let runStartedAt: number | null = null;
 
   // Live-only map layers from /api/layers/*, once the address resolves.
+  // Ida marks, FloodNet sensors and 311 points come from `final` instead
+  // (RunState.applyFinal), so the map plots what the answer found.
   $effect(() => {
     if (!run.address) return;
     const { lat, lon, source } = run.address;
     if (source === 'nta' && run.ntaCode) {
       fetchSandyNta(run.ntaCode).then((fc) => { run.sandyFc = fc; });
       fetchDepNta(run.ntaCode).then((fc) => { run.depFc = fc; });
-      // No NTA-scope synthetic / proxy endpoint: radius query around the
-      // centroid. Tight for Ida polygons, wider for sparse FloodNet dots.
+      // No NTA-scope synthetic endpoint: radius query around the centroid.
       fetchPrithviSynthetic(lat, lon, 2500).then((fc) => { run.synFc = fc; });
-      fetchProxyDots(lat, lon, 3000).then((fc) => { run.proxyFc = fc; });
-      fetchIdaHwm(lat, lon, 3000).then((fc) => { run.idaHwmFc = fc; });
     } else {
       fetchSandy(lat, lon).then((fc) => { run.sandyFc = fc; });
       fetchDep(lat, lon).then((fc) => { run.depFc = fc; });
       fetchPrithviSynthetic(lat, lon).then((fc) => { run.synFc = fc; });
-      fetchProxyDots(lat, lon).then((fc) => { run.proxyFc = fc; });
-      fetchIdaHwm(lat, lon).then((fc) => { run.idaHwmFc = fc; });
     }
   });
   $effect(() => {
