@@ -95,6 +95,8 @@
 /* Phones: one header row. The context words stay for screen readers. */
 @media (max-width: 479px) {
   .app-header-inner { padding: 13px 16px; }
+  /* The footer keeps the header's and the page's 16px gutter. */
+  .app-footer-inner { padding: 32px 16px; }
   .app-header-left { min-height: 0; }
   .app-header-sep { display: none; }
   .app-header-context {
