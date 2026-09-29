@@ -264,6 +264,15 @@ export function mergeDepScenarios(cards: Card[]): EvidenceRow[] {
  *  sources the answer does not cite close the table in one folded group.
  *  The DEP scenarios share one row. Absent and meta cards are not
  *  evidence and are left out by the caller. */
+/** A row whose card only knows "live" takes its citation's dataset date
+ *  when there is one (the FEMA FIRM's effective date), so the table and
+ *  the source note give the same date. */
+export function withDatasetDate(c: Card, citations: Record<string, Citation>): Card {
+  const v = citationOf(c, citations)?.vintage;
+  const cardHasDate = !!c.vintage && /^\d{4}/.test(c.vintage.replace(/^retrieved\s+/i, ''));
+  return !cardHasDate && v && /^\d{4}/.test(v) ? { ...c, vintage: v } : c;
+}
+
 export function evidenceGroups(cards: Card[], cited: string[], firstLabel = 'Behind the answer'): EvidenceGroup[] {
   const rankOne = (c: Card) => {
     const i = cited.indexOf(c.docId);
@@ -408,7 +417,8 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
 
   const cited = citedIn(answerParas);
   const allCards: Card[] = run.findingsData.cards;
-  const cards = allCards.filter((c) => !c.absent && c.variant !== 'meta');
+  const cards = allCards.filter((c) => !c.absent && c.variant !== 'meta')
+    .map((c) => withDatasetDate(c, run.briefing.citations));
   const absent = allCards.filter((c) => c.absent);
   const metaCard = allCards.find((c) => c.variant === 'meta') ?? null;
   const leadLabel = refusal ? 'Response' : lead?.label || (question ? 'Answer' : 'In brief');
