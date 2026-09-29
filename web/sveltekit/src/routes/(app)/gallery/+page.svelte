@@ -201,6 +201,11 @@
   .gallery-meta {
     color: var(--ink-secondary);
   }
+  /* The link's 2px padding plus 2px sets the reason 4px under it; the
+     lead keeps 4px from the reason, so the two do not read as one block. */
+  .gallery-reason + .gallery-lead {
+    margin-top: 4px;
+  }
   .gallery-colophon {
     margin: 32px 0 0;
     max-width: 54ch;
@@ -215,7 +220,7 @@
   }
   @media (max-width: 640px) {
     .gallery-page {
-      padding: 20px 16px 32px;
+      padding: 16px 16px 48px;
     }
     .gallery-item {
       grid-template-columns: minmax(0, 1fr);
