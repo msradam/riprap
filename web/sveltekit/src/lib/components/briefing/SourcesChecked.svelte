@@ -38,7 +38,7 @@
     </details>
   {/if}
   {#if lists.notChecked?.length}
-    <details open={lists.notChecked.length <= SHORT_LIST}>
+    <details id="not-checked" open={lists.notChecked.length <= SHORT_LIST}>
       <summary>Not checked for this question ({lists.notChecked.length})</summary>
       <ul>
         {#each lists.notChecked as t, i (`${i}-${t}`)}
@@ -67,6 +67,10 @@
   p {
     margin: 0;
     min-width: 0;
+  }
+  /* The evidence table's footer links here; clear the sticky header. */
+  details {
+    scroll-margin-top: var(--scroll-offset, 72px);
   }
   summary {
     min-height: 24px;

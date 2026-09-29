@@ -15,8 +15,29 @@
     citations: Record<string, Citation>;
     notRun: string[];
     labelledby: string;
+    /** Where the page lists the sources not run; the footer then points
+     *  there instead of repeating the list. */
+    notRunHref?: string;
+    /** Gallery pages: a live reading is dated to the snapshot. */
+    snapshotDate?: string | null;
   }
-  let { groups, findings, citations, notRun, labelledby }: Props = $props();
+  let { groups, findings, citations, notRun, labelledby, notRunHref, snapshotDate = null }: Props = $props();
+
+  /** A figure label longer than this reads in the finding cell instead of
+   *  wrapping down the narrow Figure column. */
+  const SHORT_LABEL = 16;
+
+  function asOf(vintage: string): string {
+    const d = asOfDate(vintage);
+    return snapshotDate && /^live$/i.test(d.trim()) ? `at snapshot, ${snapshotDate}` : d;
+  }
+
+  /** Open the linked list if it is a closed disclosure; the link then
+   *  scrolls to it as usual. */
+  function openTarget() {
+    const el = notRunHref ? document.querySelector(notRunHref) : null;
+    if (el instanceof HTMLDetailsElement) el.open = true;
+  }
 
   // Explicit headers: the group heading is a second level of th, which
   // scope alone does not resolve for every checker.
@@ -49,6 +70,7 @@
         {@const fig = figureOf(c)}
         {@const find = findings.get(c.id)}
         {@const cit = citationOf(c)}
+        {@const longLabel = !!fig?.label && fig.label.length > SHORT_LABEL}
         <tr class="ev-row">
           <td class="ev-source" headers="{col('source')} {gid}">
             {#if c.experimental}{c.source} <span class="exp-badge">Experimental</span>{:else}{c.source}{/if}
@@ -57,13 +79,14 @@
             <div class="ev-measure">
               {#if find}<span class="ev-find">{find.first}</span>{#if find.rest}{` ${find.rest}`}{/if}{/if}
               <span class="ev-dataset">{c.title}</span>
+              {#if longLabel}<span class="ev-dataset">Figure: {fig?.label}</span>{/if}
             </div>
           </td>
           <td class={['ev-num', 'ev-figure', !fig && 'is-empty']} headers="{col('figure')} {gid}">
             {#if fig}
               <span class="ev-label" aria-hidden="true">Figure</span>
               <span class="data ev-fig">{fig.value}</span>
-              {#if fig.label}<span class="ev-fig-label">{fig.label}</span>{/if}
+              {#if fig.label && !longLabel}<span class="ev-fig-label">{fig.label}</span>{/if}
             {/if}
           </td>
           <td class="ev-tier" headers="{col('tier')} {gid}">
@@ -72,7 +95,7 @@
           </td>
           <td class="ev-asof" headers="{col('asof')} {gid}">
             <span class="ev-label" aria-hidden="true">Data as of</span>
-            <span class="data" title={c.vintage}>{asOfDate(c.vintage)}</span>
+            <span class="data" title={c.vintage}>{asOf(c.vintage)}</span>
           </td>
           <td class="ev-num ev-cite" headers="{col('cite')} {gid}">
             {#if cit}
@@ -90,7 +113,11 @@
     </tbody>
   {/each}
 </table>
-{#if notRun.length}
+{#if notRun.length && notRunHref}
+  <p class="ev-not-run">
+    Sources not run for this question are listed under <a href={notRunHref} onclick={openTarget}>Sources and method</a>.
+  </p>
+{:else if notRun.length}
   <p class="ev-not-run">Not run for this question: {notRun.join(', ')}.</p>
 {/if}
 

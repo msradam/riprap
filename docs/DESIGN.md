@@ -268,8 +268,11 @@ the full source list.
   dataset name is never set as if it were the result.
 - **Order:** a first group "Behind the answer" holds the rows the answer
   cites; then one group per Stone, headed with the Stone name and its role
-  ("Cornerstone, the hazard reader"). Sources that did not run are one line
-  after the table: "Not run for this question: ...".
+  ("Cornerstone, the hazard reader"). Sources that did not run are listed
+  once, under Sources and method; one line after the table links there.
+- **Figure:** a label of about 16 characters or fewer sits under the
+  figure; a longer one moves to the finding's secondary line. A live
+  reading on a gallery page is dated "at snapshot, <date>"..
 - **Rows:** 10px vertical padding, a Hairline between rows, no zebra, no
   cell borders.
 
