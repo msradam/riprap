@@ -22,27 +22,38 @@ colors:
   sky-100: "#E3ECF2"
   white: "#FFFFFF"
 typography:
-  display:
+  lead:
     fontFamily: "Sofia Sans, system-ui, sans-serif"
-    fontSize: "36px"
+    fontSize: "64px"
+    fontWeight: 700
+    lineHeight: 1
+    letterSpacing: "-0.02em"
+  title:
+    fontFamily: "Sofia Sans, system-ui, sans-serif"
+    fontSize: "34px"
     fontWeight: 600
-    lineHeight: 1.15
+    lineHeight: 1.18
     letterSpacing: "-0.01em"
   headline:
     fontFamily: "Sofia Sans, system-ui, sans-serif"
     fontSize: "22px"
     fontWeight: 600
     lineHeight: 1.25
+  answer:
+    fontFamily: "Sofia Sans, system-ui, sans-serif"
+    fontSize: "20px"
+    fontWeight: 400
+    lineHeight: 1.5
   body:
     fontFamily: "Sofia Sans, system-ui, sans-serif"
-    fontSize: "16px"
+    fontSize: "17px"
     fontWeight: 400
     lineHeight: 1.55
-  label:
-    fontFamily: "Overpass Mono, ui-monospace, monospace"
-    fontSize: "11px"
-    fontWeight: 500
-    letterSpacing: "0.08em"
+  small:
+    fontFamily: "Sofia Sans, system-ui, sans-serif"
+    fontSize: "14px"
+    fontWeight: 400
+    lineHeight: 1.45
   data:
     fontFamily: "Overpass Mono, ui-monospace, monospace"
     fontSize: "13px"
@@ -66,13 +77,19 @@ components:
     typography: "{typography.data}"
   exp-badge:
     textColor: "{colors.slate-700}"
-    typography: "{typography.label}"
+    typography: "{typography.small}"
     rounded: "{rounded.badge}"
     padding: "0 5px"
-  citation-item:
-    backgroundColor: "{colors.white}"
+  answer-lead:
+    textColor: "{colors.slate-950}"
+    typography: "{typography.lead}"
+  source-note:
     textColor: "{colors.slate-700}"
-    padding: "10px 12px"
+    typography: "{typography.small}"
+  evidence-row:
+    textColor: "{colors.slate-950}"
+    typography: "{typography.small}"
+    padding: "10px 0"
   page:
     backgroundColor: "{colors.paper}"
     textColor: "{colors.slate-950}"
@@ -80,36 +97,38 @@ components:
 
 # Design System: Riprap
 
-<!-- Documented from the incumbent code (web/sveltekit/src/lib/tokens.css,
-     styles.css) and the handoff tokens (docs/design/handoff/tokens/) during
-     the Impeccable pass, 2026-09-27. Type, logo and palette are PINNED by
-     the owner: change sizes, weights, spacing and use; never the families,
-     the mark or the hue families. -->
+<!-- Documented from the incumbent code during the first Impeccable pass
+     (2026-09-27) and rewritten for pass 2 (2026-09-29) after the owner's
+     init interview and the three-direction lab. Type families, the dam mark,
+     the palette and the Five Stones names are PINNED: change sizes, weights,
+     spacing and use; never the families, the mark or the hue families. The
+     owner delegated the element choices to the design session; they are
+     recorded here as that session's choices. -->
 
 ## Overview
 
-**Creative North Star: "The Survey Sheet"** (inferred; the owner has not
-named one)
+**Creative North Star: "The Survey Sheet", set as a public report.**
 
-Riprap reads like a public-works survey sheet brought to a desk: cool paper,
-navy ink, drafting labels in a highway-signage mono, and a federal blue that
-marks what can be checked. It is an engineering artefact, not a dashboard or
-a consumer app. Density is moderate and calm: the briefing text leads, the
-map and citations sit at its side, and colour is spent on meaning (the link
-to a source, an evidence tier, an alert), not on decoration.
+A Riprap briefing reads like a carefully typeset public report on cool
+survey paper. The question is the title. The answer comes next, in the
+reader's language, with its sources beside it. The evidence follows as an
+exhibit table, the map is a figure, and how the briefing was made is
+recorded once, at the end. It is not a dashboard, a trace viewer or a
+consumer app. Colour is spent on meaning (the link to a source, an evidence
+tier, an alert), never on decoration.
 
 The palette is USWDS-aligned on purpose: the empirical and modelled tier
-blues are exactly USWDS `blue-60v` and `blue-warm-70v`, which a civic reader
-has met before. Depth comes from tonal layering of paper surfaces and
-hairline rules, not shadows.
+blues are USWDS `blue-60v` and `blue-warm-70v`, which a civic reader has met
+before. Depth comes from paper tones and a few hairlines, not shadows.
 
-**Key Characteristics:**
-- Cool paper surfaces in three tones, navy text, one federal-blue accent.
-- Sofia Sans for everything a person reads; Overpass Mono for data, labels
-  and citation marks.
-- Evidence tier carried by a square's fill (solid, hatched, hollow,
-  stippled), hue as reinforcement only.
-- Flat, hairline-ruled, square-cornered.
+**Key characteristics:**
+- The answer is the strongest type on the page.
+- Sofia Sans for everything a person reads; Overpass Mono only for figures,
+  identifiers and dates.
+- Evidence tier is carried by a square's fill (solid, hatched, hollow,
+  stippled) in tables, keys and the map, and by words in source notes;
+  never by a mark on every sentence.
+- Flat and square-cornered, with hairlines only where they separate rows.
 
 ## Colors
 
@@ -117,10 +136,10 @@ A cool, low-chroma civic palette: slates and papers carry the page, the
 blues carry evidence and links, amber and red are reserved for signal.
 
 ### Primary
-- **Federal Blue** (blue-60v): links, inline citation marks, focus rings,
-  the empirical evidence tier. The colour of "you can check this".
-- **Warm Navy** (blue-warm-70v): modelled and synthetic evidence tiers, the
-  Keystone stone.
+- **Federal Blue** (blue-60v): links, citation marks, focus rings, the
+  empirical tier. The colour of "you can check this".
+- **Warm Navy** (blue-warm-70v): modelled and synthetic tiers, the Keystone
+  stone.
 - **Deep Navy** (blue-warm-80v): the Capstone stone.
 
 ### Secondary
@@ -130,118 +149,187 @@ blues carry evidence and links, amber and red are reserved for signal.
 - **Hazard Amber** (amber-800): warnings, severity 2 and 3, the Lodestone
   stone hint.
 - **Alert Red** (red-700): active flood alerts and severity 4 only.
-- **Done Green** (green-800): success and completed steps, always with a
-  check or text.
+- **Done Green** (green-800): success and completed steps, always with text.
 
 ### Neutral
-- **Ink** (slate-950): primary text and strong rules.
-- **Secondary Ink** (slate-700): secondary text.
-- **Tertiary Ink** (slate-tertiary): metadata; replaces the old #64748B,
-  which failed AA on the sunken surface.
+- **Ink** (slate-950): primary text, the answer, headings.
+- **Secondary Ink** (slate-700): meta lines, source notes, captions.
+- **Tertiary Ink** (slate-tertiary): the least important metadata.
 - **Proxy Slate** (slate-600): proxy tier, severity 1, Cornerstone stone.
-- **Soft Rule** (slate-300) and **Hairline** (slate-250): decorative
-  dividers.
-- **Paper** (paper), **Sunken Paper** (paper-sunken), **Inset Paper**
-  (paper-inset), **Card White** (white): the four surfaces.
-- **Mist** (mist): the app desk backdrop. **Sky** (sky-100): basemap water.
+- **Soft Rule** (slate-300) and **Hairline** (slate-250): row separators
+  and the one input border.
+- **Paper**, **Sunken Paper**, **Inset Paper**, **Card White**: the
+  surfaces. **Mist**: the app desk backdrop. **Sky**: basemap water.
 
 ### Named Rules
 **The Checkable Blue Rule.** Federal Blue means a source or a control you
-can act on. Do not use it for decoration or headings.
+can act on. Never headings, never headlines, never decoration.
 
-**The Signal Budget Rule.** Amber and red appear only for hazard signal
-(warnings, alerts, severity). A calm briefing has none.
+**The Signal Budget Rule.** Amber and red appear only for hazard signal. A
+calm briefing has none.
 
-**The Pinned Palette Rule.** No new hue family. Rebalance use and fix
-contrast within these tokens.
+**The Pinned Palette Rule.** No new hue family.
 
 ## Typography
 
-**Display and Body Font:** Sofia Sans (system-ui fallback)
-**Label/Mono Font:** Overpass Mono (ui-monospace fallback)
+**Reading font:** Sofia Sans. **Data font:** Overpass Mono. Both OFL and
+self-hosted. PINNED. There is no italic in report content.
 
-**Character:** a Gotham-lineage civic grotesque for reading, paired with a
-mono drawn from the US highway signage alphabet for data, coordinates and
-citation marks. Both are OFL and self-hosted through @fontsource. PINNED.
-
-### Hierarchy
-- **Display** (600, 36px, 1.15): the briefing place or question heading.
-- **Headline** (600, 22px, 1.25): region and section headings.
-- **Body** (400, 16px, 1.55, 70ch measure): briefing prose and answers.
-- **Data** (Overpass Mono 400, 13px): citation lines, figures, metadata.
-- **Label** (Overpass Mono 500, 11px, 0.08em, uppercase): section labels,
-  badges.
+### Scale
+| Role | Font | Size / weight / leading | Use |
+|---|---|---|---|
+| Lead | Sofia Sans | 64 / 700 / 1.0 (44 on phones) | "Yes.", "No.", a count, or the sentence saying the sources do not answer |
+| Title | Sofia Sans | 34 / 600 / 1.18 (26 on phones), max 30ch | The H1: the question, or the place |
+| Headline | Sofia Sans | 22 / 600 / 1.25 | h2: Evidence, Map, Sources and method, report sections |
+| Answer | Sofia Sans | 20 / 400 / 1.5, max 64ch | The answer, or the "In brief" paragraph |
+| Body | Sofia Sans | 17 / 400 / 1.55, max 68ch | Report sections |
+| Small | Sofia Sans | 14 to 15 / 400 / 1.45 | Meta line, source notes, table cells, captions, method block |
+| Data | Overpass Mono | 13 to 14 / 400, tabular figures | Figures, dates, doc ids, citation numbers, the commit |
 
 ### Named Rules
 **The Mono Means Data Rule.** Overpass Mono is for figures, identifiers,
-labels and citation marks; reading text is Sofia Sans.
+dates and citation numbers. It is never a label voice: no uppercase tracked
+mono eyebrows above blocks.
 
-**The Twelve Pixel Floor Rule.** Text a reader must read is at least 12px.
-The incumbent code breaks this (9, 10 and 10.5px labels); treat those as
-defects, not precedent.
+**The Twelve Pixel Floor Rule.** Nothing a reader must read is under 12px.
+Third-party map controls are restyled to meet it.
+
+**The Measure Rule.** Prose lines stay at 75 characters or fewer.
+
+**The One Heading Style Rule.** Every h2 on a page uses Headline; sections
+are numbered in one sequence or not at all.
 
 ## Layout
 
-A desk-and-sheet model: a mist backdrop, a paper briefing band with a
-1600px maximum width and 28px side padding on desktop, and a three-region
-shell (briefing, map, citations) that stacks on narrow screens. Spacing
-follows a 4px base scale (4, 8, 12, 16, 24, 32, 48, 64, 96). Prose holds a
-70ch measure.
+Spacing follows the 4px scale (4, 8, 12, 16, 24, 32, 48, 64, 96).
+
+### Question briefing
+A single text column (about 680px) with a margin rail (about 280px) at
+1100px and wider. From the top: the kind line, the title, the meta line,
+the jump links, the lead and the answer with its source notes in the rail,
+a pointer for residents, Figure 1 (the map), the evidence table, report
+sections if any, then Sources and method. The lead word sits above y=260 at
+1440 and the whole answer is on the first screen.
+
+### Address and district briefings
+The same top (title is the place, the "In brief" paragraph takes the lead
+slot). Below it a two-column grid at 1100px and wider: the evidence table
+and report sections in the main column (about 58%), the map in a sticky
+right column (about 42%, 460px tall). Below 1100px everything is one
+column and the map comes after the answer at 300px.
+
+### Phone (390)
+One column, 16px gutters, no horizontal scroll. Source notes become
+endnotes directly after the answer. Table rows become stacked blocks.
 
 ## Elevation & Depth
 
-Flat. Depth is tonal (paper, sunken, inset, card) and ruled (hairlines and
-a strong ink rule), never shadowed.
+Flat. Depth is tonal and ruled, never shadowed.
 
-### Named Rules
-**The No-Elevation Rule.** No box shadows on report content; the handoff's
-rules lint enforces it.
-
-## Shapes
-
-Square and drafted: corners are square or a 1px hairline radius; badges
-take a 3px radius. Evidence tier is a small square mark; severity is a
-filled-step triangle, a different shape so the two axes never merge.
+**The Border Budget Rule.** Borders exist only to separate table rows, to
+frame the map and the query input, and to draw focus. No card borders, no
+side stripes, no boxes around blocks of text.
 
 ## Components
 
-### Inline citation
-- **Style:** Overpass Mono 500, Federal Blue, superscript `[n]`, no
-  underline; an accessible name naming the source.
-- **Behaviour:** activates the matching entry in the citations list and
-  scrolls it into view. Inline, so it keeps the WCAG 2.5.8 inline target
-  exception.
+### Kind line and meta line
+- **Kind line:** Small, secondary ink, plain words ("Flood-exposure
+  briefing, question").
+- **Meta line:** Small, secondary ink, one line under the title: the place
+  (on question briefings), "Snapshot" with the date in Data, and the link
+  "How this briefing was made". Items are separated by space, not dots.
 
-### Citation list item
-- **Style:** a 32px number column and body, 10px 12px padding, a 2px soft
-  left rule that turns active on selection; source, experimental badge and
-  vintage on the first line, title as a link, metadata in mono.
+### Answer block
+- **Lead:** the Lead style in Ink, on its own line.
+- **Answer:** the Answer style in Ink. A count lead keeps its sentence
+  intact below it.
+- **Citations:** a small superscript number in Federal Blue after the
+  sentence's closing punctuation, never before it. No tier mark in prose.
+- **Beside it:** the checks-ran line and the mode line in Small secondary
+  ink, then the scope disclosure.
+
+### Source note (margin rail, endnote on phones)
+Number in Data, then the source name as the link (Small, 600, underline on
+hover and focus only), then one line: the tier in words (Measured, Modeled,
+Proxy, Synthetic), the Experimental badge where it applies, and "data as of"
+with the date in Data. The long source description and doc id live only in
+the full source list.
+
+### Evidence table
+- **Columns:** Source, Finding, Figure (Data, right aligned), Tier (the
+  tier square and the word), Data as of (Data), Cite (the number).
+- **Finding:** the finding sentence first in 600 ("This address is outside
+  the 2012 Sandy extent"), the dataset name after it in secondary ink. A
+  dataset name is never set as if it were the result.
+- **Order:** a first group "Behind the answer" holds the rows the answer
+  cites; then one group per Stone, headed with the Stone name and its role
+  ("Cornerstone, the hazard reader"). Sources that did not run are one line
+  after the table: "Not run for this question: ...".
+- **Rows:** 10px vertical padding, a Hairline between rows, no zebra, no
+  cell borders.
+
+### Map figure
+- **Question briefings:** Figure 1 at the text column width, 360px tall,
+  with a caption line under the frame.
+- **Place briefings:** sticky in the right column.
+- **Layer switches:** checkboxes labelled in words with counts ("Measured
+  (empirical), 12"). Never "EMP ON".
+- **Always:** the keyboard list "Map points as a list" and a "Skip the map"
+  link.
+
+### How this briefing was made
+One closed disclosure at the end: the checks, the mode line, the models
+(name, where it ran, how, latency), the trace, the model id once, the
+commit and snapshot time, and the disclaimer once.
+
+### Jump links
+One row under the meta line: Answer, Evidence, Map, Sources. Plain links
+in Small.
 
 ### Experimental badge
-- **Style:** Overpass Mono 10px uppercase, secondary ink, a 1px soft rule
-  border, 3px radius. Marks sources without an evaluation behind them.
+Small, secondary ink, a 1px Soft Rule border, 3px radius, sentence case.
 
 ### Evidence-tier mark
-- **Style:** a small square whose fill encodes the tier (solid empirical,
-  hatched modelled, hollow proxy, stippled synthetic); hue reinforces.
+A small square whose fill encodes the tier; used in the evidence table, the
+map legend and the tier key only.
+
+### Landing
+A front page at report restraint: the kind line, an h1 "Flood-exposure
+briefings for New York City" (Title scale raised to 56px on desktop, no
+accented word), one deck sentence, the query input (56px, labelled, a
+plain "Brief this place" button), the example queries as plain links, then
+the gallery as stories: the question (or place) as a 22 to 28px headline
+link, the answer's first sentence as the standfirst, the place and snapshot
+date as a byline. No stat row, no badge row, no numbered cards.
+
+### Gallery index
+The typographic list stays: place over question, snapshot date in Data,
+plus each entry's lead or first answer sentence in Small.
+
+### Print
+A's report structure: page one carries the title, the meta line, the answer
+and its source notes; the evidence table and source lists start on page
+two.
 
 ### Logo
-- **The dam mark**, `fill=currentColor`, PINNED. Never recoloured into a
-  seal-like or official-looking treatment.
+**The dam mark**, `fill=currentColor`, PINNED. Never recoloured into a
+seal-like or official-looking treatment.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep every numeric claim next to its citation mark.
-- **Do** carry evidence tier and severity by shape as well as colour.
+- **Do** keep every numeric claim next to its citation number.
+- **Do** carry evidence tier by shape and words as well as colour.
+- **Do** give a plain reading where a technical term appears (NAVD88 is an
+  elevation above a survey datum, not a depth).
 - **Do** measure contrast with the handoff gates (`node
   docs/design/handoff/gates/verify.mjs`).
-- **Do** make an omitted section read as intentional, not broken.
 
 ### Don't:
 - **Don't** add or swap a typeface, recolour the dam mark, or introduce a
   hue family.
 - **Don't** rename the Five Stones; add plain-language subtitles instead.
-- **Don't** use shadows or rounded card chrome on report content.
+- **Don't** use shadows, card chrome, side stripes or italic headlines.
+- **Don't** put machinery (telemetry, traces, model ids) above the answer.
 - **Don't** borrow seal-like or agency-branded treatments; Riprap is
   independent.

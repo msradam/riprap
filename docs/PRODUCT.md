@@ -2,10 +2,10 @@
 
 <!-- impeccable:product-schema 1 -->
 
-<!-- Written during the unattended Impeccable pass (2026-09-27). The owner
-     asked not to be interviewed; facts come from the design handoff
-     (docs/design/handoff/) and the owner's notes. Lines
-     marked (inferred) are the author's reading and await the owner. -->
+<!-- First written during the unattended Impeccable pass (2026-09-27) from
+     the design handoff. Confirmed and corrected by the owner in the pass 2
+     init interview (2026-09-29): readers, the five-second takeaway, tone,
+     print and where the machinery belongs. -->
 
 ## Platform
 
@@ -25,7 +25,9 @@ exposure at a New York City place:
 
 They already read government cartography and technical reports, and are
 professionally sceptical. It is not a resident-facing tool and not a
-real-estate or insurance tool.
+real-estate or insurance tool. Residents do land on briefings; they get a
+short pointer to FloodHelpNY near the answer, but the page is not written
+for them. (Confirmed by the owner, 2026-09-29.)
 
 ## Product Purpose
 
@@ -34,6 +36,10 @@ QN12) or a plain-language flood question into a briefing in which every
 number is cited to a public record, an agency report or a labelled model
 output. Success is a reader who can quote a sentence and show its source,
 and who can see what was not checked.
+
+In the first five seconds of a question briefing a reader should have the
+short answer (Yes, No, a count, or that the sources do not answer it) and
+the one figure behind it. (Owner, 2026-09-29.)
 
 ## Positioning
 
@@ -49,7 +55,10 @@ answer, it says so instead of guessing.
 - A single briefing streams in over 20 seconds to several minutes (the LLM
   path can take up to 300 s; the no-LLM path is faster).
 - Readers move between the on-screen briefing, its map and citations, and a
-  printed or PDF packet brought to a meeting or attached to a filing.
+  printed or PDF packet brought to a meeting or attached to a filing. On
+  paper, page one of a question briefing carries the question, the answer
+  and the answer's sources; evidence and source lists follow on later
+  pages. (Owner, 2026-09-29.)
 - A static gallery of precomputed briefings runs with no backend (GitHub
   Pages style).
 - Six city deployments exist (NYC production; Chicago, Seattle, San
@@ -83,6 +92,9 @@ answer, it says so instead of guessing.
   pinned (use and contrast may be rebalanced; no new hue family).
 - Taxonomy: the Five Stones names are pinned; plain-language subtitles may
   be added.
+- Voice: a public report. Restrained, precise and citable in a filing, in
+  the manner of an agency or research report rather than a newsroom
+  explainer or a technical data sheet. (Owner, 2026-09-29.)
 
 ## Evidence on Hand
 
@@ -104,7 +116,13 @@ answer, it says so instead of guessing.
    experimental labels are part of the answer, not fine print.
 4. Honest silence beats a plausible guess.
 5. A professional document: it has to hold up on paper and in a meeting.
-   (inferred from the print packet and audience)
+6. The answer first, the machinery last: the question and its answer lead;
+   how the briefing was made (checks, models, trace, the model id) is
+   recorded once, at the end, where a reader can open it. (Owner,
+   2026-09-29.)
+7. Show what was found: every source that found something is on the page,
+   the ones the answer cites first; sources that did not run are named in
+   one line, not shown as empty results. (Owner, 2026-09-29.)
 
 ## Accessibility & Inclusion
 
