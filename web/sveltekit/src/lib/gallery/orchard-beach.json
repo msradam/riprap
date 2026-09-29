@@ -1,7 +1,7 @@
 {
- "slug": "rockaway-park",
- "neighborhood": "Rockaway Park, Queens",
- "address": "116-02 Rockaway Beach Boulevard, Queens, NY",
+ "slug": "orchard-beach",
+ "neighborhood": "Orchard Beach, Bronx",
+ "address": "1 Orchard Beach Road, Bronx, NY",
  "question": null,
  "generated_at": "2026-09-29T17:40Z",
  "riprap_commit": "866eeb7",
@@ -1111,7 +1111,7 @@
   ]
  },
  "final": {
-  "query": "116-02 Rockaway Beach Boulevard, Queens, NY",
+  "query": "1 Orchard Beach Road, Bronx, NY",
   "intent": "single_address",
   "plan": {
    "intent": "single_address",
@@ -1119,30 +1119,30 @@
    "targets": [
     {
      "type": "address",
-     "text": "116-02 Rockaway Beach Boulevard, Queens, NY"
+     "text": "1 Orchard Beach Road, Bronx, NY"
     }
    ],
    "place": {
     "kind": "address",
-    "text": "116-02 Rockaway Beach Boulevard, Queens, NY",
+    "text": "1 Orchard Beach Road, Bronx, NY",
     "certain": true,
     "message": null
    }
   },
   "geocode": {
-   "address": "116-02 ROCKAWAY BEACH BOULEVARD, Rockaway Park, NY, USA",
-   "borough": "Queens",
-   "lat": 40.579807,
-   "lon": -73.837575,
-   "bbl": "4162120033",
-   "bin": "4304450",
+   "address": "1 ORCHARD BEACH ROAD, Bronx, Bronx County, NY, USA",
+   "borough": "Bronx",
+   "lat": 40.86932,
+   "lon": -73.80036,
+   "bbl": "2056500001",
+   "bin": "2000000",
    "match": "exact"
   },
-  "lat": 40.579807,
-  "lon": -73.837575,
+  "lat": 40.86932,
+  "lon": -73.80036,
   "nta": null,
   "policy_corpus": {
-   "query": "address 116-02 ROCKAWAY BEACH BOULEVARD, Rockaway Park, NY, USA; in Queens; inside Hurricane Sandy 2012 inundation zone; flood resilience plan, vulnerability, hardening, mitigation",
+   "query": "address 1 ORCHARD BEACH ROAD, Bronx, Bronx County, NY, USA; in Bronx; inside Hurricane Sandy 2012 inundation zone; flood resilience plan, vulnerability, hardening, mitigation",
    "rag_hits": [
     {
      "doc_id": "rag_nycha",
@@ -1151,16 +1151,16 @@
      "file": "nycha_lessons.pdf",
      "page": 3,
      "text": "Letter from the Vice President for Recovery & Resilience Dear New Yorkers, Hurricane Sandy devasted New York City in October 2012. Despite living in a city with 520 miles of coastline, residents had never grappled with storm surge at this scale. Salt water and debris covered huge swaths of the five boroughs, including many NYCHA campuses. Unlike prior major storms, the impacts didn\u2019t dissipate when the weather improved. Salt water corroded critical infrastructure that was stored below grade. The homes of tens of thousands of public housing residents\u2014most of whom couldn\u2019t evacuate before the storm\u2014were without water, power, heat, hot water, or elevator service for weeks.",
-     "score": 0.8147239685058594
+     "score": 0.8322340250015259
     },
     {
      "doc_id": "rag_mta",
      "title": "MTA Climate Resilience Roadmap (October 2025 update)",
      "citation": "MTA Climate Resilience Roadmap, October 2025 update",
      "file": "mta_resilience_2025.pdf",
-     "page": 14,
-     "text": "The Rockaway Line serves more than 100,000 residents of Broad Channel and the Rockaway Peninsula in addition to an estimated 1.7 million visitors. After Rockaway Line infrastructure was critically damaged during Superstorm Sandy, the MT A worked quickly to restore service in 2013. Additional coastal surge protections in 2019 and 2020 hardened the line\u2019s substation and protected the Hammels Wye Campus. In addition to repairs to the Rockaway and Hammels Wye Viaducts, which carry a and s trains to the Rockaways, the South Channel Bridge\u2019s mechanical and electrical components were overhauled.",
-     "score": 0.7612636089324951
+     "page": 6,
+     "text": "I. Urgent Call for Action 7 Climate Resilience Roadmap - 2025 Update6 Heavy rains flood Metro-North\u2019s Mott Haven Yard in the South Bronx, July 14, 2025. Heavy rain flooding inundates tracks at LIRR\u2019s Bayside Station in Eastern Queens, July 31, 2025. New Y ork City and the surrounding region are already facing extreme weather events in line with climate projections. In the last year, New Y ork City has been impacted by several extreme weather events that have strained both MT A and City infrastructure. Heavy rain On July 14, 2025, a heavy rainstorm inundated New Y ork City with over 2 inches falling in a single hour.",
+     "score": 0.7940075993537903
     }
    ],
    "entities": {
@@ -1205,69 +1205,64 @@
     "mta": {
      "rag_doc_id": "rag_mta",
      "title": "MTA Climate Resilience Roadmap (October 2025 update)",
-     "paragraph_excerpt": "The Rockaway Line serves more than 100,000 residents of Broad Channel and the Rockaway Peninsula in addition to an estimated 1.7 million visitors. After Rockaway Line infrastructure was critically damaged during Superstorm Sandy, the MT A w\u2026",
-     "n_entities": 11,
+     "paragraph_excerpt": "I. Urgent Call for Action 7 Climate Resilience Roadmap - 2025 Update6 Heavy rains flood Metro-North\u2019s Mott Haven Yard in the South Bronx, July 14, 2025. Heavy rain flooding inundates tracks at LIRR\u2019s Bayside Station in Eastern Queens, July \u2026",
+     "n_entities": 10,
      "entities": [
       {
-       "label": "agency",
-       "text": "The Rockaway Line",
-       "score": 0.644
+       "label": "nyc_location",
+       "text": "Metro-North\u2019s Mott Haven Yard",
+       "score": 0.68
       },
       {
        "label": "nyc_location",
-       "text": "the Rockaway Peninsula",
-       "score": 0.789
-      },
-      {
-       "label": "infrastructure_project",
-       "text": "Superstorm Sandy",
-       "score": 0.837
-      },
-      {
-       "label": "agency",
-       "text": "the MT A",
-       "score": 0.844
+       "text": "the South Bronx",
+       "score": 0.845
       },
       {
        "label": "date_range",
-       "text": "2013",
-       "score": 0.998
-      },
-      {
-       "label": "date_range",
-       "text": "2019",
-       "score": 0.999
-      },
-      {
-       "label": "date_range",
-       "text": "2020",
-       "score": 0.91
-      },
-      {
-       "label": "nyc_location",
-       "text": "the Hammels Wye Campus",
+       "text": "July 14, 2025",
        "score": 0.865
       },
       {
        "label": "nyc_location",
-       "text": "Hammels Wye Viaducts",
-       "score": 0.683
+       "text": "LIRR",
+       "score": 0.934
       },
       {
        "label": "nyc_location",
-       "text": "Rockaways",
-       "score": 0.885
+       "text": "Bayside Station",
+       "score": 0.739
       },
       {
        "label": "nyc_location",
-       "text": "the South Channel Bridge",
-       "score": 0.926
+       "text": "Eastern Queens",
+       "score": 0.912
+      },
+      {
+       "label": "date_range",
+       "text": "July 31, 2025",
+       "score": 0.856
+      },
+      {
+       "label": "nyc_location",
+       "text": "New Y ork City",
+       "score": 0.74
+      },
+      {
+       "label": "date_range",
+       "text": "the last year",
+       "score": 0.887
+      },
+      {
+       "label": "date_range",
+       "text": "a single hour",
+       "score": 0.845
       }
      ]
     }
    },
    "n_hits": 2,
-   "n_entities": 17
+   "n_entities": 16
   },
   "dep": {
    "dep_extreme_2080": {
@@ -1289,9 +1284,9 @@
     "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, current sea level, near-term)."
    }
   },
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThis address is inside the 2012 Sandy inundation footprint [sandy_inundation], in FEMA flood zone X (an area of minimal flood hazard) [fema_nfhl], and outside the modeled flooding in the DEP stormwater scenarios for current, 2050 and 2080 sea-level rise [dep_moderate_current][dep_moderate_2050][dep_extreme_2080]. 37 flood-related 311 complaints were filed within 200 m in the last 5 years [nyc311].\n\n**Hazard Reader.**\nThis address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone X (an area of minimal flood hazard), per NFHL FIRM panel 3604970379F, effective 2007 [fema_nfhl]. NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, outside the modeled flooding [dep_extreme_2080]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address [ida_hwm]. Nearest USGS-surveyed mark: Coney Island Ave., between Ave. P and Ave. O, Midwood, Brooklyn (11131 m away) [ida_hwm]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.06% of Breezy Point-Belle Harbor-Rockaway Park-Broad Channel showed new water (100% of it observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water]. Elevation 2.14 m; this point is higher than 54% of the ground within 200 m (the 54th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 2.14 m; TWI (topographic wetness index; higher means water tends to collect) 8.26 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 2.3 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 2 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\nNo FloodNet sensors deployed within 600 m of this address [floodnet]. 37 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 14 sewer backup, 11 street flooding, 10 catch basin, 2 manhole overflow [nyc311]. Latest METAR at JFK Airport, NY (8.5 km away): 21.0\u00b0C, observed 2026-09-29 17:10 UTC [nws_obs]. Latest reading at Sandy Hook, NJ: 3.52 ft above MLLW (+0.78 ft vs predicted tide), observed 2026-09-29 17:30 UTC [noaa_tides]. Nearest USGS stream gauge, Conselyeas Pond Tributary At Rosedale NY (01311810, 12.1 km away): stage 0.62 ft, discharge 2.97 ft\u00b3/s, observed 2026-09-29 17:00 UTC [usgs_gauges].\n\n**Asset Register.**\n1 MTA subway entrance within 800 m of this address: 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 0 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 4 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 4 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doe_school_exposure]. 0 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood / coastal / wind alerts at this point [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.23 m at The Battery about 13 h ahead [ttm_battery_surge]. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions. Experimental: 5 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.04 per week for the next 96 days [ttm_311_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThis address is outside the 2012 Sandy inundation footprint [sandy_inundation], in FEMA flood zone VE [fema_nfhl], and outside the modeled flooding in the DEP stormwater scenarios for current, 2050 and 2080 sea-level rise [dep_moderate_current][dep_moderate_2050][dep_extreme_2080]. 0 flood-related 311 complaints were filed within 200 m in the last 5 years [nyc311].\n\n**Hazard Reader.**\nThis address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone VE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970106F, effective 2007 [fema_nfhl]. NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, outside the modeled flooding [dep_extreme_2080]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address [ida_hwm]. Nearest USGS-surveyed mark: South of intersection of Grenada Pl. and Grace Ave. at Edenwald housing project, Edenwald, Bronx (4198 m away) [ida_hwm]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water]. Elevation 0.0 m; this point is higher than 0% of the ground within 200 m (the 0th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 0.0 m; TWI (topographic wetness index; higher means water tends to collect) 14.93 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 21.91 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 2 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\nNo FloodNet sensors deployed within 600 m of this address [floodnet]. 0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched) [nyc311]. Latest METAR at LaGuardia Airport, NY (12.0 km away): 22.0\u00b0C, observed 2026-09-29 17:25 UTC [nws_obs]. Latest reading at Kings Point, NY: 9.32 ft above MLLW (+0.25 ft vs predicted tide), observed 2026-09-29 17:30 UTC [noaa_tides]. Nearest USGS stream gauge, Bronx River At Ny Botanical Garden At Bronx NY (01302020, 6.3 km away): stage 0.81 ft, discharge 77.5 ft\u00b3/s, observed 2026-09-29 16:30 UTC [usgs_gauges].\n\n**Asset Register.**\n0 MTA subway entrances within 800 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 0 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 0 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doe_school_exposure]. 0 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood / coastal / wind alerts at this point [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.23 m at The Battery about 13 h ahead [ttm_battery_surge]. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions. Experimental: 0 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.0 per week for the next 96 days [ttm_311_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThis address is inside the 2012 Sandy inundation footprint [sandy_inundation], in FEMA flood zone X (an area of minimal flood hazard) [fema_nfhl], and outside the modeled flooding in the DEP stormwater scenarios for current, 2050 and 2080 sea-level rise [dep_moderate_current][dep_moderate_2050][dep_extreme_2080]. 37 flood-related 311 complaints were filed within 200 m in the last 5 years [nyc311].\n\n**Hazard Reader.**\nThis address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone X (an area of minimal flood hazard), per NFHL FIRM panel 3604970379F, effective 2007 [fema_nfhl]. NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, outside the modeled flooding [dep_extreme_2080]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address [ida_hwm]. Nearest USGS-surveyed mark: Coney Island Ave., between Ave. P and Ave. O, Midwood, Brooklyn (11131 m away) [ida_hwm]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.06% of Breezy Point-Belle Harbor-Rockaway Park-Broad Channel showed new water (100% of it observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water]. Elevation 2.14 m; this point is higher than 54% of the ground within 200 m (the 54th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 2.14 m; TWI (topographic wetness index; higher means water tends to collect) 8.26 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 2.3 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 2 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\nNo FloodNet sensors deployed within 600 m of this address [floodnet]. 37 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 14 sewer backup, 11 street flooding, 10 catch basin, 2 manhole overflow [nyc311]. Latest METAR at JFK Airport, NY (8.5 km away): 21.0\u00b0C, observed 2026-09-29 17:10 UTC [nws_obs]. Latest reading at Sandy Hook, NJ: 3.52 ft above MLLW (+0.78 ft vs predicted tide), observed 2026-09-29 17:30 UTC [noaa_tides]. Nearest USGS stream gauge, Conselyeas Pond Tributary At Rosedale NY (01311810, 12.1 km away): stage 0.62 ft, discharge 2.97 ft\u00b3/s, observed 2026-09-29 17:00 UTC [usgs_gauges].\n\n**Asset Register.**\n1 MTA subway entrance within 800 m of this address: 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 0 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 4 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 4 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doe_school_exposure]. 0 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood / coastal / wind alerts at this point [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.23 m at The Battery about 13 h ahead [ttm_battery_surge]. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions. Experimental: 5 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.04 per week for the next 96 days [ttm_311_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThis address is outside the 2012 Sandy inundation footprint [sandy_inundation], in FEMA flood zone VE [fema_nfhl], and outside the modeled flooding in the DEP stormwater scenarios for current, 2050 and 2080 sea-level rise [dep_moderate_current][dep_moderate_2050][dep_extreme_2080]. 0 flood-related 311 complaints were filed within 200 m in the last 5 years [nyc311].\n\n**Hazard Reader.**\nThis address sits outside the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone VE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970106F, effective 2007 [fema_nfhl]. NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, outside the modeled flooding [dep_extreme_2080]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address [ida_hwm]. Nearest USGS-surveyed mark: South of intersection of Grenada Pl. and Grace Ave. at Edenwald housing project, Edenwald, Bronx (4198 m away) [ida_hwm]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water]. Elevation 0.0 m; this point is higher than 0% of the ground within 200 m (the 0th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 0.0 m; TWI (topographic wetness index; higher means water tends to collect) 14.93 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 21.91 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 2 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\nNo FloodNet sensors deployed within 600 m of this address [floodnet]. 0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched) [nyc311]. Latest METAR at LaGuardia Airport, NY (12.0 km away): 22.0\u00b0C, observed 2026-09-29 17:25 UTC [nws_obs]. Latest reading at Kings Point, NY: 9.32 ft above MLLW (+0.25 ft vs predicted tide), observed 2026-09-29 17:30 UTC [noaa_tides]. Nearest USGS stream gauge, Bronx River At Ny Botanical Garden At Bronx NY (01302020, 6.3 km away): stage 0.81 ft, discharge 77.5 ft\u00b3/s, observed 2026-09-29 16:30 UTC [usgs_gauges].\n\n**Asset Register.**\n0 MTA subway entrances within 800 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 0 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 0 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doe_school_exposure]. 0 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood / coastal / wind alerts at this point [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.23 m at The Battery about 13 h ahead [ttm_battery_surge]. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions. Experimental: 0 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.0 per week for the next 96 days [ttm_311_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -1664,18 +1659,18 @@
   "not_checked": [],
   "deployment": "nyc",
   "sandy": {
-   "inside": true,
-   "inside_phrasing": "sits within",
-   "inside_or_outside": "inside"
+   "inside": false,
+   "inside_phrasing": "sits outside",
+   "inside_or_outside": "outside"
   },
   "fema_nfhl": {
-   "fld_zone": "X",
-   "zone_subty": "AREA OF MINIMAL FLOOD HAZARD",
-   "sfha": false,
-   "firm_panel": "3604970379F",
+   "fld_zone": "VE",
+   "zone_subty": null,
+   "sfha": true,
+   "firm_panel": "3604970106F",
    "effective_year": 2007,
    "effective_date": "2007-09-05",
-   "narrative": "This address sits in FEMA flood zone X (an area of minimal flood hazard), per NFHL FIRM panel 3604970379F, effective 2007."
+   "narrative": "This address sits in FEMA flood zone VE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970106F, effective 2007."
   },
   "dep_extreme_2080": {
    "depth_class": 0,
@@ -1700,13 +1695,13 @@
    "radius_m": 800,
    "max_elev_ft": null,
    "max_height_above_gnd_ft": null,
-   "nearest_dist_m": 11131.0,
-   "nearest_site": "Coney Island Ave., between Ave. P and Ave. O, Midwood, Brooklyn",
-   "nearest_elev_ft": 29.1,
+   "nearest_dist_m": 4198.0,
+   "nearest_site": "South of intersection of Grenada Pl. and Grace Ave. at Edenwald housing project, Edenwald, Bronx",
+   "nearest_elev_ft": 86.2,
    "vertical_datum": null,
    "sample_sites": [],
    "points": [],
-   "narrative": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address. Nearest USGS-surveyed mark: Coney Island Ave., between Ave. P and Ave. O, Midwood, Brooklyn (11131 m away)."
+   "narrative": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address. Nearest USGS-surveyed mark: South of intersection of Grenada Pl. and Grace Ave. at Edenwald housing project, Edenwald, Bronx (4198 m away)."
   },
   "prithvi_water": {
    "new_water_m2_within_radius": 0,
@@ -1717,24 +1712,21 @@
    "model": "msradam/Prithvi-EO-2.0-NYC-Pluvial",
    "rain_date": "2021-09-01",
    "batch_run": "2026-09-28",
-   "nta_name": "Breezy Point-Belle Harbor-Rockaway Park-Broad Channel",
-   "nta_frac_new_water": 0.00061,
-   "nta_frac_observed": 1.0,
-   "narrative": "Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.06% of Breezy Point-Belle Harbor-Rockaway Park-Broad Channel showed new water (100% of it observed). Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding.",
+   "narrative": "Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed). Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding.",
    "headline_value": "0 m\u00b2 new water within 500 m"
   },
   "microtopo": {
-   "point_elev_m": 2.14,
-   "rel_elev_pct_750m": 82.2,
-   "rel_elev_pct_200m": 54.0,
-   "basin_relief_m": 2.3,
-   "aoi_min_m": 0.0,
-   "aoi_max_m": 4.44,
+   "point_elev_m": 0.0,
+   "rel_elev_pct_750m": 2.2,
+   "rel_elev_pct_200m": 0.0,
+   "basin_relief_m": 21.91,
+   "aoi_min_m": -0.94,
+   "aoi_max_m": 21.91,
    "aoi_radius_m": 750,
    "resolution_m": 22,
-   "twi": 8.26,
-   "hand_m": 2.14,
-   "narrative": "Elevation 2.14 m; this point is higher than 54% of the ground within 200 m (the 54th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 2.14 m; TWI (topographic wetness index; higher means water tends to collect) 8.26. Local basin relief (the rise from this point to the highest ground within 750 m): 2.3 m."
+   "twi": 14.93,
+   "hand_m": 0.0,
+   "narrative": "Elevation 0.0 m; this point is higher than 0% of the ground within 200 m (the 0th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 0.0 m; TWI (topographic wetness index; higher means water tends to collect) 14.93. Local basin relief (the rise from this point to the highest ground within 750 m): 21.91 m."
   },
   "floodnet": {
    "n_sensors": 0,
@@ -1746,395 +1738,68 @@
    "radius_m": 600
   },
   "nyc311": {
-   "n": 37,
+   "n": 0,
    "capped": false,
    "radius_m": 200,
    "years": 5,
-   "by_year": {
-    "2022": 7,
-    "2023": 6,
-    "2024": 16,
-    "2025": 6,
-    "2026": 2
-   },
-   "by_descriptor": {
-    "Sewer Backup (Use Comments) (SA)": 14,
-    "Street Flooding (SJ)": 11,
-    "Catch Basin Clogged/Flooding (Use Comments) (SC)": 10,
-    "Manhole Overflow (Use Comments) (SA1)": 2
-   },
-   "by_kind": {
-    "sewer backup": 14,
-    "street flooding": 11,
-    "catch basin": 10,
-    "manhole overflow": 2
-   },
-   "most_recent": [
-    {
-     "date": "2026-03-27",
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "date": "2026-03-26",
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "date": "2025-10-15",
-     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-     "address": "116-16 ROCKAWAY BEACH BOULEVARD"
-    },
-    {
-     "date": "2025-08-21",
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "date": "2025-06-29",
-     "descriptor": "Street Flooding (SJ)",
-     "address": null
-    }
-   ],
-   "points": [
-    {
-     "lat": 40.57865401746152,
-     "lon": -73.83858040786546,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2026-03-27",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.57865401746152,
-     "lon": -73.83858040786546,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2026-03-26",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.579720231624705,
-     "lon": -73.83750504191076,
-     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-     "date": "2025-10-15",
-     "address": "116-16 ROCKAWAY BEACH BOULEVARD"
-    },
-    {
-     "lat": 40.57865401746152,
-     "lon": -73.83858040786546,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2025-08-21",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.57951247064039,
-     "lon": -73.8381031394337,
-     "descriptor": "Street Flooding (SJ)",
-     "date": "2025-06-29",
-     "address": null
-    },
-    {
-     "lat": 40.579124790193184,
-     "lon": -73.83570292500706,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2025-05-05",
-     "address": "150 BEACH  115 STREET"
-    },
-    {
-     "lat": 40.58070040940395,
-     "lon": -73.83770425803976,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2025-03-28",
-     "address": "260 BEACH  116 STREET"
-    },
-    {
-     "lat": 40.579124790193184,
-     "lon": -73.83570292500706,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2025-02-16",
-     "address": "150 BEACH  115 STREET"
-    },
-    {
-     "lat": 40.57918443523221,
-     "lon": -73.83905791719492,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2024-11-15",
-     "address": "118-03 ROCKAWAY BEACH BOULEVARD"
-    },
-    {
-     "lat": 40.57876115056274,
-     "lon": -73.83864134743914,
-     "descriptor": "Street Flooding (SJ)",
-     "date": "2024-10-18",
-     "address": "186 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.57868148567512,
-     "lon": -73.83859474110852,
-     "descriptor": "Manhole Overflow (Use Comments) (SA1)",
-     "date": "2024-10-18",
-     "address": "180 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.57868148567512,
-     "lon": -73.83859474110852,
-     "descriptor": "Street Flooding (SJ)",
-     "date": "2024-09-22",
-     "address": "180 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.57876115056274,
-     "lon": -73.83864134743914,
-     "descriptor": "Street Flooding (SJ)",
-     "date": "2024-09-21",
-     "address": "186 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.57868148567512,
-     "lon": -73.83859474110852,
-     "descriptor": "Street Flooding (SJ)",
-     "date": "2024-09-20",
-     "address": "180 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.580637258714106,
-     "lon": -73.83769001144613,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2024-07-29",
-     "address": "259 BEACH  116 STREET"
-    },
-    {
-     "lat": 40.57865401746152,
-     "lon": -73.83858040786546,
-     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-     "date": "2024-04-17",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.57865401746152,
-     "lon": -73.83858040786546,
-     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-     "date": "2024-04-17",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.57865401746152,
-     "lon": -73.83858040786546,
-     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-     "date": "2024-04-17",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.580637223110216,
-     "lon": -73.83766481144347,
-     "descriptor": "Manhole Overflow (Use Comments) (SA1)",
-     "date": "2024-03-27",
-     "address": "246 BEACH  116 STREET"
-    },
-    {
-     "lat": 40.57836693411735,
-     "lon": -73.83742913678356,
-     "descriptor": "Street Flooding (SJ)",
-     "date": "2024-03-23",
-     "address": "136 BEACH  117 STREET"
-    },
-    {
-     "lat": 40.57865401746152,
-     "lon": -73.83858040786546,
-     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-     "date": "2024-03-19",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.57865401746152,
-     "lon": -73.83858040786546,
-     "descriptor": "Street Flooding (SJ)",
-     "date": "2024-03-09",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.58001618960502,
-     "lon": -73.8352399348327,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2024-01-22",
-     "address": "198 BEACH  114 STREET"
-    },
-    {
-     "lat": 40.58001618960502,
-     "lon": -73.8352399348327,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2024-01-11",
-     "address": "198 B  114 STREET"
-    },
-    {
-     "lat": 40.57865401746152,
-     "lon": -73.83858040786546,
-     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-     "date": "2023-12-27",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.57865401746152,
-     "lon": -73.83858040786546,
-     "descriptor": "Street Flooding (SJ)",
-     "date": "2023-12-18",
-     "address": "178 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.57963574437674,
-     "lon": -73.83599686471673,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2023-07-04",
-     "address": "188 BEACH  115 STREET"
-    },
-    {
-     "lat": 40.57963574437674,
-     "lon": -73.83599686471673,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2023-04-21",
-     "address": "188 BEACH  115 STREET"
-    },
-    {
-     "lat": 40.579720231624705,
-     "lon": -73.83750504191076,
-     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-     "date": "2023-03-04",
-     "address": "116-16 ROCKAWAY BEACH BOULEVARD"
-    },
-    {
-     "lat": 40.579720231624705,
-     "lon": -73.83750504191076,
-     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-     "date": "2023-02-25",
-     "address": "116-16 ROCKAWAY BEACH BOULEVARD"
-    },
-    {
-     "lat": 40.578667786970044,
-     "lon": -73.83861277374557,
-     "descriptor": "Street Flooding (SJ)",
-     "date": "2022-12-23",
-     "address": "179 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.57951247064039,
-     "lon": -73.8381031394337,
-     "descriptor": "Street Flooding (SJ)",
-     "date": "2022-12-23",
-     "address": null
-    },
-    {
-     "lat": 40.57987644687149,
-     "lon": -73.83928664782272,
-     "descriptor": "Street Flooding (SJ)",
-     "date": "2022-12-23",
-     "address": "218 BEACH  118 STREET"
-    },
-    {
-     "lat": 40.579466037241446,
-     "lon": -73.83826524971904,
-     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-     "date": "2022-08-09",
-     "address": "117-06 ROCKAWAY BEACH BOULEVARD"
-    },
-    {
-     "lat": 40.579714772576814,
-     "lon": -73.8375266549706,
-     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-     "date": "2022-07-01",
-     "address": "116-16 ROCKAWAY BEACH BOULEVARD"
-    },
-    {
-     "lat": 40.580020667809464,
-     "lon": -73.83645311692547,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2022-04-09",
-     "address": "115-09 ROCKAWAY BEACH BOULEVARD"
-    },
-    {
-     "lat": 40.57970376283709,
-     "lon": -73.83750508197875,
-     "descriptor": "Sewer Backup (Use Comments) (SA)",
-     "date": "2022-01-25",
-     "address": "116-15 ROCKAWAY BEACH BOULEVARD"
-    }
-   ],
-   "headline_value": "37 calls",
-   "subhead_text": "14 sewer backup, 11 street flooding, 10 catch basin, 2 manhole overflow",
-   "narrative": "37 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 14 sewer backup, 11 street flooding, 10 catch basin, 2 manhole overflow.",
-   "histogram": [
-    7,
-    6,
-    16,
-    6,
-    2
-   ]
+   "by_year": {},
+   "by_descriptor": {},
+   "by_kind": {},
+   "most_recent": [],
+   "points": [],
+   "headline_value": "0 calls",
+   "subhead_text": "no flood-related calls",
+   "narrative": "0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched).",
+   "histogram": []
   },
   "nws_obs": {
-   "station_id": "KJFK",
-   "station_name": "JFK Airport, NY",
-   "distance_km": 8.5,
-   "obs_time": "2026-09-29T17:10:00+00:00",
-   "temp_c": 21.0,
+   "station_id": "KLGA",
+   "station_name": "LaGuardia Airport, NY",
+   "distance_km": 12.0,
+   "obs_time": "2026-09-29T17:25:00+00:00",
+   "temp_c": 22.0,
    "precip_last_hour_mm": null,
    "precip_last_3h_mm": null,
    "precip_last_6h_mm": null,
-   "narrative": "Latest METAR at JFK Airport, NY (8.5 km away): 21.0\u00b0C, observed 2026-09-29 17:10 UTC.",
+   "narrative": "Latest METAR at LaGuardia Airport, NY (12.0 km away): 22.0\u00b0C, observed 2026-09-29 17:25 UTC.",
    "error": null
   },
   "noaa_tides": {
-   "station_id": "8531680",
-   "station_name": "Sandy Hook, NJ",
-   "station_lat": 40.4669,
-   "station_lon": -74.0094,
-   "distance_km": 19.2,
+   "station_id": "8516945",
+   "station_name": "Kings Point, NY",
+   "station_lat": 40.8103,
+   "station_lon": -73.7649,
+   "distance_km": 7.2,
    "datum": "MLLW",
-   "observed_ft": 3.52,
-   "observed_ft_mllw": 3.52,
-   "predicted_ft_mllw": 2.74,
-   "residual_ft": 0.78,
+   "observed_ft": 9.32,
+   "observed_ft_mllw": 9.32,
+   "predicted_ft_mllw": 9.07,
+   "residual_ft": 0.25,
    "obs_time": "2026-09-29 17:30",
-   "narrative": "Latest reading at Sandy Hook, NJ: 3.52 ft above MLLW (+0.78 ft vs predicted tide), observed 2026-09-29 17:30 UTC.",
+   "narrative": "Latest reading at Kings Point, NY: 9.32 ft above MLLW (+0.25 ft vs predicted tide), observed 2026-09-29 17:30 UTC.",
    "error": null
   },
   "usgs_gauges": {
-   "site_no": "01311810",
-   "site_name": "Conselyeas Pond Tributary At Rosedale NY",
-   "distance_km": 12.1,
-   "stage_ft": 0.62,
-   "obs_time": "2026-09-29 17:00 UTC",
-   "n_gauges_in_area": 1,
-   "narrative": "Nearest USGS stream gauge, Conselyeas Pond Tributary At Rosedale NY (01311810, 12.1 km away): stage 0.62 ft, discharge 2.97 ft\u00b3/s, observed 2026-09-29 17:00 UTC.",
-   "discharge_cfs": 2.97
+   "site_no": "01302020",
+   "site_name": "Bronx River At Ny Botanical Garden At Bronx NY",
+   "distance_km": 6.3,
+   "stage_ft": 0.81,
+   "obs_time": "2026-09-29 16:30 UTC",
+   "n_gauges_in_area": 2,
+   "narrative": "Nearest USGS stream gauge, Bronx River At Ny Botanical Garden At Bronx NY (01302020, 6.3 km away): stage 0.81 ft, discharge 77.5 ft\u00b3/s, observed 2026-09-29 16:30 UTC.",
+   "discharge_cfs": 77.5
   },
   "mta_entrances": {
    "available": true,
-   "n_entrances": 1,
-   "n_checked": 1,
+   "n_entrances": 0,
+   "n_checked": 0,
    "radius_m": 800,
    "footprint_buffer_m": 8,
-   "n_inside_sandy_2012": 1,
-   "n_in_dep_extreme_2080": 1,
-   "narrative": "1 MTA subway entrance within 800 m of this address: 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+   "n_inside_sandy_2012": 0,
+   "n_in_dep_extreme_2080": 0,
+   "narrative": "0 MTA subway entrances within 800 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
    "n_ada_accessible": 0,
-   "entrances": [
-    {
-     "station_id": "203",
-     "station_name": "Rockaway Park-Beach 116 St",
-     "daytime_routes": "A S",
-     "borough": "Q",
-     "entrance_type": "Station House",
-     "entrance_lat": 40.5805473,
-     "entrance_lon": -73.8374145,
-     "distance_m": 83.4,
-     "ada_accessible": false,
-     "elevation_m": 1.27,
-     "hand_m": 1.27,
-     "inside_sandy_2012": true,
-     "dep_extreme_2080_class": 3,
-     "dep_extreme_2080_label": "Deep Contiguous (>4 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    }
-   ],
+   "entrances": [],
    "citation": "MTA Open Data subway entrances + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM"
   },
   "nycha_developments": {
@@ -2149,90 +1814,13 @@
   },
   "doe_schools": {
    "available": true,
-   "n_schools": 4,
+   "n_schools": 0,
    "radius_m": 1500,
    "footprint_buffer_m": 50,
-   "n_inside_sandy_2012": 4,
-   "n_in_dep_extreme_2080": 3,
-   "narrative": "4 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 4 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
-   "schools": [
-    {
-     "loc_code": "Q317",
-     "loc_name": "Waterside Children's Studio School",
-     "address": "190 BEACH 110 STREET",
-     "borough": "Queens",
-     "bin": "4303853",
-     "bbl": "4161810001",
-     "managed_by": "DOE-managed",
-     "school_lat": 40.58091,
-     "school_lon": -73.83109,
-     "distance_m": 561.1,
-     "elevation_m": 2.96,
-     "hand_m": null,
-     "inside_sandy_2012": true,
-     "dep_extreme_2080_class": 3,
-     "dep_extreme_2080_label": "Deep Contiguous (>4 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "loc_code": "Q323",
-     "loc_name": "Scholars' Academy",
-     "address": "320 BEACH 104TH STREET",
-     "borough": "Queens",
-     "bin": "4303722",
-     "bbl": "4161590012",
-     "managed_by": "DOE-managed",
-     "school_lat": 40.58454,
-     "school_lon": -73.82516,
-     "distance_m": 1173.1,
-     "elevation_m": 0.83,
-     "hand_m": null,
-     "inside_sandy_2012": true,
-     "dep_extreme_2080_class": 3,
-     "dep_extreme_2080_label": "Deep Contiguous (>4 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "loc_code": "Q996",
-     "loc_name": "ALC - Beach Channel Educational Complex",
-     "address": "100-00 BEACH CHANNEL DRIVE",
-     "borough": "Queens",
-     "bin": "4303773",
-     "bbl": "4161670099",
-     "managed_by": "DOE-managed",
-     "school_lat": 40.58601,
-     "school_lon": -73.82532,
-     "distance_m": 1244.1,
-     "elevation_m": 0.0,
-     "hand_m": null,
-     "inside_sandy_2012": true,
-     "dep_extreme_2080_class": 0,
-     "dep_extreme_2080_label": "outside",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "loc_code": "Q114",
-     "loc_name": "P.S./M.S. 114 Belle Harbor",
-     "address": "134-01 CRONSTON AVENUE",
-     "borough": "Queens",
-     "bin": "4305615",
-     "bbl": "4162570001",
-     "managed_by": "DOE-managed",
-     "school_lat": 40.57755,
-     "school_lon": -73.85436,
-     "distance_m": 1440.0,
-     "elevation_m": 0.86,
-     "hand_m": null,
-     "inside_sandy_2012": true,
-     "dep_extreme_2080_class": 3,
-     "dep_extreme_2080_label": "Deep Contiguous (>4 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    }
-   ],
+   "n_inside_sandy_2012": 0,
+   "n_in_dep_extreme_2080": 0,
+   "narrative": "0 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+   "schools": [],
    "citation": "Pre-computed from NYC DOE Locations Points joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. See data/registers/schools.json."
   },
   "doh_hospitals": {
@@ -2369,22 +1957,22 @@
    "skill_vs_persistence": "35% lower RMSE than persistence, a weak baseline, on mostly calm 2023-2024 test windows; not evaluated on storms or against NOAA ETSS",
    "spatial_note": "regional \u00b7 The Battery, NY, not point-of-query",
    "compute": "local CPU",
-   "elapsed_s": 0.14
+   "elapsed_s": 0.06
   },
   "ttm_311_forecast": {
    "available": true,
    "radius_m": 200,
    "days_context": 512,
    "days_horizon": 96,
-   "history_total_complaints": 5,
-   "history_mean_per_day": 0.01,
+   "history_total_complaints": 0,
+   "history_mean_per_day": 0.0,
    "history_recent_30d_mean": 0.0,
-   "history_weekly_equivalent": 0.07,
-   "forecast_total_next_horizon": 0.5,
-   "forecast_mean_per_day": 0.005,
-   "forecast_weekly_equivalent": 0.04,
-   "forecast_peak_day": 0.02,
-   "forecast_peak_day_offset": 5,
+   "history_weekly_equivalent": 0.0,
+   "forecast_total_next_horizon": 0.0,
+   "forecast_mean_per_day": 0.0,
+   "forecast_weekly_equivalent": 0.0,
+   "forecast_peak_day": 0.0,
+   "forecast_peak_day_offset": 69,
    "context_window_start": "2025-05-06",
    "context_window_end": "2026-09-29"
   },
@@ -2438,20 +2026,20 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790703645.030207,
+    "started_at": 1790703650.618237,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
-     "address": "116-02 ROCKAWAY BEACH BOULEVARD, Rockaway Park, NY, USA",
-     "borough": "Queens",
-     "lat": 40.579807,
-     "lon": -73.837575
+     "address": "1 ORCHARD BEACH ROAD, Bronx, Bronx County, NY, USA",
+     "borough": "Bronx",
+     "lat": 40.86932,
+     "lon": -73.80036
     }
    },
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790703645.033789,
+    "started_at": 1790703650.622118,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2463,35 +2051,35 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790703645.083393,
-    "elapsed_s": 0.04,
+    "started_at": 1790703650.67263,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "inside": {
-      "inside": true,
-      "inside_phrasing": "sits within",
-      "inside_or_outside": "inside"
+      "inside": false,
+      "inside_phrasing": "sits outside",
+      "inside_or_outside": "outside"
      }
     }
    },
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790703645.0849018,
-    "elapsed_s": 0.16,
+    "started_at": 1790703650.6741261,
+    "elapsed_s": 0.09,
     "err": null,
     "result": {
-     "zone": "X",
-     "sfha": false,
-     "panel": "3604970379F",
+     "zone": "VE",
+     "sfha": true,
+     "panel": "3604970106F",
      "vintage": 2007
     }
    },
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790703645.087646,
-    "elapsed_s": 0.03,
+    "started_at": 1790703650.676895,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2501,7 +2089,7 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790703645.0905159,
+    "started_at": 1790703650.6800158,
     "elapsed_s": 0.03,
     "err": null,
     "result": {
@@ -2512,8 +2100,8 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790703645.085665,
-    "elapsed_s": 0.04,
+    "started_at": 1790703650.674904,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2523,20 +2111,20 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790703645.109365,
-    "elapsed_s": 0.01,
+    "started_at": 1790703650.687747,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "n_within_800m": 0,
      "max_height_above_gnd_ft": null,
-     "nearest_m": 11131.0
+     "nearest_m": 4198.0
     }
    },
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790703645.108657,
-    "elapsed_s": 0.03,
+    "started_at": 1790703650.698621,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "new_water_m2_within_radius": 0,
@@ -2546,20 +2134,20 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790703645.0990632,
+    "started_at": 1790703650.699334,
     "elapsed_s": 0.01,
     "err": null,
     "result": {
-     "elev_m": 2.14,
-     "pct_200m": 54.0,
-     "relief_m": 2.3
+     "elev_m": 0.0,
+     "pct_200m": 0.0,
+     "relief_m": 21.91
     }
    },
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790703645.120393,
-    "elapsed_s": 0.12,
+    "started_at": 1790703650.699601,
+    "elapsed_s": 0.06,
     "err": null,
     "result": {
      "n_sensors": 0,
@@ -2569,21 +2157,21 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790703645.1223109,
-    "elapsed_s": 0.3,
+    "started_at": 1790703650.6983302,
+    "elapsed_s": 0.13,
     "err": null,
     "result": {
-     "n": 37
+     "n": 0
     }
    },
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790703645.12192,
-    "elapsed_s": 0.11,
+    "started_at": 1790703650.6998022,
+    "elapsed_s": 0.06,
     "err": null,
     "result": {
-     "station": "KJFK",
+     "station": "KLGA",
      "p1h_mm": null,
      "p6h_mm": null
     }
@@ -2591,43 +2179,43 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790703645.12211,
-    "elapsed_s": 0.12,
+    "started_at": 1790703650.704843,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {
-     "station": "8531680",
-     "observed_ft_mllw": 3.52,
-     "residual_ft": 0.78
+     "station": "8516945",
+     "observed_ft_mllw": 9.32,
+     "residual_ft": 0.25
     }
    },
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790703645.1225321,
-    "elapsed_s": 1.01,
+    "started_at": 1790703650.706604,
+    "elapsed_s": 1.06,
     "err": null,
     "result": {
-     "station": "01311810",
-     "stage_ft": 0.62,
-     "discharge_cfs": 2.97
+     "station": "01302020",
+     "stage_ft": 0.81,
+     "discharge_cfs": 77.5
     }
    },
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790703645.123731,
-    "elapsed_s": 0.12,
+    "started_at": 1790703650.706835,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
-     "n_entrances": 1,
-     "n_inside_sandy_2012": 1,
-     "n_in_dep_extreme_2080": 1
+     "n_entrances": 0,
+     "n_inside_sandy_2012": 0,
+     "n_in_dep_extreme_2080": 0
     }
    },
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790703645.127769,
+    "started_at": 1790703650.707254,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2639,19 +2227,19 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790703645.124944,
+    "started_at": 1790703650.714186,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
-     "n_schools": 4,
-     "n_inside_sandy_2012": 4,
-     "n_in_dep_extreme_2080": 3
+     "n_schools": 0,
+     "n_inside_sandy_2012": 0,
+     "n_in_dep_extreme_2080": 0
     }
    },
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790703645.1252391,
+    "started_at": 1790703650.7134469,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2663,7 +2251,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790703645.1247308,
+    "started_at": 1790703650.7137961,
     "elapsed_s": 0.14,
     "err": null,
     "result": {
@@ -2673,8 +2261,8 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790703645.1255732,
-    "elapsed_s": 0.14,
+    "started_at": 1790703650.7155552,
+    "elapsed_s": 0.06,
     "err": null,
     "result": {
      "context_h": 1024,
@@ -2687,11 +2275,11 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790703645.126552,
-    "elapsed_s": 0.35,
+    "started_at": 1790703650.7151942,
+    "elapsed_s": 0.24,
     "err": null,
     "result": {
-     "history_total": 5,
+     "history_total": 0,
      "history_recent_mean": null,
      "forecast_mean": null,
      "forecast_peak": null
@@ -2700,8 +2288,8 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790703645.12705,
-    "elapsed_s": 0.13,
+    "started_at": 1790703650.715418,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {
      "sensor_id": null,
@@ -2713,7 +2301,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790703645.127187,
+    "started_at": 1790703650.71591,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2721,7 +2309,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790703646.387655,
+    "started_at": 1790703652.013033,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2735,25 +2323,25 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790703646.387763,
-    "elapsed_s": 0.4575,
+    "started_at": 1790703652.01314,
+    "elapsed_s": 0.4661,
     "err": null,
     "result": {
      "n_hits": 2,
-     "n_entities": 17
+     "n_entities": 16
     }
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790703646.8453581,
+    "started_at": 1790703652.4792728,
     "ok": true,
     "result": {
-     "n_chars": 5114,
+     "n_chars": 4990,
      "n_citations": 22,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0302
+    "elapsed_s": 0.0304
    }
   ],
   "models": [
@@ -2763,7 +2351,7 @@
     "where": "Apple GPU (MPS), in the batch run",
     "how": "precomputed",
     "pebble": "prithvi_water",
-    "latency_s": 0.03,
+    "latency_s": 0.02,
     "detail": "batch output for the 2021-09-01 event: Sentinel-2 scenes of 2021-09-02 vs 2021-08-13, tiles 18TWK, 18TWL, 18TXK, 18TXL; batch run 2026-09-28"
    },
    {
@@ -2772,7 +2360,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "ttm_battery_surge",
-    "latency_s": 0.14
+    "latency_s": 0.06
    },
    {
     "name": "Granite TTM r2",
@@ -2780,7 +2368,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "ttm_311_forecast",
-    "latency_s": 0.35
+    "latency_s": 0.24
    },
    {
     "name": "Granite TTM r2",
@@ -2788,7 +2376,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "floodnet_forecast",
-    "latency_s": 0.13
+    "latency_s": 0.05
    },
    {
     "name": "Granite Embedding 278M",
@@ -2796,7 +2384,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "policy_corpus",
-    "latency_s": 0.4575
+    "latency_s": 0.4661
    },
    {
     "name": "Flair NER (OntoNotes, fast)",
@@ -2804,7 +2392,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "policy_corpus",
-    "latency_s": 0.4575
+    "latency_s": 0.4661
    }
   ],
   "compliance": {

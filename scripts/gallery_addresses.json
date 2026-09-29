@@ -13,6 +13,13 @@
   "feature_doc": "ida_hwm"
  },
  {
+  "slug": "gerritsen-beach",
+  "neighborhood": "Gerritsen Beach, Brooklyn",
+  "address": "35 Seba Avenue, Brooklyn, NY",
+  "reason": "Inside the Sandy extent, yet mapped in zone X's 0.2% annual chance, or 500-year, floodplain.",
+  "feature_doc": "fema_nfhl"
+ },
+ {
   "slug": "broad-channel",
   "neighborhood": "Broad Channel, Queens",
   "address": "20 West 12th Road, Queens, NY",
@@ -55,11 +62,11 @@
   "feature_doc": "nycha_development_exposure"
  },
  {
-  "slug": "hunts-point",
-  "neighborhood": "Hunts Point, Bronx",
-  "address": "355 Food Center Drive, Bronx, NY",
-  "reason": "What an empty result looks like: no 311 flood complaints within 200 m in five years and no FloodNet sensor nearby.",
-  "feature_doc": "nyc311"
+  "slug": "orchard-beach",
+  "neighborhood": "Orchard Beach, Bronx",
+  "address": "1 Orchard Beach Road, Bronx, NY",
+  "reason": "The Bronx shore: FEMA zone VE, the coastal high hazard area, though outside the mapped Sandy extent.",
+  "feature_doc": "fema_nfhl"
  },
  {
   "slug": "south-street-seaport",
@@ -67,6 +74,13 @@
   "address": "19 Fulton Street, Manhattan, NY",
   "reason": "Lower Manhattan's waterfront: inside the Sandy extent, zone AE and the DEP 2080 scenario.",
   "feature_doc": "sandy_inundation"
+ },
+ {
+  "slug": "inwood",
+  "neighborhood": "Inwood, Manhattan",
+  "address": "4970 Broadway, Manhattan, NY",
+  "reason": "Upper Manhattan: outside every flood map, with 4 Ida high-water marks within 800 m and 8 FloodNet flood events in three years.",
+  "feature_doc": "ida_hwm"
  },
  {
   "slug": "hollis-since-ida",
@@ -94,14 +108,21 @@
   "neighborhood": "Community district QN12, Queens",
   "address": "QN12",
   "question": "How many street flooding complaints has community district QN12 had?",
-  "reason": "A community district: complaints counted inside the district's outline."
+  "reason": "A community district: complaints counted inside its outline, approximated from 2020 neighborhood areas."
  },
  {
   "slug": "hunts-point-311",
   "neighborhood": "Hunts Point, Bronx",
   "address": "355 Food Center Drive, Bronx, NY",
-  "question": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 since Hurricane Ida?",
-  "reason": "An honest No: the 311 service answered and reported no flood complaints since Ida."
+  "question": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 since 2022?",
+  "reason": "An honest No: the 311 service answered and reported no flood complaints within 200 m since 2022."
+ },
+ {
+  "slug": "brooklyn-heights-sensors",
+  "neighborhood": "Brooklyn Heights, Brooklyn",
+  "address": "189 Atlantic Avenue, Brooklyn, NY",
+  "question": "Have the FloodNet sensors near 189 Atlantic Avenue, Brooklyn recorded flooding?",
+  "reason": "Honest silence: no FloodNet sensor is deployed within 600 m, so the sources cannot answer."
  },
  {
   "slug": "red-hook-buy",

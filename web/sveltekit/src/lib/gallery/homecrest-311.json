@@ -3,8 +3,8 @@
  "neighborhood": "Homecrest, Brooklyn",
  "address": "2017 East 17th Street, Brooklyn, NY 11229",
  "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
- "generated_at": "2026-09-29T16:36Z",
- "riprap_commit": "68d143a",
+ "generated_at": "2026-09-29T17:41Z",
+ "riprap_commit": "866eeb7",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -1172,7 +1172,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1861,
      "completion_tokens": 132,
-     "duration_s": 6.286,
+     "duration_s": 6.338,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1229,9 +1229,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 439,
+     "prompt_tokens": 446,
      "completion_tokens": 22,
-     "duration_s": 1.995,
+     "duration_s": 1.971,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1261,7 +1261,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-29T01:44:54+0000",
-    "retrieved_at": "2026-09-29T16:36Z",
+    "retrieved_at": "2026-09-29T17:41Z",
     "vintage": "2026-09-29T01:44:54+0000",
     "maturity": "production"
    }
@@ -1398,7 +1398,7 @@
    "firm_panel": "3604970352F",
    "effective_year": 2007,
    "effective_date": "2007-09-05",
-   "narrative": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970352F, effective 2007."
+   "narrative": "This address sits in FEMA flood zone X (an area of minimal flood hazard), per NFHL FIRM panel 3604970352F, effective 2007."
   },
   "dep_moderate_2050": {
    "depth_class": 0,
@@ -1735,8 +1735,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790699807.775456,
-    "elapsed_s": 0.01,
+    "started_at": 1790703686.984919,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "address": "2017 EAST 17 STREET, Brooklyn, NY, USA",
@@ -1748,7 +1748,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790699807.782104,
+    "started_at": 1790703687.004564,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1760,7 +1760,7 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790699807.818568,
+    "started_at": 1790703687.050095,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1770,7 +1770,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790699807.81857,
+    "started_at": 1790703687.050097,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1780,7 +1780,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790699807.81857,
+    "started_at": 1790703687.050097,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1790,7 +1790,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790699807.81857,
+    "started_at": 1790703687.050098,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1800,7 +1800,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790699807.818571,
+    "started_at": 1790703687.050098,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1810,7 +1810,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790699807.818571,
+    "started_at": 1790703687.050098,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1820,7 +1820,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790699807.818571,
+    "started_at": 1790703687.050098,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1830,7 +1830,7 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790699807.818571,
+    "started_at": 1790703687.050099,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1840,7 +1840,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790699807.818572,
+    "started_at": 1790703687.050099,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1850,7 +1850,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790699807.818572,
+    "started_at": 1790703687.050099,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1860,7 +1860,7 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790699807.818572,
+    "started_at": 1790703687.050099,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1870,7 +1870,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790699807.818572,
+    "started_at": 1790703687.050099,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1880,7 +1880,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790699807.818573,
+    "started_at": 1790703687.0500998,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1890,7 +1890,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790699807.818573,
+    "started_at": 1790703687.0500998,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1900,7 +1900,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790699807.818573,
+    "started_at": 1790703687.0500998,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1910,7 +1910,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790699807.8185742,
+    "started_at": 1790703687.0500998,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1920,7 +1920,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790699807.8185742,
+    "started_at": 1790703687.050101,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1930,8 +1930,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790699807.854997,
-    "elapsed_s": 0.03,
+    "started_at": 1790703687.079245,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "inside": {
@@ -1944,8 +1944,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790699807.854665,
-    "elapsed_s": 0.04,
+    "started_at": 1790703687.08608,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "zone": "X",
@@ -1957,8 +1957,8 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790699807.856081,
-    "elapsed_s": 0.03,
+    "started_at": 1790703687.0810728,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -1968,8 +1968,8 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790699807.863355,
-    "elapsed_s": 0.0,
+    "started_at": 1790703687.079168,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "n_within_800m": 0,
@@ -1980,8 +1980,8 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790699807.863117,
-    "elapsed_s": 0.1,
+    "started_at": 1790703687.085857,
+    "elapsed_s": 0.07,
     "err": null,
     "result": {
      "n_sensors": 0,
@@ -1991,8 +1991,8 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790699807.8638332,
-    "elapsed_s": 0.53,
+    "started_at": 1790703687.085516,
+    "elapsed_s": 0.36,
     "err": null,
     "result": {
      "n": 34
@@ -2001,7 +2001,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790699808.662805,
+    "started_at": 1790703687.6972952,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2012,7 +2012,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790699808.663029,
+    "started_at": 1790703687.697485,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -2022,7 +2022,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 2.04
+    "elapsed_s": 2.0
    }
   ],
   "models": [
@@ -2031,7 +2031,7 @@
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 8.29,
+    "latency_s": 8.31,
     "calls": 2
    }
   ],
@@ -2046,11 +2046,11 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 8.281,
+   "total_duration_s": 8.309,
    "tokens": {
-    "prompt": 2300,
+    "prompt": 2307,
     "completion": 154,
-    "total": 2454
+    "total": 2461
    },
    "calls": [
     {
@@ -2059,7 +2059,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1861,
      "completion_tokens": 132,
-     "duration_s": 6.286,
+     "duration_s": 6.338,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -2068,9 +2068,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 439,
+     "prompt_tokens": 446,
      "completion_tokens": 22,
-     "duration_s": 1.995,
+     "duration_s": 1.971,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"

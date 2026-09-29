@@ -1,8 +1,8 @@
 {
- "slug": "hunts-point-311",
- "neighborhood": "Hunts Point, Bronx",
- "address": "355 Food Center Drive, Bronx, NY",
- "question": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 since 2022?",
+ "slug": "brooklyn-heights-sensors",
+ "neighborhood": "Brooklyn Heights, Brooklyn",
+ "address": "189 Atlantic Avenue, Brooklyn, NY",
+ "question": "Have the FloodNet sensors near 189 Atlantic Avenue, Brooklyn recorded flooding?",
  "generated_at": "2026-09-29T17:42Z",
  "riprap_commit": "866eeb7",
  "mode": "llm",
@@ -1111,25 +1111,25 @@
   ]
  },
  "final": {
-  "query": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 since 2022?",
+  "query": "Have the FloodNet sensors near 189 Atlantic Avenue, Brooklyn recorded flooding?",
   "intent": "single_address",
   "plan": {
    "intent": "single_address",
    "targets": [
     {
      "type": "address",
-     "text": "355 Food Center Drive, Bronx"
+     "text": "189 Atlantic Avenue, Brooklyn"
     }
    ],
-   "rationale": "The question asks for past flood-related 311 complaints near a specific address, which requires the nyc311 source.",
-   "question": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 since 2022?",
+   "rationale": "The question asks about past flooding events recorded by FloodNet sensors near a specific address.",
+   "question": "Have the FloodNet sensors near 189 Atlantic Avenue, Brooklyn recorded flooding?",
    "focus": {
     "hazard": "flood",
     "time_frame": "past",
     "assets": []
    },
    "pebbles": [
-    "nyc311"
+    "floodnet"
    ],
    "catalog": [
     "area_boundary",
@@ -1170,9 +1170,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1859,
-     "completion_tokens": 127,
-     "duration_s": 6.103,
+     "prompt_tokens": 1854,
+     "completion_tokens": 115,
+     "duration_s": 5.662,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1180,16 +1180,16 @@
    ]
   },
   "geocode": {
-   "address": "355 FOOD CENTER DRIVE, Bronx, NY, USA",
-   "borough": "Bronx",
-   "lat": 40.807808,
-   "lon": -73.872917,
-   "bbl": "2027810460",
-   "bin": "2109483",
+   "address": "189 ATLANTIC AVENUE, Brooklyn, NY, USA",
+   "borough": "Brooklyn",
+   "lat": 40.690135,
+   "lon": -73.993242,
+   "bbl": "3002760007",
+   "bin": "3002767",
    "match": "exact"
   },
-  "lat": 40.807808,
-  "lon": -73.872917,
+  "lat": 40.690135,
+  "lon": -73.993242,
   "nta": null,
   "policy_corpus": null,
   "dep": {
@@ -1200,9 +1200,9 @@
     "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR)."
    }
   },
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nNo. 0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched) [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThe sources consulted do not answer this question directly. Here is what they show.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nNo. 0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched) [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nThe sources consulted do not answer this question directly. Here is what they show.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
    "dropped": [],
    "tier": "llm"
   },
@@ -1210,62 +1210,38 @@
    "tier": "llm",
    "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
    "attempts": 1,
-   "claims": [
-    {
-     "section": "answer",
-     "text": "0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched).",
-     "doc_ids": [
-      "nyc311"
-     ],
-     "numbers": []
-    }
-   ],
+   "claims": [],
    "dropped_claims": [],
    "retried_claims": [],
-   "n_kept": 1,
+   "n_kept": 0,
    "n_dropped": 0,
    "llm_calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 457,
-     "completion_tokens": 28,
-     "duration_s": 2.003,
+     "prompt_tokens": 441,
+     "completion_tokens": 45,
+     "duration_s": 2.893,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
     }
    ],
-   "question": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 since 2022?",
+   "question": "Have the FloodNet sensors near 189 Atlantic Avenue, Brooklyn recorded flooding?",
    "n_documents": 6,
    "answer_mode": "extractive",
-   "answer_lead": "no",
-   "lead_fact": {
-    "doc_id": "nyc311",
-    "in_lead": false
-   },
+   "answer_lead": "cannot_answer",
+   "lead_fact": null,
    "answer_flags": [],
    "checks": [
     "citations and numbers on every claim",
     "lead rules on the answer; no entailment check needed, since the answer is the cited text word for word"
    ],
    "entailment": {},
-   "answered": true
+   "answered": false
   },
-  "citations": {
-   "nyc311": {
-    "doc_id": "nyc311",
-    "source": "NYC 311 Service Requests (NYC Open Data)",
-    "title": "NYC 311 Service Requests, flood-related complaints (5-year window).",
-    "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
-    "license": "NYC Open Data Terms of Use",
-    "date_modified": "2026-09-29T01:44:54+0000",
-    "retrieved_at": "2026-09-29T17:42Z",
-    "vintage": "2026-09-29T01:44:54+0000",
-    "maturity": "production"
-   }
-  },
+  "citations": {},
   "consulted": [
    {
     "id": "sandy",
@@ -1393,12 +1369,12 @@
   },
   "fema_nfhl": {
    "fld_zone": "X",
-   "zone_subty": "0.2 PCT ANNUAL CHANCE FLOOD HAZARD",
+   "zone_subty": "AREA OF MINIMAL FLOOD HAZARD",
    "sfha": false,
-   "firm_panel": "3604970111F",
+   "firm_panel": "3604970203F",
    "effective_year": 2007,
    "effective_date": "2007-09-05",
-   "narrative": "This address sits in FEMA flood zone X (the 0.2% annual chance, or 500-year, floodplain), per NFHL FIRM panel 3604970111F, effective 2007."
+   "narrative": "This address sits in FEMA flood zone X (an area of minimal flood hazard), per NFHL FIRM panel 3604970203F, effective 2007."
   },
   "dep_moderate_2050": {
    "depth_class": 0,
@@ -1411,13 +1387,13 @@
    "radius_m": 800,
    "max_elev_ft": null,
    "max_height_above_gnd_ft": null,
-   "nearest_dist_m": 1700.0,
-   "nearest_site": "Near intersection of Fteley Ave. and Story Ave., in basement of 43rd NYC Police Precinct, Soundview, Bronx",
-   "nearest_elev_ft": 8.6,
+   "nearest_dist_m": 1417.0,
+   "nearest_site": "Intersection of Carroll St. and Nevins St., Gowanus, Brooklyn",
+   "nearest_elev_ft": 10.7,
    "vertical_datum": null,
    "sample_sites": [],
    "points": [],
-   "narrative": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address. Nearest USGS-surveyed mark: Near intersection of Fteley Ave. and Story Ave., in basement of 43rd NYC Police Precinct, Soundview, Bronx (1700 m away)."
+   "narrative": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address. Nearest USGS-surveyed mark: Intersection of Carroll St. and Nevins St., Gowanus, Brooklyn (1417 m away)."
   },
   "floodnet": {
    "n_sensors": 0,
@@ -1429,38 +1405,241 @@
    "radius_m": 600
   },
   "nyc311": {
-   "n": 0,
+   "n": 22,
    "capped": false,
    "radius_m": 200,
    "years": 5,
-   "by_year": {},
-   "by_descriptor": {},
-   "by_kind": {},
-   "most_recent": [],
-   "points": [],
-   "headline_value": "0 calls",
-   "subhead_text": "no flood-related calls",
-   "narrative": "0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched).",
-   "histogram": []
+   "by_year": {
+    "2022": 6,
+    "2023": 5,
+    "2024": 8,
+    "2025": 2,
+    "2026": 1
+   },
+   "by_descriptor": {
+    "Catch Basin Clogged/Flooding (Use Comments) (SC)": 10,
+    "Sewer Backup (Use Comments) (SA)": 9,
+    "Street Flooding (SJ)": 2,
+    "Manhole Overflow (Use Comments) (SA1)": 1
+   },
+   "by_kind": {
+    "catch basin": 10,
+    "sewer backup": 9,
+    "street flooding": 2,
+    "manhole overflow": 1
+   },
+   "most_recent": [
+    {
+     "date": "2026-03-27",
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "address": "137 COURT STREET"
+    },
+    {
+     "date": "2025-06-10",
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "address": "199 CLINTON STREET"
+    },
+    {
+     "date": "2025-01-16",
+     "descriptor": "Manhole Overflow (Use Comments) (SA1)",
+     "address": "139 PACIFIC STREET"
+    },
+    {
+     "date": "2024-05-10",
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "address": "169 ATLANTIC AVENUE"
+    },
+    {
+     "date": "2024-04-03",
+     "descriptor": "Street Flooding (SJ)",
+     "address": "125 COURT STREET"
+    }
+   ],
+   "points": [
+    {
+     "lat": 40.689607165501144,
+     "lon": -73.99239157232373,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-03-27",
+     "address": "137 COURT STREET"
+    },
+    {
+     "lat": 40.689678655275635,
+     "lon": -73.99462000651336,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2025-06-10",
+     "address": "199 CLINTON STREET"
+    },
+    {
+     "lat": 40.68976926296644,
+     "lon": -73.99531233174558,
+     "descriptor": "Manhole Overflow (Use Comments) (SA1)",
+     "date": "2025-01-16",
+     "address": "139 PACIFIC STREET"
+    },
+    {
+     "lat": 40.69016445186255,
+     "lon": -73.99405744379067,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2024-05-10",
+     "address": "169 ATLANTIC AVENUE"
+    },
+    {
+     "lat": 40.69011218692611,
+     "lon": -73.99214991824358,
+     "descriptor": "Street Flooding (SJ)",
+     "date": "2024-04-03",
+     "address": "125 COURT STREET"
+    },
+    {
+     "lat": 40.688805719309414,
+     "lon": -73.99280633612756,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2024-04-03",
+     "address": "150 COURT STREET"
+    },
+    {
+     "lat": 40.689689506687856,
+     "lon": -73.99236271577318,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2024-04-03",
+     "address": null
+    },
+    {
+     "lat": 40.689689506687856,
+     "lon": -73.99236271577318,
+     "descriptor": "Street Flooding (SJ)",
+     "date": "2024-04-02",
+     "address": null
+    },
+    {
+     "lat": 40.689689506687856,
+     "lon": -73.99236271577318,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2024-03-23",
+     "address": null
+    },
+    {
+     "lat": 40.689689506687856,
+     "lon": -73.99236271577318,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2024-03-09",
+     "address": null
+    },
+    {
+     "lat": 40.69004631466083,
+     "lon": -73.99218237922172,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2024-03-09",
+     "address": "127 COURT STREET"
+    },
+    {
+     "lat": 40.69052942708549,
+     "lon": -73.99268354820809,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2023-07-03",
+     "address": "169 STATE STREET"
+    },
+    {
+     "lat": 40.689972283456314,
+     "lon": -73.99342282082003,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2023-05-03",
+     "address": "180 ATLANTIC AVENUE"
+    },
+    {
+     "lat": 40.68954403769603,
+     "lon": -73.99242042661893,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2023-04-27",
+     "address": "139 COURT STREET"
+    },
+    {
+     "lat": 40.69004631466083,
+     "lon": -73.99218237922172,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2023-04-25",
+     "address": "127 COURT STREET"
+    },
+    {
+     "lat": 40.69004631466083,
+     "lon": -73.99218237922172,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2023-04-03",
+     "address": "127 COURT STREET"
+    },
+    {
+     "lat": 40.68992280562386,
+     "lon": -73.99226532956285,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2022-12-23",
+     "address": "122 COURT STREET"
+    },
+    {
+     "lat": 40.69052942708549,
+     "lon": -73.99268354820809,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2022-09-26",
+     "address": "169 STATE STREET"
+    },
+    {
+     "lat": 40.688583449075374,
+     "lon": -73.9937691179291,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2022-09-25",
+     "address": "195 AMITY STREET"
+    },
+    {
+     "lat": 40.69052942708549,
+     "lon": -73.99268354820809,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2022-09-21",
+     "address": "169 STATE STREET"
+    },
+    {
+     "lat": 40.691366610408444,
+     "lon": -73.99314862841518,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2022-09-14",
+     "address": "12 SCHERMERHORN STREET"
+    },
+    {
+     "lat": 40.689307899920784,
+     "lon": -73.99119085052254,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2022-08-01",
+     "address": "249 ATLANTIC AVENUE"
+    }
+   ],
+   "headline_value": "22 calls",
+   "subhead_text": "10 catch basin, 9 sewer backup, 2 street flooding, 1 manhole overflow",
+   "narrative": "22 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 10 catch basin, 9 sewer backup, 2 street flooding, 1 manhole overflow.",
+   "histogram": [
+    6,
+    5,
+    8,
+    2,
+    1
+   ]
   },
   "trace": [
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790703725.768799,
-    "elapsed_s": 0.01,
+    "started_at": 1790703742.0371258,
+    "elapsed_s": 0.13,
     "err": null,
     "result": {
-     "address": "355 FOOD CENTER DRIVE, Bronx, NY, USA",
-     "borough": "Bronx",
-     "lat": 40.807808,
-     "lon": -73.872917
+     "address": "189 ATLANTIC AVENUE, Brooklyn, NY, USA",
+     "borough": "Brooklyn",
+     "lat": 40.690135,
+     "lon": -73.993242
     }
    },
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790703725.7747421,
+    "started_at": 1790703742.1709409,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1472,7 +1651,7 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790703725.8006,
+    "started_at": 1790703742.219143,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1482,7 +1661,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790703725.800601,
+    "started_at": 1790703742.2191439,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1492,7 +1671,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790703725.800601,
+    "started_at": 1790703742.2191439,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1502,7 +1681,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790703725.800601,
+    "started_at": 1790703742.219145,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1512,7 +1691,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790703725.800601,
+    "started_at": 1790703742.219145,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1522,7 +1701,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790703725.8006022,
+    "started_at": 1790703742.219145,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1532,7 +1711,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790703725.8006022,
+    "started_at": 1790703742.219145,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1542,7 +1721,7 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790703725.8006022,
+    "started_at": 1790703742.219145,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1552,7 +1731,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790703725.8006022,
+    "started_at": 1790703742.219145,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1562,7 +1741,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790703725.8006022,
+    "started_at": 1790703742.219146,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1572,7 +1751,7 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790703725.8006022,
+    "started_at": 1790703742.219146,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1582,7 +1761,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790703725.800603,
+    "started_at": 1790703742.219146,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1592,7 +1771,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790703725.800603,
+    "started_at": 1790703742.219146,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1602,7 +1781,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790703725.800603,
+    "started_at": 1790703742.219146,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1612,7 +1791,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790703725.800603,
+    "started_at": 1790703742.219146,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1622,7 +1801,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790703725.800603,
+    "started_at": 1790703742.219147,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1632,7 +1811,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790703725.800603,
+    "started_at": 1790703742.219147,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1642,8 +1821,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790703725.8297842,
-    "elapsed_s": 0.03,
+    "started_at": 1790703742.2539918,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "inside": {
@@ -1656,21 +1835,21 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790703725.830027,
-    "elapsed_s": 0.04,
+    "started_at": 1790703742.2559419,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "zone": "X",
      "sfha": false,
-     "panel": "3604970111F",
+     "panel": "3604970203F",
      "vintage": 2007
     }
    },
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790703725.83587,
-    "elapsed_s": 0.02,
+    "started_at": 1790703742.247689,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -1680,20 +1859,20 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790703725.837429,
+    "started_at": 1790703742.258014,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
      "n_within_800m": 0,
      "max_height_above_gnd_ft": null,
-     "nearest_m": 1700.0
+     "nearest_m": 1417.0
     }
    },
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790703725.837872,
-    "elapsed_s": 0.07,
+    "started_at": 1790703742.2587578,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "n_sensors": 0,
@@ -1703,17 +1882,17 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790703725.838457,
-    "elapsed_s": 8.16,
+    "started_at": 1790703742.2589262,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
-     "n": 0
+     "n": 22
     }
    },
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790703734.252558,
+    "started_at": 1790703742.538369,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1724,17 +1903,17 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790703734.252738,
+    "started_at": 1790703742.538614,
     "ok": true,
     "result": {
      "tier": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "attempts": 1,
-     "kept": 1,
+     "kept": 0,
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 2.05
+    "elapsed_s": 3.13
    }
   ],
   "models": [
@@ -1743,7 +1922,7 @@
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 8.1,
+    "latency_s": 8.55,
     "calls": 2
    }
   ],
@@ -1758,20 +1937,20 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 8.106,
+   "total_duration_s": 8.555,
    "tokens": {
-    "prompt": 2316,
-    "completion": 155,
-    "total": 2471
+    "prompt": 2295,
+    "completion": 160,
+    "total": 2455
    },
    "calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1859,
-     "completion_tokens": 127,
-     "duration_s": 6.103,
+     "prompt_tokens": 1854,
+     "completion_tokens": 115,
+     "duration_s": 5.662,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1780,9 +1959,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 457,
-     "completion_tokens": 28,
-     "duration_s": 2.003,
+     "prompt_tokens": 441,
+     "completion_tokens": 45,
+     "duration_s": 2.893,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
