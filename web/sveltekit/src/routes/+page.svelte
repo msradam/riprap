@@ -1,48 +1,29 @@
 <script lang="ts">
-  /** v0.4.5 marketing landing page at `/`.
-   *
-   *  Per docs/design_handoff/README.md §"Landing page": four-section
-   *  vertical scroll inside a 1200px-max paper-background frame:
-   *
-   *    1. Header (wordmark · context · nav)
-   *    2. Hero (italic-serif headline · deck · query box · cycling examples)
-   *    3. "What you'll get back" preview (excerpt · evidence cards · mini map)
-   *    4. Five Stones strip (5-cell explanation grid with oversized numerals)
-   *    5. Footer (tier legend + build line)
-   *
-   *  Cold-start (the analyst's "ready to query" page) lives at /app.
-   *  Live briefings render at /q/<query>; CityPicker on this page
-   *  links each of the five shipped cities directly to its canonical
-   *  anchor address so first-time visitors can see a real briefing
-   *  without typing.
-   */
+  /** Landing at `/`: a front page at report restraint (docs/DESIGN.md,
+   *  "Landing"). The query box and examples, the gallery as stories, what
+   *  a briefing contains, then the cities, bring-your-own-data and
+   *  responsible use as quiet sections. Live briefings render at /q/<query>. */
+  import { onMount } from 'svelte';
   import SkipLink from '$lib/components/shell/SkipLink.svelte';
-  import PhaseBanner from '$lib/components/landing/PhaseBanner.svelte';
   import LandHeader from '$lib/components/landing/LandHeader.svelte';
   import LandHero from '$lib/components/landing/LandHero.svelte';
-  import CityPicker from '$lib/components/landing/CityPicker.svelte';
-  import SourceStrip from '$lib/components/landing/SourceStrip.svelte';
-  import UseBand from '$lib/components/landing/UseBand.svelte';
-  import StandardsStrip from '$lib/components/landing/StandardsStrip.svelte';
+  import LandStories from '$lib/components/landing/LandStories.svelte';
   import LandStones from '$lib/components/landing/LandStones.svelte';
+  import CityPicker from '$lib/components/landing/CityPicker.svelte';
+  import UseBand from '$lib/components/landing/UseBand.svelte';
   import LandFooter from '$lib/components/landing/LandFooter.svelte';
   import { byodRegistry } from '$lib/stores/byodRegistry.svelte';
   import { STATIC_SITE } from '$lib/staticSite';
+  import type { PageProps } from './$types';
 
-  // LandPreview was removed: its "Briefing excerpt" pane fabricated
-  // citation chrome around numbers no one had queried (a `4.7 ft Sandy
-  // HWM` claim with a `[c1] USGS HWM · Sandy 2012` chip, all
-  // synthetic). LandStones below is the structural explainer for
-  // "what you'll get back" and contains no fabricated data.
+  let { data }: PageProps = $props();
 
   let byodOpen = $state(false);
 
-  // Load BYOD registry on mount so the trigger badge shows how many
-  // user pebbles are already stored in this browser.
-  $effect(() => {
-    if (!STATIC_SITE && typeof window !== 'undefined' && !byodRegistry.loaded) {
-      void byodRegistry.load();
-    }
+  // Load the BYOD registry so the trigger can say how many files are
+  // already stored in this browser.
+  onMount(() => {
+    if (!STATIC_SITE && !byodRegistry.loaded) void byodRegistry.load();
   });
 </script>
 
@@ -52,37 +33,27 @@
 </svelte:head>
 
 <SkipLink />
-<PhaseBanner />
 
 <div class="land">
   <LandHeader />
   <div class="land-page" id="main-content">
     <LandHero />
-    <div class="land-trust">
-      <!-- City samples and BYOD both run a live briefing: not on the static site. -->
-      {#if !STATIC_SITE}
-        <CityPicker />
-      {/if}
-      <SourceStrip />
-      {#if !STATIC_SITE}
-        <div class="land-byod-row">
-          <button
-            type="button"
-            class="land-byod-trigger"
-            onclick={() => (byodOpen = true)}
-          >
-            + Bring your own data
-            {#if byodRegistry.entries.length > 0}
-              <span class="land-byod-badge">{byodRegistry.entries.length}</span>
-            {/if}
-          </button>
-          <span class="land-byod-note">Files stay in your browser. No upload.</span>
-        </div>
-      {/if}
-      <UseBand />
-      <StandardsStrip />
-    </div>
+    <LandStories stories={data.stories} />
+    <LandStones />
+    <!-- City samples and BYOD both run a live briefing: not on the static site. -->
+    {#if !STATIC_SITE}
+      <CityPicker />
+      <section class="land-byod" aria-labelledby="byod-h">
+        <h2 id="byod-h">Your own data</h2>
+        <p>Files stay in your browser. No upload.</p>
+        <button type="button" onclick={() => (byodOpen = true)}>
+          Bring your own data{#if byodRegistry.entries.length > 0}&nbsp;({byodRegistry.entries.length} saved){/if}
+        </button>
+      </section>
+    {/if}
+    <UseBand />
   </div>
+  <LandFooter />
 
   <!-- Loaded on first open: it brings js-yaml and papaparse, which the
        landing's first view does not need. -->
@@ -91,72 +62,57 @@
       <ByodDialog open onClose={() => (byodOpen = false)} />
     {/await}
   {/if}
-  <LandStones />
-  <LandFooter />
 </div>
 
 <style>
   .land {
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
     background: var(--paper);
     color: var(--ink);
+    font-family: var(--font-sans);
   }
-  .land-page { max-width: 1200px; margin: 0 auto; width: 100%; }
-  .land-trust {
-    /* Trust-signal stack — city picker + source counts + responsible-use
-       + standards. Inset by the same horizontal padding as LandHero so
-       the visual rhythm holds across the column. */
-    padding: 0 32px 8px;
-    max-width: 880px;
+  .land-page {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 32px;
   }
-  .land-byod-row {
-    margin-top: 18px;
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    flex-wrap: wrap;
+  .land-byod {
+    margin-top: 64px;
+    max-width: 68ch;
   }
-  .land-byod-trigger {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--accent);
-    background: transparent;
-    border: 1px solid var(--accent);
-    padding: 6px 14px;
+  .land-byod h2 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .land-byod p {
+    margin: 0 0 8px;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .land-byod button {
+    min-height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 17px;
+    color: var(--riprap-text-link);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
     cursor: pointer;
-    letter-spacing: 0.02em;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
   }
-  .land-byod-trigger:hover { background: var(--accent); color: white; }
-  .land-byod-trigger:focus-visible {
-    outline: 3px solid var(--accent);
+  .land-byod button:focus-visible {
+    outline: 3px solid var(--riprap-focus);
     outline-offset: 2px;
   }
-  .land-byod-badge {
-    display: inline-block;
-    background: var(--accent);
-    color: white;
-    font-size: 12px;
-    padding: 1px 6px;
-    border-radius: 2px;
-    margin-left: 2px;
-  }
-  .land-byod-trigger:hover .land-byod-badge {
-    background: white;
-    color: var(--accent);
-  }
-  .land-byod-note {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--ink-tertiary);
-    letter-spacing: 0.02em;
-  }
   @media (max-width: 640px) {
-    .land-trust { padding: 0 16px 8px; }
+    .land-page {
+      padding: 0 16px;
+    }
+    .land-byod {
+      margin-top: 48px;
+    }
   }
 </style>

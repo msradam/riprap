@@ -1,98 +1,80 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
 
-  /** CityPicker: one sample address per shipped city. New York City is
-   *  the production deployment; the other five are experimental and are
-   *  grouped under a visible "Experimental" label.
-   *
-   *  Anchors match probe_cities.py's smoke-test addresses so what
-   *  loads here is identical to what `scripts/probe_cities.py`
-   *  exercises in CI.
-   */
+  /** One sample address per shipped city, as plain links. New York City
+   *  is the production deployment; the other five are experimental.
+   *  Anchors match probe_cities.py's smoke-test addresses so what loads
+   *  here is identical to what `scripts/probe_cities.py` exercises in CI. */
 
-  interface CityAnchor {
-    city: string;
-    address: string;
-  }
-
-  const PRODUCTION: CityAnchor = { city: 'NYC', address: '189 Atlantic Avenue, Brooklyn, NY' };
-  const EXPERIMENTAL: CityAnchor[] = [
-    { city: 'Chicago',       address: '233 S Wacker Dr, Chicago, IL' },
-    { city: 'Seattle',       address: '2100 5th Ave, Seattle, WA' },
-    { city: 'San Francisco', address: '1 Dr Carlton B Goodlett Pl, San Francisco, CA' },
-    { city: 'Boston',        address: '1 City Hall Square, Boston, MA' },
-    { city: 'Albany',        address: '25 Erie Blvd, Albany, NY' },
+  const CITIES = [
+    { city: 'NYC', address: '189 Atlantic Avenue, Brooklyn, NY', experimental: false },
+    { city: 'Chicago', address: '233 S Wacker Dr, Chicago, IL', experimental: true },
+    { city: 'Seattle', address: '2100 5th Ave, Seattle, WA', experimental: true },
+    { city: 'San Francisco', address: '1 Dr Carlton B Goodlett Pl, San Francisco, CA', experimental: true },
+    { city: 'Boston', address: '1 City Hall Square, Boston, MA', experimental: true },
+    { city: 'Albany', address: '25 Erie Blvd, Albany, NY', experimental: true }
   ];
 
-  function pick(addr: string) {
-    goto(resolve('/(app)/q/[queryId]', { queryId: encodeURIComponent(addr) }));
-  }
+  const href = (addr: string) => resolve('/(app)/q/[queryId]', { queryId: encodeURIComponent(addr) });
 </script>
 
-<div class="city-picker" role="region" aria-label="Sample address by city">
-  <span class="city-picker-label">Or pick a city:</span>
-  <div class="city-picker-row">
-    <button
-      type="button"
-      class="city-picker-pill"
-      onclick={() => pick(PRODUCTION.address)}
-      title="Brief the sample address for {PRODUCTION.city}: {PRODUCTION.address}"
-    >{PRODUCTION.city}</button>
-  </div>
-  <div class="city-picker-row" role="group" aria-labelledby="city-picker-exp">
-    <span class="exp-badge" id="city-picker-exp">Experimental</span>
-    {#each EXPERIMENTAL as c (c.city)}
-      <button
-        type="button"
-        class="city-picker-pill"
-        onclick={() => pick(c.address)}
-        title="Brief the sample address for {c.city} (experimental): {c.address}"
-      >{c.city}<span class="visually-hidden"> (experimental)</span></button>
+<section class="land-section" aria-labelledby="cities-h">
+  <h2 id="cities-h">Cities</h2>
+  <p>
+    New York City is in production; Chicago, Seattle, San Francisco, Boston and Albany are
+    experimental. Each link briefs one sample address.
+  </p>
+  <ul>
+    {#each CITIES as c (c.city)}
+      <li>
+        <a href={href(c.address)}>{c.city}</a>
+        <span class="city-addr">({c.experimental ? 'experimental' : 'production'}), {c.address}</span>
+      </li>
     {/each}
-  </div>
-</div>
+  </ul>
+</section>
 
 <style>
-  .city-picker {
-    margin-top: 14px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-    max-width: 760px;
+  .land-section {
+    margin-top: 64px;
+    max-width: 68ch;
   }
-  .city-picker-label {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-tertiary);
+  h2 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.25;
   }
-  .city-picker-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
+  p {
+    margin: 0 0 12px;
+    font-size: 17px;
+    line-height: 1.55;
   }
-  .city-picker-pill {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    color: var(--accent);
-    background: white;
-    border: 1px solid var(--accent);
-    padding: 5px 12px;
-    cursor: pointer;
-    transition: background-color 120ms ease, color 120ms ease;
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 16px;
   }
-  .city-picker-pill:hover {
-    background: var(--accent);
-    color: white;
+  li {
+    padding: 2px 0;
   }
-  .city-picker-pill:focus-visible {
-    outline: 3px solid var(--accent);
+  a {
+    display: inline-block;
+    min-height: 24px;
+    color: var(--riprap-text-link);
+    text-underline-offset: 0.2em;
+  }
+  a:focus-visible {
+    outline: 3px solid var(--riprap-focus);
     outline-offset: 2px;
+  }
+  .city-addr {
+    color: var(--ink-secondary);
+  }
+  @media (max-width: 640px) {
+    .land-section {
+      margin-top: 48px;
+    }
   }
 </style>

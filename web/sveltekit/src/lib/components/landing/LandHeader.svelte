@@ -1,73 +1,47 @@
 <script lang="ts">
-  /** Landing-page header. Wordmark · slash · context line · nav links.
-   *  Subtly different from the in-app AppHeader so the marketing surface
-   *  reads as a separate page. */
+  /** Landing header: the wordmark and two plain links, in the app header's
+   *  lower-case register. */
   import RipMark from '$lib/components/shell/RipMark.svelte';
   import { resolve } from '$app/paths';
 </script>
 
 <header class="land-header">
-  <span class="riprap-wordmark"><RipMark size={22} />riprap</span>
-  <span class="land-header-sep">/</span>
-  <span class="land-header-context">Flood-exposure briefing</span>
-  <nav class="land-header-nav">
-    <a href="#methodology">Methodology</a>
-    <a href="#sources">Sources</a>
-    <a href="{resolve('/(app)/gallery')}/">Gallery</a>
+  <span class="riprap-wordmark"><RipMark size={20} />riprap</span>
+  <nav class="land-header-nav" aria-label="Site">
+    <a href="#methodology">methodology</a>
+    <a href="{resolve('/(app)/gallery')}/">gallery</a>
   </nav>
 </header>
 
 <style>
   .land-header {
     display: flex;
-    /* Not align-items: baseline — .riprap-wordmark is itself an
-       inline-flex (icon + text) and .land-header-nav links are
-       inline-flex too, and neither exposes a reliable CSS baseline to
-       align against plain text, which visibly misaligned the wordmark
-       against "CLIMATE-EXPOSURE BRIEFING". Center is stable regardless
-       of child display type. */
     align-items: center;
-    flex-wrap: wrap;
-    gap: 8px 12px;
+    justify-content: space-between;
+    gap: 8px 16px;
+    max-width: 1040px;
+    margin: 0 auto;
     padding: 20px 32px;
-    border-bottom: 1px solid var(--rule-soft);
-  }
-  @media (max-width: 640px) {
-    .land-header { padding: 14px 16px; }
-  }
-  .land-header :global(.riprap-wordmark) {
-    font-family: var(--font-serif);
-    font-weight: 600;
-    font-size: 18px;
-    letter-spacing: 0.02em;
-  }
-  .land-header-sep { color: var(--ink-tertiary); }
-  .land-header-context {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-secondary);
   }
   .land-header-nav {
-    margin-left: auto;
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px 18px;
-    font-family: var(--font-mono);
-    font-size: 12px;
+    gap: 20px;
+    font-size: 15px;
   }
   .land-header-nav a {
     display: inline-flex;
     align-items: center;
-    min-height: 24px; /* WCAG 2.5.8 pointer-target minimum */
-    color: var(--ink-secondary);
-    text-decoration: none;
-    border-bottom: 1px dotted transparent;
+    min-height: 24px;
+    color: var(--riprap-text-link);
+    text-underline-offset: 0.2em;
   }
-  .land-header-nav a:hover { border-bottom-color: var(--ink-secondary); }
   .land-header-nav a:focus-visible {
-    outline: 3px solid var(--accent);
+    outline: 3px solid var(--riprap-focus);
     outline-offset: 2px;
+  }
+  @media (max-width: 640px) {
+    .land-header {
+      padding: 14px 16px;
+    }
   }
 </style>

@@ -4,10 +4,9 @@
   import { EXAMPLES } from '$lib/samples';
   import { STATIC_SITE, QUICKSTART_URL } from '$lib/staticSite';
 
-  /** Landing hero. A static headline (New York City is the production
-   *  deployment; the other cities are experimental and listed below in
-   *  CityPicker), the query box, and one runnable example per kind of
-   *  input the backend accepts. Nothing rotates: WCAG 2.2.2. */
+  /** Landing top: kind line, title, one deck sentence, the query box and
+   *  one runnable example per kind of input. The static site has no
+   *  backend, so the gallery replaces the query box there. */
 
   let q = $state('');
 
@@ -25,264 +24,196 @@
     return resolve('/(app)/q/[queryId]', { queryId: encodeURIComponent(v) });
   }
 
-  function submit() {
+  function submit(e: SubmitEvent) {
+    e.preventDefault();
     const v = q.trim();
-    if (!v) return;
-    goto(briefHref(v));
+    if (v) goto(briefHref(v));
   }
 </script>
 
-<!-- +layout.svelte already wraps every page in <main>. -->
 <section class="land-hero">
-  <h1 class="land-hero-h1">
-    <span class="land-hero-headline">
-      <span class="land-hero-headline-intro">A flood-exposure briefing for</span>
-      <span class="land-hero-headline-city"><span class="city">New York City</span>.</span>
-    </span>
-    <span class="land-hero-deck">
-      {#if STATIC_SITE}
-        Riprap turns an address, a community district, or a flood question into a
-        written briefing on flood exposure.
-      {:else}
-        Type an address, a community district, or a flood question. Get a written
-        briefing on flood exposure.
-      {/if}
-      Every claim cites a public record from FEMA, NOAA, USGS, or city open data.
-    </span>
-  </h1>
+  <p class="land-kind">Riprap, open beta</p>
+  <h1>Flood-exposure briefings for New York City</h1>
+  <p class="land-deck">
+    Riprap turns an address, a community district, or a flood question into a written briefing
+    on flood exposure.
+  </p>
 
   {#if STATIC_SITE}
-    <!-- The public site has no backend: the gallery replaces the query box. -->
-    <div class="land-static">
-      <a class="land-static-gallery" href="{resolve('/(app)/gallery')}/">Read the precomputed briefings →</a>
-      <p class="land-static-note">
-        This public copy has no backend.
-        <a href={QUICKSTART_URL}>Run locally to ask your own question</a>.
-      </p>
-    </div>
+    <p class="land-static">
+      <a class="land-button" href="{resolve('/(app)/gallery')}/">Read the precomputed briefings</a>
+    </p>
+    <p class="land-note">
+      This public copy has no backend. <a href={QUICKSTART_URL}>Run locally to ask your own question</a>.
+    </p>
   {:else}
-    <form class="land-query" onsubmit={(e) => { e.preventDefault(); submit(); }} role="search">
-      <span class="land-query-prompt" aria-hidden="true">›</span>
-      <input
-        id="land-query-input"
-        type="text"
-        {@attach prefill}
-        bind:value={q}
-        placeholder="Address, district such as QN 12, or a question"
-        class="land-query-input"
-        autocomplete="off"
-        enterkeyhint="search"
-        aria-label="Address, community district, or flood question"
-      />
-      <button type="submit" class="land-query-submit">Brief this place →</button>
+    <form class="land-query" role="search" onsubmit={submit}>
+      <label for="land-query-input">Address, community district, or flood question</label>
+      <div class="land-query-row">
+        <input
+          id="land-query-input"
+          type="text"
+          {@attach prefill}
+          bind:value={q}
+          placeholder="Address, QN 12, or a question"
+          autocomplete="off"
+          enterkeyhint="search"
+        />
+        <button type="submit" class="land-button">Brief this place</button>
+      </div>
     </form>
 
-    <div class="land-try">
-      <span class="land-try-label" id="land-try-label">Try:</span>
-      <ul class="land-try-list" aria-labelledby="land-try-label">
-        {#each EXAMPLES as ex (ex.kind)}
-          <li>
-            <span class="land-try-kind">{ex.kind}</span>
-            <a class="land-try-link" href={briefHref(ex.q)}>{ex.q}</a>
-          </li>
-        {/each}
-      </ul>
-    </div>
-    <p class="land-gallery">
-      <a href="{resolve('/(app)/gallery')}/">See precomputed briefings</a> in the gallery.
-    </p>
+    <p class="land-try-head" id="land-try">Or try one of these:</p>
+    <ul class="land-try" aria-labelledby="land-try">
+      {#each EXAMPLES as ex (ex.kind)}
+        <li><span class="land-try-kind">{ex.kind}</span> <a href={briefHref(ex.q)}>{ex.q}</a></li>
+      {/each}
+    </ul>
   {/if}
 </section>
 
 <style>
-  .land-hero { padding: 64px 32px 48px; }
-  .land-hero-h1 {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    margin: 0 0 30px;
-    max-width: 880px;
+  .land-hero {
+    max-width: 800px;
+    padding: 48px 0 0;
   }
-  .land-hero-headline {
-    font-family: var(--font-serif);
-    font-weight: 500;
-    font-size: 52px;
-    line-height: 1.08;
-    color: var(--ink);
-    letter-spacing: -0.015em;
-  }
-  .land-hero-headline-intro,
-  .land-hero-headline-city {
-    display: block;
-  }
-  /* Italic federal blue, as the landing had before the rotating city
-     was removed. #005EA2 on paper is above 6:1 at this size. */
-  .city {
-    color: var(--accent);
-    font-style: italic;
-    white-space: nowrap;
-  }
-  .land-hero-deck {
-    font-family: var(--font-serif);
-    font-size: 18px;
-    line-height: 1.55;
-    color: var(--ink-secondary);
-    max-width: 64ch;
-  }
-
-  .land-query {
-    display: flex;
-    align-items: stretch;
-    gap: 0;
-    max-width: 760px;
-    border: 1px solid var(--ink);
-    background: white;
-    font-size: 18px;
-  }
-  .land-query-prompt {
-    display: flex;
-    align-items: center;
-    padding: 0 14px;
-    font-family: var(--font-mono);
-    font-size: 22px;
-    color: var(--ink-tertiary);
-    background: var(--paper-deep);
-    border-right: 1px solid var(--rule-soft);
-  }
-  .land-query-input {
-    flex: 1;
-    min-width: 0;
-    padding: 18px 16px;
-    font: inherit;
-    font-family: var(--font-sans);
-    border: none;
-    outline: none;
-    background: white;
-    color: var(--ink);
-  }
-  /* Inset ring so it sits inside the ink border: 3px federal blue on
-     white is 7:1. */
-  .land-query-input:focus-visible {
-    outline: 3px solid var(--riprap-focus);
-    outline-offset: -3px;
-  }
-  .land-query-input::placeholder { color: var(--ink-tertiary); }
-  .land-query-submit {
-    padding: 0 22px;
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: 14px;
-    background: var(--ink);
-    color: var(--paper);
-    border: none;
-    cursor: pointer;
-    white-space: nowrap;
-    letter-spacing: 0.02em;
-  }
-  .land-query-submit:hover { background: #000; }
-
-  .land-try {
-    margin-top: 18px;
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    max-width: 760px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--ink-tertiary);
-  }
-  .land-try-label {
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    font-size: 12px;
-    flex: 0 0 auto;
-  }
-  .land-try-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 2px;
-    min-width: 0;
-  }
-  .land-try-list li {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-  }
-  .land-try-kind {
-    flex: 0 0 9ch;
-    font-size: 12px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-  .land-try-link {
-    display: inline-block;
-    padding: 3px 0;
-    min-height: 24px;
-    color: var(--ink);
-    text-decoration: underline dotted var(--ink-tertiary);
-    text-underline-offset: 3px;
-  }
-  .land-try-link:hover { text-decoration-style: solid; }
-
-  .land-gallery {
-    margin: 14px 0 0;
-    font-family: var(--font-sans);
+  .land-kind {
+    margin: 0 0 12px;
     font-size: 15px;
     color: var(--ink-secondary);
   }
-  .land-gallery a {
-    display: inline-block;
-    min-height: 24px;
-    color: var(--accent);
-    text-underline-offset: 2px;
+  h1 {
+    margin: 0;
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
-
-  .land-static {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-    max-width: 760px;
+  .land-deck {
+    margin: 20px 0 0;
+    max-width: 58ch;
+    font-size: 20px;
+    line-height: 1.5;
+    color: var(--ink-secondary);
+    text-wrap: pretty;
   }
-  /* Same weight as the query box's submit button it replaces. */
-  .land-static-gallery {
-    display: inline-flex;
-    align-items: center;
-    min-height: 56px;
-    padding: 0 22px;
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: 16px;
-    letter-spacing: 0.02em;
-    background: var(--ink);
-    color: var(--paper);
-    text-decoration: none;
+  a {
+    color: var(--riprap-text-link);
+    text-underline-offset: 0.2em;
   }
-  .land-static-gallery:hover { background: #000; }
-  .land-static-gallery:focus-visible {
+  a:focus-visible,
+  input:focus-visible,
+  button:focus-visible {
     outline: 3px solid var(--riprap-focus);
     outline-offset: 2px;
   }
-  .land-static-note {
-    margin: 0;
-    font-family: var(--font-sans);
+
+  .land-query {
+    margin-top: 32px;
+    max-width: 720px;
+  }
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .land-query-row {
+    display: flex;
+    gap: 8px;
+  }
+  input {
+    flex: 1;
+    min-width: 0;
+    height: 56px;
+    padding: 0 16px;
+    border: 1px solid var(--ink-secondary);
+    border-radius: 0;
+    background: var(--riprap-white);
+    font: inherit;
+    font-size: 19px;
+    color: var(--ink);
+  }
+  input::placeholder {
+    color: var(--ink-tertiary);
+  }
+  input:focus-visible {
+    outline-offset: 0;
+  }
+  .land-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 0 24px;
+    border: 0;
+    background: var(--ink);
+    color: var(--paper);
+    font: inherit;
+    font-size: 17px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .land-button:hover {
+    background: #000;
+  }
+
+  .land-try-head {
+    margin: 20px 0 4px;
     font-size: 15px;
     color: var(--ink-secondary);
   }
-  .land-static-note a {
+  .land-try {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 16px;
+  }
+  .land-try li {
+    padding: 2px 0;
+  }
+  .land-try-kind {
+    display: inline-block;
+    min-width: 5.5em;
+    color: var(--ink-secondary);
+  }
+  .land-try a,
+  .land-note a {
     display: inline-block;
     min-height: 24px;
-    color: var(--accent);
-    text-underline-offset: 2px;
+  }
+  .land-static {
+    margin: 32px 0 12px;
+  }
+  .land-note {
+    margin: 0;
+    font-size: 15px;
+    color: var(--ink-secondary);
   }
 
   @media (max-width: 640px) {
-    .land-hero-headline { font-size: 38px; }
-    .land-hero { padding: 40px 16px 32px; }
-    .land-try { flex-direction: column; gap: 6px; }
-    .land-try-list li { flex-direction: column; gap: 0; }
-    .land-try-kind { flex-basis: auto; }
+    .land-hero {
+      padding-top: 24px;
+    }
+    h1 {
+      font-size: 36px;
+      line-height: 1.1;
+    }
+    .land-deck {
+      font-size: 18px;
+    }
+    .land-query-row {
+      flex-direction: column;
+    }
+    input {
+      flex: none;
+    }
+    .land-try li {
+      display: flex;
+      flex-direction: column;
+    }
   }
 </style>

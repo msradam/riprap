@@ -1,53 +1,65 @@
 <script lang="ts">
-  /** Landing-page footer. Tier legend + a build line. The in-app
-   *  AppFooter has more detail; this one is intentionally tighter so
-   *  the landing page closes cleanly.
-   *
-   *  Tier icons are EvidenceMark — was a third, bespoke swatch
-   *  implementation (.lm-sw-*, hand-rolled circle/dash/stripe CSS,
-   *  including a raw #6B6B6B hex) independent of both TierGlyph
-   *  (app-wide) and EvidenceMark (report content), so this legend's
-   *  proxy dot didn't match either the report body's or the map
-   *  legend's proxy mark. One mark family now. */
-  import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
-  import type { Tier } from '$lib/types/tier';
+  /** Landing footer: the beta status, the standards Riprap is built to
+   *  (commitments, not certification), and the build and credit line. */
   import { APP_VERSION } from '$lib/version';
 
-  const TIERS: Tier[] = ['empirical', 'modeled', 'proxy', 'synthetic'];
+  const FEEDBACK = 'https://github.com/msradam/riprap-nyc/issues/new/choose';
 </script>
 
 <footer class="land-footer">
-  <span class="land-footer-tiers">
-    {#each TIERS as tier (tier)}
-      <span class="land-footer-tier"><EvidenceMark {tier} size={9} />{tier}</span>
-    {/each}
-  </span>
-  <span class="land-footer-build">Riprap v{APP_VERSION} · NYC OpenData · FEMA NFHL · USGS · NPCC4 · Dam mark by Chintuza, Noun Project (CC-BY)</span>
+  <div class="land-footer-inner">
+    <p>
+      This is open beta. Methodology and source attribution are stable. Per-city coverage is
+      expanding. <a href={FEEDBACK} target="_blank" rel="noopener">Send feedback</a>.
+    </p>
+    <p>
+      Built to USWDS, WCAG 2.2 AA, Section 508 and the Plain Writing Act. Open source under
+      Apache-2.0.
+    </p>
+    <p class="land-footer-build">
+      Riprap <span class="mono">v{APP_VERSION}</span>. Data from NYC OpenData, FEMA NFHL, USGS and
+      NPCC4. Dam mark by Chintuza, Noun Project (CC-BY).
+    </p>
+  </div>
 </footer>
 
 <style>
   .land-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    padding: 16px 32px;
+    margin-top: 80px;
     border-top: 1px solid var(--rule-soft);
+  }
+  .land-footer-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 24px 32px 40px;
+  }
+  p {
+    margin: 0 0 8px;
+    max-width: 75ch;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-secondary);
+  }
+  a {
+    display: inline-block;
+    min-height: 24px;
+    color: var(--riprap-text-link);
+    text-underline-offset: 0.2em;
+  }
+  a:focus-visible {
+    outline: 3px solid var(--riprap-focus);
+    outline-offset: 2px;
+  }
+  .mono {
     font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--ink-tertiary);
-    letter-spacing: 0.02em;
+    font-size: 13px;
   }
-  .land-footer-tiers {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .land-footer-tier {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    text-transform: capitalize;
+  @media (max-width: 640px) {
+    .land-footer {
+      margin-top: 56px;
+    }
+    .land-footer-inner {
+      padding: 20px 16px 32px;
+    }
   }
 </style>

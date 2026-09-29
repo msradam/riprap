@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { formatGeneratedAt, llmStamp, modeLabel } from '$lib/client/gallery';
+  import { formatGeneratedAt, modeLabel } from '$lib/client/gallery';
   import type { PageProps } from './$types';
 
   let { data }: PageProps = $props();
@@ -8,15 +8,19 @@
   let questions = $derived(data.entries.filter((e) => e.question));
   let addresses = $derived(data.entries.filter((e) => !e.question));
 
+  // The model is named once when every question briefing used the same one;
+  // otherwise each entry says how it was made.
+  let models = $derived([...new Set(questions.map((e) => e.modelName))]);
+  let sharedModel = $derived(models.length === 1 ? models[0] : null);
+
   // The note depends on how each answer was made. In extractive mode the
   // answer is source sentences quoted under a lead the model chose.
   const NOTE_EXTRACTIVE =
     'The model chose the lead and which source sentences answer the question; the sentences are quoted from the sources.';
   const NOTE_WRITTEN = 'Written by a language model, with each claim checked against its cited sources.';
-  const isExtractive = (slug: string) => data.answerModes[slug] === 'extractive';
-  let allExtractive = $derived(questions.every((e) => isExtractive(e.slug)));
-  let noneExtractive = $derived(questions.every((e) => !isExtractive(e.slug)));
-  let mixed = $derived(!allExtractive && !noneExtractive);
+  const note = (mode: string | null) => (mode === 'extractive' ? NOTE_EXTRACTIVE : NOTE_WRITTEN);
+  let modes = $derived([...new Set(questions.filter((e) => e.modelName).map((e) => e.answerMode === 'extractive'))]);
+  let sharedNote = $derived(modes.length === 1 ? (modes[0] ? NOTE_EXTRACTIVE : NOTE_WRITTEN) : null);
 </script>
 
 <svelte:head>
@@ -24,50 +28,65 @@
   <meta name="description" content="Precomputed Riprap flood-exposure briefings for New York City neighborhoods, served as static pages." />
 </svelte:head>
 
+{#snippet row(place: string, date: string, href: string, label: string, lead: string)}
+  <span class="gallery-place">{place}</span>
+  <span class="gallery-date">{date}</span>
+  <a class="gallery-link" {href}>{label}</a>
+  {#if lead}<p class="gallery-lead">{lead}</p>{/if}
+{/snippet}
+
 <section class="hero-band">
   <div class="hero-band-inner">
     <section class="app-region app-region-brief" aria-labelledby="gallery-h1">
-      <header class="region-head">
-        <span class="section-label">Gallery</span>
-      </header>
+      <p class="gallery-kind">Gallery</p>
       <h1 id="gallery-h1" class="brief-h1">Precomputed briefings</h1>
-      <p class="gallery-intro">
-        Snapshots generated ahead of time and saved as static pages. Opening one does not
-        contact the Riprap backend, so the data is as of the generation date shown.
+      <p class="gallery-note">
+        Snapshots generated ahead of time and saved as static pages. Opening one does not contact the
+        Riprap backend, so the data is as of the generation date shown.
       </p>
 
       <h2 class="gallery-group">Questions</h2>
-      {#if !mixed}
-        <p class="gallery-group-note">{allExtractive ? NOTE_EXTRACTIVE : NOTE_WRITTEN}</p>
-      {/if}
+      <p class="gallery-note">
+        {#if sharedModel}
+          Each question briefing was made with the language model
+          <span class="gallery-model">{sharedModel}</span>.
+        {/if}
+        {#if sharedNote}{sharedNote}{/if}
+      </p>
       <ul class="gallery-list">
         {#each questions as e (e.slug)}
           <li class="gallery-item">
-            <div class="gallery-line-1">
-              <span class="gallery-place">{e.neighborhood}</span>
-              <span class="gallery-date">{formatGeneratedAt(e.generated_at)}</span>
-            </div>
-            <a class="gallery-link" href="{resolve('/(app)/gallery/[slug]', { slug: e.slug })}/">{e.question}</a>
-            <div class="gallery-meta">{llmStamp(e) ?? modeLabel(e.mode)}</div>
-            {#if mixed}
-              <p class="gallery-group-note">{isExtractive(e.slug) ? NOTE_EXTRACTIVE : NOTE_WRITTEN}</p>
+            {@render row(
+              e.neighborhood,
+              formatGeneratedAt(e.generated_at),
+              `${resolve('/(app)/gallery/[slug]', { slug: e.slug })}/`,
+              e.question ?? '',
+              e.lead
+            )}
+            {#if !sharedModel || !sharedNote}
+              <p class="gallery-meta">
+                {#if !sharedModel}
+                  {#if e.modelName}Language model <span class="gallery-model">{e.modelName}</span>.{:else}{modeLabel(e.mode)}.{/if}
+                {/if}
+                {#if !sharedNote && e.modelName}{note(e.answerMode)}{/if}
+              </p>
             {/if}
           </li>
         {/each}
       </ul>
 
       <h2 class="gallery-group">Addresses</h2>
-      <p class="gallery-group-note">
-        Evidence briefings built from cited source values, with no language model.
-      </p>
+      <p class="gallery-note">Evidence briefings built from cited source values, with no language model.</p>
       <ul class="gallery-list">
         {#each addresses as e (e.slug)}
           <li class="gallery-item">
-            <div class="gallery-line-1">
-              <span class="gallery-place">{e.neighborhood}</span>
-              <span class="gallery-date">{formatGeneratedAt(e.generated_at)}</span>
-            </div>
-            <a class="gallery-link" href="{resolve('/(app)/gallery/[slug]', { slug: e.slug })}/">{e.address}</a>
+            {@render row(
+              e.neighborhood,
+              formatGeneratedAt(e.generated_at),
+              `${resolve('/(app)/gallery/[slug]', { slug: e.slug })}/`,
+              e.address,
+              e.lead
+            )}
           </li>
         {/each}
       </ul>
@@ -76,63 +95,96 @@
 </section>
 
 <style>
-  .region-head .section-label { font-size: 12px; }
-  .gallery-intro {
+  .gallery-kind {
     margin: 0 0 8px;
-    max-width: 70ch;
     font-size: 15px;
     color: var(--ink-secondary);
   }
+  .gallery-note {
+    margin: 0 0 12px;
+    max-width: 68ch;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-secondary);
+  }
+  .gallery-model {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+  @media (min-width: 640px) {
+    .gallery-model {
+      white-space: nowrap;
+    }
+  }
   .gallery-group {
-    margin: 32px 0 4px;
+    margin: 40px 0 4px;
     font-size: 22px;
     line-height: 1.25;
     font-weight: 600;
-  }
-  .gallery-group-note {
-    margin: 0 0 12px;
-    font-size: 14px;
-    color: var(--ink-secondary);
   }
   .gallery-list {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    gap: 8px;
-    max-width: 80ch;
+    max-width: 760px;
+    border-bottom: 1px solid var(--riprap-rule-hairline);
   }
+  /* Place and date share the first line; the date column is right-aligned
+     to the list edge, which the row hairlines make visible. */
   .gallery-item {
-    padding: 8px 12px;
-    border-left: 2px solid var(--rule-soft);
-  }
-  .gallery-line-1 {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 24px;
     align-items: baseline;
-    gap: 4px 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--riprap-rule-hairline);
   }
-  .gallery-place { font-weight: 600; }
+  .gallery-place {
+    font-size: 16px;
+    font-weight: 600;
+  }
   .gallery-date {
-    margin-left: auto;
     font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--ink-tertiary);
+    font-size: 13px;
+    color: var(--ink-secondary);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .gallery-link,
+  .gallery-lead,
+  .gallery-meta {
+    grid-column: 1 / -1;
+    justify-self: start;
   }
   /* WCAG 2.5.8: at least 24px tall, even for a one-line address. */
   .gallery-link {
-    display: inline-block;
     min-height: 24px;
     padding: 2px 0;
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.4;
-    color: var(--accent);
+    color: var(--riprap-text-link);
     text-underline-offset: 2px;
   }
-  .gallery-link:hover { text-decoration-thickness: 2px; }
+  .gallery-link:hover {
+    text-decoration-thickness: 2px;
+  }
+  .gallery-lead,
   .gallery-meta {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--ink-tertiary);
+    margin: 2px 0 0;
+    max-width: 68ch;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .gallery-meta {
+    color: var(--ink-secondary);
+  }
+  @media (max-width: 640px) {
+    .gallery-item {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .gallery-date {
+      text-align: left;
+    }
   }
 </style>

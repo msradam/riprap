@@ -54,11 +54,7 @@ const EXEMPT_FILES = new Set<string>([
   'landing/LandHeader.svelte',
   'landing/LandFooter.svelte',
   'landing/LandStones.svelte',
-  'landing/SourceStrip.svelte',
-  'landing/LandMiniMap.svelte',
-  'landing/StandardsStrip.svelte',
   'landing/UseBand.svelte',
-  'landing/PhaseBanner.svelte',
   'landing/ByodDialog.svelte',
   // RegisterCard renders ONLY when NYC register data is present (the
   // four NYC-only register specialists fired). NYC-specific provenance
