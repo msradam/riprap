@@ -22,7 +22,7 @@ config:
 provenance:
   date_modified: null
   retrieved_at: 2026-07-11
-  source_name: USGS 3DEP 30 m DEM with derived HAND and TWI rasters
+  source_name: USGS 3DEP DEM with derived HAND and TWI rasters
   source_url: https://www.usgs.gov/3d-elevation-program
   license: U.S. Public Domain
   doc_id: microtopo_nta

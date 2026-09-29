@@ -33,7 +33,8 @@ warnings.filterwarnings("ignore")
 log = logging.getLogger("riprap.microtopo")
 
 DOC_ID = "microtopo"
-CITATION = "USGS 3DEP 30 m DEM (precomputed citywide GeoTIFF, WGS84)"
+# No resolution in the label: the cells are about 22 m east-west and 29 m north-south.
+CITATION = "USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)"
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 DEM_PATH = DATA_DIR / "nyc_dem_30m.tif"

@@ -43,3 +43,12 @@ def test_briefing_citation_for_fema_uses_the_value():
     stones, registry = evidence.load("federal")
     cites = evidence.citations(evidence.collect(state, stones, registry))
     assert cites["fema_nfhl"]["vintage"] == "2007-09-05"
+
+
+def test_dem_label_states_no_resolution_the_raster_does_not_have():
+    from app.context import microtopo
+
+    labels = [microtopo.CITATION, NYC.get("microtopo").manifest.provenance.source_name,
+              NYC.get("microtopo").manifest.provenance.citation,
+              NYC.get("microtopo_nta").manifest.provenance.source_name]
+    assert all("30 m" not in s and s.startswith("USGS 3DEP DEM") for s in labels)
