@@ -30,10 +30,6 @@ def eo(tmp_path, monkeypatch):
                        crs="EPSG:32618", transform=tr, nodata=255) as dst:
         dst.write(a, 1)
         dst.update_tags(rain_date=pw.EVENT, post_scene=POST, pre_scene=PRE, model=pw.MODEL)
-    nta = gpd.GeoDataFrame({"nta2020": ["QN1206"], "ntaname": ["Hollis"], "frac_new_water": [0.0025],
-                            "frac_observed": [0.9]},
-                           geometry=[box(LON - 0.01, LAT - 0.01, LON + 0.01, LAT + 0.01)], crs="EPSG:4326")
-    nta.to_parquet(tmp_path / f"prithvi_new_water_{pw.EVENT}_by_nta.parquet")
     monkeypatch.setattr(pw, "EO_DIR", tmp_path)
     pw._tags.cache_clear()
     yield
