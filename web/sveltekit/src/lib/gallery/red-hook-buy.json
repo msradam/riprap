@@ -3,8 +3,8 @@
  "neighborhood": "Red Hook, Brooklyn",
  "address": "80 Pioneer Street, Brooklyn, NY",
  "question": "Should I buy the house at 80 Pioneer Street, Brooklyn?",
- "generated_at": "2026-09-29T17:42Z",
- "riprap_commit": "866eeb7",
+ "generated_at": "2026-09-29T18:25Z",
+ "riprap_commit": "f8c6e20",
  "mode": "llm",
  "model": null,
  "quantization": null,
@@ -207,7 +207,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_extreme_2080_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -273,7 +273,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_moderate_2050_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -339,7 +339,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_moderate_current_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -1153,7 +1153,7 @@
   "trace": [
    {
     "step": "reconcile_claims",
-    "started_at": 1790703745.7044742,
+    "started_at": 1790706351.741973,
     "ok": true,
     "result": {
      "tier": "llm",

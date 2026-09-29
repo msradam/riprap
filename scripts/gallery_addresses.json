@@ -37,7 +37,7 @@
   "slug": "gowanus",
   "neighborhood": "Gowanus, Brooklyn",
   "address": "400 Carroll Street, Brooklyn, NY",
-  "reason": "The canal: inside the Sandy extent, zone AE and the DEP 2050 and 2080 scenarios.",
+  "reason": "The canal: inside the Sandy extent, zone AE and the future high tide areas of the DEP 2050 and 2080 scenarios.",
   "feature_doc": "dep_moderate_2050"
  },
  {
@@ -64,15 +64,15 @@
  {
   "slug": "orchard-beach",
   "neighborhood": "Orchard Beach, Bronx",
-  "address": "1 Orchard Beach Road, Bronx, NY",
-  "reason": "The Bronx shore: FEMA zone VE, the coastal high hazard area, though outside the mapped Sandy extent.",
+  "address": "Orchard Beach, Bronx, NY",
+  "reason": "The Bronx shore: FEMA zone VE, the coastal high hazard area, inside the 2012 Sandy extent.",
   "feature_doc": "fema_nfhl"
  },
  {
   "slug": "south-street-seaport",
   "neighborhood": "South Street Seaport, Manhattan",
   "address": "19 Fulton Street, Manhattan, NY",
-  "reason": "Lower Manhattan's waterfront: inside the Sandy extent, zone AE and the DEP 2080 scenario.",
+  "reason": "Lower Manhattan's waterfront: inside the Sandy extent, zone AE and the future high tide area of the DEP 2080 scenario.",
   "feature_doc": "sandy_inundation"
  },
  {

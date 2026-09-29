@@ -3,8 +3,8 @@
  "neighborhood": "Hollis, Queens",
  "address": "90-01 183rd Street, Queens, NY 11423",
  "question": "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?",
- "generated_at": "2026-09-29T17:41Z",
- "riprap_commit": "866eeb7",
+ "generated_at": "2026-09-29T18:24Z",
+ "riprap_commit": "f8c6e20",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -207,7 +207,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_extreme_2080_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -273,7 +273,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_moderate_2050_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -339,7 +339,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_moderate_current_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -1121,7 +1121,7 @@
      "text": "90-01 183rd Street, Queens"
     }
    ],
-   "rationale": "The query asks about past flooding on a specific address since Hurricane Ida, requiring historic flood data (Sandy), post-Hurricane Ida surface water (Prithvi), recent street flooding observations (FloodNet), and sea level rise context (NPCC4).",
+   "rationale": "The question asks about past flooding at a specific address since Hurricane Ida, requiring the Sandy flood extent and local elevation data.",
    "question": "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?",
    "focus": {
     "hazard": "flood",
@@ -1130,9 +1130,7 @@
    },
    "pebbles": [
     "sandy",
-    "prithvi_water",
-    "floodnet",
-    "npcc4_slr"
+    "microtopo"
    ],
    "catalog": [
     "area_boundary",
@@ -1173,9 +1171,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1859,
-     "completion_tokens": 180,
-     "duration_s": 14.987,
+     "prompt_tokens": 1919,
+     "completion_tokens": 136,
+     "duration_s": 13.367,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1203,9 +1201,9 @@
     "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR)."
    }
   },
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nYes. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this address; the highest stood 0.76 ft above ground; the highest water surface elevation was 48.2 ft NAVD88 [ida_hwm]. Nearest mark: Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174 m away) [ida_hwm]. 2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years [floodnet]. Peak depth recorded by these sensors: 1172 mm on 2026-05-20, at a sensor FloodNet marks as noisy [floodnet]. 82 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 47 sewer backup, 22 catch basin, 10 street flooding, 3 manhole overflow [nyc311]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.00% of Jamaica showed new water (100% of it observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nYes. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this address; the highest stood 0.76 ft above ground; the highest water surface elevation was 48.2 ft NAVD88 [ida_hwm]. Nearest mark: Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174 m away) [ida_hwm]. This address sits in FEMA flood zone X (an area of minimal flood hazard), per NFHL FIRM panel 3604970234F, effective 2007 [fema_nfhl]. This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) [dep_moderate_2050]. Elevation 14.87 m; this point is higher than 29% of the ground within 200 m (the 29th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 0.0 m; TWI (topographic wetness index; higher means water tends to collect) 11.78 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 35.02 m [microtopo]. 2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years [floodnet]. Peak depth recorded by these sensors: 1172 mm on 2026-05-20, at a sensor FloodNet marks as noisy [floodnet].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nYes. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this address; the highest stood 0.76 ft above ground; the highest water surface elevation was 48.2 ft NAVD88 [ida_hwm]. Nearest mark: Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174 m away) [ida_hwm]. 2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years [floodnet]. Peak depth recorded by these sensors: 1172 mm on 2026-05-20, at a sensor FloodNet marks as noisy [floodnet]. 82 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 47 sewer backup, 22 catch basin, 10 street flooding, 3 manhole overflow [nyc311]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.00% of Jamaica showed new water (100% of it observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nYes. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this address; the highest stood 0.76 ft above ground; the highest water surface elevation was 48.2 ft NAVD88 [ida_hwm]. Nearest mark: Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174 m away) [ida_hwm]. This address sits in FEMA flood zone X (an area of minimal flood hazard), per NFHL FIRM panel 3604970234F, effective 2007 [fema_nfhl]. This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) [dep_moderate_2050]. Elevation 14.87 m; this point is higher than 29% of the ground within 200 m (the 29th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 0.0 m; TWI (topographic wetness index; higher means water tends to collect) 11.78 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 35.02 m [microtopo]. 2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years [floodnet]. Peak depth recorded by these sensors: 1172 mm on 2026-05-20, at a sensor FloodNet marks as noisy [floodnet].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
    "dropped": [],
    "tier": "llm"
   },
@@ -1224,48 +1222,56 @@
     },
     {
      "section": "answer",
+     "text": "This address sits in FEMA flood zone X (an area of minimal flood hazard), per NFHL FIRM panel 3604970234F, effective 2007.",
+     "doc_ids": [
+      "fema_nfhl"
+     ],
+     "numbers": []
+    },
+    {
+     "section": "answer",
+     "text": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR).",
+     "doc_ids": [
+      "dep_moderate_2050"
+     ],
+     "numbers": []
+    },
+    {
+     "section": "answer",
+     "text": "Elevation 14.87 m; this point is higher than 29% of the ground within 200 m (the 29th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 0.0 m; TWI (topographic wetness index; higher means water tends to collect) 11.78. Local basin relief (the rise from this point to the highest ground within 750 m): 35.02 m.",
+     "doc_ids": [
+      "microtopo"
+     ],
+     "numbers": []
+    },
+    {
+     "section": "answer",
      "text": "2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years. Peak depth recorded by these sensors: 1172 mm on 2026-05-20, at a sensor FloodNet marks as noisy.",
      "doc_ids": [
       "floodnet"
-     ],
-     "numbers": []
-    },
-    {
-     "section": "answer",
-     "text": "82 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 47 sewer backup, 22 catch basin, 10 street flooding, 3 manhole overflow.",
-     "doc_ids": [
-      "nyc311"
-     ],
-     "numbers": []
-    },
-    {
-     "section": "answer",
-     "text": "Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.00% of Jamaica showed new water (100% of it observed). Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding.",
-     "doc_ids": [
-      "prithvi_water"
      ],
      "numbers": []
     }
    ],
    "dropped_claims": [],
    "retried_claims": [],
-   "n_kept": 4,
+   "n_kept": 5,
    "n_dropped": 0,
    "llm_calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 710,
-     "completion_tokens": 39,
-     "duration_s": 3.24,
+     "prompt_tokens": 613,
+     "completion_tokens": 43,
+     "duration_s": 3.657,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
     }
    ],
    "question": "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?",
-   "n_documents": 8,
+   "n_documents": 7,
    "answer_mode": "extractive",
    "answer_lead": "yes",
    "lead_fact": {
@@ -1281,6 +1287,28 @@
    "answered": true
   },
   "citations": {
+   "fema_nfhl": {
+    "doc_id": "fema_nfhl",
+    "source": "FEMA National Flood Hazard Layer (NFHL) \u2014 effective flood zones",
+    "title": "FEMA NFHL effective flood-zone polygon and FIRM panel intersecting the address point.",
+    "url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
+    "license": "U.S. Public Domain",
+    "date_modified": "2007-09-05",
+    "retrieved_at": "2026-09-29T18:24Z",
+    "vintage": "2007-09-05",
+    "maturity": "production"
+   },
+   "dep_moderate_2050": {
+    "doc_id": "dep_moderate_2050",
+    "source": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
+    "title": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
+    "url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
+    "license": "NYC Open Data Terms of Use",
+    "date_modified": "2024-07-03",
+    "retrieved_at": "2026-07-11",
+    "vintage": "2024-07-03",
+    "maturity": "production"
+   },
    "ida_hwm": {
     "doc_id": "ida_hwm",
     "source": "USGS STN \u2014 Hurricane Ida 2021 (Event 312, NY)",
@@ -1292,16 +1320,16 @@
     "vintage": "retrieved 2026-07-11",
     "maturity": "production"
    },
-   "prithvi_water": {
-    "doc_id": "prithvi_water",
-    "source": "msradam/Prithvi-EO-2.0-NYC-Pluvial on Copernicus Sentinel-2 L2A (Planetary Computer)",
-    "title": "msradam/Prithvi-EO-2.0-NYC-Pluvial (Apache-2.0), run by scripts/run_eo_batch.py on Sentinel-2 L2A scenes from 2021-09-02 (tiles 18TWL, 18TWK, 18TXL), with same-tile scenes from 2021-08-13 masking permanent water. Contains modified Copernicus Sentinel data 2021, via Microsoft Planetary Computer. Experimental: no flood-detection score on held-out events; street and basement flooding is not visible at 10 to 20 m.",
-    "url": "https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial",
-    "license": "Apache-2.0 (model); Copernicus Sentinel data terms (imagery)",
-    "date_modified": "2021-09-02",
-    "retrieved_at": "2026-09-28",
-    "vintage": "2021-09-02",
-    "maturity": "experimental"
+   "microtopo": {
+    "doc_id": "microtopo",
+    "source": "USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)",
+    "title": "USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)",
+    "url": "https://www.usgs.gov/3d-elevation-program",
+    "license": "USGS \u2014 public domain",
+    "date_modified": null,
+    "retrieved_at": "2026-07-11",
+    "vintage": "retrieved 2026-07-11",
+    "maturity": "production"
    },
    "floodnet": {
     "doc_id": "floodnet",
@@ -1309,20 +1337,9 @@
     "title": "FloodNet NYC, community-led real-time street-flood sensor network. Data CC-BY-NC-SA 4.0; derivatives must carry the same license. Readings come from the FloodNet API (api.floodnet.nyc), which has no stable page per sensor or event, so the link is the project's data download page. https://www.floodnet.nyc/data-downloads",
     "url": "https://www.floodnet.nyc/data-downloads",
     "license": "CC-BY-NC-SA 4.0",
-    "date_modified": "2026-09-29T17:41Z",
-    "retrieved_at": "2026-09-29T17:41Z",
-    "vintage": "2026-09-29T17:41Z",
-    "maturity": "production"
-   },
-   "nyc311": {
-    "doc_id": "nyc311",
-    "source": "NYC 311 Service Requests (NYC Open Data)",
-    "title": "NYC 311 Service Requests, flood-related complaints (5-year window).",
-    "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
-    "license": "NYC Open Data Terms of Use",
-    "date_modified": "2026-09-29T01:44:54+0000",
-    "retrieved_at": "2026-09-29T17:41Z",
-    "vintage": "2026-09-29T01:44:54+0000",
+    "date_modified": "2026-09-29T18:24Z",
+    "retrieved_at": "2026-09-29T18:24Z",
+    "vintage": "2026-09-29T18:24Z",
     "maturity": "production"
    }
   },
@@ -1348,8 +1365,8 @@
     "stone": "cornerstone"
    },
    {
-    "id": "prithvi_water",
-    "title": "New surface water after Hurricane Ida, Prithvi-EO (experimental)",
+    "id": "microtopo",
+    "title": "LiDAR / DEM-derived micro-topography",
     "stone": "cornerstone"
    },
    {
@@ -1361,11 +1378,6 @@
     "id": "nyc311",
     "title": "NYC 311 flood-related complaints (5y)",
     "stone": "touchstone"
-   },
-   {
-    "id": "npcc4_slr",
-    "title": "NPCC4 (2024) sea-level rise projections",
-    "stone": "lodestone"
    }
   ],
   "not_checked": [
@@ -1380,8 +1392,8 @@
     "stone": "cornerstone"
    },
    {
-    "id": "microtopo",
-    "title": "LiDAR / DEM-derived micro-topography",
+    "id": "prithvi_water",
+    "title": "New surface water after Hurricane Ida, Prithvi-EO (experimental)",
     "stone": "cornerstone"
    },
    {
@@ -1437,6 +1449,11 @@
    {
     "id": "floodnet_forecast",
     "title": "Granite TTM r2 \u2014 flood-event recurrence at nearest FloodNet sensor",
+    "stone": "lodestone"
+   },
+   {
+    "id": "npcc4_slr",
+    "title": "NPCC4 (2024) sea-level rise projections",
     "stone": "lodestone"
    },
    {
@@ -1499,20 +1516,18 @@
    ],
    "narrative": "USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this address; the highest stood 0.76 ft above ground; the highest water surface elevation was 48.2 ft NAVD88. Nearest mark: Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174 m away)."
   },
-  "prithvi_water": {
-   "new_water_m2_within_radius": 0,
-   "radius_m": 500,
-   "frac_observed_within_radius": 1.0,
-   "post_scene": "S2A_MSIL2A_20210902T154911_R054_T18TXL_20210903T042643;S2A_MSIL2A_20210902T154911_R054_T18TWK_20210903T055945;S2A_MSIL2A_20210902T154911_R054_T18TXK_20210903T042442;S2A_MSIL2A_20210902T154911_R054_T18TWL_20210903T050849",
-   "pre_scene": "S2A_MSIL2A_20210813T154911_R054_T18TXL_20210814T051639;S2A_MSIL2A_20210813T154911_R054_T18TWK_20210814T055254;S2A_MSIL2A_20210813T154911_R054_T18TXK_20210926T233456;S2A_MSIL2A_20210813T154911_R054_T18TWL_20210814T063950",
-   "model": "msradam/Prithvi-EO-2.0-NYC-Pluvial",
-   "rain_date": "2021-09-01",
-   "batch_run": "2026-09-28",
-   "nta_name": "Jamaica",
-   "nta_frac_new_water": 0.0,
-   "nta_frac_observed": 1.0,
-   "narrative": "Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.00% of Jamaica showed new water (100% of it observed). Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding.",
-   "headline_value": "0 m\u00b2 new water within 500 m"
+  "microtopo": {
+   "point_elev_m": 14.87,
+   "rel_elev_pct_750m": 28.5,
+   "rel_elev_pct_200m": 29.1,
+   "basin_relief_m": 35.02,
+   "aoi_min_m": 8.4,
+   "aoi_max_m": 49.88,
+   "aoi_radius_m": 750,
+   "resolution_m": 22,
+   "twi": 11.78,
+   "hand_m": 0.0,
+   "narrative": "Elevation 14.87 m; this point is higher than 29% of the ground within 200 m (the 29th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 0.0 m; TWI (topographic wetness index; higher means water tends to collect) 11.78. Local basin relief (the rise from this point to the highest ground within 750 m): 35.02 m."
   },
   "floodnet": {
    "n_sensors": 2,
@@ -2036,53 +2051,11 @@
     12
    ]
   },
-  "npcc4_slr": {
-   "available": true,
-   "baseline": "2000\u20132004",
-   "gauge": "NOAA Battery (8518750)",
-   "2050": {
-    "10": {
-     "in": 8,
-     "m": 0.2
-    },
-    "50": {
-     "in": 15,
-     "m": 0.38
-    },
-    "90": {
-     "in": 29,
-     "m": 0.74
-    },
-    "99": {
-     "in": 40,
-     "m": 1.02
-    }
-   },
-   "2100": {
-    "10": {
-     "in": 13,
-     "m": 0.33
-    },
-    "50": {
-     "in": 31,
-     "m": 0.79
-    },
-    "90": {
-     "in": 65,
-     "m": 1.65
-    },
-    "99": {
-     "in": 96,
-     "m": 2.44
-    }
-   },
-   "narrative": "NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m."
-  },
   "trace": [
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790703673.813154,
+    "started_at": 1790706274.209064,
     "elapsed_s": 0.03,
     "err": null,
     "result": {
@@ -2095,7 +2068,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790703673.839029,
+    "started_at": 1790706274.240824,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2107,7 +2080,7 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790703673.8720262,
+    "started_at": 1790706274.2740512,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2117,7 +2090,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790703673.8720279,
+    "started_at": 1790706274.2740521,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2125,9 +2098,9 @@
     }
    },
    {
-    "step": "microtopo",
+    "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790703673.8720279,
+    "started_at": 1790706274.2740521,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2137,7 +2110,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790703673.8720288,
+    "started_at": 1790706274.274053,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2147,7 +2120,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790703673.8720288,
+    "started_at": 1790706274.274053,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2157,7 +2130,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790703673.8720288,
+    "started_at": 1790706274.274053,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2167,7 +2140,7 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790703673.8720288,
+    "started_at": 1790706274.274053,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2177,7 +2150,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790703673.8720288,
+    "started_at": 1790706274.274053,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2187,7 +2160,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790703673.87203,
+    "started_at": 1790706274.2740538,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2197,7 +2170,7 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790703673.87203,
+    "started_at": 1790706274.2740538,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2207,7 +2180,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790703673.87203,
+    "started_at": 1790706274.2740538,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2217,7 +2190,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790703673.87203,
+    "started_at": 1790706274.2740538,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2227,7 +2200,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790703673.87203,
+    "started_at": 1790706274.2740538,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2237,7 +2210,17 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790703673.87203,
+    "started_at": 1790706274.2740538,
+    "elapsed_s": 0.0,
+    "err": null,
+    "result": {
+     "skipped": "not selected for this question"
+    }
+   },
+   {
+    "step": "npcc4_slr",
+    "ok": true,
+    "started_at": 1790706274.2740538,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2247,7 +2230,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790703673.872031,
+    "started_at": 1790706274.274055,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2257,8 +2240,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790703676.693821,
-    "elapsed_s": 0.24,
+    "started_at": 1790706277.3091578,
+    "elapsed_s": 0.28,
     "err": null,
     "result": {
      "inside": {
@@ -2271,8 +2254,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790703676.694384,
-    "elapsed_s": 0.16,
+    "started_at": 1790706277.310405,
+    "elapsed_s": 0.19,
     "err": null,
     "result": {
      "zone": "X",
@@ -2284,8 +2267,8 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790703676.695128,
-    "elapsed_s": 0.24,
+    "started_at": 1790706277.310039,
+    "elapsed_s": 0.28,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2295,7 +2278,7 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790703676.69556,
+    "started_at": 1790706277.3104372,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2305,21 +2288,22 @@
     }
    },
    {
-    "step": "prithvi_water",
+    "step": "microtopo",
     "ok": true,
-    "started_at": 1790703676.69522,
-    "elapsed_s": 0.37,
+    "started_at": 1790706277.310355,
+    "elapsed_s": 0.6,
     "err": null,
     "result": {
-     "new_water_m2_within_radius": 0,
-     "frac_observed_within_radius": 1.0
+     "elev_m": 14.87,
+     "pct_200m": 29.1,
+     "relief_m": 35.02
     }
    },
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790703676.6950881,
-    "elapsed_s": 0.15,
+    "started_at": 1790706277.310774,
+    "elapsed_s": 0.19,
     "err": null,
     "result": {
      "n_sensors": 2,
@@ -2329,25 +2313,17 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790703676.695652,
-    "elapsed_s": 0.15,
+    "started_at": 1790706277.31116,
+    "elapsed_s": 0.18,
     "err": null,
     "result": {
      "n": 82
     }
    },
    {
-    "step": "npcc4_slr",
-    "ok": true,
-    "started_at": 1790703676.695918,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {}
-   },
-   {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790703677.283102,
+    "started_at": 1790706278.134988,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2358,35 +2334,26 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790703677.2832892,
+    "started_at": 1790706278.1351838,
     "ok": true,
     "result": {
      "tier": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "attempts": 1,
-     "kept": 4,
+     "kept": 5,
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 3.29
+    "elapsed_s": 3.7
    }
   ],
   "models": [
-   {
-    "name": "Prithvi-EO 2.0, NYC pluvial fine-tune",
-    "repo": "msradam/Prithvi-EO-2.0-NYC-Pluvial",
-    "where": "Apple GPU (MPS), in the batch run",
-    "how": "precomputed",
-    "pebble": "prithvi_water",
-    "latency_s": 0.37,
-    "detail": "batch output for the 2021-09-01 event: Sentinel-2 scenes of 2021-09-02 vs 2021-08-13, tiles 18TWK, 18TWL, 18TXK, 18TXL; batch run 2026-09-28"
-   },
    {
     "name": "LLM",
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 18.23,
+    "latency_s": 17.03,
     "calls": 2
    }
   ],
@@ -2401,20 +2368,20 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 18.227,
+   "total_duration_s": 17.024,
    "tokens": {
-    "prompt": 2569,
-    "completion": 219,
-    "total": 2788
+    "prompt": 2532,
+    "completion": 179,
+    "total": 2711
    },
    "calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1859,
-     "completion_tokens": 180,
-     "duration_s": 14.987,
+     "prompt_tokens": 1919,
+     "completion_tokens": 136,
+     "duration_s": 13.367,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -2423,9 +2390,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 710,
-     "completion_tokens": 39,
-     "duration_s": 3.24,
+     "prompt_tokens": 613,
+     "completion_tokens": 43,
+     "duration_s": 3.657,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"

@@ -3,8 +3,8 @@
  "neighborhood": "Homecrest, Brooklyn",
  "address": "2017 East 17th Street, Brooklyn, NY 11229",
  "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
- "generated_at": "2026-09-29T17:41Z",
- "riprap_commit": "866eeb7",
+ "generated_at": "2026-09-29T18:24Z",
+ "riprap_commit": "f8c6e20",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -207,7 +207,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_extreme_2080_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -273,7 +273,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_moderate_2050_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -339,7 +339,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_moderate_current_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -1121,12 +1121,17 @@
      "text": "2017 East 17th Street, Brooklyn"
     }
    ],
-   "rationale": "The question asks for past flood-related 311 complaints near a specific address, which requires the nyc311 source.",
+   "rationale": "The question asks for the count of flood-related 311 complaints near a specific address, which is answered by the nyc311 source.",
    "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
    "focus": {
     "hazard": "flood",
-    "time_frame": "past",
-    "assets": []
+    "time_frame": "any",
+    "assets": [
+     "public_housing",
+     "schools",
+     "subway",
+     "hospitals"
+    ]
    },
    "pebbles": [
     "nyc311"
@@ -1170,9 +1175,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1861,
-     "completion_tokens": 132,
-     "duration_s": 6.338,
+     "prompt_tokens": 1921,
+     "completion_tokens": 152,
+     "duration_s": 7.904,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1229,16 +1234,16 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 446,
+     "prompt_tokens": 640,
      "completion_tokens": 22,
-     "duration_s": 1.971,
+     "duration_s": 2.138,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
     }
    ],
    "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
-   "n_documents": 6,
+   "n_documents": 8,
    "answer_mode": "extractive",
    "answer_lead": "count",
    "lead_fact": {
@@ -1261,7 +1266,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-29T01:44:54+0000",
-    "retrieved_at": "2026-09-29T17:41Z",
+    "retrieved_at": "2026-09-29T18:24Z",
     "vintage": "2026-09-29T01:44:54+0000",
     "maturity": "production"
    }
@@ -1283,55 +1288,8 @@
     "stone": "cornerstone"
    },
    {
-    "id": "ida_hwm",
-    "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
-    "stone": "cornerstone"
-   },
-   {
-    "id": "floodnet",
-    "title": "FloodNet ultrasonic depth sensors (NYC)",
-    "stone": "touchstone"
-   },
-   {
     "id": "nyc311",
     "title": "NYC 311 flood-related complaints (5y)",
-    "stone": "touchstone"
-   }
-  ],
-  "not_checked": [
-   {
-    "id": "dep_extreme_2080",
-    "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
-    "stone": "cornerstone"
-   },
-   {
-    "id": "dep_moderate_current",
-    "title": "NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)",
-    "stone": "cornerstone"
-   },
-   {
-    "id": "prithvi_water",
-    "title": "New surface water after Hurricane Ida, Prithvi-EO (experimental)",
-    "stone": "cornerstone"
-   },
-   {
-    "id": "microtopo",
-    "title": "LiDAR / DEM-derived micro-topography",
-    "stone": "cornerstone"
-   },
-   {
-    "id": "nws_obs",
-    "title": "NWS hourly METAR observations (nearest station)",
-    "stone": "touchstone"
-   },
-   {
-    "id": "noaa_tides",
-    "title": "NOAA tide-gauge water level (nearest station)",
-    "stone": "touchstone"
-   },
-   {
-    "id": "usgs_gauges",
-    "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
     "stone": "touchstone"
    },
    {
@@ -1353,6 +1311,53 @@
     "id": "doh_hospitals",
     "title": "NYC DOH hospitals exposed nearby",
     "stone": "keystone"
+   }
+  ],
+  "not_checked": [
+   {
+    "id": "dep_extreme_2080",
+    "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
+    "stone": "cornerstone"
+   },
+   {
+    "id": "dep_moderate_current",
+    "title": "NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)",
+    "stone": "cornerstone"
+   },
+   {
+    "id": "ida_hwm",
+    "title": "Hurricane Ida 2021 \u2014 USGS high-water marks",
+    "stone": "cornerstone"
+   },
+   {
+    "id": "prithvi_water",
+    "title": "New surface water after Hurricane Ida, Prithvi-EO (experimental)",
+    "stone": "cornerstone"
+   },
+   {
+    "id": "microtopo",
+    "title": "LiDAR / DEM-derived micro-topography",
+    "stone": "cornerstone"
+   },
+   {
+    "id": "floodnet",
+    "title": "FloodNet ultrasonic depth sensors (NYC)",
+    "stone": "touchstone"
+   },
+   {
+    "id": "nws_obs",
+    "title": "NWS hourly METAR observations (nearest station)",
+    "stone": "touchstone"
+   },
+   {
+    "id": "noaa_tides",
+    "title": "NOAA tide-gauge water level (nearest station)",
+    "stone": "touchstone"
+   },
+   {
+    "id": "usgs_gauges",
+    "title": "USGS stream gauge \u2014 live stage at the nearest gauge",
+    "stone": "touchstone"
    },
    {
     "id": "nws_alerts",
@@ -1405,28 +1410,6 @@
    "depth_label": "outside",
    "citation": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
    "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR)."
-  },
-  "ida_hwm": {
-   "n_within_radius": 0,
-   "radius_m": 800,
-   "max_elev_ft": null,
-   "max_height_above_gnd_ft": null,
-   "nearest_dist_m": 1351.0,
-   "nearest_site": "Coney Island Ave., between Ave. P and Ave. O, Midwood, Brooklyn",
-   "nearest_elev_ft": 29.1,
-   "vertical_datum": null,
-   "sample_sites": [],
-   "points": [],
-   "narrative": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address. Nearest USGS-surveyed mark: Coney Island Ave., between Ave. P and Ave. O, Midwood, Brooklyn (1351 m away)."
-  },
-  "floodnet": {
-   "n_sensors": 0,
-   "sensors": [],
-   "n_flood_events_3y": 0,
-   "n_sensors_with_events": 0,
-   "peak_event": null,
-   "narrative": "No FloodNet sensors deployed within 600 m of this address.",
-   "radius_m": 600
   },
   "nyc311": {
    "n": 34,
@@ -1731,11 +1714,223 @@
     2
    ]
   },
+  "mta_entrances": {
+   "available": true,
+   "n_entrances": 5,
+   "n_checked": 5,
+   "radius_m": 800,
+   "footprint_buffer_m": 8,
+   "n_inside_sandy_2012": 0,
+   "n_in_dep_extreme_2080": 3,
+   "narrative": "5 MTA subway entrances within 800 m of this address: 0 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+   "n_ada_accessible": 0,
+   "entrances": [
+    {
+     "station_id": "52",
+     "station_name": "Avenue U",
+     "daytime_routes": "Q",
+     "borough": "B",
+     "entrance_type": "Station House",
+     "entrance_lat": 40.5990226,
+     "entrance_lon": -73.9558565,
+     "distance_m": 222.5,
+     "ada_accessible": false,
+     "elevation_m": 7.26,
+     "hand_m": 4.23,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "52",
+     "station_name": "Ave U",
+     "daytime_routes": "Q",
+     "borough": "B",
+     "entrance_type": "Station House",
+     "entrance_lat": 40.599,
+     "entrance_lon": -73.9560243,
+     "distance_m": 231.8,
+     "ada_accessible": false,
+     "elevation_m": 7.26,
+     "hand_m": 3.4,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 2,
+     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
+     "dep_moderate_2050_class": 2,
+     "dep_moderate_2050_label": "deep and contiguous flooding (1 ft or more)"
+    },
+    {
+     "station_id": "53",
+     "station_name": "Neck Rd",
+     "daytime_routes": "Q",
+     "borough": "B",
+     "entrance_type": "Station House",
+     "entrance_lat": 40.595075,
+     "entrance_lon": -73.9549866,
+     "distance_m": 634.7,
+     "ada_accessible": false,
+     "elevation_m": 7.06,
+     "hand_m": 4.03,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 2,
+     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
+     "dep_moderate_2050_class": 2,
+     "dep_moderate_2050_label": "deep and contiguous flooding (1 ft or more)"
+    },
+    {
+     "station_id": "53",
+     "station_name": "Neck Rd",
+     "daytime_routes": "Q",
+     "borough": "B",
+     "entrance_type": "Station House",
+     "entrance_lat": 40.5950522,
+     "entrance_lon": -73.9551299,
+     "distance_m": 638.0,
+     "ada_accessible": false,
+     "elevation_m": 7.39,
+     "hand_m": 4.36,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "53",
+     "station_name": "Neck Rd",
+     "daytime_routes": "Q",
+     "borough": "B",
+     "entrance_type": "Station House",
+     "entrance_lat": 40.595031,
+     "entrance_lon": -73.9552736,
+     "distance_m": 641.3,
+     "ada_accessible": false,
+     "elevation_m": 7.39,
+     "hand_m": 4.36,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 2,
+     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
+     "dep_moderate_2050_class": 2,
+     "dep_moderate_2050_label": "deep and contiguous flooding (1 ft or more)"
+    }
+   ],
+   "citation": "MTA Open Data subway entrances + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM"
+  },
+  "nycha_developments": {
+   "available": true,
+   "n_developments": 0,
+   "radius_m": 2000,
+   "n_inside_sandy_2012": 0,
+   "n_in_dep_extreme_2080": 0,
+   "narrative": "0 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+   "developments": [],
+   "citation": "Pre-computed from NYC Open Data NYCHA Developments (phvi-damg) joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. See data/registers/nycha.json."
+  },
+  "doe_schools": {
+   "available": true,
+   "n_schools": 1,
+   "radius_m": 1500,
+   "footprint_buffer_m": 50,
+   "n_inside_sandy_2012": 0,
+   "n_in_dep_extreme_2080": 1,
+   "narrative": "1 flood-exposed NYC DOE school within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+   "schools": [
+    {
+     "loc_code": "K278",
+     "loc_name": "J.H.S. 278 Marine Park",
+     "address": "1925 STUART STREET",
+     "borough": "Brooklyn",
+     "bin": "3239889",
+     "bbl": "3.0849601E+9",
+     "managed_by": "DOE-managed",
+     "school_lat": 40.60675,
+     "school_lon": -73.93872,
+     "distance_m": 1494.7,
+     "elevation_m": 4.26,
+     "hand_m": null,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 2,
+     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    }
+   ],
+   "citation": "Pre-computed from NYC DOE Locations Points joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. See data/registers/schools.json."
+  },
+  "doh_hospitals": {
+   "available": true,
+   "n_hospitals": 3,
+   "n_checked": 3,
+   "radius_m": 3000,
+   "footprint_buffer_m": 100,
+   "n_inside_sandy_2012": 1,
+   "n_in_dep_extreme_2080": 2,
+   "narrative": "3 hospitals within 3000 m of this address: 1 inside the 2012 Sandy inundation extent and 2 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+   "hospitals": [
+    {
+     "fac_id": "1293",
+     "facility_name": "Maimonides Midwood Community Hospital",
+     "address": "2525 Kings Highway, Brooklyn",
+     "borough": "BROOKLYN",
+     "operator_name": "The New York Community Hospital of Brooklyn, Inc.",
+     "ownership_type": "Not for Profit Corporation",
+     "hospital_lat": 40.61342,
+     "hospital_lon": -73.94897,
+     "distance_m": 1483.8,
+     "elevation_m": 5.76,
+     "hand_m": 0.3,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 2,
+     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "fac_id": "1294",
+     "facility_name": "South Brooklyn Health",
+     "address": "2601 Ocean Parkway, Brooklyn",
+     "borough": "BROOKLYN",
+     "operator_name": "New York City Health and Hospitals Corporation",
+     "ownership_type": "Municipality",
+     "hospital_lat": 40.58662,
+     "hospital_lon": -73.9658,
+     "distance_m": 1836.7,
+     "elevation_m": 2.66,
+     "hand_m": 0.0,
+     "inside_sandy_2012": true,
+     "dep_extreme_2080_class": 2,
+     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "fac_id": "1324",
+     "facility_name": "Mount Sinai Brooklyn",
+     "address": "3201 Kings Highway, Brooklyn",
+     "borough": "BROOKLYN",
+     "operator_name": "Beth Israel Medical Center Inc",
+     "ownership_type": "Not for Profit Corporation",
+     "hospital_lat": 40.61795,
+     "hospital_lon": -73.94323,
+     "distance_m": 2137.2,
+     "elevation_m": 7.07,
+     "hand_m": 2.9,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    }
+   ],
+   "citation": "NYS DOH Health Facility Certification (vn5v-hh5r) + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM"
+  },
   "trace": [
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790703686.984919,
+    "started_at": 1790706289.8055449,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -1748,7 +1943,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790703687.004564,
+    "started_at": 1790706289.8265548,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1760,7 +1955,7 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790703687.050095,
+    "started_at": 1790706289.870263,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1770,7 +1965,17 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790703687.050097,
+    "started_at": 1790706289.870264,
+    "elapsed_s": 0.0,
+    "err": null,
+    "result": {
+     "skipped": "not selected for this question"
+    }
+   },
+   {
+    "step": "ida_hwm",
+    "ok": true,
+    "started_at": 1790706289.870265,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1780,7 +1985,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790703687.050097,
+    "started_at": 1790706289.870265,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1790,7 +1995,17 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790703687.050098,
+    "started_at": 1790706289.870265,
+    "elapsed_s": 0.0,
+    "err": null,
+    "result": {
+     "skipped": "not selected for this question"
+    }
+   },
+   {
+    "step": "floodnet",
+    "ok": true,
+    "started_at": 1790706289.870265,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1800,7 +2015,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790703687.050098,
+    "started_at": 1790706289.870265,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1810,7 +2025,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790703687.050098,
+    "started_at": 1790706289.8702662,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1820,47 +2035,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790703687.050098,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
-    "step": "mta_entrances",
-    "ok": true,
-    "started_at": 1790703687.050099,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
-    "step": "nycha_developments",
-    "ok": true,
-    "started_at": 1790703687.050099,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
-    "step": "doe_schools",
-    "ok": true,
-    "started_at": 1790703687.050099,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
-    "step": "doh_hospitals",
-    "ok": true,
-    "started_at": 1790703687.050099,
+    "started_at": 1790706289.8702662,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1870,7 +2045,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790703687.050099,
+    "started_at": 1790706289.8702662,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1880,7 +2055,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790703687.0500998,
+    "started_at": 1790706289.8702662,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1890,7 +2065,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790703687.0500998,
+    "started_at": 1790706289.8702662,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1900,7 +2075,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790703687.0500998,
+    "started_at": 1790706289.870267,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1910,7 +2085,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790703687.0500998,
+    "started_at": 1790706289.870267,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1920,7 +2095,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790703687.050101,
+    "started_at": 1790706289.870267,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1930,7 +2105,7 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790703687.079245,
+    "started_at": 1790706289.8981829,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -1944,8 +2119,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790703687.08608,
-    "elapsed_s": 0.02,
+    "started_at": 1790706289.904172,
+    "elapsed_s": 0.13,
     "err": null,
     "result": {
      "zone": "X",
@@ -1957,7 +2132,7 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790703687.0810728,
+    "started_at": 1790706289.9048069,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -1966,42 +2141,67 @@
     }
    },
    {
-    "step": "ida_hwm",
-    "ok": true,
-    "started_at": 1790703687.079168,
-    "elapsed_s": 0.01,
-    "err": null,
-    "result": {
-     "n_within_800m": 0,
-     "max_height_above_gnd_ft": null,
-     "nearest_m": 1351.0
-    }
-   },
-   {
-    "step": "floodnet",
-    "ok": true,
-    "started_at": 1790703687.085857,
-    "elapsed_s": 0.07,
-    "err": null,
-    "result": {
-     "n_sensors": 0,
-     "n_events_3y": 0
-    }
-   },
-   {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790703687.085516,
-    "elapsed_s": 0.36,
+    "started_at": 1790706289.9088619,
+    "elapsed_s": 0.79,
     "err": null,
     "result": {
      "n": 34
     }
    },
    {
+    "step": "mta_entrances",
+    "ok": true,
+    "started_at": 1790706289.909635,
+    "elapsed_s": 2.04,
+    "err": null,
+    "result": {
+     "n_entrances": 5,
+     "n_inside_sandy_2012": 0,
+     "n_in_dep_extreme_2080": 3
+    }
+   },
+   {
+    "step": "nycha_developments",
+    "ok": true,
+    "started_at": 1790706289.915871,
+    "elapsed_s": 0.01,
+    "err": null,
+    "result": {
+     "n_developments": 0,
+     "n_inside_sandy_2012": 0,
+     "n_in_dep_extreme_2080": 0
+    }
+   },
+   {
+    "step": "doe_schools",
+    "ok": true,
+    "started_at": 1790706289.921094,
+    "elapsed_s": 0.01,
+    "err": null,
+    "result": {
+     "n_schools": 1,
+     "n_inside_sandy_2012": 0,
+     "n_in_dep_extreme_2080": 1
+    }
+   },
+   {
+    "step": "doh_hospitals",
+    "ok": true,
+    "started_at": 1790706289.9163032,
+    "elapsed_s": 0.12,
+    "err": null,
+    "result": {
+     "n_hospitals": 3,
+     "n_inside_sandy_2012": 1,
+     "n_in_dep_extreme_2080": 2
+    }
+   },
+   {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790703687.6972952,
+    "started_at": 1790706292.180393,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2012,7 +2212,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790703687.697485,
+    "started_at": 1790706292.180593,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -2022,7 +2222,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 2.0
+    "elapsed_s": 2.19
    }
   ],
   "models": [
@@ -2031,7 +2231,7 @@
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 8.31,
+    "latency_s": 10.04,
     "calls": 2
    }
   ],
@@ -2046,20 +2246,20 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 8.309,
+   "total_duration_s": 10.042,
    "tokens": {
-    "prompt": 2307,
-    "completion": 154,
-    "total": 2461
+    "prompt": 2561,
+    "completion": 174,
+    "total": 2735
    },
    "calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1861,
-     "completion_tokens": 132,
-     "duration_s": 6.338,
+     "prompt_tokens": 1921,
+     "completion_tokens": 152,
+     "duration_s": 7.904,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -2068,9 +2268,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 446,
+     "prompt_tokens": 640,
      "completion_tokens": 22,
-     "duration_s": 1.971,
+     "duration_s": 2.138,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"

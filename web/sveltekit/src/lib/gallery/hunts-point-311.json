@@ -3,8 +3,8 @@
  "neighborhood": "Hunts Point, Bronx",
  "address": "355 Food Center Drive, Bronx, NY",
  "question": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 since 2022?",
- "generated_at": "2026-09-29T17:42Z",
- "riprap_commit": "866eeb7",
+ "generated_at": "2026-09-29T18:25Z",
+ "riprap_commit": "f8c6e20",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -207,7 +207,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_extreme_2080_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -273,7 +273,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_moderate_2050_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -339,7 +339,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_moderate_current_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -1121,7 +1121,7 @@
      "text": "355 Food Center Drive, Bronx"
     }
    ],
-   "rationale": "The question asks for past flood-related 311 complaints near a specific address, which requires the nyc311 source.",
+   "rationale": "The question asks for past flood-related 311 complaints near a specific address, so the nyc311 source (flood-related 311 complaints) is needed.",
    "question": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 since 2022?",
    "focus": {
     "hazard": "flood",
@@ -1170,9 +1170,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1859,
-     "completion_tokens": 127,
-     "duration_s": 6.103,
+     "prompt_tokens": 1919,
+     "completion_tokens": 136,
+     "duration_s": 6.442,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1231,7 +1231,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 457,
      "completion_tokens": 28,
-     "duration_s": 2.003,
+     "duration_s": 1.949,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1261,7 +1261,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-29T01:44:54+0000",
-    "retrieved_at": "2026-09-29T17:42Z",
+    "retrieved_at": "2026-09-29T18:25Z",
     "vintage": "2026-09-29T01:44:54+0000",
     "maturity": "production"
    }
@@ -1447,8 +1447,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790703725.768799,
-    "elapsed_s": 0.01,
+    "started_at": 1790706337.651998,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "address": "355 FOOD CENTER DRIVE, Bronx, NY, USA",
@@ -1460,7 +1460,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790703725.7747421,
+    "started_at": 1790706337.678136,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1472,7 +1472,7 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790703725.8006,
+    "started_at": 1790706337.7317472,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1482,7 +1482,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790703725.800601,
+    "started_at": 1790706337.731749,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1492,7 +1492,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790703725.800601,
+    "started_at": 1790706337.731749,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1502,7 +1502,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790703725.800601,
+    "started_at": 1790706337.731749,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1512,7 +1512,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790703725.800601,
+    "started_at": 1790706337.731749,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1522,7 +1522,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790703725.8006022,
+    "started_at": 1790706337.731749,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1532,7 +1532,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790703725.8006022,
+    "started_at": 1790706337.7317498,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1542,7 +1542,7 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790703725.8006022,
+    "started_at": 1790706337.7317498,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1552,7 +1552,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790703725.8006022,
+    "started_at": 1790706337.7317498,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1562,7 +1562,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790703725.8006022,
+    "started_at": 1790706337.7317498,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1572,7 +1572,7 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790703725.8006022,
+    "started_at": 1790706337.731751,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1582,7 +1582,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790703725.800603,
+    "started_at": 1790706337.731751,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1592,7 +1592,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790703725.800603,
+    "started_at": 1790706337.731751,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1602,7 +1602,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790703725.800603,
+    "started_at": 1790706337.731751,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1612,7 +1612,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790703725.800603,
+    "started_at": 1790706337.731751,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1622,7 +1622,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790703725.800603,
+    "started_at": 1790706337.731751,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1632,7 +1632,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790703725.800603,
+    "started_at": 1790706337.731752,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1642,8 +1642,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790703725.8297842,
-    "elapsed_s": 0.03,
+    "started_at": 1790706337.760318,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "inside": {
@@ -1656,7 +1656,7 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790703725.830027,
+    "started_at": 1790706337.760056,
     "elapsed_s": 0.04,
     "err": null,
     "result": {
@@ -1669,7 +1669,7 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790703725.83587,
+    "started_at": 1790706337.7599318,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -1680,8 +1680,8 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790703725.837429,
-    "elapsed_s": 0.0,
+    "started_at": 1790706337.762388,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "n_within_800m": 0,
@@ -1692,8 +1692,8 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790703725.837872,
-    "elapsed_s": 0.07,
+    "started_at": 1790706337.7669508,
+    "elapsed_s": 0.13,
     "err": null,
     "result": {
      "n_sensors": 0,
@@ -1703,8 +1703,8 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790703725.838457,
-    "elapsed_s": 8.16,
+    "started_at": 1790706337.773428,
+    "elapsed_s": 2.87,
     "err": null,
     "result": {
      "n": 0
@@ -1713,7 +1713,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790703734.252558,
+    "started_at": 1790706340.918628,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1724,7 +1724,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790703734.252738,
+    "started_at": 1790706340.918817,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -1734,7 +1734,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 2.05
+    "elapsed_s": 1.99
    }
   ],
   "models": [
@@ -1743,7 +1743,7 @@
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 8.1,
+    "latency_s": 8.39,
     "calls": 2
    }
   ],
@@ -1758,20 +1758,20 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 8.106,
+   "total_duration_s": 8.391,
    "tokens": {
-    "prompt": 2316,
-    "completion": 155,
-    "total": 2471
+    "prompt": 2376,
+    "completion": 164,
+    "total": 2540
    },
    "calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1859,
-     "completion_tokens": 127,
-     "duration_s": 6.103,
+     "prompt_tokens": 1919,
+     "completion_tokens": 136,
+     "duration_s": 6.442,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1782,7 +1782,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 457,
      "completion_tokens": 28,
-     "duration_s": 2.003,
+     "duration_s": 1.949,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"

@@ -3,8 +3,8 @@
  "neighborhood": "Brooklyn Heights, Brooklyn",
  "address": "189 Atlantic Avenue, Brooklyn, NY",
  "question": "Have the FloodNet sensors near 189 Atlantic Avenue, Brooklyn recorded flooding?",
- "generated_at": "2026-09-29T17:42Z",
- "riprap_commit": "866eeb7",
+ "generated_at": "2026-09-29T18:25Z",
+ "riprap_commit": "f8c6e20",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -207,7 +207,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Extreme (3.66 in/hr, 2080 sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_extreme_2080_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -273,7 +273,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_moderate_2050_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -339,7 +339,7 @@
      "source_name": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level)",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level), share of the neighborhood by depth class",
+     "citation": "NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, current sea level), share of the neighborhood by flooding category",
      "doc_id": "dep_moderate_current_nta",
      "date_modified": "2024-07-03",
      "retrieved_at": "2026-07-11"
@@ -1170,9 +1170,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1854,
+     "prompt_tokens": 1914,
      "completion_tokens": 115,
-     "duration_s": 5.662,
+     "duration_s": 5.51,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1222,7 +1222,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 441,
      "completion_tokens": 45,
-     "duration_s": 2.893,
+     "duration_s": 2.67,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1626,8 +1626,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790703742.0371258,
-    "elapsed_s": 0.13,
+    "started_at": 1790706348.6092758,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "address": "189 ATLANTIC AVENUE, Brooklyn, NY, USA",
@@ -1639,7 +1639,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790703742.1709409,
+    "started_at": 1790706348.636142,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1651,7 +1651,7 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790703742.219143,
+    "started_at": 1790706348.679979,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1661,7 +1661,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790703742.2191439,
+    "started_at": 1790706348.67998,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1671,7 +1671,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790703742.2191439,
+    "started_at": 1790706348.67998,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1681,7 +1681,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790703742.219145,
+    "started_at": 1790706348.679981,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1691,7 +1691,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790703742.219145,
+    "started_at": 1790706348.679981,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1701,7 +1701,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790703742.219145,
+    "started_at": 1790706348.679981,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1711,7 +1711,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790703742.219145,
+    "started_at": 1790706348.679981,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1721,7 +1721,7 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790703742.219145,
+    "started_at": 1790706348.6799822,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1731,7 +1731,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790703742.219145,
+    "started_at": 1790706348.6799822,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1741,7 +1741,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790703742.219146,
+    "started_at": 1790706348.6799822,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1751,7 +1751,7 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790703742.219146,
+    "started_at": 1790706348.6799822,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1761,7 +1761,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790703742.219146,
+    "started_at": 1790706348.6799822,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1771,7 +1771,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790703742.219146,
+    "started_at": 1790706348.6799822,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1781,7 +1781,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790703742.219146,
+    "started_at": 1790706348.6799831,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1791,7 +1791,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790703742.219146,
+    "started_at": 1790706348.6799831,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1801,7 +1801,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790703742.219147,
+    "started_at": 1790706348.6799831,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1811,7 +1811,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790703742.219147,
+    "started_at": 1790706348.6799831,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1821,8 +1821,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790703742.2539918,
-    "elapsed_s": 0.02,
+    "started_at": 1790706348.708645,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "inside": {
@@ -1835,8 +1835,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790703742.2559419,
-    "elapsed_s": 0.03,
+    "started_at": 1790706348.7083871,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {
      "zone": "X",
@@ -1848,8 +1848,8 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790703742.247689,
-    "elapsed_s": 0.03,
+    "started_at": 1790706348.71145,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -1859,7 +1859,7 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790703742.258014,
+    "started_at": 1790706348.711364,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1871,7 +1871,7 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790703742.2587578,
+    "started_at": 1790706348.7151098,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -1882,7 +1882,7 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790703742.2589262,
+    "started_at": 1790706348.715422,
     "elapsed_s": 0.03,
     "err": null,
     "result": {
@@ -1892,7 +1892,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790703742.538369,
+    "started_at": 1790706348.962158,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1903,7 +1903,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790703742.538614,
+    "started_at": 1790706348.9623501,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -1913,7 +1913,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 3.13
+    "elapsed_s": 2.72
    }
   ],
   "models": [
@@ -1922,7 +1922,7 @@
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 8.55,
+    "latency_s": 8.18,
     "calls": 2
    }
   ],
@@ -1937,20 +1937,20 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 8.555,
+   "total_duration_s": 8.18,
    "tokens": {
-    "prompt": 2295,
+    "prompt": 2355,
     "completion": 160,
-    "total": 2455
+    "total": 2515
    },
    "calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1854,
+     "prompt_tokens": 1914,
      "completion_tokens": 115,
-     "duration_s": 5.662,
+     "duration_s": 5.51,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1961,7 +1961,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 441,
      "completion_tokens": 45,
-     "duration_s": 2.893,
+     "duration_s": 2.67,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
