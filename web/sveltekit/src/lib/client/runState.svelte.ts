@@ -219,6 +219,20 @@ export function buildIdaHwmFc(fr: Rec): FeatureCollection | undefined {
       metres(e.distance_m)].filter(Boolean).join(', '));
 }
 
+/** An OpenStreetMap-style address made as compact as a Geosearch one:
+ *  "4970, Broadway, Inwood, Manhattan Community Board 12, Manhattan, New
+ *  York County, New York, 10034, United States" becomes "4970 Broadway,
+ *  Inwood, Manhattan". Geosearch addresses pass through unchanged. */
+export function compactAddress(a: string): string {
+  const parts = a.split(',').map((p) => p.trim()).filter(Boolean);
+  if (parts.length < 5) return a;
+  const drop = /^(United States|New York|NY|\d{5}(-\d{4})?|.* County|.*Community Board.*|City of New York)$/i;
+  const keep = parts.filter((p) => !drop.test(p));
+  if (keep.length > 1 && /^\d+[A-Za-z]?(-\d+)?$/.test(keep[0])) keep.splice(0, 2, `${keep[0]} ${keep[1]}`);
+  const out = keep.slice(0, 3).join(', ');
+  return out || a;
+}
+
 /** A FloodNet status code in words: "good" and its variants are in good
  *  working order; every other code is a maintenance flag. */
 export function sensorStatusWords(status: unknown): string | null {
@@ -397,7 +411,8 @@ export class RunState {
     const a = this.compareAddressA?.label;
     const b = this.compareAddressB?.label;
     if (a || b) return [a && `A: ${a}`, b && `B: ${b}`].filter(Boolean).join('; ');
-    const addr = this.finalResult?.geocode?.address ?? this.address?.label ?? null;
+    const raw = this.finalResult?.geocode?.address ?? this.address?.label ?? null;
+    const addr = raw ? compactAddress(raw) : null;
     const nta = this.finalResult?.nta?.nta_name;
     const place = addr && nta && !addr.includes(nta) ? `${addr} (${nta})` : (addr ?? nta ?? null);
     if (place && this.finalResult?.geocode?.match === 'closest')
