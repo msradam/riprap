@@ -25,3 +25,14 @@ describe('register row', () => {
     expect(text).toMatch(/flood-exposed NYC DOE schools/);
   });
 });
+
+describe('register row sentences', () => {
+  it('closes each register sentence, so they do not run together', () => {
+    pebbleManifest.setFromResponse(g.pebbles as unknown as PebbleManifestResponse, 'nyc');
+    const card = RunState.fromFinal(g.final as unknown as FinalResult, g.address).findingsData.cards
+      .find((c) => c.id === 'fsm-registers');
+    const sentences = (card?.sub ?? '').split(/(?<=\.)\s+(?=[A-Z0-9])/);
+    expect(sentences.length).toBeGreaterThan(1);
+    for (const s of sentences) expect(s).toMatch(/[.!?]$/);
+  });
+});

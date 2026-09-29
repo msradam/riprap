@@ -629,7 +629,9 @@ function buildRegisterComposite(
     vintage: RIPRAP_VINTAGE,
     title: 'Nearby assets',
     registers: rows,
-    sub: [...found, ...empty].join(' '),
+    // Pebble narratives carry no closing stop; without one the sentences
+    // run together and findingOf cannot split the first from the rest.
+    sub: [...found, ...empty].map((s) => (/[.!?]$/.test(s.trim()) ? s.trim() : `${s.trim()}.`)).join(' '),
     docId: docIds[0] ?? 'registers',
     citeId: 'registers',
     mapLayer: 'registers',
