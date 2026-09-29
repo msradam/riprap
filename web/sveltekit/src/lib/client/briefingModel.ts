@@ -173,6 +173,37 @@ export function keySentence(
   return null;
 }
 
+const EXP_LABEL = /^\s*Experimental:\s+/;
+
+/** A paragraph from an experimental source opens with the badge part; the
+ *  badge replaces the sentence's own "Experimental:" label. */
+function badged(parts: ClaimPart[]): ClaimPart[] {
+  const [first, ...rest] = parts;
+  const t = first.text.replace(EXP_LABEL, '');
+  const head = t === first.text ? first : { ...first, text: t.charAt(0).toUpperCase() + t.slice(1) };
+  return [{ text: '', exp: true }, head, ...rest];
+}
+
+/** A question's answer with a lead fact: the key sentence (keySentence),
+ *  then the rest as one paragraph per cited source (bySource). Paragraphs
+ *  citing an experimental source come last, each with the Experimental
+ *  badge. An experimental sentence is never the key sentence: then no
+ *  sentence is singled out (`key` null) and the paragraphs are the whole
+ *  answer. Null when there is no lead fact or its sentence is not found. */
+export function keyedAnswer(
+  answer: ClaimPart[][],
+  fact: { doc_id: string; in_lead: boolean } | null | undefined,
+  isExp: (docId: string) => boolean
+): { key: ClaimPart[] | null; paras: ClaimPart[][] } | null {
+  const k = keySentence(answer, fact);
+  if (!k) return null;
+  const key = citedIn([k.key]).some(isExp) ? null : k.key;
+  const support = (key ? k.rest : answer).flatMap(bySource);
+  const exp = (p: ClaimPart[]) => citedIn([p]).some(isExp);
+  const paras = [...support.filter((p) => !exp(p)), ...support.filter(exp).map(badged)];
+  return { key, paras: key ? [key, ...paras] : paras };
+}
+
 /** The Answer or In brief section of a parsed briefing, with the lead word
  *  split off its first paragraph (splitLead). The gallery's standfirsts
  *  read the same paragraphs, so they pick the key sentence the page sets. */
@@ -350,10 +381,13 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   // A question's answer leads with its key sentence; the rest follows,
   // one size smaller, as support, one short paragraph per cited source.
   // Place briefings keep their In brief.
-  const keyed = question && !refusal ? keySentence(answer0, g?.lead_fact) : null;
-  const answerParas = keyed ? [keyed.key, ...keyed.rest.flatMap(bySource)] : answer0;
+  // Experimental sources come after the answer, badged, and never lead it.
+  const isExp = (id: string) => run.briefing.citations[id]?.maturity === 'experimental';
+  const answered = question && !refusal ? keyedAnswer(answer0, g?.lead_fact, isExp) : null;
+  const keyed = answered?.key ?? null;
+  const answerParas = answered?.paras ?? answer0;
   // A count answer whose count sits inside its key sentence leads with that count.
-  const leadWord = refusal ? null : first.word ?? (keyed && g?.answer_lead === 'count' ? countLead(keyed.key) : null);
+  const leadWord = refusal ? null : first.word ?? (keyed && g?.answer_lead === 'count' ? countLead(keyed) : null);
 
   // "Checks run: ..." closes the Out of scope note; it is its own line here.
   const outParas = sections(split.outOfScope).flatMap((s) => s.paras);

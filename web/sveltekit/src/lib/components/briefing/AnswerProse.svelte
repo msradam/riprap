@@ -5,7 +5,8 @@
 
   /** One paragraph of claim parts as plain prose: no tier marks, and a
    *  small citation number after the closing punctuation. A run of
-   *  adjacent parts citing the same source shows its number once. */
+   *  adjacent parts citing the same source shows its number once. A part
+   *  marked `exp` sets the Experimental badge. */
   interface Props {
     parts: ClaimPart[];
     citations: Record<string, Citation>;
@@ -17,7 +18,7 @@
 </script>
 
 <p class={className}>
-  {#each tidied as p, i (i)}{#if p.bold}<strong>{p.text}</strong>{:else}{p.text}{/if}{#if p.cite && citations[p.cite] && tidied[i + 1]?.cite !== p.cite}{@const c = citations[p.cite]}<a
+  {#each tidied as p, i (i)}{#if p.exp}<span class="exp-badge">Experimental</span>&#32;{/if}{#if p.bold}<strong>{p.text}</strong>{:else}{p.text}{/if}{#if p.cite && citations[p.cite] && tidied[i + 1]?.cite !== p.cite}{@const c = citations[p.cite]}<a
         href="#cite-{c.id}"
         class="inline-cite"
         data-cite={c.id}

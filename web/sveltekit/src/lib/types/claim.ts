@@ -19,6 +19,9 @@ export interface ClaimPart {
   tier?: Tier;
   cite?: string;
   bold?: boolean;
+  /** An empty part that opens a paragraph from an experimental source:
+   *  the paragraph is set with the Experimental badge at its start. */
+  exp?: boolean;
 }
 
 export type BriefingBlock =

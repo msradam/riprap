@@ -4,9 +4,9 @@
  * answer mode, so neither page ships the full snapshots.
  */
 import { galleryIndex, loadGalleryEntry, type GalleryIndexEntry } from '$lib/client/gallery';
-import type { FinalResult } from '$lib/client/agentStream';
+import { citationList, type FinalResult } from '$lib/client/agentStream';
 import { parseBriefing } from '$lib/client/parseBriefing';
-import { keySentence, leadAnswer } from '$lib/client/briefingModel';
+import { keyedAnswer, leadAnswer } from '$lib/client/briefingModel';
 import { tidy } from '$lib/client/briefingText';
 
 export interface GalleryStory extends GalleryIndexEntry {
@@ -29,13 +29,14 @@ export function leadSentence(paragraph: string): string {
 }
 
 /** The standfirst: with a lead fact, the lead word and the key sentence
- *  the page sets large, chosen by the page's own keySentence; otherwise
+ *  the page sets large, chosen by the page's own keyedAnswer; otherwise
  *  leadSentence. */
-export function standfirst(final: Pick<FinalResult, 'paragraph' | 'grounding'>): string {
+export function standfirst(final: Pick<FinalResult, 'paragraph' | 'grounding' | 'citations'>): string {
   const { first, answer } = leadAnswer(parseBriefing(final.paragraph).blocks);
-  const keyed = keySentence(answer, final.grounding?.lead_fact);
+  const exp = new Set(citationList(final.citations).filter((c) => c.maturity === 'experimental').map((c) => c.doc_id));
+  const keyed = keyedAnswer(answer, final.grounding?.lead_fact, (id) => exp.has(id))?.key;
   if (!keyed) return leadSentence(final.paragraph);
-  const key = tidy(keyed.key).map((p) => p.text).join('').replace(/\s+/g, ' ').trim();
+  const key = tidy(keyed).map((p) => p.text).join('').replace(/\s+/g, ' ').trim();
   // A count lead keeps its sentence whole, so only a word such as "Yes" is added.
   return first.word && /^[A-Z]/.test(first.word) ? `${first.word}. ${key}` : key;
 }
