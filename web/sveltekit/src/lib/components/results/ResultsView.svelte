@@ -473,8 +473,9 @@
     gap: 4px 24px;
     margin-top: 2px;
   }
-  /* An action, not a jump: at the row's right end. */
-  .brief-action {
+  /* An action, not a jump: at the row's right end. Without jump links (a
+     refusal) there is no row to end, so it keeps the text's left edge. */
+  nav + .brief-action {
     margin-left: auto;
   }
   .brief-footer {
