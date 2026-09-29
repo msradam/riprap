@@ -4,10 +4,11 @@
   import { asOfPhrase } from '$lib/client/briefingText';
   import { TIER_WORDS } from '$lib/types/tier';
 
-  /** Every source the briefing cites, with its long title and doc id. A
-   *  citation mark focuses the element with id `cite-{id}`; for sources
-   *  already shown as a source note beside the answer that element is the
-   *  note, so these entries carry no id (ids stay unique). */
+  /** Every source the briefing cites: its name as the link, then its long
+   *  title as plain text and its doc id. A citation mark focuses the
+   *  element with id `cite-{id}`; for sources already shown as a source
+   *  note beside the answer that element is the note, so these entries
+   *  carry no id (ids stay unique). */
   interface Props {
     citations: Citation[];
     /** Ids already rendered as source notes. */
@@ -22,14 +23,15 @@
 
 {#snippet entry(c: Citation)}
   <span class="source-entry-n data">{c.n}</span>
-  <span class="source-entry-name">{c.source}</span>
-  <span class="source-entry-title">
+  <!-- Only the name is the link; the long description is plain text. -->
+  <span class="source-entry-name">
     {#if c.url?.startsWith('http')}
-      <a href={c.url} target="_blank" rel="noopener noreferrer">{c.title}</a>
+      <a href={c.url} target="_blank" rel="noopener noreferrer">{c.source}</a>
     {:else}
-      {c.title}
+      {c.source}
     {/if}
   </span>
+  <span class="source-entry-title">{c.title}</span>
   <span class="source-entry-line">
     {#if c.maturity === 'experimental'}{TIER_WORDS[c.tier] ?? c.tier} <span class="exp-badge">Experimental</span>{:else}{TIER_WORDS[c.tier] ?? c.tier}{/if}, {@render asOf(c.vintage)},
     <span class="data">{c.docId}</span>
@@ -89,7 +91,12 @@
   .source-entry-line {
     display: block;
   }
-  .source-entry-title a {
+  .source-entry-name a {
     color: var(--riprap-text-link);
+    text-decoration: none;
+  }
+  .source-entry-name a:hover,
+  .source-entry-name a:focus-visible {
+    text-decoration: underline;
   }
 </style>
