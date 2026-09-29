@@ -113,6 +113,22 @@ export function sentencesOf(parts: ClaimPart[]): ClaimPart[][] {
 
 const joinSentences = (ss: ClaimPart[][]) => ss.flatMap((s, i) => (i ? [{ text: ' ' }, ...s] : s));
 
+/** A paragraph broken into one paragraph per cited source, in reading
+ *  order: consecutive sentences citing the same sources stay together,
+ *  and an uncited sentence stays with the sentence before it. */
+export function bySource(parts: ClaimPart[]): ClaimPart[][] {
+  const groups: { key: string; ss: ClaimPart[][] }[] = [];
+  for (const s of sentencesOf(parts)) {
+    const key = citedIn([s]).join(' ');
+    const last = groups.at(-1);
+    if (last && (!key || !last.key || key === last.key)) {
+      last.ss.push(s);
+      last.key ||= key;
+    } else groups.push({ key, ss: [s] });
+  }
+  return groups.map((g) => joinSentences(g.ss));
+}
+
 /** The answer's key sentence, taken out so it can lead at the answer size,
  *  and the rest of the answer as support. `in_lead`: the backend's lead
  *  sentence, before "From the sources consulted:"; its count comes from
@@ -326,9 +342,10 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     : leadAnswerParas;
   const leadWord = refusal ? null : first.word;
   // A question's answer leads with its key sentence; the rest follows,
-  // one size smaller, as support. Place briefings keep their In brief.
+  // one size smaller, as support, one short paragraph per cited source.
+  // Place briefings keep their In brief.
   const keyed = question && !refusal ? keySentence(answer0, g?.lead_fact) : null;
-  const answerParas = keyed ? [keyed.key, ...keyed.rest] : answer0;
+  const answerParas = keyed ? [keyed.key, ...keyed.rest.flatMap(bySource)] : answer0;
 
   // "Checks run: ..." closes the Out of scope note; it is its own line here.
   const outParas = sections(split.outOfScope).flatMap((s) => s.paras);

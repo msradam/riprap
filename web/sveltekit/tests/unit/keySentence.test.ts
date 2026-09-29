@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { keySentence, sentencesOf, splitLead } from '$lib/client/briefingModel';
+import { bySource, keySentence, sentencesOf, splitLead } from '$lib/client/briefingModel';
 import { parseBriefing } from '$lib/client/parseBriefing';
 import { tidy } from '$lib/client/briefingText';
 import type { ClaimPart } from '$lib/types/claim';
@@ -60,5 +60,20 @@ describe('keySentence', () => {
 describe('sentencesOf', () => {
   it('splits at the gap between sentences, not inside a cited sentence', () => {
     expect(sentencesOf(answerOf(IDA)[0]).map(words)).toHaveLength(5);
+  });
+});
+
+describe('bySource', () => {
+  it('breaks the support into one paragraph per cited source, in order, keeping every sentence and mark', () => {
+    const rest = keySentence(answerOf(IDA), { doc_id: 'nyc311', in_lead: false })!.rest;
+    const paras = rest.flatMap(bySource);
+    expect(paras.map((p) => [...new Set(cites([p]))])).toEqual([['ida_hwm'], ['floodnet']]);
+    expect(cites(paras)).toEqual(cites(rest));
+    expect(paras.map(words).join(' ')).toBe(rest.map(words).join(' '));
+  });
+
+  it('keeps an uncited sentence with the one before it, and a returning source in a new paragraph', () => {
+    const [p] = answerOf('A one [a]. A two. B one [b]. A three [a].');
+    expect(bySource(p).map(words)).toEqual(['A one. A two.', 'B one.', 'A three.']);
   });
 });
