@@ -8,8 +8,6 @@
  *   - main-pane status indicator has cleared (no stuck "gathering
  *     evidence" / "Resolving address…" )
  *   - briefing pane contains the templated paragraph
- *   - Map Layers panel ("Layers · grouped by Stone") contains only
- *     map-layer pebbles from the routed deployment
  *   - cross-city: zero NYC-only needles in any non-NYC render
  *
  * Driven against the production SvelteKit build served by uvicorn.
@@ -105,9 +103,9 @@ for (const c of CITIES) {
       expect(text, `${c.key} still contains literal "NYC"`).not.toMatch(/\bNYC\b/);
     }
 
-    // 4. Map awaiting-geocode is gone (geocode succeeded).
-    await expect(page.locator('#region-map .region-head-meta'))
-      .not.toContainText('awaiting geocode…');
+    // 4. The geocode succeeded: the map figure is on the page (it only
+    //    renders once the place has resolved).
+    await expect(page.locator('#brief-map')).toBeVisible();
   });
 }
 

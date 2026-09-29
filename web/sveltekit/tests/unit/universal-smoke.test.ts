@@ -25,15 +25,17 @@ import SkipLink from '$lib/components/shell/SkipLink.svelte';
 import ColdStart from '$lib/components/shell/ColdStart.svelte';
 // Briefing
 import Briefing from '$lib/components/briefing/Briefing.svelte';
-import CitationDrawer from '$lib/components/briefing/CitationDrawer.svelte';
 import SectionHead from '$lib/components/briefing/SectionHead.svelte';
-// Findings
-import FindingsRegion from '$lib/components/findings/FindingsRegion.svelte';
-import StoneRegion from '$lib/components/findings/StoneRegion.svelte';
-import StoneTally from '$lib/components/findings/StoneTally.svelte';
-import RunHealthStrip from '$lib/components/findings/RunHealthStrip.svelte';
-// Map
-import MapLegend from '$lib/components/map/MapLegend.svelte';
+import AnswerProse from '$lib/components/briefing/AnswerProse.svelte';
+import SourceNotes from '$lib/components/briefing/SourceNotes.svelte';
+import SourceList from '$lib/components/briefing/SourceList.svelte';
+import SourcesChecked from '$lib/components/briefing/SourcesChecked.svelte';
+import MapFigure from '$lib/components/briefing/MapFigure.svelte';
+import EvidenceTable from '$lib/components/briefing/EvidenceTable.svelte';
+import HowMade from '$lib/components/briefing/HowMade.svelte';
+import ProvenanceTrace from '$lib/components/findings/ProvenanceTrace.svelte';
+import { RunState } from '$lib/client/runState.svelte';
+import { briefingModel } from '$lib/client/briefingModel';
 // States
 import ErrorCard from '$lib/components/states/ErrorCard.svelte';
 import SkeletonBriefing from '$lib/components/states/SkeletonBriefing.svelte';
@@ -47,15 +49,9 @@ import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
 import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
 import SeverityMark from '$lib/components/glyphs/SeverityMark.svelte';
 
-import type { FindingsData, StoneTrace, StoneKey } from '$lib/types/card';
-
-const emptyStone = (s: StoneKey): StoneTrace => ({ key: s, members: [] });
-
-const EMPTY_FINDINGS: FindingsData = {
-  cards: [],
-  stones: ['cornerstone', 'touchstone', 'keystone', 'lodestone', 'capstone']
-    .map((s) => emptyStone(s as StoneKey)),
-  wallSeconds: 0,
+const CITATION = {
+  id: 'sandy', n: 1, tier: 'empirical' as const, source: 'Open Data', title: 'Inundation extent',
+  docId: 'sandy', url: 'https://example.org', vintage: '2015-11-09', retrieved: '2026-01-01'
 };
 
 interface SmokeCase {
@@ -63,8 +59,6 @@ interface SmokeCase {
   Component: Component<any>;  // eslint-disable-line @typescript-eslint/no-explicit-any
   props: Record<string, unknown>;
 }
-
-const ALL_ON = { empirical: true, modeled: true, proxy: true, synthetic: true };
 
 const CASES: SmokeCase[] = [
   // Shell
@@ -78,23 +72,24 @@ const CASES: SmokeCase[] = [
   // Briefing
   { name: 'Briefing',          Component: Briefing,
     props: { blocks: [], citations: {} } },
-  { name: 'CitationDrawer',    Component: CitationDrawer,    props: { citations: {} } },
   { name: 'SectionHead',       Component: SectionHead,
     props: { n: '01', label: 'Test', title: 'Test section' } },
-
-  // Findings
-  { name: 'FindingsRegion',    Component: FindingsRegion,
-    props: { data: EMPTY_FINDINGS } },
-  { name: 'StoneRegion',       Component: StoneRegion,
-    props: { stone: 'cornerstone', cards: [], trace: emptyStone('cornerstone') } },
-  { name: 'StoneTally',        Component: StoneTally,
-    props: { cardCount: 0, members: [] } },
-  { name: 'RunHealthStrip',    Component: RunHealthStrip,
-    props: { cards: [], stones: EMPTY_FINDINGS.stones, wallSeconds: 0 } },
-
-  // Map
-  { name: 'MapLegend',         Component: MapLegend,
-    props: { active: ALL_ON, onToggle: () => {} } },
+  { name: 'AnswerProse',       Component: AnswerProse,
+    props: { parts: [{ text: 'Outside the extent.', cite: 'sandy' }], citations: { sandy: CITATION } } },
+  { name: 'SourceNotes',       Component: SourceNotes,
+    props: { citations: [CITATION], label: 'Sources for the answer' } },
+  { name: 'SourceList',        Component: SourceList,
+    props: { citations: [CITATION], noted: [] } },
+  { name: 'SourcesChecked',    Component: SourcesChecked,
+    props: { lists: { consulted: [], hasConsultedList: true, noData: [], notChecked: [] } } },
+  { name: 'MapFigure',         Component: MapFigure,
+    props: { run: new RunState() } },
+  { name: 'EvidenceTable',     Component: EvidenceTable,
+    props: { groups: [], findings: new Map(), citations: {}, notRun: [], labelledby: 'x' } },
+  { name: 'HowMade',           Component: HowMade,
+    props: { model: briefingModel(new RunState(), 'test'), stones: [] } },
+  { name: 'ProvenanceTrace',   Component: ProvenanceTrace,
+    props: { members: [{ id: 'sandy', name: 'Sandy extent', status: 'fired' as const }] } },
 
   // States
   { name: 'ErrorCard',         Component: ErrorCard,

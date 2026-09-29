@@ -6,6 +6,6 @@
 @import './lib/fonts.css';
 @import './lib/tokens.css';
 @import './lib/chrome.css';
-/* styles.css, layout.css and print.css belong to the briefing, gallery and
+/* styles.css and print.css belong to the briefing, gallery and
    print routes; routes/(app)/+layout.svelte loads them so the landing's
    render-blocking CSS stays small. */

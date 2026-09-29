@@ -46,9 +46,7 @@
 .app-header-query-icon { color: var(--ink-tertiary); }
 .app-header-query-edit {
   margin-left: auto;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 12px;
   color: var(--ink-tertiary);
 }
 /* One line at every width: the status pill truncates rather than wraps and

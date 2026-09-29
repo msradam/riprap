@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
 import DroppedClaims from '$lib/components/briefing/DroppedClaims.svelte';
-import CitationDrawer from '$lib/components/briefing/CitationDrawer.svelte';
+import SourceList from '$lib/components/briefing/SourceList.svelte';
 import { briefingFromFinal } from '$lib/client/runState.svelte';
 
 const DROPPED = [
@@ -67,11 +67,11 @@ describe('briefingFromFinal', () => {
     expect(flat).not.toContain('**');
   });
 
-  it('carries citation maturity and retrieval date, and the drawer badges experimental ones', () => {
+  it('carries citation maturity and retrieval date, and the source list badges experimental ones', () => {
     const { citations } = briefingFromFinal(final);
     expect(citations.ttm_battery_surge.maturity).toBe('experimental');
     expect(citations.ttm_battery_surge.retrieved).toBe('2026-09-26');
-    const { container } = render(CitationDrawer, { props: { citations } });
+    const { container } = render(SourceList, { props: { citations: Object.values(citations), noted: [] } });
     const badges = container.querySelectorAll('.exp-badge');
     expect(badges).toHaveLength(1);
     expect(badges[0].closest('li')?.id).toBe('cite-ttm_battery_surge');
@@ -98,21 +98,24 @@ describe('gallery snapshot replay (hollis.json)', () => {
   });
 });
 
-describe('RunHealthStrip inference energy', () => {
-  const base = { cards: [], stones: [] };
-  it('labels a supplied figure and says "energy unknown" otherwise', async () => {
-    const RunHealthStrip = (await import('$lib/components/findings/RunHealthStrip.svelte')).default;
-    const est = render(RunHealthStrip, { props: { ...base,
-      emissions: { n_calls: 2, energy_status: 'estimated' as const, total_wh: 0.42, tokens: { total: 900 } } } });
-    expect(est.container.textContent).toContain('0.42 Wh (estimated)');
-    const unknown = render(RunHealthStrip, { props: { ...base,
-      emissions: { n_calls: 1, energy_status: 'unknown' as const, total_wh: null } } });
-    expect(unknown.container.textContent).toContain('energy unknown');
+describe('run facts inference energy', () => {
+  const facts = async (emissions: Record<string, unknown>) => {
+    const { runFacts } = await import('$lib/client/briefingModel');
+    const run = { findingsData: { cards: [], stones: [], emissions }, runWallSeconds: undefined };
+    return runFacts(run as never).join(' ');
+  };
+  it('labels a supplied figure and leaves an unknown one out', async () => {
+    expect(await facts({ n_calls: 2, energy_status: 'estimated', total_wh: 0.42, tokens: { total: 900 } }))
+      .toContain('2 language-model calls, 900 tokens, 0.42 Wh (estimated).');
+    const unknown = await facts({ n_calls: 1, energy_status: 'unknown', total_wh: null });
+    expect(unknown).toContain('1 language-model call.');
+    expect(unknown).not.toMatch(/unknown|Wh/);
     // Older payload: a number with no label is not shown as a figure.
-    const legacy = render(RunHealthStrip, { props: { ...base, emissions: { n_calls: 1, total_wh: 0.5 } } });
-    expect(legacy.container.textContent).toContain('energy unknown');
-    expect(legacy.container.textContent).not.toContain('0.50 Wh');
-    const none = render(RunHealthStrip, { props: { ...base, emissions: { n_calls: 0, energy_status: 'none' as const } } });
-    expect(none.container.textContent).not.toContain('inference');
+    const legacy = await facts({ n_calls: 1, total_wh: 0.5 });
+    expect(legacy).not.toContain('0.50 Wh');
+    expect(await facts({ n_calls: 0, energy_status: 'none' })).not.toContain('language-model');
+  });
+  it('drops an unknown wall clock instead of printing it', async () => {
+    expect(await facts({})).not.toMatch(/took|wall/);
   });
 });

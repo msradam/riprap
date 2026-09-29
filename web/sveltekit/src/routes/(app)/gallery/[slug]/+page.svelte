@@ -3,7 +3,7 @@
   import { resolve } from '$app/paths';
   import ResultsView from '$lib/components/results/ResultsView.svelte';
   import { RunState } from '$lib/client/runState.svelte';
-  import { formatGeneratedAt, llmStamp } from '$lib/client/gallery';
+  import { llmStamp } from '$lib/client/gallery';
   import { persistSnapshot, snapshotFromRun } from '$lib/stores/briefingState.svelte';
   import type { PageProps } from './$types';
 
@@ -12,7 +12,7 @@
   let entry = $derived(data.entry);
   // Rebuilt from the saved `final` payload: no EventSource, no fetch.
   let run = $derived(RunState.fromFinal(entry.final, entry.address));
-  let stamp = $derived(llmStamp(entry));
+  let meta = $derived({ generatedAt: entry.generated_at, commit: entry.riprap_commit, stamp: llmStamp(entry) });
 
   /** Save this entry as a print snapshot and open the print route. The
    *  id is what a reader would type to run the same briefing live, so the
@@ -29,29 +29,39 @@
   <meta name="description" content="Precomputed Riprap flood-exposure briefing for {entry.address}." />
 </svelte:head>
 
-<ResultsView {run} queryText={entry.address} snapshot>
+<ResultsView {run} queryText={entry.address} snapshot {meta}>
   {#snippet notice()}
-    <p class="region-head-meta snapshot-note">
-      Precomputed snapshot, generated {formatGeneratedAt(entry.generated_at)} from Riprap
-      commit {entry.riprap_commit}. Live readings (tides, alerts, sensors) are as of that time.
-      {#if stamp}{stamp}.{/if}
-      <a href="{resolve('/(app)/gallery')}/">All gallery entries</a>
-    </p>
     <p class="snapshot-actions">
-      <button type="button" class="region-action" onclick={print}>Print this briefing</button>
+      <button type="button" class="snapshot-print" onclick={print}>Print this briefing</button>
+      <a href="{resolve('/(app)/gallery')}/">All gallery entries</a>
     </p>
   {/snippet}
 </ResultsView>
 
 <style>
-  .snapshot-note {
-    margin: 0 0 12px;
-  }
   .snapshot-actions {
-    margin: 0 0 16px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 16px;
+    margin: 0;
   }
-  .snapshot-actions .region-action {
-    min-height: 28px;
-    font-size: 12px;
+  .snapshot-actions a {
+    display: inline-block;
+    min-height: 24px;
+  }
+  .snapshot-print {
+    min-height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: var(--riprap-text-link);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .snapshot-print:focus-visible {
+    outline: 3px solid var(--riprap-focus);
+    outline-offset: 2px;
   }
 </style>

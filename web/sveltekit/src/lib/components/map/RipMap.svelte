@@ -130,13 +130,13 @@
     return `
           <div style="font-family: 'Sofia Sans', system-ui; font-size: 12px;">
             <div style="font-weight: 600; color: #0F172A;">${name}</div>
-            <div style="color: #6B6B6B; font-size: 11px; margin-top: 2px;">${kind}</div>
+            <div style="color: #475569; font-size: 12px; margin-top: 2px;">${kind}</div>
             <div style="margin-top: 6px;">
-              <span style="font-family: 'Overpass Mono', monospace; font-size: 10.5px; color: ${inside ? '#0B5394' : '#6B6B6B'};">
+              <span style="font-family: 'Overpass Mono', monospace; font-size: 12px; color: ${inside ? '#0B5394' : '#6B6B6B'};">
                 inside_sandy_2012=${inside}
               </span>
             </div>
-            ${docId ? `<div style="margin-top: 4px; font-family: 'Overpass Mono', monospace; font-size: 10.5px; color: #005EA2;">[${docId}]</div>` : ''}
+            ${docId ? `<div style="margin-top: 4px; font-family: 'Overpass Mono', monospace; font-size: 12px; color: #005EA2;">[${docId}]</div>` : ''}
           </div>`;
   }
 
@@ -238,9 +238,9 @@
           const height = p.height_above_gnd_ft != null ? `${Number(p.height_above_gnd_ft).toFixed(2)} ft above ground` : '—';
           const html = `
             <div style="font-family: 'Sofia Sans', system-ui; font-size: 12px; max-width: 220px;">
-              <div style="font-weight: 600; color: #92400E; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;">Ida 2021 HWM · USGS</div>
+              <div style="font-weight: 600; color: #92400E; font-size: 12px;">Ida 2021 high-water mark, USGS</div>
               <div style="margin-top: 4px; color: #0F172A; font-size: 12px;">${site}</div>
-              <div style="margin-top: 6px; font-family: 'Overpass Mono', monospace; font-size: 10.5px; color: #4E5A6E;">elev: ${elev}<br>mark: ${height}</div>
+              <div style="margin-top: 6px; font-family: 'Overpass Mono', monospace; font-size: 12px; color: #4E5A6E;">elev: ${elev}<br>mark: ${height}</div>
             </div>`;
           import('maplibre-gl').then(({ Popup }) => {
             if (!map) return;
@@ -605,6 +605,14 @@
     z-index: 1;
     box-shadow: 0 0 0 3px var(--riprap-focus);
   }
+  /* Twelve Pixel Floor: MapLibre's scale and attribution text in the
+     data face at 12px. */
+  .map-frame :global(.maplibregl-ctrl-scale),
+  .map-frame :global(.maplibregl-ctrl-attrib) {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 400;
+  }
   .link-badge {
     position: absolute;
     bottom: 8px;
@@ -613,9 +621,7 @@
     background: var(--ink);
     color: var(--paper);
     font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: lowercase;
+    font-size: 12px;
     z-index: 5;
     pointer-events: none;
   }

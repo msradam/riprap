@@ -28,6 +28,9 @@
   let isPrint = $derived(routeId.startsWith('/(app)/print/'));
   let chromeFree = $derived(isPrint || routeId === '/');
   // Gallery and lab pages are static snapshots: the header must not call /api/*.
+  // Briefing pages carry the disclaimer in their scope note; the footer
+  // does not repeat it.
+  let isBriefing = $derived(routeId.startsWith('/(app)/q/') || routeId === '/(app)/gallery/[slug]');
   let isGallery = $derived(routeId.startsWith('/(app)/gallery') || routeId.startsWith('/(app)/lab'));
 
   // The run status lives in a module store that outlives the /q/ page, so
@@ -52,7 +55,7 @@
 <!-- The landing sets its own skip target (.land-page), so main only carries the skip-link id on app routes. -->
 <main id={chromeFree ? undefined : 'main-content'} tabindex="-1">{@render children()}</main>
 {#if !chromeFree}
-  <AppFooter />
+  <AppFooter disclaimer={!isBriefing} />
 {/if}
 
 <style>

@@ -167,8 +167,8 @@
      the wordmark. */
   .app-header-city-pill {
     font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 400;
     letter-spacing: 0.04em;
     color: var(--accent);
     background: var(--reference-bg);

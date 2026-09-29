@@ -14,7 +14,7 @@
  * Per-query knobs:
  *   - minCitations         lower bound; out-of-scope = 0, full briefing = 2-5
  *   - expectError          allow ErrorCard surfaced (e.g. all-silent for OOS)
- *   - expectRegisterCards  assert ≥1 RegisterCard renders (NYCHA / school /
+ *   - expectRegisterCards  assert ≥1 Keystone evidence row renders (NYCHA / school /
  *                          hospital / subway). Requires
  *                          RIPRAP_HEAVY_SPECIALISTS=1; safely skipped when off.
  *   - expectLiveNow        live_now intent — no Mellea reconcile, faster path
@@ -118,9 +118,9 @@ test.describe('@demo live SSE end-to-end', () => {
       await page.waitForFunction(
         () => {
           const errCard = document.querySelector('.error-card');
-          const briefing = document.querySelector('.briefing-prose');
-          const caret = document.querySelector('.streaming-caret');
-          return Boolean(errCard) || (briefing != null && caret == null);
+          const briefing = document.querySelector('#brief-answer, .brief-section');
+          const status = document.querySelector('.generating-status');
+          return Boolean(errCard) || (briefing != null && status == null);
         },
         undefined,
         { timeout: settleTimeout }
@@ -135,28 +135,32 @@ test.describe('@demo live SSE end-to-end', () => {
       let headCount = 0;
       let citeCount = 0;
       if (errorCardCount === 0) {
-        // Briefing rendered — full asserts.
-        const heads = page.locator('.briefing-section-head');
+        // Briefing rendered: full asserts. Section heads are the answer's
+        // h2 and the report sections' h2s.
+        const heads = page.locator('#region-briefing h2');
         headCount = await heads.count();
         expect(headCount,
           `at least one section head should render for "${d.query}"`).toBeGreaterThan(0);
 
-        const claimGlyphs = page.locator('.claim-glyph svg[role="img"]');
-        const claimCount = await claimGlyphs.count();
+        // Tier marks left the prose; each cited claim carries a citation mark.
+        const claimCount = await page.locator('a.inline-cite').count();
         if (d.minCitations > 0) {
           expect(claimCount,
-            `at least one tier-glyph claim should render for "${d.query}"`
+            `at least one cited claim should render for "${d.query}"`
           ).toBeGreaterThan(0);
         }
 
-        const cites = page.locator('.citation-drawer .citation-item');
+        const cites = page.locator('.source-list .source-entry');
         citeCount = await cites.count();
         expect(citeCount, `≥${d.minCitations} citations for "${d.query}"`)
           .toBeGreaterThanOrEqual(d.minCitations);
       }
 
-      // Trace summary always shows counts.
-      await expect(page.locator('.trace-head-meta')).toContainText('fired');
+      // The method block states the run facts whenever a briefing rendered
+      // (an error card replaces the whole briefing, method block included).
+      if (errorCardCount === 0) {
+        await expect(page.locator('#how-made')).toContainText('registered source functions');
+      }
 
       // Map: only assert legend has features when the map mounted AND we
       // have any data at all (out-of-scope correctly has all-empty layers).
@@ -164,7 +168,7 @@ test.describe('@demo live SSE end-to-end', () => {
       const mapMounted = await page.locator('.maplibregl-canvas').count();
       if (mapMounted > 0) {
         await page.waitForTimeout(1500);
-        legendItems = await page.locator('.map-legend-item').count();
+        legendItems = await page.locator('.map-layers label').count();
         // Don't enforce ≥1 for out-of-scope or live-now.
         if (!d.expectError && !d.expectLiveNow && d.minCitations > 0) {
           expect(legendItems,
@@ -176,10 +180,12 @@ test.describe('@demo live SSE end-to-end', () => {
       // Optional: register cards present (when HEAVY specialists active).
       let registerCardCount = 0;
       if (d.expectRegisterCards) {
-        registerCardCount = await page.locator('.register-card').count();
+        registerCardCount = await page
+          .locator('tbody', { has: page.locator('.ev-group th', { hasText: 'Keystone' }) })
+          .locator('.ev-row').count();
         if (process.env.RIPRAP_HEAVY_SPECIALISTS === '1') {
           expect(registerCardCount,
-            `≥1 RegisterCard for "${d.query}" with HEAVY=1`).toBeGreaterThan(0);
+            `≥1 Keystone evidence row for "${d.query}" with HEAVY=1`).toBeGreaterThan(0);
         }
         // With HEAVY off, register-card absence is expected; just log.
       }

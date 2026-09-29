@@ -3,9 +3,8 @@
   import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
   import Self from './ProvenanceTrace.svelte';
 
-  /** Indented specialist tree. Each row: status pip · mono id · italic-
-   *  serif name · note. Recursive via self-import (svelte:self is
-   *  deprecated in Svelte 5). */
+  /** Indented specialist tree. Each row: status pip, mono id, name, note.
+   *  Recursive via self-import (svelte:self is deprecated in Svelte 5). */
   let { members, depth = 0 }: { members: StoneMember[]; depth?: number } = $props();
 
   /** v0.4.5 status pip — five distinct shapes per V0.4.5_SPEC.md §1.
@@ -26,8 +25,8 @@
     } as const)[status];
   }
   function pipColorVar(m: StoneMember): string {
-    if (m.status === 'warned') return '#B7791F';
-    if (m.status === 'errored') return '#B91C1C';
+    if (m.status === 'warned') return 'var(--accent-warn)';
+    if (m.status === 'errored') return 'var(--accent-alert)';
     if (m.status === 'silent_by_design') return 'var(--ink-tertiary)';
     if (m.status === 'not_invoked') return 'var(--ink-tertiary)';
     if (m.tier) return `var(--tier-${m.tier})`;
@@ -46,7 +45,7 @@
         </span>
       {/if}
       <span class="prov-name">{m.name}</span>
-      {#if m.note}<span class="prov-note">· {m.note}</span>{/if}
+      {#if m.note}<span class="prov-note">{m.note}</span>{/if}
       {#if m.ms != null}<span class="prov-ms">{m.ms < 1000 ? `${m.ms}ms` : `${(m.ms / 1000).toFixed(1)}s`}</span>{/if}
     </li>
     {#if m.children?.length}
@@ -66,20 +65,17 @@
   }
   .prov-row {
     /* Flex, not a fixed grid: rows carry four to six cells (tier and note
-       are optional), and a grid pushed the timing into the 14px pip
-       column on the next line. */
+       are optional). */
     display: flex;
     flex-wrap: wrap;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
     column-gap: var(--s-2);
     row-gap: 2px;
     align-items: baseline;
     padding: 3px 0;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    border-bottom: 1px dotted var(--rule-soft);
+    font-size: 14px;
+    line-height: 1.45;
   }
-  .prov-row:last-child { border-bottom: 0; }
   .prov-row > * { min-width: 0; }
   .prov-pip {
     flex: 0 0 14px;
@@ -87,46 +83,30 @@
     font-size: 12px;
     line-height: 1;
   }
-  .prov-id {
-    color: var(--ink);
-    letter-spacing: 0.04em;
-    text-transform: lowercase;
+  .prov-id,
+  .prov-ms {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--ink-secondary);
   }
   .prov-tier {
     display: inline-flex;
     align-items: center;
   }
   .prov-name {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: 13px;
     color: var(--ink);
   }
   .prov-note {
-    font-family: var(--font-sans);
-    font-size: 12px;
-    color: var(--ink-tertiary);
+    color: var(--ink-secondary);
   }
   .prov-ms {
     margin-left: auto;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--ink-tertiary);
   }
-  /* v0.4.5 status row treatments */
-  .prov-status-silent_by_design .prov-name {
-    color: var(--ink-tertiary);
-    font-style: italic;
-  }
-  .prov-status-warned .prov-name { color: #B7791F; }
-  .prov-status-errored .prov-name { color: #B91C1C; }
-  .prov-status-errored .prov-pip { font-weight: bold; }
+  .prov-status-silent_by_design .prov-name,
   .prov-status-not_invoked .prov-name {
-    color: var(--ink-tertiary);
-    font-style: italic;
+    color: var(--ink-secondary);
   }
-  .prov-status-not_invoked .prov-id {
-    color: var(--ink-tertiary);
-  }
+  .prov-status-warned .prov-name { color: var(--accent-warn); }
+  .prov-status-errored .prov-name { color: var(--accent-alert); }
   .prov-children { padding: 0; }
 </style>

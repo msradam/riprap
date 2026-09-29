@@ -24,37 +24,29 @@
 
 <style>
   .dropped-claims {
-    border: 1px solid var(--rule-soft);
-    background: var(--paper-deep);
-    margin: 16px 0;
+    margin: 12px 0 0;
+    max-width: 54ch;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-secondary);
   }
   .dropped-claims summary {
-    padding: 10px 14px;
+    min-height: 24px;
     cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--ink-secondary);
+    font-weight: 600;
+    color: var(--ink);
   }
   .dropped-list {
     list-style: none;
     margin: 0;
-    padding: 0 14px 12px;
+    padding: 0 0 0 16px;
   }
   .dropped-item {
     padding: 8px 0;
-    border-top: 1px solid var(--rule-soft);
   }
-  .dropped-text {
+  .dropped-text,
+  .dropped-reason {
     margin: 0;
-    font-size: 13px;
-    line-height: 1.45;
-    color: var(--ink-secondary);
   }
   .dropped-place { font-weight: 600; }
-  .dropped-reason {
-    margin: 4px 0 0;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink-tertiary);
-  }
 </style>

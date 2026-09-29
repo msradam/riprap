@@ -7,20 +7,26 @@
   // out of scope (FloodHelpNY is a NY-state nonprofit) or
   // misdirection (FloodNet NYC has no Boston coverage).
   let showNycResources = $derived(deployment.current?.name === 'nyc');
+
+  /** False on briefing pages, whose scope note already carries the
+   *  disclaimer and whose answer carries the resident pointer. */
+  let { disclaimer = true }: { disclaimer?: boolean } = $props();
 </script>
 
 <footer class="app-footer no-print">
   <div class="app-footer-inner">
-    <p class="app-footer-guard">
-      <strong>Riprap is a reference dossier, not a stamped engineering memo, risk score, or disclosure.</strong>
-      It is informational only; not a substitute for a licensed professional, and
-      not designed for personal property decisions, real-estate transactions, or
-      mortgage / insurance underwriting. {#if showNycResources}For residents, see
-        <!-- nyc-leak-ok: links gated on showNycResources (deployment === 'nyc') -->
-        <a href="https://www.floodhelpny.org">FloodHelpNY</a>
-        <!-- nyc-leak-ok: same gate as the FloodHelpNY link above -->
-        · <a href="https://www.floodnet.nyc">FloodNet NYC</a>.{/if}
-    </p>
+    {#if disclaimer}
+      <p class="app-footer-guard">
+        <strong>Riprap is a reference dossier, not a stamped engineering memo, risk score, or disclosure.</strong>
+        It is informational only; not a substitute for a licensed professional, and
+        not designed for personal property decisions, real-estate transactions, or
+        mortgage / insurance underwriting. {#if showNycResources}For residents, see
+          <!-- nyc-leak-ok: links gated on showNycResources (deployment === 'nyc') -->
+          <a href="https://www.floodhelpny.org">FloodHelpNY</a>
+          <!-- nyc-leak-ok: same gate as the FloodHelpNY link above -->
+          · <a href="https://www.floodnet.nyc">FloodNet NYC</a>.{/if}
+      </p>
+    {/if}
     <p class="app-footer-build">
       All foundation models Apache-2.0 · All data from public-record federal, state, and city sources · No commercial APIs contacted at runtime · Riprap v{APP_VERSION}
     </p>
@@ -29,3 +35,11 @@
     </p>
   </div>
 </footer>
+
+<style>
+  /* Measure: no footer line runs past 75 characters. */
+  .app-footer-build,
+  .app-footer-credits {
+    max-width: 75ch;
+  }
+</style>

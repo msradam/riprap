@@ -1,140 +1,93 @@
 /**
- * Sticky-map vs trace overlap regression.
+ * Sticky map containment on a place briefing (the prerendered
+ * /gallery/hollis/ page, no backend needed).
  *
- * Per handoff hard rule #12, the map sticks at top: 80px with a viewport
- * cap. The bug: with the original single-grid `.app-shell` layout, the
- * map's sticky containing block spanned the whole grid (including the
- * evidence and trace rows below) — so when the user scrolled to the
- * trace, the map kept sticking and visually overlapped the trace UI.
- *
- * Fix: split `.app-shell` into a sticky-parent top region (brief + map +
- * cites) and a non-sticky bottom region (evidence + trace). This test
- * scrolls to the trace and asserts the map's rect doesn't intersect.
+ * At 1100px and wider the map sits in a sticky right column beside the
+ * evidence table and report sections. Its sticky containing block is the
+ * two-column grid, so it must release before the Sources and method
+ * section below the grid. The sticky column is capped at the viewport
+ * and scrolls on its own, so the map point list under the map stays
+ * reachable from any scroll position.
  */
 import { test, expect } from '@playwright/test';
 
+const PAGE = '/gallery/hollis/';
+
+async function mapReady(page: import('@playwright/test').Page) {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(PAGE);
+  await page.waitForFunction(
+    () => Boolean((window as unknown as { __riprapMap?: unknown }).__riprapMap),
+    undefined,
+    { timeout: 15_000 }
+  );
+}
+
 test.describe('sticky map containment', () => {
-  test('does not overlap the trace UI when scrolled to bottom', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/q/sample');
-
-    // Wait for the map to mount so its bounding box is meaningful.
-    await page.waitForFunction(
-      () => Boolean((window as unknown as { __riprapMap?: unknown }).__riprapMap),
-      undefined,
-      { timeout: 15_000 }
-    );
-
-    // Scroll the trace into view and let layout settle.
-    await page.locator('#region-trace').scrollIntoViewIfNeeded();
+  test('does not overlap Sources and method when scrolled to it', async ({ page }) => {
+    await mapReady(page);
+    await page.locator('#brief-sources').scrollIntoViewIfNeeded();
     await page.waitForTimeout(300);
 
-    const rects = await page.evaluate(() => {
-      const m = document.getElementById('region-map')?.getBoundingClientRect();
-      const t = document.getElementById('region-trace')?.getBoundingClientRect();
-      const e = document.querySelector('[aria-label="Evidence"]')?.getBoundingClientRect();
-      return { m, t, e };
-    });
-
+    const rects = await page.evaluate(() => ({
+      m: document.querySelector('.brief-sticky')?.getBoundingClientRect(),
+      t: document.getElementById('brief-sources')?.getBoundingClientRect()
+    }));
     expect(rects.m, 'map rect').toBeTruthy();
-    expect(rects.t, 'trace rect').toBeTruthy();
+    expect(rects.t, 'sources rect').toBeTruthy();
     if (!rects.m || !rects.t) return;
 
-    // Two boxes overlap iff X-axis ranges overlap AND Y-axis ranges overlap.
     const xOverlap = !(rects.m.right <= rects.t.left || rects.t.right <= rects.m.left);
     const yOverlap = !(rects.m.bottom <= rects.t.top || rects.t.bottom <= rects.m.top);
-    const overlaps = xOverlap && yOverlap;
-
-    expect(overlaps,
-      `map should not visually overlap the trace UI when scrolled to it. ` +
-      `Map rect: ${JSON.stringify(rects.m)}; Trace rect: ${JSON.stringify(rects.t)}.`
+    expect(xOverlap && yOverlap,
+      `map should not overlap Sources and method. Map: ${JSON.stringify(rects.m)}; Sources: ${JSON.stringify(rects.t)}.`
     ).toBe(false);
-
-    // Belt + suspenders: map's bottom edge must be ABOVE the trace's top.
     expect(rects.m.bottom).toBeLessThanOrEqual(rects.t.top + 1);
   });
 
-  test('side rail is position:sticky with citations stacked beneath the map (DOM order)', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/q/sample');
-
-    await page.waitForFunction(
-      () => Boolean((window as unknown as { __riprapMap?: unknown }).__riprapMap),
-      undefined,
-      { timeout: 15_000 }
-    );
-
-    // Note: we don't pin a specific viewport-top here. Sample is a
-    // short page so the sticky range is small; live briefings (where
-    // brief content is much longer) get a multi-screen sticky range
-    // automatically because .app-shell-top stretches with brief height.
-    // What we verify here is the structural contract: rail is sticky
-    // at top:80, the map renders before citations in the rail, and the
-    // rail itself can scroll internally.
+  test('map column is sticky under the header, with the point list after the map (DOM order)', async ({ page }) => {
+    await mapReady(page);
     const facts = await page.evaluate(() => {
-      const rail = document.querySelector('.app-region-side') as HTMLElement | null;
+      const rail = document.querySelector('.brief-sticky') as HTMLElement | null;
       if (!rail) return null;
       const cs = getComputedStyle(rail);
-      const map = document.getElementById('region-map');
-      const cites = document.querySelector('.citation-drawer');
-      const order = map && cites &&
-        (map.compareDocumentPosition(cites) & Node.DOCUMENT_POSITION_FOLLOWING) ? 'map-first' : 'wrong';
-      return {
-        position: cs.position,
-        top: cs.top,
-        overflowY: cs.overflowY,
-        order
-      };
+      const map = rail.querySelector('.map-frame');
+      const list = rail.querySelector('.map-points');
+      const order = map && list && (map.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING) ? 'map-first' : 'wrong';
+      return { position: cs.position, top: cs.top, overflowY: cs.overflowY, order };
     });
     expect(facts).toBeTruthy();
     if (!facts) return;
     expect(facts.position).toBe('sticky');
-    expect(facts.top).toBe('80px');
+    // Below the 52px sticky app header.
+    expect(facts.top).toBe('68px');
     expect(facts.overflowY).toBe('auto');
     expect(facts.order).toBe('map-first');
   });
 
-  test('citations are reachable from the side rail (not buried under sticky map)', async ({ page }) => {
-    // Regression: at 100% browser zoom the map's max-height was nearly
-    // full viewport, so the citation drawer ended up entirely behind
-    // the sticky map after any scroll. Fix: wrap map + citations in a
-    // single sticky overflow-y:auto rail so the user can always scroll
-    // to the citations from any page-scroll position.
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/q/sample');
-
-    await page.waitForFunction(
-      () => Boolean((window as unknown as { __riprapMap?: unknown }).__riprapMap),
-      undefined,
-      { timeout: 15_000 }
-    );
-
-    await page.evaluate(() => window.scrollTo({ top: 400, behavior: 'instant' }));
+  test('the map point list is reachable from the sticky column (not buried under the map)', async ({ page }) => {
+    await mapReady(page);
+    await page.evaluate(() => window.scrollTo({ top: 1400, behavior: 'instant' }));
     await page.waitForTimeout(250);
 
-    // The side rail itself is sticky and overflow-y:auto — citations
-    // are always inside it, reachable by scrolling within the rail.
     const inside = await page.evaluate(() => {
-      const rail = document.querySelector('.app-region-side') as HTMLElement | null;
-      const cites = document.querySelector('.citation-drawer') as HTMLElement | null;
-      if (!rail || !cites) return null;
-      const inside = rail.contains(cites);
-      const railRect = rail.getBoundingClientRect();
-      const railVisible = railRect.top < window.innerHeight && railRect.bottom > 0;
-      const railScrollable = rail.scrollHeight > rail.clientHeight;
-      // Map sits at the start of the flex column; citations come after
-      // it in DOM order (so internal-scrolling reveals them).
-      const map = document.getElementById('region-map');
-      const mapBeforeCites =
-        map &&
-        map.compareDocumentPosition(cites) & Node.DOCUMENT_POSITION_FOLLOWING;
-      return { inside, railVisible, railScrollable, mapBeforeCites: Boolean(mapBeforeCites) };
+      const rail = document.querySelector('.brief-sticky') as HTMLElement | null;
+      const list = document.querySelector('.map-points') as HTMLElement | null;
+      if (!rail || !list) return null;
+      const r = rail.getBoundingClientRect();
+      const map = rail.querySelector('.map-frame');
+      return {
+        inside: rail.contains(list),
+        railVisible: r.top < window.innerHeight && r.bottom > 0,
+        railFits: r.height <= window.innerHeight,
+        mapBeforeList: Boolean(map && map.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING)
+      };
     });
-
-    expect(inside, 'rail / cites geometry').toBeTruthy();
+    expect(inside, 'rail / list geometry').toBeTruthy();
     if (!inside) return;
-    expect(inside.inside, 'citations inside side rail').toBe(true);
-    expect(inside.railVisible, 'side rail visible in viewport').toBe(true);
-    expect(inside.mapBeforeCites, 'map renders before cites in DOM').toBe(true);
+    expect(inside.inside, 'point list inside the sticky column').toBe(true);
+    expect(inside.railVisible, 'sticky column visible in viewport').toBe(true);
+    expect(inside.railFits, 'sticky column capped at the viewport height').toBe(true);
+    expect(inside.mapBeforeList, 'map renders before the list in DOM').toBe(true);
   });
 });

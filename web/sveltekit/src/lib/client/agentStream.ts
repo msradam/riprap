@@ -125,6 +125,8 @@ export interface FinalResult {
   area_boundary?: { geojson?: unknown; narrative?: string } | null;
   /** Models that contributed to this briefing. Missing on older gallery entries. */
   models?: ModelRow[];
+  /** The deployment the query was routed to ("nyc"); null out of coverage. */
+  deployment?: string | null;
 }
 
 /** One model row from the backend's `final.models`. */

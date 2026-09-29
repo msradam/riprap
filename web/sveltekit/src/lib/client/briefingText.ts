@@ -1,0 +1,102 @@
+/**
+ * Typesetting and table helpers for the briefing page. None of them change
+ * a word of the briefing; they move punctuation, pick out figures and
+ * choose which card text reads as the finding.
+ */
+import type { ClaimPart } from '$lib/types/claim';
+import type { Card } from '$lib/types/card';
+
+const PUNCT_RE = /^[.,;:]/;
+
+/** A cited claim ends in a space and the next part opens with its
+ *  punctuation ("NAVD88 " + "."), which puts the citation mark before the
+ *  full stop. Move that punctuation onto the first cited part of the run,
+ *  so the mark lands after it: "NAVD88.1". */
+export function tidy(parts: ClaimPart[]): ClaimPart[] {
+  const out = parts.map((p) => ({ ...p }));
+  for (let i = 1; i < out.length; i++) {
+    const m = PUNCT_RE.exec(out[i].text);
+    if (!m || !out[i - 1].cite) continue;
+    // Walk back over empty cited parts (several sources on one claim).
+    let j = i - 1;
+    while (j > 0 && out[j].text === '' && out[j - 1].cite) j--;
+    out[j].text = out[j].text.trimEnd() + m[0];
+    out[i].text = out[i].text.slice(1);
+  }
+  return out;
+}
+
+/** Doc ids cited in these paragraphs, in reading order. */
+export function citedIn(paras: ClaimPart[][]): string[] {
+  return [...new Set(paras.flat().flatMap((p) => (p.cite ? [p.cite] : [])))];
+}
+
+const FIGURE_RE = /^\d[\d.,]*(?:\s?(?:%|m²|cm|mm|ft|in|m\b|\/wk))?/;
+
+/** The evidence table's figure: the first scalar, else a leading number in
+ *  the headline ("82 calls" gives "82"), else nothing. */
+export function figureOf(c: Card): { value: string; label: string | null } | null {
+  const s = c.scalars?.[0];
+  if (s) return { value: s.unit ? `${s.value} ${s.unit}` : s.value, label: s.label };
+  const m = c.headline ? FIGURE_RE.exec(c.headline) : null;
+  return m ? { value: m[0].trim(), label: null } : null;
+}
+
+/** The finding sentence(s) for a card, split after the first sentence so
+ *  the table can set the first one heavier. The body or sub line (the
+ *  templated result) comes first. A headline is used only when it says
+ *  something of its own: a headline equal to the source's generic
+ *  narration (`narration`, e.g. "The 2012 Hurricane Sandy inundation
+ *  extent at this address.") names the dataset, not the result. */
+export function findingOf(c: Card, narration?: string | null): { first: string; rest: string } | null {
+  const headline = c.headline && c.headline !== narration ? c.headline : undefined;
+  const t = c.body ?? c.sub ?? headline;
+  if (!t) return null;
+  const m = /(?<=\.)\s+(?=[A-Z0-9])/.exec(t);
+  return m ? { first: t.slice(0, m.index), rest: t.slice(m.index + m[0].length) } : { first: t, rest: '' };
+}
+
+/** ISO timestamps show their date; "retrieved 2026-07-11" shows the
+ *  date; other vintages ("live", "2024-Q3") stay as they are. */
+export function asOfDate(v: string): string {
+  const d = v.replace(/^retrieved\s+/i, '');
+  return /^\d{4}-\d{2}-\d{2}T/.test(d) ? d.slice(0, 10) : d;
+}
+
+/** The vintage as a phrase for a source note: "data as of 2026-05",
+ *  "retrieved 2026-07-11" or "live data". */
+export function asOfPhrase(v: string): { label: string; date: string | null } {
+  if (/^live$/i.test(v.trim())) return { label: 'live data', date: null };
+  return { label: /^retrieved\s/i.test(v) ? 'retrieved' : 'data as of', date: asOfDate(v) };
+}
+
+/** Plain readings for terms a reader may not know. Shown only when the
+ *  term appears in the rendered briefing. */
+export const GLOSSARY: { term: string; re: RegExp; reading: string }[] = [
+  {
+    term: 'NAVD88',
+    re: /NAVD88/,
+    reading:
+      'an elevation above a fixed survey reference (the North American Vertical Datum of 1988), not a water depth.'
+  },
+  { term: 'SLR', re: /\bSLR\b/, reading: 'sea-level rise.' },
+  {
+    term: 'above-curb flood event',
+    re: /above-curb/i,
+    reading:
+      "a flood event logged by a FloodNet street sensor, which measures the depth of water on the street; the count uses FloodNet's own event records."
+  }
+];
+
+export const TIER_TERM = {
+  term: 'Measured, Modeled, Proxy, Synthetic',
+  reading:
+    'how directly a source observes flooding. Measured sources record it; modeled sources simulate a scenario; proxy sources, such as 311 complaints, indicate it indirectly; synthetic layers are generated, not observed.'
+};
+
+/** The glossary entries whose term appears in `text`, plus the tier words
+ *  when the evidence table is on the page. */
+export function termsIn(text: string, withTiers: boolean): { term: string; reading: string }[] {
+  const found = GLOSSARY.filter((g) => g.re.test(text)).map(({ term, reading }) => ({ term, reading }));
+  return withTiers ? [...found, TIER_TERM] : found;
+}

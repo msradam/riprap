@@ -1,77 +1,73 @@
 /**
- * Static demo route /q/sample.
+ * Static worked example: the prerendered gallery briefing /gallery/hollis/.
  *
- * This is the prerendered worked example with hard-coded sample data —
- * it must render every design-system piece without an SSE connection or
- * a working LLM backend, so it's also the cheapest probe for design-
- * system regressions.
+ * It renders every briefing piece without an SSE connection or a working
+ * LLM backend, so it is the cheapest probe for design-system regressions.
+ * (It replaces the old /q/sample demo route, which no longer exists.)
  */
 import { test, expect } from '@playwright/test';
 
-test.describe('/q/sample (prerendered demo)', () => {
-  test('renders four-section briefing with claim glyphs + cite anchors', async ({ page }) => {
-    await page.goto('/q/sample');
+const PAGE = '/gallery/hollis/';
 
-    // Header wordmark + region label
+test.describe('/gallery/hollis/ (prerendered worked example)', () => {
+  test('renders the briefing: place title, report sections, cite anchors', async ({ page }) => {
+    await page.goto(PAGE);
+
     await expect(page.locator('.riprap-wordmark')).toContainText('riprap');
-    await expect(page.locator('h1.brief-h1')).toContainText('Flood-exposure briefing');
+    await expect(page.locator('h1.brief-title')).toContainText('183');
 
-    // 4 canonical section heads
-    const heads = page.locator('.briefing-section-head .briefing-section-num');
+    // Four report sections, each under one h2 style, unnumbered.
+    const heads = page.locator('.brief-section h2.brief-h2');
     await expect(heads).toHaveCount(4);
-    await expect(heads.nth(0)).toHaveText('01');
-    await expect(heads.nth(1)).toHaveText('02');
-    await expect(heads.nth(2)).toHaveText('03');
-    await expect(heads.nth(3)).toHaveText('04');
+    await expect(heads.nth(0)).toHaveText('Hazard Reader');
 
-    // Tier glyphs in the prose gutter (one per claim)
-    const claimGlyphs = page.locator('.claim-glyph svg[role="img"]');
-    expect(await claimGlyphs.count()).toBeGreaterThan(5);
+    // Tier marks moved out of the prose into the evidence table.
+    expect(await page.locator('.ev-mark svg').count()).toBeGreaterThan(5);
+    expect(await page.locator('.brief-answer-p svg, .brief-body svg').count()).toBe(0);
 
-    // Inline citations link to drawer entries
+    // Inline citations link to source entries.
     const cites = page.locator('a.inline-cite');
     expect(await cites.count()).toBeGreaterThan(5);
   });
 
-  test('renders citation drawer with all 10 sample sources', async ({ page }) => {
-    await page.goto('/q/sample');
-    const items = page.locator('.citation-drawer .citation-item');
-    await expect(items).toHaveCount(10);
-    // Each item carries source label + tier glyph + doc id
-    await expect(items.first().locator('.citation-source')).toBeVisible();
-    await expect(items.first().locator('.citation-docid')).toBeVisible();
+  test('renders the full source list with every cited source', async ({ page }) => {
+    await page.goto(PAGE);
+    const items = page.locator('.source-list .source-entry');
+    expect(await items.count()).toBeGreaterThanOrEqual(10);
+    // Each entry carries the source name, the tier in words and the doc id.
+    await expect(items.first().locator('.source-entry-name')).not.toBeEmpty();
+    await expect(items.first().locator('.source-entry-line')).toContainText(/Measured|Modeled|Proxy|Synthetic/);
   });
 
-  test('renders trace UI with all run steps', async ({ page }) => {
-    await page.goto('/q/sample');
-    await expect(page.locator('.trace-ui')).toBeVisible();
-    // Trace head meta should show a non-zero total
-    await expect(page.locator('.trace-head-meta')).toContainText('s total');
+  test('records how the briefing was made, closed, with the trace per Stone', async ({ page }) => {
+    await page.goto(PAGE);
+    const how = page.locator('details#how-made');
+    await expect(how).not.toHaveAttribute('open', '');
+    await page.getByRole('link', { name: 'How this briefing was made' }).click();
+    await expect(how).toHaveAttribute('open', '');
+    await expect(how).toContainText('registered source functions');
+    await how.locator('details.how-made-stone').first().locator('summary').click();
+    expect(await how.locator('.prov-row').count()).toBeGreaterThan(0);
   });
 
-  test('renders evidence grid with all 6 viz formats', async ({ page }) => {
-    await page.goto('/q/sample');
-    const cards = page.locator('.evidence-card');
-    await expect(cards).toHaveCount(8);
-    // Each tier is represented at least once
-    for (const t of ['empirical', 'modeled', 'proxy', 'synthetic']) {
-      expect(await page.locator(`.evidence-card-${t}`).count()).toBeGreaterThan(0);
+  test('renders the evidence table grouped with the cited rows first', async ({ page }) => {
+    await page.goto(PAGE);
+    expect(await page.locator('.ev-row').count()).toBeGreaterThan(8);
+    await expect(page.locator('.ev-group th').first()).toHaveText('Behind the summary');
+    for (const t of ['Measured', 'Modeled', 'Proxy']) {
+      expect(await page.locator('.ev-tier', { hasText: t }).count()).toBeGreaterThan(0);
     }
+    // A dataset name is never set as the finding (the Sandy misreading).
+    await expect(page.locator('.ev-find').first()).toContainText('outside');
   });
 
-  test('legend hides layers with zero features', async ({ page }) => {
-    await page.goto('/q/sample');
-    // /q/sample only ships a synthetic fixture (the others are 0).
-    // Legend must show synthetic only — silence-over-confabulation
-    // applied to the map (handoff hard rule #3).
-    await expect(page.locator('.map-legend')).toBeVisible({ timeout: 10_000 });
-    const items = page.locator('.map-legend-item');
-    await expect(items).toHaveCount(1);
-    await expect(items.first().locator('.map-legend-label'))
-      .toContainText(/Synthetic SAR/);
-    // Empty layers must not be present.
-    await expect(page.locator('.map-legend-item', { hasText: 'Sandy' })).toHaveCount(0);
-    await expect(page.locator('.map-legend-item', { hasText: '311' })).toHaveCount(0);
+  test('map layer switches hide layers with zero features and use words', async ({ page }) => {
+    await page.goto(PAGE);
+    await expect(page.locator('.maplibregl-canvas')).toBeVisible({ timeout: 15_000 });
+    // The gallery fetches no live layers, so every tier layer is empty and
+    // no switch is offered (silence over confabulation on the map).
+    await expect(page.locator('.map-layers label')).toHaveCount(0);
+    await expect(page.getByText(/\b(EMP|MOD|PRX|SYN) ON\b/)).toHaveCount(0);
   });
 
   test('MapLibre map mounts and registers syn-stripe-45 pattern', async ({ page }) => {
@@ -79,40 +75,25 @@ test.describe('/q/sample (prerendered demo)', () => {
     page.on('console', (msg) => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
     });
-    await page.goto('/q/sample');
+    await page.goto(PAGE);
 
-    // MapLibre canvas mounts
-    const canvas = page.locator('.maplibregl-canvas');
-    await expect(canvas).toBeVisible({ timeout: 15_000 });
-
-    // Wait for `window.__riprapMap` to appear (RipMap.svelte sets it
-    // on `map.on('load')`), then for the syn-stripe registration
-    // promise to settle.
+    await expect(page.locator('.maplibregl-canvas')).toBeVisible({ timeout: 15_000 });
     await page.waitForFunction(
       () => Boolean((window as unknown as { __riprapMap?: unknown }).__riprapMap),
       undefined,
       { timeout: 15_000 }
     );
-    // SVG → image decode happens asynchronously; give it a beat.
     await page.waitForFunction(
       () => {
-        const m = (window as unknown as { __riprapMap?: { hasImage: (s: string) => boolean } })
-          .__riprapMap;
+        const m = (window as unknown as { __riprapMap?: { hasImage: (s: string) => boolean } }).__riprapMap;
         return Boolean(m && m.hasImage('syn-stripe-45'));
       },
       undefined,
       { timeout: 5_000 }
     );
 
-    const mapState = await page.evaluate<{
-      hasStripe: boolean;
-      hasStripe2x: boolean;
-      hasStripeLow: boolean;
-      sources: string[];
-      layers: string[];
-    } | null>(() => {
+    const mapState = await page.evaluate(() => {
       type MlMap = {
-        loaded: () => boolean;
         hasImage: (id: string) => boolean;
         getStyle: () => { sources: Record<string, unknown>; layers: Array<{ id: string }> };
       };
@@ -127,54 +108,25 @@ test.describe('/q/sample (prerendered demo)', () => {
         layers: style.layers.map((l) => l.id)
       };
     });
-
     expect(mapState, 'map instance should be reachable from the DOM').not.toBeNull();
     if (!mapState) return;
 
-    // The sample route ships a synthetic-prior fixture polygon — verify
-    // the syn-prior source has a non-empty FeatureCollection so the
-    // syn-stripe-45 fill is actually visible (not just registered).
-    const synFeatureCount = await page.evaluate<number>(() => {
-      type Src = { _data?: { features?: unknown[] } } | undefined;
-      type MlMap = { getSource: (id: string) => Src };
-      const map = (window as unknown as { __riprapMap?: MlMap }).__riprapMap;
-      const src = map?.getSource('syn-prior');
-      const data = src?._data as { features?: unknown[] } | undefined;
-      return data?.features?.length ?? 0;
-    });
-    expect(synFeatureCount,
-      'syn-prior source should have at least one feature in the /q/sample fixture')
-      .toBeGreaterThan(0);
-
-    // The four tier sources are added by RipMap on style.load
-    expect(mapState.sources).toContain('sandy-empirical');
-    expect(mapState.sources).toContain('dep-modeled');
-    expect(mapState.sources).toContain('syn-prior');
-    expect(mapState.sources).toContain('proxy-311');
-    expect(mapState.sources).toContain('queried-address');
-
-    // Tier layers are added with the canonical ids from the spec
+    expect(mapState.sources).toEqual(expect.arrayContaining(['syn-prior', 'register-points', 'queried-address']));
     expect(mapState.layers).toEqual(expect.arrayContaining([
-      'tier-empirical-fill',
-      'tier-empirical-line',
-      'tier-modeled-fill',
-      'tier-modeled-line',
-      'tier-synthetic-fill',
-      'tier-synthetic-line',
-      'tier-proxy-dots',
-      'queried-pin'
+      'tier-synthetic-fill', 'tier-synthetic-line', 'register-points-circle', 'queried-pin'
     ]));
+    // The register points behind the map point list are on the map.
+    const points = await page.evaluate(() => {
+      type Src = { _data?: { features?: unknown[] } } | undefined;
+      const map = (window as unknown as { __riprapMap?: { getSource: (id: string) => Src } }).__riprapMap;
+      return map?.getSource('register-points')?._data?.features?.length ?? 0;
+    });
+    expect(points).toBeGreaterThan(0);
 
-    // v0.4.2 §14: syn-stripe pattern image must be registered. This is
-    // the exact regression we're guarding against — synthetic SAR not
-    // rendering because `fill-pattern: syn-stripe-45` resolves to a
-    // missing image.
     expect(mapState.hasStripe, 'syn-stripe-45 image should be registered').toBe(true);
     expect(mapState.hasStripe2x, 'syn-stripe-45-2x image should be registered').toBe(true);
     expect(mapState.hasStripeLow, 'syn-stripe-45-low image should be registered').toBe(true);
 
-    // No console errors during boot
-    expect(consoleErrors.filter((e) => !e.includes('favicon')))
-      .toEqual([]);
+    expect(consoleErrors.filter((e) => !e.includes('favicon'))).toEqual([]);
   });
 });

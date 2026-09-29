@@ -23,7 +23,10 @@
   .plan-details,
   .plan-stream,
   .app-header-query-edit,
-  .skeleton-brief {
+  .skeleton-brief,
+  .brief-tools,
+  .brief-map,
+  .map-skip {
     display: none !important;
   }
 

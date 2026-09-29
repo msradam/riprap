@@ -56,13 +56,6 @@ const EXEMPT_FILES = new Set<string>([
   'landing/LandStones.svelte',
   'landing/UseBand.svelte',
   'landing/ByodDialog.svelte',
-  // RegisterCard renders ONLY when NYC register data is present (the
-  // four NYC-only register specialists fired). NYC-specific provenance
-  // text inside it is therefore data-gated, not deployment-leaked.
-  'evidence/RegisterCard.svelte',
-  // RegisterBody is the cardAdapter-driven variant of the same data
-  // path. Same gating logic — empty `registers` array → no render.
-  'findings/cards/RegisterBody.svelte',
   // RipMap layer descriptions reference NYC-specific data sources
   // (FloodNet NYC, Prithvi-NYC). Map layers visibility is itself
   // gated on the per-query manifest's display.map_layer flag, so
@@ -73,11 +66,6 @@ const EXEMPT_FILES = new Set<string>([
   // hazard-agnostic context; the per-query chip overrides downstream.
   // TODO(post-launch): rotate the example query per active deployment.
   'shell/ColdStart.svelte',
-  // CardGrammarReference is a dev-only documentation surface rendered
-  // ONLY when /q/[queryId]?grammar=1 is in the URL. The NYC examples
-  // are spec catalog data, not user-facing content for any
-  // production briefing render.
-  'findings/CardGrammarReference.svelte',
 ]);
 
 function walk(dir: string): string[] {
@@ -95,8 +83,11 @@ function walk(dir: string): string[] {
  *  reference NYC (incident history, bug context, design rationale)
  *  without being rendered. */
 function stripComments(src: string): string {
-  let out = src.replace(/<!--[\s\S]*?-->/g, '');                   // HTML
-  out = out.replace(/\/\*[\s\S]*?\*\//g, '');                       // JS block
+  // Multi-line comments keep their newlines, so a stripped line number
+  // still points at the same source line (and its nyc-leak-ok marker).
+  const blank = (m: string) => m.replace(/[^\n]/g, '');
+  let out = src.replace(/<!--[\s\S]*?-->/g, blank);                // HTML
+  out = out.replace(/\/\*[\s\S]*?\*\//g, blank);                    // JS block
   out = out.replace(/(^|[^:"'`])\/\/[^\n]*/g, (_, prefix) => prefix); // JS line
   return out;
 }

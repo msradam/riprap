@@ -18,7 +18,7 @@ test.describe('export-PDF curated print flow', () => {
   test('print route hydrates from localStorage and shows curated layout', async ({ page }) => {
     // Visit /q/sample first so it persists a snapshot.
     await page.goto('/q/sample');
-    await expect(page.locator('.briefing-prose')).toBeVisible();
+    await expect(page.locator('#brief-answer, .brief-section').first()).toBeVisible();
 
     // Confirm a snapshot landed for queryId='sample'.
     const snapKey = await page.evaluate(() => {
