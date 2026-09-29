@@ -308,9 +308,11 @@ A front page at report restraint: the kind line, an h1 "Flood-exposure
 briefings for New York City" (Title scale raised to 56px on desktop, no
 accented word), one deck sentence, the query input (56px, labelled, a
 plain "Brief this place" button), the example queries as plain links, then
-the gallery as stories: the question (or place) as a 22 to 28px headline
-link, the answer's first sentence as the standfirst, the place and snapshot
-date as a byline. No stat row, no badge row, no numbered cards.
+the gallery's question briefings as stories: the question as a 22 to 28px
+headline link, the answer's first sentence as the standfirst, the place and
+snapshot date as a byline. The address briefings follow as one compact
+list under "Address briefings": the place as the link, its address and the
+snapshot date, one row each. No stat row, no badge row, no numbered cards.
 
 ### Gallery index
 The typographic list stays: place over question, snapshot date in Data,

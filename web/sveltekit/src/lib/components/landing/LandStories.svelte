@@ -1,9 +1,10 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
 
-  /** The gallery as stories: the question (or the place) as the headline,
-   *  the answer's first sentence as the standfirst, place and snapshot date
-   *  as the byline. The two question briefings named in TOP lead. */
+  /** The gallery's question briefings as stories: the question as the
+   *  headline, the answer's first sentence as the standfirst, place and
+   *  snapshot date as the byline; the two named in TOP lead. The address
+   *  briefings, whose standfirsts read alike, follow as a compact list. */
   export interface LandStory {
     slug: string;
     neighborhood: string;
@@ -20,9 +21,8 @@
 
   const TOP = ['hollis-since-ida', 'qn12-complaints'];
   let top = $derived(TOP.map((slug) => stories.find((s) => s.slug === slug)).filter((s) => !!s));
-  let rest = $derived(
-    stories.filter((s) => !TOP.includes(s.slug)).sort((a, b) => Number(!a.question) - Number(!b.question))
-  );
+  let rest = $derived(stories.filter((s) => s.question && !TOP.includes(s.slug)));
+  let places = $derived(stories.filter((s) => !s.question && !TOP.includes(s.slug)));
 </script>
 
 {#snippet story(s: LandStory, big: boolean)}
@@ -53,6 +53,18 @@
   <ul class="stories-rest">
     {#each rest as s (s.slug)}{@render story(s, false)}{/each}
   </ul>
+  {#if places.length}
+    <h3 id="places-h" class="places-h">Address briefings</h3>
+    <ul class="places" aria-labelledby="places-h">
+      {#each places as s (s.slug)}
+        <li>
+          <a href="{resolve('/(app)/gallery/[slug]', { slug: s.slug })}/">{s.neighborhood}</a>
+          <span class="place-address">{#each parts(s.address) as p, i (i)}{#if i % 2}<span class="nowrap">{p}</span>{:else}{p}{/if}{/each}</span>
+          <time datetime={s.generated_at.slice(0, 10)}>{s.generated_at.slice(0, 10)}</time>
+        </li>
+      {/each}
+    </ul>
+  {/if}
 </section>
 
 <style>
@@ -136,12 +148,53 @@
     font-family: var(--font-mono);
     font-size: 13px;
   }
+  .places-h {
+    margin-top: 64px;
+    font-size: 17px;
+    line-height: 1.3;
+  }
+  /* One row per address briefing: the place as the link, its address,
+     the snapshot date; hairlines between rows. */
+  ul.places {
+    display: block;
+    margin-top: 8px;
+    border-top: 1px solid var(--riprap-rule-hairline);
+  }
+  .places li {
+    display: grid;
+    grid-template-columns: minmax(0, 14rem) minmax(0, 1fr) auto;
+    gap: 2px 24px;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--riprap-rule-hairline);
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .places a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    font-weight: 600;
+  }
+  .place-address {
+    color: var(--ink-secondary);
+  }
+  .places time {
+    color: var(--ink-secondary);
+  }
   @media (max-width: 720px) {
     .stories {
       margin-top: 48px;
     }
     ul {
       grid-template-columns: minmax(0, 1fr);
+    }
+    .places li {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .place-address {
+      grid-column: 1 / -1;
+      grid-row: 2;
     }
     .is-top h3 {
       font-size: 25px;
