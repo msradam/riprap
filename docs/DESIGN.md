@@ -182,7 +182,7 @@ self-hosted. PINNED. There is no italic in report content.
 | Title | Sofia Sans | 34 / 600 / 1.18 (26 on phones), max 30ch | The H1: the question, or the place |
 | Headline | Sofia Sans | 22 / 600 / 1.25 | h2: Evidence, Map, Sources and method, report sections |
 | Brief | Sofia Sans | 24 / 400 / 1.4 (21 on phones), first sentence 600 | The "In brief" paragraph of an address or district briefing, and nothing else |
-| Answer | Sofia Sans | 20 / 400 / 1.5, max 64ch | The answer to a question |
+| Answer | Sofia Sans | 20 / 400 / 1.5, max 64ch | The answer to a question; with a lead fact, its key sentence only, the rest of the answer in Body |
 | Body | Sofia Sans | 17 / 400 / 1.55, max 68ch | Report sections |
 | Small | Sofia Sans | 14 to 15 / 400 / 1.45 | Meta line, source notes, table cells, captions, method block |
 | Data | Overpass Mono | 13 to 14 / 400, tabular figures | Figures, dates, doc ids, citation numbers, the commit |
@@ -245,10 +245,22 @@ side stripes, no boxes around blocks of text.
 ### Answer block
 - **Lead:** the Lead style in Ink, on its own line.
 - **Answer:** the Answer style in Ink. A count lead keeps its sentence
-  intact below it.
+  intact below it. When the result names a lead fact (`grounding.lead_fact`),
+  the key sentence comes first in Answer and the rest of the answer follows
+  as its own paragraph in Body, as support. The key sentence is the
+  backend's lead sentence when `in_lead` is true, else the first answer
+  sentence citing `lead_fact.doc_id`. Without a lead fact no sentence is
+  singled out.
 - **Citations:** a small superscript number in Federal Blue after the
   sentence's closing punctuation, never before it. No tier mark in prose.
+  Numbers follow first appearance on the page (the answer or In brief, the
+  evidence table, the report sections), the same number in the margin
+  notes, the Cite column, the source list and the print packet. Several
+  marks on one claim read in ascending order. Anchors keep the doc id.
 - **Below it:** the scope disclosure and the resident pointer.
+- **Refusal:** a refusal's lead is set at 44px (32px on phones), smaller
+  than an answer's 64px, on purpose: a refusal is not an answer and must not
+  look like one.
 - **In the margin:** the checks-ran line and the mode line in Small
   secondary ink, under the source notes (after the endnotes below 1100px).
   Machinery never sits directly under the answer.
@@ -267,12 +279,19 @@ the full source list.
   the 2012 Sandy extent"), the dataset name after it in secondary ink. A
   dataset name is never set as if it were the result.
 - **Order:** a first group "Behind the answer" holds the rows the answer
-  cites; then one group per Stone, headed with the Stone name and its role
-  ("Cornerstone, the hazard reader"). Sources that did not run are listed
+  cites, experimental or not; then one group per Stone, headed with the
+  Stone name and its role ("Cornerstone, the hazard reader"); then the
+  experimental and forecast sources the answer does not cite, in one closed
+  disclosure after the table titled with its count ("Experimental and
+  forecast sources (4)"), each row keeping its Experimental badge. NPCC4 and
+  the NWS alerts are not experimental. Sources that did not run are listed
   once, under Sources and method; one line after the table links there.
+- **DEP scenarios:** the DEP stormwater scenarios share one Modeled row: one
+  finding per scenario (current, 2050, 2080), each with its own citation,
+  and its own date only when the dates differ.
 - **Figure:** a label of about 16 characters or fewer sits under the
   figure; a longer one moves to the finding's secondary line. A live
-  reading on a gallery page is dated "at snapshot, <date>"..
+  reading on a gallery page is dated "at snapshot, <date>".
 - **Rows:** 10px vertical padding, a Hairline between rows, no zebra, no
   cell borders.
 
@@ -296,6 +315,22 @@ in Small. An action such as "Print this briefing" sits at the row's right
 end, apart from the jumps; "All gallery entries" is a plain link at the
 end of the page.
 
+### Header and footer
+One header and one footer on every page except print. The header carries
+the wordmark (linked home), the context words, the active deployment when
+one is known, and the links "methodology" and "gallery"; the query box and
+the print and export links appear only on a live briefing. The footer
+carries the disclaimer, the open beta sentence with its feedback link, the
+standards line, the build line and the dam mark credit. A page that already
+states the disclaimer (a briefing's scope note, the landing's "evidence, not
+advice" section) drops it from the footer, so it appears once per page.
+
+### Empty search
+An empty or blank submit keeps the page, moves focus to the input and shows
+"Type an address, a community district such as QN12, or a question." under
+it in Small, in ink, in a status region. It is a prompt, not an error: no
+red, no disabled button, no browser bubble. Typing clears it.
+
 ### Experimental badge
 Small, secondary ink, a 1px Soft Rule border, 3px radius, sentence case.
 
@@ -313,6 +348,8 @@ headline link, the answer's first sentence as the standfirst, the place and
 snapshot date as a byline. The address briefings follow as one compact
 list under "Address briefings": the place as the link, its address and the
 snapshot date, one row each. No stat row, no badge row, no numbered cards.
+Community districts are written QN12, with no space, in copy, examples and
+placeholders.
 
 ### Gallery index
 The typographic list stays: place over question, snapshot date in Data,
@@ -321,7 +358,9 @@ plus each entry's lead or first answer sentence in Small.
 ### Print
 A's report structure: page one carries the title, the meta line, the answer
 and its source notes; the evidence table and source lists start on page
-two.
+two. A print from a gallery snapshot dates live readings "at snapshot,
+<date>"; only a live run prints "live". The folded experimental group
+prints open.
 
 ### Logo
 **The dam mark**, `fill=currentColor`, PINNED. Never recoloured into a
