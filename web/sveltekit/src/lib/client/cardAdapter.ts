@@ -1271,14 +1271,24 @@ export function applyStepEventToLiveState(
  *  print. An extractive answer is quoted, not model prose, so it does not
  *  say "LLM claims checked" for it. */
 export function modeLine(g: { tier: string; model?: string; answer_mode?: string; note?: string;
-                              claims?: unknown[]; dropped_claims?: unknown[] } | null | undefined): string | null {
+                              claims?: unknown[]; dropped_claims?: unknown[]; fallback_reason?: string } | null | undefined): string | null {
   if (!g) return null;
-  if (g.tier !== 'llm') return g.note ? 'Evidence briefing (no question, so no LLM was needed)' : 'Evidence briefing (no LLM)';
+  if (g.tier !== 'llm') {
+    if (g.note) return 'Evidence briefing: no question was asked, so no LLM was needed';
+    return g.fallback_reason
+      ? `Evidence briefing (no LLM). The LLM was unavailable (${g.fallback_reason}), so the evidence briefing is shown.`
+      : 'Evidence briefing (no LLM)';
+  }
   const model = g.model ? ` (${g.model})` : '';
   const counts = `${g.claims?.length ?? 0} kept, ${g.dropped_claims?.length ?? 0} dropped`;
   if (g.answer_mode === 'extractive') {
+    // The answer's facts are listed as claims in section "answer"; say "other
+    // claims" only when the model wrote any outside the answer.
+    const other = (g.claims ?? []).filter((c) => (c as { section?: string })?.section !== 'answer').length;
+    const otherDropped = (g.dropped_claims ?? []).filter((c) => (c as { section?: string })?.section !== 'answer').length;
     return `Extractive answer: sentences quoted word for word from the cited sources, chosen by the model${model} ` +
-      `and checked by the lead rules. Other claims checked against cited sources: ${counts}`;
+      'and checked by the lead rules' + (other || otherDropped
+        ? `. Other claims checked against cited sources: ${other} kept, ${otherDropped} dropped` : '');
   }
   return `LLM claims checked against cited sources: ${counts}${model}`;
 }

@@ -181,11 +181,7 @@
         {:else}
           {#if grounding}
             <p class="region-head-meta grounding-line">
-              {#if grounding.tier === 'llm'}
-                {modeLine(grounding)}
-              {:else}
-                Evidence briefing (no LLM){#if grounding.fallback_reason}. The LLM was unavailable ({grounding.fallback_reason}), so the evidence briefing is shown.{/if}
-              {/if}
+              {modeLine(grounding)}
             </p>
           {/if}
 

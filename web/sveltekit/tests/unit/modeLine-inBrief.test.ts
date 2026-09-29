@@ -19,6 +19,14 @@ describe('mode line', () => {
     expect(modeLine({ tier: 'no_llm' })).toBe('Evidence briefing (no LLM)');
     expect(modeLine(null)).toBeNull();
   });
+  it('says no LLM was needed when no question was asked', () => {
+    expect(modeLine({ tier: 'no_llm', note: 'x' }))
+      .toBe('Evidence briefing: no question was asked, so no LLM was needed');
+  });
+  it('omits "Other claims" when every extractive claim is in the answer', () => {
+    const line = modeLine({ tier: 'llm', answer_mode: 'extractive', claims: [{ section: 'answer' }, { section: 'answer' }] });
+    expect(line).not.toContain('Other claims');
+  });
 });
 
 describe('In brief lead', () => {

@@ -34,7 +34,20 @@ entries in this mode and 4 question entries in LLM mode.
 
 Set `RIPRAP_LLM_BASE_URL` and `RIPRAP_LLM_MODEL` to any OpenAI-compatible
 endpoint (for example local Ollama at `http://localhost:11434/v1`). The model
-then rewrites the evidence as a list of claims. It never writes free prose.
+is used only where there is a question (refactor 8):
+
+- A bare address or district has no question, so neither the planner nor the
+  synthesis calls the LLM: the page is the no-LLM evidence briefing, and the
+  mode line says no LLM was needed. `RIPRAP_LLM_BARE=1` restores the older
+  behaviour below, in which the model rewrites the evidence as claims.
+- In extractive mode (the default for questions) the model returns only the
+  answer: a lead and the ids of one to four facts. It writes no section
+  claims. For a question that asks about forecasts or projections, code
+  chooses the facts (the forecasts and projections themselves); for a yes or
+  no question about past flooding, a rule sets the lead.
+- In guarded mode, and with `RIPRAP_LLM_BARE=1`, the model rewrites the
+  evidence as a list of claims, as described in the steps below. It never
+  writes free prose.
 
 1. The model receives the evidence sentences, grouped by section, each labelled
    with its `doc_id`. Retrieved policy passages are added as `rag_*` documents.
