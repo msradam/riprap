@@ -232,6 +232,22 @@ def _checks_run(mode: str | None, entail_info: dict) -> list[str]:
     return checks
 
 
+def _lead_fact(lead: str | None, facts: list[str], kind_lead: bool, rel: str | None, question: str,
+               focus: dict | None, texts: dict[str, str], values: dict | None) -> dict | None:
+    """Which fact the lead rests on, so the page can set that sentence as the
+    key figure. A count lead: the counted kind's lead sentence itself
+    (`in_lead`), else the source the question is about, else the first fact
+    with a count. A yes or no set by the past-event rule: the source the rule
+    relied on. Any other lead: None (no sentence is singled out)."""
+    if lead == "count":
+        if kind_lead:
+            return {"doc_id": rel, "in_lead": True}
+        doc = rel if rel in facts else next((f for f in facts if answer_checks.count_numbers(texts[f])), None)
+        return {"doc_id": doc, "in_lead": False} if doc else None
+    doc = answer_checks.past_event_source(question, focus, lead or "", texts, values)
+    return {"doc_id": doc, "in_lead": False} if doc and doc in facts else None
+
+
 def _extract(out: dict, question: str, texts: dict[str, str],
              values: dict | None = None, focus: dict | None = None) -> tuple[str, list[str], list[tuple[str, str]]]:
     a = out.get("answer") or {}
@@ -449,7 +465,7 @@ def synthesize(state) -> dict:
                 "grounding": {"tier": "no_llm", "fallback_reason": f"LLM unavailable: {e}",
                               "claims": [], "dropped_claims": [], "attempts": attempts,
                               "llm_calls": calls, "answer_mode": mode}}
-    lead_phrase, answer_flags, lead = "", notes, None
+    lead_phrase, answer_flags, lead, lead_fact = "", notes, None, None
     if mode == "extractive":
         lead, facts, lead_hits = answer
         rel = answer_checks.relevant_doc(question, texts)
@@ -473,6 +489,8 @@ def synthesize(state) -> dict:
         lead_phrase = LEAD_PHRASES.get(lead, "")
         if lead == "count" and rel in facts and (kl := answer_checks.kind_lead(question, texts, values)):
             lead_phrase = f"{kl} {lead_phrase}"
+        lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
+                               focus, texts, values)
     checks = _checks_run(mode, entail_info)
     # A bare address opens with the same verified "In brief" lead as no-LLM mode.
     from riprap.core.burr.templated_reconciler import _lead
@@ -488,7 +506,7 @@ def synthesize(state) -> dict:
                       "retried_claims": first_dropped if attempts == 2 else [],
                       "n_kept": len(kept), "n_dropped": len(dropped), "llm_calls": calls,
                       "question": question, "n_documents": len(docs), "answer_mode": mode,
-                      "answer_lead": lead,
+                      "answer_lead": lead, "lead_fact": lead_fact,
                       "answer_flags": answer_flags, "checks": checks, "entailment": entail_info,
                       "answered": any(c["section"] == ANSWER_SECTION for c in kept) if question else None},
     }

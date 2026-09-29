@@ -377,15 +377,10 @@ def _event(doc_id: str, v: dict, start: int | None, this_year: int) -> bool | No
     return None
 
 
-def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: dict[str, str],
-                    values: dict | None, this_year: int | None = None) -> tuple[str, list[str]] | None:
-    """(lead, facts) for a yes or no question about past flooding, or None
-    for any other question. `yes` when a relevant observed source reports an
-    event in the asked period; `no` only when every relevant source answered
-    and reported none; `cannot_answer` otherwise. A source the rule relies on is added to
-    the facts when the model left it out, so the lead is always cited."""
-    if not is_past_event_question(question, focus):
-        return None
+def _past_event_verdict(question: str, docs: dict[str, str], values: dict | None,
+                        this_year: int | None = None) -> tuple[list[str], dict[str, bool | None]]:
+    """The sources a past-event question rests on, in precedence order, and
+    what each reports for the asked period (see _event)."""
     import datetime
 
     year = this_year or datetime.date.today().year
@@ -404,6 +399,31 @@ def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: d
         relevant = [complaints, "floodnet"]
     verdict = {i: _event(i, v, start, year) for i in relevant
                if isinstance(v := (values or {}).get(i), dict) and docs.get(i)}
+    return relevant, verdict
+
+
+def past_event_source(question: str, focus: dict | None, lead: str, docs: dict[str, str],
+                      values: dict | None, this_year: int | None = None) -> str | None:
+    """The source a rule-set "yes" or "no" rests on: the first relevant
+    source reporting an event for "yes", the first relevant source for "no"."""
+    if lead not in ("yes", "no") or not is_past_event_question(question, focus):
+        return None
+    relevant, verdict = _past_event_verdict(question, docs, values, this_year)
+    if lead == "yes":
+        return next((i for i in relevant if verdict.get(i) is True), None)
+    return next((i for i in relevant if i in verdict), None)
+
+
+def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: dict[str, str],
+                    values: dict | None, this_year: int | None = None) -> tuple[str, list[str]] | None:
+    """(lead, facts) for a yes or no question about past flooding, or None
+    for any other question. `yes` when a relevant observed source reports an
+    event in the asked period; `no` only when every relevant source answered
+    and reported none; `cannot_answer` otherwise. A source the rule relies on is added to
+    the facts when the model left it out, so the lead is always cited."""
+    if not is_past_event_question(question, focus):
+        return None
+    relevant, verdict = _past_event_verdict(question, docs, values, this_year)
     positive = [i for i, e in verdict.items() if e is True]
     if positive:
         return "yes", facts if set(positive) & set(facts) else [*facts, positive[0]]
