@@ -2,7 +2,7 @@
   import type { Citation } from '$lib/types/claim';
   import { citationOf, type EvidenceCard } from '$lib/client/briefingModel';
   import { TIER_WORDS } from '$lib/types/tier';
-  import { asOfDate, figureOf, leadClause, sharedStem, snapshotNote, withoutSubject } from '$lib/client/briefingText';
+  import { SENTENCE_GAP, asOfDate, figureOf, leadClause, sharedStem, snapshotNote, withoutSubject } from '$lib/client/briefingText';
   import { activateCitation } from '$lib/stores/citations.svelte';
   import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
 
@@ -131,7 +131,9 @@
         </ul>
       {:else}
         <div class="ev-measure">
-          {#if find}{@render sentence(find.first)}{#if find.rest}{` ${find.rest}`}{/if}{/if}
+          <!-- The register row joins one sentence per register; each gets
+               its own line so the row does not read as one block. -->
+          {#if find}{@render sentence(find.first)}{#if find.rest && c.variant === 'register'}{#each find.rest.split(SENTENCE_GAP) as r, k (k)}<span class="ev-line">{r}</span>{/each}{:else if find.rest}{` ${find.rest}`}{/if}{/if}
           {#if note}<span class="ev-snap">{note}</span>{/if}
           <span class="ev-dataset">{c.title}</span>
           {#if longLabel}<span class="ev-dataset">Figure: {fig?.label}</span>{/if}
@@ -250,6 +252,10 @@
   }
   .ev-find {
     font-weight: 600;
+  }
+  .ev-line {
+    display: block;
+    margin-top: 4px;
   }
   .ev-dataset,
   .ev-fig-label {

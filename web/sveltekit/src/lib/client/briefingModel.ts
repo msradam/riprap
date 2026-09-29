@@ -23,7 +23,7 @@ export type EvidenceRow = Card & { parts?: Card[] };
 /** `closed` groups (experimental and forecast sources) start folded. */
 export type EvidenceGroup = { key: string; name: string; role: string | null; cards: EvidenceRow[]; closed?: boolean };
 /** The card fields the evidence table prints. */
-export type EvidenceCard = Pick<Card, 'id' | 'source' | 'experimental' | 'title' | 'tier' | 'vintage' | 'citeId' | 'docId' | 'scalars' | 'headline'> & { parts?: EvidenceCard[] };
+export type EvidenceCard = Pick<Card, 'id' | 'source' | 'experimental' | 'title' | 'tier' | 'vintage' | 'citeId' | 'docId' | 'scalars' | 'headline' | 'variant'> & { parts?: EvidenceCard[] };
 
 const LEAD_RE = /^(Yes|No|Partly|In part|Not clear|Unclear)\.\s*/;
 const COUNT_RE = /^([\d,]+(?:\.\d+)?%?)\s+/;

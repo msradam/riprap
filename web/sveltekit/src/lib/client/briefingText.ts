@@ -78,6 +78,9 @@ export function snapshotNote(docId: string, at: string | null | undefined, findi
   return null;
 }
 
+/** The space after a full stop that starts a new sentence. */
+export const SENTENCE_GAP = /(?<=\.)\s+(?=[A-Z0-9])/;
+
 /** The finding sentence(s) for a card, split after the first sentence so
  *  the table can set the first one heavier. The body or sub line (the
  *  templated result) comes first. A headline is used only when it says
@@ -88,7 +91,7 @@ export function findingOf(c: Card, narration?: string | null): { first: string; 
   const headline = c.headline && c.headline !== narration ? c.headline : undefined;
   const t = c.body ?? c.sub ?? headline;
   if (!t) return null;
-  const m = /(?<=\.)\s+(?=[A-Z0-9])/.exec(t);
+  const m = SENTENCE_GAP.exec(t);
   return m ? { first: t.slice(0, m.index), rest: t.slice(m.index + m[0].length) } : { first: t, rest: '' };
 }
 
