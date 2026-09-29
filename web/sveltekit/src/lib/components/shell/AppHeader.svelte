@@ -88,6 +88,7 @@
     </div>
     <div class="app-header-right">
       <a class="app-header-link" href={`${resolve('/')}#methodology`}>methodology</a>
+      <a class="app-header-link" href="{resolve('/(app)/gallery')}/">gallery</a>
       {#if briefingState.ready && !offline && page.params.queryId}
         <!-- The browser print view, built from the snapshot this run saved. -->
         <a

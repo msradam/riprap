@@ -51,8 +51,6 @@ const EXEMPT_FILES = new Set<string>([
   // design, not a leak.
   'landing/CityPicker.svelte',
   'landing/LandHero.svelte',
-  'landing/LandHeader.svelte',
-  'landing/LandFooter.svelte',
   'landing/LandStones.svelte',
   'landing/UseBand.svelte',
   'landing/ByodDialog.svelte',

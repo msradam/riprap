@@ -80,3 +80,12 @@ describe('AppHeader baseline: NYC city renders the NYC pill', () => {
     expect(screen.getByText('NYC')).toBeInTheDocument();
   });
 });
+
+describe('AppHeader site links (the landing uses this header too)', () => {
+  it('links the wordmark home and the gallery, with no query box when there is no query', () => {
+    const { container, getByRole } = render(AppHeader);
+    expect(getByRole('link', { name: 'Riprap home' })).toBeInTheDocument();
+    expect(getByRole('link', { name: 'gallery' })).toHaveAttribute('href', expect.stringMatching(/\/gallery\/$/));
+    expect(container.querySelector('.app-header-query')).toBeNull();
+  });
+});

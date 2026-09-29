@@ -1,5 +1,5 @@
 /* App header and footer. In the base sheet (not styles.css) because the
-   root layout renders them on every route except the landing and print,
+   root layout renders them on every route except print,
    including error pages that sit outside the (app) route group. */
 
 /* ── App header ────────────────────────────────────────── */
@@ -64,9 +64,12 @@
 .app-footer-inner { max-width: 1600px; margin: 0 auto; padding: 32px 28px; display: flex; flex-direction: column; gap: 12px; }
 .app-footer-guard { font-size: 14px; line-height: 1.5; margin: 0; }
 .app-footer-guard a,
+.app-footer-beta a,
 .app-footer-credits a { color: var(--riprap-text-link); text-decoration: underline; text-underline-offset: 2px; }
 .app-footer-guard a:hover,
+.app-footer-beta a:hover,
 .app-footer-credits a:hover { text-decoration-thickness: 2px; }
+.app-footer-beta,
 .app-footer-build,
 .app-footer-credits { font-size: 14px; line-height: 1.5; color: var(--ink-secondary); margin: 0; }
 

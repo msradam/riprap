@@ -5,8 +5,8 @@
    *  content" lets them bypass repeated nav. Hidden visually until
    *  focused (NOT display:none, which removes from a11y tree).
    *
-   *  Used by the landing (target .land-page) and by the root layout on
-   *  app routes (target the layout <main>).
+   *  Rendered by the root layout on every route but print (target the
+   *  layout <main>).
    */
   interface Props {
     /** Anchor id to skip to. Defaults to `main-content`. */

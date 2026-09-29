@@ -51,3 +51,19 @@ describe('AppFooter NYC-only resource links are deployment-gated', () => {
     expect(text).toContain('informational only');
   });
 });
+
+describe('AppFooter site lines (the landing uses this footer too)', () => {
+  it('carries the beta status with its feedback link and the standards', () => {
+    const { container, getByRole } = render(AppFooter);
+    const text = container.textContent ?? '';
+    expect(text).toContain('This is open beta.');
+    expect(text).toMatch(/WCAG 2\.2 AA/);
+    expect(getByRole('link', { name: 'Send feedback' })).toHaveAttribute('href', expect.stringContaining('/issues/new'));
+  });
+
+  it('drops the disclaimer when the page already carries it', () => {
+    const { container } = render(AppFooter, { props: { disclaimer: false } });
+    expect(container.textContent).not.toContain('Riprap is a reference dossier');
+    expect(container.textContent).toContain('This is open beta.');
+  });
+});

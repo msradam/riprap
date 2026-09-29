@@ -4,14 +4,11 @@
    *  a briefing contains, then the cities, bring-your-own-data and
    *  responsible use as quiet sections. Live briefings render at /q/<query>. */
   import { onMount } from 'svelte';
-  import SkipLink from '$lib/components/shell/SkipLink.svelte';
-  import LandHeader from '$lib/components/landing/LandHeader.svelte';
   import LandHero from '$lib/components/landing/LandHero.svelte';
   import LandStories from '$lib/components/landing/LandStories.svelte';
   import LandStones from '$lib/components/landing/LandStones.svelte';
   import CityPicker from '$lib/components/landing/CityPicker.svelte';
   import UseBand from '$lib/components/landing/UseBand.svelte';
-  import LandFooter from '$lib/components/landing/LandFooter.svelte';
   import { byodRegistry } from '$lib/stores/byodRegistry.svelte';
   import { STATIC_SITE } from '$lib/staticSite';
   import type { PageProps } from './$types';
@@ -32,11 +29,8 @@
   <meta name="description" content="Riprap composes federal, state, and city open data into a written flood-exposure briefing in which every claim cites a public record. Open source, Apache-2.0. New York City is in production; Chicago, Seattle, San Francisco, Boston and Albany are experimental." />
 </svelte:head>
 
-<SkipLink />
-
 <div class="land">
-  <LandHeader />
-  <div class="land-page" id="main-content">
+  <div class="land-page">
     <LandHero />
     <LandStories stories={data.stories} />
     <LandStones />
@@ -53,7 +47,6 @@
     {/if}
     <UseBand />
   </div>
-  <LandFooter />
 
   <!-- Loaded on first open: it brings js-yaml and papaparse, which the
        landing's first view does not need. -->
@@ -66,7 +59,6 @@
 
 <style>
   .land {
-    min-height: 100vh;
     background: var(--paper);
     color: var(--ink);
     font-family: var(--font-sans);
@@ -74,7 +66,7 @@
   .land-page {
     max-width: 1040px;
     margin: 0 auto;
-    padding: 0 32px;
+    padding: 0 32px 96px;
   }
   .land-byod {
     margin-top: 64px;
@@ -109,7 +101,7 @@
   }
   @media (max-width: 640px) {
     .land-page {
-      padding: 0 16px;
+      padding: 0 16px 48px;
     }
     .land-byod {
       margin-top: 48px;

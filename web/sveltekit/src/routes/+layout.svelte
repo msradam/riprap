@@ -20,16 +20,15 @@
   // Route params arrive decoded; no second decodeURIComponent.
   let query = $derived(page.params.queryId || null);
 
-  // The landing at / and the print artifact at /print/<id> both bring
-  // their own chrome, so the layout's AppHeader / AppFooter sit out
-  // for those. Briefings at /q/<id> and error pages still get the app
-  // chrome (styled by lib/chrome.css in the base sheet).
+  // Every page but the print artifact at /print/<id> gets the app chrome
+  // (styled by lib/chrome.css in the base sheet), the landing included.
   let routeId = $derived(page.route.id ?? '');
-  let isPrint = $derived(routeId.startsWith('/(app)/print/'));
-  let chromeFree = $derived(isPrint || routeId === '/');
-  // Gallery pages are static snapshots: the header must not call /api/*.
-  // Briefing pages carry the disclaimer in their scope note; the footer
-  // does not repeat it.
+  let chromeFree = $derived(routeId.startsWith('/(app)/print/'));
+  let isLanding = $derived(routeId === '/');
+  // The landing and the gallery need no backend: the header must not call
+  // /api/*. Briefing pages carry the disclaimer in their scope note and
+  // the landing in its "evidence, not advice" section; the footer does not
+  // repeat it.
   let isBriefing = $derived(routeId.startsWith('/(app)/q/') || routeId === '/(app)/gallery/[slug]');
   let isGallery = $derived(routeId.startsWith('/(app)/gallery'));
 
@@ -50,12 +49,11 @@
 
 {#if !chromeFree}
   <SkipLink />
-  <AppHeader {query} offline={isGallery} onResetCold={() => (window.location.href = query ? `${resolve('/')}?q=${encodeURIComponent(query)}` : resolve('/'))} />
+  <AppHeader {query} offline={isGallery || isLanding} onResetCold={() => (window.location.href = query ? `${resolve('/')}?q=${encodeURIComponent(query)}` : resolve('/'))} />
 {/if}
-<!-- The landing sets its own skip target (.land-page), so main only carries the skip-link id on app routes. -->
 <main id={chromeFree ? undefined : 'main-content'} tabindex="-1">{@render children()}</main>
 {#if !chromeFree}
-  <AppFooter disclaimer={!isBriefing} />
+  <AppFooter disclaimer={!isBriefing && !isLanding} />
 {/if}
 
 <style>

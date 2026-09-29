@@ -107,7 +107,7 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* ── Wordmark ─────────────────────────────────────────────────────── */
 /* Dam-mark prefix is now an inline SVG component (RipMark.svelte)
-   mounted next to the text in AppHeader / LandHeader, replacing the
+   mounted next to the text in AppHeader, replacing the
    earlier ▌ block-glyph. The mark inherits color via currentColor;
    the wordmark text picks up its own ink color from the cascade. */
 .riprap-wordmark {
