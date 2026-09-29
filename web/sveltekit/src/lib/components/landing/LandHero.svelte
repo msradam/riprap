@@ -55,7 +55,7 @@
           type="text"
           {@attach prefill}
           bind:value={q}
-          placeholder="Address, QN 12, or a question"
+          placeholder="Address, QN12, or a question"
           autocomplete="off"
           enterkeyhint="search"
         />

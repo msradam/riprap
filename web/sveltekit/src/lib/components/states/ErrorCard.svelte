@@ -54,7 +54,7 @@
       // Community districts are New York City codes; name them only
       // when the run is in NYC or no city resolved at all.
       body: isUnknown || depName === 'nyc'
-        ? 'Try a full street address, or a community district such as QN 12.'
+        ? 'Try a full street address, or a community district such as QN12.'
         : 'Try a full street address.',
       actions: [sample, edit]
     },
@@ -90,8 +90,8 @@
   <p class="error-card-body">{spec.body}</p>
   {#if state === 'geocoder' && looksLikeDistrict && (isUnknown || depName === 'nyc')}
     <p class="error-card-body">
-      Write a district code with a space, for example QN 12, or read the precomputed
-      <a href="{resolve('/(app)/gallery/[slug]', { slug: 'qn12-complaints' })}/">QN 12 briefing in the gallery</a>.
+      Check the borough code and district number, for example QN12, or read the precomputed
+      <a href="{resolve('/(app)/gallery/[slug]', { slug: 'qn12-complaints' })}/">QN12 briefing in the gallery</a>.
     </p>
   {/if}
   <!-- A full load: each action starts a new run or restarts this one. -->
