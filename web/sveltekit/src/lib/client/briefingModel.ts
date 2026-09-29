@@ -496,8 +496,8 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
 
 export type BriefingModel = ReturnType<typeof briefingModel>;
 
-const evidenceCard = ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline, parts }: EvidenceRow): EvidenceCard =>
-  ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline, ...(parts && { parts: parts.map(evidenceCard) }) });
+const evidenceCard = ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline, variant, parts }: EvidenceRow): EvidenceCard =>
+  ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline, variant, ...(parts && { parts: parts.map(evidenceCard) }) });
 
 /** Build the print snapshot from a finished run: the live route calls it
  *  when the stream ends, the gallery when a reader presses Print
