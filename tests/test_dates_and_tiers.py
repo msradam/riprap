@@ -52,3 +52,7 @@ def test_dem_label_states_no_resolution_the_raster_does_not_have():
               NYC.get("microtopo").manifest.provenance.citation,
               NYC.get("microtopo_nta").manifest.provenance.source_name]
     assert all("30 m" not in s and s.startswith("USGS 3DEP DEM") for s in labels)
+
+
+def test_policy_corpus_is_not_tiered_as_a_measurement():
+    assert NYC.get("policy_corpus").manifest.tier == "proxy"

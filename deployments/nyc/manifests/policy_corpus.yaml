@@ -4,7 +4,7 @@ title: NYC flood-policy corpus — agency reports + plans
 answers: "passages from NYC agency flood plans and reports related to the place (experimental relevance)"
 stone: cornerstone
 maturity: experimental
-tier: empirical
+tier: proxy  # policy documents are context, not measurements
 adapter: local_corpus_with_ner
 
 spatial:
