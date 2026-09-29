@@ -613,6 +613,11 @@
     font-size: 12px;
     font-weight: 400;
   }
+  /* An opaque card so the scale text keeps AA contrast over any tile. */
+  .map-frame :global(.maplibregl-ctrl-scale) {
+    background-color: var(--riprap-surface-card);
+    color: var(--ink);
+  }
   .link-badge {
     position: absolute;
     bottom: 8px;

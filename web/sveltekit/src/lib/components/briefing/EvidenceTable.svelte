@@ -18,6 +18,11 @@
   }
   let { groups, findings, citations, notRun, labelledby }: Props = $props();
 
+  // Explicit headers: the group heading is a second level of th, which
+  // scope alone does not resolve for every checker.
+  const uid = $props.id();
+  const col = (name: 'source' | 'finding' | 'figure' | 'tier' | 'asof' | 'cite') => `${uid}-col-${name}`;
+
   function citationOf(c: EvidenceCard): Citation | null {
     return (c.citeId && citations[c.citeId]) || citations[c.docId] || null;
   }
@@ -26,49 +31,50 @@
 <table class="ev-table" aria-labelledby={labelledby}>
   <thead>
     <tr>
-      <th scope="col">Source</th>
-      <th scope="col">Finding</th>
-      <th scope="col" class="ev-num">Figure</th>
-      <th scope="col">Tier</th>
-      <th scope="col">Data as of</th>
-      <th scope="col" class="ev-num">Cite</th>
+      <th scope="col" id={col('source')}>Source</th>
+      <th scope="col" id={col('finding')}>Finding</th>
+      <th scope="col" class="ev-num" id={col('figure')}>Figure</th>
+      <th scope="col" id={col('tier')}>Tier</th>
+      <th scope="col" id={col('asof')}>Data as of</th>
+      <th scope="col" class="ev-num" id={col('cite')}>Cite</th>
     </tr>
   </thead>
-  {#each groups as g (g.key)}
+  {#each groups as g, gi (g.key)}
+    {@const gid = `${uid}-group-${gi}`}
     <tbody>
       <tr class="ev-group">
-        <th colspan="6" scope="colgroup">{g.name}{#if g.role}, {g.role}{/if}</th>
+        <th colspan="6" scope="rowgroup" id={gid}>{g.name}{#if g.role}, {g.role}{/if}</th>
       </tr>
       {#each g.cards as c (c.id)}
         {@const fig = figureOf(c)}
         {@const find = findings.get(c.id)}
         {@const cit = citationOf(c)}
         <tr class="ev-row">
-          <td class="ev-source">
+          <td class="ev-source" headers="{col('source')} {gid}">
             {#if c.experimental}{c.source} <span class="exp-badge">Experimental</span>{:else}{c.source}{/if}
           </td>
-          <td class="ev-finding">
+          <td class="ev-finding" headers="{col('finding')} {gid}">
             <div class="ev-measure">
               {#if find}<span class="ev-find">{find.first}</span>{#if find.rest}{` ${find.rest}`}{/if}{/if}
               <span class="ev-dataset">{c.title}</span>
             </div>
           </td>
-          <td class={['ev-num', 'ev-figure', !fig && 'is-empty']}>
+          <td class={['ev-num', 'ev-figure', !fig && 'is-empty']} headers="{col('figure')} {gid}">
             {#if fig}
               <span class="ev-label" aria-hidden="true">Figure</span>
               <span class="data ev-fig">{fig.value}</span>
               {#if fig.label}<span class="ev-fig-label">{fig.label}</span>{/if}
             {/if}
           </td>
-          <td class="ev-tier">
+          <td class="ev-tier" headers="{col('tier')} {gid}">
             <span class="ev-mark" style:color="var(--tier-{c.tier})" aria-hidden="true"><TierGlyph tier={c.tier} size={11} /></span>
             {TIER_WORDS[c.tier] ?? c.tier}
           </td>
-          <td class="ev-asof">
+          <td class="ev-asof" headers="{col('asof')} {gid}">
             <span class="ev-label" aria-hidden="true">Data as of</span>
             <span class="data" title={c.vintage}>{asOfDate(c.vintage)}</span>
           </td>
-          <td class="ev-num ev-cite">
+          <td class="ev-num ev-cite" headers="{col('cite')} {gid}">
             {#if cit}
               <span class="ev-label" aria-hidden="true">Cite</span>
               <a
