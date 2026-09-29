@@ -3,8 +3,8 @@
  "neighborhood": "Homecrest, Brooklyn",
  "address": "2017 East 17th Street, Brooklyn, NY 11229",
  "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
- "generated_at": "2026-09-28T23:46Z",
- "riprap_commit": "07233b3",
+ "generated_at": "2026-09-29T01:40Z",
+ "riprap_commit": "db77ee8",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -869,7 +869,7 @@
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC DOB permits issued inside the neighborhood, cross-referenced with Sandy 2012 and DEP scenarios",
      "doc_id": "dob_permits_nta",
-     "date_modified": "2026-09-27T23:29:36+0000",
+     "date_modified": "2026-09-28T23:42:27+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -1172,7 +1172,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1839,
      "completion_tokens": 136,
-     "duration_s": 12.811,
+     "duration_s": 6.337,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1200,9 +1200,9 @@
     "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR)."
    }
   },
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 16 catch basin, 12 sewer backup, 6 street flooding [nyc311].\n\n**Hazard Reader.**\nThe address at 2017 East 17th Street, Brooklyn, is outside the documented 2012 Hurricane Sandy inundation area as per the NYC OEM report [sandy_inundation]. According to the FEMA National Flood Hazard Layer (NFHL) FIRM panel 3604970352F, effective since 2007, the location falls within FEMA flood zone X [fema_nfhl]. Modeling by the NYC Department of Environmental Protection (DEP) for a stormwater scenario with a rainfall intensity of 2.13 inches per hour and a 2050 sea-level rise projection indicates that the address is outside the predicted flooding area [dep_moderate_2050].\n\n**Live Observer.**\nWithin a 200-meter radius of 2017 East 17th Street, Brooklyn, 34 flood-related complaints have been filed to NYC 311 over the past five years, comprising 16 catch basin issues, 12 sewer backup incidents, and 6 instances of street flooding [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 16 catch basin, 12 sewer backup, 6 street flooding [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 16 catch basin, 12 sewer backup, 6 street flooding [nyc311].\n\n**Hazard Reader.**\nThe address at 2017 East 17th Street, Brooklyn, is outside the documented 2012 Hurricane Sandy inundation area as per the NYC OEM report [sandy_inundation]. According to the FEMA National Flood Hazard Layer (NFHL) FIRM panel 3604970352F, effective since 2007, the location falls within FEMA flood zone X [fema_nfhl]. Modeling by the NYC Department of Environmental Protection (DEP) for a stormwater scenario with a rainfall intensity of 2.13 inches per hour and a 2050 sea-level rise projection indicates that the address is outside the predicted flooding area [dep_moderate_2050].\n\n**Live Observer.**\nWithin a 200-meter radius of 2017 East 17th Street, Brooklyn, 34 flood-related complaints have been filed to NYC 311 over the past five years, comprising 16 catch basin issues, 12 sewer backup incidents, and 6 instances of street flooding [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and baked data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 16 catch basin, 12 sewer backup, 6 street flooding [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
    "dropped": [],
    "tier": "llm"
   },
@@ -1218,52 +1218,20 @@
       "nyc311"
      ],
      "numbers": []
-    },
-    {
-     "section": "Live Observer",
-     "text": "Within a 200-meter radius of 2017 East 17th Street, Brooklyn, 34 flood-related complaints have been filed to NYC 311 over the past five years, comprising 16 catch basin issues, 12 sewer backup incidents, and 6 instances of street flooding.",
-     "doc_ids": [
-      "nyc311"
-     ],
-     "numbers": []
-    },
-    {
-     "section": "Hazard Reader",
-     "text": "The address at 2017 East 17th Street, Brooklyn, is outside the documented 2012 Hurricane Sandy inundation area as per the NYC OEM report.",
-     "doc_ids": [
-      "sandy_inundation"
-     ],
-     "numbers": []
-    },
-    {
-     "section": "Hazard Reader",
-     "text": "According to the FEMA National Flood Hazard Layer (NFHL) FIRM panel 3604970352F, effective since 2007, the location falls within FEMA flood zone X.",
-     "doc_ids": [
-      "fema_nfhl"
-     ],
-     "numbers": []
-    },
-    {
-     "section": "Hazard Reader",
-     "text": "Modeling by the NYC Department of Environmental Protection (DEP) for a stormwater scenario with a rainfall intensity of 2.13 inches per hour and a 2050 sea-level rise projection indicates that the address is outside the predicted flooding area.",
-     "doc_ids": [
-      "dep_moderate_2050"
-     ],
-     "numbers": []
     }
    ],
    "dropped_claims": [],
    "retried_claims": [],
-   "n_kept": 5,
+   "n_kept": 1,
    "n_dropped": 0,
    "llm_calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 559,
-     "completion_tokens": 348,
-     "duration_s": 33.788,
+     "prompt_tokens": 361,
+     "completion_tokens": 22,
+     "duration_s": 1.401,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1282,39 +1250,6 @@
    "answered": true
   },
   "citations": {
-   "sandy_inundation": {
-    "doc_id": "sandy_inundation",
-    "source": "NYC Open Data \u2014 Sandy Inundation Zone",
-    "title": "NYC Sandy Inundation Zone (NYC OpenData uyj8-7rv5, empirical 2012 extent)",
-    "url": "https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/uyj8-7rv5",
-    "license": "NYC Open Data Terms of Use",
-    "date_modified": "2015-11-09",
-    "retrieved_at": "2026-07-11",
-    "vintage": "2015-11-09",
-    "maturity": "production"
-   },
-   "fema_nfhl": {
-    "doc_id": "fema_nfhl",
-    "source": "FEMA National Flood Hazard Layer (NFHL) \u2014 effective flood zones",
-    "title": "FEMA NFHL effective flood-zone polygon and FIRM panel intersecting the address point.",
-    "url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
-    "license": "U.S. Public Domain",
-    "date_modified": "2026-09-28T23:46Z",
-    "retrieved_at": "2026-09-28T23:46Z",
-    "vintage": "2026-09-28T23:46Z",
-    "maturity": "production"
-   },
-   "dep_moderate_2050": {
-    "doc_id": "dep_moderate_2050",
-    "source": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
-    "title": "NYC DEP Stormwater Flood Map \u2014 Moderate (2.13 in/hr, 2050 SLR)",
-    "url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
-    "license": "NYC Open Data Terms of Use",
-    "date_modified": "2024-07-03",
-    "retrieved_at": "2026-07-11",
-    "vintage": "2024-07-03",
-    "maturity": "production"
-   },
    "nyc311": {
     "doc_id": "nyc311",
     "source": "NYC 311 Service Requests (NYC Open Data)",
@@ -1322,7 +1257,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-28T01:37:58+0000",
-    "retrieved_at": "2026-09-28T23:46Z",
+    "retrieved_at": "2026-09-29T01:40Z",
     "vintage": "2026-09-28T01:37:58+0000",
     "maturity": "production"
    }
@@ -1773,8 +1708,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790639152.520192,
-    "elapsed_s": 0.01,
+    "started_at": 1790646031.5834491,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "address": "2017 EAST 17 STREET, Brooklyn, NY, USA",
@@ -1786,7 +1721,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790639152.525751,
+    "started_at": 1790646031.5872629,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1798,7 +1733,7 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790639152.551557,
+    "started_at": 1790646031.615083,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1808,7 +1743,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790639152.551557,
+    "started_at": 1790646031.615084,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1818,7 +1753,7 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790639152.5515578,
+    "started_at": 1790646031.615084,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1828,7 +1763,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790639152.5515578,
+    "started_at": 1790646031.6150851,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1838,7 +1773,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790639152.5515578,
+    "started_at": 1790646031.6150851,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1848,7 +1783,7 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790639152.5515578,
+    "started_at": 1790646031.6150851,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1858,7 +1793,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790639152.551559,
+    "started_at": 1790646031.6150851,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1868,7 +1803,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790639152.551559,
+    "started_at": 1790646031.6150851,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1878,7 +1813,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790639152.551559,
+    "started_at": 1790646031.615086,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1888,7 +1823,7 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790639152.551559,
+    "started_at": 1790646031.615086,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1898,7 +1833,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790639152.551559,
+    "started_at": 1790646031.615086,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1908,7 +1843,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790639152.551559,
+    "started_at": 1790646031.615086,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1918,7 +1853,7 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790639152.551559,
+    "started_at": 1790646031.615086,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1928,7 +1863,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790639152.55156,
+    "started_at": 1790646031.615086,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1938,7 +1873,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790639152.55156,
+    "started_at": 1790646031.615087,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1948,7 +1883,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790639152.55156,
+    "started_at": 1790646031.615087,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1958,7 +1893,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790639152.55156,
+    "started_at": 1790646031.615087,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1968,7 +1903,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790639152.55156,
+    "started_at": 1790646031.615087,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1978,7 +1913,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790639152.55156,
+    "started_at": 1790646031.615087,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1988,7 +1923,7 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790639152.5785851,
+    "started_at": 1790646031.642433,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -2002,7 +1937,7 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790639152.5786932,
+    "started_at": 1790646031.645178,
     "elapsed_s": 0.03,
     "err": null,
     "result": {
@@ -2015,8 +1950,8 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790639152.578819,
-    "elapsed_s": 0.03,
+    "started_at": 1790646031.643361,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2026,8 +1961,8 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790639152.5783,
-    "elapsed_s": 0.51,
+    "started_at": 1790646031.648552,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "n": 34
@@ -2036,7 +1971,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790639153.3433611,
+    "started_at": 1790646031.915485,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2047,17 +1982,17 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790639153.343542,
+    "started_at": 1790646031.915683,
     "ok": true,
     "result": {
      "tier": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "attempts": 1,
-     "kept": 5,
+     "kept": 1,
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 33.82
+    "elapsed_s": 1.44
    }
   ],
   "models": [
@@ -2066,7 +2001,7 @@
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 46.6,
+    "latency_s": 7.74,
     "calls": 2
    }
   ],
@@ -2081,11 +2016,11 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 46.599,
+   "total_duration_s": 7.738,
    "tokens": {
-    "prompt": 2398,
-    "completion": 484,
-    "total": 2882
+    "prompt": 2200,
+    "completion": 158,
+    "total": 2358
    },
    "calls": [
     {
@@ -2094,7 +2029,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1839,
      "completion_tokens": 136,
-     "duration_s": 12.811,
+     "duration_s": 6.337,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -2103,9 +2038,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 559,
-     "completion_tokens": 348,
-     "duration_s": 33.788,
+     "prompt_tokens": 361,
+     "completion_tokens": 22,
+     "duration_s": 1.401,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"

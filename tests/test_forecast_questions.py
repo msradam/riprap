@@ -76,3 +76,18 @@ def test_forecast_facts_are_the_forecasts_not_the_flood_zone(monkeypatch):
     out = syn.synthesize({"intent": "single_address", "plan": {"question": Q, "focus": {"time_frame": "future"}}})
     answer = out["paragraph"].split("**Answer.**\n")[1].split("\n\n")[0]
     assert answer.index("[ttm_battery_surge]") < answer.index("[npcc4_slr]") and "fema_nfhl" not in answer
+
+
+def test_a_scenario_question_keeps_the_model_facts(monkeypatch):
+    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
+    docs = [Doc("dep_moderate_2050", "Hazard Reader", "The DEP 2050 scenario models Deep Contiguous (>4 ft) flooding here.",
+                False),
+            Doc("ttm_battery_surge", "Projector", "a TTM model forecasts a peak surge residual of 0.41 m.", True)]
+    monkeypatch.setattr(syn, "_documents", lambda state: (docs, [], None))
+    monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
+    reply = {"answer": {"lead": "yes", "facts": ["dep_moderate_2050"]}}
+    monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (reply, "scripted"))
+    q = "What does the 2050 stormwater scenario show at 400 Carroll Street, Brooklyn?"
+    out = syn.synthesize({"intent": "single_address", "plan": {"question": q, "focus": {"time_frame": "future"}}})
+    answer = out["paragraph"].split("**Answer.**\n")[1].split("\n\n")[0]
+    assert answer.startswith("From the sources consulted: The DEP 2050 scenario") and "ttm_battery_surge" not in answer

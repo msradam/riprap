@@ -245,9 +245,13 @@ def _extract(out: dict, question: str, texts: dict[str, str],
         # A forecast question: the facts are the forecasts and projections themselves,
         # chosen in code (the model tended to pick the flood zone), and the lead is
         # neutral, since a forecast is not an observation.
+        from riprap.core.burr.intake import forecast_question
+
         forecasts = [i for i in FORECAST_FACTS if texts.get(i)]
-        if forecasts:
+        if forecasts and forecast_question(question):
             lead, facts = "facts", forecasts[:4]
+        elif lead in ("yes", "no", "partly"):
+            lead = "facts"  # a scenario question ("what does the 2050 scenario show"): the model's facts, neutral lead
     return lead, facts, answer_checks.check_lead(lead, facts, question, texts, values)
 # "facts" is set only by code: the facts with no yes or no in front of them.
 LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:",

@@ -3,8 +3,8 @@
  "neighborhood": "Community district QN12, Queens",
  "address": "QN12",
  "question": "How many street flooding complaints has community district QN12 had?",
- "generated_at": "2026-09-28T23:47Z",
- "riprap_commit": "07233b3",
+ "generated_at": "2026-09-29T01:40Z",
+ "riprap_commit": "db77ee8",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -869,7 +869,7 @@
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC DOB permits issued inside the neighborhood, cross-referenced with Sandy 2012 and DEP scenarios",
      "doc_id": "dob_permits_nta",
-     "date_modified": "2026-09-27T23:29:36+0000",
+     "date_modified": "2026-09-28T23:42:27+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -1172,7 +1172,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1830,
      "completion_tokens": 126,
-     "duration_s": 11.747,
+     "duration_s": 6.09,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1222,30 +1222,20 @@
       "nyc311_nta"
      ],
      "numbers": []
-    },
-    {
-     "section": "Live Observer",
-     "text": "Community district QN12 has had 533 street flooding complaints in the past three years.",
-     "doc_ids": [
-      "nyc311_nta"
-     ],
-     "numbers": [
-      "533"
-     ]
     }
    ],
    "dropped_claims": [],
    "retried_claims": [],
-   "n_kept": 2,
+   "n_kept": 1,
    "n_dropped": 0,
    "llm_calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 624,
-     "completion_tokens": 91,
-     "duration_s": 7.65,
+     "prompt_tokens": 426,
+     "completion_tokens": 33,
+     "duration_s": 1.906,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1271,7 +1261,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-28T01:37:58+0000",
-    "retrieved_at": "2026-09-28T23:47Z",
+    "retrieved_at": "2026-09-29T01:40Z",
     "vintage": "2026-09-28T01:37:58+0000",
     "maturity": "production"
    }
@@ -1587,7 +1577,7 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790639239.3803499,
+    "started_at": 1790646049.9105668,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1606,7 +1596,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790639239.382587,
+    "started_at": 1790646049.912419,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1618,7 +1608,7 @@
    {
     "step": "dep_extreme_2080_nta",
     "ok": true,
-    "started_at": 1790639239.408204,
+    "started_at": 1790646049.946156,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1628,7 +1618,7 @@
    {
     "step": "dep_moderate_current_nta",
     "ok": true,
-    "started_at": 1790639239.408205,
+    "started_at": 1790646049.946157,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1638,7 +1628,7 @@
    {
     "step": "prithvi_water_nta",
     "ok": true,
-    "started_at": 1790639239.408205,
+    "started_at": 1790646049.946157,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1648,7 +1638,7 @@
    {
     "step": "microtopo_nta",
     "ok": true,
-    "started_at": 1790639239.408205,
+    "started_at": 1790646049.9461582,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1658,7 +1648,7 @@
    {
     "step": "dob_permits_nta",
     "ok": true,
-    "started_at": 1790639239.408206,
+    "started_at": 1790646049.9461582,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1668,39 +1658,39 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1790639239.4330611,
-    "elapsed_s": 0.01,
+    "started_at": 1790646049.978339,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {}
    },
    {
     "step": "sandy_nta",
     "ok": true,
-    "started_at": 1790639239.4339368,
-    "elapsed_s": 1.09,
+    "started_at": 1790646049.979261,
+    "elapsed_s": 1.08,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_2050_nta",
     "ok": true,
-    "started_at": 1790639239.433901,
-    "elapsed_s": 0.2,
+    "started_at": 1790646049.9792168,
+    "elapsed_s": 0.23,
     "err": null,
     "result": {}
    },
    {
     "step": "nyc311_nta",
     "ok": true,
-    "started_at": 1790639239.433843,
-    "elapsed_s": 5.06,
+    "started_at": 1790646049.979361,
+    "elapsed_s": 0.15,
     "err": null,
     "result": {}
    },
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790639244.748477,
+    "started_at": 1790646051.3175418,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1709,17 +1699,17 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790639244.748611,
+    "started_at": 1790646051.317698,
     "ok": true,
     "result": {
      "tier": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "attempts": 1,
-     "kept": 2,
+     "kept": 1,
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 7.69
+    "elapsed_s": 1.94
    }
   ],
   "models": [
@@ -1728,7 +1718,7 @@
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 19.4,
+    "latency_s": 8.0,
     "calls": 2
    }
   ],
@@ -1743,11 +1733,11 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 19.397,
+   "total_duration_s": 7.996,
    "tokens": {
-    "prompt": 2454,
-    "completion": 217,
-    "total": 2671
+    "prompt": 2256,
+    "completion": 159,
+    "total": 2415
    },
    "calls": [
     {
@@ -1756,7 +1746,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1830,
      "completion_tokens": 126,
-     "duration_s": 11.747,
+     "duration_s": 6.09,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1765,9 +1755,9 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 624,
-     "completion_tokens": 91,
-     "duration_s": 7.65,
+     "prompt_tokens": 426,
+     "completion_tokens": 33,
+     "duration_s": 1.906,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
