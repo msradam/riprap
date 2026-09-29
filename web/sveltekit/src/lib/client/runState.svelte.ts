@@ -219,17 +219,34 @@ export function buildIdaHwmFc(fr: Rec): FeatureCollection | undefined {
       metres(e.distance_m)].filter(Boolean).join(', '));
 }
 
+/** A FloodNet status code in words: "good" and its variants are in good
+ *  working order; every other code is a maintenance flag. */
+export function sensorStatusWords(status: unknown): string | null {
+  const s = typeof status === 'string' ? status.trim().toLowerCase() : '';
+  if (!s) return null;
+  return s.startsWith('good') ? 'in good working order' : 'flagged by FloodNet for maintenance';
+}
+
+/** A 311 descriptor without its internal codes: "Sewer Backup (Use
+ *  Comments) (SA)" becomes "Sewer backup". */
+export function plainDescriptor(d: unknown): string | null {
+  if (typeof d !== 'string' || !d.trim()) return null;
+  const t = d.replace(/\(Use Comments\)/gi, '').replace(/\([A-Z0-9]{1,6}\)/g, '')
+    .replace(/\s*\/\s*/g, ' or ').replace(/\s+/g, ' ').trim();
+  return t ? t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() : null;
+}
+
 /** FloodNet street sensors (`final.floodnet.sensors`). */
 export function buildFloodnetFc(fr: Rec): FeatureCollection | undefined {
   return pointsFc(block(fr, 'floodnet')?.sensors, 'floodnet', (e) => String(e.name ?? 'FloodNet sensor'), (e) =>
-    ['FloodNet flood sensor', e.street && `on ${e.street}`, e.status && `status ${e.status}`]
+    ['FloodNet flood sensor', e.street && `on ${e.street}`, e.status_words ?? sensorStatusWords(e.status)]
       .filter(Boolean).join(', '));
 }
 
 /** NYC 311 flood complaints with coordinates (`final.nyc311.points`). */
 export function build311Fc(fr: Rec): FeatureCollection | undefined {
   return pointsFc(block(fr, 'nyc311')?.points, 'nyc311', (e) => String(e.address ?? '311 complaint'), (e) =>
-    ['311 complaint', e.descriptor, e.date].filter(Boolean).join(', '));
+    ['311 complaint', plainDescriptor(e.descriptor), e.date].filter(Boolean).join(', '));
 }
 
 export interface SearchRadius { label: string; radius_m: number; tier: 'empirical' | 'proxy' }

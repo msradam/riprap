@@ -42,10 +42,10 @@ describe('evidence point builders', () => {
   it('builds FloodNet sensors and 311 complaints', () => {
     expect(buildFloodnetFc(final)!.features[0].properties).toMatchObject({
       pid: 'floodnet-0', name: 'Q - 184th St/91st Ave',
-      detail: 'FloodNet flood sensor, on 184th Street, status good'
+      detail: 'FloodNet flood sensor, on 184th Street, in good working order'
     });
     expect(build311Fc(final)!.features[0].properties).toMatchObject({
-      pid: 'nyc311-0', name: '91-11 184 STREET', detail: '311 complaint, Sewer Backup, 2026-05-25'
+      pid: 'nyc311-0', name: '91-11 184 STREET', detail: '311 complaint, Sewer backup, 2026-05-25'
     });
   });
 
@@ -61,7 +61,7 @@ describe('evidence point builders', () => {
   it('lists the plotted points as rows in the order given', () => {
     const rows = evidencePointRows(buildIdaHwmFc(final), undefined, build311Fc(final));
     expect(rows.map((r) => r.id)).toEqual(['ida-0', 'nyc311-0']);
-    expect(rows[1]).toEqual({ id: 'nyc311-0', name: '91-11 184 STREET', meta: '311 complaint, Sewer Backup, 2026-05-25' });
+    expect(rows[1]).toEqual({ id: 'nyc311-0', name: '91-11 184 STREET', meta: '311 complaint, Sewer backup, 2026-05-25' });
   });
 
   it('reports the search radii that the blocks give, skipping missing ones', () => {
