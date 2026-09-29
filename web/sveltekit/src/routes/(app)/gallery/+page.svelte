@@ -22,6 +22,9 @@
   const note = (mode: string | null) => (mode === 'extractive' ? NOTE_EXTRACTIVE : NOTE_WRITTEN);
   let modes = $derived([...new Set(questions.filter((e) => e.modelName).map((e) => e.answerMode === 'extractive'))]);
   let sharedNote = $derived(modes.length === 1 ? (modes[0] ? NOTE_EXTRACTIVE : NOTE_WRITTEN) : null);
+  // One generation date for the whole gallery is said once, not per row.
+  let dates = $derived([...new Set(data.entries.map((e) => e.generated_at.slice(0, 10)))]);
+  let sharedDate = $derived(dates.length === 1 ? dates[0] : null);
 </script>
 
 <svelte:head>
@@ -31,7 +34,7 @@
 
 {#snippet row(place: string, generatedAt: string, href: string, label: string, lead: string, reason?: string | null)}
   <span class="gallery-place">{place}</span>
-  <time class="gallery-date" datetime={generatedAt.slice(0, 10)}>{generatedAt.slice(0, 10)}</time>
+  {#if !sharedDate}<time class="gallery-date" datetime={generatedAt.slice(0, 10)}>{generatedAt.slice(0, 10)}</time>{/if}
   <a class="gallery-link" {href}>{label}</a>
   {#if reason}<p class="gallery-reason">{reason}</p>{/if}
   {#if lead}<p class="gallery-lead">{lead}</p>{/if}
@@ -43,7 +46,7 @@
     <h1 id="gallery-h1" class="gallery-title">Precomputed briefings</h1>
     <p class="gallery-note">
       Snapshots generated ahead of time and saved as static pages. Opening one does not contact the
-      Riprap backend, so the data is as of the generation date shown.
+      Riprap backend, so the data is as of the generation date{#if sharedDate}, <time class="data" datetime={sharedDate}>{sharedDate}</time>{:else} shown{/if}.
     </p>
 
     <h2 class="gallery-group">Questions</h2>

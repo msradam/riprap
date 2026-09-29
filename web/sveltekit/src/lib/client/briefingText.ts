@@ -184,3 +184,21 @@ export function sharedStem(sentences: string[]): { stem: string; tails: string[]
   if (ms.some((m) => !m || m[1] !== ms[0]![1])) return null;
   return { stem: ms[0]![1], tails: ms.map((m) => m![2]) };
 }
+
+
+/** Hosts a sentence may name in passing ("FEMA's Flood Map Service Center
+ *  (msc.fema.gov)"), linked without changing the words. */
+const LINK_HOSTS = /\b(msc\.fema\.gov|floodhelpny\.org)\b/g;
+
+/** Text split into plain pieces and linked host names, in order. */
+export function linkHosts(text: string): { text: string; href?: string }[] {
+  const out: { text: string; href?: string }[] = [];
+  let last = 0;
+  for (const m of text.matchAll(LINK_HOSTS)) {
+    if (m.index! > last) out.push({ text: text.slice(last, m.index) });
+    out.push({ text: m[0], href: `https://${m[0]}/` });
+    last = m.index! + m[0].length;
+  }
+  if (last < text.length) out.push({ text: text.slice(last) });
+  return out;
+}

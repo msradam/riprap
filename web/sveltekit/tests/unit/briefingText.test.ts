@@ -168,3 +168,14 @@ describe('keepTogether', () => {
     expect(parts.filter((_, i) => i % 2)).toEqual(['200 m', '2.13 in/hr', '2021-09-02', '0 m²']);
   });
 });
+
+import { linkHosts } from '$lib/client/briefingText';
+
+describe('linkHosts', () => {
+  it('links a named host without changing the words', () => {
+    const s = linkHosts("use FEMA's Flood Map Service Center (msc.fema.gov).");
+    expect(s.map((x) => x.text).join('')).toBe("use FEMA's Flood Map Service Center (msc.fema.gov).");
+    expect(s.find((x) => x.href)?.href).toBe('https://msc.fema.gov/');
+    expect(linkHosts('no host here')).toEqual([{ text: 'no host here' }]);
+  });
+});
