@@ -14,7 +14,7 @@
  * store. Backend-defined manifests (`deployments/nyc/manifests/*.yaml`)
  * propagate to the UI with no TS edits.
  */
-import type { StoneKey, CardVariant, Citation } from '$lib/types/card';
+import type { StoneKey, Citation } from '$lib/types/card';
 import { STATIC_SITE } from '$lib/staticSite';
 
 /** One stone descriptor from /api/pebbles. */

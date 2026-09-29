@@ -75,17 +75,18 @@ export function sourceLists(run: RunState) {
   let consulted: { id: string; title: string; failed: boolean }[] | undefined;
   if (f?.consulted || failed.length) {
     consulted = (f?.consulted ?? []).map((c) => ({ id: c.id, title: c.title, failed: failed.includes(c.id) }));
-    const known = new Set([...(f?.consulted ?? []), ...(f?.not_checked ?? [])].map((c) => c.id));
+    // Plain arrays: these are local lookups in a pure function, not reactive state.
+    const known = [...(f?.consulted ?? []), ...(f?.not_checked ?? [])].map((c) => c.id);
     for (const id of failed) {
-      if (!known.has(id)) consulted.push({ id, title: pebbleManifest.byId[id]?.title ?? id, failed: true });
+      if (!known.includes(id)) consulted.push({ id, title: pebbleManifest.byId[id]?.title ?? id, failed: true });
     }
     // Failures first, so a closed list still leads with them.
     consulted.sort((x, y) => Number(y.failed) - Number(x.failed));
   }
   // With a consulted list, only its members ran; older payloads ran all.
-  const ran = f?.consulted ? new Set(f.consulted.map((c) => c.id)) : null;
+  const ran = f?.consulted ? f.consulted.map((c) => c.id) : null;
   const noData = (run.findingsData.noData ?? [])
-    .filter((s) => !ran || ran.has(s.id))
+    .filter((s) => !ran || ran.includes(s.id))
     .map((s) => s.title);
   return {
     consulted,

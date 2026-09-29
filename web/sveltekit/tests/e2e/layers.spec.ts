@@ -33,7 +33,6 @@ test.describe('@layers backend data coverage', () => {
         fetchFc(`/api/floodnet_near?lat=${p.lat}&lon=${p.lon}&r=1500`)
       ]);
 
-      // eslint-disable-next-line no-console
       console.log(`[${p.name}] sandy=${sandy.features} dep=${dep.features} prithvi=${prithvi.features} floodnet=${floodnet.features}`);
 
       // Each endpoint should respond 200 (or be cleanly skipped on a

@@ -27,7 +27,7 @@ import {
   installMockEventSource, getMockEventSource, scriptBostonRun, scriptCityRun,
 } from './helpers/sse';
 import {
-  ALL_CITIES, BOSTON, NYC, CHICAGO, SEATTLE, SF, ELSEWHERE,
+  ALL_CITIES, BOSTON, NYC, CHICAGO, SEATTLE, SF,
   NYC_LEAK_NEEDLES, type CityFixture,
 } from './fixtures/cities';
 

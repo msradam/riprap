@@ -20,6 +20,14 @@ export default [
     }
   },
   {
+    // Rune modules (*.svelte.ts / *.svelte.js) go through the Svelte parser,
+    // which needs the TypeScript parser for their script.
+    files: ['**/*.svelte.ts', '**/*.svelte.js'],
+    languageOptions: {
+      parserOptions: { parser: ts.parser }
+    }
+  },
+  {
     languageOptions: {
       globals: {
         // GeoJSON namespace lives in @types/geojson, available in TS but

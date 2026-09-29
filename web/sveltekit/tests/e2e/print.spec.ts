@@ -30,7 +30,7 @@ test.describe('export-PDF curated print flow', () => {
       // @ts-expect-error — instrument print for test
       window.__printed = 0;
       window.print = () => {
-        // @ts-expect-error
+        // @ts-expect-error: __printed is a global only this test defines
         window.__printed += 1;
       };
     });
@@ -65,7 +65,7 @@ test.describe('export-PDF curated print flow', () => {
 
     // window.print() fired automatically.
     await page.waitForFunction(
-      // @ts-expect-error
+      // @ts-expect-error: __printed is a global only this test defines
       () => window.__printed > 0,
       undefined,
       { timeout: 4000 }

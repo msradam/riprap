@@ -11,7 +11,6 @@
  * the lifecycle (deployment event swaps chip + scaffold, final
  * event renders the briefing, done event hides the status pill).
  */
-import { vi } from 'vitest';
 
 export class MockEventSource {
   url: string;
@@ -60,6 +59,7 @@ export function installMockEventSource(): void {
     class extends MockEventSource {
       constructor(url: string) {
         super(url);
+        // eslint-disable-next-line @typescript-eslint/no-this-alias -- records the instance the code under test built
         CURRENT = this;
       }
     } as unknown as typeof MockEventSource;
