@@ -14,6 +14,8 @@ describe('Battery surge row', () => {
     const surge = run.findingsData.cards.find((c) => c.docId.startsWith('ttm_battery'));
     expect((g.final as unknown as { ttm_battery_surge: { interesting: boolean } }).ttm_battery_surge.interesting).toBe(false);
     expect(surge).toBeTruthy();
+    expect(surge!.absent).toBeFalsy();
+    expect(surge!.headline).toMatch(/cm/);
     expect(isExperimentalRow(surge!)).toBe(true);
   });
 });
