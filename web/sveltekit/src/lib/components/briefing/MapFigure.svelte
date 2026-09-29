@@ -75,19 +75,23 @@
   {#if shown.length}
     <fieldset class="map-layers">
       <legend>Map layers</legend>
-      {#each shown as l (l.key)}
-        <label>
-          <!-- A new object, not a mutation: RipMap tracks activeLayers by identity. -->
-          <input
-            type="checkbox"
-            checked={active[l.key]}
-            onchange={() => (active = { ...active, [l.key]: !active[l.key] })}
-          />
-          <span class="map-layer-mark" style:color="var(--tier-{l.key})" aria-hidden="true"><TierGlyph tier={l.key} size={11} /></span>
-          <!-- One flex item, so the count shares the label's baseline. -->
-          <span>{l.label}, <span class="data">{run.mapFeatureCounts[l.key]}</span></span>
-        </label>
-      {/each}
+      <!-- A flex box beside the floated legend: a wrapped switch lines up
+           with the first one, not under the legend. -->
+      <div class="map-layer-list">
+        {#each shown as l (l.key)}
+          <label>
+            <!-- A new object, not a mutation: RipMap tracks activeLayers by identity. -->
+            <input
+              type="checkbox"
+              checked={active[l.key]}
+              onchange={() => (active = { ...active, [l.key]: !active[l.key] })}
+            />
+            <span class="map-layer-mark" style:color="var(--tier-{l.key})" aria-hidden="true"><TierGlyph tier={l.key} size={11} /></span>
+            <!-- One flex item, so the count shares the label's baseline. -->
+            <span>{l.label}, <span class="data">{run.mapFeatureCounts[l.key]}</span></span>
+          </label>
+        {/each}
+      </div>
     </fieldset>
   {/if}
   {#if run.address && run.mapPoints.length}
@@ -144,16 +148,19 @@
     color: var(--ink-secondary);
   }
   .map-layers {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 20px;
     margin: 8px 0 0;
     padding: 0;
     border: 0;
   }
+  .map-layer-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+  }
   .map-layers legend {
     float: left;
-    margin-right: 4px;
+    margin-right: 16px;
+    line-height: 24px;
     padding: 0;
     color: var(--ink-secondary);
   }
