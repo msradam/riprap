@@ -81,12 +81,16 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
     if _tier() == "llm" and not no_llm:
         calls: list = []
         try:
+            from app.planner import is_bare_place
             from app.planner import plan as run_planner
+            from riprap.core.burr.synthesis import llm_bare
 
-            p = run_planner(query, ledger=calls)
             guard = heuristic_plan(query)
             if guard["intent"] == "out_of_scope":  # the same fixed rules in both modes
-                return {**guard, "llm_calls": calls}
+                return guard
+            if not llm_bare() and guard["intent"] != "not_implemented" and is_bare_place(query, guard["targets"]):
+                return guard  # a bare place: the resolver finds it, and there is no question to plan
+            p = run_planner(query, ledger=calls)
             intent, focus = p.intent, p.focus
             if forecast_question(query):
                 # Decided in code: a forecast question is about what is coming,

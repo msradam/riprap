@@ -1270,10 +1270,10 @@ export function applyStepEventToLiveState(
 /** What produced the briefing, in words: the mode line on screen and in
  *  print. An extractive answer is quoted, not model prose, so it does not
  *  say "LLM claims checked" for it. */
-export function modeLine(g: { tier: string; model?: string; answer_mode?: string;
+export function modeLine(g: { tier: string; model?: string; answer_mode?: string; note?: string;
                               claims?: unknown[]; dropped_claims?: unknown[] } | null | undefined): string | null {
   if (!g) return null;
-  if (g.tier !== 'llm') return 'Evidence briefing (no LLM)';
+  if (g.tier !== 'llm') return g.note ? 'Evidence briefing (no question, so no LLM was needed)' : 'Evidence briefing (no LLM)';
   const model = g.model ? ` (${g.model})` : '';
   const counts = `${g.claims?.length ?? 0} kept, ${g.dropped_claims?.length ?? 0} dropped`;
   if (g.answer_mode === 'extractive') {

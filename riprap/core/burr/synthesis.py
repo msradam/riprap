@@ -164,16 +164,30 @@ Rules:
 - Never say a place "will flood", is "safe", or has "no risk". Say "is mapped within", "was recorded", "is modeled to".
 """
 
-EXTRACTIVE_RULES = """
-A question was asked. Do not write claims in section "answer". Instead fill "answer": "lead" is one of yes, no, partly, count, cannot_answer, and "facts" lists the ids of one to four documents that support the lead, most relevant first. The reader sees a fixed phrase for the lead followed by those documents' text, word for word. Use "no" only when the facts report an absence (outside, none, zero). Use "partly" when some but not all of what was asked about is affected. Use "count" when the question asks how many or how much. Use "cannot_answer" with no facts when the documents do not answer the question. Then write the other sections as usual.
-"""
 GUARD_RULES = """
 Answer claims are also checked in code. Do not say no, none or not when a cited document reports something. Do not write "all", "both" or "the <things> are" when a document counts fewer inside than in total; give the count ("3 of 5"). Do not join two documents with "which means", "indicating" or "therefore", and do not state a warning or forecast as something happening. State an elevation with its datum. Include the count or value that answers the question.
 """
+# Extractive mode asks the model for the answer only (refactor 8): a lead and
+# the ids of the facts. The reader sees those facts word for word, and a
+# question page shows no model-written section claims, so asking for them
+# only cost generation time (about 1,100 tokens, over a minute on a laptop).
+EXTRACTIVE_SYSTEM = """You answer a question about flood exposure at one place by choosing from numbered documents. You write no prose.
+
+Return JSON with "answer": "lead" is one of yes, no, partly, count, cannot_answer, and "facts" lists the ids of one to four documents that support the lead, most relevant first. The reader sees a fixed phrase for the lead followed by those documents' text, word for word. Use "no" only when the facts report an absence (outside, none, zero). Use "partly" when some but not all of what was asked about is affected. Use "count" when the question asks how many or how much. Use "cannot_answer" with no facts when the documents do not answer the question. Use only ids from the list."""
 LEADS = ("yes", "no", "partly", "count", "cannot_answer")
 # The owner's decision after refactor 3: extractive cannot paraphrase, and
 # it declines honestly when the evidence does not answer.
 DEFAULT_ANSWER_MODE = "extractive"
+
+
+def llm_bare() -> bool:
+    """RIPRAP_LLM_BARE=1: send a bare address or district (no question) to
+    the LLM to rewrite its evidence as claims. Off by default: with no
+    question there is nothing to answer, and the claims only restated the
+    cited sentences at a minute or more per briefing."""
+    import os
+
+    return os.environ.get("RIPRAP_LLM_BARE", "").lower() in ("1", "true", "yes")
 
 
 def answer_mode() -> str:
@@ -341,6 +355,12 @@ def synthesize(state) -> dict:
                 "grounding": {"tier": "llm", "claims": [], "dropped_claims": [], "attempts": 0}}
     plan = state.get("plan") or {}
     question, focus = plan.get("question") or "", plan.get("focus")
+    if not question and not llm_bare():
+        paragraph, cites = compose_briefing(state)
+        return {"paragraph": paragraph, "citations": cites,
+                "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": 0,
+                              "note": "No question was asked, so the cited evidence is shown without the LLM "
+                                      "(RIPRAP_LLM_BARE=1 sends it to the LLM)."}}
     mode = answer_mode() if question else None
     # Stones whose consulted sources all returned nothing: named on a question page.
     empty: dict[str, list[str]] = {}
@@ -366,14 +386,16 @@ def synthesize(state) -> dict:
                                   f"{(state.get('geocode') or {}).get('address') or ''}"))
     schema = claims_schema(sorted(texts), [*extra, *sections])
     if mode == "extractive":
-        schema["properties"]["answer"] = {
-            "type": "object", "additionalProperties": False, "required": ["lead", "facts"],
-            "properties": {"lead": {"type": "string", "enum": list(LEADS)},
-                           "facts": {"type": "array", "items": {"type": "string", "enum": sorted(texts)},
-                                     "maxItems": 4}}}
-        schema["required"] = [*schema["required"], "answer"]
-    rules = {"guarded": ANSWER_RULES + GUARD_RULES, "extractive": EXTRACTIVE_RULES}.get(mode or "", "")
-    messages = [{"role": "system", "content": SYSTEM_PROMPT + rules},
+        # The answer only: no section claims (see EXTRACTIVE_SYSTEM).
+        schema = {"type": "object", "additionalProperties": False, "required": ["answer"], "properties": {
+            "answer": {"type": "object", "additionalProperties": False, "required": ["lead", "facts"],
+                       "properties": {"lead": {"type": "string", "enum": list(LEADS)},
+                                      "facts": {"type": "array", "items": {"type": "string", "enum": sorted(texts)},
+                                                "maxItems": 4}}}}}
+        system = EXTRACTIVE_SYSTEM
+    else:
+        system = SYSTEM_PROMPT + {"guarded": ANSWER_RULES + GUARD_RULES}.get(mode or "", "")
+    messages = [{"role": "system", "content": system},
                 {"role": "user", "content": _user_prompt(docs, sections, question, focus)}]
 
     entail_info: dict = {}

@@ -136,7 +136,7 @@ def warm() -> dict:
     from app.context import entity_extract
     from app.live import ttm_battery_surge, ttm_forecast
 
-    step("granite-embedding", rag.warm)
+    step("granite-embedding", lambda: (rag.warm(), rag._model()))  # the index, then the encoder
     step("flair-ner", entity_extract.warm)
     step("ttm-battery-surge", ttm_battery_surge.warm)
     step("ttm-r2", ttm_forecast._load_model)

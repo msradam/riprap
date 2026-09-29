@@ -88,6 +88,8 @@ export interface Grounding {
   answered?: boolean;
   /** "extractive": the answer quotes source sentences under a model-chosen lead. */
   answer_mode?: string;
+  /** Set when LLM mode skipped the LLM because no question was asked. */
+  note?: string;
 }
 
 /** Substring checks for required disclosure phrases. Not a quality score. */
