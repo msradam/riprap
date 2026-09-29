@@ -136,6 +136,25 @@ def count_numbers(doc: str, near: str = "") -> list[str]:
     return out
 
 
+# A DEP stormwater scenario named in a question, by its year, and the words
+# that mark a stormwater question (not a sea-level one).
+_DEP_YEAR = ((re.compile(r"\b2080\b"), "dep_extreme_2080"), (re.compile(r"\b2050\b"), "dep_moderate_2050"),
+             (re.compile(r"\bcurrent\b", re.I), "dep_moderate_current"))
+_STORMWATER_RE = re.compile(r"stormwater|\bdep\b|\bscenario\b", re.I)
+_NOT_STORMWATER_RE = re.compile(r"sea.level|surge|\btide", re.I)
+
+
+def dep_scenario_asked(question: str) -> str | None:
+    """The DEP stormwater scenario pebble id ("dep_moderate_2050") a question
+    names ("What does the 2050 stormwater scenario show?"), or None when it
+    names none, or more than one, or asks about sea level."""
+    q = question or ""
+    if not _STORMWATER_RE.search(q) or _NOT_STORMWATER_RE.search(q):
+        return None
+    named = [pid for pat, pid in _DEP_YEAR if pat.search(q)]
+    return named[0] if len(named) == 1 else None
+
+
 def relevant_doc(question: str, docs: dict[str, str]) -> str | None:
     """The doc_id of the source the question is about, if it produced one."""
     for pattern, ids in RELEVANT:

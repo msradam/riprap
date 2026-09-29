@@ -239,11 +239,18 @@ def _lead_fact(lead: str | None, facts: list[str], kind_lead: bool, rel: str | N
     key figure. A count lead: the counted kind's lead sentence itself
     (`in_lead`), else the source the question is about, else the first fact
     with a count. A yes or no set by the past-event rule: the source the rule
-    relied on. Any other lead: None (no sentence is singled out). An
+    relied on. A future scenario question's neutral lead: the source the
+    question is about. Any other lead: None (no sentence is singled out). An
     experimental source is never the key fact."""
     facts = [f for f in facts if f not in experimental]
     if rel in experimental:
         rel = None
+    if lead == "facts" and (focus or {}).get("time_frame") == "future":
+        # A scenario question keeps its neutral lead; the key fact is the source
+        # it is about (the DEP scenario it names), when that is among the facts.
+        asked = answer_checks.dep_scenario_asked(question)
+        doc = rel if rel in facts else next((f for f in facts if asked and f.startswith(asked)), None)
+        return {"doc_id": doc, "in_lead": False} if doc else None
     if lead == "count":
         if kind_lead:
             return {"doc_id": rel, "in_lead": True} if rel else None
@@ -273,6 +280,11 @@ def _extract(out: dict, question: str, texts: dict[str, str],
             lead, facts = "facts", forecasts[:4]
         elif lead in ("yes", "no", "partly"):
             lead = "facts"  # a scenario question ("what does the 2050 scenario show"): the model's facts, neutral lead
+        # A question naming one DEP scenario: the other DEP scenarios were not asked
+        # about, so they leave the answer when the one asked about is among the facts.
+        asked = answer_checks.dep_scenario_asked(question)
+        if lead == "facts" and asked and any(f.startswith(asked) for f in facts):
+            facts = [f for f in facts if not f.startswith("dep_") or f.startswith(asked)]
     return lead, facts, answer_checks.check_lead(lead, facts, question, texts, values)
 # "facts" is set only by code: the facts with no yes or no in front of them.
 LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:",

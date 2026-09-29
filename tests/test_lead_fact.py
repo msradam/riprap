@@ -81,3 +81,48 @@ def test_extractive_answer_puts_experimental_facts_after_the_others(monkeypatch)
     answer = [c["doc_ids"][0] for c in out["grounding"]["claims"] if c["section"] == "answer"]
     assert answer == ["sandy_inundation", "prithvi_water"], out["paragraph"]
     assert (out["grounding"]["lead_fact"] or {}).get("doc_id") != "prithvi_water"
+
+
+# A future scenario question keeps its neutral lead and names its key fact.
+
+Q_2050 = "What does the 2050 stormwater scenario show at 400 Carroll Street, Brooklyn?"
+FUTURE = {"hazard": "flood", "time_frame": "future", "assets": []}
+GOWANUS = {
+    "dep_moderate_2050": "The NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR) models flooding at this address: "
+                         "Deep Contiguous (>4 ft).",
+    "dep_extreme_2080": "The NYC DEP stormwater scenario (3.66 in/hr, 2080 SLR) models flooding at this address: "
+                        "Deep Contiguous (>4 ft).",
+    "fema_nfhl": "This address sits in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel "
+                 "3604970211F, effective 2007.",
+    "sandy_inundation": "This address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",
+}
+
+
+def test_dep_scenario_asked():
+    from riprap.core.burr.answer_checks import dep_scenario_asked
+
+    assert dep_scenario_asked(Q_2050) == "dep_moderate_2050"
+    assert dep_scenario_asked("What does the DEP 2080 scenario show here?") == "dep_extreme_2080"
+    assert dep_scenario_asked("What does the current stormwater scenario show?") == "dep_moderate_current"
+    assert dep_scenario_asked("How do the 2050 and 2080 stormwater scenarios compare?") is None
+    assert dep_scenario_asked("What sea level does the 2050 scenario project?") is None
+    assert dep_scenario_asked("Will this block flood in 2050?") is None
+
+
+def test_scenario_question_key_fact_is_the_scenario_it_names():
+    facts = ["dep_moderate_2050", "fema_nfhl", "sandy_inundation"]
+    assert _lead_fact("facts", facts, False, None, Q_2050, FUTURE, GOWANUS, {}) == \
+        {"doc_id": "dep_moderate_2050", "in_lead": False}
+    assert _lead_fact("facts", ["fema_nfhl"], False, None, Q_2050, FUTURE, GOWANUS, {}) is None
+
+
+def test_scenario_question_drops_the_dep_scenarios_it_did_not_ask_about():
+    from riprap.core.burr.synthesis import _extract
+
+    out = {"answer": {"lead": "yes", "facts": ["dep_moderate_2050", "dep_extreme_2080", "fema_nfhl",
+                                              "sandy_inundation"]}}
+    lead, facts, hits = _extract(out, Q_2050, GOWANUS, {}, FUTURE)
+    assert lead == "facts" and facts == ["dep_moderate_2050", "fema_nfhl", "sandy_inundation"] and not hits
+    # The scenario asked about is not among the facts: nothing is dropped.
+    out = {"answer": {"lead": "yes", "facts": ["dep_extreme_2080", "fema_nfhl"]}}
+    assert _extract(out, Q_2050, GOWANUS, {}, FUTURE)[1] == ["dep_extreme_2080", "fema_nfhl"]
