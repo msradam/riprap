@@ -84,7 +84,8 @@
             onchange={() => (active = { ...active, [l.key]: !active[l.key] })}
           />
           <span class="map-layer-mark" style:color="var(--tier-{l.key})" aria-hidden="true"><TierGlyph tier={l.key} size={11} /></span>
-          {l.label}, <span class="data">{run.mapFeatureCounts[l.key]}</span>
+          <!-- One flex item, so the count shares the label's baseline. -->
+          <span>{l.label}, <span class="data">{run.mapFeatureCounts[l.key]}</span></span>
         </label>
       {/each}
     </fieldset>
