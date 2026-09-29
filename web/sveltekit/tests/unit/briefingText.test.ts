@@ -95,6 +95,7 @@ describe('termsIn', () => {
     expect(termsIn('2050 SLR; 14 above-curb flood events', true).map((t) => t.term))
       .toEqual(['SLR', 'above-curb flood event', 'Measured, Modeled, Proxy, Synthetic']);
     expect(termsIn('SLRs and slurry', false)).toEqual([]);
+    expect(termsIn('water level 1.2 ft above MLLW', false).map((t) => t.term)).toEqual(['MLLW']);
   });
 });
 

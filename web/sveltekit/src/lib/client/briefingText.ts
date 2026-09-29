@@ -137,6 +137,11 @@ export const GLOSSARY: { term: string; re: RegExp; reading: string }[] = [
   },
   { term: 'SLR', re: /\bSLR\b/, reading: 'sea-level rise.' },
   {
+    term: 'MLLW',
+    re: /\bMLLW\b/,
+    reading: "mean lower low water, the average of each day's lower low tide; NOAA tide readings are measured against it."
+  },
+  {
     term: 'above-curb flood event',
     re: /above-curb/i,
     reading:
