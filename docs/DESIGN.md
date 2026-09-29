@@ -222,7 +222,9 @@ right column (about 42%) holds the source notes, the checks-ran and mode
 lines, the terms, the scope note and the resident pointer, then the map,
 sticky, 460px tall, beside the table. Neither column leaves an empty
 quadrant at the top. Below 1100px everything is one column: the summary,
-the endnotes, the scope note, the map at 300px, then the evidence.
+the evidence table and the written sections, then the endnotes, the terms,
+the scope note and the map at 300px, so the evidence comes before the
+apparatus on a phone. The map attribution starts folded into its (i) control.
 
 ### Phone (390)
 One column, 16px gutters, no horizontal scroll. Source notes become
@@ -253,7 +255,8 @@ side stripes, no boxes around blocks of text.
   as its own paragraph in Body, as support. The key sentence is the
   backend's lead sentence when `in_lead` is true, else the first answer
   sentence citing `lead_fact.doc_id`. Without a lead fact no sentence is
-  singled out.
+  singled out. An experimental source is never the key sentence: its
+  paragraph comes after the others and opens with the Experimental badge.
 - **Citations:** a small superscript number in Federal Blue after the
   sentence's closing punctuation, never before it. No tier mark in prose.
   Numbers follow first appearance on the page (the answer or In brief, the
@@ -356,7 +359,15 @@ placeholders.
 
 ### Gallery index
 The typographic list stays: place over question, snapshot date in Data,
-plus each entry's lead or first answer sentence in Small.
+plus each entry's lead or first answer sentence in Small. Each entry may
+carry a one-line reason (why it is in the gallery) under its title, and an
+address entry may name a featured source whose sentence is its snippet, so
+ten addresses never read as one template.
+
+### Frozen readings
+On a gallery snapshot, forecasts say "Forecast made at the snapshot, <date>
+<time> UTC." and an active alert says "Active at the snapshot, ..."; live
+times are written in UTC. The Figure column never shows a temperature.
 
 ### Print
 A's report structure: page one carries the title, the meta line, the answer
