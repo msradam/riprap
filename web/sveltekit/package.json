@@ -31,7 +31,6 @@
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.6.0",
     "@types/papaparse": "^5.5.2",
-    "@vitest/expect": "^4.1.6",
     "eslint": "^10.3.0",
     "eslint-plugin-svelte": "^3.17.1",
     "globals": "^17.6.0",
@@ -44,14 +43,11 @@
     "vitest": "^2.1.9"
   },
   "dependencies": {
-    "@deck.gl/aggregation-layers": "^9.3.6",
-    "@deck.gl/core": "^9.3.6",
     "@deck.gl/extensions": "^9.3.6",
     "@deck.gl/layers": "^9.3.6",
     "@deck.gl/mapbox": "^9.3.6",
     "@fontsource/overpass-mono": "^5.2.8",
     "@fontsource/sofia-sans": "^5.2.8",
-    "deck.gl": "^9.3.6",
     "idb-keyval": "^6.2.2",
     "js-yaml": "^4.1.1",
     "maplibre-gl": "^4.7.0",
