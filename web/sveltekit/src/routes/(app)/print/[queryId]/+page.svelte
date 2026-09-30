@@ -463,6 +463,33 @@
     .print-doc :global(.sources-checked li) {
       break-inside: avoid;
     }
+    /* Letter paper is 6.5in wide: the date and figure cells wrap rather
+       than keep the widths they take on screen, so the Finding column
+       keeps most of the page (nowrap once squeezed it to 80px and the
+       packet ran to 15 pages). */
+    .print-doc :global(.ev-table) {
+      table-layout: fixed;
+      width: 100%;
+    }
+    /* Tier holds "Synthetic" and its mark; Data as of holds a date on
+       one line, so "fetched 2026-09-30 17:53 UTC" breaks at its spaces. */
+    .print-doc :global(.ev-table thead th:nth-child(1)) { width: 17%; }
+    .print-doc :global(.ev-table thead th:nth-child(2)) { width: 41%; }
+    .print-doc :global(.ev-table thead th:nth-child(3)) { width: 11%; }
+    .print-doc :global(.ev-table thead th:nth-child(4)) { width: 13%; }
+    .print-doc :global(.ev-table thead th:nth-child(5)) { width: 14%; }
+    .print-doc :global(.ev-table thead th:nth-child(6)) { width: 4%; }
+    .print-doc :global(.ev-date),
+    .print-doc :global(.ev-fig),
+    .print-doc :global(.ev-tier) {
+      white-space: normal;
+    }
+    /* Balanced columns across a page break left the rest of the page
+       blank after the source list's last entries; filling column by
+       column lets the next block follow on the same page. */
+    .print-citations :global(.source-list) {
+      column-fill: auto;
+    }
     /* The evidence and the source lists start on page two. */
     .print-rest {
       break-before: page;
