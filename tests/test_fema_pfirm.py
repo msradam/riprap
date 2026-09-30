@@ -24,3 +24,17 @@ def test_no_bfe_when_the_zone_has_none(monkeypatch):
     v = fema_nfhl.preliminary_for_point(40.711, -73.777)
     assert v["static_bfe_ft"] is None and "base flood elevation" not in v["narrative"]
     assert "zone X (an area of minimal flood hazard)" in v["narrative"]
+
+
+def test_effective_panel_comes_from_the_zones_own_study(monkeypatch):
+    """At Staten Island's shore two New Jersey countywide panels cover the
+    point as well as NYC's. The panel cited is from the zone's study, even
+    when a neighbouring county's panel is newer."""
+    zone = [{"attributes": {"FLD_ZONE": "X", "ZONE_SUBTY": "AREA OF MINIMAL FLOOD HAZARD", "SFHA_TF": "F",
+                            "DFIRM_ID": "360497"}}]
+    panels = [{"attributes": {"FIRM_PAN": "34017C0114D", "EFF_DATE": 1400000000000, "DFIRM_ID": "34017C"}},
+              {"attributes": {"FIRM_PAN": "3604970189F", "EFF_DATE": 1188950400000, "DFIRM_ID": "360497"}}]
+    monkeypatch.setattr(fema_nfhl, "_point_query",
+                        lambda layer, lat, lon, fields, ttl, base=fema_nfhl.URL: zone if layer == 28 else panels)
+    v = fema_nfhl.summary_for_point(40.642, -74.076)
+    assert v["firm_panel"] == "3604970189F" and v["effective_year"] == 2007

@@ -63,7 +63,7 @@ def zone_reading(subtype: str | None) -> str | None:
 
 def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> dict[str, Any] | None:
     try:
-        zones = _point_query(_ZONE_LAYER, lat, lon, "FLD_ZONE,ZONE_SUBTY,SFHA_TF", cache_ttl_s)
+        zones = _point_query(_ZONE_LAYER, lat, lon, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,DFIRM_ID", cache_ttl_s)
     except httpx.HTTPError:
         return None
     if not zones:
@@ -74,10 +74,14 @@ def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> dict[
     eff_year: int | None = None
     eff_date: str | None = None
     try:
-        panels = _point_query(_PANEL_LAYER, lat, lon, "FIRM_PAN,EFF_DATE", cache_ttl_s)
-        # A point on a panel boundary intersects several panels — cite
-        # the most recently effective one.
+        panels = _point_query(_PANEL_LAYER, lat, lon, "FIRM_PAN,EFF_DATE,DFIRM_ID", cache_ttl_s)
+        # Panel polygons overlap along the water (at Staten Island's shore
+        # two New Jersey countywide panels cover the point as well as
+        # NYC's), so cite a panel from the zone's own study when there is
+        # one, and the most recently effective of those.
         dated = [p["attributes"] for p in panels if p["attributes"].get("EFF_DATE")]
+        same_study = [a for a in dated if a.get("DFIRM_ID") == zone.get("DFIRM_ID")]
+        dated = same_study or dated
         if dated:
             latest = max(dated, key=lambda a: a["EFF_DATE"])
             panel_id = latest.get("FIRM_PAN")
