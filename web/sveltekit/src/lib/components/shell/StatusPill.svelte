@@ -46,7 +46,7 @@
 
   let phaseLabel = $derived.by(() => {
     switch (briefingState.phase) {
-      case 'planning':    return 'planning intent';
+      case 'planning':    return 'reading the question';
       case 'specialists': return 'gathering evidence';
       case 'reconciling': return 'reconciling';
       case 'error':       return 'error';

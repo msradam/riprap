@@ -203,7 +203,7 @@ describe('/q/[queryId] no-deployment (out-of-coverage) lifecycle', () => {
     es.emit('done', {});
 
     await waitFor(
-      () => expect(deployment.current?.city).toBe('Not in any shipped deployment'),
+      () => expect(deployment.current?.city).toBe('Outside the covered cities: federal sources only'),
       { timeout: 1000 },
     );
 
@@ -217,7 +217,7 @@ describe('/q/[queryId] no-deployment (out-of-coverage) lifecycle', () => {
 });
 
 describe('/q/[queryId] SSE error BEFORE the deployment handshake', () => {
-  it('clears the boot NYC scaffold so the error card stands alone', async () => {
+  it('swaps the boot NYC scaffold for the federal one so the error card stands alone', async () => {
     // Pre-seed boot NYC into both stores (mirror what AppHeader's
     // $effect + the page's onMount pebbleManifest.load() would do
     // on first render — they fire BEFORE any SSE event lands).
@@ -237,12 +237,12 @@ describe('/q/[queryId] SSE error BEFORE the deployment handshake', () => {
     es.emit('hello', { query: '600 4th Avenue, Seattle, WA' });
     es.emit('error', { err: 'SSE connection error: 503 Service Unavailable' });
 
-    // Wait for the scaffold-clear to land.
+    // Wait for the federal scaffold (no city pebbles) to land.
     await waitFor(
-      () => expect(pebbleManifest.byId).toEqual({}),
+      () => expect(pebbleManifest.loadedFor).toBe('federal'),
       { timeout: 1000 },
     );
-    expect(pebbleManifest.stones).toEqual([]);
+    expect(pebbleManifest.byId).toEqual({});
 
     // The chip should also be neutralized — it WAS NYC before the
     // error, but with the deployment handshake never completing the

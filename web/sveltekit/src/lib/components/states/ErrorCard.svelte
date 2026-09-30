@@ -40,7 +40,7 @@
   // an NYC community district; under a Boston chip it would mislead.
   let depName = $derived(deployment.current?.name);
   let cityName = $derived(deployment.current?.city ?? '');
-  let isUnknown = $derived(!depName || depName === 'unknown' || depName === '__none__');
+  let isUnknown = $derived(!depName || depName === 'unknown' || depName === '__none__' || depName === 'federal');
 
   let sample = $derived<Action>({ label: 'Use a sample query', href: resolve('/(app)/q/[queryId]', { queryId: encodeURIComponent(SAMPLE_ADDRESS) }) });
   // The landing reads ?q= into its search box and focuses it.

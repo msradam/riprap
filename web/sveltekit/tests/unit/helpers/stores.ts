@@ -39,7 +39,7 @@ export function seedForCity(fixture: CityFixture): void {
   pebbleManifest.stones = [...fixture.manifest.stones].sort((a, b) => a.order - b.order);
   pebbleManifest.byStone = byStone;
   pebbleManifest.loaded = true;
-  pebbleManifest.loadedFor = fixture.key === 'elsewhere' ? null : fixture.key;
+  pebbleManifest.loadedFor = fixture.key;
   pebbleManifest.error = null;
 
   // deployment — as if /api/deployment?deployment=<city> resolved

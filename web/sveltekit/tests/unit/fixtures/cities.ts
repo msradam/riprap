@@ -309,9 +309,9 @@ export const SF: CityFixture = {
 
 // ─────────────────────────────────────────────────────────── Out-of-coverage
 export const ELSEWHERE: CityFixture = {
-  key: 'elsewhere',
-  deployment: { name: 'unknown', city: 'Not in any shipped deployment',
-                hazard: 'Climate-exposure briefing' },
+  key: 'federal',
+  deployment: { name: 'federal', city: 'Outside the covered cities: federal sources only',
+                hazard: 'Flood-exposure briefing' },
   geocode: { address: '1 Civic Plaza NW, Albuquerque, NM',
              lat: 35.0844, lon: -106.6504 },
   manifest: { stones: deploymentStones({

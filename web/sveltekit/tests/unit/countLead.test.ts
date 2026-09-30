@@ -24,6 +24,12 @@ describe('countLead', () => {
     expect(countLead([{ text: 'No figure here.' }])).toBeNull();
   });
 
+  it('takes no number from inside a word or later in the sentence', () => {
+    // Live: "How much sea-level rise ... by the 2050s?" led with a bare "4".
+    const npcc = 'From the sources consulted: NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s.';
+    expect(countLead([{ text: npcc, cite: 'npcc4_slr' }])).toBeNull();
+  });
+
   it('leads a count answer with that number and keeps the sentence whole below it', () => {
     const m = model('count');
     expect(m.lead).toBe('34');

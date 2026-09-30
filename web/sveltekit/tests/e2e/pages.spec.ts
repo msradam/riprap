@@ -119,9 +119,9 @@ test('out-of-coverage (Albuquerque) renders the neutral chip', async ({ page }) 
 
   await waitForDone(page, 45_000);
 
-  // Neutral chip — not any shipped deployment.
+  // Out-of-coverage chip: federal sources only, no city claimed.
   const pill = page.locator('.app-header-city-pill');
-  await expect(pill).toContainText('Not in any shipped deployment');
+  await expect(pill).toContainText('Outside the covered cities: federal sources only');
 
   // No NYC needle even though no city is loaded.
   const text = await page.locator('body').innerText();

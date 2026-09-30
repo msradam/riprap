@@ -106,30 +106,17 @@ class PebbleManifestStore {
    *  the SSE stream emits the `deployment` event. No-op when the same
    *  deployment is already loaded.
    *
-   *  When `name` is null (out-of-coverage) we explicitly CLEAR the
-   *  scaffold instead of falling through to the boot manifest — a
-   *  null name signals "no shipped deployment covers this query",
-   *  and rendering NYC's scaffold under that chip is the very leak
-   *  this routing was supposed to fix. */
+   *  When `name` is null (out-of-coverage) the backend ran the federal
+   *  sources only, so load the `federal` manifest rather than falling
+   *  through to the boot one. It carries no NYC pebbles or Stone
+   *  descriptions, so nothing city-specific can leak under the
+   *  out-of-coverage chip, and the evidence cards keep their tiers and
+   *  titles. */
   async loadForDeployment(name: string | null): Promise<void> {
     this.lockedForQuery = true;  // claim ownership against load() races
-    if (name === null) {
-      // Out-of-coverage: clear EVERYTHING, including stones[]. Keeping
-      // stale stones[] left behind the previous deployment's Stone
-      // descriptions ("Reads what NYC's ground remembers about
-      // flooding") under an Albuquerque chip — caught by the
-      // pages.spec.ts no-leak assertion. Cleared scaffold = MapLegend /
-      // StoneRegion fall back to the city-agnostic STONE_META.tag.
-      this.byId = {};
-      this.stones = [];
-      this.byStone = {};
-      this.loaded = true;
-      this.loadedFor = null;
-      this.error = null;
-      return;
-    }
-    if (this.loadedFor === name && this.loaded) return;
-    await this._fetchInto(name);
+    const dep = name ?? 'federal';
+    if (this.loadedFor === dep && this.loaded) return;
+    await this._fetchInto(dep);
   }
 
   /** Internal: fetch /api/pebbles with optional ?deployment=<name> and

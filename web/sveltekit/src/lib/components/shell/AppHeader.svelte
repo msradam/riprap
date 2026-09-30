@@ -124,6 +124,16 @@
 </header>
 
 <style>
+  /* Desktop: the left group keeps its natural width and the query column
+     is capped, so a long question shrinks the query button (it truncates)
+     instead of wrapping the wordmark and context one word per line. The
+     cap leaves the links column room for print and export PDF at 1101px.
+     The tablet and phone rows in chrome.css put the query on its own row. */
+  @media (min-width: 1101px) {
+    .app-header-inner {
+      grid-template-columns: minmax(max-content, 1fr) fit-content(min(560px, 40%)) 1fr;
+    }
+  }
   .app-header-link-button {
     background: transparent;
     border: 0;

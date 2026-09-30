@@ -91,11 +91,11 @@
   // at most every 10 seconds.
   const startedAt = Date.now();
   let now = $state(startedAt);
-  let srStatus = $state('Planning intent');
+  let srStatus = $state('Reading the question');
   let loading = $derived(!snapshot && !run.finalResult && !run.errorState && !run.streamDone);
   let elapsed = $derived(Math.max(0, Math.round((now - startedAt) / 1000)));
   let loadingText = $derived.by(() => {
-    if (!run.plan) return 'Planning intent';
+    if (!run.plan) return 'Reading the question';
     switch (briefingState.phase) {
       case 'specialists':
         return briefingState.totalSpecialists
@@ -290,8 +290,8 @@
         </p>
         <span class="visually-hidden" aria-live="polite">{srStatus}</span>
         <p class="generating-expect">
-          Briefings take from a few seconds to a few minutes; questions answered by a
-          language model can take up to five minutes.
+          A place briefing takes a few seconds. A question goes through the language
+          model first and usually takes 10 to 25 seconds.
         </p>
         {#if !run.plan && run.planTokens}
           <details class="plan-details">

@@ -66,14 +66,15 @@ class DeploymentStore {
    *  /api/deployment?deployment=<name> to pick up the right city +
    *  hazard strings; without that the chip would just show the raw
    *  directory name and miss the deployment-specific hazard text.
-   *  When name is null (out-of-coverage), falls back to a neutral
-   *  chip rather than claiming a city we don't have. */
+   *  When name is null (out-of-coverage), the backend ran the federal
+   *  sources only; the chip says so rather than claiming a city we
+   *  don't have. */
   async setForQuery(name: string | null): Promise<void> {
     this.lockedForQuery = true;  // claim ownership against load() races
     if (!name) {
       this.current = {
-        name: 'unknown',
-        city: 'Not in any shipped deployment',
+        name: 'federal',
+        city: 'Outside the covered cities: federal sources only',
         hazard: 'Flood-exposure briefing',
       };
       this.loaded = true;
