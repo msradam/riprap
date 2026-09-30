@@ -86,7 +86,7 @@
 {#snippet dated(vintage: string, retrieved: string | null | undefined, bare = false)}
   {@const a = asOfPhrase(vintage, retrieved)}
   {@const label = bare && a.label === 'data as of' ? '' : a.label}
-  {#if a.date}{#if label}{label} {/if}<span class="data ev-date" title={vintage}>{a.date}</span>{:else}{label}{/if}
+  {#if a.date}{#if label}{`${label} `}{/if}<span class="data ev-date" title={vintage}>{a.date}</span>{:else}{label}{/if}
 {/snippet}
 
 {#snippet sentence(first: string)}
