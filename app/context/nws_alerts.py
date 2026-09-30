@@ -1,7 +1,7 @@
 """NWS API — active alerts at a point.
 
 api.weather.gov/alerts/active?point={lat},{lon}, no auth, JSON.
-A User-Agent header is required (NWS rate-limits anonymous traffic).
+NWS requires a User-Agent; the shared client in riprap.core.http sends one.
 
 We surface only flood-relevant categories so the doc the reconciler
 sees is short and on-topic.
@@ -14,8 +14,6 @@ from riprap.core import http
 
 DOC_ID = "nws_alerts"
 CITATION = "NWS public alert API (api.weather.gov/alerts)"
-
-USER_AGENT = "Riprap-NYC/0.1 (civic-flood-tool; +https://huggingface.co/spaces/msradam/riprap-nyc)"
 
 _FLOOD_EVENT_KEYWORDS = (
     "flood", "flash flood", "coastal flood", "high surf", "storm surge",
@@ -33,7 +31,7 @@ def alerts_at(lat: float, lon: float) -> list[dict[str, Any]]:
     r = http.get(
         "https://api.weather.gov/alerts/active",
         params={"point": f"{lat:.4f},{lon:.4f}"},
-        headers={"User-Agent": USER_AGENT, "Accept": "application/geo+json"},
+        headers={"Accept": "application/geo+json"},
         timeout=8.0,
     )
     r.raise_for_status()

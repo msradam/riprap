@@ -22,13 +22,10 @@ actually needs to write a useful sentence.
 from __future__ import annotations
 
 import logging
-import warnings
 from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-
-warnings.filterwarnings("ignore")
 
 log = logging.getLogger("riprap.microtopo")
 
@@ -123,15 +120,9 @@ def warm():
 
 
 def _row_col(transform, lat: float, lon: float) -> tuple[int, int]:
-    """Inverse-affine: WGS84 (lon,lat) -> raster (row, col).
-    Mirrors rasterio.transform.rowcol but without holding a dataset handle.
-    """
-    # Diagonal affine (north-up raster): x = a*col + c, y = e*row + f.
-    a, c = transform.a, transform.c
-    e, f = transform.e, transform.f
-    col = int(round((lon - c) / a))
-    row = int(round((lat - f) / e))
-    return row, col
+    """WGS84 (lat, lon) to the nearest raster (row, col)."""
+    x, y = ~transform @ (lon, lat)
+    return int(round(y)), int(round(x))
 
 
 def _ordinal(n: int) -> str:

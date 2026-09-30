@@ -18,8 +18,6 @@ from riprap.core import http
 DOC_ID = "nws_obs"
 CITATION = "NWS station observations API (api.weather.gov/stations)"
 
-USER_AGENT = "Riprap-NYC/0.1 (civic-flood-tool; +https://huggingface.co/spaces/msradam/riprap-nyc)"
-
 # NYC + Hudson Corridor ASOS stations. Picker is haversine-nearest, so adding
 # upstate stations enables Albany / Poughkeepsie / Newburgh queries without
 # breaking NYC behaviour (NYC stations stay closer for NYC lat/lon).
@@ -90,7 +88,7 @@ def obs_at(lat: float, lon: float) -> Obs:
     try:
         r = http.get(
             f"https://api.weather.gov/stations/{sid}/observations/latest",
-            headers={"User-Agent": USER_AGENT, "Accept": "application/geo+json"},
+            headers={"Accept": "application/geo+json"},
             timeout=8.0,
         )
         r.raise_for_status()
