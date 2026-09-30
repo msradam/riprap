@@ -139,6 +139,10 @@ def build_app(query: str, plan: dict | None = None, *, step_queue=None, no_llm: 
             ("plan_intent", "reconcile", expr("intent in ('not_implemented', 'out_of_scope')")),
             ("plan_intent", "resolve_area", expr(f"intent in {POLYGON_INTENTS!r}")),
             ("plan_intent", "geocode_target"),
+            # No point resolved: nothing to run the sources on, so the
+            # briefing says so instead of reporting every source as failed.
+            ("resolve_area", "reconcile", expr("lat is None")),
+            ("geocode_target", "reconcile", expr("lat is None")),
             ("resolve_area", "select_deployment"),
             ("geocode_target", "select_deployment"),
             ("select_deployment", "select_sources"),
@@ -186,9 +190,9 @@ def attach_disclosure_checks(out: dict) -> dict:
     from riprap.core.compliance import check_briefing
 
     paragraph = out.get("paragraph") or ""
-    if not paragraph or out.get("intent") in ("not_implemented", "out_of_scope"):
+    if not paragraph or out.get("intent") in ("not_implemented", "out_of_scope") or out.get("lat") is None:
         out["compliance"] = {"passed": False, "n_passed": 0, "n_total": 0, "failed": [],
-                             "note": "no paragraph"}
+                             "note": "no briefing to check"}
         return out
     report = check_briefing(paragraph)
     out["compliance"] = {

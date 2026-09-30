@@ -54,6 +54,9 @@ def _evidence_payload(out: dict) -> dict:
     stones, registry = evidence.load(out.get("deployment") or "nyc")
     items = evidence.collect(out, stones, registry)
     heading = {s.id: s.name for s in stones.all()}
+    if not items:  # say why, rather than hand back an empty list
+        text = (out.get("paragraph") or "").split("\n\n")
+        return {"place": None, "message": text[1] if len(text) > 1 else text[0], "evidence": []}
     return {
         "place": (out.get("geocode") or {}).get("address"),
         "place_match": _place_match(out),

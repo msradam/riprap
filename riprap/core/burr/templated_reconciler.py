@@ -163,9 +163,18 @@ def _lead(state, items) -> str | None:
     return " ".join(out) or None
 
 
+def no_place(state) -> str:
+    """The briefing when the query named no place the geocoder could find."""
+    asked = (state.get("first_target") or state.get("query") or "").strip()
+    return (f"{_scope_header()}\n\nRiprap could not match \"{asked}\" to a place. Give a street address with "
+            "its city or borough, such as 90-01 183rd Street, Queens, or an NYC community district such as QN12.")
+
+
 def nothing_built(state) -> str:
     """The briefing when no source produced evidence: which sources failed
     to respond and which answered with nothing, not a bare "no data"."""
+    if state.get("lat") is None:
+        return no_place(state)
     ok = {t.get("step"): t.get("ok") for t in state.get("trace") or []}
     consulted = state.get("consulted") or []
     failed = [e["title"] for e in consulted if ok.get(e["id"]) is False]

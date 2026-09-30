@@ -184,7 +184,7 @@ def test_no_gauge_nearby_is_a_true_zero_and_an_api_error_fails(monkeypatch):
 def test_a_briefing_with_no_evidence_names_the_failed_sources():
     from riprap.core.burr.templated_reconciler import compose_briefing
 
-    state = {"intent": "single_address", "deployment": "nyc", "plan": {"question": ""},
+    state = {"intent": "single_address", "deployment": "nyc", "plan": {"question": ""}, "lat": 40.7, "lon": -73.9,
              "consulted": [{"id": "fema_nfhl", "title": "FEMA National Flood Hazard Layer", "stone": "cornerstone"},
                            {"id": "nyc311", "title": "NYC 311 flood-related complaints (5y)", "stone": "touchstone"}],
              "trace": [{"step": "fema_nfhl", "ok": False}, {"step": "nyc311", "ok": False}]}
