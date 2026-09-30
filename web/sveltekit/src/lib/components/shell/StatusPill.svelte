@@ -12,8 +12,10 @@
    */
 
   // Short labels for FSM step names, from the legacy agent.js label
-  // set. Anything not mapped shows its raw step name.
+  // set. Anything not mapped shows its step id with the underscores
+  // as spaces.
   const SHORT: Record<string, string> = {
+    select_deployment: 'choosing the deployment',
     geocode: 'geocoding',
     nta_resolve: 'resolving NTA',
     sandy_inundation: 'Sandy 2012',
@@ -57,15 +59,15 @@
   let stepLabel = $derived.by(() => {
     const s = briefingState.activeStep;
     if (!s) return null;
-    return SHORT[s] ?? s;
+    return SHORT[s] ?? s.replace(/_/g, ' ');
   });
 
+  // "12/26" once the plan has said how many sources run; a bare count
+  // reads as seconds beside the elapsed timer, so none until then.
   let progress = $derived.by(() => {
     if (briefingState.phase !== 'specialists' && briefingState.phase !== 'reconciling') return null;
-    const fired = briefingState.firedCount;
     const total = briefingState.totalSpecialists;
-    if (!total) return fired > 0 ? `${fired}` : null;
-    return `${fired}/${total}`;
+    return total ? `${briefingState.firedCount}/${total}` : null;
   });
 
   // Drives the colour: red for real errors, neutral for a run that
