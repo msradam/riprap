@@ -34,6 +34,7 @@ def alerts_at(lat: float, lon: float) -> list[dict[str, Any]]:
         params={"point": f"{lat:.4f},{lon:.4f}"},
         headers={"Accept": "application/geo+json"},
         timeout=8.0,
+        ttl_s=0,  # the sentence states the check time, so never a cached answer
     )
     r.raise_for_status()
     out = []
@@ -65,7 +66,8 @@ def summary_for_point(lat: float, lon: float) -> dict:
         return {"n_active": 0, "alerts": [], "narrative": None, "error": str(e)}
     n = len(active)
     # A live source says when it looked, so a reader knows how old "active" is.
-    checked = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
+    now = datetime.now(UTC)
+    checked = now.strftime("%Y-%m-%d %H:%M UTC")
     if n == 0:
         narrative = f"No active NWS flood, coastal or wind alerts at this point, checked {checked}."
     elif n == 1:
@@ -87,6 +89,6 @@ def summary_for_point(lat: float, lon: float) -> dict:
         "n_active": n,
         "alerts": active,
         "narrative": narrative,
-        "checked_at": checked,
+        "retrieved_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "error": None,
     }
