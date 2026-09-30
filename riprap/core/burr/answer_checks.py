@@ -356,6 +356,15 @@ _STORM_DATE = {"ida": (2021, 9, 1), "sandy": (2012, 10, 29)}
 _FLOODNET_WINDOW_YEARS = 3
 
 
+_YES_NO_RE = re.compile(r"^\W*(is|are|was|were|has|have|had|do|does|did|can|could|will|would|should)\b", re.IGNORECASE)
+
+
+def is_yes_no_question(question: str) -> bool:
+    """A question that can take a yes or no: it opens with a verb ("Has the
+    block flooded"), not with what, which, where or how."""
+    return bool(_YES_NO_RE.match(question or ""))
+
+
 def is_past_event_question(question: str, focus: dict | None) -> bool:
     return ((focus or {}).get("time_frame") == "past" and bool(_HAPPENED_RE.search(question or ""))
             and not is_count_question(question))

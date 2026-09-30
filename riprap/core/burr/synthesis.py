@@ -269,6 +269,12 @@ def _extract(out: dict, question: str, texts: dict[str, str],
     rule = answer_checks.past_event_lead(question, focus, facts, texts, values)
     if rule:
         lead, facts = rule
+    # A yes, no or partly lead needs a yes-or-no question ("What is the FEMA
+    # flood zone" once got "Yes."), and never a question about now: no active
+    # alert is not an observation that nothing is flooding.
+    if lead in ("yes", "no", "partly") and (not answer_checks.is_yes_no_question(question)
+                                            or (focus or {}).get("time_frame") == "now"):
+        lead = "facts"
     if (focus or {}).get("time_frame") == "future":
         # A forecast question: the facts are the forecasts and projections themselves,
         # chosen in code (the model tended to pick the flood zone), and the lead is
