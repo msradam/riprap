@@ -25,7 +25,7 @@ describe.each([['hollis', hollis], ['qn12-complaints', qn12]])('%s', (_name, g) 
 
   it('a modeled or proxy manifest tier is never shown as measured', () => {
     for (const c of run.findingsData.cards) {
-      const declared = pebbleManifest.get(c.id.replace(/^pebble-/, ''))?.tier;
+      const declared = pebbleManifest.byId[c.id.replace(/^pebble-/, '')]?.tier;
       if (declared && declared !== 'empirical') expect(c.tier, c.id).not.toBe('empirical');
     }
   });

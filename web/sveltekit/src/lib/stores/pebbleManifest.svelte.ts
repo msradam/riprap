@@ -182,11 +182,6 @@ class PebbleManifestStore {
     this.error = null;
   }
 
-  /** Lookup with fallback to undefined for unknown ids. */
-  get(pebbleId: string): PebbleManifest | undefined {
-    return this.byId[pebbleId];
-  }
-
   /** The manifest's declared tier for a cited doc id (matched on
    *  provenance.doc_id, then on pebble id), so the evidence table and the
    *  source notes read one tier. Null when no manifest declares one. */
