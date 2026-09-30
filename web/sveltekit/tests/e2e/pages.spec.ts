@@ -94,7 +94,10 @@ for (const c of CITIES) {
     // 3. Cross-city no-leak: for non-NYC runs, ZERO NYC needles in the
     //    full page text.
     if (c.key !== 'nyc') {
-      const text = await page.locator('body').innerText();
+      // The experimental line is the one sentence allowed to name NYC: it
+      // says NYC is the source set this deployment does not have.
+      const text = (await page.locator('body').innerText())
+        .replace(/Experimental deployment:[^\n]*Not the NYC source set\./, '');
       for (const needle of NYC_NEEDLES) {
         expect(text, `${c.key} leaked NYC needle "${needle}"`).not.toContain(needle);
       }
