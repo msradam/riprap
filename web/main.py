@@ -265,6 +265,7 @@ def api_deployment(deployment: str | None = None):
                 "name": _DEPLOYMENT.name,
                 "city": _STONES.city,
                 "hazard": _STONES.hazard,
+                "experimental": _STONES.experimental,
             }
         )
     stones_reg, _ = _stones_pebbles_for_deployment(deployment)
@@ -273,6 +274,7 @@ def api_deployment(deployment: str | None = None):
             "name": deployment,
             "city": stones_reg.city,
             "hazard": stones_reg.hazard,
+            "experimental": stones_reg.experimental,
         }
     )
 
@@ -417,7 +419,7 @@ def api_register(asset_class: str):
         return JSONResponse({"error": f"unknown asset class {asset_class!r}"}, status_code=404)
     f = ROOT.parent / "data" / "registers" / f"{asset_class}.json"
     if not f.exists():
-        script = f"scripts/build_{asset_class}_register.py"
+        script = f"scripts/build_register.py {asset_class}"
         return JSONResponse(
             {"error": f"register not built — run python {script}", "rows": []},
             status_code=503,

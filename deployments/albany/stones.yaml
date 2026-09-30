@@ -5,6 +5,8 @@
 # the NOAA water-level pebble resolves to the Albany station (8518995).
 # Albany runs its 311 intake on SeeClickFix, not a Socrata/CKAN portal,
 # so the 311 pebble uses the python_call adapter.
+deployment:
+  experimental: true
 coverage:
   bbox: [-73.90, 42.60, -73.72, 42.73]
   city: Albany

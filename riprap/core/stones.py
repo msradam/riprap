@@ -49,6 +49,8 @@ class DeploymentDescriptor(BaseModel):
 
     city: str | None = None
     hazard: str | None = None
+    # Experimental: federal sources plus a local feed or two, not the NYC source set.
+    experimental: bool = False
 
 
 class CoverageDescriptor(BaseModel):
@@ -74,6 +76,7 @@ class StoneRegistry:
     stones: list[StoneManifest]
     city: str
     hazard: str
+    experimental: bool = False
 
     def get(self, stone_id: str) -> StoneManifest:
         return next(s for s in self.stones if s.id == stone_id)
@@ -117,4 +120,5 @@ def load_stones(deployment_root: str | Path) -> StoneRegistry:
     city = parsed.deployment.city or _CITY_FALLBACK.get(dep_name, root.name.title())
     hazard = parsed.deployment.hazard or _HAZARD_FALLBACK.get(dep_name, "Flood-exposure briefing")
 
-    return StoneRegistry(stones=list(parsed.stones), city=city, hazard=hazard)
+    return StoneRegistry(stones=list(parsed.stones), city=city, hazard=hazard,
+                         experimental=parsed.deployment.experimental)

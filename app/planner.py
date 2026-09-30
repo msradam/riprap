@@ -144,10 +144,9 @@ _RANKING_RE = re.compile(
 NOT_IMPLEMENTED_INTENTS = {
     "retrospective": (
         _RETROSPECTIVE_RE,
-        "Historical-date mode (\"what would Riprap have said on [date]\") "
-        "is on the roadmap but not yet available. Riprap currently reports "
-        "present-state flood exposure; past-state reconstruction is planned "
-        "for a future release.",
+        "Riprap cannot say what it would have reported on a past date. It "
+        "reports present flood exposure from today's sources; reconstructing "
+        "an earlier date is on the roadmap but not yet available.",
     ),
     "ranking": (
         _RANKING_RE,

@@ -49,7 +49,8 @@ SCOPE_REFUSAL = (
     "its source. It does not give advice on buying, renting or insuring property, "
     "legal advice, or a prediction for a specific day. For those, consult a licensed "
     "professional; for a regulatory flood determination, use FEMA's Flood Map "
-    "Service Center (msc.fema.gov)."
+    "Service Center (msc.fema.gov); for a home in New York City, FloodHelpNY "
+    "(floodhelpny.org) explains flood insurance and resiliency options."
 )
 COVERAGE_REFUSAL = (
     "Riprap's New York City deployment covers flood evidence only. It has no {what} "

@@ -2,6 +2,8 @@
 #
 # Same architecture as the NYC reference. Federal pebbles (NWS, NOAA)
 # port unchanged; city-specific pebbles point at data.seattle.gov.
+deployment:
+  experimental: true
 coverage:
   bbox: [-122.46, 47.49, -122.22, 47.74]
   city: Seattle
