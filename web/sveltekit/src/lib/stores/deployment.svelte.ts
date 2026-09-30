@@ -18,6 +18,9 @@ export interface Deployment {
   city: string;
   /** Hazard tagline — `Flood-exposure briefing`, `Heat-exposure briefing`, ... */
   hazard: string;
+  /** A deployment still being built out (albany, boston, chicago, seattle,
+   *  sf): the chip and the briefing say so. Missing means false. */
+  experimental?: boolean;
 }
 
 class DeploymentStore {

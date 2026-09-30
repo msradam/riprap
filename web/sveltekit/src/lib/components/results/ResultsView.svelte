@@ -16,6 +16,7 @@
   import type { RunState } from '$lib/client/runState.svelte';
   import { boldFirstSentence, briefingModel, type SnapshotMeta } from '$lib/client/briefingModel';
   import { briefingState } from '$lib/stores/briefingState.svelte';
+  import { deployment } from '$lib/stores/deployment.svelte';
 
   /** One briefing, laid out as a public report: the question and its
    *  answer lead, the map is a figure, the evidence is a table, and how
@@ -264,6 +265,12 @@
           {#if notice}<div class="brief-action">{@render notice()}</div>{/if}
         </div>
       {/if}
+      {#if deployment.current?.experimental}
+        <p class="brief-experimental">
+          <strong>Experimental deployment:</strong> federal sources plus a local 311 feed and a
+          water-level gauge. Not the NYC source set.
+        </p>
+      {/if}
     </header>
 
     {#if loading}
@@ -483,6 +490,17 @@
      refusal) there is no row to end, so it keeps the text's left edge. */
   nav + .brief-action {
     margin-left: auto;
+  }
+  .brief-experimental {
+    max-width: 54ch;
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-secondary);
+  }
+  .brief-experimental strong {
+    font-weight: 600;
+    color: var(--ink);
   }
   .brief-footer {
     margin-top: 24px;

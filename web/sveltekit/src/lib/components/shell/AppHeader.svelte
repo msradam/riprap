@@ -35,7 +35,9 @@
   const hazardText = $derived(
     deployment.current?.hazard.toLowerCase() ?? 'flood-exposure briefing'
   );
-  const cityText = $derived(deployment.current?.city ?? null);
+  const cityText = $derived(
+    deployment.current ? `${deployment.current.city}${deployment.current.experimental ? ' (experimental)' : ''}` : null
+  );
 
   let exporting = $state(false);
   let exportError = $state<string | null>(null);
