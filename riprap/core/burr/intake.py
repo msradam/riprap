@@ -166,8 +166,10 @@ def heuristic_plan(query: str) -> dict:
     elif place["kind"] == "neighborhood" and nta.resolve(place["text"]):
         intent, target = area_intent, place["text"]
     else:
-        # A landmark or anything else: let the geocoder decide, and fail honestly.
-        intent, target = "single_address", place["text"] or _address_from_query(q)
+        # A landmark or anything else: the whole place text, so "Ferry
+        # Building, San Francisco" keeps its city; the geocoder decides, and
+        # fails honestly.
+        intent, target = "single_address", _address_from_query(q)
     kind = "nta" if intent in ("neighborhood", "development_check") else "address"
     out = {"intent": intent, "rationale": f"Heuristic match: {intent}.",
            "targets": [{"type": kind, "text": target}], "place": place}

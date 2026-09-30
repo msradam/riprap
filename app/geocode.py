@@ -336,6 +336,11 @@ def geocode_one(text: str, *, scope_hint: str | None = None) -> GeocodeHit | Non
     # national resolver and let downstream scope logic handle it.
     bbox = _active_deployment_bbox()
     primary = None
+    # "Ferry Building, San Francisco" once matched a Jersey City ferry
+    # building inside the NYC viewbox: a query that names another city or
+    # state goes to the national lookup directly.
+    if _looks_non_nyc(text) or (scope_hint and _looks_non_nyc(scope_hint)):
+        bbox = None
     if bbox is not None:
         min_lon, min_lat, max_lon, max_lat = bbox
         primary = geocode_nominatim(
@@ -353,6 +358,13 @@ def geocode_one(text: str, *, scope_hint: str | None = None) -> GeocodeHit | Non
         if national is not None and geocode_matches(text, national.address):
             primary = national
     if primary is None:
+        return None
+    if re.match(r"\s*\d", text) and not geocode_matches(text, primary.address):
+        # A numbered address whose nearest hit is another street is not a
+        # "closest match": "90-01 183rd Steet, Quens" once became a Harlem
+        # corner, and a house number that does not exist became a point on
+        # the street 7 km away. Not resolved is the honest answer.
+        log.info("geocode_one: %r names a house number but the nearest hit is %r; not resolved", text, primary.address)
         return None
     # Enrich with NYC Geosearch when the resolved point is inside the
     # NYC bbox. Geosearch may add bbl/bin/borough refinements we

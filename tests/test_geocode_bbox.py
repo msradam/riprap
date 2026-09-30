@@ -69,8 +69,12 @@ def test_geocode_one_falls_back_when_out_of_region(monkeypatch):
 
     hit = gc.geocode_one("Willis Tower, Chicago, IL")
     assert hit is not None and abs(hit.lat - 41.8787) < 0.01
-    # Bounded attempt first, then unbounded national fallback.
-    assert calls == [True, False]
+    # A query naming another city goes straight to the national lookup.
+    assert calls == [False]
+    calls.clear()
+    hit = gc.geocode_one("Willis Tower")
+    # Without a city named: the bounded attempt first, then the national fallback.
+    assert hit is not None and calls == [True, False]
 
 
 def test_looks_non_us_detects_foreign_country_names():
@@ -168,3 +172,42 @@ def test_region_biased_street_yields_to_a_national_house_match(monkeypatch):
     monkeypatch.setattr(gc, "geocode", lambda text, limit=5: [])
     hit = gc.geocode_one("1600 Pennsylvania Ave NW, Washington DC")
     assert hit is not None and hit.lat == 38.8977
+
+
+def test_a_numbered_address_on_another_street_is_not_resolved(monkeypatch):
+    """Live: '90-01 183rd Steet, Quens' became a Harlem corner marked
+    'closest match', and a house number that does not exist became a point
+    on the same street 7 km away. A house number that neither lookup finds
+    on its street is not resolved."""
+    monkeypatch.setenv("RIPRAP_DEPLOYMENT", "deployments/nyc")
+    gc._active_deployment_bbox.cache_clear()
+
+    def fake_nominatim(text, *, viewbox=None, bounded=False, country_codes="us"):
+        return gc.GeocodeHit(address="Adam Clayton Powell Jr. Boulevard & West 112th Steet, Harlem, Manhattan",
+                             borough="Manhattan", lat=40.80, lon=-73.95, bbl=None, bin=None,
+                             raw={"address": {"country_code": "us"}})
+
+    monkeypatch.setattr(gc, "geocode_nominatim", fake_nominatim)
+    monkeypatch.setattr(gc, "geocode", lambda text, limit=5: [])
+    assert gc.geocode_one("90-01 183rd Steet, Quens") is None
+    # A landmark has no house number to hold the hit to, so it still resolves.
+    assert gc.geocode_one("Coney Island Hospital") is not None
+
+
+def test_a_query_naming_another_city_skips_the_region_biased_lookup(monkeypatch):
+    """'Ferry Building, San Francisco' matched a Jersey City ferry building
+    inside the NYC viewbox; 'Seattle, WA' a street in Nassau County."""
+    monkeypatch.setenv("RIPRAP_DEPLOYMENT", "deployments/nyc")
+    gc._active_deployment_bbox.cache_clear()
+    calls = []
+
+    def fake_nominatim(text, *, viewbox=None, bounded=False, country_codes="us"):
+        calls.append(bounded)
+        return gc.GeocodeHit(address="Ferry Building, San Francisco, California", borough=None,
+                             lat=37.7955, lon=-122.3937, bbl=None, bin=None,
+                             raw={"address": {"country_code": "us"}})
+
+    monkeypatch.setattr(gc, "geocode_nominatim", fake_nominatim)
+    monkeypatch.setattr(gc, "geocode", lambda text, limit=5: [])
+    hit = gc.geocode_one("Ferry Building, San Francisco")
+    assert hit is not None and hit.lat == 37.7955 and calls == [False]
