@@ -467,7 +467,11 @@ def synthesize(state) -> dict:
         if lead == "count" and rel in facts:
             facts = [rel]  # a count answers with the counted source alone, not unrelated facts
         experimental = frozenset(d.doc_id for d in docs if d.experimental)
-        facts = sorted(facts, key=lambda f: f in experimental)  # experimental sources after all others
+        # The source the question is about leads the facts when the model
+        # chose it ("Are the schools ... exposed?" opened with the FEMA zone
+        # of the address, and the school register came fourth); a record
+        # appended by rule keeps its place. Experimental sources come last.
+        facts = sorted(facts, key=lambda f: (f in experimental, appended or f != rel))
         kept = [*({"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts),
                 *kept]
         # Honest silence still shows what the sources say: facts under a

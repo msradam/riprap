@@ -131,3 +131,13 @@ def test_d01_share_question_is_given_the_count_lead(run):
         DOCS[:] = syn_docs
     assert out["grounding"]["answer_lead"] == "count"
     assert "In part." not in out["paragraph"]
+
+
+def test_the_asked_about_source_leads_the_facts(run):
+    """Live: "Are the schools near 79-01 Broadway exposed?" opened with the
+    FEMA zone of the address and the school register came fourth."""
+    q = "Are the subway entrances near the address in a flood scenario?"
+    out = run(q, {"claims": [], "answer": {"lead": "partly",
+                                           "facts": ["sandy_inundation", "dep_moderate_2050", "mta_entrance_exposure"]}})
+    assert out["grounding"]["answer_lead"] == "partly"
+    assert out["paragraph"].split("**Answer.**\n")[1].startswith(f"In part. {MTA.rstrip('.')} [mta_entrance_exposure].")
