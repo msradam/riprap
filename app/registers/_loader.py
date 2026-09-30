@@ -26,8 +26,6 @@ import math
 from functools import lru_cache
 from pathlib import Path
 
-from app.registers._footprint import _degree_box
-
 REGISTERS_DIR = Path(__file__).resolve().parents[2] / "data" / "registers"
 
 
@@ -47,6 +45,15 @@ def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     dp = math.radians(lat2 - lat1); dl = math.radians(lon2 - lon1)
     a = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
     return 2 * R * math.asin(math.sqrt(a))
+
+
+def _degree_box(lat: float, radius_m: float) -> tuple[float, float]:
+    """Half-widths in degrees of a box that contains every point within
+    radius_m: a degree of longitude shrinks with the cosine of the
+    latitude (84 km at NYC against 111 km at the equator), so the box
+    was 750 m wide east to west when it was drawn as 800 m."""
+    dlat = radius_m / 90_000
+    return dlat, dlat / math.cos(math.radians(lat))
 
 
 def nearest_n(rows: list[dict], lat: float, lon: float,

@@ -46,19 +46,19 @@ COUNTY_TO_BOROUGH = {
     "New York": "MANHATTAN", "Kings": "BROOKLYN", "Bronx": "BRONX",
     "Queens": "QUEENS", "Richmond": "STATEN ISLAND",
 }
-Head = Callable[[dict, float, float, float], dict]
 
 
 @dataclass(frozen=True)
 class Spec:
-    one: str                  # noun for the register sentence
-    many: str
+    singular: str             # noun for the register sentence
+    plural: str
     radius_m: int
     max_n: int
     count_key: str
     list_key: str
     citation: str
-    head: Head                # identity fields, coordinates and distance, in output order
+    # The row's identity fields, coordinates and distance, in output order.
+    head: Callable[[dict, float, float, float], dict]
     register: str | None = None   # baked register name under data/registers/
     geojson: Path | None = None   # live layer; exposure is looked up per hit
     lat_lon: Callable[[dict], tuple[float, float]] = (
@@ -109,30 +109,33 @@ def _mta_lat_lon(f: dict) -> tuple[float, float]:
 
 CLASSES: dict[str, Spec] = {
     "mta_entrances": Spec(
-        "MTA subway entrance", "MTA subway entrances", 800, 8, "n_entrances", "entrances",
-        "MTA Open Data subway entrances + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + "
-        "NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
-        _entrance, geojson=DATA / "mta_entrances.geojson", lat_lon=_mta_lat_lon,
+        singular="MTA subway entrance", plural="MTA subway entrances", radius_m=800, max_n=8,
+        count_key="n_entrances", list_key="entrances",
+        citation="MTA Open Data subway entrances + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + "
+                 "NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
+        head=_entrance, geojson=DATA / "mta_entrances.geojson", lat_lon=_mta_lat_lon,
         buffer_m=BUFFER_MTA_ENTRANCE_M, rollups={"n_ada_accessible": "ada_accessible"}),
     "doh_hospitals": Spec(
-        "hospital", "hospitals", 3000, 5, "n_hospitals", "hospitals",
-        "NYS DOH Health Facility Certification (vn5v-hh5r) + NYC OEM Sandy 2012 Inundation "
-        "Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
-        _hospital, geojson=DATA / "hospitals.geojson", buffer_m=BUFFER_DOH_HOSPITAL_M, raster=True),
+        singular="hospital", plural="hospitals", radius_m=3000, max_n=5,
+        count_key="n_hospitals", list_key="hospitals",
+        citation="NYS DOH Health Facility Certification (vn5v-hh5r) + NYC OEM Sandy 2012 Inundation "
+                 "Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
+        head=_hospital, geojson=DATA / "hospitals.geojson", buffer_m=BUFFER_DOH_HOSPITAL_M, raster=True),
     "doe_schools": Spec(
-        "flood-exposed NYC DOE school", "flood-exposed NYC DOE schools", 1500, 6, "n_schools", "schools",
-        "Pre-computed from NYC DOE Locations Points joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + "
-        "NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. See data/registers/schools.json.",
-        _school, register="schools", buffer_m=BUFFER_DOE_SCHOOL_M,
+        singular="flood-exposed NYC DOE school", plural="flood-exposed NYC DOE schools", radius_m=1500, max_n=6,
+        count_key="n_schools", list_key="schools",
+        citation="Pre-computed from NYC DOE Locations Points joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + "
+                 "NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. See data/registers/schools.json.",
+        head=_school, register="schools", buffer_m=BUFFER_DOE_SCHOOL_M,
         scope=" (the register lists only schools found inside the 2012 Sandy extent or a DEP "
               "stormwater scenario, not every school)"),
     "nycha": Spec(
-        "flood-exposed NYCHA development", "flood-exposed NYCHA developments", 2000, 5,
-        "n_developments", "developments",
-        "Pre-computed from NYC Open Data NYCHA Developments (phvi-damg) joined to Sandy 2012 "
-        "Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. "
-        "See data/registers/nycha.json.",
-        _development, register="nycha", missing_class=0,
+        singular="flood-exposed NYCHA development", plural="flood-exposed NYCHA developments", radius_m=2000, max_n=5,
+        count_key="n_developments", list_key="developments",
+        citation="Pre-computed from NYC Open Data NYCHA Developments (phvi-damg) joined to Sandy 2012 "
+                 "Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. "
+                 "See data/registers/nycha.json.",
+        head=_development, register="nycha", missing_class=0,
         scenarios=SCENARIOS + ("dep_moderate_current",),
         elev_key="rep_elevation_m", hand_key="rep_hand_m",
         scope=" (the register lists only developments found inside the 2012 Sandy extent or a DEP "
@@ -157,12 +160,8 @@ def geojson_rows(asset_class: str) -> list[dict]:
     return rows
 
 
-def _rows(spec: Spec) -> list[dict]:
-    return load_register(spec.register) if spec.register else geojson_rows(_class_of(spec))
-
-
-def _class_of(spec: Spec) -> str:
-    return next(k for k, v in CLASSES.items() if v is spec)
+def _rows(asset_class: str, spec: Spec) -> list[dict]:
+    return load_register(spec.register) if spec.register else geojson_rows(asset_class)
 
 
 def _sample_raster(raster_path: Path, lat: float, lon: float) -> float | None:
@@ -229,7 +228,7 @@ def summary_for_point(lat: float, lon: float, asset_class: str,
     spec = CLASSES[asset_class]
     radius_m = spec.radius_m if radius_m is None else radius_m
     max_n = spec.max_n if max_n is None else max_n
-    hits = nearest_n(_rows(spec), lat, lon, radius_m, None)
+    hits = nearest_n(_rows(asset_class, spec), lat, lon, radius_m, None)
     live = spec.register is None
     findings = [_finding(spec, d, r) for d, r in (hits[:max_n] if live else hits)]
     n_sandy = sum(1 for f in findings if f["inside_sandy_2012"])
@@ -242,7 +241,7 @@ def summary_for_point(lat: float, lon: float, asset_class: str,
         out["footprint_buffer_m"] = spec.buffer_m
     out["n_inside_sandy_2012"] = n_sandy
     out["n_in_dep_extreme_2080"] = n_dep
-    out["narrative"] = narrative(spec.one, spec.many, len(hits), radius_m, n_sandy, n_dep,
+    out["narrative"] = narrative(spec.singular, spec.plural, len(hits), radius_m, n_sandy, n_dep,
                                  scope=spec.scope, n_checked=len(findings) if live else None)
     for key, flag in spec.rollups.items():
         out[key] = sum(1 for f in findings if f[flag])

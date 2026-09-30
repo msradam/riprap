@@ -28,7 +28,6 @@ auditability over hidden assumptions.
 from __future__ import annotations
 
 import logging
-import math
 
 log = logging.getLogger("riprap.register.footprint")
 
@@ -81,10 +80,3 @@ def dep_class_buffered(lat: float, lon: float, buffer_m: float,
     return int(j["depth_class"]), str(j["depth_label"])
 
 
-def _degree_box(lat: float, radius_m: float) -> tuple[float, float]:
-    """Half-widths in degrees of a box that contains every point within
-    radius_m: a degree of longitude shrinks with the cosine of the
-    latitude (84 km at NYC against 111 km at the equator), so the box
-    was 750 m wide east to west when it was drawn as 800 m."""
-    dlat = radius_m / 90_000
-    return dlat, dlat / math.cos(math.radians(lat))
