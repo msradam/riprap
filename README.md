@@ -42,7 +42,9 @@ A real answer, from the gallery entry
 > [floodnet]. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this
 > address; the highest stood 0.76 ft above ground; the highest water surface
 > elevation was 48.2 ft NAVD88 [ida_hwm]. Nearest mark: Intersection of 182nd St.
-> and 90th Ave., Jamaica, Queens (174 m away) [ida_hwm].
+> and 90th Ave., Jamaica, Queens (174 m away) [ida_hwm]. 82 NYC 311 flood-related
+> complaints filed within 200 m of this location in the last 5 years: 47 sewer
+> backup, 22 catch basin, 10 street flooding, 3 manhole overflow [nyc311].
 
 The "Yes." is set by a rule, not by the model: at least one observed source
 reports flooding since Ida, on 1 September 2021.
