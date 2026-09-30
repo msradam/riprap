@@ -329,4 +329,4 @@ _Frame: 2 → 2; detector matched type: `on-topic exposure language but no quest
 
 Queries with framing < 3 in the framed run: **12**.
 
-**Threshold exceeded.** Per Adam's stop condition, this means the Capstone prompt-conditional alone is insufficient. The next step would be option (a) — planner sub-classifier — or option (c) — both. Documented but NOT implemented in this overnight pass.
+**Threshold exceeded.** Per the owner's stop condition, this means the Capstone prompt-conditional alone is insufficient. The next step would be option (a) — planner sub-classifier — or option (c) — both. Documented but NOT implemented in this overnight pass.

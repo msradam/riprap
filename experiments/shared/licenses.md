@@ -22,3 +22,9 @@ enters an experiment.
       base's LICENSE is also tracked here and ALL of base+wrapper are
       acceptable
 - [ ] Date verified is the date the LICENSE file was last fetched
+
+## Third-party code kept in the experiments
+
+| Code | Upstream | License | Verified |
+|------|----------|---------|----------|
+| `experiments/05_terramind_nyc_finetune/data/MajorTOM/` (grid, dataset and metadata helpers, with local edits) | github.com/ESA-PhiLab/Major-TOM | Apache-2.0 (the repository's LICENSE file) | 2026-09-30 |

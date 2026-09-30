@@ -12,7 +12,8 @@ adapter: python_call
 # (G102.2.1, G102.2.2) adopts the PFIRM for flood-resistant construction
 # and requires the more restrictive of the two maps. A planner asks about
 # this map within minutes, so it is a source of its own, labelled
-# preliminary. See research_notes/fable/pfirm.md for the sources.
+# preliminary. Sources: FEMA's preliminary NFHL service, NYC's flood map
+# pages (nyc.gov/site/floodmaps) and NYC Building Code Appendix G.
 spatial:
   scope: point
   crs: EPSG:4326

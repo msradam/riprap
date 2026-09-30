@@ -102,9 +102,8 @@ fill it in with your own token/role names.
 As you design:
 
 1. Write `tokens/tokens.dtcg.json` (W3C Design Tokens Community Group
-   format — see the sibling Hanji design system in `~/calluna-meta` for
-   an example of the three-layer primitive/semantic/purpose shape, if
-   useful as a structural reference; its actual token *values* are not
+   format, in the three-layer primitive/semantic/purpose shape; the token
+   *values* are not
    relevant to Riprap and should not be copied) and a built
    `tokens/tokens.css`.
 2. Hand-type `tokens/reference.css` as your own verified source of truth

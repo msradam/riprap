@@ -146,14 +146,14 @@ def main() -> int:
                     f"`{f.get('framing_rationale','')[:80]}`_")
         rows.append("")
 
-    # Stop-condition check (Adam's rule)
+    # Stop-condition check (the owner's rule)
     rows.append("## Stop-condition check")
     rows.append("")
     below_three = sum(1 for x in framed.values() if x.get("framing_score", 0) < 3)
     rows.append(f"Queries with framing < 3 in the framed run: **{below_three}**.")
     rows.append("")
     if below_three > 5:
-        rows.append("**Threshold exceeded.** Per Adam's stop condition, this means "
+        rows.append("**Threshold exceeded.** Per the owner's stop condition, this means "
                     "the Capstone prompt-conditional alone is insufficient. The next "
                     "step would be option (a) — planner sub-classifier — or option "
                     "(c) — both. Documented but NOT implemented in this overnight pass.")

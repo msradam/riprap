@@ -2,8 +2,8 @@
 
 ## Where things live
 
-- **Droplet:** `129.212.182.52` (root, key auth). MI300X, gfx942, 192 GiB
-  VRAM. Other droplet `165.245.134.44` was unreachable at prep time.
+- **Droplet:** `<droplet-ip>` (root, key auth). MI300X, gfx942, 192 GiB
+  VRAM. A second droplet was unreachable at prep time.
 - **Container:** `terramind` (rocm:latest, `sleep infinity`). Bind-mounts
   `/root/hf-cache` only. Files are pushed in via `docker cp`. Keep this
   container alive — terratorch 1.2.7 is installed in its system Python.

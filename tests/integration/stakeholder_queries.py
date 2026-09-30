@@ -24,7 +24,7 @@ Usage:
     .venv/bin/python tests/integration/stakeholder_queries.py \\
         --only 1,2,3 --timeout 600
 
-Per-query timeout defaults to 600 s (10 min) per Adam's instruction —
+Per-query timeout defaults to 600 s (10 min) per the owner's instruction —
 log + move on past that.
 """
 from __future__ import annotations

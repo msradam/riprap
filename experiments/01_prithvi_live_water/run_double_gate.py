@@ -7,7 +7,7 @@ Usage:
   python run_double_gate.py \\
       --chip .cache/chip_40.5780_-73.9617_2024-09-01_2024-09-30.tif \\
       --label "Brighton Beach" \\
-      --vllm-base-url http://165.245.134.44:8000/v1 \\
+      --vllm-base-url http://<droplet-ip>:8000/v1 \\
       --vllm-api-key $RIPRAP_LLM_API_KEY
 
 Output: a small report with both backends' citations side-by-side and a

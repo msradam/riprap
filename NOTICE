@@ -34,6 +34,11 @@ Public-record data sources contacted at runtime (no commercial APIs):
   See the "Data sources" table in README.md. Each pebble manifest's
   provenance block records its source's licence, URL and vintage.
 
+Third-party code kept in the experiments:
+  experiments/05_terramind_nyc_finetune/data/MajorTOM/ adapts the grid,
+  dataset and metadata helpers of Major-TOM (ESA PhiLab,
+  https://github.com/ESA-PhiLab/Major-TOM), Apache License 2.0.
+
 Logo attribution:
   The Riprap dam mark is derived from "Dam" by Chintuza, via the
   Noun Project (https://thenounproject.com/icon/dam-4516918/),

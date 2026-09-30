@@ -4,9 +4,9 @@
 // brace-depth scanner, not a full CSS parser — good enough for a token
 // file that is itself generated/hand-authored in a predictable shape.
 //
-// Adapted from a sibling design-system handoff (Hanji, for the Calluna
-// project) where this exact parser caught two real bugs before anything
-// shipped on top of it:
+// Adapted from an earlier design-system handoff by the same author,
+// where this exact parser caught two real bugs before anything shipped
+// on top of it:
 //   1. A naive "match every --prefix-*: value; in the whole file" regex
 //      let a ground-override block (e.g. [data-ground="night"]) silently
 //      clobber :root's values in a flat map, since both declare the same

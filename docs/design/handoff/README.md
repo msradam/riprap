@@ -41,15 +41,12 @@ gates/                      Deterministic verification tooling. Runs today,
 ## Where this format came from
 
 The tokens → gates → proof/specimens → docs → implementation-prompt shape
-is borrowed from Hanji, a design system for a sibling project
-(`~/calluna-meta`'s `Hanji design system.zip`) — the best structure found
-for a design handoff that has to survive contact with a different team
-and a different codebase later. Only the *shape* is reused; Hanji's own
-palette, radius policy, and component decisions are for a different
-product (a phone-first social-media planner) and are not referenced or
-copied here. Riprap's design session should not consult Hanji's specific
-choices at all — different research, different reader, different medium
-(a civic report read on screen and printed, not a mobile app).
+is borrowed from an earlier design handoff the owner wrote for an
+unrelated product: the best structure found for a handoff that has to
+survive contact with a different team and a different codebase later.
+Only the *shape* is reused. That system's palette, radius policy and
+component decisions were made for a different reader and medium and are
+not referenced or copied here.
 
 An earlier, more opinionated draft of this handoff (internally called
 "Datum") was produced and then deliberately not shipped here: it made
