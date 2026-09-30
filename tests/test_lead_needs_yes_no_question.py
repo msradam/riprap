@@ -30,12 +30,29 @@ def test_a_question_about_now_gets_no_yes_or_no():
     assert (lead, facts) == ("facts", ["nws_alerts"])
 
 
+PFIRM = ("FEMA's preliminary flood map (PFIRM issued 2015-01-30, community 360497) places this address in zone AE "
+         "(a Special Flood Hazard Area). A preliminary map is not the effective map and does not set flood insurance.")
+
+
 def test_a_zone_answer_quotes_both_fema_maps():
-    texts = {**TEXTS, "fema_pfirm": "FEMA's preliminary flood map (PFIRM issued 2015-01-30, community 360497) places this address in zone AE (a Special Flood Hazard Area); a preliminary map is not the effective map and does not set flood insurance."}
+    texts = {**TEXTS, "fema_pfirm": PFIRM}
     out = {"answer": {"lead": "facts", "facts": ["fema_nfhl"]}}
     _, facts, _ = _extract(out, "What is the FEMA flood zone at 1310 Surf Avenue, Brooklyn?", texts,
                            focus={"time_frame": "any"})
     assert facts == ["fema_nfhl", "fema_pfirm"]
+
+
+def test_two_maps_that_agree_cannot_make_a_partly():
+    """The PFIRM caveat ("not the effective map") is its own sentence, so
+    the lead rules do not read it as a map reporting no zone; "partly"
+    with both maps in zone AE is rejected as it is with one."""
+    texts = {**TEXTS, "fema_pfirm": PFIRM}
+    out = {"answer": {"lead": "partly", "facts": ["fema_nfhl"]}}
+    _, facts, hits = _extract(out, "Is 1310 Surf Avenue, Brooklyn in a FEMA flood zone?", texts,
+                              focus={"time_frame": "any"})
+    assert facts == ["fema_nfhl", "fema_pfirm"]
+    assert answer_checks.reports_result(PFIRM)
+    assert any("'partly' needs" in reason for _, reason in hits), hits
 
 
 def test_a_question_about_now_quotes_the_live_sources_in_code():

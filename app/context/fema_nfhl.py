@@ -138,7 +138,9 @@ def preliminary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> d
     narrative = (f"FEMA's preliminary flood map (PFIRM{when}, community {study.get('DFIRM_ID')}) places "
                  f"this address in zone {fld_zone}{reading}"
                  + (f", static base flood elevation {bfe:g} ft" if bfe is not None else "")
-                 + "; a preliminary map is not the effective map and does not set flood insurance.")
+                 # Its own sentence: the lead rules read a source's first
+                 # sentence for a result, and "not" there reads as an absence.
+                 + ". A preliminary map is not the effective map and does not set flood insurance.")
     return {
         "fld_zone": fld_zone,
         "zone_subty": zone.get("ZONE_SUBTY"),
