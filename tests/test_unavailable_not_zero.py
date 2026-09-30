@@ -155,7 +155,6 @@ def test_extractive_no_from_an_unavailable_source_falls_back_to_cannot_answer(mo
     from riprap.core.burr import synthesis as syn
     from riprap.core.burr.synthesis import CANNOT_ANSWER, Doc
 
-    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
     monkeypatch.setattr(syn, "_documents", lambda state: (
         [Doc("nws_alerts", "Projector", "NWS alerts unavailable for this point.", False)], [], None))
     monkeypatch.setattr(syn.evidence, "citations", lambda items: {})

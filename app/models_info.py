@@ -71,11 +71,6 @@ def for_briefing(final: dict) -> list[dict]:
                                         "latency_s": 0.0, "calls": 0})
         row["latency_s"] = round(row["latency_s"] + float(c.get("duration_s") or 0), 2)
         row["calls"] += 1
-    ent = (final.get("grounding") or {}).get("entailment") or {}
-    if ent.get("ran"):
-        out.append({"name": f"Entailment check ({ent.get('label', '')})".replace(" ()", ""),
-                    "repo": "knowledgator/gliclass-large-v3.0" if ent.get("backend") == "gliclass" else ent.get("backend"),
-                    "where": "CPU", "how": "loaded", "latency_s": ent.get("seconds")})
     return out + list(by_model.values())
 
 

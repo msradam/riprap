@@ -72,7 +72,6 @@ def test_extractive_answer_puts_experimental_facts_after_the_others(monkeypatch)
     sandy = "This address sits inside the 2012 Hurricane Sandy inundation footprint (NYC OEM)."
     prithvi = ("Experimental: satellite-detected surface water about 14 hours after Hurricane Ida: "
                "3 water polygons within 500 m of this address.")
-    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
     monkeypatch.setattr(syn, "_documents", lambda state: (
         [Doc("prithvi_water", "Hazard reader", prithvi, True),
          Doc("sandy_inundation", "Hazard reader", sandy, False)], [], None))

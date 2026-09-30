@@ -10,7 +10,7 @@ perturbation), not owner judgements.
 
 | File | Source in the experiment | What it is | Used by |
 |---|---|---|---|
-| `task_b.csv` | `data/task_b.csv` | 198 claims from stored briefings with their cited evidence, and 530 perturbed copies labelled unsupported (changed number, swapped document, flipped direction, changed place) | `scripts/calibrate_entailment.py` picks the entailment threshold on its calibration split |
+| `task_b.csv` | `data/task_b.csv` | 198 claims from stored briefings with their cited evidence, and 530 perturbed copies labelled unsupported (changed number, swapped document, flipped direction, changed place) | the retired entailment check's threshold was picked on its calibration split (`scripts/calibrate_entailment.py` at the git tag `archive/guarded-answer-mode`) |
 | `task_a.csv` | `data/task_a.csv` | 398 311 records from NYC, San Francisco, Boston and Albany; silver labels from each city's category field (the classifier never sees it) | `scripts/train_311_filter.py` scores the filter and picks its threshold on the calibration split |
 | (not committed) `distill_pool.csv` | `data/distill_pool.csv` | 2,500 unlabelled 311 records from the experiment's API cache, none in `task_a.csv`; removed from the history because its free text held residents' email addresses | training data for the 311 filter, passed with `--pool` |
 | `distill_teacher_a1_granite8b.jsonl` | `results/raw/p_a1_v1_mps.jsonl` | Granite 4.1 8B option probabilities for each pool record (the A1 readout, phrasing v1) | soft labels for the 311 filter |

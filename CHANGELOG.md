@@ -40,8 +40,23 @@ that landed on the hackathon-period production deploys.
 - FEMA's 2015 preliminary flood map (PFIRM) is cited beside the 2007 FIRM,
   with the issue date from FEMA's own availability layer; NYC Building Code
   Appendix G adopts it for flood-resistant construction.
-- MCP results carry a `record` block (query, time, version, commit, SHA-256)
-  and a `failed` list; every tool works without an LLM.
+- MCP evidence and briefing results carry a `record` block (query, time,
+  version, commit, SHA-256) and a `failed` list; `plan_query` says which
+  planner ran (`planner`: `llm` or `regex`); `get_briefing`'s docstring says
+  it works without an LLM.
+- A community district's 311 count is by the record's own `community_board`
+  field, the official definition, and the sentence says so; the NTA-union
+  outline stays on the map. The FIRM panel cited is from the zone's own
+  study when panels overlap along the water. The PFIRM caveat is its own
+  sentence, so the lead rules do not read it as a map reporting no zone. A
+  district's rainfall share quotes the classes the cited sentence states.
+- Removed: the guarded answer mode and its entailment model (see
+  `docs/GROUNDING.md` for the tag that keeps the experiment citable), the
+  `/q/sample` redirect, `/api/agent/plan` (use the MCP `plan_query` tool),
+  `/api/layers/nta`, the `RIPRAP_NYCHA_REGISTERS` and
+  `RIPRAP_TTM_BATTERY_SURGE_DEVICE` variables, `riprap.core.llm.chat_text`,
+  and the `--offline` and `--skip-e2e` flags of `scripts/test_all.sh`.
+  `nws_alerts` reports `retrieved_at` (ISO, uncached) instead of `checked_at`.
 - Reader-facing texts: live sources say when they were fetched, figures carry
   units, `not_implemented` renders as a response, the public copy says it has
   no backend, experimental deployments say so in the header, the refusal

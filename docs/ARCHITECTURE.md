@@ -383,7 +383,6 @@ check work with any model and any endpoint.
 | Granite Embedding 278M | 278 M | sentence-transformers, in process on CPU | Embeds the query for `policy_corpus`; the corpus index is built offline by `scripts/build_rag_index.py` into `data/rag_index.npz` | Experimental |
 | Flair NER (`flair/ner-english-ontonotes-fast`) | about 150 MB | flair, in process on CPU | Coarse entity tags on retrieved passages | Experimental |
 | Prithvi-EO 2.0 (`msradam/Prithvi-EO-2.0-NYC-Pluvial` by default) | 300 M | TerraTorch, batch only (`eo` extra) | `scripts/run_eo_batch.py`; the app reads only the baked Ida polygons | Experimental |
-| GLiClass large v3.0 (`knowledgator/gliclass-large-v3.0`) | see model card | gliclass, in process on CPU | Entailment check on guarded answer claims (`riprap/core/burr/entailment.py`); misses paraphrased inferences | Experimental |
 | GLiClass modern-base v3.0, distilled 311 filter | see model card | gliclass, in process on CPU; weights built locally by `scripts/train_311_filter.py`, found through `RIPRAP_311_FILTER_PATH` | Flood filter for SF, Boston and Albany 311 records; unreliable on live feeds | Experimental |
 
 The in-process models need the `ml` extra; without it their pebbles skip

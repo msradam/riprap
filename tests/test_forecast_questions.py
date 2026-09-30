@@ -49,7 +49,6 @@ def test_future_floor_runs_every_forecast():
 
 
 def test_forecast_answer_keeps_labels_and_has_no_yes(monkeypatch):
-    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
     surge = ("a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak "
              "surge residual of 0.46 m at The Battery about 4 h ahead. Use NOAA ETSS or the Stevens Flood "
              "Advisory System for storm decisions.")
@@ -65,7 +64,6 @@ def test_forecast_answer_keeps_labels_and_has_no_yes(monkeypatch):
 
 
 def test_forecast_facts_are_the_forecasts_not_the_flood_zone(monkeypatch):
-    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
     docs = [Doc("fema_nfhl", "Hazard Reader", "This address sits in FEMA flood zone AE.", False),
             Doc("npcc4_slr", "Projector", "NPCC4 projects 0.38 m of sea-level rise by the 2050s.", False),
             Doc("ttm_battery_surge", "Projector", "a TTM model forecasts a peak surge residual of 0.41 m.", True)]
@@ -80,7 +78,6 @@ def test_forecast_facts_are_the_forecasts_not_the_flood_zone(monkeypatch):
 
 
 def test_a_scenario_question_keeps_the_model_facts(monkeypatch):
-    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
     docs = [Doc("dep_moderate_2050", "Hazard Reader", "The DEP 2050 scenario models deep and contiguous flooding (1 ft or more) here.",
                 False),
             Doc("ttm_battery_surge", "Projector", "a TTM model forecasts a peak surge residual of 0.41 m.", True)]

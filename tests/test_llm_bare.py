@@ -26,7 +26,6 @@ def test_bare_place_briefing_skips_the_llm(monkeypatch):
 
 
 def test_extractive_asks_for_the_answer_only(monkeypatch):
-    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
     seen = {}
 
     def chat(messages, schema, **k):

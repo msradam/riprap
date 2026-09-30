@@ -43,7 +43,6 @@ def test_kind_question_uses_that_kind_count():
 
 
 def test_extractive_count_answer_leads_with_the_kind(monkeypatch):
-    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
     monkeypatch.setattr(syn, "_documents", lambda state: (
         [Doc("nyc311_nta", "Touchstone", V["narrative"], False)],
         [SimpleNamespace(doc_id="nyc311_nta", pebble_id="nyc311_nta")], None))

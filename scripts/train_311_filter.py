@@ -106,9 +106,18 @@ def train(device: str, pool_path: Path, teacher_path: Path):
     return model.eval(), tok, len(examples), epochs
 
 
-def evaluate(out: Path) -> dict:
-    from calibrate_entailment import split
+def split(df: pd.DataFrame, seed: int = 0) -> np.ndarray:
+    """The calibration split, grouped by item: a fifth of each label's groups."""
+    rng = np.random.default_rng(seed)
+    first = df.groupby("group").label.first()
+    cal: set = set()
+    for _, g in first.groupby(first):
+        ids = g.index.to_numpy()
+        cal |= set(rng.choice(ids, size=max(1, round(0.2 * len(ids))), replace=False))
+    return df.group.isin(cal).to_numpy()
 
+
+def evaluate(out: Path) -> dict:
     from riprap.core.pebbles import record_filter as rf
 
     os.environ["RIPRAP_311_FILTER_PATH"] = str(out)

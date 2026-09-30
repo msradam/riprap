@@ -13,7 +13,6 @@ TEXTS = {"nyc311": "82 NYC 311 flood-related complaints filed within 200 m in th
 
 
 def test_uncited_consulted_sources_keep_their_citation(monkeypatch):
-    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
     docs = [Doc(i, "Live Observer", t, False) for i, t in TEXTS.items()]
     items = [SimpleNamespace(doc_id=i, pebble_id=i) for i in [*TEXTS, "rag_npcc_1"]]
     monkeypatch.setattr(syn, "_documents", lambda state: (docs, items, None))

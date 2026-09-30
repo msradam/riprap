@@ -1,5 +1,5 @@
-"""Guarded and extractive answer modes, on the refactor 2 failures
-(q05, q10, q12, q16, q18, q19). The LLM is scripted."""
+"""The extractive answer, on the refactor 2 failures (q05, q10, q12, q16,
+q18, q19). The LLM is scripted."""
 
 import pytest
 
@@ -25,10 +25,8 @@ DOCS = [Doc("nws_alerts", "Projector", ALERTS, False), Doc("nws_obs", "Live Obse
 
 @pytest.fixture
 def run(monkeypatch):
-    def go(mode, question, *outputs):
+    def go(question, *outputs):
         replies = list(outputs)
-        monkeypatch.setenv("RIPRAP_ANSWER_MODE", mode)
-        monkeypatch.setenv("RIPRAP_ENTAILMENT", "off")  # tested on its own in test_entailment.py
         monkeypatch.setattr(syn, "_documents", lambda state: (DOCS, [], None))
         monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
         monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (replies.pop(0), "scripted"))
@@ -38,83 +36,36 @@ def run(monkeypatch):
     return go
 
 
-def claim(text, *ids, section="answer"):
-    return {"section": section, "text": text, "doc_ids": list(ids), "numbers": []}
-
-
-# Guarded mode
-
-def test_guarded_q12_absence_is_dropped_then_fixed(run):
-    bad = claim("No active flood alerts indicate heavy rain near the address.", "nws_alerts")
-    good = claim("There are 3 active NWS alerts, including a Coastal Flood Warning.", "nws_alerts")
-    out = run("guarded", "Is it raining hard here?", {"claims": [bad]}, {"claims": [good]})
-    g = out["grounding"]
-    assert g["attempts"] == 2 and "absence" in g["retried_claims"][0]["reason"]
-    assert out["paragraph"].split("**Answer.**\n")[1].startswith("There are 3 active NWS alerts")
-
-
-@pytest.mark.parametrize("text,ids,cls", [
-    ("The NYCHA developments near the address are mapped within the 2012 Sandy inundation extent.",
-     ["nycha_development_exposure"], "universal"),                                          # q19
-    ("A Coastal Flood Warning is active, indicating flooding is currently occurring.", ["nws_alerts"], "inference"),  # q10
-    ("NPCC4 projects 0.38 m of sea-level rise by 2050, which means the address is outside the DEP scenario.",
-     ["npcc4_slr", "dep_moderate_2050"], "inference"),                                       # q16
-    ("The highest observed water elevation was 48.2 ft.", ["ida_hwm"], "datum"),             # q05
-])
-def test_guarded_failures_are_dropped_after_one_retry(run, text, ids, cls):
-    out = run("guarded", "Question?", {"claims": [claim(text, *ids)]}, {"claims": [claim(text, *ids)]})
-    g = out["grounding"]
-    assert g["attempts"] == 2 and not g["claims"]
-    assert cls in g["dropped_claims"][0]["reason"]
-    assert CANNOT_ANSWER in out["paragraph"]
-
-
-def test_guarded_q18_dropped_count_retries_but_keeps_true_claims(run):
-    text = "The subway entrances near the address are inside the DEP extreme stormwater scenario."
+def test_answer_is_lead_plus_template_verbatim(run):
     q = "Are the subway entrances near the address in a flood scenario?"
-    out = run("guarded", q, {"claims": [claim(text, "mta_entrance_exposure")]},
-              {"claims": [claim(text, "mta_entrance_exposure")]})
-    g = out["grounding"]
-    assert g["attempts"] == 2 and len(g["claims"]) == 1
-    assert "mta_entrance_exposure (8)" in g["answer_flags"][0]
-
-
-def test_guarded_number_words_are_checked(run):
-    bad = claim("Four NYCHA developments are inside the 2012 Sandy extent.", "nycha_development_exposure")
-    out = run("guarded", "How many NYCHA developments were in the Sandy extent?", {"claims": [bad]}, {"claims": [bad]})
-    assert "numbers not found" in out["grounding"]["dropped_claims"][0]["reason"]
-
-
-# Extractive mode
-
-def test_extractive_answer_is_lead_plus_template_verbatim(run):
-    q = "Are the subway entrances near the address in a flood scenario?"
-    out = run("extractive", q, {"claims": [], "answer": {"lead": "count", "facts": ["mta_entrance_exposure"]}})
+    out = run(q, {"claims": [], "answer": {"lead": "count", "facts": ["mta_entrance_exposure"]}})
     assert out["paragraph"].split("**Answer.**\n")[1].startswith(
         f"From the sources consulted: {MTA.rstrip('.')} [mta_entrance_exposure].")
     assert out["grounding"]["answer_lead"] == "count"
+    assert out["paragraph"].endswith("Checks run: citations and numbers on every claim; lead rules on the "
+                                     "answer, which is the cited text word for word.")
 
 
-def test_extractive_q12_no_with_a_positive_fact_falls_back(run):
+def test_q12_no_with_a_positive_fact_falls_back(run):
     bad = {"claims": [], "answer": {"lead": "no", "facts": ["nws_alerts"]}}
-    out = run("extractive", "Is it raining hard here?", bad, bad)
+    out = run("Is it raining hard here?", bad, bad)
     g = out["grounding"]
     assert g["answer_lead"] == "cannot_answer" and "reports a result" in g["dropped_claims"][0]["reason"]
     assert CANNOT_ANSWER in out["paragraph"]
 
 
-def test_extractive_q19_yes_over_a_partial_count_is_retried_to_partly(run):
+def test_q19_yes_over_a_partial_count_is_retried_to_partly(run):
     q = "Are the NYCHA developments near the address exposed to flooding?"
-    out = run("extractive", q, {"claims": [], "answer": {"lead": "yes", "facts": ["nycha_development_exposure"]}},
+    out = run(q, {"claims": [], "answer": {"lead": "yes", "facts": ["nycha_development_exposure"]}},
               {"claims": [], "answer": {"lead": "partly", "facts": ["nycha_development_exposure"]}})
     assert out["grounding"]["answer_lead"] == "partly"
     assert "In part. 5 NYCHA developments" in out["paragraph"]
 
 
-def test_extractive_q05_missing_source_is_appended(run):
+def test_q05_missing_source_is_appended(run):
     q = "Has the block flooded since Hurricane Ida?"
     reply = {"claims": [], "answer": {"lead": "no", "facts": ["sandy_inundation"]}}
-    out = run("extractive", q, reply, reply)
+    out = run(q, reply, reply)
     facts = [c["doc_ids"][0] for c in out["grounding"]["claims"] if c["section"] == "answer"]
     assert facts == ["sandy_inundation", "ida_hwm"]
     # "No." no longer fits once the Ida marks are appended, so the lead is dropped
@@ -168,11 +119,6 @@ def test_register_with_one_inside_is_a_result():
     assert not reports_result(HOSP)
 
 
-def test_extractive_is_the_default(monkeypatch):
-    monkeypatch.delenv("RIPRAP_ANSWER_MODE", raising=False)
-    assert syn.answer_mode() == "extractive"
-
-
 def test_d01_share_question_is_given_the_count_lead(run):
     q = "What share of community district QN04 is inside the DEP 2050 stormwater scenario?"
     reply = {"claims": [], "answer": {"lead": "partly", "facts": ["dep_moderate_2050_nta"]}}
@@ -180,7 +126,7 @@ def test_d01_share_question_is_given_the_count_lead(run):
     syn_docs = DOCS[:]
     DOCS[:] = monkey_docs
     try:
-        out = run("extractive", q, reply, reply)
+        out = run(q, reply, reply)
     finally:
         DOCS[:] = syn_docs
     assert out["grounding"]["answer_lead"] == "count"

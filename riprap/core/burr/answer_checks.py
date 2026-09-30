@@ -1,30 +1,17 @@
-"""Deterministic checks on answer claims against their cited evidence.
+"""Deterministic rules on an extractive answer's lead against its cited
+evidence: a "no" needs facts that report an absence, a "partly" one
+positive and one negative or partial fact, a count question the count
+lead, a yes or no about past flooding follows the record, and a "no" or
+a 0 never rests on a source that could not answer (`unavailable`).
 
-The claim verifier checks citations and numbers. These checks cover five
-ways an answer can still misstate its evidence (refactor 3):
-
-  absence       "no", "none", "not", "zero", "without" about a source whose
-                cited document reports a result
-  universal     "all", "every", "both", or "the <assets> are", where the
-                cited register counts fewer inside than in total
-  inference     "which means", "indicating", "therefore" ... joining two
-                sources, or a warning or forecast stated as an observation
-  dropped_count the answer omits the count or value of the source the
-                question is about, when that source produced one
-  datum         an elevation stated without its datum, or without the
-                height above ground when the source gives one
-  unavailable   (extractive leads, refactor 5) a "no" or a count of 0
-                resting on a source that could not answer
-
-Every check is a pattern over words; none reads meaning. They are used by
-scripts/answer_audit.py and, in guarded answer mode, by the verifier.
+Every rule is a pattern over words; none reads meaning. The five per-claim
+checks of the retired guarded mode (absence, universal, inference, dropped
+count, datum) are kept at the git tag archive/guarded-answer-mode.
 """
 
 from __future__ import annotations
 
 import re
-
-CLASSES = ("absence", "universal", "inference", "dropped_count", "datum", "unavailable")
 
 _WORDS = {w: i for i, w in enumerate(
     "zero one two three four five six seven eight nine ten eleven twelve thirteen "
@@ -40,28 +27,13 @@ _DOC_ABSENCE_RE = re.compile(r"\b(no|none|not|zero|without|outside|never)\b|(?<!
 # A document or value that says its source could not answer.
 _UNAVAILABLE_RE = re.compile(r"\bunavailable\b|\bnot available\b|could not be (read|reached)|failed to respond"
                              r"|\bunreachable\b", re.IGNORECASE)
-_UNIVERSAL_RE = re.compile(r"\b(all|every|both|each of)\b", re.IGNORECASE)
-_THE_ASSETS_RE = re.compile(
-    r"^\W*the\s+(?:[\w'-]+\s+){0,3}?(developments|entrances|schools|hospitals|sensors|gauges)\b"
-    r"[^.]*?\b(are|were)\b", re.IGNORECASE)
 # "{n} <assets> within {r} m of this address: {a} inside the 2012 Sandy ... and {b} inside the DEP ..."
 _REGISTER_RE = re.compile(r"(\d[\d,]*)\s[^:]*?within\s[\d,.]+\s?m\b[^:]*:\s*(\d+) inside the 2012 Sandy"
                           r"[^.]*?(\d+) inside the DEP", re.IGNORECASE)
-_INFER_RE = re.compile(r"\b(which means|meaning that|indicating|indicates|suggests|suggesting|therefore"
-                       r"|thus|as a result)\b|,\s*so\b", re.IGNORECASE)
-_WARNING_DOC_RE = re.compile(r"\b(warning|watch|advisory|statement|forecast|projects?|expects?)\b",
-                             re.IGNORECASE)
-_OBSERVED_RE = re.compile(
-    r"\b(flooding|inundation) (is|are) (currently |now |actively )?(occurring|happening|underway|taking place)\b"
-    r"|\bcurrently (flooding|flooded|underwater|experiencing flooding)\b"
-    r"|\b(is|are) (currently |now )(flooding|flooded|underwater)\b", re.IGNORECASE)
-_ELEVATION_RE = re.compile(r"\belevation\b", re.IGNORECASE)
-_DATUM_RE = re.compile(r"\b(navd ?88|ngvd ?29|mllw|mean lower low water|mean sea level|datum|above ground"
-                       r"|above grade|height above)\b", re.IGNORECASE)
 _DISTANCE_OR_YEAR_RE = re.compile(r"^\s?(m|km|meters?|metres?|mi|miles?)\b", re.IGNORECASE)
 
 # Question words -> the doc_ids of the source that answers them, most
-# specific first. Used only by the dropped_count check.
+# specific first: the source a question is about.
 RELEVANT = (
     (re.compile(r"subway|entrance", re.I), ("mta_entrance_exposure",)),
     (re.compile(r"school", re.I), ("doe_school_exposure",)),
@@ -174,38 +146,6 @@ def relevant_doc(question: str, docs: dict[str, str]) -> str | None:
     return None
 
 
-def check_claim(text: str, doc_ids: list[str], docs: dict[str, str]) -> list[tuple[str, str]]:
-    """Per-claim checks (absence, universal, inference, datum). Returns
-    (class, reason) pairs; empty when the claim passes."""
-    hits: list[tuple[str, str]] = []
-    cited = {i: docs.get(i, "") for i in doc_ids}
-    if ABSENCE_RE.search(text):
-        positive = [i for i, d in cited.items() if reports_result(d)]
-        if positive:
-            hits.append(("absence", f"states an absence, but {', '.join(positive)} reports a result"))
-    universal = _UNIVERSAL_RE.search(text) or _THE_ASSETS_RE.search(text)
-    if universal:
-        for i, d in cited.items():
-            counts = _register_counts(d)
-            if not counts:
-                continue
-            total, sandy, dep = counts
-            scoped = [c for c, pat in ((sandy, r"sandy"), (dep, r"\bdep\b|stormwater|2080"))
-                      if re.search(pat, text, re.I)] or [sandy, dep]
-            if any(c < total for c in scoped):
-                hits.append(("universal", f"implies all, but {i} counts {min(scoped)} of {total}"))
-    if _INFER_RE.search(text) and len(set(doc_ids)) >= 2:
-        hits.append(("inference", "draws a conclusion joining two sources"))
-    elif _OBSERVED_RE.search(text) and any(_WARNING_DOC_RE.search(d) for d in (text, *cited.values())):
-        hits.append(("inference", "states a warning or forecast as an observation"))
-    if _ELEVATION_RE.search(text) and re.search(r"\d", text):
-        if not _DATUM_RE.search(text):
-            hits.append(("datum", "states an elevation without its datum"))
-        elif any("above ground" in d.lower() for d in cited.values()) and "above ground" not in text.lower():
-            hits.append(("datum", "omits the height above ground the source gives"))
-    return hits
-
-
 # The structured field that holds each source's headline figure.
 COUNT_FIELD = {
     "ida_hwm": "n_within_radius", "mta_entrance_exposure": "n_entrances", "doe_school_exposure": "n_schools",
@@ -277,28 +217,6 @@ def unavailable(doc_id: str, docs: dict[str, str], values: dict | None = None) -
     if isinstance(v, dict) and (v.get("available") is False or v.get("error")):
         return True
     return bool(_UNAVAILABLE_RE.search(docs.get(doc_id, "")))
-
-
-def check_answer(answer_texts: list[str], question: str, docs: dict[str, str],
-                 values: dict | None = None) -> list[tuple[str, str]]:
-    """Answer-level check (dropped_count). An empty answer (the cannot-answer
-    line) is not flagged: saying the evidence does not answer is honest."""
-    if not answer_texts:
-        return []
-    rel = relevant_doc(question, docs)
-    figure = relevant_figure(rel, docs, values, question) if rel else None
-    if figure is None:
-        return []
-    from riprap.core.burr.synthesis import _parse
-
-    # Exact equality: the verifier's unit-conversion tolerance would let
-    # "0.76 ft" (2.49 m) stand in for a count of 2.
-    said = {p[0] for n in count_numbers(words_to_digits(" ".join(answer_texts))) if (p := _parse(n))}
-    if figure == 0 and ABSENCE_RE.search(" ".join(answer_texts)):
-        return []  # "no hospitals" states a count of 0
-    if figure not in said:
-        return [("dropped_count", f"omits the figure from {rel} ({figure:g})")]
-    return []
 
 
 def rel_zero_down(question: str, docs: dict[str, str], values: dict | None) -> bool:

@@ -55,7 +55,7 @@ def _tokens(calls: list[dict]) -> dict:
 
 
 def _doc_texts(out: dict) -> dict[str, str]:
-    """doc_id -> evidence text, as the synthesis saw it (for answer_audit.py)."""
+    """doc_id -> evidence text, as the synthesis saw it."""
     from riprap.core.burr.synthesis import _documents
 
     try:
@@ -123,7 +123,7 @@ def cmd_run(outdir: Path, only: list[str] | None = None, suffix: str = "") -> No
             "paragraph": out.get("paragraph"),
             "documents": _doc_texts(out) if out else {},
             "values": _doc_values(out) if out else {},
-            "checks": g.get("checks"), "entailment": g.get("entailment"),
+            "checks": g.get("checks"),
             "answer_mode": g.get("answer_mode"), "answer_lead": g.get("answer_lead"),
             "answer_flags": g.get("answer_flags") or [],
         }

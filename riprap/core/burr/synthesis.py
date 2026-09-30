@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from burr.core import State, action
 
 from riprap.core import llm
-from riprap.core.burr import answer_checks, entailment, evidence
+from riprap.core.burr import answer_checks, evidence
 from riprap.core.burr.templated_reconciler import NON_SCOPE_FOOTER, _scope_header, compose_briefing
 
 log = logging.getLogger("riprap.synthesis")
@@ -164,10 +164,7 @@ Rules:
 - Never say a place "will flood", is "safe", or has "no risk". Say "is mapped within", "was recorded", "is modeled to".
 """
 
-GUARD_RULES = """
-Answer claims are also checked in code. Do not say no, none or not when a cited document reports something. Do not write "all", "both" or "the <things> are" when a document counts fewer inside than in total; give the count ("3 of 5"). Do not join two documents with "which means", "indicating" or "therefore", and do not state a warning or forecast as something happening. State an elevation with its datum. Include the count or value that answers the question.
-"""
-# Extractive mode asks the model for the answer only (refactor 8): a lead and
+# The answer is extractive (refactor 8): the model returns a lead and
 # the ids of the facts. The reader sees those facts word for word, and a
 # question page shows no model-written section claims, so asking for them
 # only cost generation time (about 1,100 tokens, over a minute on a laptop).
@@ -182,8 +179,14 @@ LIVE_FACTS = ("nws_alerts", "floodnet", "noaa_tides", "usgs_gauges", "nws_obs")
 FORECAST_FACTS = ("ttm_battery_surge", "ttm_311_forecast", "floodnet_forecast", "npcc4_slr",
                   "dep_moderate_2050", "dep_extreme_2080", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
 # The owner's decision after refactor 3: extractive cannot paraphrase, and
-# it declines honestly when the evidence does not answer.
-DEFAULT_ANSWER_MODE = "extractive"
+# it declines honestly when the evidence does not answer. The guarded mode
+# it replaced (model-written answer claims, five answer rules and an
+# entailment check) is kept at the git tag archive/guarded-answer-mode.
+CHECKS_RUN = {
+    "extractive": ["citations and numbers on every claim",
+                   "lead rules on the answer, which is the cited text word for word"],
+    None: ["citations and numbers on every claim"],
+}
 
 
 def llm_bare() -> bool:
@@ -194,45 +197,6 @@ def llm_bare() -> bool:
     import os
 
     return os.environ.get("RIPRAP_LLM_BARE", "").lower() in ("1", "true", "yes")
-
-
-def answer_mode() -> str:
-    """RIPRAP_ANSWER_MODE: 'guarded' (model-written answer claims, checked
-    by answer_checks) or 'extractive' (a lead plus template sentences)."""
-    import os
-
-    mode = os.environ.get("RIPRAP_ANSWER_MODE", DEFAULT_ANSWER_MODE).strip().lower()
-    return mode if mode in ("guarded", "extractive") else DEFAULT_ANSWER_MODE
-
-
-def _guard(kept: list[dict], dropped: list[dict], texts: dict[str, str],
-           question: str, values: dict | None = None) -> tuple[list[dict], list[dict], list[str]]:
-    """Guarded mode: an answer claim failing an answer check is dropped with
-    the reason. An omitted count asks for a retry but drops nothing (the
-    claims that were written are still true)."""
-    out = []
-    for c in kept:
-        hits = answer_checks.check_claim(c["text"], c["doc_ids"], texts) if c["section"] == ANSWER_SECTION else []
-        if hits:
-            dropped = [*dropped, {**c, "reason": "answer check: " + "; ".join(f"{k}: {r}" for k, r in hits)}]
-        else:
-            out.append(c)
-    notes = [f"the answer {r}" for _, r in answer_checks.check_answer(
-        [c["text"] for c in out if c["section"] == ANSWER_SECTION], question, texts, values)]
-    return out, dropped, notes
-
-
-def _checks_run(mode: str | None, entail_info: dict) -> list[str]:
-    """What was verified, in words, for the line at the end of the briefing."""
-    checks = ["citations and numbers on every claim"]
-    if mode == "guarded":
-        checks.append("five answer rules on the answer")
-        checks.append(f"{entail_info['label']} on the answer" if entail_info.get("ran")
-                      else entail_info.get("reason", "entailment check not run"))
-    elif mode == "extractive":
-        checks.append("lead rules on the answer; no entailment check needed, since the answer is the "
-                      "cited text word for word")
-    return checks
 
 
 def _lead_fact(lead: str | None, facts: list[str], kind_lead: bool, rel: str | None, question: str,
@@ -307,10 +271,6 @@ def _extract(out: dict, question: str, texts: dict[str, str],
 # "facts" is set only by code: the facts with no yes or no in front of them.
 LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:",
                 "facts": "From the sources consulted:"}
-
-ANSWER_RULES = """
-A question was asked. First write one to three claims in section "answer" that answer it directly, using only the documents, with the same citation and number rules. Lead with the fact that answers the question. If the documents do not contain the answer, write no "answer" claims; do not guess. Then write the other sections as usual.
-"""
 
 
 def _documents(state) -> tuple[list[Doc], list, object]:
@@ -424,7 +384,7 @@ def synthesize(state) -> dict:
                 "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": 0,
                               "note": "No question was asked, so the cited evidence is shown without the LLM "
                                       "(RIPRAP_LLM_BARE=1 sends it to the LLM)."}}
-    mode = answer_mode() if question else None
+    mode = "extractive" if question else None
     # Stones whose consulted sources all returned nothing: named on a question page.
     empty: dict[str, list[str]] = {}
     if question and stones is not None:
@@ -442,12 +402,11 @@ def synthesize(state) -> dict:
     texts: dict[str, str] = {}
     for d in docs:
         texts[d.doc_id] = f"{texts.get(d.doc_id, '')} {d.text}".strip()
-    extra = (ANSWER_SECTION,) if mode == "guarded" else ()
     # Numbers the user typed (the question, the place) may be restated;
     # they are the user's words, not claims about the data.
     exempt = frozenset(numbers_in(f"{question} {state.get('query') or ''} "
                                   f"{(state.get('geocode') or {}).get('address') or ''}"))
-    schema = claims_schema(sorted(texts), [*extra, *sections])
+    schema = claims_schema(sorted(texts), sections)
     if mode == "extractive":
         # The answer only: no section claims (see EXTRACTIVE_SYSTEM).
         schema = {"type": "object", "additionalProperties": False, "required": ["answer"], "properties": {
@@ -457,22 +416,15 @@ def synthesize(state) -> dict:
                                                 "maxItems": 4}}}}}
         system = EXTRACTIVE_SYSTEM
     else:
-        system = SYSTEM_PROMPT + {"guarded": ANSWER_RULES + GUARD_RULES}.get(mode or "", "")
+        system = SYSTEM_PROMPT
     messages = [{"role": "system", "content": system},
                 {"role": "user", "content": _user_prompt(docs, sections, question, focus)}]
 
-    entail_info: dict = {}
-
     def check(out: dict):
-        nonlocal entail_info
-        kept, dropped = verify(out.get("claims") or [], docs, extra, exempt)
+        kept, dropped = verify(out.get("claims") or [], docs, exempt=exempt)
         notes: list[str] = []
         lead, facts, lead_hits = "", [], []
-        if mode == "guarded":
-            kept, dropped, notes = _guard(kept, dropped, texts, question, values)
-            kept, failed, entail_info = entailment.check(kept, texts)
-            dropped = [*dropped, *failed]
-        elif mode == "extractive":
+        if mode == "extractive":
             lead, facts, lead_hits = _extract(out, question, texts, values, focus)
             notes = [f"answer lead {lead!r}: {r}" for _, r in lead_hits]
         return kept, dropped, notes, (lead, facts, lead_hits)
@@ -532,7 +484,7 @@ def synthesize(state) -> dict:
             lead_phrase = f"{kl} {lead_phrase}"
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
                                focus, texts, values, experimental)
-    checks = _checks_run(mode, entail_info)
+    checks = CHECKS_RUN[mode]
     # A bare address opens with the same verified "In brief" lead as no-LLM mode.
     from riprap.core.burr.templated_reconciler import _lead
 
@@ -555,7 +507,7 @@ def synthesize(state) -> dict:
                       "n_kept": len(kept), "n_dropped": len(dropped), "llm_calls": calls,
                       "question": question, "n_documents": len(docs), "answer_mode": mode,
                       "answer_lead": lead, "lead_fact": lead_fact,
-                      "answer_flags": answer_flags, "checks": checks, "entailment": entail_info,
+                      "answer_flags": answer_flags, "checks": checks,
                       "answered": (lead != "cannot_answer" and any(c["section"] == ANSWER_SECTION for c in kept))
                       if question else None},
     }

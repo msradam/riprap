@@ -40,14 +40,13 @@ is used only where there is a question (refactor 8):
   synthesis calls the LLM: the page is the no-LLM evidence briefing, and the
   mode line says no LLM was needed. `RIPRAP_LLM_BARE=1` restores the older
   behaviour below, in which the model rewrites the evidence as claims.
-- In extractive mode (the default for questions) the model returns only the
-  answer: a lead and the ids of one to four facts. It writes no section
-  claims. For a question that asks about forecasts or projections, code
-  chooses the facts (the forecasts and projections themselves); for a yes or
-  no question about past flooding, a rule sets the lead.
-- In guarded mode, and with `RIPRAP_LLM_BARE=1`, the model rewrites the
-  evidence as a list of claims, as described in the steps below. It never
-  writes free prose.
+- For a question the model returns only the answer: a lead and the ids of
+  one to four facts. It writes no section claims. For a question that asks
+  about forecasts or projections, code chooses the facts (the forecasts and
+  projections themselves); for a yes or no question about past flooding, a
+  rule sets the lead.
+- With `RIPRAP_LLM_BARE=1` the model rewrites the evidence as a list of
+  claims, as described in the steps below. It never writes free prose.
 
 1. The model receives the evidence sentences, grouped by section, each labelled
    with its `doc_id`. Retrieved policy passages are added as `rag_*` documents.
@@ -87,8 +86,8 @@ When the input is a question, not just a place, three more rules apply.
   question alerts, observations, FloodNet and the tide gauge; for an asset
   question that asset's register). Only those pebbles run, and every briefing lists the
   sources consulted and the ones not checked. A bare address runs every source.
-- The briefing opens with an answer, written in one of two modes
-  (`RIPRAP_ANSWER_MODE`, described below). If no answer survives the checks,
+- The briefing opens with an answer (described below). If no answer
+  survives the checks,
   it opens with the fixed line "The sources consulted do not answer this
   question directly. Here is what they show." The answer is not repeated in
   the sections below it, and a Stone section with no sentence is hidden. A
@@ -98,11 +97,9 @@ When the input is a question, not just a place, three more rules apply.
   legal advice, a prediction for a specific day, or a hazard other than
   flooding) get a fixed refusal text, never model prose.
 
-### Answer modes and answer checks
+### The answer and its checks
 
-`RIPRAP_ANSWER_MODE` picks one of two modes. Extractive is the default.
-
-**Extractive (default).** The model does not write the answer. It returns a
+**Extractive.** The model does not write the answer. It returns a
 lead (`yes`, `no`, `partly`, `count`, `cannot_answer`) and up to four
 document ids. The answer is a fixed phrase for the lead ("Yes.", "No.", "In
 part.", "From the sources consulted:") followed by those documents' template
@@ -142,44 +139,21 @@ the facts after the retry, it is appended; if the lead no longer fits the
 appended fact, the lead is dropped and the answer opens "From the sources
 consulted:".
 
-**Guarded.** The model writes one to three claims in section `answer`. They
-pass the number and citation checks like every claim, then five answer
-checks, then the entailment check below. A claim that fails is retried once
-with the reason and dropped if it still fails:
+Every LLM briefing ends with a line naming the checks that ran: "Checks
+run: citations and numbers on every claim; lead rules on the answer, which
+is the cited text word for word."
 
-| Check | Flags | Example it catches |
-|---|---|---|
-| absence | "no", "none", "not", "zero", "without" about a cited source that reports something | "No active flood alerts" citing three alerts |
-| universal | "all", "every", "both", "each of", or "the <assets> are", when the cited asset register counts fewer inside than in total | "The NYCHA developments are inside Sandy" when 3 of 5 are |
-| inference | "which means", "indicating", "therefore" and similar in a claim citing two sources; or a warning or forecast stated as flooding happening | "Coastal Flood Warning, indicating flooding is occurring" |
-| datum | an elevation without its datum, or without the height above ground when the source gives one | "water elevation 48.2 ft" |
-| dropped count | the answer omits the headline figure of the source the question is about, read from the pebble's structured value (`COUNT_FIELD`) | "the subway entrances are inside the scenario" without "8" |
-
-A dropped count asks for a retry but drops nothing, since the claims that
-were written are still true; if it persists it is recorded in
-`grounding.answer_flags`.
-
-**Entailment check (guarded answers).** `riprap/core/burr/entailment.py`
-asks a natural-language-inference model whether the cited evidence supports
-each answer claim: `knowledgator/gliclass-large-v3.0` (pinned SHA,
-safetensors, CPU), the evidence trimmed to the 512 tokens most relevant to
-the claim as premise and the claim as hypothesis. A claim scoring below
-0.787 is dropped with the reason "not supported by the cited evidence
-(entailment check)" and the retry applies. The threshold keeps 95% of the
-true claims in the Task B calibration split from an unpublished experiment;
-its calibration data is in `data/calibration/`
-(`scripts/calibrate_entailment.py`); on that experiment's 582 test items it
-keeps 86% of true claims and catches 85% of perturbed ones: 89% of flipped
-directions, 87% of changed numbers, 84% of swapped documents and 67% of
-changed places (`tests/entailment_calibration_gliclass.json`).
-It takes about 0.2 s per claim on CPU. `RIPRAP_ENTAILMENT=guardian` selects
-Granite Guardian 8B on the GPU instead, but it has no calibrated threshold
-yet, so selecting it skips the check. The check needs the `ml` extra.
-Extractive answers are the cited text, so the check does not run on them.
-
-Every LLM briefing ends with a line naming the checks that ran, for example
-"Checks run: citations and numbers on every claim; lead rules on the
-answer; ...", or saying why the entailment check was skipped.
+**The retired guarded mode.** Until 2026-09-30 `RIPRAP_ANSWER_MODE=guarded`
+let the model write one to three answer claims of its own, checked by five
+word-pattern rules (absence, universal, inference, dropped count, datum) and
+an entailment classifier (`knowledgator/gliclass-large-v3.0`, threshold
+0.787 from a 146-claim calibration split; on the 582 test claims it kept
+86% of true claims and caught 85% of perturbed ones). On real answers the
+classifier caught only absence and warning-read-as-observation errors,
+passed paraphrased inferences and wrong quantifiers, and dropped correct
+claims (about 6% of the answer claims it saw). Extractive answers cannot
+paraphrase, so the mode was removed. The code, its tests, the calibration
+script and its results are at the git tag `archive/guarded-answer-mode`.
 
 Number words ("four", "two") are read as digits by the number check in both
 modes.
@@ -206,31 +180,12 @@ document does not count.
 
 ### What is not checked
 
-Body claims (the sections after the answer) get citation and number
-checks only. Answer claims in guarded mode also get the five answer
-checks, which are word patterns, not a reading of meaning. They miss:
-
-- an absence stated without one of the listed words ("the address is
-  clear of alerts");
-- a wrong quantifier over something other than an asset register count;
-- an inference that uses no listed connective, or joins facts from one
-  source;
-- a wrong non-numeric fact ("inside" for "outside") with correct numbers;
-- an omitted figure when the question's words match no listed source.
-
-The entailment check is a classifier that scores whether the cited text
-supports a claim. On the records in `tests/question_eval/entail.json` it
-caught only absence and warning-read-as-observation errors. It passed a
-paraphrased inference ("Given the projected 0.38 m ..., the address
-remains outside the floodplain"), a claim attributing the address's flood
-zone to nearby subway entrances, a true claim that does not answer the
-question, and "the developments are inside" when 3 of 5 are. It also
-dropped correct claims (a district's correct 3.1% share, a correct tide
-reading), about 6% of the answer claims it saw.
-
-In extractive mode the answer text is the evidence text, so it cannot
-paraphrase; what can still be wrong is the lead and the choice of facts,
-and only the lead rules above are checked.
+Body claims (the sections after the answer, written only with
+`RIPRAP_LLM_BARE=1`) get citation and number checks only: a wrong
+non-numeric fact ("inside" for "outside") with correct numbers passes. In
+the answer the text is the evidence text, so it cannot paraphrase; what can
+still be wrong is the lead and the choice of facts, and only the lead rules
+above are checked.
 
 ## 311 feeds outside NYC
 

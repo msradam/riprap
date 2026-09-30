@@ -83,7 +83,6 @@ def test_other_questions_are_left_to_the_model():
 
 
 def test_extractive_answer_uses_the_rule_lead(monkeypatch):
-    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
     docs = [Doc(i, "Live Observer" if i in ("nyc311", "floodnet") else "Hazard Reader", t, False)
             for i, t in TEXTS.items()]
     items = [SimpleNamespace(doc_id=i, pebble_id={"sandy_inundation": "sandy"}.get(i, i)) for i in TEXTS]
@@ -102,7 +101,6 @@ def test_extractive_answer_uses_the_rule_lead(monkeypatch):
 
 def test_honest_silence_shows_the_sources_that_answered(monkeypatch):
     # A sensor question with no sensor in range: the silence line, then FloodNet's own sentence, cited.
-    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
     q = "Have street flood sensors recorded flooding near 1 East 161st Street, Bronx?"
     texts = {"floodnet": "No FloodNet sensors deployed within 600 m of this address.",
              "nyc311": "82 NYC 311 flood-related complaints filed within 200 m in the last 5 years."}
@@ -155,7 +153,6 @@ def test_count_answer_quotes_only_the_counted_source(monkeypatch):
 
     n311 = "34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years."
     fema = "This address sits in FEMA flood zone X (an area of minimal flood hazard)."
-    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
     monkeypatch.setattr(syn, "_documents", lambda state: (
         [Doc("fema_nfhl", "Hazard reader", fema, False), Doc("nyc311", "Live observer", n311, False)], [], None))
     monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
