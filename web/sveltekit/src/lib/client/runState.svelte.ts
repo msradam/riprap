@@ -10,6 +10,7 @@
 import type { FeatureCollection } from 'geojson';
 import { adaptFinalToFindings } from './cardAdapter';
 import { parseBriefing, citationFromMeta } from './parseBriefing';
+import { isoNow } from './gallery';
 import { citationList, type FinalResult, type PlanInfo, type StepEvent } from './agentStream';
 import type { TraceNode } from '$lib/types/trace';
 import type { ErrorKey } from '$lib/types/states';
@@ -537,7 +538,7 @@ export class RunState {
    *  but no briefing came back. */
   finish(): void {
     this.streamDone = true;
-    this.finishedAt = new Date().toISOString();
+    this.finishedAt = isoNow();
     if (!this.finalResult?.paragraph?.trim() && !this.errorState && this.geocodeSucceeded) {
       this.errorState = 'all-silent';
     }

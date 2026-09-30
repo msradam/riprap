@@ -42,6 +42,10 @@ export async function loadGalleryEntry(slug: string): Promise<GalleryEntry | nul
   return load ? await load() : null;
 }
 
+/** The present instant as an ISO timestamp, the form a snapshot's
+ *  generatedAt takes. */
+export const isoNow = () => new Date().toISOString();
+
 /** "2026-09-26T19:33Z" → "2026-09-26 19:33 UTC". */
 export function formatGeneratedAt(s: string): string {
   const m = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/.exec(s);
