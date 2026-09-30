@@ -11,12 +11,22 @@ SvelteKit UI already consumes.
 """
 from __future__ import annotations
 
+import os
 import time
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FutureTimeout
 from typing import Any
 
 from burr.core import State, action
 
 from riprap.core.pebbles.bridge import fetch_pebble
+
+# The longest one source may hold a briefing. A Socrata query for the DOB
+# permits of one district once took 104 s (5 s the time before), and the
+# page sat at "Gathering evidence" for all of it. Past the budget the source
+# is reported as not having answered; its thread finishes on its own.
+SOURCE_BUDGET_S = float(os.environ.get("RIPRAP_SOURCE_BUDGET_S", "45"))
+_FETCHES = ThreadPoolExecutor(max_workers=48, thread_name_prefix="riprap-fetch")
 
 
 def trace_rec_for(step_name: str) -> dict[str, Any]:
@@ -62,11 +72,15 @@ def pebble_action(pebble_id: str):
             # registry — which doesn't contain boston_311 — and crash
             # with KeyError('boston_311').
             deployment = state.get("deployment")
-            value, trace_summary, err = fetch_pebble(
-                pebble_id, lat, lon, deployment=deployment,
+            fetch = _FETCHES.submit(
+                fetch_pebble, pebble_id, lat, lon, deployment=deployment,
                 geometry_wkt=state.get("polygon_wkt"),
                 extras={"area_code": (state.get("nta") or {}).get("nta_code")},
             )
+            try:
+                value, trace_summary, err = fetch.result(timeout=SOURCE_BUDGET_S)
+            except FutureTimeout:
+                value, trace_summary, err = None, None, f"no answer within {SOURCE_BUDGET_S:.0f} s"
             if value is None:
                 rec["ok"] = False
                 rec["err"] = err or "no value"
