@@ -28,6 +28,7 @@ from pathlib import Path
 
 from app.registers._footprint import (
     BUFFER_DOE_SCHOOL_M,
+    _degree_box,
     dep_class_buffered,
     inside_sandy_buffered,
 )
@@ -90,9 +91,9 @@ def _load_schools():
 
 def _schools_near(lat: float, lon: float, radius_m: float):
     gdf = _load_schools()
-    deg = radius_m / 90_000
-    sub = gdf[(gdf["lat"].between(lat - deg, lat + deg))
-              & (gdf["lon"].between(lon - deg, lon + deg))].copy()
+    dlat, dlon = _degree_box(lat, radius_m)
+    sub = gdf[(gdf["lat"].between(lat - dlat, lat + dlat))
+              & (gdf["lon"].between(lon - dlon, lon + dlon))].copy()
     if sub.empty:
         return sub
     sub["distance_m"] = sub.apply(

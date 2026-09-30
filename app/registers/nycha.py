@@ -39,6 +39,8 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
+from app.registers._footprint import _degree_box
+
 _ROOT = Path(__file__).resolve().parents[2]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
@@ -125,11 +127,11 @@ def _developments_near(lat: float, lon: float, radius_m: float):
     gdf = _load_nycha()
     # Re-project centroids to 4326 for haversine
     cents_4326 = gpd.GeoSeries(gdf["centroid_2263"], crs="EPSG:2263").to_crs("EPSG:4326")
-    deg = radius_m / 90_000
+    dlat, dlon = _degree_box(lat, radius_m)
     cent_lat = cents_4326.y
     cent_lon = cents_4326.x
-    mask = ((cent_lat >= lat - deg) & (cent_lat <= lat + deg)
-            & (cent_lon >= lon - deg) & (cent_lon <= lon + deg))
+    mask = ((cent_lat >= lat - dlat) & (cent_lat <= lat + dlat)
+            & (cent_lon >= lon - dlon) & (cent_lon <= lon + dlon))
     sub = gdf[mask].copy()
     if sub.empty:
         return sub, []

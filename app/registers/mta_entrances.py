@@ -44,6 +44,7 @@ from pathlib import Path
 
 from app.registers._footprint import (
     BUFFER_MTA_ENTRANCE_M,
+    _degree_box,
     dep_class_buffered,
     inside_sandy_buffered,
 )
@@ -113,10 +114,10 @@ def _load_entrances():
 def _entrances_near(lat: float, lon: float, radius_m: float):
     gdf = _load_entrances()
     # Coarse bbox prefilter to avoid haversine on 2120 rows every call.
-    deg = radius_m / 90_000  # generous degree padding at NYC latitude
+    dlat, dlon = _degree_box(lat, radius_m)
     sub = gdf[
-        (gdf["entrance_latitude"].between(lat - deg, lat + deg))
-        & (gdf["entrance_longitude"].between(lon - deg, lon + deg))
+        (gdf["entrance_latitude"].between(lat - dlat, lat + dlat))
+        & (gdf["entrance_longitude"].between(lon - dlon, lon + dlon))
     ].copy()
     if sub.empty:
         return sub
