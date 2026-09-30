@@ -182,12 +182,6 @@ FORECAST_FACTS = ("ttm_battery_surge", "ttm_311_forecast", "floodnet_forecast", 
 # it declines honestly when the evidence does not answer. The guarded mode
 # it replaced (model-written answer claims, five answer rules and an
 # entailment check) is kept at the git tag archive/guarded-answer-mode.
-CHECKS_RUN = {
-    "extractive": ["citations and numbers on every claim",
-                   "lead rules on the answer, which is the cited text word for word"],
-    None: ["citations and numbers on every claim"],
-}
-
 
 def llm_bare() -> bool:
     """RIPRAP_LLM_BARE=1: send a bare address or district (no question) to
@@ -384,7 +378,6 @@ def synthesize(state) -> dict:
                 "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": 0,
                               "note": "No question was asked, so the cited evidence is shown without the LLM "
                                       "(RIPRAP_LLM_BARE=1 sends it to the LLM)."}}
-    mode = "extractive" if question else None
     # Stones whose consulted sources all returned nothing: named on a question page.
     empty: dict[str, list[str]] = {}
     if question and stones is not None:
@@ -407,7 +400,7 @@ def synthesize(state) -> dict:
     exempt = frozenset(numbers_in(f"{question} {state.get('query') or ''} "
                                   f"{(state.get('geocode') or {}).get('address') or ''}"))
     schema = claims_schema(sorted(texts), sections)
-    if mode == "extractive":
+    if question:
         # The answer only: no section claims (see EXTRACTIVE_SYSTEM).
         schema = {"type": "object", "additionalProperties": False, "required": ["answer"], "properties": {
             "answer": {"type": "object", "additionalProperties": False, "required": ["lead", "facts"],
@@ -424,7 +417,7 @@ def synthesize(state) -> dict:
         kept, dropped = verify(out.get("claims") or [], docs, exempt=exempt)
         notes: list[str] = []
         lead, facts, lead_hits = "", [], []
-        if mode == "extractive":
+        if question:
             lead, facts, lead_hits = _extract(out, question, texts, values, focus)
             notes = [f"answer lead {lead!r}: {r}" for _, r in lead_hits]
         return kept, dropped, notes, (lead, facts, lead_hits)
@@ -451,9 +444,9 @@ def synthesize(state) -> dict:
         return {"paragraph": paragraph, "citations": cites,
                 "grounding": {"tier": "no_llm", "fallback_reason": f"LLM unavailable: {e}",
                               "claims": [], "dropped_claims": [], "attempts": attempts,
-                              "llm_calls": calls, "answer_mode": mode}}
+                              "llm_calls": calls, "answer_mode": "extractive"}}
     lead_phrase, answer_flags, lead, lead_fact = "", notes, None, None
-    if mode == "extractive":
+    if question:
         lead, facts, lead_hits = answer
         rel = answer_checks.relevant_doc(question, texts)
         appended = bool(rel and rel not in facts and lead != "cannot_answer"
@@ -484,7 +477,9 @@ def synthesize(state) -> dict:
             lead_phrase = f"{kl} {lead_phrase}"
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
                                focus, texts, values, experimental)
-    checks = CHECKS_RUN[mode]
+    checks = ["citations and numbers on every claim"]
+    if question:
+        checks.append("lead rules on the answer, which is the cited text word for word")
     # A bare address opens with the same verified "In brief" lead as no-LLM mode.
     from riprap.core.burr.templated_reconciler import _lead
 
@@ -505,7 +500,7 @@ def synthesize(state) -> dict:
                       "claims": kept, "dropped_claims": dropped,
                       "retried_claims": first_dropped if attempts == 2 else [],
                       "n_kept": len(kept), "n_dropped": len(dropped), "llm_calls": calls,
-                      "question": question, "n_documents": len(docs), "answer_mode": mode,
+                      "question": question, "n_documents": len(docs), "answer_mode": "extractive",
                       "answer_lead": lead, "lead_fact": lead_fact,
                       "answer_flags": answer_flags, "checks": checks,
                       "answered": (lead != "cannot_answer" and any(c["section"] == ANSWER_SECTION for c in kept))
