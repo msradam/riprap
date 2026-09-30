@@ -26,6 +26,32 @@ that landed on the hackathon-period production deploys.
 - A new hero image from the current Hollis "since Ida" answer.
 - `scripts/check_links.py --local` checks every relative link in the docs.
 
+## [Unreleased] (polish for stakeholder demos, 2026-09-30)
+
+- A golden set (`tests/golden/`) scores the app against keys computed by a
+  separate implementation that reads the public datasets directly; half of
+  it stayed unseen until the final scoring.
+- Fixes it found: registers counted assets only within 750 m east to west of
+  an 800 m radius (a degree box drawn without the cosine of the latitude); a
+  query naming no place blamed every source instead of saying so; a
+  Washington address became a Brooklyn briefing; a "what is the flood zone"
+  question was answered "Yes."; a "right now" question was answered "No."
+  from the absence of an alert.
+- FEMA's 2015 preliminary flood map (PFIRM) is cited beside the 2007 FIRM,
+  with the issue date from FEMA's own availability layer; NYC Building Code
+  Appendix G adopts it for flood-resistant construction.
+- MCP results carry a `record` block (query, time, version, commit, SHA-256)
+  and a `failed` list; every tool works without an LLM.
+- Reader-facing texts: live sources say when they were fetched, figures carry
+  units, `not_implemented` renders as a response, the public copy says it has
+  no backend, experimental deployments say so in the header, the refusal
+  names FloodHelpNY.
+- Smaller: the four register modules are one table-driven module; the
+  browser BYOD flow, dead scripts, unused packages (deck.gl, js-yaml,
+  papaparse, idb-keyval) and dead frontend tables are gone; one deployment
+  resolver and one registry cache; one StaticFiles mount serves the
+  prerendered gallery locally; the Playwright suite runs on one Playwright.
+
 ## [Unreleased] (refactors 2 to 6 and the design pass)
 
 Plain-language summary of the work on branches `refactor/mvp-2` to
