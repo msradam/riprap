@@ -134,7 +134,7 @@ For a query in any of the intents in [§4](#4-intents), Riprap returns:
 
 The deterministic tier 1 to 4 rubric ([§5](#5-the-scoring-rubric),
 `app/score.py`) is not part of the live response. Its callers are the
-offline register builders (`scripts/build_*_register.py`), whose output
+offline register builder (`scripts/build_register.py`), whose output
 is served at `/api/register/{asset_class}`.
 
 ---
