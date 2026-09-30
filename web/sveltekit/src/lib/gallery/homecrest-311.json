@@ -3,8 +3,8 @@
  "neighborhood": "Homecrest, Brooklyn",
  "address": "2017 East 17th Street, Brooklyn, NY 11229",
  "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
- "generated_at": "2026-09-30T17:54Z",
- "riprap_commit": "29d5aa9",
+ "generated_at": "2026-09-30T20:51Z",
+ "riprap_commit": "d6847f9",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -1211,10 +1211,10 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1967,
      "completion_tokens": 152,
-     "duration_s": 7.02,
-     "energy_status": "estimated",
-     "wh": 0.04875,
-     "energy_note": "declared 25 W times duration"
+     "duration_s": 10.95,
+     "energy_status": "unknown",
+     "wh": null,
+     "energy_note": "no energy source configured"
     }
    ]
   },
@@ -1239,9 +1239,9 @@
     "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR)."
    }
   },
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 16 catch basin, 12 sewer backup, 6 street flooding [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 16 catch basin, 12 sewer backup, 6 street flooding [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 16 catch basin, 12 sewer backup, 6 street flooding [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 16 catch basin, 12 sewer backup, 6 street flooding [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
    "dropped": [],
    "tier": "llm"
   },
@@ -1270,10 +1270,10 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 640,
      "completion_tokens": 22,
-     "duration_s": 2.012,
-     "energy_status": "estimated",
-     "wh": 0.01397,
-     "energy_note": "declared 25 W times duration"
+     "duration_s": 2.662,
+     "energy_status": "unknown",
+     "wh": null,
+     "energy_note": "no energy source configured"
     }
    ],
    "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
@@ -1287,9 +1287,8 @@
    "answer_flags": [],
    "checks": [
     "citations and numbers on every claim",
-    "lead rules on the answer; no entailment check needed, since the answer is the cited text word for word"
+    "lead rules on the answer, which is the cited text word for word"
    ],
-   "entailment": {},
    "answered": true
   },
   "citations": {
@@ -1300,7 +1299,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-30T01:38:23+0000",
-    "retrieved_at": "2026-09-30T17:54Z",
+    "retrieved_at": "2026-09-30T20:51Z",
     "vintage": "2026-09-30T01:38:23+0000",
     "maturity": "production"
    },
@@ -1322,7 +1321,7 @@
     "url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
     "license": "U.S. Public Domain",
     "date_modified": "2007-09-05",
-    "retrieved_at": "2026-09-30T17:54Z",
+    "retrieved_at": "2026-09-30T20:51Z",
     "vintage": "2007-09-05",
     "maturity": "production"
    },
@@ -1531,6 +1530,7 @@
    "n": 34,
    "capped": false,
    "radius_m": 200,
+   "where": "within 200 m of this location",
    "years": 5,
    "by_year": {
     "2021": 3,
@@ -2046,8 +2046,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790790839.6806872,
-    "elapsed_s": 0.18,
+    "started_at": 1790801495.578642,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "address": "2017 EAST 17 STREET, Brooklyn, NY, USA",
@@ -2059,7 +2059,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790790839.861331,
+    "started_at": 1790801495.59264,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2071,7 +2071,7 @@
    {
     "step": "fema_pfirm",
     "ok": true,
-    "started_at": 1790790839.861757,
+    "started_at": 1790801495.592808,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2081,7 +2081,7 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790790839.861758,
+    "started_at": 1790801495.592809,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2091,7 +2091,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790790839.861759,
+    "started_at": 1790801495.592809,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2101,7 +2101,7 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790790839.86176,
+    "started_at": 1790801495.59281,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2111,7 +2111,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790790839.86176,
+    "started_at": 1790801495.59281,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2121,7 +2121,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790790839.861761,
+    "started_at": 1790801495.59281,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2131,7 +2131,7 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790790839.861761,
+    "started_at": 1790801495.59281,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2141,7 +2141,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790790839.861762,
+    "started_at": 1790801495.59281,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2151,7 +2151,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790790839.861762,
+    "started_at": 1790801495.592811,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2161,7 +2161,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790790839.861763,
+    "started_at": 1790801495.592811,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2171,7 +2171,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790790839.8617642,
+    "started_at": 1790801495.592811,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2181,7 +2181,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790790839.8617642,
+    "started_at": 1790801495.592811,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2191,7 +2191,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790790839.8617651,
+    "started_at": 1790801495.592811,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2201,7 +2201,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790790839.8617651,
+    "started_at": 1790801495.592812,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2211,7 +2211,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790790839.8617659,
+    "started_at": 1790801495.592812,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2221,7 +2221,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790790839.8617668,
+    "started_at": 1790801495.592812,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2231,8 +2231,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790790839.863143,
-    "elapsed_s": 0.04,
+    "started_at": 1790801495.5936,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "inside": {
@@ -2245,8 +2245,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790790839.868077,
-    "elapsed_s": 3.33,
+    "started_at": 1790801495.599839,
+    "elapsed_s": 0.08,
     "err": null,
     "result": {
      "zone": "X",
@@ -2258,8 +2258,8 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790790839.869329,
-    "elapsed_s": 0.03,
+    "started_at": 1790801495.593997,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2269,8 +2269,8 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790790839.877743,
-    "elapsed_s": 0.8,
+    "started_at": 1790801495.6008132,
+    "elapsed_s": 0.86,
     "err": null,
     "result": {
      "n": 34
@@ -2279,8 +2279,8 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790790839.878484,
-    "elapsed_s": 2.02,
+    "started_at": 1790801495.601423,
+    "elapsed_s": 0.58,
     "err": null,
     "result": {
      "n_entrances": 5,
@@ -2291,8 +2291,8 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790790839.8792808,
-    "elapsed_s": 0.03,
+    "started_at": 1790801495.6017852,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "n_developments": 0,
@@ -2303,8 +2303,8 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790790839.890263,
-    "elapsed_s": 0.02,
+    "started_at": 1790801495.608941,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "n_schools": 1,
@@ -2315,8 +2315,8 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790790839.8914611,
-    "elapsed_s": 0.05,
+    "started_at": 1790801495.610761,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {
      "n_hospitals": 3,
@@ -2327,7 +2327,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790790843.202425,
+    "started_at": 1790801496.4634721,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2338,7 +2338,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790790843.202875,
+    "started_at": 1790801496.464013,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -2348,7 +2348,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 2.03
+    "elapsed_s": 2.68
    }
   ],
   "models": [
@@ -2357,7 +2357,7 @@
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 9.03,
+    "latency_s": 13.61,
     "calls": 2
    }
   ],
@@ -2370,9 +2370,9 @@
   "emissions": {
    "n_calls": 2,
    "n_measured": 0,
-   "energy_status": "estimated",
-   "total_wh": 0.06272,
-   "total_duration_s": 9.032,
+   "energy_status": "unknown",
+   "total_wh": null,
+   "total_duration_s": 13.612,
    "tokens": {
     "prompt": 2607,
     "completion": 174,
@@ -2385,10 +2385,10 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1967,
      "completion_tokens": 152,
-     "duration_s": 7.02,
-     "energy_status": "estimated",
-     "wh": 0.04875,
-     "energy_note": "declared 25 W times duration"
+     "duration_s": 10.95,
+     "energy_status": "unknown",
+     "wh": null,
+     "energy_note": "no energy source configured"
     },
     {
      "kind": "llm",
@@ -2396,10 +2396,10 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 640,
      "completion_tokens": 22,
-     "duration_s": 2.012,
-     "energy_status": "estimated",
-     "wh": 0.01397,
-     "energy_note": "declared 25 W times duration"
+     "duration_s": 2.662,
+     "energy_status": "unknown",
+     "wh": null,
+     "energy_note": "no energy source configured"
     }
    ],
    "method": "Each LLM call is labelled measured (Apple SoC counters), estimated (declared watts times duration) or unknown; hosted endpoints are always unknown. See app/emissions.py."
