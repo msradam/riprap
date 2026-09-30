@@ -8,9 +8,8 @@ against /api/agent/stream and checks:
     their state key
   - The final paragraph mentions city-specific content (sandy / lake /
     bay) and doesn't leak content from other cities
-  - For the new templated pebbles (DEP / ida_hwm / floodnet / nyc311 /
-    microtopo / prithvi_water / prithvi_live): the value carries a
-    `narrative` field the frontend renders verbatim.
+  - Each pebble in `expect_narrative_pebbles` carries the fields in
+    CONTRACTS (a `narrative` string by default) in its final value.
 
 Run with:
     RIPRAP_RECONCILER_TIER=no_llm uv run python scripts/probe_cities_smoke.py
@@ -23,6 +22,20 @@ import time
 from urllib.parse import quote
 
 import httpx
+
+# Fields each pebble's final value must carry. Templated pebbles need a
+# `narrative`; bespoke renderers (raster, histogram, register) need the
+# normalised rendering fields too. Pebbles not listed default to
+# ["narrative"].
+CONTRACTS = {
+    "sandy": ["inside_phrasing", "inside_or_outside"],
+    "nyc311": ["narrative", "histogram"],
+    "dep_extreme_2080": ["narrative", "depth_class"],
+    "dep_moderate_2050": ["narrative", "depth_class"],
+    "dep_moderate_current": ["narrative", "depth_class"],
+    "prithvi_water": ["headline_value", "subhead_text", "narrative", "raster_kind"],
+    "prithvi_live": ["ok"],  # ok=False is the offline path
+}
 
 CITIES = [
     {
@@ -164,13 +177,16 @@ def check_city(spec: dict, result: dict) -> list[str]:
         # step names may be munged (step_311 → nyc311; treat as soft check)
         if pid not in state_keys:
             issues.append(f"pebble {pid!r} did not fire")
-    # Narrative contract — each migrated pebble's value should include
-    # a `narrative` string. Read from final pebble snapshot.
+    # Narrative contract. Step events carry only the slim trace summary;
+    # the final event carries every pebble's full value keyed by id.
     for pid in spec["expect_narrative_pebbles"]:
-        # The SSE step.result payload carries the slim trace_summary,
-        # not the full value dict. The full value is in the final state
-        # if exposed; otherwise this is a soft check.
-        pass  # TODO: cross-check once we have the full value snapshot
+        value = final.get(pid)
+        if not isinstance(value, dict):
+            issues.append(f"pebble {pid!r} has no value in final")
+            continue
+        missing = [f for f in CONTRACTS.get(pid, ["narrative"]) if f not in value]
+        if missing:
+            issues.append(f"pebble {pid!r} value missing {missing}")
     # No-leak check on the briefing paragraph
     leaks = [needle for needle in spec["no_leak"] if needle.lower() in para.lower()]
     if leaks:
