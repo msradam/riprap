@@ -410,8 +410,13 @@ export class RunState {
     return out;
   });
 
-  /** The planner refused the question (out of scope). */
-  refused = $derived((this.finalResult?.intent ?? this.plan?.intent) === 'out_of_scope');
+  /** The planner asked for something Riprap has not built yet (an invalid
+   *  district, a cross-register ranking): its statement is the response. */
+  notImplemented = $derived((this.finalResult?.intent ?? this.plan?.intent) === 'not_implemented');
+
+  /** The planner answered with a statement instead of a briefing: the
+   *  question is out of scope, or asks for something not built yet. */
+  refused = $derived((this.finalResult?.intent ?? this.plan?.intent) === 'out_of_scope' || this.notImplemented);
 
   /** The run ended without evidence to show: refused, the place did not
    *  resolve, or the backend failed. Map and findings are hidden. */

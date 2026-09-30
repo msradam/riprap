@@ -123,7 +123,8 @@
         }
         // End the header pill on a final state; a stopped run must not
         // keep saying "gathering evidence".
-        const stopped = STOPPED_LABEL[run.errorState ?? ''] ?? (run.refused ? 'refused' : null);
+        const stopped = STOPPED_LABEL[run.errorState ?? '']
+          ?? (run.notImplemented ? 'not available' : run.refused ? 'refused' : null);
         if (stopped) briefingState.markStopped(stopped);
         else if (!run.errorState) briefingState.markReady();
       }

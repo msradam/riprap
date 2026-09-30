@@ -56,8 +56,10 @@
   let showTerms = $derived(hasBriefing && !run.stopped && model.terms.length > 0);
   let showMap = $derived(hasBriefing && !run.stopped && !isCompare && !!run.address);
   let showEvidence = $derived(hasBriefing && !run.stopped && !isCompare && model.cards.length > 0);
+  // A run the planner could not serve is not an address or district briefing.
   let kindLine = $derived(
-    model.kind === 'question'
+    run.notImplemented ? 'Flood-exposure briefing, not available'
+      : model.kind === 'question'
       ? run.finalResult?.area_boundary ? 'Flood-exposure briefing, district question' : 'Flood-exposure briefing, question'
       : `Flood-exposure briefing, ${model.kind}`
   );
