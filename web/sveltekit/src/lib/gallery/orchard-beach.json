@@ -3,8 +3,8 @@
  "neighborhood": "Orchard Beach, Bronx",
  "address": "Orchard Beach, Bronx, NY",
  "question": null,
- "generated_at": "2026-09-30T20:51Z",
- "riprap_commit": "d6847f9",
+ "generated_at": "2026-09-30T20:57Z",
+ "riprap_commit": "09d6557",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -682,7 +682,7 @@
    {
     "id": "nyc311_nta",
     "type": "baked",
-    "title": "NYC 311 flood complaints inside the neighborhood",
+    "title": "NYC 311 flood complaints in the area",
     "stone": "touchstone",
     "tier": "proxy",
     "maturity": "production",
@@ -695,14 +695,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "Flood-related 311 complaints inside this neighborhood.",
+     "short": "Flood-related 311 complaints in this area.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests, flood-related complaints inside the area (the sentence states the window).",
+     "citation": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
      "doc_id": "nyc311_nta",
      "date_modified": "2026-09-30T01:38:23+0000",
      "retrieved_at": "live"
@@ -1317,9 +1317,9 @@
     "narrative": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, current sea level, near-term)."
    }
   },
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThis address is inside the 2012 Sandy inundation footprint [sandy_inundation], in FEMA flood zone VE [fema_nfhl], and outside the modeled flooding in the DEP stormwater scenarios for current, 2050 and 2080 sea-level rise [dep_moderate_current][dep_moderate_2050][dep_extreme_2080]. 0 flood-related 311 complaints were filed within 200 m in the last 5 years [nyc311].\n\n**Hazard Reader.**\nThis address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone VE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970106F, effective 2007 [fema_nfhl]. FEMA's preliminary flood map (PFIRM issued 2015-01-30, community 360497) places this address in zone VE (a Special Flood Hazard Area), static base flood elevation 16 ft [fema_pfirm]. A preliminary map is not the effective map and does not set flood insurance. NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, outside the modeled flooding [dep_extreme_2080]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address [ida_hwm]. Nearest USGS-surveyed mark: Fairmount Ave., between Ellsworth Ave. and Fairfax Ave., Country Club, Bronx (4199 m away) [ida_hwm]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.00% of Pelham Bay Park showed new water (100% of it observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water]. Elevation 1.06 m; this point is higher than 48% of the ground within 200 m (the 48th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 1.06 m; TWI (topographic wetness index; higher means water tends to collect) 6.95 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 21.75 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 2 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\nNo FloodNet sensors deployed within 600 m of this address [floodnet]. 0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched) [nyc311]. Latest METAR at LaGuardia Airport, NY (12.1 km away): 23.0\u00b0C, observed 2026-09-30 20:35 UTC [nws_obs]. Latest reading at Kings Point, NY: 7.43 ft above MLLW (+0.87 ft vs predicted tide), observed 2026-09-30 20:42 UTC [noaa_tides].\n\n**Asset Register.**\n0 MTA subway entrances within 800 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 0 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 0 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doe_school_exposure]. 0 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts at this point, checked 2026-09-30 20:51 UTC [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.22 m at The Battery about 63 h ahead; for storm decisions use NOAA ETSS or the Stevens Flood Advisory System instead [ttm_battery_surge]. Experimental: 0 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.0 per week for the next 96 days [ttm_311_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThis address is inside the 2012 Sandy inundation footprint [sandy_inundation], in FEMA flood zone VE [fema_nfhl], and outside the modeled flooding in the DEP stormwater scenarios for current, 2050 and 2080 sea-level rise [dep_moderate_current][dep_moderate_2050][dep_extreme_2080]. 0 flood-related 311 complaints were filed within 200 m in the last 5 years [nyc311].\n\n**Hazard Reader.**\nThis address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone VE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970106F, effective 2007 [fema_nfhl]. FEMA's preliminary flood map (PFIRM issued 2015-01-30, community 360497) places this address in zone VE (a Special Flood Hazard Area), static base flood elevation 16 ft [fema_pfirm]. A preliminary map is not the effective map and does not set flood insurance. NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, outside the modeled flooding [dep_extreme_2080]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address [ida_hwm]. Nearest USGS-surveyed mark: Fairmount Ave., between Ellsworth Ave. and Fairfax Ave., Country Club, Bronx (4199 m away) [ida_hwm]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.00% of Pelham Bay Park showed new water (100% of it observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water]. Elevation 1.06 m; this point is higher than 48% of the ground within 200 m (the 48th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 1.06 m; TWI (topographic wetness index; higher means water tends to collect) 6.95 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 21.75 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 2 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\nNo FloodNet sensors deployed within 600 m of this address [floodnet]. 0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched) [nyc311]. Latest METAR at LaGuardia Airport, NY (12.1 km away): 23.0\u00b0C, observed 2026-09-30 20:35 UTC [nws_obs]. Latest reading at Kings Point, NY: 7.43 ft above MLLW (+0.87 ft vs predicted tide), observed 2026-09-30 20:42 UTC [noaa_tides].\n\n**Asset Register.**\n0 MTA subway entrances within 800 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 0 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 0 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doe_school_exposure]. 0 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts at this point, checked 2026-09-30 20:57 UTC [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.22 m at The Battery about 63 h ahead; for storm decisions use NOAA ETSS or the Stevens Flood Advisory System instead [ttm_battery_surge]. Experimental: 0 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.0 per week for the next 96 days [ttm_311_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThis address is inside the 2012 Sandy inundation footprint [sandy_inundation], in FEMA flood zone VE [fema_nfhl], and outside the modeled flooding in the DEP stormwater scenarios for current, 2050 and 2080 sea-level rise [dep_moderate_current][dep_moderate_2050][dep_extreme_2080]. 0 flood-related 311 complaints were filed within 200 m in the last 5 years [nyc311].\n\n**Hazard Reader.**\nThis address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone VE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970106F, effective 2007 [fema_nfhl]. FEMA's preliminary flood map (PFIRM issued 2015-01-30, community 360497) places this address in zone VE (a Special Flood Hazard Area), static base flood elevation 16 ft [fema_pfirm]. A preliminary map is not the effective map and does not set flood insurance. NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, outside the modeled flooding [dep_extreme_2080]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address [ida_hwm]. Nearest USGS-surveyed mark: Fairmount Ave., between Ellsworth Ave. and Fairfax Ave., Country Club, Bronx (4199 m away) [ida_hwm]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.00% of Pelham Bay Park showed new water (100% of it observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water]. Elevation 1.06 m; this point is higher than 48% of the ground within 200 m (the 48th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 1.06 m; TWI (topographic wetness index; higher means water tends to collect) 6.95 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 21.75 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 2 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\nNo FloodNet sensors deployed within 600 m of this address [floodnet]. 0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched) [nyc311]. Latest METAR at LaGuardia Airport, NY (12.1 km away): 23.0\u00b0C, observed 2026-09-30 20:35 UTC [nws_obs]. Latest reading at Kings Point, NY: 7.43 ft above MLLW (+0.87 ft vs predicted tide), observed 2026-09-30 20:42 UTC [noaa_tides].\n\n**Asset Register.**\n0 MTA subway entrances within 800 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 0 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 0 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doe_school_exposure]. 0 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts at this point, checked 2026-09-30 20:51 UTC [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.22 m at The Battery about 63 h ahead; for storm decisions use NOAA ETSS or the Stevens Flood Advisory System instead [ttm_battery_surge]. Experimental: 0 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.0 per week for the next 96 days [ttm_311_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThis address is inside the 2012 Sandy inundation footprint [sandy_inundation], in FEMA flood zone VE [fema_nfhl], and outside the modeled flooding in the DEP stormwater scenarios for current, 2050 and 2080 sea-level rise [dep_moderate_current][dep_moderate_2050][dep_extreme_2080]. 0 flood-related 311 complaints were filed within 200 m in the last 5 years [nyc311].\n\n**Hazard Reader.**\nThis address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM) [sandy_inundation]. This address sits in FEMA flood zone VE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970106F, effective 2007 [fema_nfhl]. FEMA's preliminary flood map (PFIRM issued 2015-01-30, community 360497) places this address in zone VE (a Special Flood Hazard Area), static base flood elevation 16 ft [fema_pfirm]. A preliminary map is not the effective map and does not set flood insurance. NYC DEP stormwater scenarios at this address: current sea level with 2.13 in/hr of rain, outside the modeled flooding [dep_moderate_current]; 2050 sea-level rise with 2.13 in/hr, outside the modeled flooding [dep_moderate_2050]; 2080 sea-level rise with 3.66 in/hr, outside the modeled flooding [dep_extreme_2080]. No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address [ida_hwm]. Nearest USGS-surveyed mark: Fairmount Ave., between Ellsworth Ave. and Fairfax Ave., Country Club, Bronx (4199 m away) [ida_hwm]. Experimental: a satellite model (Prithvi-EO 2.0, NYC fine-tune) on Sentinel-2 scenes from 2021-09-02, compared with 2021-08-13: 0 m\u00b2 of new surface water within 500 m of this address (100% of that circle observed); 0.00% of Pelham Bay Park showed new water (100% of it observed) [prithvi_water]. Street and basement flooding drains within hours and is not visible at 10 to 20 m, so no water here is not evidence of no flooding [prithvi_water]. Elevation 1.06 m; this point is higher than 48% of the ground within 200 m (the 48th percentile; a low percentile means a local low spot where water collects); HAND (height above the nearest drainage channel) 1.06 m; TWI (topographic wetness index; higher means water tends to collect) 6.95 [microtopo]. Local basin relief (the rise from this point to the highest ground within 750 m): 21.75 m [microtopo]. Experimental: Policy passages retrieved from the NYC flood-policy corpus for this place: 2 (embedding retrieval; entity tags are experimental) [policy_corpus].\n\n**Live Observer.**\nNo FloodNet sensors deployed within 600 m of this address [floodnet]. 0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched) [nyc311]. Latest METAR at LaGuardia Airport, NY (12.1 km away): 23.0\u00b0C, observed 2026-09-30 20:35 UTC [nws_obs]. Latest reading at Kings Point, NY: 7.43 ft above MLLW (+0.87 ft vs predicted tide), observed 2026-09-30 20:42 UTC [noaa_tides].\n\n**Asset Register.**\n0 MTA subway entrances within 800 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [mta_entrance_exposure]. 0 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [nycha_development_exposure]. 0 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doe_school_exposure]. 0 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts at this point, checked 2026-09-30 20:57 UTC [nws_alerts]. Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of 0.22 m at The Battery about 63 h ahead; for storm decisions use NOAA ETSS or the Stevens Flood Advisory System instead [ttm_battery_surge]. Experimental: 0 flood-related 311 complaints within 200 m over the last 512 days; a zero-shot TTM forecast with no rainfall input and no backtest projects about 0.0 per week for the next 96 days [ttm_311_forecast]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -1349,7 +1349,7 @@
     "url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
     "license": "U.S. Public Domain",
     "date_modified": "2007-09-05",
-    "retrieved_at": "2026-09-30T20:51Z",
+    "retrieved_at": "2026-09-30T20:57Z",
     "vintage": "2007-09-05",
     "maturity": "production"
    },
@@ -1360,7 +1360,7 @@
     "url": "https://hazards.fema.gov/arcgis/rest/services/PrelimPending/Prelim_NFHL/MapServer",
     "license": "U.S. Public Domain",
     "date_modified": "2015-01-30",
-    "retrieved_at": "2026-09-30T20:51Z",
+    "retrieved_at": "2026-09-30T20:57Z",
     "vintage": "2015-01-30",
     "maturity": "production"
    },
@@ -1447,9 +1447,9 @@
     "title": "FloodNet NYC, community-led real-time street-flood sensor network. Data CC-BY-NC-SA 4.0; derivatives must carry the same license. Readings come from the FloodNet API (api.floodnet.nyc), which has no stable page per sensor or event, so the link is the project's data download page. https://www.floodnet.nyc/data-downloads",
     "url": "https://www.floodnet.nyc/data-downloads",
     "license": "CC-BY-NC-SA 4.0",
-    "date_modified": "2026-09-30T20:51Z",
-    "retrieved_at": "2026-09-30T20:51Z",
-    "vintage": "2026-09-30T20:51Z",
+    "date_modified": "2026-09-30T20:57Z",
+    "retrieved_at": "2026-09-30T20:57Z",
+    "vintage": "2026-09-30T20:57Z",
     "maturity": "production"
    },
    "nyc311": {
@@ -1459,7 +1459,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-30T01:38:23+0000",
-    "retrieved_at": "2026-09-30T20:51Z",
+    "retrieved_at": "2026-09-30T20:57Z",
     "vintage": "2026-09-30T01:38:23+0000",
     "maturity": "production"
    },
@@ -1469,9 +1469,9 @@
     "title": "NWS hourly METAR observations, nearest station to address.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-09-30T20:51Z",
-    "retrieved_at": "2026-09-30T20:51Z",
-    "vintage": "2026-09-30T20:51Z",
+    "date_modified": "2026-09-30T20:57Z",
+    "retrieved_at": "2026-09-30T20:57Z",
+    "vintage": "2026-09-30T20:57Z",
     "maturity": "production"
    },
    "noaa_tides": {
@@ -1480,9 +1480,9 @@
     "title": "NOAA CO-OPS tide-gauge water level observations, nearest station to address.",
     "url": "https://tidesandcurrents.noaa.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-09-30T20:51Z",
-    "retrieved_at": "2026-09-30T20:51Z",
-    "vintage": "2026-09-30T20:51Z",
+    "date_modified": "2026-09-30T20:57Z",
+    "retrieved_at": "2026-09-30T20:57Z",
+    "vintage": "2026-09-30T20:57Z",
     "maturity": "production"
    },
    "mta_entrance_exposure": {
@@ -1535,9 +1535,9 @@
     "title": "NWS active alerts at address (flood / coastal / wind).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-09-30T20:51Z",
-    "retrieved_at": "2026-09-30T20:51Z",
-    "vintage": "2026-09-30T20:51Z",
+    "date_modified": "2026-09-30T20:57Z",
+    "retrieved_at": "2026-09-30T20:57Z",
+    "vintage": "2026-09-30T20:57Z",
     "maturity": "production"
    },
    "ttm_battery_surge": {
@@ -1546,9 +1546,9 @@
     "title": "Granite TTM r2 fine-tune (msradam/Granite-TTM-r2-Battery-Surge, Apache-2.0, trained on AMD MI300X). 96 h hourly Battery storm-surge nowcast.",
     "url": "https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge",
     "license": "Apache-2.0",
-    "date_modified": "2026-09-30T20:51Z",
-    "retrieved_at": "2026-09-30T20:51Z",
-    "vintage": "2026-09-30T20:51Z",
+    "date_modified": "2026-09-30T20:57Z",
+    "retrieved_at": "2026-09-30T20:57Z",
+    "vintage": "2026-09-30T20:57Z",
     "maturity": "experimental"
    },
    "ttm_311_forecast": {
@@ -1557,9 +1557,9 @@
     "title": "Granite TimeSeries TTM r2 (IBM Granite, Apache-2.0) zero-shot forecast on weekly NYC 311 flood-complaint counts at the queried address (200 m radius).",
     "url": "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2",
     "license": "Apache-2.0",
-    "date_modified": "2026-09-30T20:51Z",
-    "retrieved_at": "2026-09-30T20:51Z",
-    "vintage": "2026-09-30T20:51Z",
+    "date_modified": "2026-09-30T20:57Z",
+    "retrieved_at": "2026-09-30T20:57Z",
+    "vintage": "2026-09-30T20:57Z",
     "maturity": "experimental"
    },
    "npcc4_slr": {
@@ -1881,8 +1881,8 @@
   "nws_alerts": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS flood, coastal or wind alerts at this point, checked 2026-09-30 20:51 UTC.",
-   "retrieved_at": "2026-09-30T20:51:05Z",
+   "narrative": "No active NWS flood, coastal or wind alerts at this point, checked 2026-09-30 20:57 UTC.",
+   "retrieved_at": "2026-09-30T20:57:26Z",
    "error": null
   },
   "ttm_battery_surge": {
@@ -2001,7 +2001,7 @@
    "skill_vs_persistence": "35% lower RMSE than persistence, a weak baseline, on mostly calm 2023-2024 test windows; not evaluated on storms or against NOAA ETSS",
    "spatial_note": "regional \u00b7 The Battery, NY, not point-of-query",
    "compute": "local CPU",
-   "elapsed_s": 0.21
+   "elapsed_s": 0.22
   },
   "ttm_311_forecast": {
    "available": true,
@@ -2072,7 +2072,7 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790801465.083151,
+    "started_at": 1790801846.3437161,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -2085,7 +2085,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790801465.098745,
+    "started_at": 1790801846.3611572,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2097,8 +2097,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790801465.100126,
-    "elapsed_s": 0.02,
+    "started_at": 1790801846.367133,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "inside": {
@@ -2111,7 +2111,7 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790801465.099974,
+    "started_at": 1790801846.3619242,
     "elapsed_s": 0.22,
     "err": null,
     "result": {
@@ -2124,8 +2124,8 @@
    {
     "step": "fema_pfirm",
     "ok": true,
-    "started_at": 1790801465.099817,
-    "elapsed_s": 0.22,
+    "started_at": 1790801846.375058,
+    "elapsed_s": 0.21,
     "err": null,
     "result": {
      "zone": "VE",
@@ -2137,8 +2137,8 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790801465.101772,
-    "elapsed_s": 0.03,
+    "started_at": 1790801846.369359,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2148,8 +2148,8 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790801465.104751,
-    "elapsed_s": 0.03,
+    "started_at": 1790801846.362678,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2159,8 +2159,8 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790801465.117352,
-    "elapsed_s": 0.02,
+    "started_at": 1790801846.364557,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2170,8 +2170,8 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790801465.118746,
-    "elapsed_s": 0.01,
+    "started_at": 1790801846.364487,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "n_within_800m": 0,
@@ -2182,8 +2182,8 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790801465.1241012,
-    "elapsed_s": 0.03,
+    "started_at": 1790801846.373918,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {
      "new_water_m2_within_radius": 0,
@@ -2193,7 +2193,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790801465.132577,
+    "started_at": 1790801846.3737862,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2205,8 +2205,8 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790801465.1326542,
-    "elapsed_s": 0.16,
+    "started_at": 1790801846.3752341,
+    "elapsed_s": 0.17,
     "err": null,
     "result": {
      "n_sensors": 0,
@@ -2216,8 +2216,8 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790801465.127271,
-    "elapsed_s": 0.33,
+    "started_at": 1790801846.388876,
+    "elapsed_s": 0.15,
     "err": null,
     "result": {
      "n": 0
@@ -2226,8 +2226,8 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790801465.1358411,
-    "elapsed_s": 0.19,
+    "started_at": 1790801846.3865511,
+    "elapsed_s": 0.16,
     "err": null,
     "result": {
      "station": "KLGA",
@@ -2238,8 +2238,8 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790801465.1280901,
-    "elapsed_s": 0.19,
+    "started_at": 1790801846.381516,
+    "elapsed_s": 0.2,
     "err": null,
     "result": {
      "station": "8516945",
@@ -2250,15 +2250,15 @@
    {
     "step": "usgs_gauges",
     "ok": false,
-    "started_at": 1790801465.136427,
-    "elapsed_s": 0.37,
+    "started_at": 1790801846.393833,
+    "elapsed_s": 0.38,
     "err": "python_call: summary_for_point raised: HTTP 429 after 0/1 chunks; catch QuotaExhausted (or FanOutInterrupted) to access .partial_frame or .call.resume() once the rate-limit window has rolled over. Cause: RateLimited: 429: Too many requests made. Please obtain an API token or try again later. (URL: https://api.waterdata.usgs.gov/ogcapi/v0/collections/latest-continuous/items?parameter_code=00065%2C00060&limit=50000&bbox=-73.9183152%2C40.7407682%2C-73.6683152%2C40.9907682)",
     "result": null
    },
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790801465.136127,
+    "started_at": 1790801846.388299,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2270,7 +2270,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790801465.134958,
+    "started_at": 1790801846.38848,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2282,7 +2282,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790801465.134635,
+    "started_at": 1790801846.3885388,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2294,7 +2294,7 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790801465.134721,
+    "started_at": 1790801846.3886101,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2306,8 +2306,8 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790801465.134777,
-    "elapsed_s": 0.25,
+    "started_at": 1790801846.388663,
+    "elapsed_s": 0.26,
     "err": null,
     "result": {
      "n_active": 0
@@ -2316,8 +2316,8 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790801465.1350322,
-    "elapsed_s": 0.21,
+    "started_at": 1790801846.389086,
+    "elapsed_s": 0.22,
     "err": null,
     "result": {
      "context_h": 1024,
@@ -2330,8 +2330,8 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790801465.1356318,
-    "elapsed_s": 0.44,
+    "started_at": 1790801846.4002712,
+    "elapsed_s": 0.16,
     "err": null,
     "result": {
      "history_total": 0,
@@ -2343,8 +2343,8 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790801465.1362948,
-    "elapsed_s": 0.21,
+    "started_at": 1790801846.406083,
+    "elapsed_s": 0.19,
     "err": null,
     "result": {
      "sensor_id": "fluttering_massive_faucet",
@@ -2356,7 +2356,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790801465.136637,
+    "started_at": 1790801846.406288,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2364,7 +2364,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790801465.583255,
+    "started_at": 1790801846.778574,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2378,8 +2378,8 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790801465.5835211,
-    "elapsed_s": 0.4534,
+    "started_at": 1790801846.778795,
+    "elapsed_s": 0.4794,
     "err": null,
     "result": {
      "n_hits": 2,
@@ -2388,7 +2388,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790801466.0369642,
+    "started_at": 1790801847.258305,
     "ok": true,
     "result": {
      "tier": "no_llm",
@@ -2398,7 +2398,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 0.01
+    "elapsed_s": 0.07
    }
   ],
   "models": [
@@ -2408,7 +2408,7 @@
     "where": "Apple GPU (MPS), in the batch run",
     "how": "precomputed",
     "pebble": "prithvi_water",
-    "latency_s": 0.03,
+    "latency_s": 0.04,
     "detail": "batch output for the 2021-09-01 event: Sentinel-2 scenes of 2021-09-02 vs 2021-08-13, tiles 18TWK, 18TWL, 18TXK, 18TXL; batch run 2026-09-28"
    },
    {
@@ -2417,7 +2417,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "ttm_battery_surge",
-    "latency_s": 0.21
+    "latency_s": 0.22
    },
    {
     "name": "Granite TTM r2",
@@ -2425,7 +2425,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "ttm_311_forecast",
-    "latency_s": 0.44
+    "latency_s": 0.16
    },
    {
     "name": "Granite TTM r2",
@@ -2433,7 +2433,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "floodnet_forecast",
-    "latency_s": 0.21
+    "latency_s": 0.19
    },
    {
     "name": "Granite Embedding 278M",
@@ -2441,7 +2441,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "policy_corpus",
-    "latency_s": 0.4534
+    "latency_s": 0.4794
    },
    {
     "name": "Flair NER (OntoNotes, fast)",
@@ -2449,7 +2449,7 @@
     "where": "CPU",
     "how": "loaded",
     "pebble": "policy_corpus",
-    "latency_s": 0.4534
+    "latency_s": 0.4794
    }
   ],
   "compliance": {

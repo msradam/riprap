@@ -3,8 +3,8 @@
  "neighborhood": "Community district QN12, Queens",
  "address": "QN12",
  "question": "How many street flooding complaints has community district QN12 had?",
- "generated_at": "2026-09-30T20:52Z",
- "riprap_commit": "d6847f9",
+ "generated_at": "2026-09-30T20:58Z",
+ "riprap_commit": "09d6557",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -682,7 +682,7 @@
    {
     "id": "nyc311_nta",
     "type": "baked",
-    "title": "NYC 311 flood complaints inside the neighborhood",
+    "title": "NYC 311 flood complaints in the area",
     "stone": "touchstone",
     "tier": "proxy",
     "maturity": "production",
@@ -695,14 +695,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "Flood-related 311 complaints inside this neighborhood.",
+     "short": "Flood-related 311 complaints in this area.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests, flood-related complaints inside the area (the sentence states the window).",
+     "citation": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
      "doc_id": "nyc311_nta",
      "date_modified": "2026-09-30T01:38:23+0000",
      "retrieved_at": "live"
@@ -1206,7 +1206,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1958,
      "completion_tokens": 132,
-     "duration_s": 11.484,
+     "duration_s": 7.885,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1269,7 +1269,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 462,
      "completion_tokens": 24,
-     "duration_s": 3.264,
+     "duration_s": 2.187,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1294,11 +1294,11 @@
    "nyc311_nta": {
     "doc_id": "nyc311_nta",
     "source": "NYC 311 Service Requests (NYC Open Data)",
-    "title": "NYC 311 Service Requests, flood-related complaints inside the area (the sentence states the window).",
+    "title": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-30T01:38:23+0000",
-    "retrieved_at": "2026-09-30T20:52Z",
+    "retrieved_at": "2026-09-30T20:58Z",
     "vintage": "2026-09-30T01:38:23+0000",
     "maturity": "production"
    },
@@ -1354,7 +1354,7 @@
    },
    {
     "id": "nyc311_nta",
-    "title": "NYC 311 flood complaints inside the neighborhood",
+    "title": "NYC 311 flood complaints in the area",
     "stone": "touchstone"
    }
   ],
@@ -1648,8 +1648,8 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790801530.904192,
-    "elapsed_s": 0.01,
+    "started_at": 1790801891.435164,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "nta_code": "QN12",
@@ -1667,7 +1667,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790801530.910004,
+    "started_at": 1790801891.439171,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1679,7 +1679,7 @@
    {
     "step": "dep_extreme_2080_nta",
     "ok": true,
-    "started_at": 1790801530.9103758,
+    "started_at": 1790801891.43949,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1689,7 +1689,7 @@
    {
     "step": "dep_moderate_current_nta",
     "ok": true,
-    "started_at": 1790801530.910379,
+    "started_at": 1790801891.439492,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1699,7 +1699,7 @@
    {
     "step": "prithvi_water_nta",
     "ok": true,
-    "started_at": 1790801530.9103801,
+    "started_at": 1790801891.4394932,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1709,7 +1709,7 @@
    {
     "step": "microtopo_nta",
     "ok": true,
-    "started_at": 1790801530.9103801,
+    "started_at": 1790801891.4394932,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1719,7 +1719,7 @@
    {
     "step": "dob_permits_nta",
     "ok": true,
-    "started_at": 1790801530.910381,
+    "started_at": 1790801891.439494,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1729,39 +1729,39 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1790801530.914459,
-    "elapsed_s": 0.02,
+    "started_at": 1790801891.444085,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "sandy_nta",
     "ok": true,
-    "started_at": 1790801530.912351,
-    "elapsed_s": 0.03,
+    "started_at": 1790801891.441358,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_2050_nta",
     "ok": true,
-    "started_at": 1790801530.913943,
-    "elapsed_s": 0.24,
+    "started_at": 1790801891.44275,
+    "elapsed_s": 0.13,
     "err": null,
     "result": {}
    },
    {
     "step": "nyc311_nta",
     "ok": true,
-    "started_at": 1790801530.9155278,
-    "elapsed_s": 1.15,
+    "started_at": 1790801891.443417,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {}
    },
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790801532.065792,
+    "started_at": 1790801891.5752902,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -1770,7 +1770,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790801532.066058,
+    "started_at": 1790801891.5754921,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -1780,7 +1780,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 3.29
+    "elapsed_s": 2.21
    }
   ],
   "models": [
@@ -1789,7 +1789,7 @@
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 14.74,
+    "latency_s": 10.07,
     "calls": 2
    }
   ],
@@ -1804,7 +1804,7 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 14.748,
+   "total_duration_s": 10.072,
    "tokens": {
     "prompt": 2420,
     "completion": 156,
@@ -1817,7 +1817,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1958,
      "completion_tokens": 132,
-     "duration_s": 11.484,
+     "duration_s": 7.885,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1828,7 +1828,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 462,
      "completion_tokens": 24,
-     "duration_s": 3.264,
+     "duration_s": 2.187,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"

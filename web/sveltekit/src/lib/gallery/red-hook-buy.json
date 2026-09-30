@@ -3,8 +3,8 @@
  "neighborhood": "Red Hook, Brooklyn",
  "address": "80 Pioneer Street, Brooklyn, NY",
  "question": "Should I buy the house at 80 Pioneer Street, Brooklyn?",
- "generated_at": "2026-09-30T20:52Z",
- "riprap_commit": "d6847f9",
+ "generated_at": "2026-09-30T20:58Z",
+ "riprap_commit": "09d6557",
  "mode": "llm",
  "model": null,
  "quantization": null,
@@ -682,7 +682,7 @@
    {
     "id": "nyc311_nta",
     "type": "baked",
-    "title": "NYC 311 flood complaints inside the neighborhood",
+    "title": "NYC 311 flood complaints in the area",
     "stone": "touchstone",
     "tier": "proxy",
     "maturity": "production",
@@ -695,14 +695,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "Flood-related 311 complaints inside this neighborhood.",
+     "short": "Flood-related 311 complaints in this area.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests, flood-related complaints inside the area (the sentence states the window).",
+     "citation": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
      "doc_id": "nyc311_nta",
      "date_modified": "2026-09-30T01:38:23+0000",
      "retrieved_at": "live"
@@ -1186,7 +1186,7 @@
   "trace": [
    {
     "step": "reconcile_claims",
-    "started_at": 1790801570.034914,
+    "started_at": 1790801923.858392,
     "ok": true,
     "result": {
      "tier": "llm",

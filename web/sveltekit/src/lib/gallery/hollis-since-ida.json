@@ -3,8 +3,8 @@
  "neighborhood": "Hollis, Queens",
  "address": "90-01 183rd Street, Queens, NY 11423",
  "question": "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?",
- "generated_at": "2026-09-30T20:51Z",
- "riprap_commit": "d6847f9",
+ "generated_at": "2026-09-30T20:57Z",
+ "riprap_commit": "09d6557",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -682,7 +682,7 @@
    {
     "id": "nyc311_nta",
     "type": "baked",
-    "title": "NYC 311 flood complaints inside the neighborhood",
+    "title": "NYC 311 flood complaints in the area",
     "stone": "touchstone",
     "tier": "proxy",
     "maturity": "production",
@@ -695,14 +695,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "Flood-related 311 complaints inside this neighborhood.",
+     "short": "Flood-related 311 complaints in this area.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests, flood-related complaints inside the area (the sentence states the window).",
+     "citation": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
      "doc_id": "nyc311_nta",
      "date_modified": "2026-09-30T01:38:23+0000",
      "retrieved_at": "live"
@@ -1208,7 +1208,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1965,
      "completion_tokens": 164,
-     "duration_s": 10.568,
+     "duration_s": 9.112,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1283,7 +1283,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 645,
      "completion_tokens": 39,
-     "duration_s": 4.039,
+     "duration_s": 2.803,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -1311,9 +1311,9 @@
     "title": "FloodNet NYC, community-led real-time street-flood sensor network. Data CC-BY-NC-SA 4.0; derivatives must carry the same license. Readings come from the FloodNet API (api.floodnet.nyc), which has no stable page per sensor or event, so the link is the project's data download page. https://www.floodnet.nyc/data-downloads",
     "url": "https://www.floodnet.nyc/data-downloads",
     "license": "CC-BY-NC-SA 4.0",
-    "date_modified": "2026-09-30T20:51Z",
-    "retrieved_at": "2026-09-30T20:51Z",
-    "vintage": "2026-09-30T20:51Z",
+    "date_modified": "2026-09-30T20:57Z",
+    "retrieved_at": "2026-09-30T20:57Z",
+    "vintage": "2026-09-30T20:57Z",
     "maturity": "production"
    },
    "ida_hwm": {
@@ -1334,7 +1334,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-09-30T01:38:23+0000",
-    "retrieved_at": "2026-09-30T20:51Z",
+    "retrieved_at": "2026-09-30T20:57Z",
     "vintage": "2026-09-30T01:38:23+0000",
     "maturity": "production"
    },
@@ -1356,7 +1356,7 @@
     "url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
     "license": "U.S. Public Domain",
     "date_modified": "2007-09-05",
-    "retrieved_at": "2026-09-30T20:51Z",
+    "retrieved_at": "2026-09-30T20:57Z",
     "vintage": "2007-09-05",
     "maturity": "production"
    },
@@ -2105,8 +2105,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790801480.311001,
-    "elapsed_s": 0.13,
+    "started_at": 1790801859.311358,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "address": "90-01 183 STREET, Hollis, NY, USA",
@@ -2118,7 +2118,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790801480.4432158,
+    "started_at": 1790801859.3236191,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2130,7 +2130,7 @@
    {
     "step": "fema_pfirm",
     "ok": true,
-    "started_at": 1790801480.443403,
+    "started_at": 1790801859.323942,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2140,7 +2140,7 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790801480.443404,
+    "started_at": 1790801859.323943,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2150,7 +2150,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790801480.4434052,
+    "started_at": 1790801859.3239439,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2160,7 +2160,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790801480.4434052,
+    "started_at": 1790801859.3239439,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2170,7 +2170,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790801480.443406,
+    "started_at": 1790801859.323945,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2180,7 +2180,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790801480.443406,
+    "started_at": 1790801859.323945,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2190,7 +2190,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790801480.443406,
+    "started_at": 1790801859.323945,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2200,7 +2200,7 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790801480.443406,
+    "started_at": 1790801859.323945,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2210,7 +2210,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790801480.443407,
+    "started_at": 1790801859.323945,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2220,7 +2220,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790801480.443407,
+    "started_at": 1790801859.323946,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2230,7 +2230,7 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790801480.443407,
+    "started_at": 1790801859.323946,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2240,7 +2240,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790801480.4434078,
+    "started_at": 1790801859.323946,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2250,7 +2250,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790801480.4434078,
+    "started_at": 1790801859.323946,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2260,7 +2260,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790801480.4434078,
+    "started_at": 1790801859.323946,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2270,7 +2270,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790801480.4434078,
+    "started_at": 1790801859.323946,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2280,7 +2280,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790801480.4434078,
+    "started_at": 1790801859.323946,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2290,7 +2290,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790801480.443409,
+    "started_at": 1790801859.323947,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2300,7 +2300,7 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790801480.444663,
+    "started_at": 1790801859.324915,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -2314,8 +2314,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790801480.450426,
-    "elapsed_s": 0.05,
+    "started_at": 1790801859.330457,
+    "elapsed_s": 0.06,
     "err": null,
     "result": {
      "zone": "X",
@@ -2327,8 +2327,8 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790801480.44451,
-    "elapsed_s": 0.02,
+    "started_at": 1790801859.331241,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2338,7 +2338,7 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790801480.451023,
+    "started_at": 1790801859.33625,
     "elapsed_s": 0.01,
     "err": null,
     "result": {
@@ -2350,7 +2350,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790801480.452301,
+    "started_at": 1790801859.3363461,
     "elapsed_s": 0.03,
     "err": null,
     "result": {
@@ -2361,8 +2361,8 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790801480.4520261,
-    "elapsed_s": 0.05,
+    "started_at": 1790801859.350612,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {
      "n_sensors": 2,
@@ -2372,8 +2372,8 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790801480.458734,
-    "elapsed_s": 0.05,
+    "started_at": 1790801859.351147,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {
      "n": 82
@@ -2382,7 +2382,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790801480.5063198,
+    "started_at": 1790801859.393172,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2393,7 +2393,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790801480.506519,
+    "started_at": 1790801859.3933702,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -2403,7 +2403,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 4.06
+    "elapsed_s": 2.82
    }
   ],
   "models": [
@@ -2421,7 +2421,7 @@
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 14.61,
+    "latency_s": 11.91,
     "calls": 2
    }
   ],
@@ -2436,7 +2436,7 @@
    "n_measured": 0,
    "energy_status": "unknown",
    "total_wh": null,
-   "total_duration_s": 14.607,
+   "total_duration_s": 11.915,
    "tokens": {
     "prompt": 2610,
     "completion": 203,
@@ -2449,7 +2449,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 1965,
      "completion_tokens": 164,
-     "duration_s": 10.568,
+     "duration_s": 9.112,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
@@ -2460,7 +2460,7 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 645,
      "completion_tokens": 39,
-     "duration_s": 4.039,
+     "duration_s": 2.803,
      "energy_status": "unknown",
      "wh": null,
      "energy_note": "no energy source configured"
