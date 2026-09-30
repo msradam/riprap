@@ -55,17 +55,35 @@ const FIGURE_RE = /^\d[\d.,]*(?:\s?(?:%|m²|cm|mm|ft|in|m\b|\/wk)|\s[a-z]+(?=$|[
 const NOT_FIGURE_RE = /distance|effective|year|date|temperature|gauges/i;
 const TEMPERATURE_RE = /°/;
 
+/** The plural that ends a phrase's leading noun phrase, cut at its first
+ *  preposition ("active NYC DOB construction permits inside this area"
+ *  gives "permits"). "NYC 311 complaints filed within 200 m" gives
+ *  nothing: "filed" is no noun, and a wrong noun is worse than none. */
+const NOUN_PHRASE_RE = /^([A-Za-z][\w-]*(?:\s[A-Za-z][\w-]*){0,5})\s(?:inside|within|in|at|of|since|from|per|for|with|on|to|by)\b/;
+function countNoun(phrase: string): string | null {
+  const noun = NOUN_PHRASE_RE.exec(phrase)?.[1].split(' ').pop();
+  return noun && /[a-z]s$/.test(noun) ? noun : null;
+}
+
 /** The evidence table's figure: the finding's own quantity, the first
  *  scalar that is not a distance or a year. With scalars but none of
  *  those, nothing. Without scalars, a leading number in the headline
- *  ("82 calls" gives "82"), else nothing. */
-export function figureOf(c: Pick<Card, 'scalars' | 'headline'>): { value: string; label: string | null } | null {
+ *  with its unit or noun, else nothing. A bare count ("73") takes its
+ *  noun from the rest of the headline or from the dataset's title
+ *  ("Active DOB construction permits inside the neighborhood" gives
+ *  "73 permits"). */
+export function figureOf(c: Pick<Card, 'scalars' | 'headline' | 'title'>): { value: string; label: string | null } | null {
   if (c.scalars?.length) {
     const s = c.scalars.find((x) => !NOT_FIGURE_RE.test(x.label) && !TEMPERATURE_RE.test(`${x.value}${x.unit ?? ''}`));
     return s ? { value: s.unit ? `${s.value} ${s.unit}` : s.value, label: s.label } : null;
   }
   const m = c.headline ? FIGURE_RE.exec(c.headline) : null;
-  return m && !TEMPERATURE_RE.test(c.headline!.charAt(m[0].length)) ? { value: m[0].trim(), label: null } : null;
+  if (!m || TEMPERATURE_RE.test(c.headline!.charAt(m[0].length))) return null;
+  const value = m[0].trim();
+  const noun = /^[\d.,]+$/.test(value)
+    ? countNoun(c.headline!.slice(m[0].length).trim()) ?? (c.title ? countNoun(c.title) : null)
+    : null;
+  return { value: noun ? `${value} ${noun}` : value, label: null };
 }
 
 /** The forecasts, whatever their maturity (district pages add `_nta`). */

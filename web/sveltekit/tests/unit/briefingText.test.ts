@@ -59,6 +59,13 @@ describe('figureOf', () => {
     expect(figureOf(card({ headline: '3 of 5 listed' }))?.value).toBe('3');
     expect(figureOf(card({ headline: 'No active alerts' }))).toBeNull();
   });
+  it('names a bare count by the plural that ends its noun phrase', () => {
+    expect(figureOf(card({ headline: '73 active NYC DOB construction permits inside this area since 2025-04-08: 0 inside the 2012 Sandy extent.' }))?.value).toBe('73 permits');
+    // A bare headline value takes the noun from the dataset's title.
+    expect(figureOf(card({ headline: '73', title: 'Active DOB construction permits inside the neighborhood' }))?.value).toBe('73 permits');
+    // "filed" ends the phrase: no noun rather than a wrong one.
+    expect(figureOf(card({ headline: '82 NYC 311 flood-related complaints filed within 200 m of this location.', title: 'NYC 311 flood-related complaints (5y)' }))?.value).toBe('82');
+  });
   it('shows no figure for a gauge count: it is not a reading', () => {
     expect(figureOf(card({ scalars: [{ value: '0', label: 'Gauges in the area' }] }))).toBeNull();
     expect(figureOf(card({ scalars: [{ value: '3', label: 'Gauges in the area' }, { value: '0.28', unit: 'ft', label: 'Stream stage' }] })))
