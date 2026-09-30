@@ -5,6 +5,7 @@ Run: uvicorn web.main:app --reload --port 8000
 
 from __future__ import annotations
 
+import functools
 import json
 import os
 import re
@@ -87,11 +88,22 @@ SVELTEKIT_BUILD = ROOT / "sveltekit" / "build"
 
 app = FastAPI(title="Riprap")
 
-import json as _json  # noqa: E402
-
 import geopandas as _gpd  # noqa: E402
 
-_LAYER_CACHE: dict = {}
+
+@functools.lru_cache(maxsize=256)
+def _layer(kind: str, lat: float, lon: float, r: int) -> dict:
+    """Clipped map layers keyed by rounded position; the routes below
+    round before calling so nearby requests share an entry."""
+    if kind == "sandy":
+        return _clip_simplify(sandy_inundation.load(), lat, lon, r)
+    if kind == "dep2080":
+        return _clip_simplify(
+            dep_stormwater.load("dep_extreme_2080"), lat, lon, r, props_keep={"Flooding_Category"}
+        )
+    from app.flood_layers import prithvi_water as pw
+
+    return pw.layer_geojson(lat, lon, r)
 
 
 def _clip_simplify(
@@ -125,7 +137,7 @@ def _clip_simplify(
         g = g[[c for c in g.columns if c in props_keep or c == "geometry"]]
     else:
         g = g[["geometry"]]
-    return _json.loads(g.to_json())
+    return json.loads(g.to_json())
 
 
 @app.on_event("startup")
@@ -142,27 +154,6 @@ def _warm_caches():
     for scen in ["dep_extreme_2080", "dep_moderate_2050", "dep_moderate_current"]:
         dep_stormwater.load(scen)
     print("[startup] flood layers ready", flush=True)
-    if os.environ.get("RIPRAP_NYCHA_REGISTERS", "0").lower() in ("1", "true", "yes"):
-        print("[startup] pre-loading register catalogs...", flush=True)
-        try:
-            # NYCHA + DOE schools read from pre-built JSON catalogs at
-            # data/registers/{nycha,schools}.json — sub-ms per query.
-            from app.registers._loader import load_register
-
-            n_nycha = len(load_register("nycha"))
-            n_schools = len(load_register("schools"))
-            print(
-                f"[startup] catalogs ready: nycha={n_nycha} rows, schools={n_schools} rows",
-                flush=True,
-            )
-            # DOH hospitals has no pre-built catalog (~150 entries; we
-            # read the GeoJSON directly and sample baked rasters per hit).
-            from app.registers import doh_hospitals as _r_hospitals
-
-            _r_hospitals._load_hospitals()
-            print("[startup] hospitals geojson loaded", flush=True)
-        except Exception as _e:
-            print(f"[startup] register warm failed (non-fatal): {_e}", flush=True)
     print("[startup] loading the policy-corpus index...", flush=True)
     # RAG warm loads sentence-transformers, which on some HF Space rebuilds
     # has hit transformers-lazy-import edge cases (CodeCarbonCallback). The
@@ -214,8 +205,6 @@ def _stones_pebbles_for_deployment(deployment_name: str | None):
     deployment the server booted with — this is what makes per-query
     routing reach the UI scaffold.
     """
-    from pathlib import Path
-
     if not deployment_name:
         return _STONES, _PEBBLES
     from riprap.core.pebbles.deployments import deployment_by_name as _dep_by_name  # noqa: PLC0415
@@ -434,7 +423,7 @@ def api_register(asset_class: str):
             status_code=503,
         )
     return JSONResponse(
-        _json.loads(f.read_text()), headers={"Cache-Control": "public, max-age=300"}
+        json.loads(f.read_text()), headers={"Cache-Control": "public, max-age=300"}
     )
 
 
@@ -663,28 +652,6 @@ def api_nyc311_flood_requests(lat: float | None = None, lon: float | None = None
     return JSONResponse(out, status_code=400 if "error" in out else 200)
 
 
-@app.get("/api/agent/plan")
-def api_agent_plan(q: str):
-    """Just the plan (intent and targets), no execution."""
-    from riprap.core.burr.app import plan_for
-
-    return JSONResponse(plan_for(q))
-
-
-@app.get("/api/layers/nta")
-def layer_nta(code: str):
-    """Return the NTA polygon for a given NTA code as GeoJSON (EPSG:4326)."""
-    from app.areas import nta as nta_mod
-
-    g = nta_mod.load()
-    sub = g[g["nta2020"] == code][["nta2020", "ntaname", "boroname", "geometry"]]
-    if sub.empty:
-        return JSONResponse({"type": "FeatureCollection", "features": []}, status_code=404)
-    return JSONResponse(
-        _json.loads(sub.to_json()), headers={"Cache-Control": "public, max-age=3600"}
-    )
-
-
 @app.get("/api/layers/sandy_clipped")
 def layer_sandy_clipped(code: str):
     """Sandy inundation polygons clipped to an NTA bbox + simplified.
@@ -727,32 +694,22 @@ def layer_dep_clipped(code: str, scenario: str = "dep_extreme_2080"):
 
 @app.get("/api/layers/sandy")
 def layer_sandy(lat: float, lon: float, r: float = 1500):
-    key = ("sandy", round(lat, 4), round(lon, 4), int(r))
-    if key not in _LAYER_CACHE:
-        _LAYER_CACHE[key] = _clip_simplify(sandy_inundation.load(), lat, lon, r)
-    return JSONResponse(_LAYER_CACHE[key], headers={"Cache-Control": "public, max-age=3600"})
+    layer = _layer("sandy", round(lat, 4), round(lon, 4), int(r))
+    return JSONResponse(layer, headers={"Cache-Control": "public, max-age=3600"})
 
 
 @app.get("/api/layers/dep_extreme_2080")
 def layer_dep_2080(lat: float, lon: float, r: float = 1500):
-    key = ("dep2080", round(lat, 4), round(lon, 4), int(r))
-    if key not in _LAYER_CACHE:
-        _LAYER_CACHE[key] = _clip_simplify(
-            dep_stormwater.load("dep_extreme_2080"), lat, lon, r, props_keep={"Flooding_Category"}
-        )
-    return JSONResponse(_LAYER_CACHE[key], headers={"Cache-Control": "public, max-age=3600"})
+    layer = _layer("dep2080", round(lat, 4), round(lon, 4), int(r))
+    return JSONResponse(layer, headers={"Cache-Control": "public, max-age=3600"})
 
 
 @app.get("/api/layers/prithvi_water")
 def layer_prithvi_water(lat: float, lon: float, r: float = 1500):
     """New surface water after Ida from the Prithvi-EO batch (experimental):
     the new-water pixels of data/eo/ within `r` m of the address, as polygons."""
-    key = ("prithvi", round(lat, 4), round(lon, 4), int(r))
-    if key not in _LAYER_CACHE:
-        from app.flood_layers import prithvi_water as pw
-
-        _LAYER_CACHE[key] = pw.layer_geojson(lat, lon, r)
-    return JSONResponse(_LAYER_CACHE[key], headers={"Cache-Control": "public, max-age=3600"})
+    layer = _layer("prithvi", round(lat, 4), round(lon, 4), int(r))
+    return JSONResponse(layer, headers={"Cache-Control": "public, max-age=3600"})
 
 
 @app.get("/api/layers/ida_hwm")
