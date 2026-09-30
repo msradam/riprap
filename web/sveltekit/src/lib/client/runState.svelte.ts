@@ -320,6 +320,9 @@ export class RunState {
   planTokens = $state('');
   finalResult = $state.raw<FinalResult | null>(null);
   streamDone = $state(false);
+  /** When the stream closed (ISO), the run date the page and its print
+   *  snapshot show. */
+  finishedAt = $state<string | null>(null);
   geocodeSucceeded = $state(false);
   errorState = $state<ErrorKey | null>(null);
   runWallSeconds = $state<number | undefined>(undefined);
@@ -534,6 +537,7 @@ export class RunState {
    *  but no briefing came back. */
   finish(): void {
     this.streamDone = true;
+    this.finishedAt = new Date().toISOString();
     if (!this.finalResult?.paragraph?.trim() && !this.errorState && this.geocodeSucceeded) {
       this.errorState = 'all-silent';
     }

@@ -118,7 +118,7 @@
         run.finish();
         // Snapshot for the /print/<queryId> route and PDF export.
         if (!run.errorState && run.briefing.blocks.length > 0) {
-          persistSnapshot(snapshotFromRun(run, queryId, queryText));
+          persistSnapshot(snapshotFromRun(run, queryId, queryText, run.finishedAt ?? undefined));
         }
         // End the header pill on a final state; a stopped run must not
         // keep saying "gathering evidence".

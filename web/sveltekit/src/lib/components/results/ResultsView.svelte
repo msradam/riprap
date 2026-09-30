@@ -17,6 +17,7 @@
   import { boldFirstSentence, briefingModel, type SnapshotMeta } from '$lib/client/briefingModel';
   import { briefingState } from '$lib/stores/briefingState.svelte';
   import { deployment } from '$lib/stores/deployment.svelte';
+  import { formatGeneratedAt } from '$lib/client/gallery';
 
   /** One briefing, laid out as a public report: the question and its
    *  answer lead, the map is a figure, the evidence is a table, and how
@@ -248,7 +249,11 @@
         {#if run.resolvedPlace}
           <span class="resolved-place"><span class="brief-meta-label">Briefing for:</span> {placeRepeats ? 'the place named above' : run.resolvedPlace}</span>
         {/if}
-        {#if model.generated}<span>Snapshot <span class="data">{model.generated.slice(0, 10)}</span></span>{/if}
+        <!-- A gallery page is dated to its snapshot; a live briefing to
+             the minute its run ended, which is when its readings were
+             fetched. -->
+        {#if model.generated}<span>Snapshot <span class="data">{model.generated.slice(0, 10)}</span></span>
+        {:else if hasBriefing && run.finishedAt}<span>Run <span class="data">{formatGeneratedAt(run.finishedAt)}</span></span>{/if}
         {#if hasBriefing && !run.stopped}<a href="#how-made" onclick={openHowMade}>How this briefing was made</a>{/if}
       </p>
       {#if (hasBriefing && !run.stopped) || notice}
