@@ -178,8 +178,9 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
             )
         if flagged:
             k = len(flagged)
-            narrative += (f" {k} of the sensors that logged events {'is' if k == 1 else 'are'} flagged by "
-                          f"FloodNet for maintenance, so {'its' if k == 1 else 'their'} depths are not "
+            # "1 sensor" (a number with its noun) so the sentence is cited like the others.
+            narrative += (f" {k} sensor{'' if k == 1 else 's'} that logged events {'is' if k == 1 else 'are'} "
+                          f"flagged by FloodNet for maintenance, so {'its' if k == 1 else 'their'} depths are not "
                           f"used for the peak.")
     return {
         "n_sensors": n_sensors,

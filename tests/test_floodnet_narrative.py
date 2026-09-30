@@ -21,7 +21,7 @@ def test_a_flagged_sensor_is_not_the_peak(monkeypatch):
     n = out["narrative"]
     assert "1172" not in n and "noisy" not in n
     assert ("Peak depth recorded by the sensors in good working order: 300 mm on 2025-07-14. "
-            "1 of the sensors that logged events is flagged by FloodNet for maintenance, "
+            "1 sensor that logged events is flagged by FloodNet for maintenance, "
             "so its depths are not used for the peak.") in n
     assert out["peak_event"]["max_depth_mm"] == 300
     assert [s["status_words"] for s in out["sensors"]] == ["flagged by FloodNet for maintenance",
@@ -32,7 +32,7 @@ def test_no_good_sensor_with_an_event_means_no_peak(monkeypatch):
     _stub(monkeypatch, "needs_driverail", other="non-ota")
     n = floodnet.summary_for_point(40.71, -73.78)["narrative"]
     assert "Peak depth" not in n and "driverail" not in n and "non-ota" not in n
-    assert n.endswith("2 of the sensors that logged events are flagged by FloodNet for maintenance, "
+    assert n.endswith("2 sensors that logged events are flagged by FloodNet for maintenance, "
                       "so their depths are not used for the peak.")
 
 
@@ -40,3 +40,12 @@ def test_good_variants_count_as_good(monkeypatch):
     _stub(monkeypatch, "good - fs")
     n = floodnet.summary_for_point(40.71, -73.78)["narrative"]
     assert n.endswith("Peak depth recorded by the sensors in good working order: 1172 mm on 2026-05-20.")
+
+
+
+def test_the_flagged_sentence_is_cited():
+    from riprap.core.burr.evidence import cite
+
+    t = ("Peak depth recorded by the sensors in good working order: 300 mm on 2025-07-14. "
+         "1 sensor that logged events is flagged by FloodNet for maintenance, so its depths are not used for the peak.")
+    assert cite(t, "floodnet").endswith("used for the peak [floodnet].")
