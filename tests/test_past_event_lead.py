@@ -177,3 +177,24 @@ def test_a_qualifying_sentence_does_not_turn_events_into_an_absence():
     assert not reports_result("1 FloodNet community sensor within 600 m has logged 0 above-curb flood events "
                               "in the last 3 years.")
     assert not reports_result("No FloodNet sensors deployed within 600 m of this address.")
+
+
+def test_since_ida_with_no_mark_nearby_keeps_the_rules_yes():
+    """41-17 Main Street, Flushing: one sensor with 8 events and 17
+    complaints since 2021, no Ida high-water mark within 800 m. "since Ida"
+    names the period, so the Ida record is not the source the question is
+    about, and its "none within 800 m" cannot turn the rule's yes into
+    silence."""
+    from riprap.core.burr.answer_checks import check_lead
+
+    q = "Has the block around 41-17 Main Street, Queens flooded since Hurricane Ida?"
+    texts = {"floodnet": "1 FloodNet community sensor within 600 m has logged 8 above-curb flood events in the last 3 years.",
+             "nyc311": "18 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years.",
+             "ida_hwm": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address."}
+    values = {"ida_hwm": {"n_within_radius": 0}}
+    # The Ida record is still appended (the reader sees it), but its "none" is no contradiction.
+    assert [k for k, _ in check_lead("yes", ["floodnet", "nyc311"], q, texts, values)] == ["dropped_count"]
+    assert check_lead("yes", ["floodnet", "nyc311", "ida_hwm"], q, texts, values) == []
+    # A question about the storm itself keeps the marks as its subject.
+    during = "Did Hurricane Ida flood the block around 41-17 Main Street, Queens?"
+    assert [k for k, _ in check_lead("yes", ["floodnet", "ida_hwm"], during, texts, values)] == ["absence"]

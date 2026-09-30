@@ -259,7 +259,11 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str],
     if lead == "count" and not any(count_numbers(t) for t in texts.values()):
         hits.append(("dropped_count", "lead 'count' needs a fact with a count"))
     rel = relevant_doc(question, docs)
-    if rel in texts and lead in ("yes", "partly") and not reports_result(texts[rel]):
+    # "since Ida" names the period, not the subject: no Ida mark within
+    # 800 m does not contradict flooding since Ida that the sensors and
+    # 311 recorded (USGS surveyed marks at selected sites only).
+    since_storm = rel == _storm_record(question) and _period_start(question) is not None
+    if rel in texts and lead in ("yes", "partly") and not reports_result(texts[rel]) and not since_storm:
         hits.append(("absence", f"lead {lead!r}, but {rel}, the source the question is about, reports none"))
     if rel and rel not in facts and relevant_figure(rel, docs, values, question) is not None:
         hits.append(("dropped_count", f"omits {rel}, the source the question is about"))
