@@ -291,7 +291,8 @@ HTTP routes: `/api/agent` (JSON), `/api/agent/stream` (SSE),
 MCP server (`riprap/mcp/server.py`) exposes `list_sources`,
 `get_evidence`, `get_district_summary`, `get_citation`,
 `nyc311_flood_requests`, `plan_query` and `get_briefing(address,
-question)`; all but `get_briefing` work without an LLM.
+question)`; every tool works without an LLM, and `get_briefing` answers
+the question only when one is configured.
 
 ---
 

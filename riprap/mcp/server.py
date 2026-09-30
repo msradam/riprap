@@ -13,8 +13,9 @@ operations through curation, not mirroring (arxiv.org/html/2507.16044).
   plan_query(question, address)       how a question would be routed, without running it
   get_briefing(address, question)     the briefing, answering the question when given
 
-Every tool except get_briefing works without an LLM. Run over stdio (for a
-local MCP client config) or streamable HTTP:
+Every tool works without an LLM; get_briefing answers the question only
+when one is configured. Run over stdio (for a local MCP client config) or
+streamable HTTP:
 
     uv run riprap-mcp                     # or: uv run python -m riprap.mcp.server
     uv run riprap-mcp --http --port 8765
@@ -40,12 +41,12 @@ mcp = MCPServer(
         "appeal process. Start with get_evidence (an address) or "
         "get_district_summary (an NYC community district): both return cited "
         "sentences without a language model. plan_query shows how a question "
-        "would be routed without fetching anything. get_briefing returns the "
+        "would be routed without running the sources. get_briefing returns the "
         "same evidence as a briefing and, only when the server has an LLM "
         "endpoint configured, an answer to the question whose every claim is "
-        "checked against its cited source. Every result carries a record "
-        "block (query, time, code version, digest) and names the sources that "
-        "failed to respond."
+        "checked against its cited source. Evidence and briefing results carry "
+        "a record block (query, time, code version, digest) and name the "
+        "sources that failed to respond."
     ),
 )
 
@@ -66,7 +67,8 @@ def _commit() -> str | None:
 
 def _record(out: dict, body: dict) -> dict:
     """What a reader needs to reproduce or verify a result: the query, when
-    it ran, the code version and commit, and a digest of the body."""
+    it ran, the code version and commit, and a digest of the body (SHA-256
+    of the body as JSON with sorted keys and Python's default separators)."""
     import hashlib
     import json
     from datetime import UTC, datetime
@@ -99,8 +101,9 @@ def _evidence_payload(out: dict) -> dict:
     heading = {s.id: s.name for s in stones.all()}
     if not items:  # say why, rather than hand back an empty list
         text = (out.get("paragraph") or "").split("\n\n")
-        return {"place": None, "error": text[1] if len(text) > 1 else text[0], "evidence": [],
+        body = {"place": None, "error": text[1] if len(text) > 1 else text[0], "evidence": [],
                 "failed": _failed(out)}
+        return {**body, "record": _record(out, body)}
     body = {
         "place": (out.get("geocode") or {}).get("address"),
         "place_match": _place_match(out),
@@ -172,11 +175,13 @@ def _query(address: str, question: str | None) -> str:
 
 @mcp.tool()
 def plan_query(question: str, address: str | None = None) -> dict:
-    """How Riprap would route a question, without running it: intent,
-    targets, the question and its focus, the pebbles the planner chose,
-    the always-run floor, and the final selection for the deployment the
-    place routes to. Uses the LLM planner when configured, else the regex
-    planner (which selects every pebble for the intent)."""
+    """How Riprap would route a question, without running the sources
+    (it geocodes the place): intent, targets, the question and its focus,
+    the pebbles the planner chose, the always-run floor, and the final
+    selection for the deployment the place routes to. `planner` says
+    which planner ran: "llm" when the server has an LLM endpoint, else
+    "regex", the no-LLM router, which chooses no pebbles (`chosen` is
+    null) so `selected` is every pebble for the intent."""
     from app.geocode import geocode_one
     from riprap.core.burr.app import plan_for
     from riprap.core.burr.stones import floor_for, select_pebbles
@@ -189,6 +194,7 @@ def plan_query(question: str, address: str | None = None) -> dict:
     dep = pick_deployment(hit.lat, hit.lon) if hit else None
     deployment = dep.name if dep else "nyc"
     return {
+        "planner": "llm" if plan.get("llm_calls") else "regex",
         "intent": plan["intent"], "targets": plan.get("targets"), "place": plan.get("place"),
         "question": plan.get("question"),
         "focus": plan.get("focus"), "chosen": plan.get("pebbles"),
@@ -203,7 +209,8 @@ def get_briefing(address: str, question: str | None = None) -> dict:
     """The flood-exposure briefing for a US street address, optionally
     answering a question about it ("Has this block flooded since Ida?").
     Works without an LLM: the briefing is then the cited evidence and
-    `mode` is "no_llm". With an LLM endpoint configured on the server
+    `mode` is "no_llm" (the HTTP API calls the same value `grounding.tier`).
+    With an LLM endpoint configured on the server
     (RIPRAP_LLM_BASE_URL and RIPRAP_LLM_MODEL), the planner picks the
     sources the question needs and the answer is the lead plus cited
     sentences the model chose, each checked in code (failed claims are
