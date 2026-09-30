@@ -10,6 +10,8 @@ CKAN, SeeClickFix). Adding a city is a directory of YAML.
 > `kind: category_table`). SF, Boston and Albany use `kind:
 > flood_311_model`, which passes records unfiltered, and says so, unless
 > `RIPRAP_311_FILTER_PATH` points at locally built classifier weights.
+> Each of the five sets `deployment.experimental: true` in its
+> `stones.yaml`, and the header and the briefing say so.
 > An unfiltered count of 200 (500 for Boston) is the query limit, not a
 > flood signal. NYC (31 pebbles) is the only deployment with local
 > hazard, asset and forecast layers.
