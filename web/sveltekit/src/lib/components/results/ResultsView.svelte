@@ -267,8 +267,8 @@
       {/if}
       {#if deployment.current?.experimental}
         <p class="brief-experimental">
-          <strong>Experimental deployment:</strong> federal sources plus a local 311 feed and a
-          water-level gauge. Not the NYC source set.
+          <!-- nyc-leak-ok: shown only on non-NYC deployments, naming NYC as the source set this one is not -->
+          <strong>Experimental deployment:</strong> federal sources plus a local 311 feed and a water-level gauge. Not the NYC source set.
         </p>
       {/if}
     </header>
