@@ -268,9 +268,10 @@
   .ev-figure {
     width: 11%;
   }
+  /* A value with a datum ("9.24 ft above MLLW") wraps at its spaces
+     rather than running into the Cite column. */
   .ev-fig {
     display: block;
-    white-space: nowrap;
   }
   .ev-fig-label {
     margin-left: auto;
