@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Citation, ClaimPart } from '$lib/types/claim';
   import { keepTogether, linkHosts, tidy } from '$lib/client/briefingText';
+  import { shortSource } from '$lib/client/cardAdapter';
   import { activateCitation } from '$lib/stores/citations.svelte';
 
   /** One paragraph of claim parts as plain prose: no tier marks, and a
@@ -26,7 +27,7 @@
         class="inline-cite"
         data-cite={c.id}
         onclick={(e) => activateCitation(e, c.id)}
-        aria-label="Citation {c.n}: {c.source}, {c.title}"
+        aria-label="Citation {c.n}, {shortSource(c.source)}"
       ><sup>{c.n}</sup></a>{/if}{/each}
 </p>
 

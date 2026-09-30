@@ -33,7 +33,7 @@ const RIPRAP_VINTAGE = '2026-05';
 /** The publisher part of a source name: "NOAA CO-OPS, tide gauge water
  *  level" is "NOAA CO-OPS". Splits at a spaced dash or at the first comma
  *  outside parentheses (titles use a comma now), never at a hyphen. */
-function shortSource(name: string): string {
+export function shortSource(name: string): string {
   const head = name.split(/\s[-–—]\s|—/)[0];
   let depth = 0;
   for (let i = 0; i < head.length; i++) {

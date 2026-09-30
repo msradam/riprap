@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Citation } from '$lib/types/claim';
   import { citationOf, type EvidenceCard } from '$lib/client/briefingModel';
+  import { shortSource } from '$lib/client/cardAdapter';
   import { TIER_WORDS } from '$lib/types/tier';
   import { asOfPhrase, figureOf, leadClause, sharedStem, snapshotNote, withoutSubject } from '$lib/client/briefingText';
   import { activateCitation } from '$lib/stores/citations.svelte';
@@ -98,7 +99,7 @@
     href="#cite-{cit.id}"
     class={sup ? 'inline-cite' : 'data'}
     onclick={(e) => activateCitation(e, cit.id)}
-    aria-label="Citation {cit.n}: {cit.source}, {cit.title}"
+    aria-label="Citation {cit.n}, {shortSource(cit.source)}"
   >{#if sup}<sup>{cit.n}</sup>{:else}{cit.n}{/if}</a>
 {/snippet}
 
