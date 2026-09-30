@@ -166,8 +166,8 @@ def ida_hwm(lat: float, lon: float, radius_m: int = 800) -> dict:
 _NFHL = "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer"
 
 
-def _nfhl_point(layer: int, lat: float, lon: float, fields: str) -> dict | None:
-    d = _get(f"{_NFHL}/{layer}/query", {
+def _nfhl_point(layer: int, lat: float, lon: float, fields: str, base: str = _NFHL) -> dict | None:
+    d = _get(f"{base}/{layer}/query", {
         "geometry": f"{lon},{lat}", "geometryType": "esriGeometryPoint", "inSR": 4326,
         "spatialRel": "esriSpatialRelIntersects", "outFields": fields,
         "returnGeometry": "false", "f": "json"}, timeout=90)
@@ -185,6 +185,23 @@ def fema_nfhl(lat: float, lon: float) -> dict | None:
             "sfha": zone.get("SFHA_TF") == "T",
             "panel": panel.get("FIRM_PAN") if panel else None,
             "effective_year": datetime.fromtimestamp(eff / 1000, UTC).year if eff else None}
+
+
+# FEMA's preliminary NFHL: the same layers one service over, plus the
+# availability layer that carries the preliminary study's issue date.
+_PRELIM = "https://hazards.fema.gov/arcgis/rest/services/PrelimPending/Prelim_NFHL/MapServer"
+
+
+def fema_pfirm(lat: float, lon: float) -> dict | None:
+    zone = _nfhl_point(28, lat, lon, "FLD_ZONE,SFHA_TF,STATIC_BFE", base=_PRELIM)
+    study = _nfhl_point(0, lat, lon, "DFIRM_ID,PRELM_ISSUE_DATE", base=_PRELIM)
+    if not zone or not study:
+        return None
+    issued = study.get("PRELM_ISSUE_DATE")
+    bfe = zone.get("STATIC_BFE")
+    return {"zone": zone.get("FLD_ZONE"), "sfha": zone.get("SFHA_TF") == "T",
+            "bfe_ft": float(bfe) if bfe is not None and bfe > -9000 else None,
+            "issue_date": datetime.fromtimestamp(issued / 1000, UTC).date().isoformat() if issued else None}
 
 
 # The Sandy inundation zone (NYC Open Data uyj8-7rv5). The dataset's
@@ -247,6 +264,7 @@ def all_keys(lat: float, lon: float) -> dict:
         "floodnet": floodnet(lat, lon),
         "ida_hwm": ida_hwm(lat, lon),
         "fema_nfhl": fema_nfhl(lat, lon),
+        "fema_pfirm": fema_pfirm(lat, lon),
         "sandy_inside": sandy_inside(lat, lon),
         "dep": {s: dep_class(lat, lon, s) for s in DEP_FILES},
         "mta_entrances_800m": mta_entrances_within(lat, lon),

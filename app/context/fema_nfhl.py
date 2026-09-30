@@ -23,16 +23,20 @@ from riprap.core.pebbles._http import fetch_url_json
 DOC_ID = "fema_nfhl"
 CITATION = "FEMA National Flood Hazard Layer (hazards.fema.gov)"
 URL = "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer"
+# The preliminary maps: the same layers, one service over. Layer 0 lists the
+# preliminary study covering a point with the date FEMA issued it.
+PRELIM_URL = "https://hazards.fema.gov/arcgis/rest/services/PrelimPending/Prelim_NFHL/MapServer"
 
 _ZONE_LAYER = 28
 _PANEL_LAYER = 3
+_PRELIM_AVAILABILITY_LAYER = 0
 
 
 def _point_query(
-    layer: int, lat: float, lon: float, out_fields: str, cache_ttl_s: int
+    layer: int, lat: float, lon: float, out_fields: str, cache_ttl_s: int, base: str = URL
 ) -> list[dict[str, Any]]:
     url = (
-        f"{URL}/{layer}/query?geometry={lon},{lat}"
+        f"{base}/{layer}/query?geometry={lon},{lat}"
         f"&geometryType=esriGeometryPoint&inSR=4326"
         f"&spatialRel=esriSpatialRelIntersects"
         f"&outFields={out_fields}&returnGeometry=false&f=json"
@@ -100,4 +104,43 @@ def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> dict[
         "effective_year": eff_year,
         "effective_date": eff_date,  # the FIRM panel's; the citation's vintage
         "narrative": "".join(bits),
+    }
+
+
+def preliminary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> dict[str, Any] | None:
+    """The preliminary flood zone (PFIRM) at a point, with the date FEMA
+    issued the preliminary study, read from the service's own availability
+    layer (the panel records carry no date until the map goes to print).
+    None when no preliminary study covers the point."""
+    try:
+        zones = _point_query(_ZONE_LAYER, lat, lon, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,STATIC_BFE",
+                             cache_ttl_s, PRELIM_URL)
+        studies = _point_query(_PRELIM_AVAILABILITY_LAYER, lat, lon, "DFIRM_ID,PRELM_ISSUE_DATE",
+                               cache_ttl_s, PRELIM_URL)
+    except httpx.HTTPError:
+        return None
+    if not zones or not studies:
+        return None
+    zone, study = zones[0]["attributes"], studies[0]["attributes"]
+    issued = study.get("PRELM_ISSUE_DATE")
+    issue_date = datetime.fromtimestamp(issued / 1000, UTC).date().isoformat() if issued else None
+    fld_zone = zone.get("FLD_ZONE")
+    sfha = zone.get("SFHA_TF") == "T"
+    bfe = zone.get("STATIC_BFE")
+    bfe = float(bfe) if bfe is not None and bfe > -9000 else None
+    reading = " (a Special Flood Hazard Area)" if sfha else (
+        f" ({r})" if (r := zone_reading(zone.get("ZONE_SUBTY"))) else "")
+    when = f" issued {issue_date}" if issue_date else ""
+    narrative = (f"FEMA's preliminary flood map (PFIRM{when}, community {study.get('DFIRM_ID')}) places "
+                 f"this address in zone {fld_zone}{reading}"
+                 + (f", static base flood elevation {bfe:g} ft" if bfe is not None else "")
+                 + "; a preliminary map is not the effective map and does not set flood insurance.")
+    return {
+        "fld_zone": fld_zone,
+        "zone_subty": zone.get("ZONE_SUBTY"),
+        "sfha": sfha,
+        "static_bfe_ft": bfe,
+        "community": study.get("DFIRM_ID"),
+        "issue_date": issue_date,  # the citation's vintage
+        "narrative": narrative,
     }

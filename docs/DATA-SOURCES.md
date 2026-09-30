@@ -13,7 +13,8 @@ runtime. No commercial APIs, no proprietary scores. Source URLs, licences,
 |---|---|---|
 | Hurricane Sandy 2012 inundation zone | NYC OTI / NOAA Office for Coastal Management | Hazard memory |
 | NYC DEP Stormwater Flood Maps | NYC Department of Environmental Protection | Modeled scenarios |
-| FEMA National Flood Hazard Layer | FEMA | Regulatory flood zone |
+| FEMA National Flood Hazard Layer | FEMA | Regulatory flood zone (2007 effective FIRM) |
+| FEMA preliminary NFHL (2015 PFIRM) | FEMA | Preliminary flood zone and base flood elevation, adopted by NYC Building Code Appendix G for flood-resistant construction |
 | Hurricane Ida 2021 USGS high-water marks | USGS Short-Term Network | Empirical points |
 | FloodNet ultrasonic sensor network | NYU CUSP / FloodNet | Flood-event log |
 | NYC 311 flood complaints | NYC Open Data | Complaint history |

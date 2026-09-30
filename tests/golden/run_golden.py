@@ -89,6 +89,12 @@ def score_address(base: str, query: str) -> dict:
     check(f, "FEMA FIRM panel", v.get("firm_panel"), kf.get("panel"))
     check(f, "FEMA panel effective year", v.get("effective_year"), kf.get("effective_year"))
 
+    v = out.get("fema_pfirm") or {}
+    kp = k["fema_pfirm"] or {}
+    check(f, "PFIRM zone", v.get("fld_zone"), kp.get("zone"))
+    check(f, "PFIRM base flood elevation ft", v.get("static_bfe_ft"), kp.get("bfe_ft"))
+    check(f, "PFIRM issue date", v.get("issue_date"), kp.get("issue_date"))
+
     check(f, "inside Sandy 2012 extent", (out.get("sandy") or {}).get("inside"), k["sandy_inside"])
     for s, cls in k["dep"].items():
         check(f, f"DEP class {s}", (out.get(s) or {}).get("depth_class"), cls)

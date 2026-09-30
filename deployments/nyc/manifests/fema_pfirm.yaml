@@ -1,0 +1,57 @@
+id: fema_pfirm
+type: live
+title: FEMA preliminary flood map (PFIRM), flood zone at this point
+answers: "the preliminary FEMA flood zone (2015 PFIRM) at the point, which NYC Building Code Appendix G adopts for flood-resistant construction alongside the 2007 effective FIRM"
+stone: cornerstone
+tier: modeled
+adapter: python_call
+
+# NYC's effective FIRM dates from 2007. FEMA issued preliminary maps on
+# 2015-01-30 (community 360497), which the City appealed and FEMA agreed to
+# revise; until revised maps take effect, NYC Building Code Appendix G
+# (G102.2.1, G102.2.2) adopts the PFIRM for flood-resistant construction
+# and requires the more restrictive of the two maps. A planner asks about
+# this map within minutes, so it is a source of its own, labelled
+# preliminary. See research_notes/fable/pfirm.md for the sources.
+spatial:
+  scope: point
+  crs: EPSG:4326
+
+config:
+  module: app.context.fema_nfhl
+  function: preliminary_for_point
+  args:
+    - {source: lat}
+    - {source: lon}
+  on_none: offline
+
+trace_summary:
+  zone: fld_zone
+  sfha: sfha
+  bfe_ft: static_bfe_ft
+  issued: issue_date
+
+provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
+  source_name: FEMA Preliminary National Flood Hazard Layer (Prelim_NFHL), preliminary flood zones
+  source_url: https://hazards.fema.gov/arcgis/rest/services/PrelimPending/Prelim_NFHL/MapServer
+  license: U.S. Public Domain
+  doc_id: fema_pfirm
+  citation: FEMA preliminary flood-zone polygon (PFIRM) intersecting the address point, with the issue date from the service's Preliminary Data Availability layer.
+  # The citation's vintage is the date FEMA issued the preliminary study.
+  date_modified_field: issue_date
+
+narration:
+  short: FEMA preliminary flood map (PFIRM) zone at this address.
+  template: "{narrative}"
+
+display:
+  order: 13
+  kind: stat
+  map_layer: false
+  icon: "🗺️"
+
+fallback:
+  on_offline: skip
+  message: FEMA's preliminary NFHL service was unreachable, or no preliminary study covers this point.

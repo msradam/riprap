@@ -62,7 +62,7 @@ flood zone, use FEMA's [Map Service Center](https://msc.fema.gov). More in
 
 | Area | Status |
 |---|---|
-| New York City flood | Production: 31 data sources (5 marked experimental), addresses, questions and all 59 community districts |
+| New York City flood | Production: 32 data sources (5 marked experimental), addresses, questions and all 59 community districts |
 | Chicago, Seattle, San Francisco, Boston, Albany | Experimental: federal sources plus a 311 feed and a water-level gauge ([docs/multi-city.md](docs/multi-city.md)) |
 | Heat and air quality | Not reachable yet: scaffolds with no coverage area ([docs/multi-hazard.md](docs/multi-hazard.md)) |
 | LLM | Optional. Without one, the briefing is the cited evidence itself |
@@ -138,7 +138,7 @@ More in [docs/METHODOLOGY.md](docs/METHODOLOGY.md),
 
 ## Data sources
 
-The NYC deployment reads 31 sources: 27 NYC manifests and 4 federal ones (FEMA
+The NYC deployment reads 32 sources: 28 NYC manifests and 4 federal ones (FEMA
 flood zones, NWS observations and alerts, USGS stream gauges). All are
 public-record city, state and federal data; there are no commercial APIs or
 proprietary scores. Each manifest records its URL, licence and vintage. The full
