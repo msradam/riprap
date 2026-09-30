@@ -82,8 +82,10 @@ uv run uvicorn web.main:app --port 7860
 
 Open <http://localhost:7860> and type an address (`90-01 183rd Street, Queens`),
 a district (`QN12`) or a question (`Has 80 Pioneer Street, Brooklyn flooded?`).
-Without an LLM, a question gets the cited evidence for its place and a note
-saying it was not answered directly. The same briefing from the command line:
+Without an LLM, a question gets the cited evidence for its place, and the app
+says it was not answered directly (the JSON reports `grounding.tier` as
+`no_llm`). The first district query on a cold server takes about half a
+minute while the layers load. The same briefing from the command line:
 
 ```bash
 curl -s "http://localhost:7860/api/agent?q=QN12" | python3 -c "import json, sys; print(json.load(sys.stdin)['paragraph'])"
@@ -113,9 +115,9 @@ npx @modelcontextprotocol/inspector --cli uv run riprap-mcp \
   --method tools/call --tool-name get_district_summary --tool-arg community_district=QN12
 ```
 
-**Gallery.** `uv run python scripts/build_gallery.py` rebuilds the ten address
-entries in `web/sveltekit/src/lib/gallery/`; the four question entries are kept
-unless an LLM is configured. To see them in the app, rebuild the frontend
+**Gallery.** `uv run python scripts/build_gallery.py` rebuilds the address and
+district entries in `web/sveltekit/src/lib/gallery/`; the question entries are
+kept as they are unless an LLM is configured. To see them in the app, rebuild the frontend
 (needs Node and [pnpm](https://pnpm.io)): `cd web/sveltekit && pnpm install &&
 pnpm build`. Docker and the Modal host are in [docs/DEPLOY.md](docs/DEPLOY.md).
 
