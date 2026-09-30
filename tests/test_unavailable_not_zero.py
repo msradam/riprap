@@ -8,28 +8,26 @@ import pytest
 OCEAN = (40.30, -73.50)  # inside the NYC bounding box, no assets nearby
 
 
-@pytest.mark.parametrize("module,count", [
-    ("app.registers.mta_entrances", "n_entrances"), ("app.registers.nycha", "n_developments"),
-    ("app.registers.doe_schools", "n_schools"), ("app.registers.doh_hospitals", "n_hospitals"),
+@pytest.mark.parametrize("asset_class,count", [
+    ("mta_entrances", "n_entrances"), ("nycha", "n_developments"),
+    ("doe_schools", "n_schools"), ("doh_hospitals", "n_hospitals"),
 ])
-def test_register_with_nothing_in_range_is_a_true_zero(module, count):
-    import importlib
+def test_register_with_nothing_in_range_is_a_true_zero(asset_class, count):
+    from app.registers import exposure
 
-    v = importlib.import_module(module).summary_for_point(*OCEAN)
+    v = exposure.summary_for_point(*OCEAN, asset_class)
     assert v["available"] is True and v[count] == 0
 
 
-@pytest.mark.parametrize("module", ["app.registers.nycha", "app.registers.doe_schools"])
-def test_missing_register_file_is_unavailable_not_zero(module, monkeypatch, tmp_path):
-    import importlib
-
-    from app.registers import _loader
+@pytest.mark.parametrize("asset_class", ["nycha", "doe_schools"])
+def test_missing_register_file_is_unavailable_not_zero(asset_class, monkeypatch, tmp_path):
+    from app.registers import _loader, exposure
 
     monkeypatch.setattr(_loader, "REGISTERS_DIR", tmp_path)
     _loader.load_register.cache_clear()
     try:
         with pytest.raises(FileNotFoundError):
-            importlib.import_module(module).summary_for_point(40.6755, -74.0110)
+            exposure.summary_for_point(40.6755, -74.0110, asset_class)
     finally:
         _loader.load_register.cache_clear()
 
@@ -40,21 +38,21 @@ def _broken(*a, **k):
 
 def test_mta_failed_sandy_join_is_unavailable_not_outside(monkeypatch):
     from app.flood_layers import sandy_inundation
-    from app.registers import mta_entrances
+    from app.registers import exposure
 
     monkeypatch.setattr(sandy_inundation, "join", _broken)
     with pytest.raises(OSError):
-        mta_entrances.summary_for_point(40.7557, -73.9870)  # Times Square
+        exposure.summary_for_point(40.7557, -73.9870, "mta_entrances")  # Times Square
 
 
 def test_hospital_failed_exposure_lookup_is_unavailable_not_outside(monkeypatch):
     from app.flood_layers import sandy_inundation
-    from app.registers import doh_hospitals
+    from app.registers import exposure
 
     monkeypatch.setattr(sandy_inundation, "inside_raster", _broken)
     monkeypatch.setattr(sandy_inundation, "join", _broken)
     with pytest.raises(OSError):
-        doh_hospitals.summary_for_point(40.7390, -73.9754, radius_m=2000)  # Bellevue
+        exposure.summary_for_point(40.7390, -73.9754, "doh_hospitals", radius_m=2000)  # Bellevue
 
 
 def test_value_reporting_its_own_error_is_a_failed_step(monkeypatch):

@@ -11,11 +11,12 @@ spatial:
   crs: EPSG:4326
 
 config:
-  module: app.registers.doe_schools
+  module: app.registers.exposure
   function: summary_for_point
   args:
     - {source: lat}
     - {source: lon}
+    - {const: doe_schools}
   on_none: passthrough
 
 trace_summary:

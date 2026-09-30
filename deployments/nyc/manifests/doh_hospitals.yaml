@@ -11,11 +11,12 @@ spatial:
   crs: EPSG:4326
 
 config:
-  module: app.registers.doh_hospitals
+  module: app.registers.exposure
   function: summary_for_point
   args:
     - {source: lat}
     - {source: lon}
+    - {const: doh_hospitals}
   on_none: passthrough
 
 trace_summary:

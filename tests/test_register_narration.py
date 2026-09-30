@@ -21,29 +21,29 @@ def test_helper_plural_scope_and_nearest():
 
 
 def test_exposed_only_register_names_its_scope():
-    from app.registers import doe_schools, nycha
+    from app.registers import exposure
 
-    s = doe_schools.summary_for_point(*BROOKLYN_HEIGHTS)
+    s = exposure.summary_for_point(*BROOKLYN_HEIGHTS, "doe_schools")
     assert s["n_schools"] == 0
     assert s["narrative"].startswith("0 flood-exposed NYC DOE schools within 1500 m of this address "
                                      "(the register lists only schools found inside the 2012 Sandy")
     assert "not every school" in s["narrative"]
     assert _register_counts(s["narrative"] + ".") == (0, 0, 0)
-    n = nycha.summary_for_point(*ROCKAWAY)
+    n = exposure.summary_for_point(*ROCKAWAY, "nycha")
     assert "flood-exposed NYCHA development" in n["narrative"] and "not every development" in n["narrative"]
 
 
 def test_exposed_register_counts_every_row_in_range_and_lists_the_nearest():
-    from app.registers import doe_schools
+    from app.registers import exposure
 
-    s = doe_schools.summary_for_point(*ROCKAWAY, radius_m=3000, max_schools=2)
+    s = exposure.summary_for_point(*ROCKAWAY, "doe_schools", radius_m=3000, max_n=2)
     assert s["n_schools"] > 2 and len(s["schools"]) == 2
     assert s["narrative"].startswith(f"{s['n_schools']} flood-exposed NYC DOE schools")
 
 
 def test_full_layer_count_is_every_entrance_in_range():
-    from app.registers import mta_entrances
+    from app.registers import exposure
 
-    s = mta_entrances.summary_for_point(*BROOKLYN_HEIGHTS)
+    s = exposure.summary_for_point(*BROOKLYN_HEIGHTS, "mta_entrances")
     assert s["n_entrances"] > s["n_checked"] == len(s["entrances"]) == 8
     assert f"; of the nearest {s['n_checked']}:" in s["narrative"]
