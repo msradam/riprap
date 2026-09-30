@@ -141,3 +141,12 @@ def test_the_asked_about_source_leads_the_facts(run):
                                            "facts": ["sandy_inundation", "dep_moderate_2050", "mta_entrance_exposure"]}})
     assert out["grounding"]["answer_lead"] == "partly"
     assert out["paragraph"].split("**Answer.**\n")[1].startswith(f"In part. {MTA.rstrip('.')} [mta_entrance_exposure].")
+
+
+def test_a_named_storm_record_does_not_jump_ahead_of_what_happened_since(run):
+    """The gallery's Hollis answer opens with the FloodNet events; a live run
+    once moved the Ida marks first because "Ida" names the relevant source."""
+    q = "Has the block flooded since Hurricane Ida?"
+    out = run(q, {"claims": [], "answer": {"lead": "yes", "facts": ["nws_alerts", "ida_hwm"]}})
+    facts = [c["doc_ids"][0] for c in out["grounding"]["claims"] if c["section"] == "answer"]
+    assert facts == ["nws_alerts", "ida_hwm"]

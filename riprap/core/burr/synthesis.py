@@ -469,9 +469,12 @@ def synthesize(state) -> dict:
         experimental = frozenset(d.doc_id for d in docs if d.experimental)
         # The source the question is about leads the facts when the model
         # chose it ("Are the schools ... exposed?" opened with the FEMA zone
-        # of the address, and the school register came fourth); a record
-        # appended by rule keeps its place. Experimental sources come last.
-        facts = sorted(facts, key=lambda f: (f in experimental, appended or f != rel))
+        # of the address, and the school register came fourth). A record
+        # appended by rule keeps its place, and so does a named storm's own
+        # record ("since Ida" names the period, and the sensors and 311 say
+        # what happened since). Experimental sources come last.
+        subject = None if appended or rel == answer_checks._storm_record(question) else rel
+        facts = sorted(facts, key=lambda f: (f in experimental, f != subject))
         kept = [*({"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts),
                 *kept]
         # Honest silence still shows what the sources say: facts under a
