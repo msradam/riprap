@@ -49,6 +49,13 @@ _TAIL_AREA_RE = re.compile(r"^\s*(?:,\s*|\s+in\s+(?:the\s+)?)([A-Z][\w.'-]*(?:\s
 _TAIL_STATE_RE = re.compile(r"^\s*,?\s*(?:NY|New York)\b(?!\s+(?:City|County))")
 _TAIL_ZIP_RE = re.compile(r"^\s*,?\s*(\d{5})\b")
 _CAPS_RUN_RE = re.compile(r"\b[A-Z][\w.'-]*(?:\s+[A-Z][\w.'-]*)*")
+# Two streets joined by "and", "&" or "at", with no house number: neither
+# geocoder Riprap uses places an intersection (NYC GeoSearch parses the
+# cross street and returns nothing; Nominatim returns nothing), so it is
+# refused with the reason rather than sent to a street's nearest point.
+_INTERSECTION_RE = re.compile(rf"\b((?:{_STREET_WORD}\s+){{0,3}}?{_SUFFIX})\s+(?:and|&|at)\s+"
+                              rf"((?:{_STREET_WORD}\s+){{0,3}}?{_SUFFIX})\b", re.IGNORECASE)
+_ZIP_ONLY_RE = re.compile(r"^\s*(\d{5})(?:-\d{4})?\s*[?.!]?\s*$")
 # Capitalised words that start a question or name an agency or storm, not a place.
 _NOT_PLACE = {"is", "are", "was", "were", "what", "how", "has", "have", "does", "did", "do", "tell", "show",
               "can", "could", "will", "would", "which", "where", "when", "why", "who", "the", "a", "an", "i",
@@ -137,6 +144,14 @@ def resolve_query(text: str) -> dict:
     span = extract_address(text)
     if span:
         return {"kind": "address", "text": span, "certain": True, "message": None}
+    if z := _ZIP_ONLY_RE.match(text or ""):
+        return {"kind": "invalid", "text": None, "certain": True, "message": (
+            f"A ZIP code such as {z.group(1)} covers many blocks, and Riprap briefs one place at a time. "
+            "Give a street address in it, a neighbourhood name, or a community district such as QN12.")}
+    if _INTERSECTION_RE.search(text or ""):
+        return {"kind": "invalid", "text": None, "certain": True, "message": (
+            "Riprap cannot place a street intersection: its geocoders resolve house numbers, not "
+            "corners. Give a street address on that block, with the house number.")}
     phrase = place_phrase(text)
     if phrase:
         return {"kind": "neighborhood", "text": phrase, "certain": False, "message": None}

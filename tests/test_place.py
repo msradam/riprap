@@ -66,3 +66,26 @@ def test_address_keeps_its_quadrant_and_city():
     from riprap.core.burr.place import extract_address
 
     assert extract_address("1600 Pennsylvania Ave NW, Washington DC") == "1600 Pennsylvania Ave NW, Washington DC"
+
+
+@pytest.mark.parametrize("text", [
+    "Broadway and 116th Street", "Flatbush Avenue and Avenue U, Brooklyn", "Water Street & Pearl Street",
+    "flooding at Atlantic Avenue at Flatbush Avenue",
+])
+def test_an_intersection_is_refused_with_the_reason(text):
+    r = resolve_query(text)
+    assert r["kind"] == "invalid" and "intersection" in r["message"] and "house number" in r["message"]
+
+
+def test_a_house_number_beside_a_corner_word_is_still_an_address():
+    assert resolve_query("Is 200 Water Street at risk from Pearl Street and the river?")["kind"] == "address"
+
+
+@pytest.mark.parametrize("text", ["11693", " 10305 ", "11423?"])
+def test_a_zip_code_alone_is_refused_with_the_reason(text):
+    r = resolve_query(text)
+    assert r["kind"] == "invalid" and "ZIP code" in r["message"] and "street address" in r["message"]
+
+
+def test_a_zip_after_an_address_stays_an_address():
+    assert resolve_query("90-01 183rd Street, Queens, NY 11423")["kind"] == "address"

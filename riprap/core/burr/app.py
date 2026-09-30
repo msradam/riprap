@@ -86,18 +86,22 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
             from riprap.core.burr.synthesis import llm_bare
 
             guard = heuristic_plan(query)
-            if guard["intent"] == "out_of_scope":  # the same fixed rules in both modes
+            if guard["intent"] in ("out_of_scope", "not_implemented"):  # the same fixed rules in both modes
                 return guard
-            if not llm_bare() and guard["intent"] != "not_implemented" and is_bare_place(query, guard["targets"]):
+            if not llm_bare() and is_bare_place(query, guard["targets"]):
                 return guard  # a bare place: the resolver finds it, and there is no question to plan
             p = run_planner(query, ledger=calls)
-            intent, focus = p.intent, p.focus
+            intent, targets, focus = p.intent, p.targets, p.focus
+            if intent == "neighborhood" and (guard.get("place") or {}).get("kind") == "address":
+                # The query names a street address; the model's "Hollis, Queens"
+                # resolved to no area and the reporter's question went unanswered.
+                intent, targets = "single_address", guard["targets"]
             if forecast_question(query):
                 # Decided in code: a forecast question is about what is coming,
                 # so it runs the Lodestone's forecast pebbles, never live_now.
                 intent = "single_address" if intent == "live_now" else intent
                 focus = {**(focus or {}), "time_frame": "future"}
-            return {"intent": intent, "targets": p.targets, "rationale": p.rationale,
+            return {"intent": intent, "targets": targets, "rationale": p.rationale,
                     "question": p.question, "focus": focus, "pebbles": p.pebbles,
                     "catalog": p.catalog, "llm_calls": calls}
         except Exception as e:  # noqa: BLE001 - fall back to the regex planner
