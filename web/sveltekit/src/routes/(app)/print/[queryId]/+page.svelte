@@ -134,7 +134,7 @@
     </header>
 
     <section class="print-answer" aria-labelledby="print-answer-h">
-      <h2 id="print-answer-h" class="visually-hidden">{snapshot.leadLabel}</h2>
+      {#if snapshot.lead || snapshot.answer?.length}<h2 id="print-answer-h" class="visually-hidden">{snapshot.leadLabel}</h2>{/if}
       {#if snapshot.lead}<p class="print-lead">{snapshot.lead}</p>{/if}
       {#each snapshot.answer ?? [] as parts, i (i)}
         <AnswerProse {parts} citations={snapshot.citations} class={snapshot.keyed && i > 0 ? 'print-answer-p is-support' : 'print-answer-p'} />

@@ -70,8 +70,10 @@
   let titleParts = $derived(title.split(/(\d+-\d+)/));
   const norm = (t: string) => t.replace(/\s+/g, ' ').trim().toLowerCase();
   let placeRepeats = $derived(!!run.resolvedPlace && norm(run.resolvedPlace) === norm(title));
+  // A district briefing has no In brief paragraph: no heading, no jump.
+  let hasLeadText = $derived(!!model.lead || model.answer.length > 0);
   let jumps = $derived([
-    { href: '#brief-answer', label: model.leadLabel === 'In brief' ? 'In brief' : 'Answer' },
+    ...(hasLeadText ? [{ href: '#brief-answer', label: model.leadLabel === 'In brief' ? 'In brief' : 'Answer' }] : []),
     ...(showEvidence ? [{ href: '#brief-evidence', label: 'Evidence' }] : []),
     ...(showMap ? [{ href: '#brief-map', label: 'Map' }] : []),
     { href: '#brief-sources', label: 'Sources' }
@@ -161,6 +163,7 @@
 {/snippet}
 
 {#snippet answerBlock()}
+  {#if hasLeadText}
   <section id="brief-answer" class="brief-answer" aria-labelledby="brief-answer-h">
     <h2 id="brief-answer-h" class="visually-hidden">{model.leadLabel}</h2>
     {#if model.lead}<p class={['brief-lead', model.leadIsSentence && 'is-sentence', !snapshot && 'is-arriving']}>{model.lead}</p>{/if}
@@ -172,6 +175,7 @@
       />
     {/each}
   </section>
+  {/if}
 {/snippet}
 
 {#snippet railBlock()}
