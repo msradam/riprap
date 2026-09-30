@@ -343,10 +343,12 @@ def geocode_one(text: str, *, scope_hint: str | None = None) -> GeocodeHit | Non
         )
     if primary is None:
         primary = geocode_nominatim(text)
-    elif not geocode_matches(text, primary.address):
+    elif re.match(r"\s*\d", text) and not geocode_matches(text, primary.address):
         # The region-biased lookup returned the nearest street, not the
         # house asked for ("1600 Pennsylvania Ave NW" landed on a Brooklyn
-        # avenue). The national lookup wins when it has the house.
+        # avenue). The national lookup wins when it has the house. A
+        # landmark or phrase has no house number to win with, so it makes
+        # no second request.
         national = geocode_nominatim(text)
         if national is not None and geocode_matches(text, national.address):
             primary = national
