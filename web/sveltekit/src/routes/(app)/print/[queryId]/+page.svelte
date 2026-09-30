@@ -79,11 +79,11 @@
     return JSON.stringify(s.replace(/\s+/g, ' ')).replace(/</g, '\\3c ');
   }
   // The @page running header is plain CSS and cannot read the snapshot,
-  // so the place, date and version are written into it here.
+  // so the place is written into it here. The date and version are on
+  // the meta line under the title, once.
   let pageStyle = $derived(
     snapshot
-      ? `<style>@page { @top-left { content: ${cssString(`Riprap: ${snapshot.resolvedPlace || snapshot.queryText}`)}; } ` +
-        `@top-right { content: ${cssString(`Generated ${generated}, v${APP_VERSION}`)}; } }</style>`
+      ? `<style>@page { @top-left { content: ${cssString(`Riprap: ${snapshot.resolvedPlace || snapshot.queryText}`)}; } }</style>`
       : ''
   );
 </script>
@@ -145,8 +145,6 @@
           so this is the evidence briefing for the place above.
         </p>
       {/if}
-      {#if snapshot.checks}<p class="print-quiet">{snapshot.checks}</p>{/if}
-      {#if snapshot.mode}<p class="print-quiet">{snapshot.mode}</p>{/if}
       {#each snapshot.scope ?? [] as parts, i (i)}
         <AnswerProse {parts} citations={snapshot.citations} class="print-quiet" />
       {/each}
@@ -185,6 +183,10 @@
 
       <section class="print-block" aria-labelledby="print-sources-h">
         <h2 id="print-sources-h" class="print-h2">Sources and method</h2>
+        <!-- Machinery sits with the method, never under the answer
+             (DESIGN.md), on paper as on screen. -->
+        {#if snapshot.checks}<p class="print-quiet">{snapshot.checks}</p>{/if}
+        {#if snapshot.mode}<p class="print-quiet">{snapshot.mode}</p>{/if}
         {#if citations.length}
           <div class="print-citations">
             <h3 class="print-h3">Sources cited</h3>
