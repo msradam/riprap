@@ -14,7 +14,7 @@
  * store. Backend-defined manifests (`deployments/nyc/manifests/*.yaml`)
  * propagate to the UI with no TS edits.
  */
-import type { StoneKey, Citation } from '$lib/types/card';
+import type { StoneKey } from '$lib/types/card';
 import { STATIC_SITE } from '$lib/staticSite';
 
 /** One stone descriptor from /api/pebbles. */
@@ -195,17 +195,6 @@ class PebbleManifestStore {
       if (m.provenance.doc_id === docId && m.tier) return m.tier;
     }
     return this.byId[docId]?.tier ?? null;
-  }
-
-  /** Citations[] suitable for Card.cites built from manifest provenance. */
-  citationsFor(pebbleId: string): Citation[] {
-    const m = this.byId[pebbleId];
-    if (!m || !m.provenance.doc_id) return [];
-    return [{
-      id: m.provenance.doc_id,
-      label: m.provenance.source_name,
-      href: m.provenance.source_url ?? undefined,
-    }];
   }
 }
 

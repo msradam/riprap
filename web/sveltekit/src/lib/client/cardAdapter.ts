@@ -17,7 +17,7 @@
  * a `meta` card listing whatever scalars it returned.
  */
 import type {
-  Card, CardVariant, FindingsData, ModelLine, StoneKey, StoneMember, StoneTrace
+  Card, CardVariant, FindingsData, ModelLine, RasterKind, StoneKey, StoneMember, StoneTrace
 } from '$lib/types/card';
 import type { TraceNode, TraceStatus } from '$lib/types/trace';
 import { citationList, type FinalResult, type ModelRow } from '$lib/client/agentStream';
@@ -147,49 +147,17 @@ function flattenTrace(node: TraceNode): TraceNode[] {
 }
 
 /** Group leaf specialist nodes by the Stone their pebble belongs to.
- *  Source of truth: pebbleManifest.byId — populated from /api/pebbles
- *  at app load, so every manifest in the active deployment is recognised
- *  by definition. A small alias map keeps legacy step names (the
- *  Capstone reconciler emits e.g. `reconcile_granite41`, not a
- *  manifest id) routing to the right Stone. */
-const _LEGACY_STEP_TO_STONE: Record<string, StoneKey> = {
-  // NTA / neighborhood-aggregate steps don't have their own manifests yet
-  sandy_nta: 'cornerstone',
-  dep_extreme_2080_nta: 'cornerstone',
-  dep_moderate_2050_nta: 'cornerstone',
-  dep_moderate_current_nta: 'cornerstone',
-  microtopo_nta: 'cornerstone',
-  nyc311_nta: 'touchstone',
-  rag_nta: 'capstone',
-  // Asset-exposure step names that pre-date the matching pebble ids
-  mta_entrance_exposure: 'keystone',
-  nycha_development_exposure: 'keystone',
-  doe_school_exposure: 'keystone',
-  doh_hospital_exposure: 'keystone',
-  // Specialist clusters not yet ported to manifests
-  terramind_synthesis: 'keystone',
-  terramind_buildings: 'keystone',
-  terramind_lulc: 'touchstone',
-  eo_chip_fetch: 'keystone',
-  prithvi_eo_v2: 'cornerstone',
-  // Capstone reconciler variants
-  reconcile_granite41: 'capstone',
-  reconcile_neighborhood: 'capstone',
-  reconcile_development: 'capstone',
-  reconcile_live_now: 'capstone',
+ *  Source of truth: pebbleManifest.byId, populated from /api/pebbles at
+ *  app load, so every manifest in the active deployment is recognised
+ *  by definition. The two Capstone reconciler steps are not pebbles. */
+const RECONCILE_STEPS: Record<string, StoneKey> = {
   reconcile_templated: 'capstone',
   reconcile_claims: 'capstone',
-  rag_granite_embedding: 'capstone',
-  gliner_extract: 'capstone',
 };
 
 function stoneForStep(name: string): StoneKey | null {
   const n = name.toLowerCase();
-  // Manifest is the truth: any pebble id in the active deployment maps
-  // to its stone by definition.
-  const pebble = pebbleManifest.byId[n];
-  if (pebble) return pebble.stone;
-  return _LEGACY_STEP_TO_STONE[n] ?? null;
+  return pebbleManifest.byId[n]?.stone ?? RECONCILE_STEPS[n] ?? null;
 }
 
 /** Project the live trace against the deployment's pebble roster.
@@ -289,72 +257,6 @@ function obj(v: unknown): Record<string, unknown> | null {
 // instead. The `boolean_zone` shaper wraps the bare bool so the
 // template can phrase inside-vs-outside correctly. The templated
 // path renders the card.
-
-function buildTerramindBuildings(state: Final): Card | null {
-  const tmb = obj(state.terramind_buildings);
-  if (!tmb?.ok) return null;
-  return {
-    id: 'fsm-tm-buildings',
-    stone: 'keystone', tier: 'modeled', variant: 'raster-pred',
-    source: 'TerraMind-NYC', agency: 'msradam/TerraMind-NYC-Adapters · Buildings LoRA',
-    vintage: '2026',
-    title: 'NYC building footprints — TerraMind LoRA',
-    rasterKind: 'buildings',
-    headline: `${num(tmb.pct_buildings) ?? 0}%`,
-    subhead: 'building-footprint coverage in chip',
-    sub: `${num(tmb.n_building_components) ?? 0} distinct components, test mIoU 0.5511`,
-    illustrative: true,
-    docId: 'tm_buildings', citeId: 'tm_buildings', mapLayer: 'buildings',
-  };
-}
-
-/** Conventional LULC palette — matches the design handoff's LULC card
- *  visual (urban / water / vegetation / barren / wetland). The colors
- *  are layer conventions, NOT new tier signals. */
-const LULC_PALETTE: Record<string, string> = {
-  urban: '#C66',
-  water: '#5B7FB4',
-  vegetation: '#5B8A4A',
-  barren: '#A89A78',
-  wetland: '#D9C75A',
-};
-
-function buildTerramindLulc(state: Final): Card | null {
-  const t = obj(state.terramind_lulc);
-  if (!t?.ok) return null;
-  // Translate the FSM's class_fractions dict into the design-system's
-  // expected ordered class-mix (urban / water / vegetation / barren /
-  // wetland). Unknown class names land in barren as a catch-all.
-  const fractions = (obj(t.class_fractions) ?? {}) as Record<string, number>;
-  const buckets: Record<keyof typeof LULC_PALETTE, number> = {
-    urban: 0, water: 0, vegetation: 0, barren: 0, wetland: 0,
-  };
-  for (const [k, v] of Object.entries(fractions)) {
-    const lk = k.toLowerCase();
-    if (lk.includes('urban') || lk.includes('built') || lk.includes('impervious')) buckets.urban += v;
-    else if (lk.includes('water')) buckets.water += v;
-    else if (lk.includes('tree') || lk.includes('vegetation') || lk.includes('crop') || lk.includes('grass')) buckets.vegetation += v;
-    else if (lk.includes('bare') || lk.includes('barren') || lk.includes('soil')) buckets.barren += v;
-    else if (lk.includes('wet') || lk.includes('marsh')) buckets.wetland += v;
-    else buckets.barren += v;
-  }
-  const classMix = (Object.entries(buckets) as [keyof typeof LULC_PALETTE, number][])
-    .filter(([, v]) => v > 0)
-    .map(([k, v]) => ({ k, pct: Math.round(v), color: LULC_PALETTE[k] }));
-
-  return {
-    id: 'fsm-tm-lulc',
-    stone: 'touchstone', tier: 'synthetic', variant: 'lulc',
-    source: 'TerraMind v1.2', agency: 'IBM TerraMind v1.2 · Sentinel-2 inputs',
-    vintage: 'Sentinel-2',
-    title: 'Land use / land cover, TerraMind v1.2',
-    rasterKind: 'lulc',
-    classMix: classMix.length ? classMix : undefined,
-    sub: 'Synthetic prior. LULC palette is a layer convention, not a tier signal.',
-    illustrative: true,
-    docId: 'tm_lulc', citeId: 'tm_lulc', mapLayer: 'terramind-lulc',
-  };
-}
 
 // ─── Type-keyed bespoke variant renderers ─────────────────────────
 //
@@ -718,7 +620,7 @@ function buildRasterCard(m: PebbleManifest, value: unknown): Card | null {
     source, agency: m.provenance.source_name,
     vintage: m.provenance.date_modified?.toString() ?? RIPRAP_VINTAGE,
     title: m.title,
-    rasterKind: (t.raster_kind ?? 'prithvi') as 'prithvi' | 'buildings' | 'lulc',
+    rasterKind: (t.raster_kind ?? 'prithvi') as RasterKind,
     headline,
     subhead: t.subhead_text,
     sub: t.narrative,
@@ -823,31 +725,10 @@ const KIND_TO_VARIANT: Record<PebbleManifest['display']['kind'], CardVariant | n
  *  (typed as a loose `string | null` since it's server-supplied JSON)
  *  before trusting it as an override in buildTemplated. */
 const VALID_CARD_VARIANTS: Record<CardVariant, true> = {
-  headline: true, tabular: true, scalars: true, spark: true, histogram: true,
-  timeseries: true, 'timeseries-ft': true, forecast: true, raster: true,
-  'raster-pred': true, lulc: true, register: true, comparison: true, meta: true,
+  headline: true, tabular: true, scalars: true, histogram: true,
+  timeseries: true, 'timeseries-ft': true, raster: true,
+  'raster-pred': true, register: true, meta: true,
 };
-
-/** Set of pebble ids that already have a special builder above. The
- *  templated pass skips these; they appear via the curated path. */
-const SPECIAL_BUILT_IDS = new Set<string>([
-  // Migration in progress: each pebble drops out of this set as its
-  // manifest gains a usable narration.template + (if needed) a
-  // shaper. Migrated so far: sandy, noaa_tides, water_level,
-  // lake_michigan_water_level, nws_obs, nws_alerts — all now flow
-  // through the templated path using `{narrative}` placeholders
-  // computed in each pebble's Python adapter.
-  // microtopo migrated to templated scalars path
-  // (manifest narration.template + adapter {narrative} field).
-  // Touchstone
-  // nyc311 dispatched via buildHistogramCard (display.variant: histogram).
-  // Lodestone: the forecast pebbles (ttm_battery_surge, ttm_311_forecast,
-  // floodnet_forecast) now flow through the type-keyed
-  // buildTimeseriesForecast renderer below (display.variant + value shape).
-  // Keystone — the four register pebbles now dispatch via
-  // buildRegisterComposite (multi-pebble, variant: register). Drop
-  // from this set so they participate in the type-keyed dispatch.
-]);
 
 /** Intents that run polygon (neighborhood) pebbles instead of point ones. */
 const POLYGON_INTENTS = new Set(['neighborhood', 'development_check']);
@@ -1133,17 +1014,12 @@ export function adaptFinalToFindings(
   hasFinal: boolean = true,
 ): FindingsData {
   const f = (final ?? {}) as Final;
-  // Neighborhood evidence (sandy_nta, dep_*_nta, nyc311_nta, microtopo_nta,
-  // dob_permits_nta) and every other pebble render through the manifest
-  // loop below; only non-manifest outputs keep a curated builder.
-  const cards: (Card | null)[] = [
-    buildTerramindBuildings(f),
-    buildTerramindLulc(f),
-    // Capstone (only once we have something to summarise)
-    hasFinal ? buildCapstoneMeta((final ?? { paragraph: '' }) as FinalResult, wallSeconds) : null,
-  ];
-
-  const curatedCards = cards.filter((c): c is Card => c != null);
+  // Every pebble renders through the manifest loop below. The Capstone
+  // run summary is the one curated card, and only once there is
+  // something to summarise.
+  const curatedCards: Card[] = hasFinal
+    ? [buildCapstoneMeta((final ?? { paragraph: '' }) as FinalResult, wallSeconds)]
+    : [];
 
   // Phase 2 — templated cards for every manifest pebble that didn't get a
   // curated special-builder card. New BYOD pebbles defined only in YAML
@@ -1167,7 +1043,6 @@ export function adaptFinalToFindings(
     // Per-pebble loop — single-pebble bespoke variants + the generic
     // templated fallback. Type-keyed dispatch by display.variant.
     for (const m of inScope(stone.id)) {
-      if (SPECIAL_BUILT_IDS.has(m.id)) continue;
       const value = (f as Record<string, unknown>)[m.id];
       let card: Card | null = null;
       if (m.display.variant === 'register') {
@@ -1194,86 +1069,6 @@ export function adaptFinalToFindings(
     emissions: (f as { emissions?: FindingsData['emissions'] }).emissions,
     noData,
   };
-}
-
-/** Per-step-event live-state mapper. The FSM action `step_X` writes to
- *  state key `X` (sometimes munged — e.g. `step_311` writes `nyc311`,
- *  `step_terramind` writes `terramind`). The SSE `step.result` payload
- *  is a slim summary (not the full doc body); cards adapt to whichever
- *  fields are present.
- *
- *  Mutates `live` in place and returns the keys that changed so callers
- *  can decide whether to re-render. */
-export function applyStepEventToLiveState(
-  live: Record<string, unknown>,
-  stepName: string,
-  result: unknown,
-  ok: boolean,
-): string[] {
-  const STEP_TO_STATE: Record<string, string> = {
-    sandy_inundation: 'sandy',
-    dep_stormwater: 'dep',
-    floodnet: 'floodnet',
-    nyc311: 'nyc311',
-    noaa_tides: 'noaa_tides',
-    nws_alerts: 'nws_alerts',
-    nws_obs: 'nws_obs',
-    ttm_311_forecast: 'ttm_311_forecast',
-    ttm_battery_surge: 'ttm_battery_surge',
-    floodnet_forecast: 'floodnet_forecast',
-    ida_hwm_2021: 'ida_hwm',
-    prithvi_eo_v2: 'prithvi_water',
-    microtopo_lidar: 'microtopo',
-    mta_entrance_exposure: 'mta_entrances',
-    nycha_development_exposure: 'nycha_developments',
-    doe_school_exposure: 'doe_schools',
-    doh_hospital_exposure: 'doh_hospitals',
-    terramind_synthesis: 'terramind',
-    terramind_lulc: 'terramind_lulc',
-    terramind_buildings: 'terramind_buildings',
-    eo_chip_fetch: 'eo_chip',
-    geocode: 'geocode',
-    // Neighborhood NTA chain
-    sandy_nta: 'sandy_nta',
-    dep_extreme_2080_nta: 'dep_extreme_2080_nta',
-    dep_moderate_2050_nta: 'dep_moderate_2050_nta',
-    dep_moderate_current_nta: 'dep_moderate_current_nta',
-    nyc311_nta: 'nyc311_nta',
-    microtopo_nta: 'microtopo_nta',
-  };
-  const key = STEP_TO_STATE[stepName];
-  if (!key) return [];
-  // A pebble the planner did not select reports {skipped: ...}: it did not
-  // run, so it has no value (its card says "Not run"), never a finding.
-  if ((result as Record<string, unknown> | null)?.skipped) return [];
-
-  // Translate the slim summary shapes the FSM emits into the
-  // doc-payload shapes the card builders expect. Mostly identity
-  // (the summaries already nest the relevant fields), with a few
-  // exceptions documented inline.
-  if (stepName === 'sandy_inundation') {
-    // FSM summary: { inside: bool }. Adapter expects state.sandy === true.
-    const r = result as Record<string, unknown> | null;
-    live[key] = ok && r?.inside === true ? true : (ok ? false : null);
-  } else if (stepName === 'dep_stormwater') {
-    // FSM summary: { dep_extreme_2080: 'label', dep_moderate_2050: 'label', ... }.
-    // Adapter expects state.dep[scen] = { depth_class, depth_label }.
-    // Reconstruct depth_class>0 from any non-empty label.
-    const r = (result as Record<string, unknown>) ?? {};
-    const dep: Record<string, unknown> = {};
-    for (const [scen, label] of Object.entries(r)) {
-      const lbl = typeof label === 'string' ? label : '';
-      if (!lbl) continue;
-      dep[scen] = { depth_class: 1, depth_label: lbl };
-    }
-    live[key] = Object.keys(dep).length ? dep : null;
-  } else if (ok && result != null) {
-    live[key] = result;
-  } else {
-    live[key] = null;
-  }
-
-  return [key];
 }
 
 /** What produced the briefing, in words: the mode line on screen and in

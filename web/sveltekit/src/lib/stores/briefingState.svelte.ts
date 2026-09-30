@@ -116,8 +116,8 @@ class BriefingState {
    *  pill. /q/[queryId]/+page.svelte is the canonical writer.
    */
   phase = $state<RunPhase>('idle');
-  /** The most recent step name the FSM emitted — e.g. `floodnet`,
-   *  `terramind_lulc`. Pretty-printed by AppHeader via STEP_LABELS. */
+  /** The most recent step name the FSM emitted, e.g. `floodnet` or
+   *  `nyc311`. Pretty-printed by AppHeader via STEP_LABELS. */
   activeStep = $state<string | null>(null);
   /** How many specialists have fired (any non-error status) so far. */
   firedCount = $state(0);

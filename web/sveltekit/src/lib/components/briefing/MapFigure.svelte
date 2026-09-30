@@ -61,8 +61,6 @@
         floodnet={run.floodnetFc}
         radii={run.radii}
         registerPoints={run.registerPointsFc}
-        terramindLulc={run.terramindLulcFc}
-        terramindBuildings={run.terramindBuildingsFc}
         areaBoundary={run.areaBoundary}
         {selectedPoint}
         onSelectPoint={(pid) => (selectedPoint = pid)}

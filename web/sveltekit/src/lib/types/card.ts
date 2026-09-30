@@ -39,30 +39,22 @@ export const STONE_META: Record<StoneKey, StoneMeta> = {
   capstone:    { name: 'Capstone',    role: 'the synthesizer',    tag: 'writes it all down with citations' },
 };
 
-/** 14 card body variants — one renderer per shape.
+/** Card body variants, one renderer per shape.
  *
  *    timeseries-ft  — v0.4.5 §5: timeseries + fine-tuned-model footer
  *                     (HF model-card link, RMSE, hardware badge).
- *    lulc           — v0.4.5 §4: raster + horizontal stacked class-mix bar
- *                     for TerraMind LULC outputs.
  */
 export type CardVariant =
   | 'headline'
   | 'tabular'
   | 'scalars'
-  | 'spark'
   | 'histogram'
   | 'timeseries'
   | 'timeseries-ft'
-  | 'forecast'
   | 'raster'
   | 'raster-pred'
-  | 'lulc'
   | 'register'
-  | 'comparison'
   | 'meta';
-
-export type Citation = { id: string; label: string; href?: string };
 
 export type RegisterRow = {
   reg: string;        // "MTA" | "NYCHA" | "DOE" | "DOH" | "PLUTO" | ...
@@ -77,20 +69,6 @@ export type RegisterRow = {
 };
 
 export type ScalarCell = { value: string; label: string; unit?: string };
-
-export type ForecastBand = {
-  year: number;
-  low: number;
-  mid: number;
-  high: number;
-};
-
-export type ComparisonSide = {
-  tier: Tier;
-  label: string;
-  value: string;
-  aux?: string;
-};
 
 export type MetaRow = { k: string; v: string };
 
@@ -113,8 +91,6 @@ export type RasterKind =
   | 'fema-ae'
   | 'hwm'
   | 'prithvi'
-  | 'lulc'
-  | 'buildings'
   | 'floodnet-density';
 
 /** A single Findings card. Most fields are variant-specific. */
@@ -136,7 +112,6 @@ export type Card = {
   /** Footer chrome — always shown. */
   docId: string;
   citeId?: string | null;
-  cites?: Citation[];
 
   /** Map cross-link key. Hovering this card lights up the matching map
    *  layer; hovering the layer outlines this card. */
@@ -172,8 +147,7 @@ export type Card = {
   // scalars
   scalars?: ScalarCell[];
 
-  // spark / histogram
-  spark?: number[];
+  // histogram
   histogram?: number[];
 
   // timeseries
@@ -183,19 +157,11 @@ export type Card = {
     peakLabel: string;
   };
 
-  // forecast
-  forecast?: ForecastBand[];
-
   // raster / raster-pred
   rasterKind?: RasterKind;
 
   // register
   registers?: RegisterRow[];
-
-  // comparison (always synthetic-tier)
-  left?: ComparisonSide;
-  right?: ComparisonSide;
-  delta?: string;
 
   // meta
   metaRows?: MetaRow[];
@@ -206,9 +172,6 @@ export type Card = {
   rmse?: string;
   skillVsPersistence?: string;
   hardwareBadge?: string;
-
-  // lulc — class-mix bar (v0.4.5 §4)
-  classMix?: { k: string; pct: number; color: string }[];
 };
 
 /** Per-specialist run-state. v0.4.5 splits the v0.4.4 `ok|warn|error|silent`
@@ -268,10 +231,3 @@ export type FindingsData = {
    *  (failed steps excluded). Feeds the "Ran but returned no data" list. */
   noData?: { id: string; title: string }[];
 };
-
-/** Density toggle — affects card padding + register row height. */
-export type Density = 'comfortable' | 'compact';
-
-/** Provenance-trace expansion mode. Smart = collapsed if all-ok, expanded
- *  if any specialist warned / errored / went silent. */
-export type ProvenanceMode = 'smart' | 'all-expanded' | 'all-collapsed';

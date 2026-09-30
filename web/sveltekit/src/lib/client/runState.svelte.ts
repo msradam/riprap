@@ -8,14 +8,13 @@
  * route only; the gallery leaves them empty.
  */
 import type { FeatureCollection } from 'geojson';
-import { adaptFinalToFindings, applyStepEventToLiveState } from './cardAdapter';
+import { adaptFinalToFindings } from './cardAdapter';
 import { parseBriefing, citationFromMeta } from './parseBriefing';
 import { citationList, type FinalResult, type PlanInfo, type StepEvent } from './agentStream';
 import type { TraceNode } from '$lib/types/trace';
 import type { ErrorKey } from '$lib/types/states';
 import type { FindingsData } from '$lib/types/card';
 import type { BriefingBlock, Citation } from '$lib/types/claim';
-import { tierForStep } from '$lib/types/tier';
 import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 
 // Mirrors _QUESTION_WORDS in app/planner.py. The heuristic (no-LLM)
@@ -73,26 +72,14 @@ const TTM_PARENT_ID = 'group-ttm-r2';
 /** Per-step headline fields for the collapsed trace row. Unknown steps
  *  fall back to their first two scalar fields. */
 const STEP_NOTE_KEYS: Record<string, string[]> = {
-  sandy_inundation: ['inside'],
-  dep_stormwater: ['dep_extreme_2080', 'dep_moderate_2050'],
   floodnet: ['n_sensors', 'n_events_3y'],
   nyc311: ['n'],
   noaa_tides: ['observed_ft_mllw', 'residual_ft', 'station'],
   nws_alerts: ['n_active'],
   nws_obs: ['p1h_mm', 'p6h_mm', 'station'],
   ttm_311_forecast: ['forecast_mean', 'forecast_peak'],
-  ida_hwm_2021: ['n_within_800m', 'max_height_above_gnd_ft'],
-  prithvi_eo_v2: ['nearest_distance_m'],
   prithvi_water: ['new_water_m2_within_radius', 'frac_observed_within_radius'],
-  microtopo_lidar: ['elev_m', 'pct_200m', 'relief_m'],
-  mta_entrance_exposure: ['n_entrances', 'n_inside_sandy_2012', 'n_in_dep_extreme_2080'],
-  nycha_development_exposure: ['n_developments', 'n_inside_sandy_2012', 'n_in_dep_extreme_2080'],
-  doe_school_exposure: ['n_schools', 'n_inside_sandy_2012'],
-  doh_hospital_exposure: ['n_hospitals', 'n_inside_sandy_2012'],
-  floodnet_forecast: ['sensor_id', 'distance_m', 'forecast_28d'],
-  terramind_synthesis: ['tim_chain', 'dem_mean_m'],
-  rag_granite_embedding: ['hits'],
-  gliner_extract: ['sources']
+  floodnet_forecast: ['sensor_id', 'distance_m', 'forecast_28d']
 };
 
 function fmtKV(k: string, v: unknown): string {
@@ -328,12 +315,6 @@ export function areaBoundaryGeometry(
   return undefined;
 }
 
-function polygons(v: unknown): FeatureCollection | undefined {
-  const r = v as Rec | null | undefined;
-  const pg = r?.ok ? (r.polygons_geojson as FeatureCollection | undefined) : undefined;
-  return pg?.type === 'FeatureCollection' && (pg.features?.length ?? 0) > 0 ? pg : undefined;
-}
-
 export class RunState {
   plan = $state<PlanInfo | null>(null);
   planTokens = $state('');
@@ -345,16 +326,14 @@ export class RunState {
   traceRoot = $state.raw<TraceNode>({
     id: 'root', name: 'briefing.run', status: 'ok', ms: 0, tier: null, children: []
   });
-  /** Per-step results keyed by state name; cards stream in from these
-   *  until `final` supersedes them. */
+  /** Per-step results keyed by step name (the pebble id); cards stream
+   *  in from these until `final` supersedes them. */
   liveResults = $state<Rec>({});
   liveTick = $state(0);
 
   address = $state<Place | null>(null);
   ntaCode = $state<string | null>(null);
   registerPointsFc = $state<FeatureCollection | undefined>(undefined);
-  terramindLulcFc = $state<FeatureCollection | undefined>(undefined);
-  terramindBuildingsFc = $state<FeatureCollection | undefined>(undefined);
   // Written by the live route from /api/layers/*; empty on the gallery.
   sandyFc = $state<FeatureCollection | undefined>(undefined);
   depFc = $state<FeatureCollection | undefined>(undefined);
@@ -444,14 +423,18 @@ export class RunState {
     empirical: (this.sandyFc?.features.length ?? 0) + (this.idaHwmFc?.features.length ?? 0) +
       (this.floodnetFc?.features.length ?? 0),
     modeled: this.depFc?.features.length ?? 0,
-    synthetic: (this.synFc?.features.length ?? 0) + (this.terramindLulcFc?.features.length ?? 0),
+    synthetic: this.synFc?.features.length ?? 0,
     proxy: this.proxyFc?.features.length ?? 0
   });
 
   /** Apply one `step` event. `fallbackLabel` names the address when the
    *  geocoder result has none. */
   applyStep(s: StepEvent, fallbackLabel: string): void {
-    applyStepEventToLiveState(this.liveResults, s.step, s.result, s.ok);
+    // A pebble the planner did not select reports {skipped: ...}: it did
+    // not run, so it has no value (its card says "Not run"), never a finding.
+    if (!(s.result as Rec | null | undefined)?.skipped) {
+      this.liveResults[s.step] = s.ok && s.result != null ? s.result : null;
+    }
     this.liveTick += 1;
 
     if (s.step === 'geocode') {
@@ -495,7 +478,7 @@ export class RunState {
       name: s.step,
       status,
       ms: elapsedMs,
-      tier: tierForStep(s.step),
+      tier: pebbleManifest.byId[s.step]?.tier ?? null,
       note: summarizeStepNote(s.step, s.result, s.err, status),
       // Raw structured payload, shown on click in the trace.
       output: s.result != null ? (s.result as object) : (s.err ?? null),
@@ -540,9 +523,6 @@ export class RunState {
     this.floodnetFc = buildFloodnetFc(fr);
     this.proxyFc = build311Fc(fr);
     this.radii = searchRadii(fr);
-    // TerraMind LULC LoRA wins over the synthesis output when both fired.
-    this.terramindLulcFc = polygons(fr.terramind_lulc) ?? polygons(fr.terramind) ?? this.terramindLulcFc;
-    this.terramindBuildingsFc = polygons(fr.terramind_buildings) ?? this.terramindBuildingsFc;
   }
 
   /** Stream closed. Flags the all-silent state when the address resolved

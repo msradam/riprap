@@ -299,19 +299,3 @@ export function citedDocIds(blocks: BriefingBlock[]): Set<string> {
   }
   return ids;
 }
-
-/**
- * HTML escape — kept around because the v0.4.1 parser used it for the
- * status-preamble fallback path. The v0.4.2 parser drops the preamble
- * entirely (the reconciler doesn't emit one), so this is currently
- * dead-code documentation. If the preamble path comes back, wire it
- * here.
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}

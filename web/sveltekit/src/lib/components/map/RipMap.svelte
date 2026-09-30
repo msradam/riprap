@@ -45,13 +45,6 @@
      *  not gated by `activeLayers`. */
     registerPoints?: GeoJSON.FeatureCollection;
     registerPolygons?: GeoJSON.FeatureCollection;
-    /** TerraMind-synthesis LULC polygons from the SSE final payload
-     *  (terramind.polygons_geojson). Categorical fill by `fill_color`
-     *  property; synthetic tier; controlled by the SYN master toggle. */
-    terramindLulc?: GeoJSON.FeatureCollection;
-    /** TerraMind Buildings LoRA polygons (terramind_buildings.polygons_geojson).
-     *  Synthetic tier; purple outline to distinguish from LULC fill. */
-    terramindBuildings?: GeoJSON.FeatureCollection;
     /** Prithvi-NYC-Pluvial flood prediction polygons (prithvi_live.polygons_geojson).
      *  Modeled tier; teal fill at low opacity. */
     prithviLive?: GeoJSON.FeatureCollection;
@@ -86,8 +79,6 @@
     proxy311,
     registerPoints,
     registerPolygons,
-    terramindLulc,
-    terramindBuildings,
     prithviLive,
     idaHwm,
     floodnet,
@@ -321,8 +312,6 @@
   $effect(() => { setSourceData('syn-prior', syntheticPrior); });
   $effect(() => { setSourceData('register-points', registerPoints); });
   $effect(() => { setSourceData('register-polygons', registerPolygons); });
-  $effect(() => { setSourceData('terramind-lulc', terramindLulc); });
-  $effect(() => { setSourceData('terramind-buildings', terramindBuildings); });
   $effect(() => { setSourceData('prithvi-live', prithviLive); });
   $effect(() => { setSourceData('area-boundary', boundaryFc()); });
 
@@ -352,10 +341,6 @@
   $effect(() => {
     setLayerVisibility('tier-synthetic-fill', activeLayers.synthetic);
     setLayerVisibility('tier-synthetic-line', activeLayers.synthetic);
-    setLayerVisibility('terramind-lulc-fill', activeLayers.synthetic);
-    setLayerVisibility('terramind-lulc-line', activeLayers.synthetic);
-    setLayerVisibility('terramind-buildings-fill', activeLayers.synthetic);
-    setLayerVisibility('terramind-buildings-line', activeLayers.synthetic);
     setLayerVisibility('prithvi-live-fill', activeLayers.modeled);
     setLayerVisibility('prithvi-live-line', activeLayers.modeled);
     setLayerVisibility('area-boundary-fill', activeLayers.empirical);
@@ -430,8 +415,6 @@
       map.addSource('syn-prior', { type: 'geojson', data: syntheticPrior ?? fcEmpty() });
       map.addSource('register-points', { type: 'geojson', data: registerPoints ?? fcEmpty() });
       map.addSource('register-polygons', { type: 'geojson', data: registerPolygons ?? fcEmpty() });
-      map.addSource('terramind-lulc', { type: 'geojson', data: terramindLulc ?? fcEmpty() });
-      map.addSource('terramind-buildings', { type: 'geojson', data: terramindBuildings ?? fcEmpty() });
       map.addSource('prithvi-live', { type: 'geojson', data: prithviLive ?? fcEmpty() });
       map.addSource('area-boundary', { type: 'geojson', data: boundaryFc() });
       map.addSource('queried-address', {
@@ -459,30 +442,6 @@
       });
 
       // proxy 311 complaints: deck.gl hollow rings now (buildDeckLayers).
-
-      // TerraMind-synthesis LULC categorical fill (synthetic prior tier).
-      // Per-feature fill_color property carries class-specific color from
-      // LULC_FILL_COLORS in terramind_synthesis.py. Rendered below register
-      // pins so asset markers stay dominant. Opacity kept low (0.25) so the
-      // Sandy/DEP flood-zone blues read through.
-      map.addLayer({
-        id: 'terramind-lulc-fill', type: 'fill', source: 'terramind-lulc',
-        paint: { 'fill-color': ['get', 'fill_color'], 'fill-opacity': 0.25 }
-      });
-      map.addLayer({
-        id: 'terramind-lulc-line', type: 'line', source: 'terramind-lulc',
-        paint: { 'line-color': ['get', 'fill_color'], 'line-width': 0.75, 'line-opacity': 0.45, 'line-dasharray': [3, 2] }
-      });
-
-      // TerraMind Buildings LoRA — purple outline, synthetic tier.
-      map.addLayer({
-        id: 'terramind-buildings-fill', type: 'fill', source: 'terramind-buildings',
-        paint: { 'fill-color': '#7C3AED', 'fill-opacity': 0.15 }
-      });
-      map.addLayer({
-        id: 'terramind-buildings-line', type: 'line', source: 'terramind-buildings',
-        paint: { 'line-color': '#7C3AED', 'line-width': 1.0, 'line-opacity': 0.6, 'line-dasharray': [2, 2] }
-      });
 
       // Prithvi-NYC-Pluvial flood prediction — teal fill, modeled tier.
       map.addLayer({
