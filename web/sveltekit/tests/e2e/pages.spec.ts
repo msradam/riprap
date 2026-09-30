@@ -70,6 +70,9 @@ const NYC_NEEDLES = [
  *  `.streaming-caret` blink (`{#if !streamDone}`, +page.svelte) is what
  *  actually tracks streamDone, so both must clear. */
 async function waitForDone(page: Page, timeoutMs: number): Promise<void> {
+  // The route mounts after `goto` resolves; wait for the title so an empty
+  // page is not mistaken for a finished run.
+  await expect(page.locator('#brief-h1')).toBeVisible({ timeout: 30_000 });
   await expect(page.locator('.generating-status')).toHaveCount(0, { timeout: timeoutMs });
   await expect(page.locator('.streaming-caret')).toHaveCount(0, { timeout: timeoutMs });
   // And the live status pill must have cleared (phase=done hides it).
