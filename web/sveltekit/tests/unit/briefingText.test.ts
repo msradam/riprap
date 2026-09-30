@@ -51,10 +51,18 @@ describe('figureOf', () => {
     expect(figureOf(card({ scalars: [{ value: '7.8', label: 'Distance to station (km)' }] }))).toBeNull();
     expect(figureOf(card({ scalars: [{ value: '2007', label: 'FIRM panel effective year' }], headline: '2007 panel' }))).toBeNull();
   });
-  it('falls back to a leading number in the headline', () => {
-    expect(figureOf(card({ headline: '82 calls' }))?.value).toBe('82');
+  it('falls back to a leading number in the headline, with its unit or noun', () => {
+    expect(figureOf(card({ headline: '82 complaints' }))?.value).toBe('82 complaints');
+    expect(figureOf(card({ headline: '0.5 events' }))?.value).toBe('0.5 events');
     expect(figureOf(card({ headline: '0 m² new water within 500 m' }))?.value).toBe('0 m²');
+    // A noun is kept only when it closes the headline.
+    expect(figureOf(card({ headline: '3 of 5 listed' }))?.value).toBe('3');
     expect(figureOf(card({ headline: 'No active alerts' }))).toBeNull();
+  });
+  it('shows no figure for a gauge count: it is not a reading', () => {
+    expect(figureOf(card({ scalars: [{ value: '0', label: 'Gauges in the area' }] }))).toBeNull();
+    expect(figureOf(card({ scalars: [{ value: '3', label: 'Gauges in the area' }, { value: '0.28', unit: 'ft', label: 'Stream stage' }] })))
+      .toEqual({ value: '0.28 ft', label: 'Stream stage' });
   });
 });
 

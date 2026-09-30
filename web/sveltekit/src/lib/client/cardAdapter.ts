@@ -552,10 +552,13 @@ function buildHistogramCard(m: PebbleManifest, value: unknown): Card | null {
   const t = value as HistogramValue | null;
   if (!t) return null;
   const n = num(t.n) ?? 0;
-  // Honest negative ("0 calls") still surfaces — same all-clear contract
+  // Honest negative ("0 complaints") still surfaces — same all-clear contract
   // as the NWS / ida_hwm cards. The narrative explains the zero.
   const hist = Array.isArray(t.histogram) ? t.histogram : [];
-  const headline = t.headline_value ?? `${n} call${n === 1 ? '' : 's'}`;
+  // The count in the noun the sentence uses, so the figure column reads
+  // "82 complaints"; the backend's own headline ("82 calls") only when
+  // there is no count.
+  const headline = num(t.n) != null ? `${n} complaint${n === 1 ? '' : 's'}` : t.headline_value ?? `${n} complaints`;
   const radius = num(t.radius_m);
   const years = num(t.years);
   const sparkSub = (radius != null && years != null)
@@ -741,6 +744,17 @@ export function pebbleInScope(m: PebbleManifest, intent: string | null | undefin
   return (m.scope ?? 'point') === want;
 }
 
+/** A scalar with its unit apart from its label ("Elevation (m)" is 14.87
+ *  with the unit m, labelled Elevation), so the figure column prints the
+ *  unit with the number. A water level is stated against its datum, as
+ *  the sentence states it ("6.6 ft above MLLW"). */
+function scalarCell(key: string, v: number, label: string, value: Record<string, unknown>): NonNullable<Card['scalars']>[number] {
+  const m = /^(.*) \(([^()]+)\)$/.exec(label);
+  const datum = key === 'observed_ft' ? str(value.datum) : null;
+  const unit = datum ? `ft above ${datum}` : m?.[2];
+  return { value: `${v}`, label: m ? m[1] : label, ...(unit && { unit }) };
+}
+
 function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card | null {
   // The manifest's `display.variant` is an explicit per-pebble override
   // of the kind→variant default (e.g. sandy.yaml: `kind: stat, variant:
@@ -828,9 +842,7 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
       for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
         const label = FIELD_LABELS[k];
         if (SCALAR_IGNORE.has(k) || !label) continue;
-        if (typeof v === 'number' && Number.isFinite(v)) {
-          scalars.push({ value: `${v}`, label });
-        }
+        if (typeof v === 'number' && Number.isFinite(v)) scalars.push(scalarCell(k, v, label, value));
       }
     } else if (typeof value === 'number') {
       scalars.push({ value: `${value}`, label: m.title });

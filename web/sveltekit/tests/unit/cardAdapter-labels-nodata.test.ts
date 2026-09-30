@@ -25,6 +25,17 @@ describe('card labels and no-data sources', () => {
     expect(labels.filter((l) => /_/.test(l))).toEqual([]);
   });
 
+  it('sets a scalar unit apart from its label, the water level against its datum', () => {
+    const scalars = data.cards.flatMap((c) => c.scalars ?? []);
+    expect(scalars.find((s) => s.label === 'Observed water level')?.unit).toMatch(/^ft above [A-Z]+$/);
+    expect(scalars.find((s) => s.label === 'Elevation')?.unit).toBe('m');
+    expect(scalars.filter((s) => /\(/.test(s.label))).toEqual([]);
+  });
+
+  it('counts 311 complaints in the noun the sentence uses', () => {
+    expect(data.cards.find((c) => c.variant === 'histogram')?.headline).toMatch(/^\d+ complaints?$/);
+  });
+
   it('keeps hyphenated source names whole', () => {
     expect(data.cards.map((c) => c.source)).toContain('NOAA CO-OPS');
   });

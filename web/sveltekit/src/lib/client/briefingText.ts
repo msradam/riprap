@@ -43,12 +43,16 @@ export function citedIn(paras: ClaimPart[][]): string[] {
   return [...new Set(paras.flat().flatMap((p) => (p.cite ? [p.cite] : [])))];
 }
 
-const FIGURE_RE = /^\d[\d.,]*(?:\s?(?:%|m²|cm|mm|ft|in|m\b|\/wk))?/;
+/** A figure and its unit at the start of a headline: a unit symbol ("22
+ *  cm", "0.2/wk") or, when the headline is the figure and its noun alone
+ *  ("82 complaints", "0.5 events"), that noun. */
+const FIGURE_RE = /^\d[\d.,]*(?:\s?(?:%|m²|cm|mm|ft|in|m\b|\/wk)|\s[a-z]+(?=$|[.,;:]))?/;
 
 /** A scalar that places or dates the finding ("Distance to station (km)",
- *  "FIRM panel effective year") rather than measuring it, or a temperature,
- *  which is a frozen weather reading on a snapshot, not flood evidence. */
-const NOT_FIGURE_RE = /distance|effective|year|date|temperature/i;
+ *  "FIRM panel effective year", "Gauges in the area") rather than measuring
+ *  it, or a temperature, which is a frozen weather reading on a snapshot,
+ *  not flood evidence. */
+const NOT_FIGURE_RE = /distance|effective|year|date|temperature|gauges/i;
 const TEMPERATURE_RE = /°/;
 
 /** The evidence table's figure: the finding's own quantity, the first
