@@ -70,7 +70,8 @@ describe('briefingFromFinal', () => {
   it('carries citation maturity and retrieval date, and the source list badges experimental ones', () => {
     const { citations } = briefingFromFinal(final);
     expect(citations.ttm_battery_surge.maturity).toBe('experimental');
-    expect(citations.ttm_battery_surge.retrieved).toBe('2026-09-26');
+    // The full stamp: a live reading prints "fetched 2026-09-26 19:33 UTC".
+    expect(citations.ttm_battery_surge.retrieved).toBe('2026-09-26T19:33Z');
     const { container } = render(SourceList, { props: { citations: Object.values(citations), noted: [] } });
     const badges = container.querySelectorAll('.exp-badge');
     expect(badges).toHaveLength(1);
