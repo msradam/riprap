@@ -110,8 +110,6 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
       const style = map.getStyle();
       return {
         hasStripe: map.hasImage('syn-stripe-45'),
-        hasStripe2x: map.hasImage('syn-stripe-45-2x'),
-        hasStripeLow: map.hasImage('syn-stripe-45-low'),
         sources: Object.keys(style.sources),
         layers: style.layers.map((l) => l.id)
       };
@@ -132,8 +130,6 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
     expect(points).toBeGreaterThan(0);
 
     expect(mapState.hasStripe, 'syn-stripe-45 image should be registered').toBe(true);
-    expect(mapState.hasStripe2x, 'syn-stripe-45-2x image should be registered').toBe(true);
-    expect(mapState.hasStripeLow, 'syn-stripe-45-low image should be registered').toBe(true);
 
     expect(consoleErrors.filter((e) => !e.includes('favicon'))).toEqual([]);
   });

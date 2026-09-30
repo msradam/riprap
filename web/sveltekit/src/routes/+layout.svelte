@@ -3,7 +3,6 @@
   import type { Snippet } from 'svelte';
   import AppHeader from '$lib/components/shell/AppHeader.svelte';
   import AppFooter from '$lib/components/shell/AppFooter.svelte';
-  import SkipLink from '$lib/components/shell/SkipLink.svelte';
   import { briefingState } from '$lib/stores/briefingState.svelte';
   import { afterNavigate } from '$app/navigation';
   import { page } from '$app/state';
@@ -48,7 +47,8 @@
 </svelte:head>
 
 {#if !chromeFree}
-  <SkipLink />
+  <!-- USWDS skip link: hidden until focused, never display:none. -->
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   <AppHeader {query} offline={isGallery || isLanding} onResetCold={() => (window.location.href = query ? `${resolve('/')}?q=${encodeURIComponent(query)}` : resolve('/'))} />
 {/if}
 <main id={chromeFree ? undefined : 'main-content'} tabindex="-1">{@render children()}</main>
@@ -57,6 +57,24 @@
 {/if}
 
 <style>
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 8px;
+    padding: 8px 12px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    z-index: 1000;
+    text-decoration: none;
+  }
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    left: 8px;
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
   main {
     min-height: calc(100vh - 200px);
   }

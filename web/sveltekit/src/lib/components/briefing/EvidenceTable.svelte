@@ -4,7 +4,7 @@
   import { TIER_WORDS } from '$lib/types/tier';
   import { asOfDate, figureOf, leadClause, sharedStem, snapshotNote, withoutSubject } from '$lib/client/briefingText';
   import { activateCitation } from '$lib/stores/citations.svelte';
-  import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
+  import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
 
   /** The evidence exhibit: one row per source that found something, the
    *  rows the answer cites first, then one group per Stone. A `closed`
@@ -113,7 +113,7 @@
            those cells. -->
       <span class="ev-source-line" aria-hidden="true">
         {#if c.experimental}{c.source} <span class="exp-badge">Experimental</span>{:else}{c.source}{/if}
-        <span class="ev-meta"><span class="ev-mark" style:color="var(--tier-{c.tier})"><TierGlyph tier={c.tier} size={11} /></span>{TIER_WORDS[c.tier] ?? c.tier}{#if same}{#if atSnapshot(c.vintage)}, {@render date(c.vintage)}{:else}, data as of {@render date(c.vintage)}{/if}{/if}</span>
+        <span class="ev-meta"><span class="ev-mark" style:color="var(--tier-{c.tier})"><EvidenceMark tier={c.tier} size={11} /></span>{TIER_WORDS[c.tier] ?? c.tier}{#if same}{#if atSnapshot(c.vintage)}, {@render date(c.vintage)}{:else}, data as of {@render date(c.vintage)}{/if}{/if}</span>
       </span>
       {#if c.parts}
         {@const st = stemOf(c)}
@@ -146,7 +146,7 @@
       {/if}
     </td>
     <td class="ev-tier" headers={h('tier')}>
-      <span class="ev-mark" style:color="var(--tier-{c.tier})" aria-hidden="true"><TierGlyph tier={c.tier} size={11} /></span>
+      <span class="ev-mark" style:color="var(--tier-{c.tier})" aria-hidden="true"><EvidenceMark tier={c.tier} size={11} /></span>
       {TIER_WORDS[c.tier] ?? c.tier}
     </td>
     <td class={['ev-asof', !same && 'is-empty']} headers={h('asof')}>

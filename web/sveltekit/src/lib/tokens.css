@@ -135,8 +135,8 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* ── Report-content tokens (--riprap-*) ──
    The report content (briefing, register, marks, citations, print, map
-   layer encoding) reads these names, and RipMap and EvidenceMark read
-   the tier ones by computed name. Each aliases the block above instead
+   layer encoding) reads these names, and RipMap reads the tier ones by
+   computed name (tokenColor). Each aliases the block above instead
    of restating its hex, so one colour cannot drift under two names. */
 :root {
   --riprap-white:          #FFFFFF;
@@ -150,6 +150,5 @@ a:hover { text-decoration-thickness: 2px; }
   --riprap-tier-empirical: var(--tier-empirical);
   --riprap-tier-modeled:   var(--tier-modeled);
   --riprap-tier-proxy:     var(--tier-proxy);
-  --riprap-tier-synthetic: var(--tier-synthetic);
   --riprap-font-mono:      var(--font-mono);
 }

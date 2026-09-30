@@ -14,10 +14,8 @@
   interface Props {
     /** Pixel size of the square mark. Default 18px (wordmark scale). */
     size?: number;
-    /** Aria label override; default 'Riprap'. */
-    label?: string;
   }
-  let { size = 18, label = 'Riprap' }: Props = $props();
+  let { size = 18 }: Props = $props();
 </script>
 
 <svg
@@ -28,7 +26,7 @@
   height={size}
   fill="currentColor"
   role="img"
-  aria-label={label}
+  aria-label="Riprap"
 >
   <rect x="2.16669" y="3" width="9.99998" height="3.33333" />
   <rect x="2.16669" y="9.66665" width="9.99998" height="3.33333" />

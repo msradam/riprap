@@ -21,7 +21,6 @@ import AppHeader from '$lib/components/shell/AppHeader.svelte';
 import AppFooter from '$lib/components/shell/AppFooter.svelte';
 import StatusPill from '$lib/components/shell/StatusPill.svelte';
 import RipMark from '$lib/components/shell/RipMark.svelte';
-import SkipLink from '$lib/components/shell/SkipLink.svelte';
 // Briefing
 import AnswerProse from '$lib/components/briefing/AnswerProse.svelte';
 import SourceNotes from '$lib/components/briefing/SourceNotes.svelte';
@@ -37,7 +36,6 @@ import { briefingModel } from '$lib/client/briefingModel';
 import ErrorCard from '$lib/components/states/ErrorCard.svelte';
 import SkeletonBriefing from '$lib/components/states/SkeletonBriefing.svelte';
 // Glyphs
-import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
 import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
 
 const CITATION = {
@@ -57,7 +55,6 @@ const CASES: SmokeCase[] = [
   { name: 'AppFooter',         Component: AppFooter,         props: {} },
   { name: 'StatusPill',        Component: StatusPill,        props: {} },
   { name: 'RipMark',           Component: RipMark,           props: {} },
-  { name: 'SkipLink',          Component: SkipLink,          props: {} },
 
   // Briefing
   { name: 'AnswerProse',       Component: AnswerProse,
@@ -83,8 +80,6 @@ const CASES: SmokeCase[] = [
   { name: 'SkeletonBriefing',  Component: SkeletonBriefing,  props: {} },
 
   // Glyphs
-  { name: 'TierGlyph',         Component: TierGlyph,
-    props: { tier: 'empirical' as const, size: 11, color: 'var(--tier-empirical)' } },
   { name: 'EvidenceMark',      Component: EvidenceMark,
     props: { tier: 'empirical' as const, size: 11 } },
 ];

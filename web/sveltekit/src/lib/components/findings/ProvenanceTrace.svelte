@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { StoneMember } from '$lib/types/card';
-  import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
+  import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
   import Self from './ProvenanceTrace.svelte';
 
   /** Indented specialist tree. Each row: status pip, mono id, name, note.
@@ -41,7 +41,7 @@
       <span class="prov-id">{m.id}</span>
       {#if m.tier}
         <span class="prov-tier">
-          <TierGlyph tier={m.tier} size={9} color={`var(--tier-${m.tier})`} />
+          <EvidenceMark tier={m.tier} size={9} color={`var(--tier-${m.tier})`} />
         </span>
       {/if}
       <span class="prov-name">{m.name}</span>

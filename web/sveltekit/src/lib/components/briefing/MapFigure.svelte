@@ -1,6 +1,6 @@
 <script lang="ts">
   import LazyMap from '$lib/components/map/LazyMap.svelte';
-  import TierGlyph from '$lib/components/glyphs/TierGlyph.svelte';
+  import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
   import { AREA_BOUNDARY_LEGEND, type RunState } from '$lib/client/runState.svelte';
 
   /** The single-place map as a figure: the frame and its caption, layer
@@ -84,7 +84,7 @@
               checked={active[l.key]}
               onchange={() => (active = { ...active, [l.key]: !active[l.key] })}
             />
-            <span class="map-layer-mark" style:color="var(--tier-{l.key})" aria-hidden="true"><TierGlyph tier={l.key} size={11} /></span>
+            <span class="map-layer-mark" style:color="var(--tier-{l.key})" aria-hidden="true"><EvidenceMark tier={l.key} size={11} /></span>
             <!-- One flex item, so the count shares the label's baseline. -->
             <span>{l.label}, <span class="data">{run.mapFeatureCounts[l.key]}</span></span>
           </label>
