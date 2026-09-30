@@ -29,12 +29,13 @@ import time
 from datetime import datetime, timedelta
 from typing import Any
 
+from app.live.ttm_forecast import ML_MISSING
+
 log = logging.getLogger("riprap.ttm_battery_surge")
 
 ENABLE = os.environ.get(
     "RIPRAP_TTM_BATTERY_SURGE_ENABLE", "1"
 ).lower() in ("1", "true", "yes")
-DEVICE = os.environ.get("RIPRAP_TTM_BATTERY_SURGE_DEVICE", "cpu")
 REPO = "msradam/Granite-TTM-r2-Battery-Surge"
 
 DOC_ID = "ttm_battery"
@@ -61,20 +62,6 @@ MIN_INTERESTING_RESIDUAL_M = float(
     os.environ.get("RIPRAP_TTM_BATTERY_MIN_INTERESTING_M", "0.3"))
 
 _MODEL = None
-
-
-def _has_required_deps() -> tuple[bool, str | None]:
-    missing: list[str] = []
-    import importlib.util
-
-    missing = [n for n in ("tsfm_public", "huggingface_hub", "torch")
-               if importlib.util.find_spec(n) is None]
-    if missing:
-        return False, "the ml extra is not installed (uv sync --extra ml)"
-    return True, None
-
-
-_DEPS_OK, _DEPS_MISSING = _has_required_deps()
 
 
 def _ensure_model():
@@ -236,8 +223,8 @@ def fetch(timeout_s: float = 60.0) -> dict[str, Any]:
         return {"available": False,
                 "reason": "RIPRAP_TTM_BATTERY_SURGE_ENABLE=0"}
 
-    if not _DEPS_OK:
-        return {"available": False, "reason": _DEPS_MISSING}
+    if ML_MISSING:
+        return {"available": False, "reason": ML_MISSING}
     t0 = time.time()
     try:
         df = _fetch_battery_history(CONTEXT_LENGTH)
@@ -251,22 +238,15 @@ def fetch(timeout_s: float = 60.0) -> dict[str, Any]:
 
         residuals = df["surge_residual_m"].to_numpy().astype("float32")
 
-        forecast = None
-        compute = "local CPU"
-        if forecast is None:
-            if not _DEPS_OK:
-                return {"available": False,
-                        "reason": f"deps unavailable on this deployment: "
-                                  f"{_DEPS_MISSING}"}
-            import torch
-            model = _ensure_model()
-            past = torch.from_numpy(residuals).unsqueeze(0).unsqueeze(-1)
-            with torch.no_grad():
-                out = model(past_values=past)
-            forecast = out.prediction_outputs.squeeze(-1).squeeze(0).cpu().numpy()
+        import torch
+        model = _ensure_model()
+        past = torch.from_numpy(residuals).unsqueeze(0).unsqueeze(-1)
+        with torch.no_grad():
+            out = model(past_values=past)
+        forecast = out.prediction_outputs.squeeze(-1).squeeze(0).cpu().numpy()
 
         result = _summarize(df, forecast)
-        result["compute"] = compute
+        result["compute"] = "local CPU"
         result["elapsed_s"] = round(time.time() - t0, 2)
         return result
     except Exception as e:
@@ -278,7 +258,7 @@ def fetch(timeout_s: float = 60.0) -> dict[str, Any]:
 
 def warm():
     """Optional pre-load — amortizes the first-query model build cost."""
-    if not ENABLE or not _DEPS_OK:
+    if not ENABLE or ML_MISSING:
         return
     try:
         _ensure_model()

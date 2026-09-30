@@ -90,26 +90,6 @@ def chat_json(messages: list[dict], schema: dict, *, name: str = "output",
     raise LLMUnavailable("; ".join(errors) or "no LLM endpoint configured")
 
 
-def chat_text(messages: list[dict], *, temperature: float = 0.0, max_tokens: int = 512,
-              timeout_s: float | None = None) -> tuple[str, str]:
-    """Plain completion with the same endpoint fallback."""
-    from openai import OpenAI  # noqa: PLC0415
-
-    timeout_s = timeout_s or float(os.environ.get("RIPRAP_LLM_TIMEOUT_S", "300"))
-    errors = []
-    for ep in endpoints():
-        try:
-            client = OpenAI(base_url=ep.base_url, api_key=ep.api_key, timeout=timeout_s, max_retries=0)
-            resp = client.chat.completions.create(
-                model=ep.model, messages=messages, temperature=temperature, max_tokens=max_tokens,
-            )
-            return resp.choices[0].message.content or "", ep.model
-        except Exception as e:  # noqa: BLE001
-            log.warning("LLM endpoint %s (%s) failed: %r", ep.base_url, ep.model, e)
-            errors.append(f"{ep.base_url} ({ep.model}): {type(e).__name__}: {e}")
-    raise LLMUnavailable("; ".join(errors) or "no LLM endpoint configured")
-
-
 def describe() -> dict:
     """What the UI's backend badge shows. No secrets."""
     eps = endpoints()
