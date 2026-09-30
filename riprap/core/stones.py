@@ -60,6 +60,9 @@ class CoverageDescriptor(BaseModel):
     geocoded point — so a Boston query never fires NYC's `ida_hwm`."""
     model_config = ConfigDict(extra="forbid")
     bbox: list[float] | None = None  # [min_lon, min_lat, max_lon, max_lat]
+    # Optional repo-relative vector file; the point must also fall inside
+    # the union of its features (a bbox alone reaches neighbouring counties).
+    polygon: str | None = None
     city: str | None = None
     state: str | None = None
 

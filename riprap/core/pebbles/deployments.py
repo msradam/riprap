@@ -5,8 +5,14 @@ optional top-level `coverage:` block declaring its bbox + city/state:
 
   coverage:
     bbox: [min_lon, min_lat, max_lon, max_lat]  # WGS84
+    polygon: data/nyc_ntas_2020.geojson         # optional, repo-relative
     city: New York City
     state: NY
+
+The bbox is the quick test; when `polygon` is given, the point must also
+fall inside the union of that file's features (NYC's bbox alone took in
+Hoboken and Nassau County, and the city's own layers then reported them
+"outside the Sandy footprint").
 
 When a query is geocoded, `pick_deployment(lat, lon)` picks the deployment
 whose bbox contains the resolved point. That deployment's manifest set is
@@ -34,12 +40,30 @@ class Deployment:
     bbox: tuple[float, float, float, float] | None  # (min_lon, min_lat, max_lon, max_lat)
     city: str | None
     state: str | None
+    polygon: Path | None = None
 
     def contains(self, lat: float, lon: float) -> bool:
         if self.bbox is None:
             return False
         min_lon, min_lat, max_lon, max_lat = self.bbox
-        return (min_lat <= lat <= max_lat) and (min_lon <= lon <= max_lon)
+        if not ((min_lat <= lat <= max_lat) and (min_lon <= lon <= max_lon)):
+            return False
+        return self.polygon is None or _coverage_shape(self.polygon).contains(_point(lon, lat))
+
+
+def _point(lon: float, lat: float):
+    from shapely.geometry import Point  # noqa: PLC0415
+
+    return Point(lon, lat)
+
+
+@lru_cache(maxsize=4)
+def _coverage_shape(path: Path):
+    """The union of a coverage file's features, prepared for point tests."""
+    import geopandas as gpd  # noqa: PLC0415
+    from shapely.prepared import prep  # noqa: PLC0415
+
+    return prep(gpd.read_file(path).to_crs("EPSG:4326").geometry.union_all())
 
 
 def _repo_root() -> Path:
@@ -77,12 +101,14 @@ def discover_deployments() -> tuple[Deployment, ...]:
                 and all(isinstance(v, (int, float)) for v in bbox_raw)):
             bbox = (float(bbox_raw[0]), float(bbox_raw[1]),
                     float(bbox_raw[2]), float(bbox_raw[3]))
+        poly = cov.get("polygon")
         out.append(Deployment(
             name=child.name,
             root=child.resolve(),
             bbox=bbox,
             city=cov.get("city"),
             state=cov.get("state"),
+            polygon=(_repo_root() / poly) if isinstance(poly, str) and poly else None,
         ))
     return tuple(out)
 

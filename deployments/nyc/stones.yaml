@@ -18,6 +18,9 @@
 # point. Format: [min_lon, min_lat, max_lon, max_lat] (WGS84).
 coverage:
   bbox: [-74.30, 40.49, -73.69, 40.92]
+  # The bbox alone reaches Hoboken and Nassau County; the point must also
+  # lie inside the city's 2020 neighborhood tabulation areas.
+  polygon: data/nyc_ntas_2020.geojson
   city: New York City
   state: NY
 stones:
