@@ -147,3 +147,24 @@ def test_geocode_one_catches_locality_dropped_from_extracted_target(monkeypatch)
         scope_hint="what's the flood risk at 10 Downing Street in London?",
     )
     assert result is None
+
+
+def test_region_biased_street_yields_to_a_national_house_match(monkeypatch):
+    """'1600 Pennsylvania Ave NW, Washington DC' used to land on a Brooklyn
+    avenue: the region-bounded lookup returned the nearest street with no
+    house number and that was accepted as the place."""
+    monkeypatch.setenv("RIPRAP_DEPLOYMENT", "deployments/nyc")
+    gc._active_deployment_bbox.cache_clear()
+
+    def fake_nominatim(text, *, viewbox=None, bounded=False, country_codes="us"):
+        if bounded:
+            return gc.GeocodeHit(address="Pennsylvania Avenue, Livonia Avenue, New Lots, Brooklyn",
+                                 borough="Brooklyn", lat=40.66, lon=-73.89, bbl=None, bin=None, raw={})
+        return gc.GeocodeHit(address="1600, Pennsylvania Avenue Northwest, Washington, District of Columbia",
+                             borough=None, lat=38.8977, lon=-77.0365, bbl=None, bin=None,
+                             raw={"address": {"country_code": "us"}})
+
+    monkeypatch.setattr(gc, "geocode_nominatim", fake_nominatim)
+    monkeypatch.setattr(gc, "geocode", lambda text, limit=5: [])
+    hit = gc.geocode_one("1600 Pennsylvania Ave NW, Washington DC")
+    assert hit is not None and hit.lat == 38.8977

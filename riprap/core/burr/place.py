@@ -41,8 +41,9 @@ _SUFFIX = (r"(?:street|st|avenue|ave|av|boulevard|blvd|road|rd|place|pl|drive|dr
 # Street words need a letter and are never a preposition, so "311 near 200
 # Water Street" finds "200 Water Street", not "311 near 200 Water Street".
 _STREET_WORD = r"(?!(?:near|at|in|on|around|of|for|by|from|to|and|or)\b)[A-Za-z0-9'.]*[A-Za-z][A-Za-z0-9'.]*"
-_ADDRESS_RE = re.compile(rf"\b(\d{{1,6}}(?:-\d{{1,4}})?[A-Za-z]?)\s+((?:{_STREET_WORD}\s+){{0,5}}?{_SUFFIX})\b\.?",
-                         re.IGNORECASE)
+# A quadrant after the street ("Pennsylvania Ave NW") stays with it.
+_ADDRESS_RE = re.compile(rf"\b(\d{{1,6}}(?:-\d{{1,4}})?[A-Za-z]?)\s+((?:{_STREET_WORD}\s+){{0,5}}?{_SUFFIX})\b\.?"
+                         r"(?:\s+(?:NW|NE|SW|SE)\b)?", re.IGNORECASE)
 # After the street: ", Queens", " in the Bronx", ", Red Hook, Brooklyn", ", NY", " 11423".
 _TAIL_AREA_RE = re.compile(r"^\s*(?:,\s*|\s+in\s+(?:the\s+)?)([A-Z][\w.'-]*(?:\s+[A-Z][\w.'-]*){0,2})")
 _TAIL_STATE_RE = re.compile(r"^\s*,?\s*(?:NY|New York)\b(?!\s+(?:City|County))")

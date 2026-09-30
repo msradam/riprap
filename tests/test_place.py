@@ -60,3 +60,9 @@ def test_geocode_match_needs_the_same_number_and_street():
     assert not geocode_matches("80 Pioneer Street", "82, Pioneer Street, Red Hook")
     assert not geocode_matches("2017 East 17th Street, Brooklyn", "2017 East 19th Street, Brooklyn")
     assert not geocode_matches("Yankee Stadium", "Yankee Stadium, Bronx")
+
+
+def test_address_keeps_its_quadrant_and_city():
+    from riprap.core.burr.place import extract_address
+
+    assert extract_address("1600 Pennsylvania Ave NW, Washington DC") == "1600 Pennsylvania Ave NW, Washington DC"

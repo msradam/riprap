@@ -28,6 +28,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 from riprap.core import http
+from riprap.core.burr.place import geocode_matches
 
 log = logging.getLogger("riprap.geocode")
 
@@ -342,6 +343,13 @@ def geocode_one(text: str, *, scope_hint: str | None = None) -> GeocodeHit | Non
         )
     if primary is None:
         primary = geocode_nominatim(text)
+    elif not geocode_matches(text, primary.address):
+        # The region-biased lookup returned the nearest street, not the
+        # house asked for ("1600 Pennsylvania Ave NW" landed on a Brooklyn
+        # avenue). The national lookup wins when it has the house.
+        national = geocode_nominatim(text)
+        if national is not None and geocode_matches(text, national.address):
+            primary = national
     if primary is None:
         return None
     # Enrich with NYC Geosearch when the resolved point is inside the
