@@ -62,17 +62,6 @@ def _check_pool_path(pool: Path) -> None:
         pool.resolve().relative_to(ROOT)
     except ValueError:
         return  # outside the repository
-    ignored = subprocess.run(["git", "check-ignore", "-q", str(pool)], cwd=ROOT).returncode == 0
-    if not ignored:
-        sys.exit(f"{pool} is inside the repository and not git-ignored; keep 311 pools out of the repo")
-
-
-def _check_pool_path(pool: Path) -> None:
-    """A pool inside the repository must be git-ignored: it holds 311 free text."""
-    try:
-        pool.resolve().relative_to(ROOT)
-    except ValueError:
-        return  # outside the repository
     if subprocess.run(["git", "check-ignore", "-q", str(pool)], cwd=ROOT).returncode != 0:
         sys.exit(f"{pool} is inside the repository and not git-ignored; keep 311 pools out of the repo")
 
