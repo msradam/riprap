@@ -21,9 +21,11 @@ _WORDS.update({"thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 7
 _WORD_RE = re.compile(r"\b(" + "|".join(_WORDS) + r")\b", re.IGNORECASE)
 
 ABSENCE_RE = re.compile(r"\b(no|none|not|zero|without|never)\b|n't\b", re.IGNORECASE)
-# A document that itself reports an absence or a zero.
-_DOC_ABSENCE_RE = re.compile(r"\b(no|none|not|zero|without|outside|never)\b|(?<![\d.,])0(?![\d.,])",
-                             re.IGNORECASE)
+# A document that itself reports an absence or a zero. FEMA's zone X is
+# "an area of minimal flood hazard": outside the mapped floodplain, so an
+# absence, not a result a "no" would contradict.
+_DOC_ABSENCE_RE = re.compile(r"\b(no|none|not|zero|without|outside|never)\b|(?<![\d.,])0(?![\d.,])"
+                             r"|minimal flood hazard", re.IGNORECASE)
 # A document or value that says its source could not answer.
 _UNAVAILABLE_RE = re.compile(r"\bunavailable\b|\bnot available\b|could not be (read|reached)|failed to respond"
                              r"|\bunreachable\b", re.IGNORECASE)
