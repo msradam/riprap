@@ -109,7 +109,7 @@
   "neighborhood": "Community district QN12, Queens",
   "address": "QN12",
   "question": "How many street flooding complaints has community district QN12 had?",
-  "reason": "A community district: complaints counted inside its outline, approximated from 2020 neighborhood areas."
+  "reason": "A community district: complaints counted by the 311 record's own community board field; the outline on the map is the union of its 2020 neighborhood areas."
  },
  {
   "slug": "hunts-point-311",
