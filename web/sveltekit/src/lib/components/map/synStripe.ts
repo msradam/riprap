@@ -1,5 +1,5 @@
 /**
- * v0.4.2 §14 — the syn-stripe-45 fill pattern for `tier-synthetic-fill`.
+ * v0.4.2 §14: the syn-stripe-45 fill pattern for `tier-synthetic-fill`.
  *
  * The SVG source is the canonical 12×12 tile from the spec page;
  * registerSynStripe loads it into MapLibre as a named image so

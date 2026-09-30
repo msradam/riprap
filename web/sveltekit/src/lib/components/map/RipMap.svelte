@@ -389,7 +389,7 @@
       // on syn-stripe-45 image registration, layer wiring, etc.
       (window as unknown as { __riprapMap?: typeof map }).__riprapMap = map;
 
-      // v0.4.2 §14 — synthetic-prior fill pattern (SVG source)
+      // v0.4.2 §14: synthetic-prior fill pattern (SVG source)
       registerSynStripe(map);
 
       // sources — sandy-empirical / dep-modeled / proxy-311 / ida-hwm
