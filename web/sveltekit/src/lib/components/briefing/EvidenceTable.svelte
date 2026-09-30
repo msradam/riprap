@@ -78,11 +78,14 @@
 
 <!-- "data as of 2015-11-09", "retrieved 2026-07-11" or "fetched 2026-09-30
      16:05 UTC" (asOfPhrase). Under the "Data as of" column head the first
-     shows its date alone. -->
+     shows its date alone. The label has its own block: as a bare text
+     expression it rendered nothing on the server when empty, and the
+     client then took the date's span for that text and failed to
+     hydrate the page. -->
 {#snippet dated(vintage: string, retrieved: string | null | undefined, bare = false)}
   {@const a = asOfPhrase(vintage, retrieved)}
   {@const label = bare && a.label === 'data as of' ? '' : a.label}
-  {#if a.date}{label}{label && ' '}<span class="data ev-date" title={vintage}>{a.date}</span>{:else}{label}{/if}
+  {#if a.date}{#if label}{label} {/if}<span class="data ev-date" title={vintage}>{a.date}</span>{:else}{label}{/if}
 {/snippet}
 
 {#snippet sentence(first: string)}
