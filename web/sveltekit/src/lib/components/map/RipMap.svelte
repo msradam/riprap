@@ -44,10 +44,6 @@
      *  optional `pct_inside_sandy` (NYCHA only). Always rendered;
      *  not gated by `activeLayers`. */
     registerPoints?: GeoJSON.FeatureCollection;
-    registerPolygons?: GeoJSON.FeatureCollection;
-    /** Prithvi-NYC-Pluvial flood prediction polygons (prithvi_live.polygons_geojson).
-     *  Modeled tier; teal fill at low opacity. */
-    prithviLive?: GeoJSON.FeatureCollection;
     /** USGS Ida 2021 high-water mark points. Empirical tier; amber fill.
      *  Controlled by EMP master toggle. */
     idaHwm?: GeoJSON.FeatureCollection;
@@ -57,11 +53,6 @@
      *  and hidden with their tier's layer. */
     radii?: { label: string; radius_m: number; tier: 'empirical' | 'proxy' }[];
     activeLayers?: { empirical: boolean; modeled: boolean; synthetic: boolean; proxy: boolean };
-    /** v0.4.5 §8 — when a Findings card is hovered/focused, its
-     *  `mapLayer` key flows in as `linkedKey`. The map root gains
-     *  `is-link-{key}` so existing layers can be visually emphasised
-     *  via scoped CSS. */
-    linkedKey?: string | null;
     /** Neighbourhood or district outline. When set, the map fits to it
      *  and hides the centroid pin, which is not an address. */
     areaBoundary?: GeoJSON.Polygon | GeoJSON.MultiPolygon;
@@ -78,13 +69,10 @@
     syntheticPrior,
     proxy311,
     registerPoints,
-    registerPolygons,
-    prithviLive,
     idaHwm,
     floodnet,
     radii = [],
     activeLayers = { empirical: true, modeled: true, synthetic: true, proxy: true },
-    linkedKey = null,
     areaBoundary,
     selectedPoint = null,
     onSelectPoint,
@@ -311,8 +299,6 @@
 
   $effect(() => { setSourceData('syn-prior', syntheticPrior); });
   $effect(() => { setSourceData('register-points', registerPoints); });
-  $effect(() => { setSourceData('register-polygons', registerPolygons); });
-  $effect(() => { setSourceData('prithvi-live', prithviLive); });
   $effect(() => { setSourceData('area-boundary', boundaryFc()); });
 
   // `ready` is read first so these run once the style has loaded.
@@ -341,8 +327,6 @@
   $effect(() => {
     setLayerVisibility('tier-synthetic-fill', activeLayers.synthetic);
     setLayerVisibility('tier-synthetic-line', activeLayers.synthetic);
-    setLayerVisibility('prithvi-live-fill', activeLayers.modeled);
-    setLayerVisibility('prithvi-live-line', activeLayers.modeled);
     setLayerVisibility('area-boundary-fill', activeLayers.empirical);
     setLayerVisibility('area-boundary-line', activeLayers.empirical);
   });
@@ -414,8 +398,6 @@
       const fcEmpty = (): GeoJSON.FeatureCollection => ({ type: 'FeatureCollection', features: [] });
       map.addSource('syn-prior', { type: 'geojson', data: syntheticPrior ?? fcEmpty() });
       map.addSource('register-points', { type: 'geojson', data: registerPoints ?? fcEmpty() });
-      map.addSource('register-polygons', { type: 'geojson', data: registerPolygons ?? fcEmpty() });
-      map.addSource('prithvi-live', { type: 'geojson', data: prithviLive ?? fcEmpty() });
       map.addSource('area-boundary', { type: 'geojson', data: boundaryFc() });
       map.addSource('queried-address', {
         type: 'geojson',
@@ -443,16 +425,6 @@
 
       // proxy 311 complaints: deck.gl hollow rings now (buildDeckLayers).
 
-      // Prithvi-NYC-Pluvial flood prediction — teal fill, modeled tier.
-      map.addLayer({
-        id: 'prithvi-live-fill', type: 'fill', source: 'prithvi-live',
-        paint: { 'fill-color': '#0D9488', 'fill-opacity': 0.20 }
-      });
-      map.addLayer({
-        id: 'prithvi-live-line', type: 'line', source: 'prithvi-live',
-        paint: { 'line-color': '#0D9488', 'line-width': 1.0, 'line-opacity': 0.55 }
-      });
-
       // Neighbourhood / district outline (NYC DCP 2020 NTAs), drawn in
       // the queried-address blue because it stands in for that pin.
       map.addLayer({
@@ -462,25 +434,6 @@
       map.addLayer({
         id: 'area-boundary-line', type: 'line', source: 'area-boundary',
         paint: { 'line-color': '#005EA2', 'line-width': 2, 'line-opacity': 0.9 }
-      });
-
-      // Register-asset polygons (NYCHA developments only). Fill graded
-      // by pct_inside_sandy_2012 — denser if more of the development is
-      // in the 2012 zone. Outline always-on so the boundary is legible.
-      map.addLayer({
-        id: 'register-polygons-fill', type: 'fill', source: 'register-polygons',
-        paint: {
-          'fill-color': '#0B5394',
-          'fill-opacity': [
-            'interpolate', ['linear'],
-            ['coalesce', ['get', 'pct_inside_sandy'], 0],
-            0, 0.10, 25, 0.20, 50, 0.32, 75, 0.45
-          ]
-        }
-      });
-      map.addLayer({
-        id: 'register-polygons-line', type: 'line', source: 'register-polygons',
-        paint: { 'line-color': '#0B5394', 'line-width': 1.0, 'line-opacity': 0.85 }
       });
 
       // Ida 2021 HWM points — deck.gl ScatterplotLayer now (buildDeckLayers);
@@ -580,16 +533,13 @@
   });
 </script>
 
-<div class="map-frame" data-linked={linkedKey ?? ''}>
+<div class="map-frame">
   <div
     bind:this={container}
     role="application"
     aria-label="Flood-exposure map for {address.label}"
     class="rip-map-container"
   ></div>
-  {#if linkedKey}
-    <span class="link-badge" aria-hidden="true">linked: {linkedKey}</span>
-  {/if}
 </div>
 
 <style>
@@ -602,12 +552,6 @@
   .map-frame {
     aspect-ratio: 8 / 5.6;
     position: relative;
-    transition: outline-color 150ms ease;
-    outline: 0 solid transparent;
-    outline-offset: 0;
-  }
-  .map-frame[data-linked]:not([data-linked='']) {
-    outline: 2px solid var(--accent-graphical);
   }
   /* MapLibre's own focus is a cyan (#0096ff) glow and none at all on the
      canvas; both take the app's focus token instead. */
@@ -655,17 +599,5 @@
      from the left edge) instead of sliding under it. */
   .map-frame :global(.maplibregl-ctrl-bottom-right) {
     max-width: calc(100% - 132px);
-  }
-  .link-badge {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    padding: 3px 8px;
-    background: var(--ink);
-    color: var(--paper);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    z-index: 5;
-    pointer-events: none;
   }
 </style>

@@ -95,7 +95,7 @@ export type RasterKind =
 
 /** A single Findings card. Most fields are variant-specific. */
 export type Card = {
-  /** Stable id used as Svelte key + linkedKey target. */
+  /** Stable id used as the Svelte key. */
   id: string;
   stone: StoneKey;
   tier: Tier;
