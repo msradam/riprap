@@ -26,7 +26,7 @@ provenance:
   source_url: https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9
   license: NYC Open Data Terms of Use
   doc_id: nyc311_nta
-  citation: NYC 311 Service Requests, flood-related complaints inside the neighborhood (3-year window)
+  citation: NYC 311 Service Requests, flood-related complaints inside the area (the sentence states the window).
 
 narration:
   short: Flood-related 311 complaints inside this neighborhood.

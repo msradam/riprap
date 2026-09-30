@@ -36,9 +36,50 @@ mcp = MCPServer(
         "layers without an evaluation that supports them as evidence. Riprap "
         "is an informational reference, not a FEMA flood zone determination, "
         "a professional engineering opinion, or a substitute for the NFIP "
-        "appeal process."
+        "appeal process. Start with get_evidence (an address) or "
+        "get_district_summary (an NYC community district): both return cited "
+        "sentences without a language model. plan_query shows how a question "
+        "would be routed without fetching anything. get_briefing returns the "
+        "same evidence as a briefing and, only when the server has an LLM "
+        "endpoint configured, an answer to the question whose every claim is "
+        "checked against its cited source. Every result carries a record "
+        "block (query, time, code version, digest) and names the sources that "
+        "failed to respond."
     ),
 )
+
+
+def _commit() -> str | None:
+    """The git commit the server runs from, when it runs from a checkout."""
+    import subprocess
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parent.parent.parent
+    try:
+        return subprocess.run(["git", "-C", str(root), "rev-parse", "--short", "HEAD"],
+                              capture_output=True, text=True, timeout=5, check=True).stdout.strip() or None
+    except Exception:  # noqa: BLE001 - not a checkout, or no git
+        return None
+
+
+def _record(out: dict, body: dict) -> dict:
+    """What a reader needs to reproduce or verify a result: the query, when
+    it ran, the code version and commit, and a digest of the body."""
+    import hashlib
+    import json
+    from datetime import UTC, datetime
+    from importlib.metadata import version
+
+    digest = hashlib.sha256(json.dumps(body, sort_keys=True, default=str).encode()).hexdigest()
+    return {"query": out.get("query"), "run_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "riprap_version": version("riprap"), "commit": _commit(), "sha256": digest}
+
+
+def _failed(out: dict) -> list[dict]:
+    """Sources the run consulted that did not answer, by name and reason."""
+    trace = {t.get("step"): t for t in out.get("trace") or []}
+    return [{"id": c["id"], "title": c.get("title"), "reason": trace[c["id"]].get("err")}
+            for c in out.get("consulted") or [] if trace.get(c["id"], {}).get("ok") is False]
 
 
 def _place_match(out: dict) -> str | None:
@@ -56,8 +97,9 @@ def _evidence_payload(out: dict) -> dict:
     heading = {s.id: s.name for s in stones.all()}
     if not items:  # say why, rather than hand back an empty list
         text = (out.get("paragraph") or "").split("\n\n")
-        return {"place": None, "message": text[1] if len(text) > 1 else text[0], "evidence": []}
-    return {
+        return {"place": None, "error": text[1] if len(text) > 1 else text[0], "evidence": [],
+                "failed": _failed(out)}
+    body = {
         "place": (out.get("geocode") or {}).get("address"),
         "place_match": _place_match(out),
         "lat": out.get("lat"),
@@ -67,7 +109,9 @@ def _evidence_payload(out: dict) -> dict:
         "evidence": [{"doc_id": e.doc_id, "stone": heading.get(e.stone_id, e.stone_id),
                       "text": e.text, "maturity": e.maturity} for e in items],
         "citations": out.get("citations") or {},
+        "failed": _failed(out),
     }
+    return {**body, "record": _record(out, body)}
 
 
 @mcp.tool()
@@ -156,16 +200,18 @@ def plan_query(question: str, address: str | None = None) -> dict:
 def get_briefing(address: str, question: str | None = None) -> dict:
     """The flood-exposure briefing for a US street address, optionally
     answering a question about it ("Has this block flooded since Ida?").
-    With an LLM endpoint configured, the planner picks the sources the
-    question needs and the prose is LLM claims each checked against its
-    cited sources, opening with a direct answer (failed claims are listed
-    under dropped_claims, not shown); otherwise it is the evidence
-    briefing. `consulted` and `not_checked` list the sources."""
+    Works without an LLM: the briefing is then the cited evidence and
+    `mode` is "no_llm". With an LLM endpoint configured on the server
+    (RIPRAP_LLM_BASE_URL and RIPRAP_LLM_MODEL), the planner picks the
+    sources the question needs and the answer is the lead plus cited
+    sentences the model chose, each checked in code (failed claims are
+    listed under dropped_claims, not shown). `consulted`, `not_checked`
+    and `failed` list the sources."""
     from riprap.core.burr.app import run
 
     out = run(_query(address, question))
     g = out.get("grounding") or {}
-    return {
+    body = {
         "address": address,
         "question": question,
         "place": (out.get("geocode") or {}).get("address"),
@@ -178,8 +224,10 @@ def get_briefing(address: str, question: str | None = None) -> dict:
         "citations": out.get("citations") or {},
         "consulted": out.get("consulted") or [],
         "not_checked": out.get("not_checked") or [],
+        "failed": _failed(out),
         "disclosure_checks": out.get("compliance"),
     }
+    return {**body, "record": _record(out, body)}
 
 
 def _resolve_deployment_root(deployment: str):

@@ -106,9 +106,12 @@ RIPRAP_LLM_MODEL=hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M \
 
 **MCP server.** `uv run riprap-mcp` serves seven tools over stdio
 (`get_evidence`, `get_district_summary`, `get_briefing`,
-`nyc311_flood_requests`, `plan_query`, `list_sources`, `get_citation`); all but
-`get_briefing` work without an LLM. Try one from the command line with the MCP
-Inspector (needs Node):
+`nyc311_flood_requests`, `plan_query`, `list_sources`, `get_citation`); every
+tool works without an LLM, and `get_briefing` answers a question when the
+server has one (set the two `RIPRAP_LLM_*` variables in your client's server
+config). Every result carries a `record` block (query, time, version, commit,
+SHA-256 of the body) and a `failed` list naming sources that did not answer.
+Try one from the command line with the MCP Inspector (needs Node):
 
 ```bash
 npx @modelcontextprotocol/inspector --cli uv run riprap-mcp \

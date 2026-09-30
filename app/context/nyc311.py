@@ -233,10 +233,13 @@ def flood_requests(*, lat: float | None = None, lon: float | None = None,
             return {"error": f"not a community district code like QN12: {community_district!r}"}
         where += f" AND community_board = '{board}'"
         area = {"community_district": community_district.upper().replace(" ", ""),
-                "community_board": board}
+                "community_board": board,
+                "definition": f"requests whose community_board field is '{board}'; a district briefing "
+                              "counts inside the district's outline instead, so the two can differ by about 1%"}
     elif lat is not None and lon is not None:
         where += f" AND within_circle(location, {lat}, {lon}, {radius_m})"
-        area = {"lat": lat, "lon": lon, "radius_m": radius_m}
+        area = {"lat": lat, "lon": lon, "radius_m": radius_m,
+                "definition": f"requests geocoded within {radius_m:g} m of the point"}
     else:
         return {"error": "give lat and lon, or a community district"}
     def query(**params) -> list:

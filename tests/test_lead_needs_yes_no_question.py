@@ -36,3 +36,12 @@ def test_a_zone_answer_quotes_both_fema_maps():
     _, facts, _ = _extract(out, "What is the FEMA flood zone at 1310 Surf Avenue, Brooklyn?", texts,
                            focus={"time_frame": "any"})
     assert facts == ["fema_nfhl", "fema_pfirm"]
+
+
+def test_a_question_about_now_quotes_the_live_sources_in_code():
+    texts = {**TEXTS, "floodnet": "2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years.",
+             "noaa_tides": "Latest reading at Kings Point, NY: 6.6 ft above MLLW, observed 2026-09-30 15:48 UTC."}
+    out = {"answer": {"lead": "no", "facts": ["nws_alerts"]}}
+    lead, facts, _ = _extract(out, "Is it flooding right now near 90-01 183rd Street, Queens?", texts,
+                              focus={"time_frame": "now"})
+    assert lead == "facts" and facts == ["nws_alerts", "floodnet", "noaa_tides"]
