@@ -1,0 +1,18 @@
+[
+ {"id": "s01", "kind": "address", "query": "90-01 183rd Street, Queens"},
+ {"id": "s02", "kind": "address", "query": "80 Pioneer Street, Brooklyn"},
+ {"id": "s03", "kind": "address", "query": "1310 Surf Avenue, Brooklyn"},
+ {"id": "s04", "kind": "address", "query": "200 Water Street, Manhattan"},
+ {"id": "s05", "kind": "address", "query": "1 East 161st Street, Bronx"},
+ {"id": "s06", "kind": "address", "query": "1000 Richmond Terrace, Staten Island"},
+ {"id": "s07", "kind": "address", "query": "79-01 Broadway, Queens"},
+ {"id": "s08", "kind": "address", "query": "350 5th Avenue, Manhattan"},
+ {"id": "s09", "kind": "address", "query": "31-00 47th Avenue, Queens"},
+ {"id": "s10", "kind": "address", "query": "1 Fordham Plaza, Bronx"},
+ {"id": "s11", "kind": "district", "query": "QN12"},
+ {"id": "s12", "kind": "district", "query": "BK06"},
+ {"id": "s13", "kind": "question", "query": "Has the block around 80 Pioneer Street, Brooklyn flooded since Hurricane Ida?"},
+ {"id": "s14", "kind": "question", "query": "How many flooding complaints have been made to 311 near 200 Water Street, Manhattan?"},
+ {"id": "s15", "kind": "question", "query": "Was 1310 Surf Avenue, Brooklyn inside the area Hurricane Sandy flooded?"},
+ {"id": "s16", "kind": "question", "query": "Have street flood sensors recorded flooding near 1 East 161st Street, Bronx?"}
+]
