@@ -41,14 +41,14 @@ def _get(url: str, params: dict | None = None, timeout: int = 60):
     if params:
         url += "?" + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={"User-Agent": UA})
-    for attempt in range(4):  # FEMA's firewall resets some connections at random
+    for attempt in range(6):  # FEMA's firewall resets some connections at random
         try:
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 return json.load(r)
         except (urllib.error.URLError, ConnectionResetError, TimeoutError):
-            if attempt == 3:
+            if attempt == 5:
                 raise
-            time.sleep(2 * (attempt + 1))
+            time.sleep(3 * 2 ** attempt)
 
 
 def _post_json(url: str, body: dict, timeout: int = 60):

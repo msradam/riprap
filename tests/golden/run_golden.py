@@ -173,13 +173,14 @@ def main() -> int:
     ap.add_argument("set_file")
     ap.add_argument("--base", default="http://127.0.0.1:7860")
     ap.add_argument("--kinds", default="address,district,question")
+    ap.add_argument("--ids", default=None, help="comma-separated entry ids to run")
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
     entries = json.load(open(a.set_file))
     kinds = set(a.kinds.split(","))
     results = []
     for e in entries:
-        if e["kind"] not in kinds:
+        if e["kind"] not in kinds or (a.ids and e["id"] not in a.ids.split(",")):
             continue
         try:
             fn = {"address": score_address, "district": score_district, "question": score_question}[e["kind"]]
