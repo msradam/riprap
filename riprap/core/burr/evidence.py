@@ -39,25 +39,11 @@ class Evidence:
     value: Any = None  # the pebble value the text was filled from
 
 
-def deployment_root(deployment: str | None) -> Path:
-    """Root of the routed deployment. Out-of-coverage (`__none__`) falls
-    back to the federal deployment so NWS/FEMA pebbles still narrate."""
-    import os
-
-    from riprap.core.pebbles.deployments import deployment_by_name
-
-    name = "federal" if deployment == "__none__" else deployment
-    if name:
-        dep = deployment_by_name(name)
-        if dep is not None:
-            return dep.root
-    p = Path(os.environ.get("RIPRAP_DEPLOYMENT", "deployments/nyc"))
-    return p if p.is_absolute() else _REPO / p
-
-
 def load(deployment: str | None) -> tuple[StoneRegistry, Registry]:
-    root = deployment_root(deployment)
-    return load_stones(root), load_registry(root)
+    from riprap.core.pebbles.bridge import get_registry
+    from riprap.core.pebbles.deployments import deployment_root
+
+    return load_stones(deployment_root(deployment)), get_registry(deployment)
 
 
 class _MissingField(KeyError):

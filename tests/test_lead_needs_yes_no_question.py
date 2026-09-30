@@ -28,3 +28,11 @@ def test_a_question_about_now_gets_no_yes_or_no():
     lead, facts, _ = _extract(out, "Is it flooding right now near 90-01 183rd Street, Queens?", TEXTS,
                               focus={"time_frame": "now"})
     assert (lead, facts) == ("facts", ["nws_alerts"])
+
+
+def test_a_zone_answer_quotes_both_fema_maps():
+    texts = {**TEXTS, "fema_pfirm": "FEMA's preliminary flood map (PFIRM issued 2015-01-30, community 360497) places this address in zone AE (a Special Flood Hazard Area); a preliminary map is not the effective map and does not set flood insurance."}
+    out = {"answer": {"lead": "facts", "facts": ["fema_nfhl"]}}
+    _, facts, _ = _extract(out, "What is the FEMA flood zone at 1310 Surf Avenue, Brooklyn?", texts,
+                           focus={"time_frame": "any"})
+    assert facts == ["fema_nfhl", "fema_pfirm"]

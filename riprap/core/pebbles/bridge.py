@@ -5,70 +5,29 @@ tuple `(value, trace_summary, err_msg)` matching the legacy FSM step
 contract: a dict (or None) to write into state, a small renamed dict for
 the SSE trace, and an error message if the fetch failed.
 
-The registry is lazily loaded once on first access. The deployment dir
-is `$RIPRAP_DEPLOYMENT` (default `deployments/nyc` relative to repo root).
+Registries load once per deployment directory (`get_registry`).
 """
 from __future__ import annotations
 
-import os
+import functools
 from pathlib import Path
 from typing import Any
 
 from riprap.core.pebbles import SpatialQuery, load_registry
+from riprap.core.pebbles.deployments import deployment_root
 from riprap.core.pebbles.registry import Registry
 
-_REGISTRY: Registry | None = None
-# Per-deployment registry cache. Keyed by short name (`'nyc'`,
-# `'boston'`, ...). Per-query routing needs to load whatever the
-# router picked; a single global cache would re-introduce the
-# cross-city leak fixed in 22de646.
-_REGISTRIES: dict[str, Registry] = {}
 
-
-def _repo_root() -> Path:
-    # bridge.py -> pebbles -> core -> riprap -> repo root
-    return Path(__file__).resolve().parent.parent.parent.parent
+@functools.cache
+def _registry_at(root: Path) -> Registry:
+    return load_registry(root)
 
 
 def get_registry(deployment: str | None = None) -> Registry:
-    """Return the pebble registry for `deployment` (a short name like
-    `'boston'`). When None, falls back to the `RIPRAP_DEPLOYMENT` env
-    var and caches the result globally — back-compat for callers that
-    pre-date per-query routing.
-
-    Per-query callers pass `deployment` from `state.get("deployment")`;
-    each deployment's registry is loaded once and cached.
-    """
-    # Out-of-coverage sentinel → federal: when no city covers a point,
-    # we still want NWS / NOAA-level (federal) pebbles to fire, so map
-    # the sentinel to the federal deployment's registry.
-    if deployment == "__none__":
-        deployment = "federal"
-    if deployment:
-        cached = _REGISTRIES.get(deployment)
-        if cached is not None:
-            return cached
-        # Resolve `nyc` → deployments/nyc; also accept absolute paths.
-        from riprap.core.pebbles.deployments import deployment_by_name
-        dep = deployment_by_name(deployment)
-        if dep is not None:
-            reg = load_registry(dep.root)
-        else:
-            path = Path(deployment)
-            if not path.is_absolute():
-                path = _repo_root() / path
-            reg = load_registry(path)
-        _REGISTRIES[deployment] = reg
-        return reg
-
-    global _REGISTRY
-    if _REGISTRY is None:
-        dep_str = os.environ.get("RIPRAP_DEPLOYMENT", "deployments/nyc")
-        path = Path(dep_str)
-        if not path.is_absolute():
-            path = _repo_root() / path
-        _REGISTRY = load_registry(path)
-    return _REGISTRY
+    """The pebble registry for a deployment name ('boston'), loaded once
+    per directory and shared by every caller, so a run never sees two
+    views of the same deployment. None means the server's default."""
+    return _registry_at(deployment_root(deployment))
 
 
 def fetch_pebble(pebble_id: str, lat: float, lon: float,

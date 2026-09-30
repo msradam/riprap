@@ -183,18 +183,10 @@ def get_briefing(address: str, question: str | None = None) -> dict:
 
 
 def _resolve_deployment_root(deployment: str):
-    from pathlib import Path
+    from riprap.core.pebbles.deployments import deployment_root
 
-    from riprap.core.pebbles.deployments import deployment_by_name
-
-    dep = deployment_by_name(deployment)
-    if dep is not None:
-        return dep.root
-    repo_root = Path(__file__).resolve().parent.parent.parent
-    p = Path(deployment)
-    if not p.is_absolute():
-        p = repo_root / "deployments" / deployment
-    return p if p.is_dir() else None
+    root = deployment_root(deployment)
+    return root if (root / "manifests").is_dir() else None
 
 
 @mcp.tool()

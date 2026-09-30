@@ -29,7 +29,6 @@ from burr.core.application import ApplicationContext
 from burr.core.parallelism import MapActions
 
 from riprap.core.burr.pebble import pebble_action
-from riprap.core.pebbles import load_registry
 
 DATA_STONES = ("cornerstone", "touchstone", "keystone", "lodestone")
 POLYGON_INTENTS = ("neighborhood", "development_check")
@@ -108,26 +107,15 @@ def pebbles_for(deployment: str | None, lat: float | None = None, lon: float | N
     `deployment` is a deployment name, or "__none__" when no city covers
     the point (federal pebbles still run). Pebbles whose `coverage` does
     not contain the point are skipped."""
-    import os
-    from pathlib import Path
+    from riprap.core.pebbles.bridge import get_registry
+    from riprap.core.pebbles.deployments import deployment_by_name, deployment_root
 
-    from riprap.core.pebbles.deployments import deployment_by_name
-
-    if deployment == "__none__":
-        deployment = "federal"
-    if deployment is None:
-        deployment = os.environ.get("RIPRAP_DEPLOYMENT", "deployments/nyc")
-    dep = deployment_by_name(deployment)
-    if dep is not None:
-        root, bbox = dep.root, dep.bbox
-    else:
-        root, bbox = Path(deployment), None
-        if not root.is_absolute():
-            root = Path(__file__).resolve().parent.parent.parent.parent / deployment
-    if not (root / "manifests").is_dir():
+    if not (deployment_root(deployment) / "manifests").is_dir():
         return []
+    dep = deployment_by_name("federal" if deployment == "__none__" else deployment or "")
+    bbox = dep.bbox if dep is not None else None
     order = {s: i for i, s in enumerate(DATA_STONES)}
-    pebbles = [p for p in load_registry(root).all()
+    pebbles = [p for p in get_registry(deployment).all()
                if p.stone in order and p.id != "policy_corpus" and _wants(p.manifest, intent)]
     if lat is not None and lon is not None:
         pebbles = [p for p in pebbles if p.fires_at(lat, lon, bbox)]
@@ -154,12 +142,13 @@ def _all_data_pebble_ids() -> list[str]:
     """Union of data-Stone pebble ids across every deployment. Burr needs
     `writes` before any query arrives; the reducer fills keys the routed
     deployment did not run with None."""
+    from riprap.core.pebbles.bridge import get_registry
     from riprap.core.pebbles.deployments import discover_deployments
 
     ids: set[str] = set()
     for dep in discover_deployments():
         try:
-            reg = load_registry(dep.root)
+            reg = get_registry(dep.name)
         except Exception:  # noqa: BLE001 - one malformed deployment must not break the rest
             continue
         ids.update(p.id for p in reg.all() if p.stone in DATA_STONES and p.id != "policy_corpus")

@@ -109,3 +109,21 @@ def deployment_by_name(name: str) -> Deployment | None:
         if dep.name == name:
             return dep
     return None
+
+
+def deployment_root(name: str | None) -> Path:
+    """The directory of a deployment named by its short name ('boston'),
+    a path, None (the RIPRAP_DEPLOYMENT env var, default deployments/nyc)
+    or the out-of-coverage sentinel `__none__` (the federal sources still
+    narrate). The one place this is decided."""
+    import os
+
+    if name == "__none__":
+        name = "federal"
+    if name is None:
+        name = os.environ.get("RIPRAP_DEPLOYMENT", "deployments/nyc")
+    dep = deployment_by_name(name)
+    if dep is not None:
+        return dep.root
+    path = Path(name)
+    return path if path.is_absolute() else _repo_root() / path

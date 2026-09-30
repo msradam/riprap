@@ -276,6 +276,10 @@ def _extract(out: dict, question: str, texts: dict[str, str],
     if lead in ("yes", "no", "partly") and not answer_checks.is_count_question(question) and (
             not answer_checks.is_yes_no_question(question) or (focus or {}).get("time_frame") == "now"):
         lead = "facts"
+    # The two FEMA maps go together: a zone answer that quotes the 2007
+    # effective FIRM also quotes the 2015 preliminary map when it ran.
+    if "fema_nfhl" in facts and "fema_pfirm" not in facts and texts.get("fema_pfirm"):
+        facts = [*facts, "fema_pfirm"]
     if (focus or {}).get("time_frame") == "future":
         # A forecast question: the facts are the forecasts and projections themselves,
         # chosen in code (the model tended to pick the flood zone), and the lead is
