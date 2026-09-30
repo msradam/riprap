@@ -36,9 +36,13 @@ A real answer, from the gallery entry
 > **Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?**
 >
 > Yes. 2 FloodNet community sensors within 600 m have logged 14 above-curb flood
-> events in the last 3 years [floodnet]. USGS surveyed 2 Hurricane Ida high-water
-> marks within 800 m of this address; the highest stood 0.76 ft above ground; the
-> highest water surface elevation was 48.2 ft NAVD88 [ida_hwm]. […]
+> events in the last 3 years [floodnet]. Peak depth recorded by the sensors in
+> good working order: 815 mm on 2026-05-20 [floodnet]. 1 sensor that logged events
+> is flagged by FloodNet for maintenance, so its depths are not used for the peak
+> [floodnet]. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this
+> address; the highest stood 0.76 ft above ground; the highest water surface
+> elevation was 48.2 ft NAVD88 [ida_hwm]. Nearest mark: Intersection of 182nd St.
+> and 90th Ave., Jamaica, Queens (174 m away) [ida_hwm].
 
 The "Yes." is set by a rule, not by the model: at least one observed source
 reports flooding since Ida, on 1 September 2021.

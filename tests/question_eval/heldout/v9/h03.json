@@ -1,0 +1,255 @@
+{
+ "id": "h03",
+ "kind": "flood_history",
+ "question": "How many flooding complaints have been made to 311 near 200 Water Street, Manhattan?",
+ "error": null,
+ "wall_s": 9.3,
+ "intent": "single_address",
+ "deployment": "nyc",
+ "plan": {
+  "intent": "single_address",
+  "targets": [
+   {
+    "type": "address",
+    "text": "200 Water Street, Manhattan"
+   }
+  ],
+  "rationale": "The question asks for past flood-related 311 complaints near a specific address, so the nyc311 source (touchstone, point) is needed.",
+  "question": "How many flooding complaints have been made to 311 near 200 Water Street, Manhattan?",
+  "focus": {
+   "hazard": "flood",
+   "time_frame": "past",
+   "assets": [
+    "public_housing"
+   ]
+  },
+  "pebbles": [
+   "nyc311"
+  ],
+  "catalog": [
+   "area_boundary",
+   "dep_extreme_2080",
+   "dep_extreme_2080_nta",
+   "dep_moderate_2050",
+   "dep_moderate_2050_nta",
+   "dep_moderate_current",
+   "dep_moderate_current_nta",
+   "fema_nfhl",
+   "ida_hwm",
+   "microtopo",
+   "microtopo_nta",
+   "policy_corpus",
+   "prithvi_water",
+   "prithvi_water_nta",
+   "sandy",
+   "sandy_nta",
+   "dob_permits_nta",
+   "doe_schools",
+   "doh_hospitals",
+   "mta_entrances",
+   "nycha_developments",
+   "floodnet_forecast",
+   "npcc4_slr",
+   "nws_alerts",
+   "ttm_311_forecast",
+   "ttm_battery_surge",
+   "floodnet",
+   "noaa_tides",
+   "nws_obs",
+   "nyc311",
+   "nyc311_nta",
+   "usgs_gauges"
+  ]
+ },
+ "pebbles_run": [
+  "dep_moderate_2050",
+  "fema_nfhl",
+  "floodnet",
+  "ida_hwm",
+  "nyc311",
+  "nycha_developments",
+  "sandy"
+ ],
+ "consulted": [
+  {
+   "id": "sandy",
+   "title": "NYC Sandy Inundation Zone (2012 empirical extent)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "fema_nfhl",
+   "title": "FEMA National Flood Hazard Layer, flood zone at this point",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_2050",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "ida_hwm",
+   "title": "Hurricane Ida 2021, USGS high-water marks",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "floodnet",
+   "title": "FloodNet ultrasonic depth sensors (NYC)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nyc311",
+   "title": "NYC 311 flood-related complaints (5y)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "nycha_developments",
+   "title": "NYCHA developments exposed nearby",
+   "stone": "keystone"
+  }
+ ],
+ "not_checked": [
+  {
+   "id": "dep_extreme_2080",
+   "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "dep_moderate_current",
+   "title": "NYC DEP Moderate Stormwater (2.13 in/hr, current SLR)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "prithvi_water",
+   "title": "New surface water after Hurricane Ida, Prithvi-EO (experimental)",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "microtopo",
+   "title": "LiDAR / DEM-derived micro-topography",
+   "stone": "cornerstone"
+  },
+  {
+   "id": "nws_obs",
+   "title": "NWS hourly METAR observations (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "noaa_tides",
+   "title": "NOAA tide-gauge water level (nearest station)",
+   "stone": "touchstone"
+  },
+  {
+   "id": "usgs_gauges",
+   "title": "USGS stream gauge, live stage at the nearest gauge",
+   "stone": "touchstone"
+  },
+  {
+   "id": "mta_entrances",
+   "title": "MTA subway/rail entrances exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doe_schools",
+   "title": "NYC DOE schools exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "doh_hospitals",
+   "title": "NYC DOH hospitals exposed nearby",
+   "stone": "keystone"
+  },
+  {
+   "id": "nws_alerts",
+   "title": "NWS active alerts (flood/coastal/wind)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_battery_surge",
+   "title": "Granite TTM r2 Battery Surge, 96 h hourly nowcast (fine-tune)",
+   "stone": "lodestone"
+  },
+  {
+   "id": "ttm_311_forecast",
+   "title": "Granite TTM r2, weekly 311 flood-complaint forecast at this address",
+   "stone": "lodestone"
+  },
+  {
+   "id": "floodnet_forecast",
+   "title": "Granite TTM r2, flood-event recurrence at nearest FloodNet sensor",
+   "stone": "lodestone"
+  },
+  {
+   "id": "npcc4_slr",
+   "title": "NPCC4 (2024) sea-level rise projections",
+   "stone": "lodestone"
+  },
+  {
+   "id": "policy_corpus",
+   "title": "NYC flood-policy corpus, agency reports + plans",
+   "stone": "cornerstone"
+  }
+ ],
+ "planner_tokens": {
+  "prompt": 1917,
+  "completion": 135,
+  "seconds": 6.32,
+  "n_calls": 1
+ },
+ "synthesis_tokens": {
+  "prompt": 569,
+  "completion": 22,
+  "seconds": 2.04,
+  "n_calls": 1
+ },
+ "n_documents": 7,
+ "tier": "llm",
+ "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
+ "attempts": 1,
+ "claims": [
+  {
+   "section": "answer",
+   "text": "28 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 16 manhole overflow, 7 sewer backup, 5 street flooding.",
+   "doc_ids": [
+    "nyc311"
+   ],
+   "numbers": []
+  }
+ ],
+ "dropped_claims": [],
+ "retried_claims": [],
+ "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: 28 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 16 manhole overflow, 7 sewer backup, 5 street flooding [nyc311].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer; no entailment check needed, since the answer is the cited text word for word.",
+ "documents": {
+  "sandy_inundation": "This address sits within the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).",
+  "fema_nfhl": "This address sits in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970184F, effective 2007.",
+  "dep_moderate_2050": "This address is outside the modeled flooding in the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR).",
+  "ida_hwm": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address. Nearest USGS-surveyed mark: Visitation Pl., between Van Brunt St. and Richards St., Red Hook, Brooklyn (3155 m away).",
+  "floodnet": "1 FloodNet community sensor within 600 m has logged 2 above-curb flood events in the last 3 years. 1 of the sensors that logged events is flagged by FloodNet for maintenance, so its depths are not used for the peak.",
+  "nyc311": "28 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 16 manhole overflow, 7 sewer backup, 5 street flooding.",
+  "nycha_development_exposure": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise)."
+ },
+ "values": {
+  "sandy_inundation": {},
+  "fema_nfhl": {},
+  "dep_moderate_2050": {},
+  "ida_hwm": {
+   "n_within_radius": 0
+  },
+  "floodnet": {
+   "n_flood_events_3y": 2
+  },
+  "nyc311": {
+   "n": 28
+  },
+  "nycha_development_exposure": {
+   "n_developments": 1
+  }
+ },
+ "checks": [
+  "citations and numbers on every claim",
+  "lead rules on the answer; no entailment check needed, since the answer is the cited text word for word"
+ ],
+ "entailment": {},
+ "answer_mode": "extractive",
+ "answer_lead": "count",
+ "answer_flags": []
+}
