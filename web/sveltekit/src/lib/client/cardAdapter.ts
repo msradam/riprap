@@ -842,7 +842,7 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
       for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
         const label = FIELD_LABELS[k];
         if (SCALAR_IGNORE.has(k) || !label) continue;
-        if (typeof v === 'number' && Number.isFinite(v)) scalars.push(scalarCell(k, v, label, value));
+        if (typeof v === 'number' && Number.isFinite(v)) scalars.push(scalarCell(k, v, label, value as Record<string, unknown>));
       }
     } else if (typeof value === 'number') {
       scalars.push({ value: `${value}`, label: m.title });
