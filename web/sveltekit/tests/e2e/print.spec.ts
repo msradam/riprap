@@ -52,10 +52,10 @@ test.describe('export-PDF curated print flow', () => {
     await expect(page.locator('.print-meta')).toContainText(/Pioneer/i);
     await expect(page.locator('.print-answer')).toBeVisible();
     await expect(page.locator('.print-citations h3')).toHaveText('Sources cited');
-    // A gallery print dates its live readings to the snapshot, as the
+    // A gallery print dates its live readings to their fetch, as the
     // briefing page does, and prints the folded experimental group open.
-    await expect(page.locator('.ev-asof').filter({ hasText: /^\s*live\s*$/ })).toHaveCount(0);
-    await expect(page.locator('.ev-asof').filter({ hasText: 'at snapshot' }).first()).toBeVisible();
+    await expect(page.locator('.ev-asof').filter({ hasText: /\blive\b/ })).toHaveCount(0);
+    await expect(page.locator('.ev-asof').filter({ hasText: /fetched \d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC/ }).first()).toBeVisible();
     await expect(page.locator('.print-doc details.ev-folded')).toHaveJSProperty('open', true);
 
     // App chrome is excluded (the @-page break breaks out of root layout).

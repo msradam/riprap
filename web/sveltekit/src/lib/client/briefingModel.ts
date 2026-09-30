@@ -264,15 +264,13 @@ export function mergeDepScenarios(cards: Card[]): EvidenceRow[] {
  *  sources the answer does not cite close the table in one folded group.
  *  The DEP scenarios share one row. Absent and meta cards are not
  *  evidence and are left out by the caller. */
-/** A row whose card only knows "live" takes its citation's dataset date
- *  when there is one (the FEMA FIRM's effective date), so the table and
- *  the source note give the same date. */
+/** A row is dated as its citation is: the backend dates every source it
+ *  cites (a dataset date, a retrieval date, or the fetch time of a live
+ *  reading) and the source lists show that, so the table shows the same.
+ *  The manifest's date stays only on a card with no citation. */
 export function withDatasetDate(c: Card, citations: Record<string, Citation>): Card {
   const v = citationOf(c, citations)?.vintage;
-  const cardHasDate = !!c.vintage && /^\d{4}/.test(c.vintage.replace(/^retrieved\s+/i, ''));
-  // A dataset date is a plain date ("2007-09-05", "2024"); a fetch time
-  // ("2026-09-29T21:38Z") is a live reading and stays "at snapshot".
-  return !cardHasDate && v && /^\d{4}(-\d{2}){0,2}$/.test(v.trim()) ? { ...c, vintage: v } : c;
+  return v ? { ...c, vintage: v } : c;
 }
 
 export function evidenceGroups(cards: Card[], cited: string[], firstLabel = 'Behind the answer'): EvidenceGroup[] {

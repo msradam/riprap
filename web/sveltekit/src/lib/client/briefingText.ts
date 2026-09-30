@@ -5,6 +5,7 @@
  */
 import type { ClaimPart } from '$lib/types/claim';
 import type { Card } from '$lib/types/card';
+import { formatGeneratedAt } from './gallery';
 
 const PUNCT_RE = /^[.,;:]/;
 
@@ -66,16 +67,12 @@ export function figureOf(c: Pick<Card, 'scalars' | 'headline'>): { value: string
 /** The forecasts, whatever their maturity (district pages add `_nta`). */
 export const FORECASTS = ['ttm_battery_surge', 'ttm_311_forecast', 'floodnet_forecast'];
 
-/** Gallery pages: a forecast or an NWS alert was read when the snapshot
- *  was made (`at`, "2026-09-29 12:34 UTC"), so its row says when. The
- *  alerts row is dated only when its `finding` reports an active alert;
- *  "No active ..." has nothing to date. */
-export function snapshotNote(docId: string, at: string | null | undefined, finding?: string | null): string | null {
+/** Gallery pages: a forecast was made when the snapshot was made (`at`,
+ *  "2026-09-29 12:34 UTC"), so its row says when. The NWS alerts sentence
+ *  carries its own "checked <time>" and needs no note. */
+export function snapshotNote(docId: string, at: string | null | undefined): string | null {
   if (!at) return null;
-  const id = docId.replace(/_nta$/, '');
-  if (FORECASTS.includes(id)) return `Forecast made at the snapshot, ${at}.`;
-  if (id === 'nws_alerts') return finding?.trim().startsWith('No active') ? null : `Active at the snapshot, ${at}.`;
-  return null;
+  return FORECASTS.includes(docId.replace(/_nta$/, '')) ? `Forecast made at the snapshot, ${at}.` : null;
 }
 
 /** The space after a full stop that starts a new sentence. */
@@ -119,10 +116,20 @@ export function asOfDate(v: string): string {
   return /^\d{4}-\d{2}-\d{2}T/.test(d) ? d.slice(0, 10) : d;
 }
 
-/** The vintage as a phrase for a source note: "data as of 2026-05",
- *  "retrieved 2026-07-11" or "live data". */
-export function asOfPhrase(v: string): { label: string; date: string | null } {
-  if (/^live$/i.test(v.trim())) return { label: 'live data', date: null };
+const ISO_TIME_RE = /^\d{4}-\d{2}-\d{2}T/;
+
+/** When a source's data is from, in words, the same on the evidence
+ *  table, the source lists and the print packet. A dataset with a
+ *  modification date reads "data as of 2024-07-03"; one with only a
+ *  retrieval date reads "retrieved 2026-07-11"; a live reading reads
+ *  "fetched 2026-09-30 16:05 UTC", the time it was fetched. The backend
+ *  dates a live reading to its fetch (`vintage` equal to `retrieved_at`)
+ *  or calls it "live"; the word "live" is never shown as a date. */
+export function asOfPhrase(vintage: string, retrieved?: string | null): { label: string; date: string | null } {
+  const v = vintage.trim();
+  const at = retrieved && !/^live$/i.test(retrieved) ? retrieved : null;
+  if (/^live$/i.test(v)) return at ? { label: 'fetched', date: formatGeneratedAt(at) } : { label: 'live reading', date: null };
+  if (ISO_TIME_RE.test(v) && v === at) return { label: 'fetched', date: formatGeneratedAt(v) };
   return { label: /^retrieved\s/i.test(v) ? 'retrieved' : 'data as of', date: asOfDate(v) };
 }
 

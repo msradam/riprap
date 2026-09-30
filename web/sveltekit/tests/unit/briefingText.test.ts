@@ -85,7 +85,15 @@ describe('dates', () => {
   it('phrases a vintage for a source note', () => {
     expect(asOfPhrase('2024-07-03')).toEqual({ label: 'data as of', date: '2024-07-03' });
     expect(asOfPhrase('retrieved 2026-07-11')).toEqual({ label: 'retrieved', date: '2026-07-11' });
-    expect(asOfPhrase('live')).toEqual({ label: 'live data', date: null });
+  });
+  it('dates a live reading to its fetch and never prints "live" as a date', () => {
+    // The backend dates a live reading to its fetch, or says "live".
+    expect(asOfPhrase('2026-09-30T16:05Z', '2026-09-30T16:05Z')).toEqual({ label: 'fetched', date: '2026-09-30 16:05 UTC' });
+    expect(asOfPhrase('live', '2026-09-30T16:05Z')).toEqual({ label: 'fetched', date: '2026-09-30 16:05 UTC' });
+    expect(asOfPhrase('live', 'live')).toEqual({ label: 'live reading', date: null });
+    expect(asOfPhrase('live')).toEqual({ label: 'live reading', date: null });
+    // A dataset modified at a known time is a dataset date, not a fetch.
+    expect(asOfPhrase('2026-09-30T01:38:23+0000', '2026-09-30T16:05Z')).toEqual({ label: 'data as of', date: '2026-09-30' });
   });
 });
 
@@ -146,15 +154,13 @@ describe('sharedStem', () => {
 
 describe('snapshotNote', () => {
   const at = '2026-09-29 12:34 UTC';
-  it('dates forecasts and NWS alerts to the snapshot', () => {
+  it('dates forecasts to the snapshot', () => {
     expect(snapshotNote('ttm_311_forecast', at)).toBe('Forecast made at the snapshot, 2026-09-29 12:34 UTC.');
     expect(snapshotNote('floodnet_forecast', at)).toBe('Forecast made at the snapshot, 2026-09-29 12:34 UTC.');
-    expect(snapshotNote('nws_alerts', at, '1 active NWS alert: Coastal Flood Advisory.')).toBe('Active at the snapshot, 2026-09-29 12:34 UTC.');
-  });
-  it('says nothing for an alerts row with no active alert', () => {
-    expect(snapshotNote('nws_alerts', at, 'No active NWS flood / coastal / wind alerts at this point.')).toBeNull();
   });
   it('says nothing for other sources or a live run', () => {
+    // The alerts sentence carries its own "checked <time>".
+    expect(snapshotNote('nws_alerts', at)).toBeNull();
     expect(snapshotNote('sandy_inundation', at)).toBeNull();
     expect(snapshotNote('ttm_battery_surge', null)).toBeNull();
   });

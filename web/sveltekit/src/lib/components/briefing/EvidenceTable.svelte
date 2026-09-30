@@ -2,7 +2,7 @@
   import type { Citation } from '$lib/types/claim';
   import { citationOf, type EvidenceCard } from '$lib/client/briefingModel';
   import { TIER_WORDS } from '$lib/types/tier';
-  import { asOfDate, figureOf, leadClause, sharedStem, snapshotNote, withoutSubject } from '$lib/client/briefingText';
+  import { asOfPhrase, figureOf, leadClause, sharedStem, snapshotNote, withoutSubject } from '$lib/client/briefingText';
   import { activateCitation } from '$lib/stores/citations.svelte';
   import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
 
@@ -23,13 +23,11 @@
     /** Where the page lists the sources not run; the footer then points
      *  there instead of repeating the list. */
     notRunHref?: string;
-    /** Gallery pages: when the snapshot was made ("2026-09-29 12:34 UTC").
-     *  A live reading is dated to it; a forecast or alert says so. */
+    /** Gallery pages: when the snapshot was made ("2026-09-29 12:34 UTC"),
+     *  so a forecast row says when it was made. */
     snapshotAt?: string | null;
   }
   let { groups, findings, citations, notRun, labelledby, notRunHref, snapshotAt = null }: Props = $props();
-
-  let snapshotDate = $derived(snapshotAt?.slice(0, 10) ?? null);
 
   let open = $derived(groups.filter((g) => !g.closed));
   let folded = $derived(groups.filter((g) => g.closed));
@@ -38,8 +36,9 @@
    *  wrapping down the narrow Figure column. */
   const SHORT_LABEL = 16;
 
-  /** A live reading on a gallery page was read when the snapshot was made. */
-  const atSnapshot = (vintage: string) => !!snapshotDate && /^live$/i.test(vintage.trim());
+  /** When the row's source was fetched, from its citation (a merged row's
+   *  parts share one fetch). */
+  const retrievedOf = (c: EvidenceCard) => citationOf(c.parts?.[0] ?? c, citations)?.retrieved ?? null;
 
   /** Open the linked list if it is a closed disclosure; the link then
    *  scrolls to it as usual. */
@@ -77,8 +76,13 @@
   </thead>
 {/snippet}
 
-{#snippet date(vintage: string)}
-  {#if atSnapshot(vintage)}at snapshot, <span class="data ev-date">{snapshotDate}</span>{:else}<span class="data" title={vintage}>{asOfDate(vintage)}</span>{/if}
+<!-- "data as of 2015-11-09", "retrieved 2026-07-11" or "fetched 2026-09-30
+     16:05 UTC" (asOfPhrase). Under the "Data as of" column head the first
+     shows its date alone. -->
+{#snippet dated(vintage: string, retrieved: string | null | undefined, bare = false)}
+  {@const a = asOfPhrase(vintage, retrieved)}
+  {@const label = bare && a.label === 'data as of' ? '' : a.label}
+  {#if a.date}{label}{label && ' '}<span class="data ev-date" title={vintage}>{a.date}</span>{:else}{label}{/if}
 {/snippet}
 
 {#snippet sentence(first: string)}
@@ -101,7 +105,7 @@
   {@const cit = c.parts ? null : citationOf(c, citations)}
   {@const longLabel = !!fig?.label && fig.label.length > SHORT_LABEL}
   {@const same = oneDate(c)}
-  {@const note = snapshotNote(c.docId, snapshotAt, find?.first)}
+  {@const note = snapshotNote(c.docId, snapshotAt)}
   {@const h = (name: Col) => (gid ? `${col(t, name)} ${gid}` : col(t, name))}
   <tr class="ev-row">
     <td class="ev-source" headers={h('source')}>
@@ -113,7 +117,7 @@
            those cells. -->
       <span class="ev-source-line" aria-hidden="true">
         {#if c.experimental}{c.source} <span class="exp-badge">Experimental</span>{:else}{c.source}{/if}
-        <span class="ev-meta"><span class="ev-mark" style:color="var(--tier-{c.tier})"><EvidenceMark tier={c.tier} size={11} /></span>{TIER_WORDS[c.tier] ?? c.tier}{#if same}{#if atSnapshot(c.vintage)}, {@render date(c.vintage)}{:else}, data as of {@render date(c.vintage)}{/if}{/if}</span>
+        <span class="ev-meta"><span class="ev-mark" style:color="var(--tier-{c.tier})"><EvidenceMark tier={c.tier} size={11} /></span>{TIER_WORDS[c.tier] ?? c.tier}{#if same}, {@render dated(c.vintage, retrievedOf(c))}{/if}</span>
       </span>
       {#if c.parts}
         {@const st = stemOf(c)}
@@ -125,7 +129,7 @@
             {@const pf = findings.get(p.id)}
             {@const pc = citationOf(p, citations)}
             <li>
-              {#if st}{st.tails[i]}{#if pf?.rest}{` ${pf.rest}`}{/if}{:else if pf}{@render sentence(pf.first)}{#if pf.rest}{` ${pf.rest}`}{/if}{:else}{p.title}{/if}{#if !same}&#32;(data as of {@render date(p.vintage)}){/if}{#if pc}{@render cite(pc, true)}{/if}
+              {#if st}{st.tails[i]}{#if pf?.rest}{` ${pf.rest}`}{/if}{:else if pf}{@render sentence(pf.first)}{#if pf.rest}{` ${pf.rest}`}{/if}{:else}{p.title}{/if}{#if !same}&#32;({@render dated(p.vintage, pc?.retrieved)}){/if}{#if pc}{@render cite(pc, true)}{/if}
             </li>
           {/each}
         </ul>
@@ -151,9 +155,10 @@
     </td>
     <td class={['ev-asof', !same && 'is-empty']} headers={h('asof')}>
       {#if same}
-        <!-- "at snapshot" is its own label; "Data as of at snapshot" is not English. -->
-        {#if !atSnapshot(c.vintage)}<span class="ev-label" aria-hidden="true">Data as of</span>{/if}
-        {@render date(c.vintage)}
+        <!-- "retrieved" and "fetched" are their own labels; "Data as of
+             fetched" is not English. -->
+        {#if asOfPhrase(c.vintage, retrievedOf(c)).label === 'data as of'}<span class="ev-label" aria-hidden="true">Data as of</span>{/if}
+        {@render dated(c.vintage, retrievedOf(c), true)}
       {/if}
     </td>
     <td class={['ev-num', 'ev-cite', !cit && 'is-empty']} headers={h('cite')}>

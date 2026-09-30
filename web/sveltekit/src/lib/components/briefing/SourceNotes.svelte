@@ -14,8 +14,8 @@
   let { citations, label }: Props = $props();
 </script>
 
-{#snippet asOf(v: string)}
-  {@const a = asOfPhrase(v)}{#if a.date}{a.label} <span class="data">{a.date}</span>{:else}{a.label}{/if}
+{#snippet asOf(c: Citation)}
+  {@const a = asOfPhrase(c.vintage, c.retrieved)}{#if a.date}{a.label} <span class="data">{a.date}</span>{:else}{a.label}{/if}
 {/snippet}
 
 <ol class="source-notes" aria-label={label}>
@@ -32,7 +32,7 @@
         {/if}
       </span>
       <span class="source-note-line">
-        {#if c.maturity === 'experimental'}{TIER_WORDS[c.tier] ?? c.tier} <span class="exp-badge">Experimental</span>{:else}{TIER_WORDS[c.tier] ?? c.tier}{/if}, {@render asOf(c.vintage)}
+        {#if c.maturity === 'experimental'}{TIER_WORDS[c.tier] ?? c.tier} <span class="exp-badge">Experimental</span>{:else}{TIER_WORDS[c.tier] ?? c.tier}{/if}, {@render asOf(c)}
       </span>
     </li>
   {/each}

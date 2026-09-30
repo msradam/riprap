@@ -50,7 +50,7 @@ export function briefingFromFinal(
       title: c.title,
       url: c.url,
       vintage: c.vintage,
-      retrieved: c.retrieved_at?.slice(0, 10),
+      retrieved: c.retrieved_at,
       maturity: c.maturity
     });
     // The manifest's tier wins over the doc-id heuristic, as on the cards.
