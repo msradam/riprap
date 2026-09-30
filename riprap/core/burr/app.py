@@ -106,6 +106,14 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
                     "catalog": p.catalog, "llm_calls": calls}
         except Exception as e:  # noqa: BLE001 - fall back to the regex planner
             log.warning("LLM planner failed (%s); using the heuristic planner", e)
+            # The question stays a question: with the model down mid-demo the
+            # page said "no question was asked, so no LLM was needed" and
+            # showed a place briefing. Synthesis now tries the model, fails
+            # the same way, and reports it as unavailable.
+            guard = heuristic_plan(query)
+            if "question" not in guard and not is_bare_place(query, guard.get("targets") or []):
+                guard["question"] = query.strip()
+            return guard
     return heuristic_plan(query)
 
 

@@ -38,3 +38,22 @@ def test_a_street_address_in_the_query_outranks_a_neighborhood_plan(monkeypatch)
     plan = app.plan_for("Has the block around 90-01 183rd Street in Hollis, Queens flooded since Ida?")
     assert plan["intent"] == "single_address"
     assert plan["targets"] == [{"type": "address", "text": "90-01 183rd Street, Hollis, Queens"}]
+
+
+def test_a_question_stays_a_question_when_the_planner_is_unreachable(monkeypatch):
+    """Ollama killed mid-run: the page said "no question was asked, so no LLM
+    was needed" over a place briefing. The fallback plan keeps the question
+    so synthesis reports the model as unavailable instead."""
+    import app.planner as planner
+
+    monkeypatch.setattr(app, "_tier", lambda: "llm")
+    monkeypatch.setattr(app, "llm_bare", lambda: False, raising=False)
+
+    def down(*a, **k):
+        raise ConnectionError("connection refused")
+
+    monkeypatch.setattr(planner, "plan", down)
+    q = "Was 615 Midland Avenue, Staten Island inside the area Hurricane Sandy flooded?"
+    plan = app.plan_for(q)
+    assert plan["intent"] == "single_address" and plan["question"] == q
+    assert "question" not in app.plan_for("615 Midland Avenue, Staten Island")
