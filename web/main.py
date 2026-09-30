@@ -375,24 +375,6 @@ async def api_backend():
     return JSONResponse(info)
 
 
-@app.get("/q/sample")
-def q_sample_page():
-    """Legacy `/q/sample` route — used to serve a prerendered Red Hook
-    demo briefing whose citations + numbers were fabricated. That violated
-    the Plain Writing Act voice the rest of the surface now commits to,
-    so the synthetic page was removed (see commit history). Redirect
-    to a real anchor address that runs an actual briefing through the
-    normal pipeline; CityPicker on the landing offers the same instant-
-    click affordance for each shipped city.
-    """
-    from fastapi.responses import RedirectResponse  # noqa: PLC0415
-
-    return RedirectResponse(
-        url="/q/189%20Atlantic%20Avenue%2C%20Brooklyn%2C%20NY",
-        status_code=308,
-    )
-
-
 @app.get("/q/{query_id}")
 def q_query_page(query_id: str):  # noqa: ARG001 — captured for the SPA router
     """Live briefing route. Served by the SvelteKit SPA fallback (200.html);

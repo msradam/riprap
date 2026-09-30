@@ -1,7 +1,6 @@
 /**
  * Export-PDF flow:
- *  - the header button is hidden until the briefing is ready
- *  - on /q/sample (prerendered) it appears immediately on mount
+ *  - the header button is hidden until a live briefing is ready, then shown
  *  - a gallery entry's "Print this briefing" saves a snapshot and opens
  *    /print/<id>
  *  - that route renders the report: title, answer and its source notes,
@@ -10,15 +9,18 @@
  */
 import { test, expect } from '@playwright/test';
 
-// Gallery pages come from the static build (journeys.spec.ts does the same).
-const STATIC = process.env.RIPRAP_STATIC_URL || 'http://127.0.0.1:4179';
+// The backend serves the gallery pages from the committed build; point
+// RIPRAP_STATIC_URL elsewhere to test another build of them.
+const STATIC = process.env.RIPRAP_STATIC_URL || process.env.RIPRAP_BASE_URL || 'http://127.0.0.1:7860';
 const QUERY = '80 Pioneer Street, Brooklyn, NY';
 const SNAP_KEY = `riprap:print:${QUERY}`;
 
 test.describe('export-PDF curated print flow', () => {
-  test('header export button visible on /q/sample, hidden when no snapshot', async ({ page }) => {
-    await page.goto('/q/sample');
-    await expect(page.locator('button').filter({ hasText: /export PDF/i })).toBeVisible();
+  test('header export button appears once a live briefing is ready', async ({ page }) => {
+    await page.goto(`/q/${encodeURIComponent(QUERY)}`);
+    const button = page.locator('button').filter({ hasText: /export PDF/i });
+    await expect(button).toHaveCount(0);
+    await expect(button).toBeVisible({ timeout: 200_000 });
   });
 
   test('print route hydrates from localStorage and shows curated layout', async ({ page }) => {

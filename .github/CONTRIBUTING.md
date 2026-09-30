@@ -111,6 +111,12 @@ uv run python scripts/check_links.py nyc boston # some of them
 # 5. If you touched place resolution: no-LLM accuracy on
 #    tests/place_resolution_cases.yaml (needs the network for geocoding).
 uv run python scripts/place_eval.py run
+
+# 6. If you touched the frontend: the browser journeys (with axe checks)
+#    against the running server. It serves the prerendered gallery pages
+#    from the committed build, so the gallery specs need no second server;
+#    RIPRAP_STATIC_URL points them at another build of those pages.
+cd web/sveltekit && pnpm build && pnpm test:e2e
 ```
 
 ## Structure

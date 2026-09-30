@@ -2,9 +2,9 @@
  * Real-usage journeys (Impeccable pass, phase 5). Each journey runs an axe
  * check on every state it passes through.
  *
- * Needs the backend on 127.0.0.1:7860 (no LLM required) for the live
- * routes, and the static build on 127.0.0.1:4179 for the gallery journey
- * (RIPRAP_STATIC_URL overrides it). Question journeys stub the SSE stream
+ * Needs the backend on 127.0.0.1:7860 (no LLM required); it also serves
+ * the prerendered gallery pages from the committed build (RIPRAP_STATIC_URL
+ * points at another build of them). Question journeys stub the SSE stream
  * with a recorded gallery result, so they need no LLM and run in seconds.
  * RIPRAP_E2E_LLM=1 enables one journey against the live LLM stream.
  */
@@ -13,7 +13,7 @@ import AxeBuilder from '@axe-core/playwright';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const STATIC = process.env.RIPRAP_STATIC_URL || 'http://127.0.0.1:4179';
+const STATIC = process.env.RIPRAP_STATIC_URL || process.env.RIPRAP_BASE_URL || 'http://127.0.0.1:7860';
 const QUESTION = 'Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?';
 const ADDRESS = '90-01 183rd Street, Queens';
 

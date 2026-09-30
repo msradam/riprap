@@ -2,14 +2,14 @@ import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Headless E2E for the Riprap UI. Targets a *running* uvicorn on
- * 127.0.0.1:7860 — we don't spin up our own server because the live
- * route depends on the FastAPI backend (planner, FSM, SSE, layer
- * endpoints). Static-route tests work against /q/sample which is
- * fully prerendered.
+ * 127.0.0.1:7860 (RIPRAP_BASE_URL overrides it); the live route depends
+ * on the FastAPI backend (planner, SSE, layer endpoints), and the same
+ * server serves the prerendered gallery pages from the committed build,
+ * so the gallery specs need no second server (RIPRAP_STATIC_URL points
+ * them at another build).
  *
- * Run with `npm run test:e2e` (uvicorn must already be up). The
- * matrix `npm run check:all` will fail loudly if uvicorn isn't on
- * the port — that's the design.
+ * Run with `pnpm test:e2e` (uvicorn must already be up). The matrix
+ * `pnpm check:all` fails loudly if uvicorn is not on the port, by design.
  */
 export default defineConfig({
   testDir: './tests/e2e',

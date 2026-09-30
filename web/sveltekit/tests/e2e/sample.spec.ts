@@ -3,12 +3,11 @@
  *
  * It renders every briefing piece without an SSE connection or a working
  * LLM backend, so it is the cheapest probe for design-system regressions.
- * (It replaces the old /q/sample demo route, which no longer exists.)
  */
 import { test, expect } from '@playwright/test';
 
-// The backend does not serve the gallery; the static build does (as in journeys.spec.ts).
-const STATIC = process.env.RIPRAP_STATIC_URL || 'http://127.0.0.1:4179';
+// The backend serves the gallery pages from the committed build (as in journeys.spec.ts).
+const STATIC = process.env.RIPRAP_STATIC_URL || process.env.RIPRAP_BASE_URL || 'http://127.0.0.1:7860';
 const PAGE = `${STATIC}/gallery/hollis/`;
 
 test.describe('/gallery/hollis/ (prerendered worked example)', () => {
