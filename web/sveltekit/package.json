@@ -28,9 +28,7 @@
     "@testing-library/svelte": "^5.3.1",
     "@testing-library/user-event": "^14.6.1",
     "@types/geojson": "^7946.0.16",
-    "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.6.0",
-    "@types/papaparse": "^5.5.2",
     "eslint": "^10.3.0",
     "eslint-plugin-svelte": "^3.17.1",
     "globals": "^17.6.0",
@@ -48,9 +46,6 @@
     "@deck.gl/mapbox": "^9.3.6",
     "@fontsource/overpass-mono": "^5.2.8",
     "@fontsource/sofia-sans": "^5.2.8",
-    "idb-keyval": "^6.2.2",
-    "js-yaml": "^4.1.1",
-    "maplibre-gl": "^4.7.0",
-    "papaparse": "^5.5.3"
+    "maplibre-gl": "^4.7.0"
   }
 }

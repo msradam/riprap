@@ -53,7 +53,6 @@ const EXEMPT_FILES = new Set<string>([
   'landing/LandHero.svelte',
   'landing/LandStones.svelte',
   'landing/UseBand.svelte',
-  'landing/ByodDialog.svelte',
   // RipMap layer descriptions reference NYC-specific data sources
   // (FloodNet NYC, Prithvi-NYC). Map layers visibility is itself
   // gated on the per-query manifest's display.map_layer flag, so
