@@ -432,8 +432,7 @@ def _past_event_verdict(question: str, docs: dict[str, str], values: dict | None
     year = this_year or datetime.date.today().year
     q = (question or "").lower()
     start = _period_start(question)
-    storm = next((d for w, d in (("ida", "ida_hwm"), ("sandy", "sandy_inundation")) if re.search(rf"\b{w}\b", q)),
-                 None)
+    storm = _storm_record(question)
     complaints = "nyc311" if "nyc311" in docs else "nyc311_nta"
     if storm and start is None:
         relevant = [storm]  # "during Ida", "inside the area Sandy flooded": the storm's own record
@@ -464,6 +463,22 @@ def past_event_source(question: str, focus: dict | None, lead: str, docs: dict[s
     return next((i for i in relevant if i in verdict), None)
 
 
+def _storm_record(question: str) -> str | None:
+    """The named storm's own record: ida_hwm for Ida, sandy_inundation for Sandy."""
+    q = (question or "").lower()
+    return next((d for w, d in (("ida", "ida_hwm"), ("sandy", "sandy_inundation")) if re.search(rf"\b{w}\b", q)),
+                None)
+
+
+def _storm_reports(doc_id: str, values: dict | None) -> bool:
+    """The storm's record reports something at this place: marks nearby, or
+    the address inside the extent."""
+    v = (values or {}).get(doc_id)
+    if not isinstance(v, dict):
+        return False
+    return bool(v.get("n_within_radius")) if doc_id == "ida_hwm" else bool(v.get("inside"))
+
+
 def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: dict[str, str],
                     values: dict | None, this_year: int | None = None) -> tuple[str, list[str]] | None:
     """(lead, facts) for a yes or no question about past flooding, or None
@@ -479,7 +494,14 @@ def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: d
     relevant, verdict = _past_event_verdict(question, docs, values, this_year)
     positive = [i for i, e in verdict.items() if e is True]
     if positive:
-        return "yes", facts if set(positive) & set(facts) else [*facts, positive[0]]
+        # A "yes" quotes only the evidence for yes: the sources that report an
+        # event, and the storm's own record when it reports something here.
+        # FEMA zones, DEP scenarios or terrain under a "Yes." read as
+        # counter-evidence; they stay in the evidence table. The source the
+        # rule relied on (the key sentence, lead_fact) comes first.
+        storm = _storm_record(question)
+        keep = set(positive) | ({storm} if storm and _storm_reports(storm, values) else set())
+        return "yes", [positive[0], *(f for f in facts if f in keep and f != positive[0])]
     if len(verdict) == len(relevant) and all(e is False for e in verdict.values()):
         # A "no" rests on the relevant sources alone: a positive fact about
         # something else (a 311 count for a sensor question) is not shown under it.

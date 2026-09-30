@@ -501,6 +501,8 @@ def synthesize(state) -> dict:
                                   "doc_ids": facts, "numbers": [],
                                   "reason": "answer check: " + "; ".join(r for _, r in lead_hits)}]
             lead, facts = "cannot_answer", []
+        if lead == "count" and rel in facts:
+            facts = [rel]  # a count answers with the counted source alone, not unrelated facts
         experimental = frozenset(d.doc_id for d in docs if d.experimental)
         facts = sorted(facts, key=lambda f: f in experimental)  # experimental sources after all others
         kept = [*({"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts),

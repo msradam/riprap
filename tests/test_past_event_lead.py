@@ -21,14 +21,16 @@ NONE = {"nyc311": {"n": 0, "years": 5, "by_year": {}}, "floodnet": {"n_sensors":
 
 
 def test_yes_when_an_observed_source_reports_an_event_in_the_period():
-    # The model's "partly" over two positive facts is replaced: the rule says yes.
-    assert past_event_lead(Q_IDA, PAST, ["ida_hwm", "nyc311"], TEXTS, HOLLIS, 2026) == ("yes", ["ida_hwm", "nyc311"])
+    # The model's "partly" over two positive facts is replaced: the rule says yes, with the source
+    # it relied on (FloodNet, the measured record) first and the model's order after it.
+    assert past_event_lead(Q_IDA, PAST, ["ida_hwm", "nyc311"], TEXTS, HOLLIS, 2026) == \
+        ("yes", ["floodnet", "ida_hwm", "nyc311"])
 
 
 def test_yes_adds_the_positive_source_when_the_model_left_it_out():
-    # FloodNet, the measured record, comes first in the rule's precedence.
-    assert past_event_lead(Q_IDA, PAST, ["sandy_inundation"], TEXTS, HOLLIS, 2026) == \
-        ("yes", ["sandy_inundation", "floodnet"])
+    # The model's only fact (Sandy, not the storm asked about) is not evidence for "since Ida": the
+    # answer is the source the rule relied on.
+    assert past_event_lead(Q_IDA, PAST, ["sandy_inundation"], TEXTS, HOLLIS, 2026) == ("yes", ["floodnet"])
 
 
 def test_no_only_when_every_relevant_source_answered_none():
@@ -53,7 +55,8 @@ def test_zero_in_a_window_that_misses_part_of_the_period_is_not_no():
 
 def test_a_storm_question_is_judged_by_that_storm_record():
     q = "Did the area around 79-01 Broadway, Queens flood during Hurricane Ida?"
-    assert past_event_lead(q, PAST, ["nyc311"], TEXTS, HOLLIS, 2026) == ("yes", ["nyc311", "ida_hwm"])
+    # "During Ida" rests on the storm's own record; a 311 count is not quoted under that yes.
+    assert past_event_lead(q, PAST, ["nyc311"], TEXTS, HOLLIS, 2026) == ("yes", ["ida_hwm"])
     q = "Was 1310 Surf Avenue, Brooklyn inside the area Hurricane Sandy flooded?"
     assert past_event_lead(q, PAST, [], TEXTS, HOLLIS, 2026) == ("no", ["sandy_inundation"])
 
@@ -118,3 +121,47 @@ def test_honest_silence_shows_the_sources_that_answered(monkeypatch):
             "[floodnet].") in out["paragraph"]
     assert "82 NYC 311" not in out["paragraph"].split("**Answer.**")[1].split("\n\n")[0]
     assert not g["dropped_claims"]
+
+
+
+# Refactor 9: a "Yes." quotes only the evidence for yes. Map, scenario and terrain facts the model
+# chose stay out of the answer (they remain in the evidence table).
+COUNTER = {**TEXTS, "fema_nfhl": "This address sits in FEMA flood zone X (an area of minimal flood hazard).",
+           "dep_moderate_2050": "This address is outside the modeled flooding in the NYC DEP stormwater scenario.",
+           "microtopo": "Elevation 14.87 m; higher than 29% of the ground within 200 m."}
+
+
+def test_yes_keeps_only_event_sources_with_the_relied_on_source_first():
+    chosen = ["fema_nfhl", "nyc311", "dep_moderate_2050", "floodnet", "microtopo"]
+    assert past_event_lead(Q_IDA, PAST, chosen, COUNTER, HOLLIS, 2026) == ("yes", ["floodnet", "nyc311"])
+
+
+def test_yes_keeps_the_storm_record_when_it_reports_marks_nearby():
+    chosen = ["ida_hwm", "fema_nfhl", "floodnet", "nyc311"]
+    assert past_event_lead(Q_IDA, PAST, chosen, COUNTER, HOLLIS, 2026) == ("yes", ["floodnet", "ida_hwm", "nyc311"])
+    no_marks = {**HOLLIS, "ida_hwm": {"n_within_radius": 0}}
+    assert past_event_lead(Q_IDA, PAST, chosen, COUNTER, no_marks, 2026) == ("yes", ["floodnet", "nyc311"])
+
+
+def test_yes_with_no_event_source_chosen_adds_the_relied_on_one():
+    chosen = ["fema_nfhl", "dep_moderate_2050", "microtopo"]
+    assert past_event_lead(Q_IDA, PAST, chosen, COUNTER, HOLLIS, 2026) == ("yes", ["floodnet"])
+
+
+def test_count_answer_quotes_only_the_counted_source(monkeypatch):
+    # Refactor 9, point 4: a count lead does not carry facts from unrelated sources.
+    from riprap.core.burr import synthesis as syn
+    from riprap.core.burr.synthesis import Doc
+
+    n311 = "34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years."
+    fema = "This address sits in FEMA flood zone X (an area of minimal flood hazard)."
+    monkeypatch.setenv("RIPRAP_ANSWER_MODE", "extractive")
+    monkeypatch.setattr(syn, "_documents", lambda state: (
+        [Doc("fema_nfhl", "Hazard reader", fema, False), Doc("nyc311", "Live observer", n311, False)], [], None))
+    monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
+    reply = {"answer": {"lead": "count", "facts": ["fema_nfhl", "nyc311"]}}
+    monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (reply, "scripted"))
+    out = syn.synthesize({"intent": "single_address", "plan": {
+        "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?"}})
+    answer = [c["doc_ids"][0] for c in out["grounding"]["claims"] if c["section"] == "answer"]
+    assert answer == ["nyc311"], out["paragraph"]
