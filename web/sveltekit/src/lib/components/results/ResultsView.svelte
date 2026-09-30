@@ -13,8 +13,9 @@
   import LazyMap from '$lib/components/map/LazyMap.svelte';
   import SkeletonBriefing from '$lib/components/states/SkeletonBriefing.svelte';
   import ErrorCard from '$lib/components/states/ErrorCard.svelte';
-  import type { RunState } from '$lib/client/runState.svelte';
-  import { boldFirstSentence, briefingModel, type SnapshotMeta } from '$lib/client/briefingModel';
+  import { looksLikeQuestion, type RunState } from '$lib/client/runState.svelte';
+  import { boldFirstSentence, briefingModel, firstSentence, suggestedDistrict, type SnapshotMeta } from '$lib/client/briefingModel';
+  import { resolve } from '$app/paths';
   import { briefingState } from '$lib/stores/briefingState.svelte';
   import { deployment } from '$lib/stores/deployment.svelte';
   import { formatGeneratedAt } from '$lib/client/gallery';
@@ -43,6 +44,8 @@
   let howOpen = $state(false);
 
   let hasBriefing = $derived(!!run.finalResult);
+  let isQuestionQuery = $derived(looksLikeQuestion(queryText));
+  let loading = $derived(!snapshot && !run.finalResult && !run.errorState && !run.streamDone);
   let isCompare = $derived(run.plan?.intent === 'compare' && run.finalResult?.targets?.length === 2);
   let isPlace = $derived(model.kind !== 'question');
   /** A place briefing's "In brief" paragraph, set in the Brief style. */
@@ -59,8 +62,11 @@
   let showMap = $derived(hasBriefing && !run.stopped && !isCompare && !!run.address);
   let showEvidence = $derived(hasBriefing && !run.stopped && !isCompare && model.cards.length > 0);
   // A run the planner could not serve is not an address or district briefing.
+  // During the wait the kind is known only for a question (from its text);
+  // a district reads as an address until the final payload names it.
   let kindLine = $derived(
     run.notImplemented ? 'Flood-exposure briefing, not available'
+      : loading ? (isQuestionQuery ? 'Flood-exposure briefing, question' : 'Flood-exposure briefing')
       : model.kind === 'question'
       ? run.finalResult?.area_boundary ? 'Flood-exposure briefing, district question' : 'Flood-exposure briefing, question'
       : `Flood-exposure briefing, ${model.kind}`
@@ -91,20 +97,47 @@
   // at most every 10 seconds.
   const startedAt = Date.now();
   let now = $state(startedAt);
-  let srStatus = $state('Reading the question');
-  let loading = $derived(!snapshot && !run.finalResult && !run.errorState && !run.streamDone);
+  // An address never had a question to read; say what is happening to it.
+  let firstText = $derived(isQuestionQuery ? 'Reading the question' : 'Resolving the place');
+  let srStatus = $state<string | null>(null);
   let elapsed = $derived(Math.max(0, Math.round((now - startedAt) / 1000)));
   let loadingText = $derived.by(() => {
-    if (!run.plan) return 'Reading the question';
+    if (!run.plan) return firstText;
     switch (briefingState.phase) {
       case 'specialists':
+        // The route sets this phase as soon as the plan arrives, before
+        // the geocoder (or nta_resolve, for a district) has answered.
+        if (!run.geocodeSucceeded && !run.address) return 'Resolving the place';
         return briefingState.totalSpecialists
           ? `Gathering evidence (${briefingState.firedCount}/${briefingState.totalSpecialists})`
           : 'Gathering evidence';
       case 'reconciling': return 'Reconciling';
       case 'error': return `Error${briefingState.errorMessage ? `: ${briefingState.errorMessage}` : ''}`;
-      default: return 'Resolving address';
+      default: return 'Resolving the place';
     }
+  });
+  // Past the promised window, say so; the counter alone reads as normal.
+  let elapsedNote = $derived(elapsed > 30 ? ', longer than usual' : '');
+  // The same count "What was checked" shows, so the two cannot disagree.
+  let failedCount = $derived(model.lists.consulted?.filter((r) => r.failed).length ?? 0);
+  // The live region's text once the run has landed. An error card is
+  // role="alert" and announces itself, so it gets nothing here.
+  let readyText = $derived.by(() => {
+    if (snapshot || loading || !hasBriefing || run.errorState) return null;
+    const first = model.lead ?? firstSentence(model.answer[0]);
+    return `Briefing ready.${first ? ` ${first}` : ''}`;
+  });
+  // A refusal's "Did you mean QN14?" becomes a link to that briefing.
+  let didYouMean = $derived(
+    run.stopped ? suggestedDistrict([model.lead ?? '', ...model.answer.flat().map((p) => p.text)].join(' ')) : null
+  );
+  // The report takes focus when the run ends and nothing else has it,
+  // so a keyboard reader is not sent back through the header.
+  $effect(() => {
+    if (!readyText) return;
+    tick().then(() => {
+      if (document.activeElement === document.body) document.getElementById('brief-answer')?.focus();
+    });
   });
   $effect(() => {
     if (!loading) return;
@@ -112,7 +145,7 @@
     const t = setInterval(() => {
       now = Date.now();
       ticks += 1;
-      if (ticks % 10 === 0) srStatus = `${loadingText}, ${ticks} seconds elapsed`;
+      if (ticks % 10 === 0) srStatus = `${loadingText}, ${ticks} seconds elapsed${elapsedNote}`;
     }, 1000);
     return () => clearInterval(t);
   });
@@ -171,7 +204,7 @@
 
 {#snippet answerBlock()}
   {#if hasLeadText}
-  <section id="brief-answer" class="brief-answer" aria-labelledby="brief-answer-h">
+  <section id="brief-answer" class="brief-answer" aria-labelledby="brief-answer-h" tabindex="-1">
     <h2 id="brief-answer-h" class="visually-hidden">{model.leadLabel}</h2>
     {#if model.lead}<p class={['brief-lead', model.leadIsSentence && 'is-sentence', !snapshot && 'is-arriving']}>{model.lead}</p>{/if}
     {#each model.answer as parts, i (i)}
@@ -240,12 +273,14 @@
        during generation would need the loading skeleton to hold its space. -->
   <!-- The "Map" jump link's target, headed like the answer (a hidden h2). -->
   <section id="brief-map" class="brief-map" aria-labelledby="brief-map-h">
-    <h2 id="brief-map-h" class="visually-hidden">Map</h2>
+    <!-- Not "Map": MapLibre names its canvas region that, and two
+         landmarks with one name trip the landmark-unique audit. -->
+    <h2 id="brief-map-h" class="visually-hidden">Figure 1, map</h2>
     <MapFigure {run} />
   </section>
 {/snippet}
 
-<article class={['brief', isPlace ? 'is-place' : 'is-question']}>
+<article class={['brief', isPlace ? 'is-place' : 'is-question', loading && 'is-loading']}>
   <section id="region-briefing" aria-labelledby="brief-h1">
     <header class="brief-head">
       <p class="brief-kind">{kindLine}</p>
@@ -260,6 +295,7 @@
         {#if model.generated}<span>Snapshot <span class="data">{model.generated.slice(0, 10)}</span></span>
         {:else if hasBriefing && run.finishedAt}<span>Run <span class="data">{formatGeneratedAt(run.finishedAt)}</span></span>{/if}
         {#if hasBriefing && !run.stopped}<a href="#how-made" onclick={openHowMade}>How this briefing was made</a>{/if}
+        {#if hasBriefing && !run.stopped && failedCount}<a href="#brief-sources">{failedCount} {failedCount === 1 ? 'source' : 'sources'} failed to respond</a>{/if}
       </p>
       {#if (hasBriefing && !run.stopped) || notice}
         <div class="brief-tools">
@@ -283,15 +319,18 @@
       {/if}
     </header>
 
+    <!-- One live region for the whole run: what is happening, then that
+         the briefing has landed. -->
+    <span class="visually-hidden" aria-live="polite">{readyText ?? srStatus ?? firstText}</span>
     {#if loading}
       <div class="generating-status">
         <p class="generating-line" aria-hidden="true">
-          <span class="pulse"></span>{loadingText}, <span class="data">{elapsed}</span> s
+          {loadingText}, <span class="data">{elapsed}</span> s{elapsedNote}
         </p>
-        <span class="visually-hidden" aria-live="polite">{srStatus}</span>
         <p class="generating-expect">
-          A place briefing takes a few seconds. A question goes through the language
-          model first and usually takes 10 to 25 seconds.
+          {isQuestionQuery
+            ? 'A question goes through the language model first and usually takes 10 to 25 seconds.'
+            : 'A place briefing takes a few seconds.'}
         </p>
         {#if !run.plan && run.planTokens}
           <details class="plan-details">
@@ -300,8 +339,9 @@
           </details>
         {/if}
       </div>
-      {#if run.geocodeSucceeded}
-        <!-- Geocode done; the briefing arrives whole in `final`. -->
+      {#if run.geocodeSucceeded || run.address}
+        <!-- Place resolved (geocode, or nta_resolve for a district); the
+             briefing arrives whole in `final`. -->
         <SkeletonBriefing />
       {/if}
     {/if}
@@ -370,6 +410,13 @@
           {@render sections()}
         {:else}
           {@render sections()}
+          <!-- The next step, as ErrorCard sets it: each link starts a new run. -->
+          <ul class="error-card-actions">
+            {#if didYouMean}
+              <li><a class="error-card-action" href={resolve('/(app)/q/[queryId]', { queryId: didYouMean })} data-sveltekit-reload>Briefing for {didYouMean}</a></li>
+            {/if}
+            <li><a class="error-card-action" href="{resolve('/')}?q={encodeURIComponent(queryText)}" data-sveltekit-reload>Edit query</a></li>
+          </ul>
         {/if}
       {/if}
     {/if}
@@ -439,6 +486,14 @@
   .brief :global(section),
   .brief :global(#brief-map) {
     scroll-margin-top: var(--scroll-offset);
+  }
+
+  /* During the wait the page keeps a viewport's height under the 62px
+     header, so the footer starts below the fold and does not drop when
+     the briefing lands. Phones have a taller header; the extra is a
+     little blank scroll, never a footer in the first view. */
+  .brief.is-loading {
+    min-height: calc(100vh - 62px);
   }
 
   /* Top: kind line, title, meta line, jump links */
@@ -545,6 +600,10 @@
     grid-row: 1 / span 3;
     padding-top: 10px;
   }
+  /* Focused by script when the run ends; no ring for that, a ring for keys. */
+  .brief-answer:focus:not(:focus-visible) {
+    outline: none;
+  }
   .brief-lead {
     margin: 0 0 8px;
     font-size: 64px;
@@ -626,6 +685,22 @@
     max-width: 54ch;
     margin: 12px 0 0;
     font-size: 17px;
+  }
+  /* A stopped run's next step, set as ErrorCard sets its actions. */
+  .error-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 24px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 17px;
+  }
+  .error-card-action {
+    display: inline-block;
+    min-height: 24px;
+    font-weight: 600;
+    text-underline-offset: 3px;
   }
 
   /* Headings: one h2 style on the page */
@@ -788,29 +863,9 @@
   .generating-line .data {
     font-size: 18px;
   }
-  .generating-line .pulse {
-    display: inline-block;
-    margin-right: 10px;
-    vertical-align: 0.15em;
-  }
   .generating-expect {
     margin: 0;
     max-width: 54ch;
-  }
-  .pulse {
-    flex: none;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--accent-graphical);
-    animation: pulse 1.4s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 0.3; transform: scale(0.85); }
-    50% { opacity: 1; transform: scale(1.1); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .pulse { animation: none; opacity: 0.7; }
   }
   .plan-details {
     margin-top: 8px;

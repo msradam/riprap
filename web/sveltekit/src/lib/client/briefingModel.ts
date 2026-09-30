@@ -216,6 +216,17 @@ export function leadAnswer(blocks: BriefingBlock[]) {
   return { lead, leadParas, first, answer };
 }
 
+/** The first sentence of a paragraph, for the "Briefing ready" announcement. */
+export function firstSentence(parts: ClaimPart[] | undefined): string | null {
+  if (!parts?.length) return null;
+  return text(sentencesOf(parts)[0] ?? []).trim() || null;
+}
+
+/** The community district a refusal suggests ("Did you mean QN14?"). */
+export function suggestedDistrict(refusal: string): string | null {
+  return /Did you mean ([A-Z]{2}\d{2})\?/.exec(refusal)?.[1] ?? null;
+}
+
 /** A refusal's first sentence ("Riprap does not answer this question.")
  *  comes off its first paragraph so it can stand at the answer position. */
 export function splitSentence(parts: ClaimPart[]): { sentence: string; parts: ClaimPart[] } | null {

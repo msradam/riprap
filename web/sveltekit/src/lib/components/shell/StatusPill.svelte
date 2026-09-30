@@ -12,8 +12,8 @@
    */
 
   // Short labels for FSM step names, from the legacy agent.js label
-  // set. Anything not mapped shows its step id with the underscores
-  // as spaces.
+  // set. Anything not mapped shows no step: an internal id is not a
+  // label. An empty label hides a bookkeeping step.
   const SHORT: Record<string, string> = {
     select_deployment: 'choosing the deployment',
     geocode: 'geocoding',
@@ -38,6 +38,32 @@
     eo_chip_fetch: 'fetching S2/S1/DEM chip',
     rag_granite_embedding: 'RAG retrieval',
     gliner_extract: 'GLiNER typed extraction',
+    assemble_legacy_state: '',
+    policy_corpus: 'policy corpus',
+    fema_pfirm: 'FEMA preliminary map',
+    fema_nfhl: 'FEMA flood zones',
+    sandy: 'Sandy 2012',
+    sandy_nta: 'Sandy 2012',
+    dep_extreme_2080: 'DEP scenarios',
+    dep_moderate_2050: 'DEP scenarios',
+    dep_moderate_current: 'DEP scenarios',
+    dep_extreme_2080_nta: 'DEP scenarios',
+    dep_moderate_2050_nta: 'DEP scenarios',
+    dep_moderate_current_nta: 'DEP scenarios',
+    ida_hwm: 'Ida high-water marks',
+    usgs_gauges: 'USGS gauges',
+    water_level: 'water level',
+    mta_entrances: 'MTA entrances',
+    nycha_developments: 'NYCHA developments',
+    doe_schools: 'DOE schools',
+    doh_hospitals: 'hospitals',
+    npcc4_slr: 'sea-level projections',
+    microtopo: 'terrain',
+    microtopo_nta: 'terrain',
+    nyc311_nta: 'NYC 311 history',
+    prithvi_water_nta: 'Ida surface water (experimental)',
+    dob_permits_nta: 'DOB permits',
+    area_boundary: 'area outline',
   };
 
   let visible = $derived(
@@ -59,7 +85,7 @@
   let stepLabel = $derived.by(() => {
     const s = briefingState.activeStep;
     if (!s) return null;
-    return SHORT[s] ?? s.replace(/_/g, ' ');
+    return SHORT[s] || null;
   });
 
   // "12/26" once the plan has said how many sources run; a bare count

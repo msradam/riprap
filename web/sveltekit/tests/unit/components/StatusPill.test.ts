@@ -79,3 +79,23 @@ describe('StatusPill stopped runs', () => {
     expect(container.textContent ?? '').not.toContain('error');
   });
 });
+
+describe('StatusPill step labels', () => {
+  it('a known step id shows its readable label', () => {
+    briefingState.phase = 'specialists';
+    briefingState.activeStep = 'fema_pfirm';
+    const { container } = render(StatusPill);
+    expect(container.querySelector('.status-step')?.textContent).toBe('FEMA preliminary map');
+  });
+
+  it.each(['assemble_legacy_state', 'some_unmapped_step'])(
+    '%s shows no step, never the raw id',
+    (id) => {
+      briefingState.phase = 'specialists';
+      briefingState.activeStep = id;
+      const { container } = render(StatusPill);
+      expect(container.querySelector('.status-step')).toBeNull();
+      expect(container.textContent ?? '').not.toContain(id.replace(/_/g, ' '));
+    },
+  );
+});

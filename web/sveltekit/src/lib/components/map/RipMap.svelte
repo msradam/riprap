@@ -366,7 +366,11 @@
       style: POSITRON_NO_LABELS,
       center: [address.lon, address.lat],
       zoom: 15,
-      attributionControl: { compact: true }
+      attributionControl: { compact: true },
+      // Phones: one finger scrolls the page past the map, two fingers pan
+      // it; the wheel zooms only with a modifier key. MapLibre shows its
+      // own hint text when a gesture is refused.
+      cooperativeGestures: true
     });
 
     map.addControl(new maplibre.NavigationControl({ visualizePitch: false }), 'top-right');
