@@ -96,13 +96,11 @@ PLAN_SCHEMA_DESC = """Return JSON with these keys:
             out_of_scope; [{"type": "nta", "text": ...}] for neighborhood and
             development_check (a neighborhood name or a community district code such
             as QN12); compare has exactly two address targets
-  question  the question being asked, in the user's words; "" when the input is only
-            an address or a place with no question
   focus     hazard (flood, heat, air, other), time_frame (past, now, future, any), and
             assets the question is about (subway, schools, public_housing, hospitals,
             construction), or [] for none
   pebbles   the few sources from the catalog needed to answer the question, usually
-            one to five; [] when question is ""
+            one to five; [] when the input is only a place with no question
   rationale one short sentence
 """
 
@@ -175,7 +173,9 @@ def plan_schema(pebble_ids: list[str]) -> dict:
     return {
         "type": "object",
         "additionalProperties": False,
-        "required": ["intent", "targets", "question", "focus", "pebbles", "rationale"],
+        # The question is the user's own text, set in code (_validate); the
+        # model echoing it cost about 25 generated tokens, a second per query.
+        "required": ["intent", "targets", "focus", "pebbles", "rationale"],
         "properties": {
             "intent": {"type": "string", "enum": sorted(INTENTS)},
             "targets": {"type": "array", "items": {
@@ -183,7 +183,6 @@ def plan_schema(pebble_ids: list[str]) -> dict:
                 "properties": {"type": {"type": "string", "enum": ["address", "nta", "borough", "nyc"]},
                                "text": {"type": "string"}},
             }},
-            "question": {"type": "string"},
             "focus": {"type": "object", "additionalProperties": False,
                       "required": ["hazard", "time_frame", "assets"],
                       "properties": {
