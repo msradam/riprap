@@ -89,7 +89,11 @@ def reports_result(doc: str) -> bool:
     counts = _register_counts(doc)
     if counts:
         return max(counts[1:]) > 0
-    return bool(doc) and not _DOC_ABSENCE_RE.search(doc)
+    # The finding is the first sentence; a later sentence may qualify it
+    # ("1 sensor ... is flagged ..., so its depths are not used for the peak")
+    # without turning 28 events into an absence.
+    first = re.split(r"(?<=\.)\s+(?=[A-Z0-9])", doc.strip(), maxsplit=1)[0] if doc else ""
+    return bool(first) and not _DOC_ABSENCE_RE.search(first)
 
 
 def _partial(doc: str) -> bool:

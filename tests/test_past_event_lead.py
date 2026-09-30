@@ -165,3 +165,18 @@ def test_count_answer_quotes_only_the_counted_source(monkeypatch):
         "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?"}})
     answer = [c["doc_ids"][0] for c in out["grounding"]["claims"] if c["section"] == "answer"]
     assert answer == ["nyc311"], out["paragraph"]
+
+
+def test_a_qualifying_sentence_does_not_turn_events_into_an_absence():
+    """'Have street flood sensors recorded flooding near 214 3rd Street?' got
+    cannot_answer: the FloodNet sentence's 'not used for the peak' read as
+    an absence and the rule's 'yes' was thrown out."""
+    from riprap.core.burr.answer_checks import reports_result
+
+    doc = ("5 FloodNet community sensors within 600 m have logged 28 above-curb flood events in the last "
+           "3 years. Peak depth recorded by the sensors in good working order: 715 mm on 2026-08-23. 1 sensor "
+           "that logged events is flagged by FloodNet for maintenance, so its depths are not used for the peak.")
+    assert reports_result(doc)
+    assert not reports_result("1 FloodNet community sensor within 600 m has logged 0 above-curb flood events "
+                              "in the last 3 years.")
+    assert not reports_result("No FloodNet sensors deployed within 600 m of this address.")
