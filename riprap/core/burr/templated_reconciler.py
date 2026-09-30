@@ -180,8 +180,11 @@ def _area_lead(state, items) -> str | None:
     for pid, label in (("dep_extreme_2080_nta", "the DEP extreme scenario for 2080 sea-level rise"),
                        ("dep_moderate_2050_nta", "the moderate scenario for 2050")):
         v = state.get(pid)
-        if pid in by_pebble and isinstance(v, dict) and v.get("fraction_any") is not None:
-            shares.append((pid, f"{v['fraction_any'] * 100:.1f}% is modeled to flood from rainfall in {label}"))
+        if pid in by_pebble and isinstance(v, dict) and v.get("fraction_class") is not None:
+            # Classes 1 and 2 are rainfall flooding, the share the cited
+            # sentence states; class 3 is the scenario's future high tide.
+            rain = sum(f for k, f in v["fraction_class"].items() if str(k) in ("1", "2"))
+            shares.append((pid, f"{round(rain * 100, 1)}% is modeled to flood from rainfall in {label}"))
     if shares:
         claims.append({"section": "lead", "doc_ids": [by_pebble[p].doc_id for p, _ in shares],
                        "text": ", ".join(t for _, t in shares)})
