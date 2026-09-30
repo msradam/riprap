@@ -30,9 +30,9 @@ import argparse
 import json
 import sys
 from typing import Any
+from urllib.error import URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
-from urllib.error import URLError
 
 # Same anchor addresses as the other probe scripts — keep the address
 # set in lockstep so they cover the same matrix.
