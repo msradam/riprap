@@ -53,3 +53,31 @@ def test_extractive_count_answer_leads_with_the_kind(monkeypatch):
     out = syn.synthesize({"intent": "neighborhood", "plan": {"question": Q}, "nyc311_nta": V})
     assert "**Answer.**\n4 street flooding complaints in the last 3 years, counting the 311 descriptors" in out["paragraph"]
     assert "4 street flooding, 2 sewer backup [nyc311_nta]." in out["paragraph"]
+
+
+def test_district_counts_by_community_board_and_says_so(monkeypatch):
+    """A community district is counted by the record's community_board
+    field, not the NTA-union outline, and the sentence names the field."""
+    from types import SimpleNamespace
+
+    from app.areas import nta_evidence
+    from app.context import nyc311
+
+    seen = {}
+
+    def fake(clause, since, limit):
+        seen["clause"] = clause
+        return [_c("Street Flooding (SJ)")] * 2
+
+    monkeypatch.setattr(nyc311, "_complaints_where", fake)
+    q = SimpleNamespace(extras={"area_code": "QN12"})
+    out = nta_evidence.complaints(None, query=q, years=3)
+    assert seen["clause"] == "community_board='12 QUEENS'"
+    assert out["n"] == 2 and out["where"] == "in Community District QN12 (by the record's community board field)"
+    assert out["narrative"].startswith("2 NYC 311 flood-related complaints filed in Community District QN12 "
+                                       "(by the record's community board field) in the last 3 years")
+    # An NTA code is not a district: the polygon path is unchanged.
+    called = {}
+    monkeypatch.setattr(nyc311, "summary_for_polygon", lambda polygon, years: called.setdefault("polygon", years))
+    nta_evidence.complaints("poly", query=SimpleNamespace(extras={"area_code": "QN0201"}), years=3)
+    assert called == {"polygon": 3}

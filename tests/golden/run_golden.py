@@ -113,12 +113,12 @@ def score_district(base: str, code: str) -> dict:
     v = out.get("nyc311_nta") or {}
     want = keys.nyc311_district(board, years=int(v.get("years") or 3))
     res = {"query": code, "intent": out.get("intent"), "facts": []}
-    # The app counts inside the district's NTA-union outline and says so
-    # ("filed inside this area"); the key counts by the record's own
-    # community_board field. The two agree to about 1%, so 2% is the bar.
+    # Both count by the record's own community_board field (the app fetches
+    # the rows and counts them; the key counts on the server), so exact.
     got = v.get("n")
-    check(res["facts"], f"311 count in {board} ({v.get('years')} y, within 2%)", got, want,
-          ok=got is not None and abs(got - want) <= 0.02 * want)
+    check(res["facts"], f"311 count in {board} ({v.get('years')} y)", got, want)
+    check(res["facts"], "311 sentence names the community board field", None, None,
+          ok="community board field" in (out.get("paragraph") or ""))
     check(res["facts"], "311 count in text", got, want,
           ok=bool(re.search(rf"\b{got} NYC 311", out.get("paragraph") or "")))
     return res

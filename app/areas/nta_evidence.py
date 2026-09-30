@@ -49,7 +49,13 @@ def dep(polygon, scenario: str) -> dict:
     return v
 
 
-def complaints(polygon, years: int = 3) -> dict:
+def complaints(polygon, query=None, years: int = 3) -> dict:
+    """A community district (QN12) is counted by the 311 record's own
+    community_board field, the official definition; a neighborhood by
+    its NTA polygon. The district's NTA-union outline stays on the map."""
+    code = (query.extras.get("area_code") if query else None) or ""
+    if nyc311.community_board(code):
+        return nyc311.summary_for_district(code, years=years)
     return nyc311.summary_for_polygon(polygon, years=years)
 
 

@@ -114,8 +114,17 @@ def complaints_in_polygon(polygon, polygon_crs: str = "EPSG:4326",
     import geopandas as gpd
     g = gpd.GeoDataFrame(geometry=[polygon], crs=polygon_crs).to_crs("EPSG:4326")
     geom = g.iloc[0].geometry.simplify(simplify_tolerance, preserve_topology=True)
-    wkt = geom.wkt
-    where = f"{_DESC_CLAUSE} AND within_polygon(location, '{wkt}')"
+    return _complaints_where(f"within_polygon(location, '{geom.wkt}')", since, limit)
+
+
+def complaints_in_board(board: str, since: datetime | None = None, limit: int = 5000) -> list[Complaint]:
+    """Flood-related complaints whose `community_board` field is `board`
+    ('12 QUEENS'): the record's own district, the official definition."""
+    return _complaints_where(f"community_board='{board}'", since, limit)
+
+
+def _complaints_where(clause: str, since: datetime | None, limit: int) -> list[Complaint]:
+    where = f"{_DESC_CLAUSE} AND {clause}"
     if since:
         ts = since.replace(tzinfo=None).isoformat(timespec="seconds")
         where += f" AND created_date >= '{ts}'"
@@ -138,18 +147,33 @@ def complaints_in_polygon(polygon, polygon_crs: str = "EPSG:4326",
     ]
 
 
+def _since(years: int) -> datetime:
+    # Midnight UTC, not the current second: the query text (and so the HTTP
+    # cache key) stays the same all day, so a repeat query is served from cache.
+    return datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=365 * years)
+
+
 def summary_for_polygon(polygon, polygon_crs: str = "EPSG:4326",
                         years: int = 5) -> dict:
     """Polygon-mode aggregation: counts of flood-related 311 complaints
     inside the polygon over the trailing window."""
-    # Midnight UTC, not the current second: the query text (and so the HTTP
-    # cache key) stays the same all day, so a repeat query is served from cache.
-    since = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=365 * years)
-    cs = complaints_in_polygon(polygon, polygon_crs=polygon_crs, since=since, limit=5000)
+    cs = complaints_in_polygon(polygon, polygon_crs=polygon_crs, since=_since(years), limit=5000)
     return _summarize(cs, years=years, radius_m=None, limit=5000)
 
 
-def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: int | None = None) -> dict:
+def summary_for_district(code: str, years: int = 3) -> dict:
+    """Counts for a community district (QN12) by the record's
+    `community_board` field, and the sentence says so."""
+    board = community_board(code)
+    if board is None:
+        raise ValueError(f"not a community district code like QN12: {code!r}")
+    cs = complaints_in_board(board, since=_since(years), limit=5000)
+    where = f"in Community District {code.upper().replace(' ', '')} (by the record's community board field)"
+    return _summarize(cs, years=years, radius_m=None, limit=5000, where=where)
+
+
+def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: int | None = None,
+               where: str | None = None) -> dict:
     by_year: Counter = Counter(c.created_date[:4] for c in cs if c.created_date)
     by_descriptor: Counter = Counter(c.descriptor for c in cs)
     by_kind: Counter = Counter(KIND.get(c.descriptor, c.descriptor) for c in cs)
@@ -166,7 +190,7 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: i
     n = len(cs)
     by_year_sorted = dict(sorted(by_year.items()))
     kinds = dict(by_kind.most_common())
-    where = f"within {radius_m:.0f} m of this location" if radius_m else "inside this area"
+    where = where or (f"within {radius_m:.0f} m of this location" if radius_m else "inside this area")
     # The source answered: 0 here is a true zero, and the sentence says so.
     # At the fetch limit the count is a floor, not the total.
     capped = limit is not None and n >= limit
@@ -178,6 +202,7 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: i
         "n": n,
         "capped": capped,
         "radius_m": radius_m,
+        "where": where,
         "years": years,
         "by_year": by_year_sorted,
         "by_descriptor": dict(by_descriptor.most_common()),
@@ -234,8 +259,8 @@ def flood_requests(*, lat: float | None = None, lon: float | None = None,
         where += f" AND community_board = '{board}'"
         area = {"community_district": community_district.upper().replace(" ", ""),
                 "community_board": board,
-                "definition": f"requests whose community_board field is '{board}'; a district briefing "
-                              "counts inside the district's outline instead, so the two can differ by about 1%"}
+                "definition": f"requests whose community_board field is '{board}', the same field a "
+                              "district briefing counts by"}
     elif lat is not None and lon is not None:
         where += f" AND within_circle(location, {lat}, {lon}, {radius_m})"
         area = {"lat": lat, "lon": lon, "radius_m": radius_m,

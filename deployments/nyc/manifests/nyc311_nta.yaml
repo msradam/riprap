@@ -17,6 +17,8 @@ config:
   function: complaints
   args:
     - {source: polygon_4326}
+  kwargs:
+    query: {source: query}   # extras.area_code: a district counts by community_board
   on_none: offline
 
 provenance:

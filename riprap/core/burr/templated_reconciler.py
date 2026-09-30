@@ -192,8 +192,8 @@ def _area_lead(state, items) -> str | None:
     if "nyc311_nta" in by_pebble and isinstance(n311, dict) and "n" in n311:
         claims.append({"section": "lead", "doc_ids": [by_pebble["nyc311_nta"].doc_id],
                        "text": f"{'At least ' if n311.get('capped') else ''}{n311['n']} flood-related 311 "
-                               f"complaint{'s were' if n311['n'] != 1 else ' was'} filed inside this area in the "
-                               f"last {n311['years']} years"})
+                               f"complaint{'s were' if n311['n'] != 1 else ' was'} filed "
+                               f"{n311.get('where') or 'inside this area'} in the last {n311['years']} years"})
     docs = [Doc(e.doc_id, "lead", e.text, False) for e in items]
     kept, _ = verify(claims, docs)
     return " ".join(f"{c['text']} {''.join(f'[{i}]' for i in c['doc_ids'])}." for c in kept) or None
