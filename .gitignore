@@ -122,3 +122,6 @@ Riprap.zip
 # never commit them (refactor 6)
 data/calibration/distill_pool.csv
 experiments/**/distill_pool.csv
+
+# Golden-set score files (regenerable evidence, kept out of the repo)
+tests/golden/results/

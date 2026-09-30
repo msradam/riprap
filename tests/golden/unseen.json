@@ -1,0 +1,16 @@
+[
+  {"id": "u01", "kind": "address", "query": "480 Van Brunt Street, Brooklyn"},
+  {"id": "u02", "kind": "address", "query": "101-04 Rockaway Beach Boulevard, Queens"},
+  {"id": "u03", "kind": "address", "query": "17 Battery Place, Manhattan"},
+  {"id": "u04", "kind": "address", "query": "1040 Grand Concourse, Bronx"},
+  {"id": "u05", "kind": "address", "query": "253 West 125th Street, Manhattan"},
+  {"id": "u06", "kind": "address", "query": "543 Union Street, Brooklyn"},
+  {"id": "u07", "kind": "address", "query": "58-01 Woodside Avenue, Queens"},
+  {"id": "u08", "kind": "address", "query": "615 Midland Avenue, Staten Island"},
+  {"id": "u09", "kind": "district", "query": "QN14"},
+  {"id": "u10", "kind": "district", "query": "BX01"},
+  {"id": "u11", "kind": "question", "query": "Has the block around 94-05 Astoria Boulevard, Queens flooded since Hurricane Ida?"},
+  {"id": "u12", "kind": "question", "query": "How many flooding complaints have been made to 311 near 253 West 125th Street, Manhattan?"},
+  {"id": "u13", "kind": "question", "query": "Was 204 Van Dyke Street, Brooklyn inside the area Hurricane Sandy flooded?"},
+  {"id": "u14", "kind": "question", "query": "Have street flood sensors recorded flooding near 214 3rd Street, Brooklyn?"}
+]
