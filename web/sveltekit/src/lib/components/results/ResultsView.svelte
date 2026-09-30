@@ -74,12 +74,17 @@
   let placeRepeats = $derived(!!run.resolvedPlace && norm(run.resolvedPlace) === norm(title));
   // A district briefing has no In brief paragraph: no heading, no jump.
   let hasLeadText = $derived(!!model.lead || model.answer.length > 0);
-  let jumps = $derived([
-    ...(hasLeadText ? [{ href: '#brief-answer', label: model.leadLabel === 'In brief' ? 'In brief' : 'Answer' }] : []),
-    ...(showEvidence ? [{ href: '#brief-evidence', label: 'Evidence' }] : []),
-    ...(showMap ? [{ href: '#brief-map', label: 'Map' }] : []),
-    { href: '#brief-sources', label: 'Sources' }
-  ]);
+  // In page order: a question page sets the map before the evidence, a
+  // place page the evidence (left column) before the map (right).
+  let jumps = $derived.by(() => {
+    const evidence = showEvidence ? [{ href: '#brief-evidence', label: 'Evidence' }] : [];
+    const map = showMap ? [{ href: '#brief-map', label: 'Map' }] : [];
+    return [
+      ...(hasLeadText ? [{ href: '#brief-answer', label: model.leadLabel === 'In brief' ? 'In brief' : 'Answer' }] : []),
+      ...(isPlace ? [...evidence, ...map] : [...map, ...evidence]),
+      { href: '#brief-sources', label: 'Sources' }
+    ];
+  });
 
   // Live runs only: elapsed time while the briefing is being built. The
   // visible counter ticks every second; the screen-reader line changes
