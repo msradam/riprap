@@ -101,9 +101,11 @@ def _layer(kind: str, lat: float, lon: float, r: int) -> dict:
         return _clip_simplify(
             dep_stormwater.load("dep_extreme_2080"), lat, lon, r, props_keep={"Flooding_Category"}
         )
-    from app.flood_layers import prithvi_water as pw
+    if kind == "prithvi":
+        from app.flood_layers import prithvi_water as pw
 
-    return pw.layer_geojson(lat, lon, r)
+        return pw.layer_geojson(lat, lon, r)
+    raise ValueError(f"unknown layer {kind!r}")
 
 
 def _clip_simplify(
