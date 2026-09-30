@@ -164,6 +164,38 @@ def _lead(state, items) -> str | None:
     return " ".join(out) or None
 
 
+def _area_lead(state, items) -> str | None:
+    """A community district or neighbourhood briefing's opening: the Sandy
+    share, the DEP shares and the 311 count, cited and checked like the
+    address lead."""
+    from riprap.core.burr.synthesis import Doc, verify
+
+    by_pebble = {e.pebble_id: e for e in items}
+    claims = []
+    sandy = state.get("sandy_nta")
+    if "sandy_nta" in by_pebble and isinstance(sandy, dict) and sandy.get("fraction") is not None:
+        claims.append({"section": "lead", "doc_ids": [by_pebble["sandy_nta"].doc_id],
+                       "text": f"{sandy['fraction'] * 100:.1f}% of this area lies inside the 2012 Sandy inundation extent"})
+    shares = []
+    for pid, label in (("dep_extreme_2080_nta", "the DEP extreme scenario for 2080 sea-level rise"),
+                       ("dep_moderate_2050_nta", "the moderate scenario for 2050")):
+        v = state.get(pid)
+        if pid in by_pebble and isinstance(v, dict) and v.get("fraction_any") is not None:
+            shares.append((pid, f"{v['fraction_any'] * 100:.1f}% is modeled to flood from rainfall in {label}"))
+    if shares:
+        claims.append({"section": "lead", "doc_ids": [by_pebble[p].doc_id for p, _ in shares],
+                       "text": ", ".join(t for _, t in shares)})
+    n311 = state.get("nyc311_nta")
+    if "nyc311_nta" in by_pebble and isinstance(n311, dict) and "n" in n311:
+        claims.append({"section": "lead", "doc_ids": [by_pebble["nyc311_nta"].doc_id],
+                       "text": f"{'At least ' if n311.get('capped') else ''}{n311['n']} flood-related 311 "
+                               f"complaint{'s were' if n311['n'] != 1 else ' was'} filed inside this area in the "
+                               f"last {n311['years']} years"})
+    docs = [Doc(e.doc_id, "lead", e.text, False) for e in items]
+    kept, _ = verify(claims, docs)
+    return " ".join(f"{c['text']} {''.join(f'[{i}]' for i in c['doc_ids'])}." for c in kept) or None
+
+
 def no_place(state) -> str:
     """The briefing when the query named no place the geocoder could find."""
     asked = (state.get("first_target") or state.get("query") or "").strip()
@@ -200,8 +232,10 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
     stones, registry = evidence.load(state.get("deployment"))
     items = evidence.collect(state, stones, registry)
     sections = [_scope_header()]
-    bare = state.get("intent") == "single_address" and not (state.get("plan") or {}).get("question")
-    lead = _lead(state, items) if bare else None
+    question = (state.get("plan") or {}).get("question")
+    intent = state.get("intent")
+    lead = (_lead(state, items) if intent == "single_address" and not question
+            else _area_lead(state, items) if intent == "neighborhood" and not question else None)
     if lead:
         sections.append(f"**In brief.**\n{lead}")
     dep, dep_done = _dep_sentence(state, items), False
