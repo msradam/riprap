@@ -600,8 +600,11 @@
     grid-row: 1 / span 3;
     padding-top: 10px;
   }
-  /* Focused by script when the run ends; no ring for that, a ring for keys. */
-  .brief-answer:focus:not(:focus-visible) {
+  /* Focused by script when the run ends so the next Tab lands inside the
+     answer. A ring round a whole section is unearned, so never one here;
+     more specific than the `.brief :global(:focus-visible)` ring above. */
+  .brief .brief-answer:focus,
+  .brief .brief-answer:focus-visible {
     outline: none;
   }
   .brief-lead {

@@ -92,10 +92,16 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
                 return guard  # a bare place: the resolver finds it, and there is no question to plan
             p = run_planner(query, ledger=calls)
             intent, targets, focus = p.intent, p.targets, p.focus
-            if intent == "neighborhood" and (guard.get("place") or {}).get("kind") == "address":
+            place_kind = (guard.get("place") or {}).get("kind")
+            if intent == "neighborhood" and place_kind == "address":
                 # The query names a street address; the model's "Hollis, Queens"
                 # resolved to no area and the reporter's question went unanswered.
                 intent, targets = "single_address", guard["targets"]
+            elif place_kind == "district":
+                # The code parser read the district code; the model's own words
+                # ("Queens Community Board 12") match no tabulation area.
+                intent = intent if intent in ("neighborhood", "development_check") else "neighborhood"
+                targets = guard["targets"]
             if forecast_question(query):
                 # Decided in code: a forecast question is about what is coming,
                 # so it runs the Lodestone's forecast pebbles, never live_now.

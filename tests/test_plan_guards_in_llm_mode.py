@@ -57,3 +57,19 @@ def test_a_question_stays_a_question_when_the_planner_is_unreachable(monkeypatch
     plan = app.plan_for(q)
     assert plan["intent"] == "single_address" and plan["question"] == q
     assert "question" not in app.plan_for("615 Midland Avenue, Staten Island")
+
+
+def test_a_district_code_in_the_query_outranks_the_planners_words(monkeypatch):
+    """"How many flood complaints has Queens Community Board 12 had?" got a
+    neighbourhood plan for the words "Queens Community Board 12", which
+    match no tabulation area; the parser had read QN12 all along."""
+    import app.planner as planner
+
+    monkeypatch.setattr(app, "_tier", lambda: "llm")
+    monkeypatch.setattr(app, "llm_bare", lambda: False, raising=False)
+    monkeypatch.setattr(planner, "plan", lambda *a, **k: planner.Plan(
+        intent="neighborhood", targets=[{"type": "nta", "text": "Queens Community Board 12"}], rationale="x",
+        question="How many flood complaints has Queens Community Board 12 had?"))
+    plan = app.plan_for("How many flood complaints has Queens Community Board 12 had?")
+    assert plan["intent"] == "neighborhood"
+    assert plan["targets"] == [{"type": "district", "text": "QN12"}]

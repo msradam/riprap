@@ -123,7 +123,8 @@ test.describe('journeys', () => {
 
   test('4. out-of-scope question gets the refusal', async ({ page }) => {
     await ask(page, 'Should I buy the house at 2017 East 17th Street, Brooklyn?');
-    await expect(page.getByText('Riprap does not answer this question')).toBeVisible({ timeout: 60_000 });
+    // The lead sentence; the live region announces the same words to screen readers.
+    await expect(page.locator('.brief-lead', { hasText: 'Riprap does not answer this question' })).toBeVisible({ timeout: 60_000 });
     await noAxeViolations(page, 'refusal');
   });
 
