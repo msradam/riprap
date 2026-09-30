@@ -1,0 +1,14 @@
+[
+  {"id": "a01", "kind": "address", "query": "515 Malcolm X Boulevard, Manhattan"},
+  {"id": "a02", "kind": "address", "query": "4790 Broadway, Manhattan"},
+  {"id": "a03", "kind": "address", "query": "10 Grand Army Plaza, Brooklyn"},
+  {"id": "a04", "kind": "address", "query": "89-11 Merrick Boulevard, Queens"},
+  {"id": "a05", "kind": "address", "query": "851 Grand Concourse, Bronx"},
+  {"id": "a06", "kind": "address", "query": "10 Richmond Terrace, Staten Island"},
+  {"id": "d01", "kind": "district", "query": "MN12"},
+  {"id": "d02", "kind": "district", "query": "BK14"},
+  {"id": "q01", "kind": "question", "query": "Has the block around 41-17 Main Street, Queens flooded since Hurricane Ida?"},
+  {"id": "q02", "kind": "question", "query": "How many flooding complaints have been made to 311 near 4790 Broadway, Manhattan?"},
+  {"id": "q03", "kind": "question", "query": "Was 10 Richmond Terrace, Staten Island inside the area Hurricane Sandy flooded?"},
+  {"id": "q04", "kind": "question", "query": "Have street flood sensors recorded flooding near 5108 4th Avenue, Brooklyn?"}
+]

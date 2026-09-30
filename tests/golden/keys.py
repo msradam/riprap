@@ -166,20 +166,28 @@ def ida_hwm(lat: float, lon: float, radius_m: int = 800) -> dict:
 _NFHL = "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer"
 
 
-def _nfhl_point(layer: int, lat: float, lon: float, fields: str, base: str = _NFHL) -> dict | None:
+def _nfhl_query(layer: int, lat: float, lon: float, fields: str, base: str = _NFHL) -> list[dict]:
     d = _get(f"{base}/{layer}/query", {
         "geometry": f"{lon},{lat}", "geometryType": "esriGeometryPoint", "inSR": 4326,
         "spatialRel": "esriSpatialRelIntersects", "outFields": fields,
         "returnGeometry": "false", "f": "json"}, timeout=90)
-    feats = d.get("features") or []
-    return feats[0]["attributes"] if feats else None
+    return [f["attributes"] for f in d.get("features") or []]
+
+
+def _nfhl_point(layer: int, lat: float, lon: float, fields: str, base: str = _NFHL) -> dict | None:
+    feats = _nfhl_query(layer, lat, lon, fields, base)
+    return feats[0] if feats else None
 
 
 def fema_nfhl(lat: float, lon: float) -> dict | None:
-    zone = _nfhl_point(28, lat, lon, "FLD_ZONE,ZONE_SUBTY,SFHA_TF")
-    panel = _nfhl_point(3, lat, lon, "FIRM_PAN,EFF_DATE")
+    zone = _nfhl_point(28, lat, lon, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,DFIRM_ID")
     if not zone:
         return None
+    # Panel polygons overlap along the water: at Staten Island's shore two
+    # New Jersey countywide panels cover the point as well as NYC's. The
+    # panel is the one from the study the zone belongs to (DFIRM_ID).
+    panels = _nfhl_query(3, lat, lon, "FIRM_PAN,EFF_DATE,DFIRM_ID")
+    panel = next((p for p in panels if p.get("DFIRM_ID") == zone.get("DFIRM_ID")), panels[0] if panels else None)
     eff = panel.get("EFF_DATE") if panel else None
     return {"zone": zone.get("FLD_ZONE"), "subtype": zone.get("ZONE_SUBTY"),
             "sfha": zone.get("SFHA_TF") == "T",
@@ -249,12 +257,21 @@ def dep_class(lat: float, lon: float, scenario: str) -> int:
     return int(hits["Flooding_Category"].max()) if len(hits) else 0
 
 
-# MTA subway entrances (data.ny.gov i9wp-a4ja), counted on the server.
+# MTA subway entrances (data.ny.gov i9wp-a4ja), every entrance read live
+# and filtered by distance here, on the same sphere as the FloodNet and
+# Ida keys. Socrata's within_circle measures about 0.3% longer at NYC, so
+# an entrance 797 m out by haversine falls outside its 800 m circle; the
+# count at 200 Water Street is 116 one way and 114 the other.
+@lru_cache(maxsize=1)
+def _mta_entrances() -> list[tuple[float, float]]:
+    rows = _get("https://data.ny.gov/resource/i9wp-a4ja.json",
+                {"$select": "entrance_latitude, entrance_longitude", "$limit": 10000})
+    return [(float(r["entrance_latitude"]), float(r["entrance_longitude"])) for r in rows
+            if r.get("entrance_latitude") and r.get("entrance_longitude")]
+
+
 def mta_entrances_within(lat: float, lon: float, radius_m: int = 800) -> int:
-    rows = _get("https://data.ny.gov/resource/i9wp-a4ja.json", {
-        "$select": "count(*) AS n",
-        "$where": f"within_circle(entrance_georeference, {lat}, {lon}, {radius_m})"})
-    return int(rows[0]["n"])
+    return sum(1 for la, lo in _mta_entrances() if haversine_m(lat, lon, la, lo) <= radius_m)
 
 
 def all_keys(lat: float, lon: float) -> dict:
