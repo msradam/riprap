@@ -23,6 +23,7 @@ local MCP client config) or streamable HTTP:
 from __future__ import annotations
 
 import argparse
+import functools
 
 from mcp.server.mcpserver import MCPServer
 
@@ -49,6 +50,7 @@ mcp = MCPServer(
 )
 
 
+@functools.cache
 def _commit() -> str | None:
     """The git commit the server runs from, when it runs from a checkout."""
     import subprocess

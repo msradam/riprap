@@ -555,10 +555,7 @@ function buildHistogramCard(m: PebbleManifest, value: unknown): Card | null {
   // Honest negative ("0 complaints") still surfaces — same all-clear contract
   // as the NWS / ida_hwm cards. The narrative explains the zero.
   const hist = Array.isArray(t.histogram) ? t.histogram : [];
-  // The count in the noun the sentence uses, so the figure column reads
-  // "82 complaints"; the backend's own headline ("82 calls") only when
-  // there is no count.
-  const headline = num(t.n) != null ? `${n} complaint${n === 1 ? '' : 's'}` : t.headline_value ?? `${n} complaints`;
+  const headline = t.headline_value ?? `${n} complaint${n === 1 ? '' : 's'}`;
   const radius = num(t.radius_m);
   const years = num(t.years);
   const sparkSub = (radius != null && years != null)

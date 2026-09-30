@@ -42,6 +42,29 @@ in the ledger. On the retired GPU stack the TTM, embedding and NER models
 were about 0.3% of a briefing's inference energy; the GLiClass models were
 not measured.
 
+## Measured on this laptop (2026-09-30)
+
+`scripts/measure_energy.py` reads the SMC's `PowerTelemetryData` accumulator through
+`ioreg` (no sudo): whole-machine power sampled once a second and published in one-minute
+batches. It records an idle window, then runs a list of briefings against a local server,
+aligning both windows to the batches, and takes the idle draw off for the net figure.
+
+| | Value |
+|---|---|
+| Machine | Apple M5 laptop, 32 GB, on mains power, otherwise idle |
+| Model | Granite 4.1 8B (Q4_K_M) over Ollama, two LLM calls per briefing, about 2,600 tokens |
+| Idle | 8.4 W over 300 s |
+| 16 question briefings | 24.0 W mean over 240 s, 150 s of it running, 9.4 s per briefing |
+| Per briefing, gross | 0.10 Wh (whole machine, including idle) |
+| Per briefing, net of idle | 0.065 Wh, about 25 W above idle while running |
+| A no-LLM briefing | no model call; the run itself is below the accumulator's resolution |
+
+The figure is whole-machine, not per process, and the one-minute batches make a single
+call unmeasurable in the app. So per-call figures in the ledger stay `estimated` on this
+machine: `RIPRAP_ENERGY_WATTS=25` declares the measured draw above idle, and the ledger
+labels each call's Wh as declared watts times duration. The gallery entries were regenerated
+that way and say so.
+
 ## Historical numbers
 
 [`history/BENCHMARKS.md`](history/BENCHMARKS.md) reports 1.3 to 1.6 Wh per briefing. Those

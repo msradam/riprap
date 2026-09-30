@@ -192,8 +192,8 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: i
         # Normalized rendering fields the type-keyed histogram renderer
         # reads. `histogram` is the array the chart draws; `headline_value`
         # is the bold figure; `subhead_text` is the descriptor caption.
-        "headline_value": f"{n} call{'s' if n != 1 else ''}",
-        "subhead_text": ", ".join(f"{k} {kind}" for kind, k in kinds.items()) or "no flood-related calls",
+        "headline_value": f"{n} complaint{'s' if n != 1 else ''}",
+        "subhead_text": ", ".join(f"{k} {kind}" for kind, k in kinds.items()) or "no flood-related complaints",
         "narrative": narrative,
         "histogram": list(by_year_sorted.values()) or [],
     }
