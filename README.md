@@ -120,9 +120,9 @@ npx @modelcontextprotocol/inspector --cli uv run riprap-mcp \
   --method tools/call --tool-name get_district_summary --tool-arg community_district=QN12
 ```
 
-**Gallery.** `uv run python scripts/build_gallery.py` rebuilds the address and
-district entries in `web/sveltekit/src/lib/gallery/`; the question entries are
-kept as they are unless an LLM is configured. To see them in the app, rebuild the frontend
+**Gallery.** `uv run python scripts/build_gallery.py` rebuilds the address
+entries in `web/sveltekit/src/lib/gallery/`; the question entries (one of them
+about a district) are kept as they are unless an LLM is configured. To see them in the app, rebuild the frontend
 (needs Node and [pnpm](https://pnpm.io)): `cd web/sveltekit && pnpm install &&
 pnpm build`. Docker and the Modal host are in [docs/DEPLOY.md](docs/DEPLOY.md).
 
