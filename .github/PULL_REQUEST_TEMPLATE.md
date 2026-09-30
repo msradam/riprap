@@ -12,13 +12,14 @@
 - [ ] Modal deployment
 - [ ] Mac Mini / self-hosted GPU inference
 
-## Stones-fire probe
+## Smoke probe
 
-<!-- Paste the tail of `scripts/probe_addresses.py` output. The PR
-     should not be merged unless all five Stones fire. -->
+<!-- Paste the tail of `scripts/probe_cities_smoke.py` output against a
+     local server. The PR should not be merged unless every deployment
+     passes. -->
 
 ```
-PYTHONPATH=. uv run python scripts/probe_addresses.py --timeout 600
+uv run python scripts/probe_cities_smoke.py http://127.0.0.1:7860
 ```
 
 ## Energy-ledger sanity check

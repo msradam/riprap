@@ -398,7 +398,8 @@ family. Granite TimeSeries TTM is a separate IBM Research model line
 Prithvi-EO 2.0 needs a GPU or minutes of CPU per tile, so it never runs
 per request. The Ida layer was segmented once (pre 2021-08-25, post
 2021-09-02, a pass about 14 hours after the heaviest rain) and filtered
-into 166 polygons in `data/prithvi_ida_2021.geojson`; `prithvi_water`
+into 166 polygons in `data/prithvi_ida_2021.geojson`
+(`scripts/run_prithvi_ida.py` reproduces that file); `prithvi_water`
 reads them.
 
 `scripts/run_eo_batch.py` is the repeatable version: it picks the least

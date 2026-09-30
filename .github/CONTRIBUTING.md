@@ -97,21 +97,18 @@ uv run pytest -q
 #    upstream APIs). Every deployment must pass the 13 disclosure checks.
 uv run python scripts/probe_cities_smoke.py http://127.0.0.1:7860
 
-# 3. NYC end-to-end addresses against a locally running server.
-uv run python scripts/probe_addresses.py --base http://127.0.0.1:7860
-
-# 4. If you touched claim verification or prompts: LLM-mode grounding
+# 3. If you touched claim verification or prompts: LLM-mode grounding
 #    probe over the gallery addresses (needs RIPRAP_LLM_* set).
 uv run python scripts/probe_grounding.py
 
-# 5. If you edited a manifest's provenance: request every source link once
+# 4. If you edited a manifest's provenance: request every source link once
 #    and list the status codes (needs the network; CI does not run it).
 #    Exits 1 on any 4xx, 5xx or unreachable link. Wiley answers 403 to
 #    scripted requests for the NPCC4 paper, which opens in a browser.
 uv run python scripts/check_links.py            # all deployments
 uv run python scripts/check_links.py nyc boston # some of them
 
-# 6. If you touched place resolution: no-LLM accuracy on
+# 5. If you touched place resolution: no-LLM accuracy on
 #    tests/place_resolution_cases.yaml (needs the network for geocoding).
 uv run python scripts/place_eval.py run
 ```
@@ -148,7 +145,6 @@ scripts/
 ├── build_gallery.py       Precompute the static gallery (no LLM)
 ├── build_rag_index.py     Build data/rag_index.npz offline
 ├── run_eo_batch.py        Batch Prithvi surface-water run (eo extra)
-├── probe_addresses.py     NYC end-to-end addresses
 ├── probe_cities_smoke.py  Cross-city smoke probe (all six deployments)
 ├── probe_grounding.py     LLM-mode claim verification probe
 └── …                      Register builders, raster bakers, etc.
