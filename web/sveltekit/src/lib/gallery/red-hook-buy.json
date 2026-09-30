@@ -3,8 +3,8 @@
  "neighborhood": "Red Hook, Brooklyn",
  "address": "80 Pioneer Street, Brooklyn, NY",
  "question": "Should I buy the house at 80 Pioneer Street, Brooklyn?",
- "generated_at": "2026-09-29T21:40Z",
- "riprap_commit": "1001427",
+ "generated_at": "2026-09-30T17:54Z",
+ "riprap_commit": "29d5aa9",
  "mode": "llm",
  "model": null,
  "quantization": null,
@@ -182,6 +182,39 @@
     "fallback": {
      "on_offline": "skip",
      "message": "FEMA NFHL ArcGIS endpoint unreachable or point unmapped."
+    }
+   },
+   {
+    "id": "fema_pfirm",
+    "type": "live",
+    "title": "FEMA preliminary flood map (PFIRM), flood zone at this point",
+    "stone": "cornerstone",
+    "tier": "modeled",
+    "maturity": "production",
+    "scope": "point",
+    "display": {
+     "order": 13,
+     "kind": "stat",
+     "variant": null,
+     "map_layer": false,
+     "icon": "\ud83d\uddfa\ufe0f"
+    },
+    "narration": {
+     "short": "FEMA preliminary flood map (PFIRM) zone at this address.",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "FEMA Preliminary National Flood Hazard Layer (Prelim_NFHL), preliminary flood zones",
+     "source_url": "https://hazards.fema.gov/arcgis/rest/services/PrelimPending/Prelim_NFHL/MapServer",
+     "license": "U.S. Public Domain",
+     "citation": "FEMA preliminary flood-zone polygon (PFIRM) intersecting the address point, with the issue date from the service's Preliminary Data Availability layer.",
+     "doc_id": "fema_pfirm",
+     "date_modified": "live",
+     "retrieved_at": "live"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "FEMA's preliminary NFHL service was unreachable, or no preliminary study covers this point."
     }
    },
    {
@@ -638,7 +671,7 @@
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC 311 Service Requests, flood-related complaints (5-year window).",
      "doc_id": "nyc311",
-     "date_modified": "2026-09-29T01:44:54+0000",
+     "date_modified": "2026-09-30T01:38:23+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -669,9 +702,9 @@
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests, flood-related complaints inside the neighborhood (3-year window)",
+     "citation": "NYC 311 Service Requests, flood-related complaints inside the area (the sentence states the window).",
      "doc_id": "nyc311_nta",
-     "date_modified": "2026-09-29T01:44:54+0000",
+     "date_modified": "2026-09-30T01:38:23+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -869,7 +902,7 @@
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC DOB permits issued inside the neighborhood, cross-referenced with Sandy 2012 and DEP scenarios",
      "doc_id": "dob_permits_nta",
-     "date_modified": "2026-09-28T23:42:27+0000",
+     "date_modified": "2026-09-30T00:29:00+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -993,10 +1026,10 @@
     },
     "narration": {
      "short": "Granite TTM r2 fine-tune nowcast of Battery storm-surge over the next 96 hours.",
-     "template": "Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of {forecast_peak_m} m at The Battery about {forecast_peak_hours_ahead} h ahead. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions."
+     "template": "Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of {forecast_peak_m} m at The Battery about {forecast_peak_hours_ahead} h ahead; for storm decisions use NOAA ETSS or the Stevens Flood Advisory System instead."
     },
     "provenance": {
-     "source_name": "msradam/Granite-TTM-r2-Battery-Surge (fine-tune on AMD MI300X)",
+     "source_name": "Granite TTM r2 fine-tuned on Battery gauge history (Hugging Face msradam/Granite-TTM-r2-Battery-Surge)",
      "source_url": "https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge",
      "license": "Apache-2.0",
      "citation": "Granite TTM r2 fine-tune (msradam/Granite-TTM-r2-Battery-Surge, Apache-2.0, trained on AMD MI300X). 96 h hourly Battery storm-surge nowcast.",
@@ -1134,9 +1167,9 @@
   "nta": null,
   "policy_corpus": null,
   "dep": null,
-  "paragraph": "Riprap does not answer this question. It reports public flood evidence for a place: flood maps, past flood records, live sensors and forecasts, each cited to its source. It does not give advice on buying, renting or insuring property, legal advice, or a prediction for a specific day. For those, consult a licensed professional; for a regulatory flood determination, use FEMA's Flood Map Service Center (msc.fema.gov).",
+  "paragraph": "Riprap does not answer this question. It reports public flood evidence for a place: flood maps, past flood records, live sensors and forecasts, each cited to its source. It does not give advice on buying, renting or insuring property, legal advice, or a prediction for a specific day. For those, consult a licensed professional; for a regulatory flood determination, use FEMA's Flood Map Service Center (msc.fema.gov); for a home in New York City, FloodHelpNY (floodhelpny.org) explains flood insurance and resiliency options.",
   "audit": {
-   "raw": "Riprap does not answer this question. It reports public flood evidence for a place: flood maps, past flood records, live sensors and forecasts, each cited to its source. It does not give advice on buying, renting or insuring property, legal advice, or a prediction for a specific day. For those, consult a licensed professional; for a regulatory flood determination, use FEMA's Flood Map Service Center (msc.fema.gov).",
+   "raw": "Riprap does not answer this question. It reports public flood evidence for a place: flood maps, past flood records, live sensors and forecasts, each cited to its source. It does not give advice on buying, renting or insuring property, legal advice, or a prediction for a specific day. For those, consult a licensed professional; for a regulatory flood determination, use FEMA's Flood Map Service Center (msc.fema.gov); for a home in New York City, FloodHelpNY (floodhelpny.org) explains flood insurance and resiliency options.",
    "dropped": [],
    "tier": "llm"
   },
@@ -1153,7 +1186,7 @@
   "trace": [
    {
     "step": "reconcile_claims",
-    "started_at": 1790718048.572012,
+    "started_at": 1790790894.667168,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -1172,7 +1205,7 @@
    "n_passed": 0,
    "n_total": 0,
    "failed": [],
-   "note": "no paragraph"
+   "note": "no briefing to check"
   },
   "emissions": {
    "n_calls": 0,

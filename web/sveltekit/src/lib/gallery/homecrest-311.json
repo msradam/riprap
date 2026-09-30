@@ -3,8 +3,8 @@
  "neighborhood": "Homecrest, Brooklyn",
  "address": "2017 East 17th Street, Brooklyn, NY 11229",
  "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
- "generated_at": "2026-09-29T21:39Z",
- "riprap_commit": "1001427",
+ "generated_at": "2026-09-30T17:54Z",
+ "riprap_commit": "29d5aa9",
  "mode": "llm",
  "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
  "quantization": "Q4_K_M",
@@ -182,6 +182,39 @@
     "fallback": {
      "on_offline": "skip",
      "message": "FEMA NFHL ArcGIS endpoint unreachable or point unmapped."
+    }
+   },
+   {
+    "id": "fema_pfirm",
+    "type": "live",
+    "title": "FEMA preliminary flood map (PFIRM), flood zone at this point",
+    "stone": "cornerstone",
+    "tier": "modeled",
+    "maturity": "production",
+    "scope": "point",
+    "display": {
+     "order": 13,
+     "kind": "stat",
+     "variant": null,
+     "map_layer": false,
+     "icon": "\ud83d\uddfa\ufe0f"
+    },
+    "narration": {
+     "short": "FEMA preliminary flood map (PFIRM) zone at this address.",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "FEMA Preliminary National Flood Hazard Layer (Prelim_NFHL), preliminary flood zones",
+     "source_url": "https://hazards.fema.gov/arcgis/rest/services/PrelimPending/Prelim_NFHL/MapServer",
+     "license": "U.S. Public Domain",
+     "citation": "FEMA preliminary flood-zone polygon (PFIRM) intersecting the address point, with the issue date from the service's Preliminary Data Availability layer.",
+     "doc_id": "fema_pfirm",
+     "date_modified": "live",
+     "retrieved_at": "live"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "FEMA's preliminary NFHL service was unreachable, or no preliminary study covers this point."
     }
    },
    {
@@ -638,7 +671,7 @@
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC 311 Service Requests, flood-related complaints (5-year window).",
      "doc_id": "nyc311",
-     "date_modified": "2026-09-29T01:44:54+0000",
+     "date_modified": "2026-09-30T01:38:23+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -669,9 +702,9 @@
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests, flood-related complaints inside the neighborhood (3-year window)",
+     "citation": "NYC 311 Service Requests, flood-related complaints inside the area (the sentence states the window).",
      "doc_id": "nyc311_nta",
-     "date_modified": "2026-09-29T01:44:54+0000",
+     "date_modified": "2026-09-30T01:38:23+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -869,7 +902,7 @@
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC DOB permits issued inside the neighborhood, cross-referenced with Sandy 2012 and DEP scenarios",
      "doc_id": "dob_permits_nta",
-     "date_modified": "2026-09-28T23:42:27+0000",
+     "date_modified": "2026-09-30T00:29:00+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -993,10 +1026,10 @@
     },
     "narration": {
      "short": "Granite TTM r2 fine-tune nowcast of Battery storm-surge over the next 96 hours.",
-     "template": "Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of {forecast_peak_m} m at The Battery about {forecast_peak_hours_ahead} h ahead. Use NOAA ETSS or the Stevens Flood Advisory System for storm decisions."
+     "template": "Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of {forecast_peak_m} m at The Battery about {forecast_peak_hours_ahead} h ahead; for storm decisions use NOAA ETSS or the Stevens Flood Advisory System instead."
     },
     "provenance": {
-     "source_name": "msradam/Granite-TTM-r2-Battery-Surge (fine-tune on AMD MI300X)",
+     "source_name": "Granite TTM r2 fine-tuned on Battery gauge history (Hugging Face msradam/Granite-TTM-r2-Battery-Surge)",
      "source_url": "https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge",
      "license": "Apache-2.0",
      "citation": "Granite TTM r2 fine-tune (msradam/Granite-TTM-r2-Battery-Surge, Apache-2.0, trained on AMD MI300X). 96 h hourly Battery storm-surge nowcast.",
@@ -1145,6 +1178,7 @@
     "dep_moderate_current",
     "dep_moderate_current_nta",
     "fema_nfhl",
+    "fema_pfirm",
     "ida_hwm",
     "microtopo",
     "microtopo_nta",
@@ -1175,12 +1209,12 @@
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1921,
+     "prompt_tokens": 1967,
      "completion_tokens": 152,
-     "duration_s": 7.433,
-     "energy_status": "unknown",
-     "wh": null,
-     "energy_note": "no energy source configured"
+     "duration_s": 7.02,
+     "energy_status": "estimated",
+     "wh": 0.04875,
+     "energy_note": "declared 25 W times duration"
     }
    ]
   },
@@ -1236,10 +1270,10 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 640,
      "completion_tokens": 22,
-     "duration_s": 2.136,
-     "energy_status": "unknown",
-     "wh": null,
-     "energy_note": "no energy source configured"
+     "duration_s": 2.012,
+     "energy_status": "estimated",
+     "wh": 0.01397,
+     "energy_note": "declared 25 W times duration"
     }
    ],
    "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
@@ -1265,9 +1299,9 @@
     "title": "NYC 311 Service Requests, flood-related complaints (5-year window).",
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
-    "date_modified": "2026-09-29T01:44:54+0000",
-    "retrieved_at": "2026-09-29T21:39Z",
-    "vintage": "2026-09-29T01:44:54+0000",
+    "date_modified": "2026-09-30T01:38:23+0000",
+    "retrieved_at": "2026-09-30T17:54Z",
+    "vintage": "2026-09-30T01:38:23+0000",
     "maturity": "production"
    },
    "sandy_inundation": {
@@ -1288,7 +1322,7 @@
     "url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
     "license": "U.S. Public Domain",
     "date_modified": "2007-09-05",
-    "retrieved_at": "2026-09-29T21:39Z",
+    "retrieved_at": "2026-09-30T17:54Z",
     "vintage": "2007-09-05",
     "maturity": "production"
    },
@@ -1391,6 +1425,11 @@
    }
   ],
   "not_checked": [
+   {
+    "id": "fema_pfirm",
+    "title": "FEMA preliminary flood map (PFIRM), flood zone at this point",
+    "stone": "cornerstone"
+   },
    {
     "id": "dep_extreme_2080",
     "title": "NYC DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
@@ -1779,7 +1818,7 @@
      "address": "1719 AVENUE T"
     }
    ],
-   "headline_value": "34 calls",
+   "headline_value": "34 complaints",
    "subhead_text": "16 catch basin, 12 sewer backup, 6 street flooding",
    "narrative": "34 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years: 16 catch basin, 12 sewer backup, 6 street flooding.",
    "histogram": [
@@ -2007,8 +2046,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790717978.694172,
-    "elapsed_s": 0.02,
+    "started_at": 1790790839.6806872,
+    "elapsed_s": 0.18,
     "err": null,
     "result": {
      "address": "2017 EAST 17 STREET, Brooklyn, NY, USA",
@@ -2020,7 +2059,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790717978.7152379,
+    "started_at": 1790790839.861331,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2030,9 +2069,19 @@
     }
    },
    {
+    "step": "fema_pfirm",
+    "ok": true,
+    "started_at": 1790790839.861757,
+    "elapsed_s": 0.0,
+    "err": null,
+    "result": {
+     "skipped": "not selected for this question"
+    }
+   },
+   {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790717978.759372,
+    "started_at": 1790790839.861758,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2042,7 +2091,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790717978.7593741,
+    "started_at": 1790790839.861759,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2052,7 +2101,7 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790717978.7593741,
+    "started_at": 1790790839.86176,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2062,7 +2111,7 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790717978.7593741,
+    "started_at": 1790790839.86176,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2072,7 +2121,7 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790717978.759375,
+    "started_at": 1790790839.861761,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2082,7 +2131,7 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790717978.759375,
+    "started_at": 1790790839.861761,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2092,7 +2141,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790717978.759375,
+    "started_at": 1790790839.861762,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2102,7 +2151,7 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790717978.759375,
+    "started_at": 1790790839.861762,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2112,7 +2161,7 @@
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790717978.759375,
+    "started_at": 1790790839.861763,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2122,7 +2171,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790717978.7593758,
+    "started_at": 1790790839.8617642,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2132,7 +2181,7 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790717978.7593758,
+    "started_at": 1790790839.8617642,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2142,7 +2191,7 @@
    {
     "step": "ttm_311_forecast",
     "ok": true,
-    "started_at": 1790717978.7593758,
+    "started_at": 1790790839.8617651,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2152,7 +2201,7 @@
    {
     "step": "floodnet_forecast",
     "ok": true,
-    "started_at": 1790717978.7593758,
+    "started_at": 1790790839.8617651,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2162,7 +2211,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790717978.759377,
+    "started_at": 1790790839.8617659,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2172,7 +2221,7 @@
    {
     "step": "policy_corpus",
     "ok": true,
-    "started_at": 1790717978.759377,
+    "started_at": 1790790839.8617668,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2182,8 +2231,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790717978.79168,
-    "elapsed_s": 0.01,
+    "started_at": 1790790839.863143,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {
      "inside": {
@@ -2196,8 +2245,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790717978.7951958,
-    "elapsed_s": 0.12,
+    "started_at": 1790790839.868077,
+    "elapsed_s": 3.33,
     "err": null,
     "result": {
      "zone": "X",
@@ -2209,8 +2258,8 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790717978.79574,
-    "elapsed_s": 0.02,
+    "started_at": 1790790839.869329,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2220,8 +2269,8 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790717978.79542,
-    "elapsed_s": 0.39,
+    "started_at": 1790790839.877743,
+    "elapsed_s": 0.8,
     "err": null,
     "result": {
      "n": 34
@@ -2230,8 +2279,8 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790717978.79503,
-    "elapsed_s": 2.32,
+    "started_at": 1790790839.878484,
+    "elapsed_s": 2.02,
     "err": null,
     "result": {
      "n_entrances": 5,
@@ -2242,8 +2291,8 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790717978.7995021,
-    "elapsed_s": 0.02,
+    "started_at": 1790790839.8792808,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "n_developments": 0,
@@ -2254,7 +2303,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790717978.7993119,
+    "started_at": 1790790839.890263,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -2266,8 +2315,8 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790717978.7994082,
-    "elapsed_s": 0.16,
+    "started_at": 1790790839.8914611,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {
      "n_hospitals": 3,
@@ -2278,7 +2327,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790717981.3462331,
+    "started_at": 1790790843.202425,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2289,7 +2338,7 @@
    },
    {
     "step": "reconcile_claims",
-    "started_at": 1790717981.346518,
+    "started_at": 1790790843.202875,
     "ok": true,
     "result": {
      "tier": "llm",
@@ -2299,7 +2348,7 @@
      "dropped": 0
     },
     "err": null,
-    "elapsed_s": 2.18
+    "elapsed_s": 2.03
    }
   ],
   "models": [
@@ -2308,7 +2357,7 @@
     "repo": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
     "where": "Ollama on this machine (localhost:11434)",
     "how": "endpoint",
-    "latency_s": 9.57,
+    "latency_s": 9.03,
     "calls": 2
    }
   ],
@@ -2321,25 +2370,25 @@
   "emissions": {
    "n_calls": 2,
    "n_measured": 0,
-   "energy_status": "unknown",
-   "total_wh": null,
-   "total_duration_s": 9.569,
+   "energy_status": "estimated",
+   "total_wh": 0.06272,
+   "total_duration_s": 9.032,
    "tokens": {
-    "prompt": 2561,
+    "prompt": 2607,
     "completion": 174,
-    "total": 2735
+    "total": 2781
    },
    "calls": [
     {
      "kind": "llm",
      "model": "hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M",
      "endpoint": "localhost:11434",
-     "prompt_tokens": 1921,
+     "prompt_tokens": 1967,
      "completion_tokens": 152,
-     "duration_s": 7.433,
-     "energy_status": "unknown",
-     "wh": null,
-     "energy_note": "no energy source configured"
+     "duration_s": 7.02,
+     "energy_status": "estimated",
+     "wh": 0.04875,
+     "energy_note": "declared 25 W times duration"
     },
     {
      "kind": "llm",
@@ -2347,10 +2396,10 @@
      "endpoint": "localhost:11434",
      "prompt_tokens": 640,
      "completion_tokens": 22,
-     "duration_s": 2.136,
-     "energy_status": "unknown",
-     "wh": null,
-     "energy_note": "no energy source configured"
+     "duration_s": 2.012,
+     "energy_status": "estimated",
+     "wh": 0.01397,
+     "energy_note": "declared 25 W times duration"
     }
    ],
    "method": "Each LLM call is labelled measured (Apple SoC counters), estimated (declared watts times duration) or unknown; hosted endpoints are always unknown. See app/emissions.py."
