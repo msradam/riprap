@@ -150,3 +150,13 @@ def test_a_named_storm_record_does_not_jump_ahead_of_what_happened_since(run):
     out = run(q, {"claims": [], "answer": {"lead": "yes", "facts": ["nws_alerts", "ida_hwm"]}})
     facts = [c["doc_ids"][0] for c in out["grounding"]["claims"] if c["section"] == "answer"]
     assert facts == ["nws_alerts", "ida_hwm"]
+
+
+def test_a_temperature_only_metar_is_not_an_answer_fact(run):
+    """Live: "Is there flooding near 80 Pioneer Street right now?" cited
+    "Latest METAR at Central Park: 21.1°C". A reading with no precipitation
+    says nothing about flooding and is left out; one with a rain figure stays."""
+    q = "Is there flooding near the address right now?"
+    out = run(q, {"claims": [], "answer": {"lead": "facts", "facts": ["nws_alerts", "nws_obs"]}})
+    facts = [c["doc_ids"][0] for c in out["grounding"]["claims"] if c["section"] == "answer"]
+    assert facts == ["nws_alerts"]

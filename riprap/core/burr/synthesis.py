@@ -473,6 +473,9 @@ def synthesize(state) -> dict:
         # appended by rule keeps its place, and so does a named storm's own
         # record ("since Ida" names the period, and the sensors and 311 say
         # what happened since). Experimental sources come last.
+        # A METAR with no precipitation reading says nothing about flooding:
+        # "Is there flooding ... right now?" once cited "21.1°C at Central Park".
+        facts = [f for f in facts if f != "nws_obs" or "precip" in texts.get(f, "").lower()]
         subject = None if appended or rel == answer_checks._storm_record(question) else rel
         facts = sorted(facts, key=lambda f: (f in experimental, f != subject))
         kept = [*({"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts),
