@@ -7,7 +7,7 @@
   import { snapshotFromRun } from '$lib/client/briefingModel';
   import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
   import { deployment } from '$lib/stores/deployment.svelte';
-  import { openAgentStream } from '$lib/client/agentStream';
+  import { openAgentStream, NO_BACKEND } from '$lib/client/agentStream';
   import {
     fetchSandy, fetchDep, fetchPrithviSynthetic, fetchProxyDots,
     fetchIdaHwm, fetchSandyNta, fetchDepNta
@@ -101,15 +101,14 @@
       },
       onFinal: (f) => run.applyFinal(f),
       onError: (err) => {
-        const lower = err.toLowerCase();
-        if (lower.includes('connection') || lower.includes('502') || lower.includes('503') ||
-            lower.includes('timeout') || lower.includes('routing')) {
-          run.errorState = 'backend';
-        }
+        // Any error ends the run without a briefing, unless the briefing
+        // already landed.
+        if (!run.finalResult) run.errorState = err === NO_BACKEND ? 'no-backend' : 'backend';
         briefingState.markError(err);
         // Failed before the `deployment` event: clear the boot-time NYC
-        // scaffold so no NYC ghost rows show under a non-NYC query.
-        if (!deploymentResolved) {
+        // scaffold so no NYC ghost rows show under a non-NYC query. With
+        // no backend at all the chip keeps its fallback text.
+        if (!deploymentResolved && err !== NO_BACKEND) {
           void pebbleManifest.loadForDeployment(null);
           void deployment.setForQuery(null);
         }

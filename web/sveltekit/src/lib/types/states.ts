@@ -1,4 +1,4 @@
-export type ErrorKey = 'geocoder' | 'all-silent' | 'grounding' | 'backend';
+export type ErrorKey = 'geocoder' | 'all-silent' | 'grounding' | 'backend' | 'no-backend';
 
 // Refusal classification was considered (Granite Guardian, then a
 // planner-level shim) and dropped. Grounding is enforced by checking

@@ -203,9 +203,15 @@ export interface AgentStream {
   close(): void;
 }
 
+/** The error reported when nothing answered at /api: the public static
+ *  copy, or a server that is down. */
+export const NO_BACKEND = 'no backend at /api';
+
 export function openAgentStream(query: string, handlers: AgentStreamHandlers): AgentStream {
   const url = `/api/agent/stream?q=${encodeURIComponent(query)}`;
   const es = new EventSource(url);
+  let opened = false;
+  es.addEventListener('open', () => { opened = true; });
 
   function on<T>(name: string, fn: (data: T) => void) {
     es.addEventListener(name, (e) => {
@@ -224,13 +230,24 @@ export function openAgentStream(query: string, handlers: AgentStreamHandlers): A
     'deployment', (d) => handlers.onDeployment?.(d));
   on<StepEvent>('step', (d) => handlers.onStep?.(d));
   on<FinalResult>('final', (d) => handlers.onFinal?.(d));
-  on<{ err: string }>('error', (d) => handlers.onError?.(d.err));
   es.addEventListener('done', () => {
     handlers.onDone?.();
     es.close();
   });
-  es.addEventListener('error', () => {
-    handlers.onError?.('SSE connection error');
+  // One listener for two events named "error": the backend's own event
+  // (a MessageEvent with data) and the browser's connection failure.
+  es.addEventListener('error', (e) => {
+    const data = (e as MessageEvent).data;
+    if (typeof data === 'string') {
+      // The backend's error ends the run; closing here stops the browser
+      // reconnecting and re-running the query.
+      let err = data;
+      try { err = (JSON.parse(data) as { err?: string }).err ?? data; } catch { /* plain text */ }
+      handlers.onError?.(err);
+    } else {
+      // A connection that never opened found nothing listening at /api.
+      handlers.onError?.(opened ? 'SSE connection error' : NO_BACKEND);
+    }
     es.close();
   });
 

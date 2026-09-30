@@ -10,6 +10,8 @@
   import { page } from '$app/state';
   import { resolve } from '$app/paths';
   import { SAMPLE_ADDRESS } from '$lib/samples';
+  import { briefingState } from '$lib/stores/briefingState.svelte';
+  import { QUICKSTART_URL } from '$lib/staticSite';
 
   interface Action {
     label: string;
@@ -73,11 +75,17 @@
       actions: [retry, edit]
     },
     backend: {
-      kind: 'Backend unavailable',
-      headline: 'Inference backend did not respond.',
-      body:
-        "The configured inference backend didn't respond within the routing budget. This usually clears within a few minutes during a deploy window.",
+      kind: 'Backend error',
+      headline: 'Riprap hit an error building this briefing.',
+      body: 'The backend stopped before the briefing was written. The error it reported is below.',
       actions: [retry, edit]
+    },
+    // The public static copy: the links are in the body, so no actions.
+    'no-backend': {
+      kind: 'No backend',
+      headline: 'This public copy has no backend.',
+      body: '',
+      actions: []
     }
   });
 
@@ -87,7 +95,18 @@
 <section class="error-card error-card-{state}" role="alert" aria-live="assertive" aria-labelledby="error-card-h">
   <p class="error-card-kind">{spec.kind}</p>
   <h2 id="error-card-h" class="error-card-headline">{spec.headline}</h2>
-  <p class="error-card-body">{spec.body}</p>
+  {#if spec.body}<p class="error-card-body">{spec.body}</p>{/if}
+  {#if state === 'no-backend'}
+    <p class="error-card-body">
+      Browse the <a href="{resolve('/(app)/gallery')}/">gallery</a>, or run Riprap locally:
+      <a href={QUICKSTART_URL}>README Quickstart</a>.
+    </p>
+  {:else if state === 'backend' && briefingState.errorMessage}
+    <details class="error-card-detail">
+      <summary>Error text</summary>
+      <pre>{briefingState.errorMessage}</pre>
+    </details>
+  {/if}
   {#if state === 'geocoder' && looksLikeDistrict && (isUnknown || depName === 'nyc')}
     <p class="error-card-body">
       Check the borough code and district number, for example QN12, or read the precomputed
@@ -131,6 +150,24 @@
   }
   .error-card a {
     color: var(--riprap-text-link);
+  }
+  .error-card-detail {
+    max-width: 54ch;
+    margin: 8px 0;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .error-card-detail summary {
+    min-height: 24px;
+    cursor: pointer;
+  }
+  .error-card-detail pre {
+    margin: 4px 0 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--ink-secondary);
   }
   .error-card-actions {
     display: flex;
