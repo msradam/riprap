@@ -87,44 +87,6 @@ SVELTEKIT_BUILD = ROOT / "sveltekit" / "build"
 
 app = FastAPI(title="Riprap")
 
-# SvelteKit static build (adapter-static), served from / and /q/<query>.
-if SVELTEKIT_BUILD.exists():
-    app.mount("/_app", StaticFiles(directory=SVELTEKIT_BUILD / "_app"), name="sveltekit_assets")
-
-
-# Top-level static assets the SvelteKit build emits next to the HTML
-# entry points (favicon.svg / favicon.png / robots.txt). These would
-# fall through to the SPA fallback and 404 without explicit routes;
-# adapter-static expects them under /, not /_app.
-def _serve_build_asset(name: str):
-    p = SVELTEKIT_BUILD / name
-    if not p.exists():
-        return JSONResponse({"detail": "Not Found"}, status_code=404)
-    return FileResponse(p, headers={"Cache-Control": "public, max-age=86400"})
-
-
-@app.get("/favicon.svg", include_in_schema=False)
-def _favicon_svg():
-    return _serve_build_asset("favicon.svg")
-
-
-@app.get("/favicon.png", include_in_schema=False)
-def _favicon_png():
-    return _serve_build_asset("favicon.png")
-
-
-@app.get("/favicon.ico", include_in_schema=False)
-def _favicon_ico():
-    # No .ico in the build, but browsers still probe for it. Redirect-
-    # by-content to the PNG so the tab gets the dam mark either way.
-    return _serve_build_asset("favicon.png")
-
-
-@app.get("/robots.txt", include_in_schema=False)
-def _robots():
-    return _serve_build_asset("robots.txt")
-
-
 import json as _json  # noqa: E402
 
 import geopandas as _gpd  # noqa: E402
@@ -418,18 +380,6 @@ async def api_backend():
         except Exception:
             info["reachable"] = False
     return JSONResponse(info)
-
-
-@app.get("/")
-def index():
-    """SvelteKit landing page (the new design-system UI)."""
-    sk = SVELTEKIT_BUILD / "index.html"
-    if sk.exists():
-        return FileResponse(sk)
-    return JSONResponse(
-        {"error": "sveltekit build not present — run `cd web/sveltekit && npm run build`"},
-        status_code=503,
-    )
 
 
 @app.get("/q/sample")
@@ -869,3 +819,11 @@ def floodnet_near(lat: float, lon: float, r: float = 1000):
             }
         )
     return JSONResponse({"type": "FeatureCollection", "features": features})
+
+
+# The SvelteKit build (adapter-static): index.html at /, the prerendered
+# gallery at /gallery/<slug>/, /_app assets, favicons, robots.txt and
+# 404.html for anything else. Mounted last so every API route above wins;
+# /q/* and /print/* above serve the 200.html SPA fallback.
+if SVELTEKIT_BUILD.exists():
+    app.mount("/", StaticFiles(directory=SVELTEKIT_BUILD, html=True), name="site")
