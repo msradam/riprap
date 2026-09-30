@@ -26,6 +26,8 @@ import math
 from functools import lru_cache
 from pathlib import Path
 
+from app.registers._footprint import _degree_box
+
 REGISTERS_DIR = Path(__file__).resolve().parents[2] / "data" / "registers"
 
 
@@ -47,20 +49,22 @@ def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return 2 * R * math.asin(math.sqrt(a))
 
 
-def nearest_n(asset_class: str, lat: float, lon: float,
+def nearest_n(rows: list[dict], lat: float, lon: float,
               radius_m: float, n: int | None) -> list[tuple[float, dict]]:
     """Return up to N rows (all rows when n is None) within radius_m of
-    (lat, lon), sorted by distance ascending. Each entry is (distance_m, row)."""
-    rows = load_register(asset_class)
-    if not rows:
-        return []
+    (lat, lon), sorted by distance ascending. Each entry is (distance_m, row).
+    The degree box trims the candidates before the haversine."""
+    dlat, dlon = _degree_box(lat, radius_m)
     candidates: list[tuple[float, dict]] = []
     for r in rows:
         rlat = r.get("lat")
         rlon = r.get("lon")
         if rlat is None or rlon is None:
             continue
-        d = haversine_m(lat, lon, float(rlat), float(rlon))
+        rlat, rlon = float(rlat), float(rlon)
+        if abs(rlat - lat) > dlat or abs(rlon - lon) > dlon:
+            continue
+        d = haversine_m(lat, lon, rlat, rlon)
         if d <= radius_m:
             candidates.append((d, r))
     candidates.sort(key=lambda t: t[0])
