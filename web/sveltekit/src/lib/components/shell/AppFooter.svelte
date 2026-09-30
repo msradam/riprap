@@ -2,7 +2,7 @@
   import { deployment } from '$lib/stores/deployment.svelte';
   import { APP_VERSION } from '$lib/version';
 
-  const FEEDBACK = 'https://github.com/msradam/riprap-nyc/issues/new/choose';
+  const FEEDBACK = 'https://github.com/msradam/riprap/issues/new/choose';
   // NYC-only "for residents, see" resource links. Only render when
   // the active deployment is NYC. Under a Boston / Chicago / SF /
   // Seattle / out-of-coverage chip these resources would be either
