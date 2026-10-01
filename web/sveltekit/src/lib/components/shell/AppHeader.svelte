@@ -3,7 +3,6 @@
   import { resolve } from '$app/paths';
   import { briefingState } from '$lib/stores/briefingState.svelte';
   import { deployment } from '$lib/stores/deployment.svelte';
-  import { exportBriefingPdf, ExportPdfError } from '$lib/client/exportPdf';
   import { STATIC_SITE } from '$lib/staticSite';
   import RipMark from './RipMark.svelte';
   import StatusPill from './StatusPill.svelte';
@@ -11,7 +10,7 @@
   interface Props {
     query?: string | null;
     onResetCold?: () => void;
-    /** Static snapshot pages (gallery): no /api/* calls, no PDF export. */
+    /** Static snapshot pages (gallery): no /api/* calls. */
     offline?: boolean;
   }
   let { query = null, onResetCold, offline: offlinePage = false }: Props = $props();
@@ -38,30 +37,6 @@
   const cityText = $derived(
     deployment.current ? `${deployment.current.city}${deployment.current.experimental ? ' (experimental)' : ''}` : null
   );
-
-  let exporting = $state(false);
-  let exportError = $state<string | null>(null);
-
-  /** Export the completed briefing to PDF via the server-side route.
-   *  The PrintSnapshot in localStorage is transformed into the body
-   *  /api/print expects; the response is opened in a new tab as a
-   *  blob URL. Hidden until briefingState.ready, so readers do not
-   *  export a half-streamed report. */
-  async function exportPdf() {
-    if (typeof window === 'undefined') return;
-    const id = page.params.queryId;
-    if (!id) return;
-    exporting = true;
-    exportError = null;
-    try {
-      await exportBriefingPdf(id);
-    } catch (e) {
-      // Stays until the reader dismisses it.
-      exportError = e instanceof ExportPdfError ? e.message : String(e);
-    } finally {
-      exporting = false;
-    }
-  }
 </script>
 
 <header class="app-header no-print" data-screen-label="App header">
@@ -97,29 +72,9 @@
           class="app-header-link"
           href={resolve('/(app)/print/[queryId]', { queryId: encodeURIComponent(page.params.queryId) })}
         >print</a>
-        <button
-          type="button"
-          class="app-header-link app-header-link-button"
-          onclick={exportPdf}
-          disabled={exporting}
-          aria-label="Export this briefing as a PDF and open it in a new tab"
-        >{exporting ? 'rendering…' : 'export PDF'}</button>
       {/if}
       <StatusPill />
     </div>
-  </div>
-  <!-- The live region is always in the DOM so screen readers announce
-       the message when it appears. -->
-  <div role="status">
-    {#if exportError}
-      <div class="app-header-toast">
-        <span>{exportError}</span>
-        {#if page.params.queryId}
-          <a href={resolve('/(app)/print/[queryId]', { queryId: encodeURIComponent(page.params.queryId) })}>Open the print view</a>
-        {/if}
-        <button type="button" class="app-header-toast-close" onclick={() => (exportError = null)}>Dismiss</button>
-      </div>
-    {/if}
   </div>
 </header>
 
@@ -127,53 +82,12 @@
   /* Desktop: the left group keeps its natural width and the query column
      is capped, so a long question shrinks the query button (it truncates)
      instead of wrapping the wordmark and context one word per line. The
-     cap leaves the links column room for print and export PDF at 1101px.
+     cap leaves the links column room for the print link at 1101px.
      The tablet and phone rows in chrome.css put the query on its own row. */
   @media (min-width: 1101px) {
     .app-header-inner {
       grid-template-columns: minmax(max-content, 1fr) fit-content(min(560px, 40%)) 1fr;
     }
-  }
-  .app-header-link-button {
-    background: transparent;
-    border: 0;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-  }
-  .app-header-link-button:disabled {
-    color: var(--ink-tertiary);
-    cursor: progress;
-  }
-  /* Inline export message (PDF unavailable, snapshot missing, etc.),
-     below the header. Stays until dismissed. */
-  .app-header-toast {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px 16px;
-    background: #FEF3C7;
-    border-top: 1px solid var(--accent-warn);
-    color: var(--ink);
-    font-family: var(--font-sans);
-    font-size: 14px;
-    padding: 8px 14px;
-  }
-  .app-header-toast a {
-    color: var(--ink);
-    display: inline-flex;
-    align-items: center;
-    min-height: 24px;
-  }
-  .app-header-toast-close {
-    margin-left: auto;
-    min-height: 24px;
-    padding: 0 8px;
-    background: transparent;
-    border: 1px solid var(--ink);
-    color: var(--ink);
-    font: inherit;
-    cursor: pointer;
   }
   /* The active deployment, in words after the context. */
   .app-header-city-pill {

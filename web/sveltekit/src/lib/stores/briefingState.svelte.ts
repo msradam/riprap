@@ -1,9 +1,9 @@
 /**
- * Cross-component "briefing is done" signal + snapshot for export-PDF.
+ * Cross-component "briefing is done" signal + snapshot for the print view.
  *
  * `ready` flips true only after the streaming pipeline has produced a
- * grounded briefing. The header's "export PDF" button keys off this —
- * premature print of a half-streamed briefing is bad UX.
+ * grounded briefing. The header's "print" link keys off this: printing
+ * a half-streamed briefing is bad UX.
  *
  * `persistSnapshot` stashes the curated payload in localStorage under
  * `riprap:print:<queryId>` so the dedicated print tab (opened with
@@ -32,7 +32,7 @@ export interface PrintSnapshot {
   question?: string | null;
   /** The reader-facing mode line, e.g. "Evidence briefing (no LLM)". */
   mode?: string | null;
-  /** A question run in no-LLM mode that produced no Answer section. */
+  /** A question that neither a rule nor a model answered: no Answer section. */
   unanswered?: boolean;
   /** Undefined when the payload predates the consulted list. */
   consulted?: { title: string; failed: boolean }[];

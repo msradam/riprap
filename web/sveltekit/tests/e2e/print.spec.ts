@@ -1,6 +1,6 @@
 /**
- * Export-PDF flow:
- *  - the header button is hidden until a live briefing is ready, then shown
+ * Print flow:
+ *  - the header print link is hidden until a live briefing is ready, then shown
  *  - a gallery entry's "Print this briefing" saves a snapshot and opens
  *    /print/<id>
  *  - that route renders the report: title, answer and its source notes,
@@ -15,12 +15,12 @@ const STATIC = process.env.RIPRAP_STATIC_URL || process.env.RIPRAP_BASE_URL || '
 const QUERY = '80 Pioneer Street, Brooklyn, NY';
 const SNAP_KEY = `riprap:print:${QUERY}`;
 
-test.describe('export-PDF curated print flow', () => {
-  test('header export button appears once a live briefing is ready', async ({ page }) => {
+test.describe('curated print flow', () => {
+  test('header print link appears once a live briefing is ready', async ({ page }) => {
     await page.goto(`/q/${encodeURIComponent(QUERY)}`);
-    const button = page.locator('button').filter({ hasText: /export PDF/i });
-    await expect(button).toHaveCount(0);
-    await expect(button).toBeVisible({ timeout: 200_000 });
+    const link = page.locator('.app-header a.app-header-link').filter({ hasText: /^print$/ });
+    await expect(link).toHaveCount(0);
+    await expect(link).toBeVisible({ timeout: 200_000 });
   });
 
   test('print route hydrates from localStorage and shows curated layout', async ({ page }) => {
@@ -55,10 +55,11 @@ test.describe('export-PDF curated print flow', () => {
     await expect(page.locator('.print-answer')).toBeVisible();
     await expect(page.locator('.print-citations h3')).toHaveText('Sources cited');
     // A gallery print dates its live readings to their fetch, as the
-    // briefing page does, and prints the folded experimental group open.
+    // briefing page does, and prints any folded experimental group open
+    // (New York City has no experimental source, so there may be none).
     await expect(page.locator('.ev-asof').filter({ hasText: /\blive\b/ })).toHaveCount(0);
     await expect(page.locator('.ev-asof').filter({ hasText: /fetched \d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC/ }).first()).toBeVisible();
-    await expect(page.locator('.print-doc details.ev-folded')).toHaveJSProperty('open', true);
+    await expect(page.locator('.print-doc details.ev-folded:not([open])')).toHaveCount(0);
 
     // App chrome is excluded (the @-page break breaks out of root layout).
     await expect(page.locator('.app-header')).toHaveCount(0);

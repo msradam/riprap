@@ -74,7 +74,7 @@
 .app-footer-credits { font-size: 14px; line-height: 1.5; color: var(--ink-secondary); margin: 0; }
 
 /* Tablet: the query moves to its own row so the context and the links
-   (methodology, print, export PDF, status) share the first row. */
+   (methodology, print, status) share the first row. */
 @media (max-width: 1100px) {
   /* Equal halves, so the pill's changing text never resizes the context. */
   .app-header-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 24px; }
@@ -91,7 +91,7 @@
   .app-header-right { grid-row: 1; grid-column: 2; }
   .app-header-mid { grid-row: 2; grid-column: 1 / -1; justify-content: flex-start; }
   .app-header-query { min-width: 0; width: 100%; }
-  /* With print and export PDF the links are wider than the cell left
+  /* With the print link the links are wider than the cell left
      beside the context words, and ran under them. The words go (the kind
      line under the header says the same; screen readers still get them)
      and the deployment badge stays. */
@@ -103,7 +103,7 @@
 }
 /* Phones: the wordmark and badge, then the links on one row, then the
    query. The rows exist from the first paint, so the header keeps its
-   height when print and export PDF arrive at the end of a run. */
+   height when the print link arrives at the end of a run. */
 @media (max-width: 479px) {
   .app-header-inner { padding: 13px 16px; }
   /* The footer keeps the header's and the page's 16px gutter. */
