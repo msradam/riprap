@@ -15,6 +15,7 @@ import argparse
 import json
 import re
 import sys
+import time
 import urllib.parse
 import urllib.request
 from datetime import date
@@ -181,6 +182,7 @@ def main() -> int:
     ap.add_argument("--kinds", default="address,district,question")
     ap.add_argument("--ids", default=None, help="comma-separated entry ids to run")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--pause", type=float, default=0, help="seconds between entries (the public APIs have quotas)")
     a = ap.parse_args()
     entries = json.load(open(a.set_file))
     kinds = set(a.kinds.split(","))
@@ -201,6 +203,7 @@ def main() -> int:
               + (f"  ERROR {r['error']}" if r.get("error") else ""))
         for f in bad:
             print(f"    MISS {f['fact']}: riprap={f['riprap']!r} key={f['key']!r}")
+        time.sleep(a.pause)
     n_facts = sum(len(r["facts"]) for r in results)
     n_ok = sum(1 for r in results for f in r["facts"] if f["ok"])
     print(f"\n{n_ok}/{n_facts} facts agree, {len(results)} entries, {date.today()}")
