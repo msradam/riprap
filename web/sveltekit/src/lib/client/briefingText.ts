@@ -167,17 +167,19 @@ export const GLOSSARY: { term: string; re: RegExp; reading: string }[] = [
   }
 ];
 
-export const TIER_TERM = {
-  term: 'Measured, Modeled, Proxy, Synthetic',
+const tierTerm = (synthetic: boolean) => ({
+  term: `Measured, Modeled, Proxy${synthetic ? ', Synthetic' : ''}`,
   reading:
-    'how directly a source observes flooding. Measured sources record it; modeled sources simulate a scenario; proxy sources, such as 311 complaints, indicate it indirectly; synthetic layers are generated, not observed.'
-};
+    'how directly a source observes flooding. Measured sources record it; modeled sources simulate a scenario; proxy sources, such as 311 complaints, indicate it indirectly' +
+    (synthetic ? '; synthetic layers are generated, not observed.' : '.')
+});
 
 /** The glossary entries whose term appears in `text`, plus the tier words
- *  when the evidence table is on the page. */
-export function termsIn(text: string, withTiers: boolean): { term: string; reading: string }[] {
+ *  when the evidence table is on the page. The synthetic tier is named
+ *  only when a row on the page has it. */
+export function termsIn(text: string, withTiers: boolean, synthetic = false): { term: string; reading: string }[] {
   const found = GLOSSARY.filter((g) => g.re.test(text)).map(({ term, reading }) => ({ term, reading }));
-  return withTiers ? [...found, TIER_TERM] : found;
+  return withTiers ? [...found, tierTerm(synthetic)] : found;
 }
 
 const SUBJECT_RE = /^This (?:address|area) (?:sits|is) /;

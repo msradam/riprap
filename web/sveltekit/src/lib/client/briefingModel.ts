@@ -516,7 +516,7 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     stamp: meta && !modelListed ? meta.stamp : null,
     /** Live runs without a models list still name the model once. */
     modelLine: !meta && modelId && !modelListed ? modelId : null,
-    terms: termsIn(shownText, cards.length > 0),
+    terms: termsIn(shownText, cards.length > 0, cards.some((c) => c.tier === 'synthetic')),
     runFacts: runFacts(run),
     /** NYC-only resident resources are offered only on NYC runs. */
     nyc: (f?.deployment ?? deployment.current?.name) === 'nyc'

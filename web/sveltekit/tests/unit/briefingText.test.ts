@@ -116,9 +116,17 @@ describe('termsIn', () => {
   it('shows only the terms the page uses, plus the tier words with a table', () => {
     expect(termsIn('elevation 48.2 ft NAVD88', false).map((t) => t.term)).toEqual(['NAVD88']);
     expect(termsIn('2050 SLR; 14 above-curb flood events', true).map((t) => t.term))
-      .toEqual(['SLR', 'above-curb flood event', 'Measured, Modeled, Proxy, Synthetic']);
+      .toEqual(['SLR', 'above-curb flood event', 'Measured, Modeled, Proxy']);
     expect(termsIn('SLRs and slurry', false)).toEqual([]);
     expect(termsIn('water level 1.2 ft above MLLW', false).map((t) => t.term)).toEqual(['MLLW']);
+  });
+
+  it('names the synthetic tier only when a row on the page has it', () => {
+    expect(termsIn('', true)[0].reading).not.toMatch(/synthetic/i);
+    expect(termsIn('', true, true)).toEqual([{
+      term: 'Measured, Modeled, Proxy, Synthetic',
+      reading: expect.stringMatching(/indirectly; synthetic layers are generated, not observed\.$/)
+    }]);
   });
 });
 
