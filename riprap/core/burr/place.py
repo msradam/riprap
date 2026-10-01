@@ -34,6 +34,9 @@ _CODE_RE = re.compile(r"\b(MN|BX|BK|QN|SI)\s*-?\s*(\d{1,3})\b(?![\d-])", re.IGNO
 _BORO_KIND_NUM_RE = re.compile(rf"\b{_BORO_WORDS}\s*,?\s*{_KIND}\s*{_NUM}", re.IGNORECASE)
 _KIND_NUM_BORO_RE = re.compile(rf"\b{_KIND}\s*{_NUM}(?:\s*(?:,|in|of)?\s*{_BORO_WORDS})?", re.IGNORECASE)
 _CODE_KIND_NUM_RE = re.compile(rf"\b(MN|BX|BK|QN|SI)\s+{_KIND}\s*{_NUM}", re.IGNORECASE)  # "SI CD 2"
+# The city's own three-digit code: borough digit, then the district ("community district 301" is BK01).
+_BOROCD_RE = re.compile(rf"\b{_KIND}\s*(?:no\.?\s*|#\s*)?([1-5])(0[1-9]|1[0-8])\b", re.IGNORECASE)
+_BOROCD_PREFIX = {"1": "MN", "2": "BX", "3": "BK", "4": "QN", "5": "SI"}
 _BORO_NUM_RE = re.compile(rf"^\s*{_BORO_WORDS}\s+(\d{{1,2}})\s*[?.!]?\s*$", re.IGNORECASE)
 
 _SUFFIX = (r"(?:street|st|avenue|ave|av|boulevard|blvd|road|rd|place|pl|drive|dr|lane|ln|parkway|pkwy|terrace|ter"
@@ -50,7 +53,7 @@ _TAIL_AREA_RE = re.compile(r"^\s*(?:,\s*|\s+in\s+(?:the\s+)?)([A-Z][\w.'-]*(?:\s
 # A borough right after the street, with or without a comma, in any case or
 # common abbreviation: "200 Water Street Manhattan", "1310 Surf Ave, Bklyn".
 # Without it the geocoder picks a borough itself (Water Street in Dumbo).
-_TAIL_BORO_RE = re.compile(r"^\s*,?\s*(?:in\s+)?(?:the\s+)?(manhattan|brooklyn|bklyn|bkln|queens|qns|bronx|bx"
+_TAIL_BORO_RE = re.compile(r"^\s*,?\s*(?:(?:in|on)\s+)?(?:the\s+)?(manhattan|brooklyn|bklyn|bkln|queens|qns|bronx|bx"
                            r"|staten island)\b\.?"
                            # "Manhattan Beach" and "Brooklyn Heights" are neighbourhoods, not the borough
                            r"(?!\s+(?:Beach|Heights|Village|Valley|Bridge|Terrace|Park|Hills?|Navy|Gardens)\b)", re.IGNORECASE)
@@ -97,6 +100,9 @@ def parse_district(text: str) -> tuple[str | None, str | None]:
     m = _BORO_KIND_NUM_RE.search(t)
     if m:
         return _district(_BOROUGH[m.group(1).lower()], int(m.group(2)))
+    m = _BOROCD_RE.search(t)
+    if m:
+        return _district(_BOROCD_PREFIX[m.group(1)], int(m.group(2)))
     m = _KIND_NUM_BORO_RE.search(t)
     if m:
         if m.group(2):
@@ -162,7 +168,30 @@ def place_phrase(text: str) -> str | None:
         if phrase.lower() in nta.ALIASES or (hits and re.search(rf"\b{re.escape(phrase)}\b", hits[0]["nta_name"],
                                                                  re.IGNORECASE)):
             return phrase
+    # Typed in lower case ("whats going on in hunts point"): a known
+    # neighbourhood name as whole words, the longest one.
+    # ponytail: a name that is also a word ("flushing") matches; a part-of-speech
+    # check is the upgrade if that ever misroutes a real question.
+    low = (text or "").lower()
+    known = [n for n in _known_neighbourhoods() if re.search(rf"\b{re.escape(n)}\b", low)]
+    if known:
+        return max(known, key=len).title()
     return found[0] if found else None
+
+
+_NEIGHBOURHOODS: list[str] = []
+
+
+def _known_neighbourhoods() -> list[str]:
+    """Lower-cased neighbourhood names: each part of a tabulation area's name
+    ("Carroll Gardens-Cobble Hill-Gowanus-Red Hook" is four) and the aliases."""
+    if not _NEIGHBOURHOODS:
+        from app.areas import nta  # noqa: PLC0415
+
+        parts = {re.sub(r"\s*\(.*?\)", "", p).strip().lower()
+                 for name in nta.load()["ntaname"].dropna() for p in name.split("-")}
+        _NEIGHBOURHOODS.extend(sorted(p for p in parts | set(nta.ALIASES) if len(p) >= 5 and p not in _BOROUGH))
+    return _NEIGHBOURHOODS
 
 
 def resolve_query(text: str) -> dict:

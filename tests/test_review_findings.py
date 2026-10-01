@@ -225,3 +225,21 @@ def test_a_hospital_just_outside_the_sandy_outline_is_named_not_counted_as_dry()
     lead, _ = ra.answer("Were any hospitals in MN06 flooded by Sandy?", {"doh_hospital_exposure": v["narrative"]},
                         {"doh_hospital_exposure": v})
     assert lead == "facts"
+
+
+# What the fourth fresh question set found (fresh_r4_unblinded.json).
+
+@pytest.mark.parametrize("query,intent,target", [
+    ("whats going on in hunts point rn any flooding", "live_now", "Hunts Point, Bronx, NY"),
+    ("gowanus stormwater flooding 2050 vs 2080 scenario, whats the difference", "neighborhood", "Gowanus"),
+    ("community district 301, any hospitals with flood exposure?", "neighborhood", "BK01"),
+    ("east elmhurst ida high water marks, how many and the deepest one", "neighborhood", "East Elmhurst"),
+    ("A constituent at 222 Bay Street on Staten Island keeps calling. What do the records show?", "single_address",
+     "222 Bay Street, Staten Island"),
+    ("Did Hamilton Beach flood during Sandy and how much of the neighborhood was underwater", "single_address",
+     "Hamilton Beach, New York, NY"),
+    ("Ferry Building, San Francisco", "single_address", "Ferry Building, San Francisco"),  # a short place keeps its city
+])
+def test_places_typed_the_way_people_type_them(query, intent, target):
+    plan = heuristic_plan(query)
+    assert (plan["intent"], plan["targets"][0]["text"]) == (intent, target)

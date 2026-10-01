@@ -208,7 +208,15 @@ def heuristic_plan(query: str) -> dict:
         named = place["kind"] == "neighborhood" and re.search(
             re.escape(place["text"]) + r"\s*,?\s*(?:in\s+)?(?:the\s+)?(Manhattan|Brooklyn|Queens|Bronx|Staten Island)\b", q)
         # "Hamilton Beach, Queens. Two things: ...": the place and its borough, not the whole question.
-        intent, target = "single_address", (f"{place['text']}, {named.group(1)}, NY" if named else _address_from_query(q))
+        if named:
+            target = f"{place['text']}, {named.group(1)}, NY"
+        elif place["kind"] == "neighborhood" and len(q.split()) > 6 and not _OTHER_STATE_RE.search(q):
+            # A place name inside a long question ("Did Hamilton Beach flood during Sandy and ..."): the
+            # name for the geocoder, never the rest of the sentence.
+            target = f"{place['text']}, New York, NY"
+        else:
+            target = _address_from_query(q)
+        intent = "single_address"
     kind = "nta" if intent in ("neighborhood", "development_check") else "address"
     out = {"intent": intent, "rationale": f"Heuristic match: {intent}.",
            "targets": [{"type": kind, "text": target}], "place": place}

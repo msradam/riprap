@@ -59,8 +59,8 @@ TOPICS = (
 _FLOODING_NOW_RE = re.compile(r"\bis (it|anything|the street|the block|there|this) (now )?flooding\b"
                               r"(?!\s+(risk|history|often|usually|regularly|a lot|problems?|issues?|records?|complaints?"
                               r"|common|frequent))", re.I)
-_NOW_RE = re.compile(r"\b(right now|currently|tonight|at the moment|current conditions|live conditions|happening now"
-                     r"|as we speak)\b|" + _FLOODING_NOW_RE.pattern, re.I)
+_NOW_RE = re.compile(r"\b(right now|rite now|rn|currently|tonight|at the moment|current conditions|live conditions"
+                     r"|happening now|going on now|as we speak)\b|" + _FLOODING_NOW_RE.pattern, re.I)
 _FUTURE_RE = re.compile(r"\b(forecasts?|forecasting|projections?|projected|outlook|predictions?|what is coming|what's coming"
                         r"|in the (coming|next) (years|decades)|in the future|by (the )?20\d\ds?|20[5-9]0s?|2100)\b", re.I)
 _FLOOD_RE = re.compile(r"\bflood", re.I)
