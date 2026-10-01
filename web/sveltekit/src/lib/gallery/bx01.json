@@ -1,8 +1,8 @@
 {
- "slug": "qn12-complaints",
- "neighborhood": "Community district QN12, Queens",
- "address": "QN12",
- "question": "How many street flooding complaints has community district QN12 had?",
+ "slug": "bx01",
+ "neighborhood": "Community district BX01, Bronx",
+ "address": "BX01",
+ "question": null,
  "generated_at": "2026-10-01T06:46Z",
  "riprap_commit": "f9c47b9",
  "mode": "no_llm",
@@ -1210,101 +1210,60 @@
   ]
  },
  "final": {
-  "query": "How many street flooding complaints has community district QN12 had?",
+  "query": "BX01",
   "intent": "neighborhood",
   "plan": {
    "intent": "neighborhood",
-   "rationale": "Heuristic match: community district QN12.",
+   "rationale": "Heuristic match: community district BX01.",
    "targets": [
     {
      "type": "district",
-     "text": "QN12"
+     "text": "BX01"
     }
    ],
    "place": {
     "kind": "district",
-    "text": "QN12",
+    "text": "BX01",
     "certain": true,
     "message": null
-   },
-   "question": "How many street flooding complaints has community district QN12 had?"
+   }
   },
   "geocode": {
-   "address": "QN12 Jamaica-St. Albans-Hollis (CD 12 Approximation), Queens",
-   "borough": "Queens",
-   "lat": 40.691953758970016,
-   "lon": -73.77855875897461,
+   "address": "BX01 Melrose-Mott Haven-Port Morris (CD 1 Approximation), Bronx",
+   "borough": "Bronx",
+   "lat": 40.810708220110506,
+   "lon": -73.91594019767554,
    "bbl": null,
    "bin": null,
    "match": "exact"
   },
-  "lat": 40.691953758970016,
-  "lon": -73.77855875897461,
+  "lat": 40.810708220110506,
+  "lon": -73.91594019767554,
   "nta": {
-   "nta_code": "QN12",
-   "nta_name": "QN12 Jamaica-St. Albans-Hollis (CD 12 Approximation)",
-   "borough": "Queens",
+   "nta_code": "BX01",
+   "nta_name": "BX01 Melrose-Mott Haven-Port Morris (CD 1 Approximation)",
+   "borough": "Bronx",
    "bbox": [
-    -73.81647531193624,
-    40.66645115660537,
-    -73.74359285933764,
-    40.72106344375331
+    -73.9328741193582,
+    40.796623770558085,
+    -73.90129277472668,
+    40.824387087372905
    ],
    "n_matches": 1
   },
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n533 street flooding complaints in the last 3 years, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4524 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\n395 flood-related 311 complaints were filed in Community District BX01 (by the record's community board field) in the last 3 years [nyc311_nta]. 6.0% is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise, 1.4% is modeled to flood from rainfall in the moderate scenario for 2050 [dep_extreme_2080_nta][dep_moderate_2050_nta]. 14.1% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 14.1% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 5.41 km\u00b2) [sandy_nta]. DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 6.0% of this area is modeled to flood from rainfall, 3.4% as nuisance flooding (4 in to under 1 ft) and 2.6% as deep and contiguous flooding (1 ft or more); 2.1% is in the future high tide area (coastal tidal inundation projected for 2080) [dep_extreme_2080_nta]. DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 1.4% of this area is modeled to flood from rainfall, 1.0% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more); 0.3% is in the future high tide area (coastal tidal inundation projected for 2050) [dep_moderate_2050_nta]. DEP Moderate Stormwater (2.13 in/hr, current SLR): 1.2% of this area is modeled to flood from rainfall, 0.8% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more) [dep_moderate_current_nta]. Median ground elevation 8.4 m (10th percentile 3.04 m); 26.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage) [microtopo_nta].\n\n**Live Observer.**\n395 NYC 311 flood-related complaints filed in Community District BX01 (by the record's community board field) in the last 3 years: 200 sewer backup, 115 catch basin, 53 street flooding, 27 manhole overflow [nyc311_nta].\n\n**Asset Register.**\nNYC Planning's Community District Profile counts 327 buildings, 1,972 residential units and 580 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block) [dcp_floodplain_nta]. 41 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 6 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): E 149 St (6), Jackson Av (2 5) [mta_entrance_exposure]. 1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: MOORE [nycha_development_exposure]. 21 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 1 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise) [dob_permits_nta]. 2 flood-exposed NYC DOE schools in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: Success Academy Charter School - Bronx 1. Inside the DEP extreme scenario: Legacy College Preparatory [doe_school_exposure]. 1 hospital in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:46 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n533 street flooding complaints in the last 3 years, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4524 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\n395 flood-related 311 complaints were filed in Community District BX01 (by the record's community board field) in the last 3 years [nyc311_nta]. 6.0% is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise, 1.4% is modeled to flood from rainfall in the moderate scenario for 2050 [dep_extreme_2080_nta][dep_moderate_2050_nta]. 14.1% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 14.1% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 5.41 km\u00b2) [sandy_nta]. DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 6.0% of this area is modeled to flood from rainfall, 3.4% as nuisance flooding (4 in to under 1 ft) and 2.6% as deep and contiguous flooding (1 ft or more); 2.1% is in the future high tide area (coastal tidal inundation projected for 2080) [dep_extreme_2080_nta]. DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 1.4% of this area is modeled to flood from rainfall, 1.0% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more); 0.3% is in the future high tide area (coastal tidal inundation projected for 2050) [dep_moderate_2050_nta]. DEP Moderate Stormwater (2.13 in/hr, current SLR): 1.2% of this area is modeled to flood from rainfall, 0.8% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more) [dep_moderate_current_nta]. Median ground elevation 8.4 m (10th percentile 3.04 m); 26.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage) [microtopo_nta].\n\n**Live Observer.**\n395 NYC 311 flood-related complaints filed in Community District BX01 (by the record's community board field) in the last 3 years: 200 sewer backup, 115 catch basin, 53 street flooding, 27 manhole overflow [nyc311_nta].\n\n**Asset Register.**\nNYC Planning's Community District Profile counts 327 buildings, 1,972 residential units and 580 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block) [dcp_floodplain_nta]. 41 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 6 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): E 149 St (6), Jackson Av (2 5) [mta_entrance_exposure]. 1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: MOORE [nycha_development_exposure]. 21 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 1 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise) [dob_permits_nta]. 2 flood-exposed NYC DOE schools in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: Success Academy Charter School - Bronx 1. Inside the DEP extreme scenario: Legacy College Preparatory [doe_school_exposure]. 1 hospital in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:46 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
    "dropped": [],
    "tier": "no_llm"
   },
   "grounding": {
    "tier": "no_llm",
-   "model": null,
-   "attempts": 0,
-   "claims": [
-    {
-     "section": "answer",
-     "text": "4524 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow.",
-     "doc_ids": [
-      "nyc311_nta"
-     ],
-     "numbers": []
-    }
-   ],
-   "dropped_claims": [],
-   "retried_claims": [],
-   "n_kept": 1,
-   "n_dropped": 0,
-   "llm_calls": [],
-   "question": "How many street flooding complaints has community district QN12 had?",
-   "n_documents": 14,
-   "answer_mode": "rules",
-   "answer_lead": "count",
-   "lead_fact": {
-    "doc_id": "nyc311_nta",
-    "in_lead": true
-   },
-   "answer_flags": [],
-   "checks": [
-    "citations and numbers on every claim",
-    "lead rules on the answer, which is the cited text word for word"
-   ],
-   "answered": true
+   "claims": [],
+   "dropped_claims": []
   },
   "citations": {
-   "nyc311_nta": {
-    "doc_id": "nyc311_nta",
-    "source": "NYC 311 Service Requests (NYC Open Data)",
-    "title": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
-    "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
-    "license": "NYC Open Data Terms of Use",
-    "date_modified": "2026-10-01T01:38:36+0000",
-    "retrieved_at": "2026-10-01T06:46Z",
-    "vintage": "2026-10-01T01:38:36+0000",
-    "maturity": "production"
-   },
    "area_boundary": {
     "doc_id": "area_boundary",
     "source": "NYC Department of City Planning, 2020 Neighborhood Tabulation Areas",
@@ -1371,6 +1330,17 @@
     "vintage": "retrieved 2026-07-11",
     "maturity": "production"
    },
+   "nyc311_nta": {
+    "doc_id": "nyc311_nta",
+    "source": "NYC 311 Service Requests (NYC Open Data)",
+    "title": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
+    "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
+    "license": "NYC Open Data Terms of Use",
+    "date_modified": "2026-10-01T01:38:36+0000",
+    "retrieved_at": "2026-10-01T06:46Z",
+    "vintage": "2026-10-01T01:38:36+0000",
+    "maturity": "production"
+   },
    "dcp_floodplain_nta": {
     "doc_id": "dcp_floodplain_nta",
     "source": "NYC Department of City Planning, Community District Profiles (floodplain indicators)",
@@ -1402,6 +1372,17 @@
     "date_modified": null,
     "retrieved_at": "2026-05-01",
     "vintage": "retrieved 2026-05-01",
+    "maturity": "production"
+   },
+   "dob_permits_nta": {
+    "doc_id": "dob_permits_nta",
+    "source": "NYC DOB Permit Issuance (NYC Open Data)",
+    "title": "NYC DOB permits issued inside the neighborhood, cross-referenced with Sandy 2012 and DEP scenarios",
+    "url": "https://data.cityofnewyork.us/Housing-Development/DOB-Permit-Issuance/ipu4-2q9a",
+    "license": "NYC Open Data Terms of Use",
+    "date_modified": "2026-10-01T00:27:21+0000",
+    "retrieved_at": "2026-10-01T06:46Z",
+    "vintage": "2026-10-01T00:27:21+0000",
     "maturity": "production"
    },
    "doe_school_exposure": {
@@ -1501,6 +1482,11 @@
     "stone": "keystone"
    },
    {
+    "id": "dob_permits_nta",
+    "title": "Active DOB construction permits inside the neighborhood",
+    "stone": "keystone"
+   },
+   {
     "id": "doe_schools_nta",
     "title": "NYC DOE schools exposed in the area",
     "stone": "keystone"
@@ -1521,13 +1507,7 @@
     "stone": "lodestone"
    }
   ],
-  "not_checked": [
-   {
-    "id": "dob_permits_nta",
-    "title": "Active DOB construction permits inside the neighborhood",
-    "stone": "keystone"
-   }
-  ],
+  "not_checked": [],
   "deployment": "nyc",
   "area_boundary": {
    "geojson": {
@@ -1535,168 +1515,260 @@
     "coordinates": [
      [
       [
-       -73.76031463846735,
-       40.67510997187887
+       -73.90446551344368,
+       40.81228196041534
       ],
       [
-       -73.75849761429988,
-       40.672648444991296
+       -73.90341720307497,
+       40.811506882855255
       ],
       [
-       -73.75636239193665,
-       40.67242923710904
+       -73.90229231926554,
+       40.804564776643865
       ],
       [
-       -73.75643734225946,
-       40.66966637874086
+       -73.90452954029595,
+       40.80317023565156
       ],
       [
-       -73.75763129530147,
-       40.66645115660537
+       -73.90747030436765,
+       40.80000345791503
       ],
       [
-       -73.77342462680873,
-       40.66802762009213
+       -73.9085502661004,
+       40.799307426058725
       ],
       [
-       -73.78940999355977,
-       40.666841158686104
+       -73.90830303542083,
+       40.798959135920335
       ],
       [
-       -73.79711068874407,
-       40.66694966921819
+       -73.91168831108833,
+       40.796623770558085
       ],
       [
-       -73.79919649443521,
-       40.66651752683564
+       -73.91372255742067,
+       40.79678943900846
       ],
       [
-       -73.80163473932281,
-       40.666757554359364
+       -73.91903181906888,
+       40.79898494724852
       ],
       [
-       -73.80123642352945,
-       40.67136337562343
+       -73.92024068026599,
+       40.7996136878696
       ],
       [
-       -73.80179295375413,
-       40.67439399109003
+       -73.92132730712379,
+       40.80128459163114
       ],
       [
-       -73.80717487392037,
-       40.685605273529966
+       -73.92292709999569,
+       40.80237329531277
       ],
       [
-       -73.81647531193624,
-       40.702450427418526
+       -73.92665794722352,
+       40.80240980391447
       ],
       [
-       -73.8115285676521,
-       40.70227287487812
+       -73.9276278850446,
+       40.802695665983364
       ],
       [
-       -73.81201248430207,
-       40.70594494480607
+       -73.92728271855411,
+       40.803508264416664
       ],
       [
-       -73.80694856263321,
-       40.70736710041278
+       -73.9276450026433,
+       40.803988633348276
       ],
       [
-       -73.80804630743958,
-       40.70935682763351
+       -73.9287260742369,
+       40.80410362522707
       ],
       [
-       -73.80548241255212,
-       40.71008885593892
+       -73.93051758773042,
+       40.80659056356663
       ],
       [
-       -73.80302414674632,
-       40.708139657093334
+       -73.9322826191658,
+       40.808363974125385
       ],
       [
-       -73.80141416240689,
-       40.709686873022314
+       -73.93259434581051,
+       40.81005355787177
       ],
       [
-       -73.79870150613023,
-       40.71066337711313
+       -73.9328639701707,
+       40.81012443789091
       ],
       [
-       -73.79776810067948,
-       40.70914318884339
+       -73.93256503213819,
+       40.81088597569196
       ],
       [
-       -73.78928913781589,
-       40.71203312368852
+       -73.93242307595003,
+       40.8141517151758
       ],
       [
-       -73.78657528627528,
-       40.711972493276896
+       -73.93027812596966,
+       40.8132480256553
       ],
       [
-       -73.77357135168404,
-       40.71512009536888
+       -73.92885641986327,
+       40.8148798674807
       ],
       [
-       -73.76733228086881,
-       40.717289796810775
+       -73.92731653000297,
+       40.818559634826904
       ],
       [
-       -73.76446951657488,
-       40.718890392877896
+       -73.92518486375295,
+       40.81801266937714
       ],
       [
-       -73.7594414294101,
-       40.72106344375331
+       -73.92194763991083,
+       40.82103154495854
       ],
       [
-       -73.75370834556638,
-       40.713324637241065
+       -73.9167740045355,
+       40.824387087372905
       ],
       [
-       -73.7461815781834,
-       40.696121925980215
+       -73.91587735728943,
+       40.8241037325319
       ],
       [
-       -73.74507479956513,
-       40.696390949409384
+       -73.91621588472752,
+       40.823467930224936
       ],
       [
-       -73.74359285933764,
-       40.69621532530715
+       -73.91181615668526,
+       40.822035022411974
       ],
       [
-       -73.74467955472021,
-       40.69341226447404
+       -73.90990894049723,
+       40.82255110811688
       ],
       [
-       -73.75001704218833,
-       40.68589131900592
+       -73.90129277472668,
+       40.82047544261303
       ],
       [
-       -73.75225828553378,
-       40.68149141147138
+       -73.90446551344368,
+       40.81228196041534
+      ]
+     ],
+     [
+      [
+       -73.9239995118876,
+       40.815438912951805
       ],
       [
-       -73.75484909582539,
-       40.6779288383857
+       -73.92372701237035,
+       40.81581732007284
       ],
       [
-       -73.75576169139454,
-       40.675885909418795
+       -73.92309299772212,
+       40.816697728138315
       ],
       [
-       -73.75648885703784,
-       40.67602276208586
+       -73.92372701237045,
+       40.81581732007284
       ],
       [
-       -73.75691881631015,
-       40.67652887087326
+       -73.9239995118876,
+       40.815438912951805
+      ]
+     ],
+     [
+      [
+       -73.92048117283511,
+       40.81456368686958
       ],
       [
-       -73.76031463846735,
-       40.67510997187887
+       -73.9204811728351,
+       40.81456368686959
+      ],
+      [
+       -73.92130383212299,
+       40.815477247776066
+      ],
+      [
+       -73.92048117283511,
+       40.81456368686958
+      ]
+     ],
+     [
+      [
+       -73.9194674481671,
+       40.81507370953774
+      ],
+      [
+       -73.9188793082069,
+       40.81538492891295
+      ],
+      [
+       -73.92012648774387,
+       40.814741122389165
+      ],
+      [
+       -73.9194674481671,
+       40.81507370953774
+      ]
+     ],
+     [
+      [
+       -73.91722549796239,
+       40.81588968119866
+      ],
+      [
+       -73.9176450282038,
+       40.816065918016484
+      ],
+      [
+       -73.91764502820382,
+       40.81606591801647
+      ],
+      [
+       -73.91722549796239,
+       40.81588968119866
+      ]
+     ],
+     [
+      [
+       -73.91295450686049,
+       40.81426933468041
+      ],
+      [
+       -73.91251890110344,
+       40.81412214426665
+      ],
+      [
+       -73.91395472101753,
+       40.814602900345164
+      ],
+      [
+       -73.91295450686049,
+       40.81426933468041
+      ]
+     ],
+     [
+      [
+       -73.91181210652573,
+       40.81388331455155
+      ],
+      [
+       -73.9116651695825,
+       40.813838706890124
+      ],
+      [
+       -73.91240322245037,
+       40.81408305722685
+      ],
+      [
+       -73.91181210652573,
+       40.81388331455155
       ]
      ]
     ]
@@ -1704,159 +1776,159 @@
    "narrative": "The outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district."
   },
   "sandy_nta": {
-   "overlap_area_m2": 185853.2,
-   "polygon_area_m2": 24698643.1,
-   "fraction": 0.0075,
+   "overlap_area_m2": 761159.9,
+   "polygon_area_m2": 5411275.3,
+   "fraction": 0.1407,
    "inside": true,
-   "narrative": "0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 24.7 km\u00b2).",
-   "headline_value": "0.8% inside the 2012 Sandy extent"
+   "narrative": "14.1% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 5.41 km\u00b2).",
+   "headline_value": "14.1% inside the 2012 Sandy extent"
   },
   "dep_extreme_2080_nta": {
    "scenario": "dep_extreme_2080",
    "label": "DEP Extreme Stormwater (3.66 in/hr, 2080 SLR)",
-   "fraction_any": 0.1638,
+   "fraction_any": 0.0808,
    "fraction_class": {
-    "1": 0.0755,
-    "2": 0.0883,
-    "3": 0.0
+    "1": 0.0343,
+    "2": 0.0256,
+    "3": 0.0209
    },
-   "polygon_area_m2": 24698643.1,
-   "narrative": "DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 16.4% of this area is modeled to flood from rainfall, 7.5% as nuisance flooding (4 in to under 1 ft) and 8.8% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2080).",
-   "headline_value": "16.4% modeled to flood from rainfall, 0.0% future high tide"
+   "polygon_area_m2": 5411275.3,
+   "narrative": "DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 6.0% of this area is modeled to flood from rainfall, 3.4% as nuisance flooding (4 in to under 1 ft) and 2.6% as deep and contiguous flooding (1 ft or more); 2.1% is in the future high tide area (coastal tidal inundation projected for 2080).",
+   "headline_value": "6.0% modeled to flood from rainfall, 2.1% future high tide"
   },
   "dep_moderate_2050_nta": {
    "scenario": "dep_moderate_2050",
    "label": "DEP Moderate Stormwater (2.13 in/hr, 2050 SLR)",
-   "fraction_any": 0.0332,
+   "fraction_any": 0.0173,
    "fraction_class": {
-    "1": 0.0187,
-    "2": 0.0145,
-    "3": 0.0
+    "1": 0.0096,
+    "2": 0.0045,
+    "3": 0.0032
    },
-   "polygon_area_m2": 24698643.1,
-   "narrative": "DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.3% of this area is modeled to flood from rainfall, 1.9% as nuisance flooding (4 in to under 1 ft) and 1.5% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2050).",
-   "headline_value": "3.3% modeled to flood from rainfall, 0.0% future high tide"
+   "polygon_area_m2": 5411275.3,
+   "narrative": "DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 1.4% of this area is modeled to flood from rainfall, 1.0% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more); 0.3% is in the future high tide area (coastal tidal inundation projected for 2050).",
+   "headline_value": "1.4% modeled to flood from rainfall, 0.3% future high tide"
   },
   "dep_moderate_current_nta": {
    "scenario": "dep_moderate_current",
    "label": "DEP Moderate Stormwater (2.13 in/hr, current SLR)",
-   "fraction_any": 0.0308,
+   "fraction_any": 0.0118,
    "fraction_class": {
-    "1": 0.0175,
-    "2": 0.0133,
+    "1": 0.0083,
+    "2": 0.0035,
     "3": 0.0
    },
-   "polygon_area_m2": 24698643.1,
-   "narrative": "DEP Moderate Stormwater (2.13 in/hr, current SLR): 3.1% of this area is modeled to flood from rainfall, 1.8% as nuisance flooding (4 in to under 1 ft) and 1.3% as deep and contiguous flooding (1 ft or more).",
-   "headline_value": "3.1% modeled to flood from rainfall"
+   "polygon_area_m2": 5411275.3,
+   "narrative": "DEP Moderate Stormwater (2.13 in/hr, current SLR): 1.2% of this area is modeled to flood from rainfall, 0.8% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more).",
+   "headline_value": "1.2% modeled to flood from rainfall"
   },
   "microtopo_nta": {
-   "n_cells": 39100,
-   "elev_min_m": 1.95,
-   "elev_median_m": 10.55,
-   "elev_p10_m": 5.43,
-   "elev_max_m": 43.34,
-   "hand_median_m": 2.09,
-   "twi_median": 9.15,
-   "frac_hand_lt1": 0.2878,
-   "frac_twi_gt10": 0.3438,
-   "narrative": "Median ground elevation 10.55 m (10th percentile 5.43 m); 28.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage).",
-   "headline_value": "median ground elevation 10.55 m"
+   "n_cells": 8581,
+   "elev_min_m": 0.0,
+   "elev_median_m": 8.4,
+   "elev_p10_m": 3.04,
+   "elev_max_m": 24.64,
+   "hand_median_m": 3.65,
+   "twi_median": 8.39,
+   "frac_hand_lt1": 0.2677,
+   "frac_twi_gt10": 0.2589,
+   "narrative": "Median ground elevation 8.4 m (10th percentile 3.04 m); 26.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage).",
+   "headline_value": "median ground elevation 8.4 m"
   },
   "nyc311_nta": {
-   "n": 4524,
+   "n": 395,
    "capped": false,
    "radius_m": null,
-   "where": "in Community District QN12 (by the record's community board field)",
+   "where": "in Community District BX01 (by the record's community board field)",
    "years": 3,
    "by_year": {
-    "2023": 396,
-    "2024": 1436,
-    "2025": 1312,
-    "2026": 1380
+    "2023": 42,
+    "2024": 112,
+    "2025": 120,
+    "2026": 121
    },
    "by_descriptor": {
-    "Sewer Backup (Use Comments) (SA)": 2605,
-    "Catch Basin Clogged/Flooding (Use Comments) (SC)": 936,
-    "Street Flooding (SJ)": 467,
-    "Catch Basin Clogged": 154,
-    "Manhole Overflow (Use Comments) (SA1)": 145,
-    "Backup": 142,
-    "Flooding on Street": 66,
-    "Manhole Overflow": 9
+    "Sewer Backup (Use Comments) (SA)": 186,
+    "Catch Basin Clogged/Flooding (Use Comments) (SC)": 100,
+    "Street Flooding (SJ)": 49,
+    "Manhole Overflow (Use Comments) (SA1)": 26,
+    "Catch Basin Clogged": 15,
+    "Backup": 14,
+    "Flooding on Street": 4,
+    "Manhole Overflow": 1
    },
    "by_kind": {
-    "sewer backup": 2747,
-    "catch basin": 1090,
-    "street flooding": 533,
-    "manhole overflow": 154
+    "sewer backup": 200,
+    "catch basin": 115,
+    "street flooding": 53,
+    "manhole overflow": 27
    },
    "most_recent": [
     {
-     "date": "2026-09-29",
-     "descriptor": "Flooding on Street",
-     "address": "197-31 CARPENTER AVENUE"
-    },
-    {
-     "date": "2026-09-29",
-     "descriptor": "Backup",
-     "address": "121-16 BENTON STREET"
-    },
-    {
-     "date": "2026-09-29",
+     "date": "2026-09-23",
      "descriptor": "Catch Basin Clogged",
-     "address": "119-25 164 STREET"
+     "address": "ALEXANDER AVENUE"
     },
     {
-     "date": "2026-09-29",
+     "date": "2026-09-22",
      "descriptor": "Backup",
-     "address": "178-26 130 ROAD"
+     "address": "510 EAST 146 STREET"
     },
     {
-     "date": "2026-09-29",
+     "date": "2026-09-17",
+     "descriptor": "Flooding on Street",
+     "address": "825 EAST 141 STREET"
+    },
+    {
+     "date": "2026-09-17",
      "descriptor": "Backup",
-     "address": "114-54 203 STREET"
+     "address": "524 SOUTHERN BOULEVARD"
+    },
+    {
+     "date": "2026-09-13",
+     "descriptor": "Catch Basin Clogged",
+     "address": "BROOK AVENUE"
     }
    ],
    "points": [],
-   "headline_value": "4524 complaints",
-   "subhead_text": "2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow",
-   "narrative": "4524 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow.",
+   "headline_value": "395 complaints",
+   "subhead_text": "200 sewer backup, 115 catch basin, 53 street flooding, 27 manhole overflow",
+   "narrative": "395 NYC 311 flood-related complaints filed in Community District BX01 (by the record's community board field) in the last 3 years: 200 sewer backup, 115 catch basin, 53 street flooding, 27 manhole overflow.",
    "histogram": [
-    396,
-    1436,
-    1312,
-    1380
+    42,
+    112,
+    120,
+    121
    ]
   },
   "dcp_floodplain_nta": {
-   "community_district": "QN12",
-   "n_buildings": 5,
-   "n_residential_units": 0,
-   "n_residents_2010": 0,
-   "floodplain_sq_mi": 0.15,
-   "narrative": "NYC Planning's Community District Profile counts 5 buildings, 0 residential units and 0 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block)."
+   "community_district": "BX01",
+   "n_buildings": 327,
+   "n_residential_units": 1972,
+   "n_residents_2010": 580,
+   "floodplain_sq_mi": 0.28,
+   "narrative": "NYC Planning's Community District Profile counts 327 buildings, 1,972 residential units and 580 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block)."
   },
   "mta_entrances_nta": {
    "available": true,
-   "n_entrances": 36,
+   "n_entrances": 41,
    "n_inside_sandy_2012": 0,
-   "n_in_dep_extreme_2080": 17,
+   "n_in_dep_extreme_2080": 6,
    "n_near_sandy_edge": 0,
-   "narrative": "36 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 17 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z)",
+   "narrative": "41 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 6 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): E 149 St (6), Jackson Av (2 5)",
    "entrances": [
     {
-     "station_id": "255",
-     "station_name": "169 St",
-     "daytime_routes": "F",
-     "borough": "Q",
+     "station_id": "391",
+     "station_name": "138 St-Grand Concourse",
+     "daytime_routes": "4 5",
+     "borough": "Bx",
      "entrance_type": "Stair",
-     "entrance_lat": 40.7098175,
-     "entrance_lon": -73.7947039,
+     "entrance_lat": 40.8133392,
+     "entrance_lon": -73.9299986,
      "distance_m": null,
      "ada_accessible": false,
-     "elevation_m": 23.5,
-     "hand_m": 6.8,
+     "elevation_m": 5.67,
+     "hand_m": 2.77,
      "inside_sandy_2012": false,
      "dep_extreme_2080_class": 0,
      "dep_extreme_2080_label": "outside",
@@ -1864,17 +1936,17 @@
      "dep_moderate_2050_label": "outside"
     },
     {
-     "station_id": "255",
-     "station_name": "169 St",
-     "daytime_routes": "F",
-     "borough": "Q",
+     "station_id": "391",
+     "station_name": "138 St-Grand Concourse",
+     "daytime_routes": "4 5",
+     "borough": "Bx",
      "entrance_type": "Stair",
-     "entrance_lat": 40.7098676,
-     "entrance_lon": -73.7945644,
+     "entrance_lat": 40.8133808,
+     "entrance_lon": -73.9298403,
      "distance_m": null,
      "ada_accessible": false,
-     "elevation_m": 23.22,
-     "hand_m": 6.52,
+     "elevation_m": 5.54,
+     "hand_m": 2.77,
      "inside_sandy_2012": false,
      "dep_extreme_2080_class": 0,
      "dep_extreme_2080_label": "outside",
@@ -1882,17 +1954,17 @@
      "dep_moderate_2050_label": "outside"
     },
     {
-     "station_id": "255",
-     "station_name": "169 St",
-     "daytime_routes": "F",
-     "borough": "Q",
+     "station_id": "391",
+     "station_name": "138 St-Grand Concourse",
+     "daytime_routes": "4 5",
+     "borough": "Bx",
      "entrance_type": "Stair",
-     "entrance_lat": 40.710495,
-     "entrance_lon": -73.793022,
+     "entrance_lat": 40.8131072,
+     "entrance_lon": -73.9296843,
      "distance_m": null,
      "ada_accessible": false,
-     "elevation_m": 23.93,
-     "hand_m": 7.23,
+     "elevation_m": 5.67,
+     "hand_m": 2.77,
      "inside_sandy_2012": false,
      "dep_extreme_2080_class": 0,
      "dep_extreme_2080_label": "outside",
@@ -1900,17 +1972,17 @@
      "dep_moderate_2050_label": "outside"
     },
     {
-     "station_id": "255",
-     "station_name": "169 St",
-     "daytime_routes": "F",
-     "borough": "Q",
+     "station_id": "390",
+     "station_name": "149 St-Grand Concourse",
+     "daytime_routes": "2 4 5",
+     "borough": "Bx",
      "entrance_type": "Stair",
-     "entrance_lat": 40.7105686,
-     "entrance_lon": -73.792847,
+     "entrance_lat": 40.8182648,
+     "entrance_lon": -73.927259,
      "distance_m": null,
      "ada_accessible": false,
-     "elevation_m": 23.7,
-     "hand_m": 7.0,
+     "elevation_m": 12.7,
+     "hand_m": 7.62,
      "inside_sandy_2012": false,
      "dep_extreme_2080_class": 0,
      "dep_extreme_2080_label": "outside",
@@ -1918,71 +1990,17 @@
      "dep_moderate_2050_label": "outside"
     },
     {
-     "station_id": "278",
-     "station_name": "Jamaica Center-Parsons/Archer",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
+     "station_id": "390",
+     "station_name": "149 St-Grand Concourse",
+     "daytime_routes": "2 4 5",
+     "borough": "Bx",
      "entrance_type": "Stair",
-     "entrance_lat": 40.7016719,
-     "entrance_lon": -73.8024947,
+     "entrance_lat": 40.818405,
+     "entrance_lon": -73.927101,
      "distance_m": null,
      "ada_accessible": false,
-     "elevation_m": 19.29,
-     "hand_m": 4.44,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 2,
-     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "278",
-     "station_name": "Jamaica Center-Parsons/Archer",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.702234,
-     "entrance_lon": -73.801859,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 16.2,
-     "hand_m": 1.35,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 2,
-     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "278",
-     "station_name": "Jamaica Center-Parsons/Archer",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
-     "entrance_type": "Stair/Escalator",
-     "entrance_lat": 40.701874,
-     "entrance_lon": -73.801747,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 18.45,
-     "hand_m": 9.69,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 1,
-     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "278",
-     "station_name": "Jamaica Center-Parsons/Archer",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
-     "entrance_type": "Stair/Escalator",
-     "entrance_lat": 40.7023237,
-     "entrance_lon": -73.799995,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 17.97,
-     "hand_m": 9.2,
+     "elevation_m": 13.07,
+     "hand_m": 7.99,
      "inside_sandy_2012": false,
      "dep_extreme_2080_class": 0,
      "dep_extreme_2080_label": "outside",
@@ -1990,17 +2008,17 @@
      "dep_moderate_2050_label": "outside"
     },
     {
-     "station_id": "278",
-     "station_name": "Jamaica Center-Parsons/Archer",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
-     "entrance_type": "Escalator",
-     "entrance_lat": 40.702821,
-     "entrance_lon": -73.799843,
+     "station_id": "377",
+     "station_name": "3 Av-138 St",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.810712,
+     "entrance_lon": -73.92705,
      "distance_m": null,
      "ada_accessible": false,
-     "elevation_m": 18.06,
-     "hand_m": 3.2,
+     "elevation_m": 7.11,
+     "hand_m": 2.14,
      "inside_sandy_2012": false,
      "dep_extreme_2080_class": 0,
      "dep_extreme_2080_label": "outside",
@@ -2008,17 +2026,143 @@
      "dep_moderate_2050_label": "outside"
     },
     {
-     "station_id": "278",
-     "station_name": "Jamaica Center-Parsons/Archer",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
+     "station_id": "377",
+     "station_name": "3 Av-138 St",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.810638,
+     "entrance_lon": -73.926883,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 7.11,
+     "hand_m": 2.14,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "377",
+     "station_name": "3 Av-138 St",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.810837,
+     "entrance_lon": -73.9266204,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 7.03,
+     "hand_m": 2.06,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "377",
+     "station_name": "3 Av-138 St",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.810102,
+     "entrance_lon": -73.925641,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 8.95,
+     "hand_m": 3.98,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "377",
+     "station_name": "3 Av-138 St",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.81035,
+     "entrance_lon": -73.9254715,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 9.08,
+     "hand_m": 4.11,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "377",
+     "station_name": "3 Av-138 St",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.810019,
+     "entrance_lon": -73.925438,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 9.25,
+     "hand_m": 4.28,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "377",
+     "station_name": "3 Av-138 St",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8102718,
+     "entrance_lon": -73.9252869,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 9.08,
+     "hand_m": 4.11,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "434",
+     "station_name": "3 Av-149 St",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.816033,
+     "entrance_lon": -73.918064,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 8.5,
+     "hand_m": 0.12,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "434",
+     "station_name": "3 Av-149 St",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
      "entrance_type": "Elevator",
-     "entrance_lat": 40.7023632,
-     "entrance_lon": -73.7998129,
+     "entrance_lat": 40.815971,
+     "entrance_lon": -73.917983,
      "distance_m": null,
      "ada_accessible": true,
-     "elevation_m": 17.95,
-     "hand_m": 3.1,
+     "elevation_m": 8.5,
+     "hand_m": 0.12,
      "inside_sandy_2012": false,
      "dep_extreme_2080_class": 0,
      "dep_extreme_2080_label": "outside",
@@ -2026,17 +2170,17 @@
      "dep_moderate_2050_label": "outside"
     },
     {
-     "station_id": "278",
-     "station_name": "Jamaica Center-Parsons/Archer",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
+     "station_id": "434",
+     "station_name": "3 Av-149 St",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
      "entrance_type": "Stair",
-     "entrance_lat": 40.702674,
-     "entrance_lon": -73.799786,
+     "entrance_lat": 40.8162647,
+     "entrance_lon": -73.9179365,
      "distance_m": null,
      "ada_accessible": false,
-     "elevation_m": 18.06,
-     "hand_m": 3.2,
+     "elevation_m": 8.49,
+     "hand_m": 0.11,
      "inside_sandy_2012": false,
      "dep_extreme_2080_class": 0,
      "dep_extreme_2080_label": "outside",
@@ -2044,89 +2188,17 @@
      "dep_moderate_2050_label": "outside"
     },
     {
-     "station_id": "254",
-     "station_name": "Jamaica-179 St",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7122699,
-     "entrance_lon": -73.7849066,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 20.47,
-     "hand_m": 4.6,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 1,
-     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "254",
-     "station_name": "Jamaica-179 St",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7122714,
-     "entrance_lon": -73.7844702,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 20.47,
-     "hand_m": 4.6,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 0,
-     "dep_extreme_2080_label": "outside",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "254",
-     "station_name": "Jamaica-179 St",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7123248,
-     "entrance_lon": -73.7842839,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 20.28,
-     "hand_m": 4.41,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 0,
-     "dep_extreme_2080_label": "outside",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "254",
-     "station_name": "Jamaica-179 St",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7125485,
-     "entrance_lon": -73.783397,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 20.13,
-     "hand_m": 4.26,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 1,
-     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "254",
-     "station_name": "Jamaica-179 St",
-     "daytime_routes": "F",
-     "borough": "Q",
+     "station_id": "434",
+     "station_name": "3 Av-149 St",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
      "entrance_type": "Elevator",
-     "entrance_lat": 40.7126116,
-     "entrance_lon": -73.7833764,
+     "entrance_lat": 40.8162729,
+     "entrance_lon": -73.9177931,
      "distance_m": null,
      "ada_accessible": true,
-     "elevation_m": 20.13,
-     "hand_m": 4.26,
+     "elevation_m": 8.49,
+     "hand_m": 0.11,
      "inside_sandy_2012": false,
      "dep_extreme_2080_class": 0,
      "dep_extreme_2080_label": "outside",
@@ -2134,53 +2206,17 @@
      "dep_moderate_2050_label": "outside"
     },
     {
-     "station_id": "254",
-     "station_name": "Jamaica-179 St",
-     "daytime_routes": "F",
-     "borough": "Q",
+     "station_id": "434",
+     "station_name": "3 Av-149 St",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
      "entrance_type": "Stair",
-     "entrance_lat": 40.71266,
-     "entrance_lon": -73.7832674,
+     "entrance_lat": 40.8158576,
+     "entrance_lon": -73.9177644,
      "distance_m": null,
      "ada_accessible": false,
-     "elevation_m": 19.76,
-     "hand_m": 4.89,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 1,
-     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "254",
-     "station_name": "Jamaica-179 St",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7127179,
-     "entrance_lon": -73.7830294,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 19.65,
-     "hand_m": 4.79,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 1,
-     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "254",
-     "station_name": "Jamaica-179 St",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7127313,
-     "entrance_lon": -73.7826424,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 19.49,
-     "hand_m": 4.62,
+     "elevation_m": 8.37,
+     "hand_m": 0.0,
      "inside_sandy_2012": false,
      "dep_extreme_2080_class": 0,
      "dep_extreme_2080_label": "outside",
@@ -2188,17 +2224,287 @@
      "dep_moderate_2050_label": "outside"
     },
     {
-     "station_id": "254",
-     "station_name": "Jamaica-179 St",
-     "daytime_routes": "F",
-     "borough": "Q",
+     "station_id": "434",
+     "station_name": "3 Av-149 St",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
      "entrance_type": "Stair",
-     "entrance_lat": 40.7128667,
-     "entrance_lon": -73.7823966,
+     "entrance_lat": 40.816315,
+     "entrance_lon": -73.917543,
      "distance_m": null,
      "ada_accessible": false,
-     "elevation_m": 19.49,
-     "hand_m": 4.62,
+     "elevation_m": 8.54,
+     "hand_m": 0.16,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "434",
+     "station_name": "3 Av-149 St",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.815881,
+     "entrance_lon": -73.917522,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 8.37,
+     "hand_m": 0.0,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "434",
+     "station_name": "3 Av-149 St",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8162711,
+     "entrance_lon": -73.917456,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 11.01,
+     "hand_m": 2.63,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "376",
+     "station_name": "Brook Av",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.807467,
+     "entrance_lon": -73.919448,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 8.37,
+     "hand_m": 0.11,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "376",
+     "station_name": "Brook Av",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8077634,
+     "entrance_lon": -73.9193394,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 8.37,
+     "hand_m": 0.0,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "376",
+     "station_name": "Brook Av",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8073939,
+     "entrance_lon": -73.9192355,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 8.38,
+     "hand_m": 0.01,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "376",
+     "station_name": "Brook Av",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.807591,
+     "entrance_lon": -73.9189252,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 8.77,
+     "hand_m": 0.39,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "375",
+     "station_name": "Cypress Av",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8052005,
+     "entrance_lon": -73.9139656,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 15.7,
+     "hand_m": 15.7,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "375",
+     "station_name": "Cypress Av",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8050474,
+     "entrance_lon": -73.9134955,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 13.73,
+     "hand_m": 13.73,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "375",
+     "station_name": "Cypress Av",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8052424,
+     "entrance_lon": -73.9133662,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 14.41,
+     "hand_m": 14.41,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "375",
+     "station_name": "Cypress Av",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8051614,
+     "entrance_lon": -73.9131761,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 14.94,
+     "hand_m": 14.94,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "374",
+     "station_name": "E 143 St-St Mary's St",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8080597,
+     "entrance_lon": -73.9080761,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 6.58,
+     "hand_m": 6.58,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "374",
+     "station_name": "E 143 St-St Mary's St",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8080186,
+     "entrance_lon": -73.9077431,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 6.58,
+     "hand_m": 6.58,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "374",
+     "station_name": "E 143 St-St Mary's St",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8083698,
+     "entrance_lon": -73.9076202,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 7.06,
+     "hand_m": 7.06,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "374",
+     "station_name": "E 143 St-St Mary's St",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8083258,
+     "entrance_lon": -73.9080056,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 7.19,
+     "hand_m": 7.19,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "373",
+     "station_name": "E 149 St",
+     "daytime_routes": "6",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8119099,
+     "entrance_lon": -73.9041573,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 10.84,
+     "hand_m": 10.84,
      "inside_sandy_2012": false,
      "dep_extreme_2080_class": 2,
      "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
@@ -2206,287 +2512,143 @@
      "dep_moderate_2050_label": "outside"
     },
     {
-     "station_id": "256",
-     "station_name": "Parsons Blvd",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.707063,
-     "entrance_lon": -73.80462,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 18.16,
-     "hand_m": 3.3,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 0,
-     "dep_extreme_2080_label": "outside",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "256",
-     "station_name": "Parsons Blvd",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7073746,
-     "entrance_lon": -73.804498,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 19.64,
-     "hand_m": 4.78,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 0,
-     "dep_extreme_2080_label": "outside",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "256",
-     "station_name": "Parsons Blvd",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7070783,
-     "entrance_lon": -73.8043305,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 18.55,
-     "hand_m": 3.7,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 1,
-     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
-     "dep_moderate_2050_class": 1,
-     "dep_moderate_2050_label": "nuisance flooding (4 in to under 1 ft)"
-    },
-    {
-     "station_id": "256",
-     "station_name": "Parsons Blvd",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.707873,
-     "entrance_lon": -73.802999,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 20.75,
-     "hand_m": 5.9,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 1,
-     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "256",
-     "station_name": "Parsons Blvd",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7074593,
-     "entrance_lon": -73.8027967,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 19.72,
-     "hand_m": 4.86,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 0,
-     "dep_extreme_2080_label": "outside",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "256",
-     "station_name": "Parsons Blvd",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7075757,
-     "entrance_lon": -73.8026083,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 20.23,
-     "hand_m": 5.37,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 1,
-     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "257",
-     "station_name": "Sutphin Blvd",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7053554,
-     "entrance_lon": -73.8118592,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 20.28,
-     "hand_m": 6.12,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 1,
-     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "257",
-     "station_name": "Sutphin Blvd",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7055478,
-     "entrance_lon": -73.8097128,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 20.47,
-     "hand_m": 5.61,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 1,
-     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "257",
-     "station_name": "Sutphin Blvd",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7059521,
-     "entrance_lon": -73.8094924,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 20.42,
-     "hand_m": 5.56,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 0,
-     "dep_extreme_2080_label": "outside",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "257",
-     "station_name": "Sutphin Blvd",
-     "daytime_routes": "F",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7056003,
-     "entrance_lon": -73.8094861,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 20.02,
-     "hand_m": 5.17,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 0,
-     "dep_extreme_2080_label": "outside",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "279",
-     "station_name": "Sutphin Blvd-Archer Av-JFK Airport",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7004005,
-     "entrance_lon": -73.8079881,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 14.86,
-     "hand_m": 4.89,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 2,
-     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "279",
-     "station_name": "Sutphin Blvd-Archer Av-JFK Airport",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.70081,
-     "entrance_lon": -73.807923,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 14.86,
-     "hand_m": 4.89,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 2,
-     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "279",
-     "station_name": "Sutphin Blvd-Archer Av-JFK Airport",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7008883,
-     "entrance_lon": -73.8076763,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 14.86,
-     "hand_m": 4.89,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 1,
-     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "279",
-     "station_name": "Sutphin Blvd-Archer Av-JFK Airport",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
-     "entrance_type": "Stair",
-     "entrance_lat": 40.7005696,
-     "entrance_lon": -73.807384,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 14.86,
-     "hand_m": 4.89,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 2,
-     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "279",
-     "station_name": "Sutphin Blvd-Archer Av-JFK Airport",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
-     "entrance_type": "Escalator",
-     "entrance_lat": 40.7001566,
-     "entrance_lon": -73.807713,
-     "distance_m": null,
-     "ada_accessible": false,
-     "elevation_m": 14.86,
-     "hand_m": 4.89,
-     "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 0,
-     "dep_extreme_2080_label": "outside",
-     "dep_moderate_2050_class": 0,
-     "dep_moderate_2050_label": "outside"
-    },
-    {
-     "station_id": "279",
-     "station_name": "Sutphin Blvd-Archer Av-JFK Airport",
-     "daytime_routes": "E J Z",
-     "borough": "Q",
+     "station_id": "373",
+     "station_name": "E 149 St",
+     "daytime_routes": "6",
+     "borough": "Bx",
      "entrance_type": "Elevator",
-     "entrance_lat": 40.7001701,
-     "entrance_lon": -73.8078539,
+     "entrance_lat": 40.8118665,
+     "entrance_lon": -73.904051,
      "distance_m": null,
      "ada_accessible": true,
-     "elevation_m": 14.86,
-     "hand_m": 4.89,
+     "elevation_m": 10.84,
+     "hand_m": 10.84,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 2,
+     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "433",
+     "station_name": "Jackson Av",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8162481,
+     "entrance_lon": -73.9079543,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 14.42,
+     "hand_m": 14.42,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 2,
+     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "433",
+     "station_name": "Jackson Av",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.816589,
+     "entrance_lon": -73.907893,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 14.64,
+     "hand_m": 14.64,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 2,
+     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "433",
+     "station_name": "Jackson Av",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.816349,
+     "entrance_lon": -73.907836,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 14.5,
+     "hand_m": 14.5,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 2,
+     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "433",
+     "station_name": "Jackson Av",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.816873,
+     "entrance_lon": -73.907379,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 14.69,
+     "hand_m": 14.69,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 2,
+     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "432",
+     "station_name": "Prospect Av",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8196139,
+     "entrance_lon": -73.9019949,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 22.28,
+     "hand_m": 22.28,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "432",
+     "station_name": "Prospect Av",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.8193787,
+     "entrance_lon": -73.9019781,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 21.79,
+     "hand_m": 21.79,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "station_id": "432",
+     "station_name": "Prospect Av",
+     "daytime_routes": "2 5",
+     "borough": "Bx",
+     "entrance_type": "Stair",
+     "entrance_lat": 40.819887,
+     "entrance_lon": -73.901666,
+     "distance_m": null,
+     "ada_accessible": false,
+     "elevation_m": 22.28,
+     "hand_m": 11.77,
      "inside_sandy_2012": false,
      "dep_extreme_2080_class": 0,
      "dep_extreme_2080_label": "outside",
@@ -2502,20 +2664,20 @@
    "n_inside_sandy_2012": 0,
    "n_in_dep_extreme_2080": 1,
    "n_near_sandy_edge": 0,
-   "narrative": "1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: CONLON LIHFE TOWER",
+   "narrative": "1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: MOORE",
    "developments": [
     {
-     "development": "CONLON LIHFE TOWER",
-     "tds_num": "232",
-     "borough": "Queens",
-     "centroid_lat": 40.70625,
-     "centroid_lon": -73.78844,
+     "development": "MOORE",
+     "tds_num": "129",
+     "borough": "Bronx",
+     "centroid_lat": 40.81287,
+     "centroid_lon": -73.90999,
      "distance_m": null,
-     "rep_elevation_m": 17.45,
+     "rep_elevation_m": 11.25,
      "rep_hand_m": null,
      "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 2,
-     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
+     "dep_extreme_2080_class": 1,
+     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
      "dep_moderate_2050_class": 0,
      "dep_moderate_2050_label": "outside",
      "dep_moderate_current_class": 0,
@@ -2524,51 +2686,322 @@
    ],
    "citation": "Pre-computed from NYC Open Data NYCHA Developments (phvi-damg) joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. See data/registers/nycha.json."
   },
+  "dob_permits_nta": {
+   "since": "2025-04-09",
+   "n_total": 21,
+   "n_in_sandy": 0,
+   "n_in_dep_any": 1,
+   "n_in_dep_severe": 0,
+   "n_any_flood": 1,
+   "by_job_type": {
+    "new building": 13,
+    "major alteration (use/occupancy)": 8
+   },
+   "by_permit_status": {
+    "ISSUED": 21
+   },
+   "flagged_top": [
+    {
+     "job_id": "220743845",
+     "job_type": "A1",
+     "job_type_label": "major alteration (use/occupancy)",
+     "permit_status": "ISSUED",
+     "issuance_date": "03/20/2026",
+     "expiration_date": "03/20/2027",
+     "address": "518 East 147 St",
+     "borough": "Bronx",
+     "bbl": "2-02272-0110",
+     "lat": 40.813345,
+     "lon": -73.914931,
+     "owner_business": "AVI BARANES",
+     "permittee_business": "N/A",
+     "nta_name": "Mott Haven-Port Morris",
+     "in_sandy": false,
+     "dep_max_class": 1,
+     "dep_scenarios": [
+      "dep_extreme_2080"
+     ],
+     "any_flood_layer_hit": true
+    }
+   ],
+   "all_pins": [
+    {
+     "lat": 40.810414,
+     "lon": -73.904671,
+     "address": "869 E 147 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.817091,
+     "lon": -73.921646,
+     "address": "290 East 149Th Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.817777,
+     "lon": -73.921443,
+     "address": "290 East 150Th Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.814428,
+     "lon": -73.913401,
+     "address": "567 East 149Th Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.815512,
+     "lon": -73.916344,
+     "address": "428 East 149 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.817793,
+     "lon": -73.913324,
+     "address": "671 Brook Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.803786,
+     "lon": -73.912393,
+     "address": "740 East 137Th Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.82307,
+     "lon": -73.914947,
+     "address": "382 East 159Th Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.819119,
+     "lon": -73.917362,
+     "address": "379 East  153 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.8191,
+     "lon": -73.917293,
+     "address": "381 East  153 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.820013,
+     "lon": -73.912017,
+     "address": "740 Brook Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.809267,
+     "lon": -73.923244,
+     "address": "389 East 138 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.817083,
+     "lon": -73.913741,
+     "address": "625 Brook Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.819403,
+     "lon": -73.915692,
+     "address": "411 East 154 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.80642,
+     "lon": -73.926455,
+     "address": "63 Bruckner Blvd",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.816532,
+     "lon": -73.911747,
+     "address": "639 St. Anns Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.8071,
+     "lon": -73.926021,
+     "address": "358 East 134 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.806893,
+     "lon": -73.923587,
+     "address": "419 East 135 St",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.822396,
+     "lon": -73.916801,
+     "address": "784 Courtlandt Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.81243,
+     "lon": -73.924577,
+     "address": "2630 3Rd Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.813345,
+     "lon": -73.914931,
+     "address": "518 East 147 St",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 1,
+     "any_flood": true
+    }
+   ],
+   "all_count": 21,
+   "narrative": "21 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 1 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise).",
+   "headline_value": "21 active permits"
+  },
   "doe_schools_nta": {
    "available": true,
-   "n_schools": 1,
-   "n_inside_sandy_2012": 0,
+   "n_schools": 2,
+   "n_inside_sandy_2012": 1,
    "n_in_dep_extreme_2080": 1,
    "n_near_sandy_edge": 0,
-   "narrative": "1 flood-exposed NYC DOE school in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: I.S. 059 Springfield Gardens",
+   "narrative": "2 flood-exposed NYC DOE schools in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: Success Academy Charter School - Bronx 1. Inside the DEP extreme scenario: Legacy College Preparatory",
    "schools": [
     {
-     "loc_code": "Q059",
-     "loc_name": "I.S. 059 Springfield Gardens",
-     "address": "132-55 RIDGEDALE STREET",
-     "borough": "Queens",
-     "bin": "4274083",
-     "bbl": "4127230076",
+     "loc_code": "X585",
+     "loc_name": "Legacy College Preparatory",
+     "address": "416 WILLIS AVENUE",
+     "borough": "Bronx",
+     "bin": "2098220",
+     "bbl": "0",
      "managed_by": "DOE-managed",
-     "school_lat": 40.68188,
-     "school_lon": -73.75277,
+     "school_lat": 40.81307,
+     "school_lon": -73.91998,
      "distance_m": null,
-     "elevation_m": 7.36,
+     "elevation_m": 8.37,
      "hand_m": null,
      "inside_sandy_2012": false,
-     "dep_extreme_2080_class": 2,
-     "dep_extreme_2080_label": "deep and contiguous flooding (1 ft or more)",
-     "dep_moderate_2050_class": 2,
-     "dep_moderate_2050_label": "deep and contiguous flooding (1 ft or more)"
+     "dep_extreme_2080_class": 1,
+     "dep_extreme_2080_label": "nuisance flooding (4 in to under 1 ft)",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    },
+    {
+     "loc_code": "X493",
+     "loc_name": "Success Academy Charter School - Bronx 1",
+     "address": "339 MORRIS AVENUE",
+     "borough": "Bronx",
+     "bin": "2000957",
+     "bbl": "2023330070",
+     "managed_by": "DOE-managed",
+     "school_lat": 40.81368,
+     "school_lon": -73.926,
+     "distance_m": null,
+     "elevation_m": 6.14,
+     "hand_m": null,
+     "inside_sandy_2012": true,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
     }
    ],
    "citation": "Pre-computed from NYC DOE Locations Points joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. See data/registers/schools.json."
   },
   "doh_hospitals_nta": {
    "available": true,
-   "n_hospitals": 0,
+   "n_hospitals": 1,
    "n_inside_sandy_2012": 0,
    "n_in_dep_extreme_2080": 0,
    "n_near_sandy_edge": 0,
-   "narrative": "0 hospitals in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
-   "hospitals": [],
+   "narrative": "1 hospital in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+   "hospitals": [
+    {
+     "fac_id": "1172",
+     "facility_name": "Lincoln Medical & Mental Health Center",
+     "address": "234 East 149th Street, Bronx",
+     "borough": "BRONX",
+     "operator_name": "New York City Health and Hospitals Corporation",
+     "ownership_type": "Municipality",
+     "hospital_lat": 40.81766,
+     "hospital_lon": -73.92421,
+     "distance_m": null,
+     "elevation_m": 6.56,
+     "hand_m": 1.49,
+     "inside_sandy_2012": false,
+     "dep_extreme_2080_class": 0,
+     "dep_extreme_2080_label": "outside",
+     "dep_moderate_2050_class": 0,
+     "dep_moderate_2050_label": "outside"
+    }
+   ],
    "citation": "NYS DOH Health Facility Certification (vn5v-hh5r) + NYC Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM"
   },
   "nws_alerts_nta": {
    "n_active": 0,
    "alerts": [],
    "narrative": "No active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:46 UTC.",
-   "retrieved_at": "2026-10-01T06:46:36Z",
+   "retrieved_at": "2026-10-01T06:46:07Z",
    "error": null
   },
   "npcc4_slr_nta": {
@@ -2617,18 +3050,18 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790837195.879817,
+    "started_at": 1790837167.0238268,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
-     "nta_code": "QN12",
-     "nta_name": "QN12 Jamaica-St. Albans-Hollis (CD 12 Approximation)",
-     "borough": "Queens",
+     "nta_code": "BX01",
+     "nta_name": "BX01 Melrose-Mott Haven-Port Morris (CD 1 Approximation)",
+     "borough": "Bronx",
      "bbox": [
-      -73.81647531193624,
-      40.66645115660537,
-      -73.74359285933764,
-      40.72106344375331
+      -73.9328741193582,
+      40.796623770558085,
+      -73.90129277472668,
+      40.824387087372905
      ],
      "n_matches": 1
     }
@@ -2636,7 +3069,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790837195.882634,
+    "started_at": 1790837167.0266,
     "elapsed_s": 0.0001,
     "err": null,
     "result": {
@@ -2646,99 +3079,89 @@
     }
    },
    {
-    "step": "dob_permits_nta",
-    "ok": true,
-    "started_at": 1790837195.882984,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1790837195.8839948,
-    "elapsed_s": 0.0,
+    "started_at": 1790837167.028426,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "sandy_nta",
     "ok": true,
-    "started_at": 1790837195.884904,
-    "elapsed_s": 0.01,
+    "started_at": 1790837167.029153,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_extreme_2080_nta",
     "ok": true,
-    "started_at": 1790837195.887712,
-    "elapsed_s": 0.32,
+    "started_at": 1790837167.0381079,
+    "elapsed_s": 0.25,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_2050_nta",
     "ok": true,
-    "started_at": 1790837195.889733,
-    "elapsed_s": 0.09,
+    "started_at": 1790837167.039907,
+    "elapsed_s": 0.07,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_current_nta",
     "ok": true,
-    "started_at": 1790837195.892606,
-    "elapsed_s": 0.07,
+    "started_at": 1790837167.042563,
+    "elapsed_s": 0.06,
     "err": null,
     "result": {}
    },
    {
     "step": "microtopo_nta",
     "ok": true,
-    "started_at": 1790837195.896702,
-    "elapsed_s": 0.06,
+    "started_at": 1790837167.0473511,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {}
    },
    {
     "step": "nyc311_nta",
     "ok": true,
-    "started_at": 1790837195.90003,
-    "elapsed_s": 0.14,
+    "started_at": 1790837167.048039,
+    "elapsed_s": 0.16,
     "err": null,
     "result": {}
    },
    {
     "step": "dcp_floodplain_nta",
     "ok": true,
-    "started_at": 1790837195.8994079,
-    "elapsed_s": 0.14,
+    "started_at": 1790837167.048565,
+    "elapsed_s": 0.16,
     "err": null,
     "result": {
-     "n_buildings": 5,
-     "n_residents_2010": 0
+     "n_buildings": 327,
+     "n_residents_2010": 580
     }
    },
    {
     "step": "mta_entrances_nta",
     "ok": true,
-    "started_at": 1790837195.900317,
-    "elapsed_s": 0.18,
+    "started_at": 1790837167.0516942,
+    "elapsed_s": 0.23,
     "err": null,
     "result": {
-     "n_entrances": 36,
+     "n_entrances": 41,
      "n_inside_sandy_2012": 0,
-     "n_in_dep_extreme_2080": 17
+     "n_in_dep_extreme_2080": 6
     }
    },
    {
     "step": "nycha_developments_nta",
     "ok": true,
-    "started_at": 1790837195.901688,
-    "elapsed_s": 0.01,
+    "started_at": 1790837167.053969,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "n_developments": 1,
@@ -2747,25 +3170,33 @@
     }
    },
    {
+    "step": "dob_permits_nta",
+    "ok": true,
+    "started_at": 1790837167.0589309,
+    "elapsed_s": 0.18,
+    "err": null,
+    "result": {}
+   },
+   {
     "step": "doe_schools_nta",
     "ok": true,
-    "started_at": 1790837195.9053152,
-    "elapsed_s": 0.01,
+    "started_at": 1790837167.064634,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
-     "n_schools": 1,
-     "n_inside_sandy_2012": 0,
+     "n_schools": 2,
+     "n_inside_sandy_2012": 1,
      "n_in_dep_extreme_2080": 1
     }
    },
    {
     "step": "doh_hospitals_nta",
     "ok": true,
-    "started_at": 1790837195.906924,
-    "elapsed_s": 0.01,
+    "started_at": 1790837167.065557,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
-     "n_hospitals": 0,
+     "n_hospitals": 1,
      "n_inside_sandy_2012": 0,
      "n_in_dep_extreme_2080": 0
     }
@@ -2773,8 +3204,8 @@
    {
     "step": "nws_alerts_nta",
     "ok": true,
-    "started_at": 1790837195.90594,
-    "elapsed_s": 0.22,
+    "started_at": 1790837167.0705369,
+    "elapsed_s": 0.31,
     "err": null,
     "result": {
      "n_active": 0
@@ -2783,7 +3214,7 @@
    {
     "step": "npcc4_slr_nta",
     "ok": true,
-    "started_at": 1790837195.9071271,
+    "started_at": 1790837167.0711749,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2791,7 +3222,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790837196.212553,
+    "started_at": 1790837167.37728,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2800,23 +3231,35 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790837196.2126248,
+    "started_at": 1790837167.377384,
     "ok": true,
     "result": {
-     "n_chars": 897,
-     "n_citations": 14,
+     "n_chars": 4547,
+     "n_citations": 15,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0326
+    "elapsed_s": 0.0541
    }
   ],
   "models": [],
   "compliance": {
-   "passed": true,
-   "n_passed": 13,
+   "passed": false,
+   "n_passed": 12,
    "n_total": 13,
-   "failed": []
+   "failed": [
+    {
+     "name": "projection_has_horizon",
+     "rule": "TCFD 3.2",
+     "description": "Projection sentences must declare a time horizon (short/medium/long-term or an explicit year/duration).",
+     "reason": "",
+     "evidence": [
+      "Inside the DEP extreme scenario (by station): E 149 St (6), Jackson Av (2 5) [mta_entrance_exposure].",
+      "Inside the DEP extreme scenario: MOORE [nycha_development_exposure].",
+      "Inside the DEP extreme scenario: Legacy College Preparatory [doe_school_exposure]."
+     ]
+    }
+   ]
   },
   "emissions": {
    "n_calls": 0,

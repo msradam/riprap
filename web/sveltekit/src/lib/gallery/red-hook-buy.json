@@ -3,9 +3,9 @@
  "neighborhood": "Red Hook, Brooklyn",
  "address": "80 Pioneer Street, Brooklyn, NY",
  "question": "Should I buy the house at 80 Pioneer Street, Brooklyn?",
- "generated_at": "2026-09-30T20:58Z",
- "riprap_commit": "09d6557",
- "mode": "llm",
+ "generated_at": "2026-10-01T06:46Z",
+ "riprap_commit": "f9c47b9",
+ "mode": "no_llm",
  "model": null,
  "quantization": null,
  "deployment": {
@@ -26,7 +26,7 @@
     "id": "touchstone",
     "name": "Touchstone",
     "tagline": "The Live Observer",
-    "description": "Watches the current state of the city's flood signals and EO.",
+    "description": "Reads the city's flood sensors, 311 requests, gauges and weather observations.",
     "order": 2
    },
    {
@@ -40,7 +40,7 @@
     "id": "lodestone",
     "name": "Lodestone",
     "tagline": "The Projector",
-    "description": "Projects what's coming \u2014 alerts, surge, and recurrence forecasts.",
+    "description": "Quotes what is published about what is coming, alerts, water-level forecasts and sea-level projections.",
     "order": 4
    },
    {
@@ -101,14 +101,14 @@
      "icon": "\ud83c\udf0a"
     },
     "narration": {
-     "short": "The 2012 Hurricane Sandy inundation extent (NYC OEM) at this address.",
-     "template": "This address {inside_phrasing} the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM)."
+     "short": "The 2012 Hurricane Sandy inundation extent (NYC Open Data) at this address.",
+     "template": "This address {inside_phrasing} the empirical 2012 Hurricane Sandy inundation footprint (NYC Open Data){edge_note}."
     },
     "provenance": {
      "source_name": "NYC Open Data, Sandy Inundation Zone",
-     "source_url": "https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/uyj8-7rv5",
+     "source_url": "https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/5xsi-dfpx",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC Sandy Inundation Zone (NYC OpenData uyj8-7rv5, empirical 2012 extent)",
+     "citation": "NYC Sandy Inundation Zone (NYC Open Data 5xsi-dfpx, empirical 2012 extent)",
      "doc_id": "sandy_inundation",
      "date_modified": "2015-11-09",
      "retrieved_at": "2026-07-11"
@@ -139,9 +139,9 @@
     },
     "provenance": {
      "source_name": "NYC Open Data, Sandy Inundation Zone",
-     "source_url": "https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/uyj8-7rv5",
+     "source_url": "https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/5xsi-dfpx",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC Sandy Inundation Zone (uyj8-7rv5), share of the neighborhood inside the 2012 extent",
+     "citation": "NYC Sandy Inundation Zone (NYC Open Data 5xsi-dfpx), share of the neighborhood inside the 2012 extent",
      "doc_id": "sandy_nta",
      "date_modified": "2015-11-09",
      "retrieved_at": "2026-07-11"
@@ -449,72 +449,6 @@
     }
    },
    {
-    "id": "prithvi_water",
-    "type": "baked",
-    "title": "New surface water after Hurricane Ida, Prithvi-EO (experimental)",
-    "stone": "cornerstone",
-    "tier": "modeled",
-    "maturity": "experimental",
-    "scope": "point",
-    "display": {
-     "order": 40,
-     "kind": "text",
-     "variant": "raster",
-     "map_layer": true,
-     "icon": "\ud83d\udef0\ufe0f"
-    },
-    "narration": {
-     "short": "New surface water after Hurricane Ida near this address, from the Prithvi-EO NYC model (experimental).",
-     "template": "{narrative}"
-    },
-    "provenance": {
-     "source_name": "msradam/Prithvi-EO-2.0-NYC-Pluvial on Copernicus Sentinel-2 L2A (Planetary Computer)",
-     "source_url": "https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial",
-     "license": "Apache-2.0 (model); Copernicus Sentinel data terms (imagery)",
-     "citation": "msradam/Prithvi-EO-2.0-NYC-Pluvial (Apache-2.0), run by scripts/run_eo_batch.py on Sentinel-2 L2A scenes from 2021-09-02 (tiles 18TWL, 18TWK, 18TXL), with same-tile scenes from 2021-08-13 masking permanent water. Contains modified Copernicus Sentinel data 2021, via Microsoft Planetary Computer. Experimental: no flood-detection score on held-out events; street and basement flooding is not visible at 10 to 20 m.",
-     "doc_id": "prithvi_water",
-     "date_modified": "2021-09-02",
-     "retrieved_at": "2026-09-28"
-    },
-    "fallback": {
-     "on_offline": "skip",
-     "message": "The Prithvi-EO satellite output for Ida was not available when this briefing ran."
-    }
-   },
-   {
-    "id": "prithvi_water_nta",
-    "type": "baked",
-    "title": "New surface water after Hurricane Ida in the area, Prithvi-EO (experimental)",
-    "stone": "cornerstone",
-    "tier": "modeled",
-    "maturity": "experimental",
-    "scope": "polygon",
-    "display": {
-     "order": 45,
-     "kind": "text",
-     "variant": null,
-     "map_layer": false,
-     "icon": "\ud83d\udef0\ufe0f"
-    },
-    "narration": {
-     "short": "New surface water after Hurricane Ida in this area, from the Prithvi-EO NYC model (experimental).",
-     "template": "{narrative}"
-    },
-    "provenance": {
-     "source_name": "msradam/Prithvi-EO-2.0-NYC-Pluvial on Copernicus Sentinel-2 L2A (Planetary Computer)",
-     "source_url": "https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial",
-     "license": "Apache-2.0 (model); Copernicus Sentinel data terms (imagery)",
-     "citation": "msradam/Prithvi-EO-2.0-NYC-Pluvial (Apache-2.0), run by scripts/run_eo_batch.py on Sentinel-2 L2A scenes from 2021-09-02, with same-tile scenes from 2021-08-13 masking permanent water; share of the area's observed pixels. Contains modified Copernicus Sentinel data 2021, via Microsoft Planetary Computer. Experimental: no flood-detection score on held-out events.",
-     "doc_id": "prithvi_water_nta",
-     "date_modified": "2021-09-02",
-     "retrieved_at": "2026-09-28"
-    },
-    "fallback": {
-     "on_offline": "skip",
-     "message": null
-    }
-   },
-   {
     "id": "microtopo",
     "type": "baked",
     "title": "LiDAR / DEM-derived micro-topography",
@@ -581,39 +515,6 @@
     }
    },
    {
-    "id": "policy_corpus",
-    "type": "baked",
-    "title": "NYC flood-policy corpus, agency reports + plans",
-    "stone": "cornerstone",
-    "tier": "proxy",
-    "maturity": "experimental",
-    "scope": "point",
-    "display": {
-     "order": 60,
-     "kind": "list",
-     "variant": "list",
-     "map_layer": false,
-     "icon": "\ud83d\udcc4"
-    },
-    "narration": {
-     "short": "NYC flood-policy passages and typed entities (agency, dollar amount, date, location) extracted from agency reports relevant to this address.",
-     "template": "Policy passages retrieved from the NYC flood-policy corpus for this place: {n_hits} (embedding retrieval; entity tags are experimental)."
-    },
-    "provenance": {
-     "source_name": "NYC flood-policy corpus (Comptroller, DEP, ConEd, MTA, NYCHA)",
-     "source_url": null,
-     "license": "Mixed, see per-document citations",
-     "citation": "NYC flood-policy corpus retrieved by Granite-embedding similarity search over Comptroller \"Rain to Resilience\" (2024), ConEd Storm Hardening (2022), DEP Wastewater Resiliency Plan (2013), MTA Resilience Plan (2025), NYCHA \"Lessons from Sandy\".",
-     "doc_id": "policy_corpus",
-     "date_modified": null,
-     "retrieved_at": "2026-07-11"
-    },
-    "fallback": {
-     "on_offline": "skip",
-     "message": "The policy document search was not available when this briefing ran."
-    }
-   },
-   {
     "id": "floodnet",
     "type": "live",
     "title": "FloodNet ultrasonic depth sensors (NYC)",
@@ -667,11 +568,11 @@
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
-     "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
+     "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC 311 Service Requests, flood-related complaints (5-year window).",
      "doc_id": "nyc311",
-     "date_modified": "2026-09-30T01:38:23+0000",
+     "date_modified": "2026-10-01T01:38:36+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -700,11 +601,11 @@
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
-     "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
+     "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
      "doc_id": "nyc311_nta",
-     "date_modified": "2026-09-30T01:38:23+0000",
+     "date_modified": "2026-10-01T01:38:36+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -812,6 +713,39 @@
     }
    },
    {
+    "id": "dcp_floodplain_nta",
+    "type": "live",
+    "title": "People and buildings in the floodplain (NYC Planning district profile)",
+    "stone": "keystone",
+    "tier": "empirical",
+    "maturity": "production",
+    "scope": "polygon",
+    "display": {
+     "order": 5,
+     "kind": "stat",
+     "variant": "scalars",
+     "map_layer": false,
+     "icon": null
+    },
+    "narration": {
+     "short": "Buildings, residential units and residents in the district's 1% annual chance floodplain, by NYC Planning's count.",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "NYC Department of City Planning, Community District Profiles (floodplain indicators)",
+     "source_url": "https://communityprofiles.planning.nyc.gov/",
+     "license": "NYC Open Data Terms of Use",
+     "citation": "NYC Department of City Planning, Community District Profiles, floodplain indicators (data version 2024-02). The 1% annual chance floodplain is from FEMA's 2015 preliminary and 2007 flood insurance rate maps; population is the 2010 census by census block.",
+     "doc_id": "dcp_floodplain_nta",
+     "date_modified": "2024-02-01",
+     "retrieved_at": "live"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "NYC Planning's district profile data did not respond when this briefing ran."
+    }
+   },
+   {
     "id": "mta_entrances",
     "type": "baked",
     "title": "MTA subway/rail entrances exposed nearby",
@@ -828,6 +762,39 @@
     },
     "narration": {
      "short": "MTA subway / rail entrances within range of this address and their flood exposure.",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "MTA, subway/rail entrances register",
+     "source_url": "https://data.ny.gov/Transportation/MTA-Subway-Entrances-and-Exits/i9wp-a4ja",
+     "license": "MTA Open Data Terms",
+     "citation": "MTA subway/rail entrances, cross-referenced with Sandy 2012 + DEP extreme 2080.",
+     "doc_id": "mta_entrance_exposure",
+     "date_modified": "2025-12-05",
+     "retrieved_at": "2026-05-07"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "The MTA subway entrances list was not available when this briefing ran."
+    }
+   },
+   {
+    "id": "mta_entrances_nta",
+    "type": "baked",
+    "title": "MTA subway/rail entrances exposed in the area",
+    "stone": "keystone",
+    "tier": "empirical",
+    "maturity": "production",
+    "scope": "polygon",
+    "display": {
+     "order": 10,
+     "kind": "list",
+     "variant": "register",
+     "map_layer": false,
+     "icon": "\ud83d\ude87"
+    },
+    "narration": {
+     "short": "MTA subway / rail entrances inside this area and their flood exposure.",
      "template": "{narrative}"
     },
     "provenance": {
@@ -878,6 +845,39 @@
     }
    },
    {
+    "id": "nycha_developments_nta",
+    "type": "baked",
+    "title": "NYCHA developments exposed in the area",
+    "stone": "keystone",
+    "tier": "empirical",
+    "maturity": "production",
+    "scope": "polygon",
+    "display": {
+     "order": 20,
+     "kind": "list",
+     "variant": "register",
+     "map_layer": false,
+     "icon": "\ud83c\udfe2"
+    },
+    "narration": {
+     "short": "Flood-exposed NYCHA developments inside this area, from a register that lists only exposed developments.",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "NYCHA developments register",
+     "source_url": "https://data.cityofnewyork.us/Housing-Development/NYCHA-Public-Housing-Developments/phvi-damg",
+     "license": "NYC Open Data Terms of Use",
+     "citation": "NYCHA public housing developments, cross-referenced with Sandy 2012 + DEP extreme 2080.",
+     "doc_id": "nycha_development_exposure",
+     "date_modified": null,
+     "retrieved_at": "2026-05-01"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "The NYCHA developments list was not available when this briefing ran."
+    }
+   },
+   {
     "id": "dob_permits_nta",
     "type": "baked",
     "title": "Active DOB construction permits inside the neighborhood",
@@ -902,7 +902,7 @@
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC DOB permits issued inside the neighborhood, cross-referenced with Sandy 2012 and DEP scenarios",
      "doc_id": "dob_permits_nta",
-     "date_modified": "2026-09-30T00:29:00+0000",
+     "date_modified": "2026-10-01T00:27:21+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -944,6 +944,39 @@
     }
    },
    {
+    "id": "doe_schools_nta",
+    "type": "baked",
+    "title": "NYC DOE schools exposed in the area",
+    "stone": "keystone",
+    "tier": "empirical",
+    "maturity": "production",
+    "scope": "polygon",
+    "display": {
+     "order": 30,
+     "kind": "list",
+     "variant": "register",
+     "map_layer": false,
+     "icon": "\ud83c\udfeb"
+    },
+    "narration": {
+     "short": "Flood-exposed NYC DOE schools inside this area, from a register that lists only exposed schools.",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "NYC DOE, schools register",
+     "source_url": "https://data.cityofnewyork.us/Education/2019-2020-School-Locations/wg9x-4ke6",
+     "license": "NYC Open Data Terms of Use",
+     "citation": "NYC DOE schools, cross-referenced with Sandy 2012 + DEP extreme 2080.",
+     "doc_id": "doe_school_exposure",
+     "date_modified": "2019-09-11",
+     "retrieved_at": "2026-05-01"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "The DOE schools list was not available when this briefing ran."
+    }
+   },
+   {
     "id": "doh_hospitals",
     "type": "baked",
     "title": "NYC DOH hospitals exposed nearby",
@@ -965,7 +998,40 @@
     "provenance": {
      "source_name": "NYS DOH hospitals register",
      "source_url": "https://health.data.ny.gov/Health/Health-Facility-General-Information/vn5v-hh5r",
-     "license": "NYC Open Data Terms of Use",
+     "license": "Health Data NY (New York State open data) terms of use",
+     "citation": "NYS DOH Health Facility General Information (vn5v-hh5r) hospitals in NYC, cross-referenced with Sandy 2012 + DEP extreme 2080.",
+     "doc_id": "doh_hospital_exposure",
+     "date_modified": null,
+     "retrieved_at": "2026-07-11"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "The DOH hospitals list was not available when this briefing ran."
+    }
+   },
+   {
+    "id": "doh_hospitals_nta",
+    "type": "baked",
+    "title": "NYC DOH hospitals exposed in the area",
+    "stone": "keystone",
+    "tier": "empirical",
+    "maturity": "production",
+    "scope": "polygon",
+    "display": {
+     "order": 40,
+     "kind": "list",
+     "variant": "register",
+     "map_layer": false,
+     "icon": "\ud83c\udfe5"
+    },
+    "narration": {
+     "short": "NYC DOH-licensed hospitals inside this area and their flood exposure.",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "NYS DOH hospitals register",
+     "source_url": "https://health.data.ny.gov/Health/Health-Facility-General-Information/vn5v-hh5r",
+     "license": "Health Data NY (New York State open data) terms of use",
      "citation": "NYS DOH Health Facility General Information (vn5v-hh5r) hospitals in NYC, cross-referenced with Sandy 2012 + DEP extreme 2080.",
      "doc_id": "doh_hospital_exposure",
      "date_modified": null,
@@ -1010,102 +1076,69 @@
     }
    },
    {
-    "id": "ttm_battery_surge",
-    "type": "model",
-    "title": "Granite TTM r2 Battery Surge, 96 h hourly nowcast (fine-tune)",
+    "id": "nws_alerts_nta",
+    "type": "live",
+    "title": "NWS active alerts for the area (flood/coastal/wind)",
     "stone": "lodestone",
     "tier": "modeled",
-    "maturity": "experimental",
-    "scope": "point",
+    "maturity": "production",
+    "scope": "polygon",
     "display": {
-     "order": 21,
-     "kind": "chart",
-     "variant": "timeseries-ft",
+     "order": 10,
+     "kind": "list",
+     "variant": "tabular",
      "map_layer": false,
-     "icon": "\ud83d\udcc8"
+     "icon": "\u26a0\ufe0f"
     },
     "narration": {
-     "short": "Granite TTM r2 fine-tune nowcast of Battery storm-surge over the next 96 hours.",
-     "template": "Experimental: a TTM model fine-tuned on Battery gauge history, with no wind or pressure input, forecasts a peak surge residual of {forecast_peak_m} m at The Battery about {forecast_peak_hours_ahead} h ahead; for storm decisions use NOAA ETSS or the Stevens Flood Advisory System instead."
+     "short": "Currently active NWS alerts for this area.",
+     "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "Granite TTM r2 fine-tuned on Battery gauge history (Hugging Face msradam/Granite-TTM-r2-Battery-Surge)",
-     "source_url": "https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge",
-     "license": "Apache-2.0",
-     "citation": "Granite TTM r2 fine-tune (msradam/Granite-TTM-r2-Battery-Surge, Apache-2.0, trained on AMD MI300X). 96 h hourly Battery storm-surge nowcast.",
-     "doc_id": "ttm_battery_surge",
+     "source_name": "National Weather Service (NOAA), active alerts at point",
+     "source_url": "https://api.weather.gov/",
+     "license": "U.S. Public Domain",
+     "citation": "NWS active alerts for the area (flood / coastal / wind).",
+     "doc_id": "nws_alerts",
      "date_modified": "live",
      "retrieved_at": "live"
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "The Battery surge forecast model was not loaded when this briefing ran."
+     "message": "NWS alerts endpoint unreachable."
     }
    },
    {
-    "id": "ttm_311_forecast",
-    "type": "model",
-    "title": "Granite TTM r2, weekly 311 flood-complaint forecast at this address",
+    "id": "nws_water_forecast",
+    "type": "live",
+    "title": "NWS water-level forecast (nearest harbor gauge)",
     "stone": "lodestone",
     "tier": "modeled",
-    "maturity": "experimental",
+    "maturity": "production",
     "scope": "point",
     "display": {
-     "order": 30,
-     "kind": "chart",
-     "variant": "timeseries",
+     "order": 15,
+     "kind": "stat",
+     "variant": "scalars",
      "map_layer": false,
-     "icon": "\ud83d\udcc8"
+     "icon": null
     },
     "narration": {
-     "short": "Experimental 96-day forecast of NYC 311 flood-complaint volume near this address.",
-     "template": "Experimental: {history_total_complaints} flood-related 311 complaints within {radius_m} m over the last {days_context} days; a zero-shot TTM forecast with no rainfall input and no backtest projects about {forecast_weekly_equivalent} per week for the next {days_horizon} days."
+     "short": "The Weather Service's water-level forecast for the nearest harbor gauge.",
+     "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "IBM Granite TimeSeries TTM r2, 311 flood-complaint forecast",
-     "source_url": "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2",
-     "license": "Apache-2.0",
-     "citation": "Granite TimeSeries TTM r2 (IBM Granite, Apache-2.0) zero-shot forecast on weekly NYC 311 flood-complaint counts at the queried address (200 m radius).",
-     "doc_id": "ttm_311_forecast",
+     "source_name": "NWS National Water Prediction Service, gauge forecast",
+     "source_url": "https://water.noaa.gov/",
+     "license": "U.S. Public Domain",
+     "citation": "National Weather Service, National Water Prediction Service, official water-level forecast and flood stages for the nearest harbor gauge.",
+     "doc_id": "nws_water_forecast",
      "date_modified": "live",
      "retrieved_at": "live"
     },
     "fallback": {
      "on_offline": "skip",
-     "message": "The 311 complaint forecast model was not loaded when this briefing ran."
-    }
-   },
-   {
-    "id": "floodnet_forecast",
-    "type": "model",
-    "title": "Granite TTM r2, flood-event recurrence at nearest FloodNet sensor",
-    "stone": "lodestone",
-    "tier": "modeled",
-    "maturity": "experimental",
-    "scope": "point",
-    "display": {
-     "order": 40,
-     "kind": "chart",
-     "variant": "timeseries",
-     "map_layer": false,
-     "icon": "\ud83d\udcc8"
-    },
-    "narration": {
-     "short": "28-day forecast of flood-event recurrence at the nearest FloodNet sensor.",
-     "template": "Experimental: the nearest FloodNet sensor ({sensor_name}, {distance_from_query_m} m away) recorded {history_total_events} flood events in the last {history_window_days} days; a zero-shot TTM forecast with no rainfall input expects {forecast_28d_expected_events} events in the next 28 days."
-    },
-    "provenance": {
-     "source_name": "IBM Granite TimeSeries TTM r2, FloodNet sensor event-recurrence forecast",
-     "source_url": "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2",
-     "license": "Apache-2.0",
-     "citation": "Granite TimeSeries TTM r2 (IBM Granite, Apache-2.0) zero-shot forecast on daily flood-event counts at the nearest FloodNet ultrasonic depth sensor.",
-     "doc_id": "floodnet_forecast",
-     "date_modified": "live",
-     "retrieved_at": "live"
-    },
-    "fallback": {
-     "on_offline": "skip",
-     "message": "The FloodNet forecast model was not loaded when this briefing ran."
+     "message": "The National Water Prediction Service had no current forecast for the nearest gauge when this briefing ran."
     }
    },
    {
@@ -1116,6 +1149,39 @@
     "tier": "modeled",
     "maturity": "production",
     "scope": "point",
+    "display": {
+     "order": 50,
+     "kind": "stat",
+     "variant": "tabular",
+     "map_layer": false,
+     "icon": "\ud83c\udf0a"
+    },
+    "narration": {
+     "short": "NYC Panel on Climate Change (2024) sea-level rise projections, Battery, NY.",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "NPCC4, New York City Panel on Climate Change (2024)",
+     "source_url": "https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15116",
+     "license": "CC-BY-NC 4.0 (Annals of the New York Academy of Sciences)",
+     "citation": "Rosenzweig, C. et al. (eds.). New York City Panel on Climate Change 2024 Report (NPCC4). Annals of the New York Academy of Sciences, Vol. 1539 (parent doi:10.1111/nyas.15116). Sea-level rise projections from the NPCC4 climate-science chapter, Battery (NOAA station 8518750) reference.",
+     "doc_id": "npcc4_slr",
+     "date_modified": "2024",
+     "retrieved_at": "2026-07-11"
+    },
+    "fallback": {
+     "on_offline": "error",
+     "message": "The NPCC4 sea-level rise table was not available when this briefing ran."
+    }
+   },
+   {
+    "id": "npcc4_slr_nta",
+    "type": "baked",
+    "title": "NPCC4 (2024) sea-level rise projections",
+    "stone": "lodestone",
+    "tier": "modeled",
+    "maturity": "production",
+    "scope": "polygon",
     "display": {
      "order": 50,
      "kind": "stat",
@@ -1165,19 +1231,17 @@
   "lat": null,
   "lon": null,
   "nta": null,
-  "policy_corpus": null,
   "dep": null,
   "paragraph": "Riprap does not answer this question. It reports public flood evidence for a place: flood maps, past flood records, live sensors and forecasts, each cited to its source. It does not give advice on buying, renting or insuring property, legal advice, or a prediction for a specific day. For those, consult a licensed professional; for a regulatory flood determination, use FEMA's Flood Map Service Center (msc.fema.gov); for a home in New York City, FloodHelpNY (floodhelpny.org) explains flood insurance and resiliency options.",
   "audit": {
    "raw": "Riprap does not answer this question. It reports public flood evidence for a place: flood maps, past flood records, live sensors and forecasts, each cited to its source. It does not give advice on buying, renting or insuring property, legal advice, or a prediction for a specific day. For those, consult a licensed professional; for a regulatory flood determination, use FEMA's Flood Map Service Center (msc.fema.gov); for a home in New York City, FloodHelpNY (floodhelpny.org) explains flood insurance and resiliency options.",
    "dropped": [],
-   "tier": "llm"
+   "tier": "no_llm"
   },
   "grounding": {
-   "tier": "llm",
+   "tier": "no_llm",
    "claims": [],
-   "dropped_claims": [],
-   "attempts": 0
+   "dropped_claims": []
   },
   "citations": {},
   "consulted": null,
@@ -1185,15 +1249,13 @@
   "deployment": null,
   "trace": [
    {
-    "step": "reconcile_claims",
-    "started_at": 1790801923.858392,
+    "step": "reconcile_templated",
+    "started_at": 1790837210.2994938,
     "ok": true,
     "result": {
-     "tier": "llm",
-     "model": null,
-     "attempts": 0,
-     "kept": 0,
-     "dropped": 0
+     "n_chars": 526,
+     "n_citations": 0,
+     "tier": "no_llm"
     },
     "err": null,
     "elapsed_s": 0.0

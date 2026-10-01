@@ -1,9 +1,9 @@
 {
- "slug": "qn12-complaints",
+ "slug": "qn12",
  "neighborhood": "Community district QN12, Queens",
  "address": "QN12",
- "question": "How many street flooding complaints has community district QN12 had?",
- "generated_at": "2026-10-01T06:46Z",
+ "question": null,
+ "generated_at": "2026-10-01T06:45Z",
  "riprap_commit": "f9c47b9",
  "mode": "no_llm",
  "model": null,
@@ -1210,7 +1210,7 @@
   ]
  },
  "final": {
-  "query": "How many street flooding complaints has community district QN12 had?",
+  "query": "QN12",
   "intent": "neighborhood",
   "plan": {
    "intent": "neighborhood",
@@ -1226,8 +1226,7 @@
     "text": "QN12",
     "certain": true,
     "message": null
-   },
-   "question": "How many street flooding complaints has community district QN12 had?"
+   }
   },
   "geocode": {
    "address": "QN12 Jamaica-St. Albans-Hollis (CD 12 Approximation), Queens",
@@ -1253,58 +1252,18 @@
    "n_matches": 1
   },
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n533 street flooding complaints in the last 3 years, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4524 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\n4524 flood-related 311 complaints were filed in Community District QN12 (by the record's community board field) in the last 3 years [nyc311_nta]. 16.4% is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise, 3.3% is modeled to flood from rainfall in the moderate scenario for 2050 [dep_extreme_2080_nta][dep_moderate_2050_nta]. 0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 24.7 km\u00b2) [sandy_nta]. DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 16.4% of this area is modeled to flood from rainfall, 7.5% as nuisance flooding (4 in to under 1 ft) and 8.8% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2080) [dep_extreme_2080_nta]. DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.3% of this area is modeled to flood from rainfall, 1.9% as nuisance flooding (4 in to under 1 ft) and 1.5% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2050) [dep_moderate_2050_nta]. DEP Moderate Stormwater (2.13 in/hr, current SLR): 3.1% of this area is modeled to flood from rainfall, 1.8% as nuisance flooding (4 in to under 1 ft) and 1.3% as deep and contiguous flooding (1 ft or more) [dep_moderate_current_nta]. Median ground elevation 10.55 m (10th percentile 5.43 m); 28.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage) [microtopo_nta].\n\n**Live Observer.**\n4524 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow [nyc311_nta].\n\n**Asset Register.**\nNYC Planning's Community District Profile counts 5 buildings, 0 residential units and 0 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block) [dcp_floodplain_nta]. 36 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 17 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z) [mta_entrance_exposure]. 1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: CONLON LIHFE TOWER [nycha_development_exposure]. 73 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 18 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise) [dob_permits_nta]. 1 flood-exposed NYC DOE school in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: I.S. 059 Springfield Gardens [doe_school_exposure]. 0 hospitals in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:45 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n533 street flooding complaints in the last 3 years, counting the 311 descriptors \"Street Flooding (SJ)\" and \"Flooding on Street\". From the sources consulted: 4524 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow [nyc311_nta].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\n4524 flood-related 311 complaints were filed in Community District QN12 (by the record's community board field) in the last 3 years [nyc311_nta]. 16.4% is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise, 3.3% is modeled to flood from rainfall in the moderate scenario for 2050 [dep_extreme_2080_nta][dep_moderate_2050_nta]. 0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 24.7 km\u00b2) [sandy_nta]. DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 16.4% of this area is modeled to flood from rainfall, 7.5% as nuisance flooding (4 in to under 1 ft) and 8.8% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2080) [dep_extreme_2080_nta]. DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.3% of this area is modeled to flood from rainfall, 1.9% as nuisance flooding (4 in to under 1 ft) and 1.5% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2050) [dep_moderate_2050_nta]. DEP Moderate Stormwater (2.13 in/hr, current SLR): 3.1% of this area is modeled to flood from rainfall, 1.8% as nuisance flooding (4 in to under 1 ft) and 1.3% as deep and contiguous flooding (1 ft or more) [dep_moderate_current_nta]. Median ground elevation 10.55 m (10th percentile 5.43 m); 28.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage) [microtopo_nta].\n\n**Live Observer.**\n4524 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow [nyc311_nta].\n\n**Asset Register.**\nNYC Planning's Community District Profile counts 5 buildings, 0 residential units and 0 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block) [dcp_floodplain_nta]. 36 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 17 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z) [mta_entrance_exposure]. 1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: CONLON LIHFE TOWER [nycha_development_exposure]. 73 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 18 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise) [dob_permits_nta]. 1 flood-exposed NYC DOE school in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: I.S. 059 Springfield Gardens [doe_school_exposure]. 0 hospitals in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:45 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
    "dropped": [],
    "tier": "no_llm"
   },
   "grounding": {
    "tier": "no_llm",
-   "model": null,
-   "attempts": 0,
-   "claims": [
-    {
-     "section": "answer",
-     "text": "4524 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow.",
-     "doc_ids": [
-      "nyc311_nta"
-     ],
-     "numbers": []
-    }
-   ],
-   "dropped_claims": [],
-   "retried_claims": [],
-   "n_kept": 1,
-   "n_dropped": 0,
-   "llm_calls": [],
-   "question": "How many street flooding complaints has community district QN12 had?",
-   "n_documents": 14,
-   "answer_mode": "rules",
-   "answer_lead": "count",
-   "lead_fact": {
-    "doc_id": "nyc311_nta",
-    "in_lead": true
-   },
-   "answer_flags": [],
-   "checks": [
-    "citations and numbers on every claim",
-    "lead rules on the answer, which is the cited text word for word"
-   ],
-   "answered": true
+   "claims": [],
+   "dropped_claims": []
   },
   "citations": {
-   "nyc311_nta": {
-    "doc_id": "nyc311_nta",
-    "source": "NYC 311 Service Requests (NYC Open Data)",
-    "title": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
-    "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
-    "license": "NYC Open Data Terms of Use",
-    "date_modified": "2026-10-01T01:38:36+0000",
-    "retrieved_at": "2026-10-01T06:46Z",
-    "vintage": "2026-10-01T01:38:36+0000",
-    "maturity": "production"
-   },
    "area_boundary": {
     "doc_id": "area_boundary",
     "source": "NYC Department of City Planning, 2020 Neighborhood Tabulation Areas",
@@ -1371,6 +1330,17 @@
     "vintage": "retrieved 2026-07-11",
     "maturity": "production"
    },
+   "nyc311_nta": {
+    "doc_id": "nyc311_nta",
+    "source": "NYC 311 Service Requests (NYC Open Data)",
+    "title": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
+    "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
+    "license": "NYC Open Data Terms of Use",
+    "date_modified": "2026-10-01T01:38:36+0000",
+    "retrieved_at": "2026-10-01T06:45Z",
+    "vintage": "2026-10-01T01:38:36+0000",
+    "maturity": "production"
+   },
    "dcp_floodplain_nta": {
     "doc_id": "dcp_floodplain_nta",
     "source": "NYC Department of City Planning, Community District Profiles (floodplain indicators)",
@@ -1378,7 +1348,7 @@
     "url": "https://communityprofiles.planning.nyc.gov/",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2024-02-01",
-    "retrieved_at": "2026-10-01T06:46Z",
+    "retrieved_at": "2026-10-01T06:45Z",
     "vintage": "2024-02-01",
     "maturity": "production"
    },
@@ -1402,6 +1372,17 @@
     "date_modified": null,
     "retrieved_at": "2026-05-01",
     "vintage": "retrieved 2026-05-01",
+    "maturity": "production"
+   },
+   "dob_permits_nta": {
+    "doc_id": "dob_permits_nta",
+    "source": "NYC DOB Permit Issuance (NYC Open Data)",
+    "title": "NYC DOB permits issued inside the neighborhood, cross-referenced with Sandy 2012 and DEP scenarios",
+    "url": "https://data.cityofnewyork.us/Housing-Development/DOB-Permit-Issuance/ipu4-2q9a",
+    "license": "NYC Open Data Terms of Use",
+    "date_modified": "2026-10-01T00:27:21+0000",
+    "retrieved_at": "2026-10-01T06:45Z",
+    "vintage": "2026-10-01T00:27:21+0000",
     "maturity": "production"
    },
    "doe_school_exposure": {
@@ -1432,9 +1413,9 @@
     "title": "NWS active alerts for the area (flood / coastal / wind).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T06:46Z",
-    "retrieved_at": "2026-10-01T06:46Z",
-    "vintage": "2026-10-01T06:46Z",
+    "date_modified": "2026-10-01T06:45Z",
+    "retrieved_at": "2026-10-01T06:45Z",
+    "vintage": "2026-10-01T06:45Z",
     "maturity": "production"
    },
    "npcc4_slr": {
@@ -1501,6 +1482,11 @@
     "stone": "keystone"
    },
    {
+    "id": "dob_permits_nta",
+    "title": "Active DOB construction permits inside the neighborhood",
+    "stone": "keystone"
+   },
+   {
     "id": "doe_schools_nta",
     "title": "NYC DOE schools exposed in the area",
     "stone": "keystone"
@@ -1521,13 +1507,7 @@
     "stone": "lodestone"
    }
   ],
-  "not_checked": [
-   {
-    "id": "dob_permits_nta",
-    "title": "Active DOB construction permits inside the neighborhood",
-    "stone": "keystone"
-   }
-  ],
+  "not_checked": [],
   "deployment": "nyc",
   "area_boundary": {
    "geojson": {
@@ -2524,6 +2504,800 @@
    ],
    "citation": "Pre-computed from NYC Open Data NYCHA Developments (phvi-damg) joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. See data/registers/nycha.json."
   },
+  "dob_permits_nta": {
+   "since": "2025-04-09",
+   "n_total": 73,
+   "n_in_sandy": 0,
+   "n_in_dep_any": 18,
+   "n_in_dep_severe": 8,
+   "n_any_flood": 18,
+   "by_job_type": {
+    "new building": 41,
+    "major alteration (use/occupancy)": 31,
+    "demolition": 1
+   },
+   "by_permit_status": {
+    "ISSUED": 73
+   },
+   "flagged_top": [
+    {
+     "job_id": "421801394",
+     "job_type": "NB",
+     "job_type_label": "new building",
+     "permit_status": "ISSUED",
+     "issuance_date": "12/29/2025",
+     "expiration_date": "11/21/2026",
+     "address": "161-39 118 Avenue",
+     "borough": "Queens",
+     "bbl": "4-12240-0027",
+     "lat": 40.683202,
+     "lon": -73.784035,
+     "owner_business": "SAGOR REALTY LLC",
+     "permittee_business": "SIKDER HOME IMPROVEMENTS",
+     "nta_name": "Baisley Park",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "dep_scenarios": [
+      "dep_extreme_2080",
+      "dep_moderate_2050",
+      "dep_moderate_current"
+     ],
+     "any_flood_layer_hit": true
+    },
+    {
+     "job_id": "421133543",
+     "job_type": "NB",
+     "job_type_label": "new building",
+     "permit_status": "ISSUED",
+     "issuance_date": "12/12/2025",
+     "expiration_date": "02/10/2026",
+     "address": "187-11 Hollis Ave",
+     "borough": "Queens",
+     "bbl": "4-10815-0014",
+     "lat": 40.710124,
+     "lon": -73.77053,
+     "owner_business": "860 INVESTORS LLC",
+     "permittee_business": "PRIME CONSTRUCTION USA",
+     "nta_name": "Hollis",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "dep_scenarios": [
+      "dep_extreme_2080"
+     ],
+     "any_flood_layer_hit": true
+    },
+    {
+     "job_id": "402430393",
+     "job_type": "A1",
+     "job_type_label": "major alteration (use/occupancy)",
+     "permit_status": "ISSUED",
+     "issuance_date": "10/14/2025",
+     "expiration_date": "10/14/2026",
+     "address": "155-24 113 Avenue",
+     "borough": "Queens",
+     "bbl": "4-12172-0045",
+     "lat": 40.687804,
+     "lon": -73.79227,
+     "owner_business": null,
+     "permittee_business": "PLBG P & H INC",
+     "nta_name": "South Jamaica",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "dep_scenarios": [
+      "dep_extreme_2080",
+      "dep_moderate_2050",
+      "dep_moderate_current"
+     ],
+     "any_flood_layer_hit": true
+    },
+    {
+     "job_id": "421935026",
+     "job_type": "NB",
+     "job_type_label": "new building",
+     "permit_status": "ISSUED",
+     "issuance_date": "09/22/2025",
+     "expiration_date": "06/08/2026",
+     "address": "131-07 Farmers Blvd",
+     "borough": "Queens",
+     "bbl": "4-12983-0027",
+     "lat": 40.678934,
+     "lon": -73.76188,
+     "owner_business": "FARMERS REALTY GROUP LLC",
+     "permittee_business": "PRECISION HOME DEV INC",
+     "nta_name": "St. Albans",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "dep_scenarios": [
+      "dep_extreme_2080"
+     ],
+     "any_flood_layer_hit": true
+    },
+    {
+     "job_id": "421935641",
+     "job_type": "NB",
+     "job_type_label": "new building",
+     "permit_status": "ISSUED",
+     "issuance_date": "08/25/2025",
+     "expiration_date": "08/25/2026",
+     "address": "131-09 Farmers Blvd",
+     "borough": "Queens",
+     "bbl": "4-12983-0026",
+     "lat": 40.678904,
+     "lon": -73.761894,
+     "owner_business": "FARMERS REALTY GROUP LLC",
+     "permittee_business": "INFINITI ESC PLUMBING COR",
+     "nta_name": "St. Albans",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "dep_scenarios": [
+      "dep_extreme_2080"
+     ],
+     "any_flood_layer_hit": true
+    }
+   ],
+   "all_pins": [
+    {
+     "lat": 40.683202,
+     "lon": -73.784035,
+     "address": "161-39 118 Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "any_flood": true
+    },
+    {
+     "lat": 40.70847,
+     "lon": -73.791441,
+     "address": "169-13 90 Ave",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.710623,
+     "lon": -73.791752,
+     "address": "87-67 170 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.691216,
+     "lon": -73.806907,
+     "address": "106-11 Pinegrove Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.710124,
+     "lon": -73.77053,
+     "address": "187-11 Hollis Ave",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "any_flood": true
+    },
+    {
+     "lat": 40.682207,
+     "lon": -73.781814,
+     "address": "119-06 Guy  R  Brewer  Blvd.",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.699245,
+     "lon": -73.79319,
+     "address": "106-25 Guy R Brewer Blvd",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.699199,
+     "lon": -73.793158,
+     "address": "106-29 Guy R Brewer Blvd",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.695082,
+     "lon": -73.797869,
+     "address": "107-31 155 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.695104,
+     "lon": -73.797887,
+     "address": "107-29 155 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.695128,
+     "lon": -73.797902,
+     "address": "107-27 155 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.693077,
+     "lon": -73.750978,
+     "address": "118-22 201 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.688394,
+     "lon": -73.800291,
+     "address": "145-14 Glassboro Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.707622,
+     "lon": -73.772313,
+     "address": "185-09 Henderson Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 1,
+     "any_flood": true
+    },
+    {
+     "lat": 40.694198,
+     "lon": -73.791962,
+     "address": "160-11 109Th Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.698514,
+     "lon": -73.8083,
+     "address": "144-02 94Th Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.668292,
+     "lon": -73.796011,
+     "address": "143-02 135 Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.679027,
+     "lon": -73.791591,
+     "address": "119-09 Sutphin Blvd.",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 1,
+     "any_flood": true
+    },
+    {
+     "lat": 40.69506,
+     "lon": -73.797852,
+     "address": "107-25 155 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.709722,
+     "lon": -73.794554,
+     "address": "87-83 168Th Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.707942,
+     "lon": -73.784691,
+     "address": "175-31 Jamaica Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.687804,
+     "lon": -73.79227,
+     "address": "155-24 113 Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "any_flood": true
+    },
+    {
+     "lat": 40.675348,
+     "lon": -73.78074,
+     "address": "129-04 160 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.709992,
+     "lon": -73.765102,
+     "address": "99-19 194 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.690059,
+     "lon": -73.799637,
+     "address": "109-19 Liverpool Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.678934,
+     "lon": -73.76188,
+     "address": "131-07 Farmers Blvd",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "any_flood": true
+    },
+    {
+     "lat": 40.695127,
+     "lon": -73.782002,
+     "address": "110-31 Merrick Boulevard",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.705449,
+     "lon": -73.784677,
+     "address": "94-37 175 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.670259,
+     "lon": -73.782047,
+     "address": "134-22 154 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.692529,
+     "lon": -73.80593,
+     "address": "145-18 106 Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.697194,
+     "lon": -73.8102,
+     "address": "139-16 Atlantic Ave",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 1,
+     "any_flood": true
+    },
+    {
+     "lat": 40.69717,
+     "lon": -73.810283,
+     "address": "139-12 Atlantic Ave",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 1,
+     "any_flood": true
+    },
+    {
+     "lat": 40.712905,
+     "lon": -73.767887,
+     "address": "192-08 Jamaica Ave",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.720048,
+     "lon": -73.761837,
+     "address": "202-06 Hillside Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.692931,
+     "lon": -73.796877,
+     "address": "108-53 154 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.693316,
+     "lon": -73.750112,
+     "address": "118-23 201 Place",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 1,
+     "any_flood": true
+    },
+    {
+     "lat": 40.678904,
+     "lon": -73.761894,
+     "address": "131-09 Farmers Blvd",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "any_flood": true
+    },
+    {
+     "lat": 40.695242,
+     "lon": -73.796939,
+     "address": "107-46 156 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.693077,
+     "lon": -73.750978,
+     "address": "118-22 201 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.706027,
+     "lon": -73.786655,
+     "address": "172-30 93Rd Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.709984,
+     "lon": -73.779216,
+     "address": "182-04 91 Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.709976,
+     "lon": -73.77927,
+     "address": "182-02 91 Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.687539,
+     "lon": -73.758142,
+     "address": "191-06 120 Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.710685,
+     "lon": -73.789595,
+     "address": "87-72 172 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.708042,
+     "lon": -73.798883,
+     "address": "88-35 163 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 1,
+     "any_flood": true
+    },
+    {
+     "lat": 40.682186,
+     "lon": -73.792558,
+     "address": "116-13 Sutphin Boulevard",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.690143,
+     "lon": -73.805374,
+     "address": "107-14 Pinegrove St",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.711756,
+     "lon": -73.790078,
+     "address": "172-02 Hillside Ave",
+     "job_type": "DM",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.71276,
+     "lon": -73.758855,
+     "address": "94-44 201 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.703754,
+     "lon": -73.768366,
+     "address": "188-05 Liberty Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "any_flood": true
+    },
+    {
+     "lat": 40.708835,
+     "lon": -73.807224,
+     "address": "150-02 86 Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.682095,
+     "lon": -73.792537,
+     "address": "116-17 Sutphin Boulevard",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.69723,
+     "lon": -73.81007,
+     "address": "139-22 Atlantic Ave",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 1,
+     "any_flood": true
+    },
+    {
+     "lat": 40.714151,
+     "lon": -73.770887,
+     "address": "89-25 190 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.707675,
+     "lon": -73.793344,
+     "address": "166-20 90 Ave",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.683773,
+     "lon": -73.779645,
+     "address": "117-36 166 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 1,
+     "any_flood": true
+    },
+    {
+     "lat": 40.683764,
+     "lon": -73.779642,
+     "address": "117-38 166 Street",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 1,
+     "any_flood": true
+    },
+    {
+     "lat": 40.687452,
+     "lon": -73.788929,
+     "address": "114-22 158 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "any_flood": true
+    },
+    {
+     "lat": 40.691167,
+     "lon": -73.757808,
+     "address": "118-09 193 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.693003,
+     "lon": -73.757516,
+     "address": "194-15 Linden Boulevard",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.668292,
+     "lon": -73.796008,
+     "address": "143-06 135Th Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.679231,
+     "lon": -73.760736,
+     "address": "131-32 Merrick Boulevard",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.710438,
+     "lon": -73.791352,
+     "address": "170-15 88 Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.679406,
+     "lon": -73.796323,
+     "address": "117-02 145 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.681718,
+     "lon": -73.754576,
+     "address": "188-03 Pineville Lane",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.692259,
+     "lon": -73.786541,
+     "address": "163-41 Claude Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.709969,
+     "lon": -73.761895,
+     "address": "197-17 100 Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.675633,
+     "lon": -73.783342,
+     "address": "156-10 Baisley Boulevard",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.706166,
+     "lon": -73.808184,
+     "address": "148-18 Hillside Ave",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.707115,
+     "lon": -73.797959,
+     "address": "163-16 89Th. Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "any_flood": true
+    },
+    {
+     "lat": 40.666951,
+     "lon": -73.796589,
+     "address": "144-10 135 Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.696988,
+     "lon": -73.773568,
+     "address": "111-54 178 Place",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 1,
+     "any_flood": true
+    },
+    {
+     "lat": 40.677537,
+     "lon": -73.788686,
+     "address": "121-10 153 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    }
+   ],
+   "all_count": 73,
+   "narrative": "73 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 18 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise).",
+   "headline_value": "73 active permits"
+  },
   "doe_schools_nta": {
    "available": true,
    "n_schools": 1,
@@ -2567,8 +3341,8 @@
   "nws_alerts_nta": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:46 UTC.",
-   "retrieved_at": "2026-10-01T06:46:36Z",
+   "narrative": "No active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:45 UTC.",
+   "retrieved_at": "2026-10-01T06:45:54Z",
    "error": null
   },
   "npcc4_slr_nta": {
@@ -2617,8 +3391,8 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790837195.879817,
-    "elapsed_s": 0.0,
+    "started_at": 1790837154.49903,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "nta_code": "QN12",
@@ -2636,7 +3410,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790837195.882634,
+    "started_at": 1790837154.504367,
     "elapsed_s": 0.0001,
     "err": null,
     "result": {
@@ -2646,76 +3420,66 @@
     }
    },
    {
-    "step": "dob_permits_nta",
-    "ok": true,
-    "started_at": 1790837195.882984,
-    "elapsed_s": 0.0,
-    "err": null,
-    "result": {
-     "skipped": "not selected for this question"
-    }
-   },
-   {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1790837195.8839948,
-    "elapsed_s": 0.0,
+    "started_at": 1790837154.506235,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {}
    },
    {
     "step": "sandy_nta",
     "ok": true,
-    "started_at": 1790837195.884904,
-    "elapsed_s": 0.01,
+    "started_at": 1790837154.50695,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_extreme_2080_nta",
     "ok": true,
-    "started_at": 1790837195.887712,
-    "elapsed_s": 0.32,
+    "started_at": 1790837154.507686,
+    "elapsed_s": 0.35,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_2050_nta",
     "ok": true,
-    "started_at": 1790837195.889733,
-    "elapsed_s": 0.09,
+    "started_at": 1790837154.51124,
+    "elapsed_s": 0.14,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_current_nta",
     "ok": true,
-    "started_at": 1790837195.892606,
-    "elapsed_s": 0.07,
+    "started_at": 1790837154.511492,
+    "elapsed_s": 0.13,
     "err": null,
     "result": {}
    },
    {
     "step": "microtopo_nta",
     "ok": true,
-    "started_at": 1790837195.896702,
-    "elapsed_s": 0.06,
+    "started_at": 1790837154.511319,
+    "elapsed_s": 0.13,
     "err": null,
     "result": {}
    },
    {
     "step": "nyc311_nta",
     "ok": true,
-    "started_at": 1790837195.90003,
-    "elapsed_s": 0.14,
+    "started_at": 1790837154.5111659,
+    "elapsed_s": 0.26,
     "err": null,
     "result": {}
    },
    {
     "step": "dcp_floodplain_nta",
     "ok": true,
-    "started_at": 1790837195.8994079,
-    "elapsed_s": 0.14,
+    "started_at": 1790837154.51142,
+    "elapsed_s": 0.24,
     "err": null,
     "result": {
      "n_buildings": 5,
@@ -2725,8 +3489,8 @@
    {
     "step": "mta_entrances_nta",
     "ok": true,
-    "started_at": 1790837195.900317,
-    "elapsed_s": 0.18,
+    "started_at": 1790837154.512105,
+    "elapsed_s": 0.3,
     "err": null,
     "result": {
      "n_entrances": 36,
@@ -2737,8 +3501,8 @@
    {
     "step": "nycha_developments_nta",
     "ok": true,
-    "started_at": 1790837195.901688,
-    "elapsed_s": 0.01,
+    "started_at": 1790837154.5130339,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "n_developments": 1,
@@ -2747,10 +3511,18 @@
     }
    },
    {
+    "step": "dob_permits_nta",
+    "ok": true,
+    "started_at": 1790837154.512749,
+    "elapsed_s": 0.34,
+    "err": null,
+    "result": {}
+   },
+   {
     "step": "doe_schools_nta",
     "ok": true,
-    "started_at": 1790837195.9053152,
-    "elapsed_s": 0.01,
+    "started_at": 1790837154.51492,
+    "elapsed_s": 0.08,
     "err": null,
     "result": {
      "n_schools": 1,
@@ -2761,8 +3533,8 @@
    {
     "step": "doh_hospitals_nta",
     "ok": true,
-    "started_at": 1790837195.906924,
-    "elapsed_s": 0.01,
+    "started_at": 1790837154.5155149,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "n_hospitals": 0,
@@ -2773,8 +3545,8 @@
    {
     "step": "nws_alerts_nta",
     "ok": true,
-    "started_at": 1790837195.90594,
-    "elapsed_s": 0.22,
+    "started_at": 1790837154.51486,
+    "elapsed_s": 0.44,
     "err": null,
     "result": {
      "n_active": 0
@@ -2783,7 +3555,7 @@
    {
     "step": "npcc4_slr_nta",
     "ok": true,
-    "started_at": 1790837195.9071271,
+    "started_at": 1790837154.52512,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2791,7 +3563,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790837196.212553,
+    "started_at": 1790837154.954379,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2800,23 +3572,35 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790837196.2126248,
+    "started_at": 1790837154.954452,
     "ok": true,
     "result": {
-     "n_chars": 897,
-     "n_citations": 14,
+     "n_chars": 4599,
+     "n_citations": 15,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0326
+    "elapsed_s": 0.0331
    }
   ],
   "models": [],
   "compliance": {
-   "passed": true,
-   "n_passed": 13,
+   "passed": false,
+   "n_passed": 12,
    "n_total": 13,
-   "failed": []
+   "failed": [
+    {
+     "name": "projection_has_horizon",
+     "rule": "TCFD 3.2",
+     "description": "Projection sentences must declare a time horizon (short/medium/long-term or an explicit year/duration).",
+     "reason": "",
+     "evidence": [
+      "Inside the DEP extreme scenario (by station): Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z) [mta_entrance_exposure].",
+      "Inside the DEP extreme scenario: CONLON LIHFE TOWER [nycha_development_exposure].",
+      "Inside the DEP extreme scenario: I.S. 059 Springfield Gardens [doe_school_exposure]."
+     ]
+    }
+   ]
   },
   "emissions": {
    "n_calls": 0,
