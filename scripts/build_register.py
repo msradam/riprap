@@ -1,8 +1,6 @@
 """Pre-compute a flood-exposure register into data/registers/<asset_class>.json.
 
-Run: python scripts/build_register.py {mta_entrances,nycha,schools}
-
-Resume-safe: re-running picks up after a network blip.
+Run: python scripts/build_register.py {nycha,schools}
 """
 from __future__ import annotations
 
@@ -18,7 +16,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app.register_builder import build_register  # noqa: E402
 
 META_KEYS = {
-    "mta_entrances": ("name", "address", "borough", "entrance_type"),
     "nycha": ("name", "address", "borough", "tds_num"),
     "schools": ("name", "address", "borough", "bbl", "bin"),
 }

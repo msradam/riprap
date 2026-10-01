@@ -355,8 +355,10 @@ def print_page(query_id: str):  # noqa: ARG001 — captured by the SPA router
 
 @app.get("/api/register/{asset_class}")
 def api_register(asset_class: str):
-    """Return a pre-computed asset-class register."""
-    if asset_class not in ("schools", "nycha", "mta_entrances"):
+    """The baked register of exposed assets for a class: every public
+    school or NYCHA development inside the Sandy zone or a DEP scenario,
+    with its flags."""
+    if asset_class not in ("schools", "nycha"):
         return JSONResponse({"error": f"unknown asset class {asset_class!r}"}, status_code=404)
     f = ROOT.parent / "data" / "registers" / f"{asset_class}.json"
     if not f.exists():
