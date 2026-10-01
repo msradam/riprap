@@ -13,9 +13,9 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: '^(data/|tests/integration/results/|tests/(probe_50_results|queries_50)\.json$|web/sveltekit/build/|web/static/(dist|vendor)/|outputs/|examples/byod/.*\.csv$)'
+        exclude: '^(data/|web/sveltekit/build/|web/static/(dist|vendor)/|outputs/|examples/byod/.*\.csv$)'
       - id: end-of-file-fixer
-        exclude: '^(data/|tests/integration/results/|tests/(probe_50_results|queries_50)\.json$|web/sveltekit/build/|web/static/(dist|vendor)/|outputs/|examples/byod/.*\.csv$)'
+        exclude: '^(data/|web/sveltekit/build/|web/static/(dist|vendor)/|outputs/|examples/byod/.*\.csv$)'
       - id: check-yaml
         exclude: '^web/sveltekit/'
       - id: check-toml
