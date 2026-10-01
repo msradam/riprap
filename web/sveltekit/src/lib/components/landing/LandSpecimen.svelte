@@ -21,17 +21,15 @@
   <a class="window" {href}>
     <span class="window-bar" aria-hidden="true">riprap / gallery / {specimen.slug}</span>
     <span class="window-view">
-      <!-- The size matches CROP_HEIGHT in scripts/capture-hero-preview.mjs.
-           The window spans the frame below 1100px and is about 455px wide above. -->
+      <!-- The size matches CLIP in scripts/capture-hero-preview.mjs (the 1x file). The window spans the frame below 1100px and is about 455px wide above. -->
       <img
         src={asset('/landing/hero-briefing.webp')}
-        srcset="{asset('/landing/hero-briefing-720.webp')} 720w, {asset('/landing/hero-briefing.webp')} 1200w"
+        srcset="{asset('/landing/hero-briefing-712.webp')} 712w, {asset('/landing/hero-briefing.webp')} 1424w"
         sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1099px) calc(100vw - 64px), 455px"
-        width="1200"
-        height="2700"
-        fetchpriority="high"
+        width="712"
+        height="1400"
         decoding="async"
-        alt="The Riprap briefing for this question: the answer Yes. over its cited sentences on FloodNet sensor events, Hurricane Ida high-water marks and 311 flood complaints, the three sources beside it, a map of those points around the address, and the start of the evidence table."
+        alt="The Riprap briefing for this question: the answer Yes. over its cited sentences on FloodNet sensor events, Hurricane Ida high-water marks and 311 flood complaints, then a map of those points around the address."
       />
     </span>
   </a>

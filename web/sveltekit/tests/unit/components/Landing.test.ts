@@ -43,15 +43,16 @@ describe('Landing smoke', () => {
     expect(form.compareDocumentPosition(figure) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     // The question is a paragraph, not a heading.
     expect(figure.querySelector('h1, h2, h3')).toBeNull();
-    // The window is one link to the briefing; its image loads first, at a fixed size.
+    // The window is one link to the briefing; its image has a fixed size and no fetch priority,
+    // so on phones, where it sits below the actions, it does not jump ahead of the fonts.
     const win = figure.querySelector('a.window')!;
     expect(win.getAttribute('href')).toBe('/gallery/hollis-since-ida/');
     const img = win.querySelector('img')!;
     expect(img.getAttribute('src')).toBe('/landing/hero-briefing.webp');
-    expect(img.getAttribute('srcset')).toBe('/landing/hero-briefing-720.webp 720w, /landing/hero-briefing.webp 1200w');
+    expect(img.getAttribute('srcset')).toBe('/landing/hero-briefing-712.webp 712w, /landing/hero-briefing.webp 1424w');
     expect(img.getAttribute('alt')).toMatch(/^The Riprap briefing for this question: the answer Yes\./);
-    expect([img.getAttribute('width'), img.getAttribute('height')]).toEqual(['1200', '2700']);
-    expect(img.getAttribute('fetchpriority')).toBe('high');
+    expect([img.getAttribute('width'), img.getAttribute('height')]).toEqual(['712', '1400']);
+    expect(img.hasAttribute('fetchpriority')).toBe(false);
     expect(img.getAttribute('decoding')).toBe('async');
     expect(text(win.querySelector('.window-bar')!)).toBe('riprap / gallery / hollis-since-ida');
     // The caption is real text: the question, the lead word and the link.
