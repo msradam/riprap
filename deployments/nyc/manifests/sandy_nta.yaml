@@ -23,10 +23,10 @@ provenance:
   date_modified: 2015-11-09
   retrieved_at: 2026-07-11
   source_name: NYC Open Data, Sandy Inundation Zone
-  source_url: https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/uyj8-7rv5
+  source_url: https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/5xsi-dfpx
   license: NYC Open Data Terms of Use
   doc_id: sandy_nta
-  citation: NYC Sandy Inundation Zone (uyj8-7rv5), share of the neighborhood inside the 2012 extent
+  citation: NYC Sandy Inundation Zone (NYC Open Data 5xsi-dfpx), share of the neighborhood inside the 2012 extent
 
 narration:
   short: Share of this neighborhood inside the 2012 Sandy inundation extent.

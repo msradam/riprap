@@ -238,7 +238,7 @@ def fema_pfirm(lat: float, lon: float) -> dict | None:
             "issue_date": datetime.fromtimestamp(issued / 1000, UTC).date().isoformat() if issued else None}
 
 
-# The Sandy inundation zone (NYC Open Data uyj8-7rv5). The dataset's
+# The Sandy inundation zone (NYC Open Data 5xsi-dfpx; uyj8-7rv5 is its map view). The dataset's
 # export endpoint returned an empty feature collection on 2026-09-30, so
 # the key reads the public file as downloaded on 2026-07-11 and checks the
 # point against the polygons themselves, not Riprap's rasterised copy.

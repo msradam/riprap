@@ -13,7 +13,7 @@ fewer rows than that.
 
 | Source | Publisher | Used for |
 |---|---|---|
-| Sandy Inundation Zone, 2012 | NYC Open Data (`uyj8-7rv5`) | Whether Sandy flooded the place, and the distance to the mapped edge when within 50 m |
+| Sandy Inundation Zone, 2012 | NYC Open Data (`5xsi-dfpx`) | Whether Sandy flooded the place, and the distance to the mapped edge when within 50 m |
 | NYC Stormwater Flood Maps | NYC Department of Environmental Protection | Three modeled rainfall scenarios |
 | National Flood Hazard Layer | FEMA | Effective flood zone (2007 FIRM) |
 | Preliminary NFHL (2015 PFIRM) | FEMA | Preliminary flood zone and base flood elevation with its datum, adopted by NYC Building Code Appendix G for flood-resistant construction |
