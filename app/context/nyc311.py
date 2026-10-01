@@ -56,37 +56,7 @@ class Complaint:
 def complaints_near(lat: float, lon: float, radius_m: float = 200,
                     since: datetime | None = None,
                     limit: int = 1000) -> list[Complaint]:
-    where = f"{_DESC_CLAUSE} AND within_circle(location, {lat}, {lon}, {radius_m})"
-    if since:
-        # Socrata floating-timestamp: drop tz suffix
-        ts = since.replace(tzinfo=None).isoformat(timespec="seconds")
-        where += f" AND created_date >= '{ts}'"
-    r = http.get(URL, params={
-        "$select": "unique_key, descriptor, created_date, incident_address, "
-                   "status, latitude, longitude",
-        "$where": where,
-        "$order": "created_date desc",
-        "$limit": str(limit),
-    }, timeout=30)
-    r.raise_for_status()
-    out = []
-    for row in r.json():
-        lat = row.get("latitude")
-        lon = row.get("longitude")
-        try:
-            lat = float(lat) if lat is not None else None
-            lon = float(lon) if lon is not None else None
-        except Exception:
-            lat, lon = None, None
-        out.append(Complaint(
-            unique_key=row.get("unique_key", ""),
-            descriptor=row.get("descriptor", ""),
-            created_date=row.get("created_date", ""),
-            address=row.get("incident_address"),
-            status=row.get("status"),
-            lat=lat, lon=lon,
-        ))
-    return out
+    return _complaints_where(f"within_circle(location, {lat}, {lon}, {radius_m})", since, limit, timeout=30)
 
 
 def summary_for_point(lat: float, lon: float, radius_m: float = 200,
@@ -124,17 +94,27 @@ def complaints_in_board(board: str, since: datetime | None = None, limit: int = 
     return _complaints_where(f"community_board='{board}'", since, limit)
 
 
-def _complaints_where(clause: str, since: datetime | None, limit: int) -> list[Complaint]:
+def _num(v) -> float | None:
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def _complaints_where(clause: str, since: datetime | None, limit: int, timeout: int = 60) -> list[Complaint]:
+    """Flood-related complaints matching `clause`, newest first, each with
+    its coordinates (one_per_incident needs them for intersection requests)."""
     where = f"{_DESC_CLAUSE} AND {clause}"
     if since:
+        # Socrata floating-timestamp: drop tz suffix
         ts = since.replace(tzinfo=None).isoformat(timespec="seconds")
         where += f" AND created_date >= '{ts}'"
     r = http.get(URL, params={
-        "$select": "unique_key, descriptor, created_date, incident_address, status",
+        "$select": "unique_key, descriptor, created_date, incident_address, status, latitude, longitude",
         "$where": where,
         "$order": "created_date desc",
         "$limit": str(limit),
-    }, timeout=60)
+    }, timeout=timeout)
     r.raise_for_status()
     return [
         Complaint(
@@ -143,6 +123,7 @@ def _complaints_where(clause: str, since: datetime | None, limit: int) -> list[C
             created_date=row.get("created_date", ""),
             address=row.get("incident_address"),
             status=row.get("status"),
+            lat=_num(row.get("latitude")), lon=_num(row.get("longitude")),
         )
         for row in r.json()
     ]
@@ -182,22 +163,24 @@ def one_per_incident(cs: list[Complaint]) -> list[Complaint]:
     same address or the same coordinates was created within ten minutes of
     it (an intersection request has coordinates and no address on its coded
     row, and a street-only address on its plain one)."""
-    def places(c: Complaint) -> list:
-        point = (round(c.lat, 5), round(c.lon, 5)) if c.lat is not None and c.lon is not None else None
-        return [p for p in (c.address, point) if p]
-
-    coded: dict[tuple, list[datetime]] = {}
+    coded: dict[str | None, list[tuple[datetime, Complaint]]] = {}
     for c in cs:
         if c.descriptor not in _NEW_NAMES and c.created_date:
-            for p in places(c):
-                coded.setdefault((p, KIND.get(c.descriptor)), []).append(datetime.fromisoformat(c.created_date))
+            coded.setdefault(KIND.get(c.descriptor), []).append((datetime.fromisoformat(c.created_date), c))
+
+    def same_place(a: Complaint, b: Complaint) -> bool:
+        if a.address and a.address == b.address:
+            return True
+        # Within 0.00001 degrees, about a metre: the two rows carry one geocode.
+        return (None not in (a.lat, a.lon, b.lat, b.lon)
+                and abs(a.lat - b.lat) < 1e-5 and abs(a.lon - b.lon) < 1e-5)
 
     def twin(c: Complaint) -> bool:
         if c.descriptor not in _NEW_NAMES or not c.created_date:
             return False
         t = datetime.fromisoformat(c.created_date)
-        return any(abs(t - u) <= timedelta(minutes=10)
-                   for p in places(c) for u in coded.get((p, KIND.get(c.descriptor)), ()))
+        return any(abs(t - u) <= timedelta(minutes=10) and same_place(c, other)
+                   for u, other in coded.get(KIND.get(c.descriptor), ()))
 
     return [c for c in cs if not twin(c)]
 

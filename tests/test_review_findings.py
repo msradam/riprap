@@ -243,3 +243,24 @@ def test_a_hospital_just_outside_the_sandy_outline_is_named_not_counted_as_dry()
 def test_places_typed_the_way_people_type_them(query, intent, target):
     plan = heuristic_plan(query)
     assert (plan["intent"], plan["targets"][0]["text"]) == (intent, target)
+
+
+def test_a_district_count_carries_coordinates_so_intersection_twins_drop(monkeypatch):
+    """The golden set found QN12 one over and BK06 two over: the district
+    fetch did not ask for coordinates, so the same-place rule had only
+    addresses to go on."""
+    asked = {}
+
+    class R:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return [{"unique_key": "2", "descriptor": "Flooding on Street", "created_date": "2023-10-02T21:28:17.000",
+                     "incident_address": "5 AVENUE", "latitude": "40.675777", "longitude": "-73.980889"},
+                    {"unique_key": "1", "descriptor": "Street Flooding (SJ)", "created_date": "2023-10-02T21:26:00.000",
+                     "latitude": "40.675777", "longitude": "-73.980889"}]
+
+    monkeypatch.setattr(nyc311.http, "get", lambda url, params=None, **k: asked.update(params) or R())
+    v = nyc311.summary_for_district("BK06")
+    assert "latitude" in asked["$select"] and v["n"] == 1
