@@ -36,8 +36,9 @@ def test_no_good_sensor_with_an_event_means_no_peak(monkeypatch):
     _stub(monkeypatch, "needs_driverail", other="non-ota")
     n = floodnet.summary_for_point(40.71, -73.78)["narrative"]
     assert "Peak depth" not in n and "driverail" not in n and "non-ota" not in n
-    assert ("2 sensors that logged events are flagged by FloodNet for maintenance, "
-            "so their depths are not used for the peak.") in n
+    assert n.endswith("2 sensors that logged events are flagged by FloodNet for maintenance, "
+                      "so their depths are not used for the peak. "
+                      "The highest depth a flagged sensor recorded was 1172 mm (46.1 in) on 2026-05-20.")
 
 
 def test_good_variants_count_as_good(monkeypatch):

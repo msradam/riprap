@@ -225,7 +225,7 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     A question in two parts ("was it in the Sandy area, and how many 311
     complaints") is answered part by part, in the order asked: the facts
     of each part, and the first part's yes or no when it has one."""
-    if not question or not texts:
+    if not question:
         return None
     parts = [(c, _answer_one(c, texts, values, generic=False)) for c in _clauses(question)]
     parts = [(c, a) for c, a in parts if a and a[1]]

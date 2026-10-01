@@ -2,6 +2,8 @@
 figures a reader can use, and a live reading is quoted only when notable.
 The values stay in the evidence table."""
 
+import pytest
+
 from riprap.core.burr import templated_reconciler as tr
 from riprap.core.burr.intake import heuristic_plan
 
@@ -26,8 +28,8 @@ def test_terrain_sentence_keeps_elevation_and_the_low_spot_percentile():
     from app.context.microtopo import microtopo_at
 
     m = microtopo_at(40.7106, -73.7785)
-    if m is None:  # the DEM is not in this checkout (no LFS)
-        return
+    if m is None:
+        pytest.skip("the DEM is not in this checkout (git lfs pull)")
     assert m.narrative.startswith("Elevation ") and "percentile" in m.narrative
     assert "HAND" not in m.narrative and "TWI" not in m.narrative and "basin relief" not in m.narrative
     assert m.hand_m is not None  # still in the value

@@ -63,6 +63,19 @@ def test_forecast_answer_quotes_the_weather_service_and_has_no_yes(monkeypatch):
     assert "moderate flood stage of 8.3 ft" in answer and "Yes." not in answer
 
 
+def test_an_experimental_forecast_keeps_its_label_in_the_answer(monkeypatch):
+    """A source marked experimental is labelled in the answer even when its
+    sentence does not say so (the label code in synthesis._render)."""
+    text = "A trial forecast gives a peak water level of 6.0 ft above MLLW at The Battery."
+    monkeypatch.setattr(syn, "_documents", lambda state: ([Doc("nws_water_forecast", "Projector", text, True)], [], None))
+    monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
+    reply = {"answer": {"lead": "yes", "facts": ["nws_water_forecast"]}}
+    monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (reply, "scripted"))
+    out = syn.synthesize({"intent": "single_address", "plan": {"question": Q, "focus": {"time_frame": "future"}}})
+    answer = out["paragraph"].split("**Answer.**\n")[1].split("\n\n")[0]
+    assert answer.startswith("From the sources consulted: Experimental: A trial forecast") and "Yes." not in answer
+
+
 def test_forecast_facts_are_the_forecasts_not_the_flood_zone(monkeypatch):
     docs = [Doc("fema_nfhl", "Hazard Reader", "This address sits in FEMA flood zone AE.", False),
             Doc("npcc4_slr", "Projector", "NPCC4 projects 0.38 m of sea-level rise by the 2050s.", False),

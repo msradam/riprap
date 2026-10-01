@@ -441,7 +441,10 @@ def synthesize(state, use_llm: bool = True) -> dict:
 
     attempts, model, first_dropped, calls, fallback_reason = 0, None, [], [], None
     kept, dropped, notes, answer = [], [], [], ("", [], [])
-    ruled = rule_answer.answer(question, texts, values) if question and (RULES_FIRST or not use_llm) else None
+    # The rules answer from the sources that answered: one that was
+    # unavailable is not a fact ("NWS alerts unavailable" is not "no alerts").
+    answered = {d: t for d, t in texts.items() if not answer_checks.unavailable(d, texts, values)}
+    ruled = rule_answer.answer(question, answered, values) if question and (RULES_FIRST or not use_llm) else None
     if ruled is None and use_llm:
         try:
             out, model = llm.chat_json(messages, schema, name="claims", ledger=calls)
@@ -462,7 +465,7 @@ def synthesize(state, use_llm: bool = True) -> dict:
         except llm.LLMUnavailable as e:
             # The question stays a question: the rules answer it if they can.
             fallback_reason = f"LLM unavailable: {e}"
-            ruled = rule_answer.answer(question, texts, values) if question else None
+            ruled = rule_answer.answer(question, answered, values) if question else None
             kept, dropped, notes = [], [], []
     if ruled is None and (fallback_reason or not use_llm):
         # No rule names what the question asks and no model answered: the
