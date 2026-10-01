@@ -22,7 +22,8 @@ text is the sources' own sentences ([`docs/GROUNDING.md`](GROUNDING.md)).
 The gallery is built with no LLM.
 
 **Three experimental models**, described below. They are the author's
-fine-tunes, and they answer a few questions about the days and years ahead.
+fine-tunes: one forecasts surge at the Battery, one reads satellite scenes
+after storms, one maps paved and green land.
 
 `app/models_info.py` lists the models behind each result in its `models`
 field, and `/api/models` says which this server can use.

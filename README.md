@@ -32,9 +32,9 @@ public record and its date.
 - Returns the same evidence to code and AI agents, as JSON over HTTP and as seven
   MCP tools. Open source, open data, no GPU and no API keys.
 
-Three open models fine-tuned for New York answer questions about the days and
-years ahead, labelled experimental with their tested accuracy:
-[help improve them](#experimental-models). Riprap reports evidence, not advice.
+Three open models fine-tuned for New York (a Battery surge forecast, satellite
+water after storms, paved and green land) are labelled experimental with their
+tested accuracy: [help improve them](#experimental-models). Riprap reports evidence, not advice.
 
 A real answer, from the gallery entry
 [Hollis, "since Ida"](https://msradam.github.io/riprap/gallery/hollis-since-ida/):
@@ -44,9 +44,9 @@ A real answer, from the gallery entry
 > Yes. 2 FloodNet community sensors within 600 m have logged 14 above-curb
 > flood events in the last 3 years, the most recent starting 2026-09-01 05:39
 > UTC [floodnet]. Peak depth recorded by the sensors in good working order: 815
-> mm (32.1 in) on 2026-05-20 [floodnet]. 1 sensor that logged events is flagged
-> by FloodNet for maintenance, so its depths are not used for the peak
-> [floodnet]. The highest depth a flagged sensor recorded was 1172 mm (46.1 in)
+> mm (32.1 in) on 2026-05-20 [floodnet]. 1 sensor that logged 11 of these
+> events is flagged by FloodNet for maintenance, so its depths are not used for
+> the peak [floodnet]. The highest depth a flagged sensor recorded was 1172 mm (46.1 in)
 > on 2026-05-20 [floodnet]. USGS surveyed 2 Hurricane Ida high-water marks
 > within 800 m of this address; the highest stood 0.76 ft above ground; the
 > highest water surface elevation was 48.2 ft NAVD88 [ida_hwm]. Nearest mark:
@@ -113,7 +113,7 @@ particular place will flood on a particular day. More in
 |---|---|
 | New York City flood | Production: 23 public sources (20 read for an address, 18 for a neighbourhood or district), questions, and all 59 community districts |
 | Chicago, Seattle, Albany | Experimental: federal sources plus a reviewed 311 flood filter and a water-level gauge ([docs/multi-city.md](docs/multi-city.md)) |
-| Models | None required, and none writes a sentence or sets a yes or no. An optional LLM routes questions the rules do not recognise. Three experimental models answer some questions about the future, always labelled ([below](#experimental-models)) |
+| Models | None required, and none writes a sentence or sets a yes or no. An optional LLM routes questions the rules do not recognise. Three experimental models (a surge forecast, satellite water, paved and green land) add sentences, always labelled ([below](#experimental-models)) |
 | Checks | Citations and numbers on every claim, rules on answer leads, 13 disclosure checks. They are patterns and rules: they do not read meaning and can miss a wrong inference ([docs/GROUNDING.md](docs/GROUNDING.md)) |
 
 ## Quickstart
