@@ -3,8 +3,8 @@
  "neighborhood": "Community district QN12, Queens",
  "address": "QN12",
  "question": null,
- "generated_at": "2026-10-01T06:45Z",
- "riprap_commit": "f9c47b9",
+ "generated_at": "2026-10-01T08:13Z",
+ "riprap_commit": "3b15b18",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -1252,9 +1252,9 @@
    "n_matches": 1
   },
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\n4524 flood-related 311 complaints were filed in Community District QN12 (by the record's community board field) in the last 3 years [nyc311_nta]. 16.4% is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise, 3.3% is modeled to flood from rainfall in the moderate scenario for 2050 [dep_extreme_2080_nta][dep_moderate_2050_nta]. 0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 24.7 km\u00b2) [sandy_nta]. DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 16.4% of this area is modeled to flood from rainfall, 7.5% as nuisance flooding (4 in to under 1 ft) and 8.8% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2080) [dep_extreme_2080_nta]. DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.3% of this area is modeled to flood from rainfall, 1.9% as nuisance flooding (4 in to under 1 ft) and 1.5% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2050) [dep_moderate_2050_nta]. DEP Moderate Stormwater (2.13 in/hr, current SLR): 3.1% of this area is modeled to flood from rainfall, 1.8% as nuisance flooding (4 in to under 1 ft) and 1.3% as deep and contiguous flooding (1 ft or more) [dep_moderate_current_nta]. Median ground elevation 10.55 m (10th percentile 5.43 m); 28.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage) [microtopo_nta].\n\n**Live Observer.**\n4524 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow [nyc311_nta].\n\n**Asset Register.**\nNYC Planning's Community District Profile counts 5 buildings, 0 residential units and 0 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block) [dcp_floodplain_nta]. 36 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 17 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z) [mta_entrance_exposure]. 1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: CONLON LIHFE TOWER [nycha_development_exposure]. 73 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 18 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise) [dob_permits_nta]. 1 flood-exposed NYC DOE school in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: I.S. 059 Springfield Gardens [doe_school_exposure]. 0 hospitals in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:45 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\n4517 flood-related 311 complaints were filed in Community District QN12 (by the record's community board field) in the last 3 years [nyc311_nta]. 16.4% of this area is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise, 3.3% of this area is modeled to flood from rainfall in the moderate scenario for 2050 [dep_extreme_2080_nta][dep_moderate_2050_nta]. 0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 24.7 km\u00b2) [sandy_nta]. DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 16.4% of this area is modeled to flood from rainfall, 7.5% as nuisance flooding (4 in to under 1 ft) and 8.8% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2080) [dep_extreme_2080_nta]. DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.3% of this area is modeled to flood from rainfall, 1.9% as nuisance flooding (4 in to under 1 ft) and 1.5% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2050) [dep_moderate_2050_nta]. DEP Moderate Stormwater (2.13 in/hr, current SLR): 3.1% of this area is modeled to flood from rainfall, 1.8% as nuisance flooding (4 in to under 1 ft) and 1.3% as deep and contiguous flooding (1 ft or more) [dep_moderate_current_nta]. Median ground elevation 10.55 m (10th percentile 5.43 m); 28.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage) [microtopo_nta].\n\n**Live Observer.**\n4517 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2744 sewer backup, 1087 catch basin, 532 street flooding, 154 manhole overflow [nyc311_nta].\n\n**Asset Register.**\nNYC Planning's Community District Profile counts 5 buildings, 0 residential units and 0 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block) [dcp_floodplain_nta]. 36 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 17 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise), by station: Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z) [mta_entrance_exposure]. 1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): CONLON LIHFE TOWER [nycha_development_exposure]. 73 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 18 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise) [dob_permits_nta]. 1 flood-exposed NYC DOE school in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): I.S. 059 Springfield Gardens [doe_school_exposure]. 0 hospitals in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 08:13 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\n4524 flood-related 311 complaints were filed in Community District QN12 (by the record's community board field) in the last 3 years [nyc311_nta]. 16.4% is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise, 3.3% is modeled to flood from rainfall in the moderate scenario for 2050 [dep_extreme_2080_nta][dep_moderate_2050_nta]. 0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 24.7 km\u00b2) [sandy_nta]. DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 16.4% of this area is modeled to flood from rainfall, 7.5% as nuisance flooding (4 in to under 1 ft) and 8.8% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2080) [dep_extreme_2080_nta]. DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.3% of this area is modeled to flood from rainfall, 1.9% as nuisance flooding (4 in to under 1 ft) and 1.5% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2050) [dep_moderate_2050_nta]. DEP Moderate Stormwater (2.13 in/hr, current SLR): 3.1% of this area is modeled to flood from rainfall, 1.8% as nuisance flooding (4 in to under 1 ft) and 1.3% as deep and contiguous flooding (1 ft or more) [dep_moderate_current_nta]. Median ground elevation 10.55 m (10th percentile 5.43 m); 28.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage) [microtopo_nta].\n\n**Live Observer.**\n4524 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow [nyc311_nta].\n\n**Asset Register.**\nNYC Planning's Community District Profile counts 5 buildings, 0 residential units and 0 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block) [dcp_floodplain_nta]. 36 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 17 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z) [mta_entrance_exposure]. 1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: CONLON LIHFE TOWER [nycha_development_exposure]. 73 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 18 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise) [dob_permits_nta]. 1 flood-exposed NYC DOE school in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: I.S. 059 Springfield Gardens [doe_school_exposure]. 0 hospitals in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:45 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\n4517 flood-related 311 complaints were filed in Community District QN12 (by the record's community board field) in the last 3 years [nyc311_nta]. 16.4% of this area is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise, 3.3% of this area is modeled to flood from rainfall in the moderate scenario for 2050 [dep_extreme_2080_nta][dep_moderate_2050_nta]. 0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 24.7 km\u00b2) [sandy_nta]. DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 16.4% of this area is modeled to flood from rainfall, 7.5% as nuisance flooding (4 in to under 1 ft) and 8.8% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2080) [dep_extreme_2080_nta]. DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 3.3% of this area is modeled to flood from rainfall, 1.9% as nuisance flooding (4 in to under 1 ft) and 1.5% as deep and contiguous flooding (1 ft or more); 0.0% is in the future high tide area (coastal tidal inundation projected for 2050) [dep_moderate_2050_nta]. DEP Moderate Stormwater (2.13 in/hr, current SLR): 3.1% of this area is modeled to flood from rainfall, 1.8% as nuisance flooding (4 in to under 1 ft) and 1.3% as deep and contiguous flooding (1 ft or more) [dep_moderate_current_nta]. Median ground elevation 10.55 m (10th percentile 5.43 m); 28.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage) [microtopo_nta].\n\n**Live Observer.**\n4517 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2744 sewer backup, 1087 catch basin, 532 street flooding, 154 manhole overflow [nyc311_nta].\n\n**Asset Register.**\nNYC Planning's Community District Profile counts 5 buildings, 0 residential units and 0 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block) [dcp_floodplain_nta]. 36 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 17 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise), by station: Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z) [mta_entrance_exposure]. 1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): CONLON LIHFE TOWER [nycha_development_exposure]. 73 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 18 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise) [dob_permits_nta]. 1 flood-exposed NYC DOE school in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): I.S. 059 Springfield Gardens [doe_school_exposure]. 0 hospitals in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 08:13 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -1337,7 +1337,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-10-01T01:38:36+0000",
-    "retrieved_at": "2026-10-01T06:45Z",
+    "retrieved_at": "2026-10-01T08:13Z",
     "vintage": "2026-10-01T01:38:36+0000",
     "maturity": "production"
    },
@@ -1348,7 +1348,7 @@
     "url": "https://communityprofiles.planning.nyc.gov/",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2024-02-01",
-    "retrieved_at": "2026-10-01T06:45Z",
+    "retrieved_at": "2026-10-01T08:13Z",
     "vintage": "2024-02-01",
     "maturity": "production"
    },
@@ -1381,7 +1381,7 @@
     "url": "https://data.cityofnewyork.us/Housing-Development/DOB-Permit-Issuance/ipu4-2q9a",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-10-01T00:27:21+0000",
-    "retrieved_at": "2026-10-01T06:45Z",
+    "retrieved_at": "2026-10-01T08:13Z",
     "vintage": "2026-10-01T00:27:21+0000",
     "maturity": "production"
    },
@@ -1413,9 +1413,9 @@
     "title": "NWS active alerts for the area (flood / coastal / wind).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T06:45Z",
-    "retrieved_at": "2026-10-01T06:45Z",
-    "vintage": "2026-10-01T06:45Z",
+    "date_modified": "2026-10-01T08:13Z",
+    "retrieved_at": "2026-10-01T08:13Z",
+    "vintage": "2026-10-01T08:13Z",
     "maturity": "production"
    },
    "npcc4_slr": {
@@ -1744,69 +1744,490 @@
    "headline_value": "median ground elevation 10.55 m"
   },
   "nyc311_nta": {
-   "n": 4524,
+   "n": 4517,
    "capped": false,
    "radius_m": null,
    "where": "in Community District QN12 (by the record's community board field)",
    "years": 3,
    "by_year": {
-    "2023": 396,
+    "2023": 395,
     "2024": 1436,
     "2025": 1312,
-    "2026": 1380
+    "2026": 1374
    },
    "by_descriptor": {
     "Sewer Backup (Use Comments) (SA)": 2605,
     "Catch Basin Clogged/Flooding (Use Comments) (SC)": 936,
     "Street Flooding (SJ)": 467,
-    "Catch Basin Clogged": 154,
+    "Catch Basin Clogged": 151,
     "Manhole Overflow (Use Comments) (SA1)": 145,
-    "Backup": 142,
-    "Flooding on Street": 66,
+    "Backup": 139,
+    "Flooding on Street": 65,
     "Manhole Overflow": 9
    },
    "by_kind": {
-    "sewer backup": 2747,
-    "catch basin": 1090,
-    "street flooding": 533,
+    "sewer backup": 2744,
+    "catch basin": 1087,
+    "street flooding": 532,
     "manhole overflow": 154
    },
    "most_recent": [
     {
-     "date": "2026-09-29",
-     "descriptor": "Flooding on Street",
-     "address": "197-31 CARPENTER AVENUE"
-    },
-    {
-     "date": "2026-09-29",
-     "descriptor": "Backup",
-     "address": "121-16 BENTON STREET"
-    },
-    {
-     "date": "2026-09-29",
+     "date": "2026-09-28",
      "descriptor": "Catch Basin Clogged",
-     "address": "119-25 164 STREET"
+     "address": "MERRICK BOULEVARD"
     },
     {
-     "date": "2026-09-29",
+     "date": "2026-09-28",
      "descriptor": "Backup",
-     "address": "178-26 130 ROAD"
+     "address": "161-16 FOCH BOULEVARD"
     },
     {
-     "date": "2026-09-29",
+     "date": "2026-09-28",
      "descriptor": "Backup",
-     "address": "114-54 203 STREET"
+     "address": "118-49 189 STREET"
+    },
+    {
+     "date": "2026-09-28",
+     "descriptor": "Catch Basin Clogged",
+     "address": "101 AVENUE"
+    },
+    {
+     "date": "2026-09-28",
+     "descriptor": "Backup",
+     "address": "165-18 116 AVENUE"
     }
    ],
-   "points": [],
-   "headline_value": "4524 complaints",
-   "subhead_text": "2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow",
-   "narrative": "4524 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2747 sewer backup, 1090 catch basin, 533 street flooding, 154 manhole overflow.",
+   "points": [
+    {
+     "lat": 40.68020182400475,
+     "lon": -73.75409824880109,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-28",
+     "address": "MERRICK BOULEVARD"
+    },
+    {
+     "lat": 40.68382247295273,
+     "lon": -73.7843466110496,
+     "descriptor": "Backup",
+     "date": "2026-09-28",
+     "address": "161-16 FOCH BOULEVARD"
+    },
+    {
+     "lat": 40.6891477807583,
+     "lon": -73.76094888002396,
+     "descriptor": "Backup",
+     "date": "2026-09-28",
+     "address": "118-49 189 STREET"
+    },
+    {
+     "lat": 40.69595822236913,
+     "lon": -73.80495310018212,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-28",
+     "address": "101 AVENUE"
+    },
+    {
+     "lat": 40.6865134960469,
+     "lon": -73.78203744996051,
+     "descriptor": "Backup",
+     "date": "2026-09-28",
+     "address": "165-18 116 AVENUE"
+    },
+    {
+     "lat": 40.68733412397187,
+     "lon": -73.80657207947942,
+     "descriptor": "Backup",
+     "date": "2026-09-28",
+     "address": "109-02 139 STREET"
+    },
+    {
+     "lat": 40.67431546787682,
+     "lon": -73.76653583594113,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-28",
+     "address": "134-30 175 STREET"
+    },
+    {
+     "lat": 40.697216143773296,
+     "lon": -73.79438292927705,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-27",
+     "address": "107-01 160 STREET"
+    },
+    {
+     "lat": 40.69834252581193,
+     "lon": -73.77723475746363,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-27",
+     "address": "177-14 110 AVENUE"
+    },
+    {
+     "lat": 40.68676795118545,
+     "lon": -73.76489489023739,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-27",
+     "address": "119-20 179 STREET"
+    },
+    {
+     "lat": 40.69533852391481,
+     "lon": -73.81192210787799,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-27",
+     "address": "137-22 97 AVENUE"
+    },
+    {
+     "lat": 40.68146647767493,
+     "lon": -73.7943089054097,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-27",
+     "address": "116-27 147 STREET"
+    },
+    {
+     "lat": 40.714752001327255,
+     "lon": -73.77504080775378,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-27",
+     "address": "187-06 HILLSIDE AVENUE"
+    },
+    {
+     "lat": 40.70756318413182,
+     "lon": -73.76394507650011,
+     "descriptor": "Backup",
+     "date": "2026-09-26",
+     "address": "194-03 104 AVENUE"
+    },
+    {
+     "lat": 40.67026436973535,
+     "lon": -73.78202926837884,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-26",
+     "address": "134-27 154 STREET"
+    },
+    {
+     "lat": 40.683721531142474,
+     "lon": -73.78467504550237,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-26",
+     "address": "LONG STREET"
+    },
+    {
+     "lat": 40.683721531142474,
+     "lon": -73.78467504550237,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-26",
+     "address": "LONG STREET"
+    },
+    {
+     "lat": 40.68676795118545,
+     "lon": -73.76489489023739,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-26",
+     "address": "119-20 179 STREET"
+    },
+    {
+     "lat": 40.683622591437256,
+     "lon": -73.7846068590153,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-26",
+     "address": "117-03 LONG STREET"
+    },
+    {
+     "lat": 40.66957370319424,
+     "lon": -73.77542389348991,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-26",
+     "address": "140-64 160 STREET"
+    },
+    {
+     "lat": 40.702548431642,
+     "lon": -73.78640310948681,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-26",
+     "address": "171-15 104 AVENUE"
+    },
+    {
+     "lat": 40.67260909987808,
+     "lon": -73.7576735479365,
+     "descriptor": "Backup",
+     "date": "2026-09-26",
+     "address": "186-22 140 AVENUE"
+    },
+    {
+     "lat": 40.701067402651965,
+     "lon": -73.75016230454536,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-26",
+     "address": "114-01 205 STREET"
+    },
+    {
+     "lat": 40.68340224296939,
+     "lon": -73.80414612372368,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-26",
+     "address": "139-09 LINDEN BOULEVARD"
+    },
+    {
+     "lat": 40.68061984586008,
+     "lon": -73.79983140500678,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-26",
+     "address": "142-06 116 AVENUE"
+    },
+    {
+     "lat": 40.71182638185244,
+     "lon": -73.76691666156188,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-26",
+     "address": "91-60 193 STREET"
+    },
+    {
+     "lat": 40.683721531142474,
+     "lon": -73.78467504550237,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-26",
+     "address": "FOCH BOULEVARD"
+    },
+    {
+     "lat": 40.68021901119992,
+     "lon": -73.79356283151144,
+     "descriptor": "Backup",
+     "date": "2026-09-25",
+     "address": "147-01 FOCH BOULEVARD"
+    },
+    {
+     "lat": 40.67412119691477,
+     "lon": -73.79882707185793,
+     "descriptor": "Backup",
+     "date": "2026-09-25",
+     "address": "141-26 ROCKAWAY BOULEVARD"
+    },
+    {
+     "lat": 40.67070108569826,
+     "lon": -73.77365370642347,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-25",
+     "address": "140 AVENUE"
+    },
+    {
+     "lat": 40.68707747974836,
+     "lon": -73.79935408800212,
+     "descriptor": "Backup",
+     "date": "2026-09-25",
+     "address": "145-18 111 AVENUE"
+    },
+    {
+     "lat": 40.69496756296352,
+     "lon": -73.8083422093756,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-25",
+     "address": "101 AVENUE"
+    },
+    {
+     "lat": 40.71213959863274,
+     "lon": -73.76170688227995,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-25",
+     "address": "198-04 CARPENTER AVENUE"
+    },
+    {
+     "lat": 40.67804847516993,
+     "lon": -73.79084756770781,
+     "descriptor": "Backup",
+     "date": "2026-09-25",
+     "address": "150-19 120 AVENUE"
+    },
+    {
+     "lat": 40.69485124649683,
+     "lon": -73.75434353256928,
+     "descriptor": "Backup",
+     "date": "2026-09-24",
+     "address": "116-39 198 STREET"
+    },
+    {
+     "lat": 40.70644605114781,
+     "lon": -73.78495150284606,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-24",
+     "address": "175-12 93 AVENUE"
+    },
+    {
+     "lat": 40.68281786674831,
+     "lon": -73.77292392171711,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-24",
+     "address": "120-24 172 STREET"
+    },
+    {
+     "lat": 40.71179205268308,
+     "lon": -73.75308353941784,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-24",
+     "address": "100-02 FRANCIS LEWIS BOULEVARD"
+    },
+    {
+     "lat": 40.68585594766945,
+     "lon": -73.80246587385079,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-23",
+     "address": "142-12 111 AVENUE"
+    },
+    {
+     "lat": 40.691661246376874,
+     "lon": -73.77277119969563,
+     "descriptor": "Backup",
+     "date": "2026-09-23",
+     "address": "176-05 115 AVENUE"
+    },
+    {
+     "lat": 40.698583533231975,
+     "lon": -73.78859406953563,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-23",
+     "address": "166-16 HENDRICKSON PLACE"
+    },
+    {
+     "lat": 40.68594886089783,
+     "lon": -73.8022276223282,
+     "descriptor": "Manhole Overflow",
+     "date": "2026-09-22",
+     "address": "142 STREET"
+    },
+    {
+     "lat": 40.709672195078895,
+     "lon": -73.77402995990269,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-22",
+     "address": "185 STREET"
+    },
+    {
+     "lat": 40.694676815602385,
+     "lon": -73.80197454365006,
+     "descriptor": "Manhole Overflow",
+     "date": "2026-09-22",
+     "address": "147-29 TUSKEGEE AIRMEN WAY"
+    },
+    {
+     "lat": 40.69779829661461,
+     "lon": -73.78550231669143,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-22",
+     "address": "108-45 MERRICK BOULEVARD"
+    },
+    {
+     "lat": 40.69609303918061,
+     "lon": -73.78217923262306,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-21",
+     "address": "110-01 171 PLACE"
+    },
+    {
+     "lat": 40.697342372104174,
+     "lon": -73.7474787339402,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-20",
+     "address": "205-24 116 AVENUE"
+    },
+    {
+     "lat": 40.68126777079219,
+     "lon": -73.7637316930391,
+     "descriptor": "Backup",
+     "date": "2026-09-20",
+     "address": "178-24 ZOLLER ROAD"
+    },
+    {
+     "lat": 40.70798052513147,
+     "lon": -73.80185567072522,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-20",
+     "address": "160 STREET"
+    },
+    {
+     "lat": 40.67948147234004,
+     "lon": -73.7574034114413,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-20",
+     "address": "MERRICK BOULEVARD"
+    },
+    {
+     "lat": 40.694757409155635,
+     "lon": -73.80906044271238,
+     "descriptor": "Backup",
+     "date": "2026-09-19",
+     "address": "139-04 101 AVENUE"
+    },
+    {
+     "lat": 40.69485124649683,
+     "lon": -73.75434353256928,
+     "descriptor": "Backup",
+     "date": "2026-09-17",
+     "address": "116-39 198 STREET"
+    },
+    {
+     "lat": 40.68753178141325,
+     "lon": -73.78494038708322,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-17",
+     "address": "GUY R BREWER BOULEVARD"
+    },
+    {
+     "lat": 40.70902441699367,
+     "lon": -73.75782611537144,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-17",
+     "address": "104 AVENUE"
+    },
+    {
+     "lat": 40.673734837763185,
+     "lon": -73.79453823793297,
+     "descriptor": "Backup",
+     "date": "2026-09-16",
+     "address": "144-06 ROCKAWAY BOULEVARD"
+    },
+    {
+     "lat": 40.68379672932135,
+     "lon": -73.75374246128206,
+     "descriptor": "Backup",
+     "date": "2026-09-16",
+     "address": "191-03 WILLIAMSON AVENUE"
+    },
+    {
+     "lat": 40.669855850407146,
+     "lon": -73.80042966759362,
+     "descriptor": "Backup",
+     "date": "2026-09-15",
+     "address": "137-12 132 AVENUE"
+    },
+    {
+     "lat": 40.669855850407146,
+     "lon": -73.80042966759362,
+     "descriptor": "Backup",
+     "date": "2026-09-15",
+     "address": "137-12 132 AVENUE"
+    },
+    {
+     "lat": 40.67315942018776,
+     "lon": -73.78901713401103,
+     "descriptor": "Manhole Overflow",
+     "date": "2026-09-15",
+     "address": "149 STREET"
+    },
+    {
+     "lat": 40.715646858024265,
+     "lon": -73.77089659473575,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-14",
+     "address": "88-18 191 STREET"
+    }
+   ],
+   "headline_value": "4517 complaints",
+   "subhead_text": "2744 sewer backup, 1087 catch basin, 532 street flooding, 154 manhole overflow",
+   "narrative": "4517 NYC 311 flood-related complaints filed in Community District QN12 (by the record's community board field) in the last 3 years: 2744 sewer backup, 1087 catch basin, 532 street flooding, 154 manhole overflow.",
    "histogram": [
-    396,
+    395,
     1436,
     1312,
-    1380
+    1374
    ]
   },
   "dcp_floodplain_nta": {
@@ -1823,7 +2244,7 @@
    "n_inside_sandy_2012": 0,
    "n_in_dep_extreme_2080": 17,
    "n_near_sandy_edge": 0,
-   "narrative": "36 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 17 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z)",
+   "narrative": "36 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 17 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise), by station: Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z)",
    "entrances": [
     {
      "station_id": "255",
@@ -2482,7 +2903,7 @@
    "n_inside_sandy_2012": 0,
    "n_in_dep_extreme_2080": 1,
    "n_near_sandy_edge": 0,
-   "narrative": "1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: CONLON LIHFE TOWER",
+   "narrative": "1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): CONLON LIHFE TOWER",
    "developments": [
     {
      "development": "CONLON LIHFE TOWER",
@@ -2691,18 +3112,9 @@
      "any_flood": false
     },
     {
-     "lat": 40.699245,
-     "lon": -73.79319,
-     "address": "106-25 Guy R Brewer Blvd",
-     "job_type": "NB",
-     "in_sandy": false,
-     "dep_max_class": 0,
-     "any_flood": false
-    },
-    {
-     "lat": 40.699199,
-     "lon": -73.793158,
-     "address": "106-29 Guy R Brewer Blvd",
+     "lat": 40.695104,
+     "lon": -73.797887,
+     "address": "107-29 155 Street",
      "job_type": "NB",
      "in_sandy": false,
      "dep_max_class": 0,
@@ -2718,9 +3130,18 @@
      "any_flood": false
     },
     {
-     "lat": 40.695104,
-     "lon": -73.797887,
-     "address": "107-29 155 Street",
+     "lat": 40.699245,
+     "lon": -73.79319,
+     "address": "106-25 Guy R Brewer Blvd",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.699199,
+     "lon": -73.793158,
+     "address": "106-29 Guy R Brewer Blvd",
      "job_type": "NB",
      "in_sandy": false,
      "dep_max_class": 0,
@@ -2826,15 +3247,6 @@
      "any_flood": false
     },
     {
-     "lat": 40.687804,
-     "lon": -73.79227,
-     "address": "155-24 113 Avenue",
-     "job_type": "A1",
-     "in_sandy": false,
-     "dep_max_class": 2,
-     "any_flood": true
-    },
-    {
      "lat": 40.675348,
      "lon": -73.78074,
      "address": "129-04 160 Street",
@@ -2844,19 +3256,19 @@
      "any_flood": false
     },
     {
+     "lat": 40.687804,
+     "lon": -73.79227,
+     "address": "155-24 113 Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "any_flood": true
+    },
+    {
      "lat": 40.709992,
      "lon": -73.765102,
      "address": "99-19 194 Street",
      "job_type": "NB",
-     "in_sandy": false,
-     "dep_max_class": 0,
-     "any_flood": false
-    },
-    {
-     "lat": 40.690059,
-     "lon": -73.799637,
-     "address": "109-19 Liverpool Street",
-     "job_type": "A1",
      "in_sandy": false,
      "dep_max_class": 0,
      "any_flood": false
@@ -2880,9 +3292,9 @@
      "any_flood": false
     },
     {
-     "lat": 40.705449,
-     "lon": -73.784677,
-     "address": "94-37 175 Street",
+     "lat": 40.690059,
+     "lon": -73.799637,
+     "address": "109-19 Liverpool Street",
      "job_type": "A1",
      "in_sandy": false,
      "dep_max_class": 0,
@@ -2898,6 +3310,15 @@
      "any_flood": false
     },
     {
+     "lat": 40.705449,
+     "lon": -73.784677,
+     "address": "94-37 175 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
      "lat": 40.692529,
      "lon": -73.80593,
      "address": "145-18 106 Avenue",
@@ -2907,18 +3328,18 @@
      "any_flood": false
     },
     {
-     "lat": 40.697194,
-     "lon": -73.8102,
-     "address": "139-16 Atlantic Ave",
+     "lat": 40.69717,
+     "lon": -73.810283,
+     "address": "139-12 Atlantic Ave",
      "job_type": "NB",
      "in_sandy": false,
      "dep_max_class": 1,
      "any_flood": true
     },
     {
-     "lat": 40.69717,
-     "lon": -73.810283,
-     "address": "139-12 Atlantic Ave",
+     "lat": 40.697194,
+     "lon": -73.8102,
+     "address": "139-16 Atlantic Ave",
      "job_type": "NB",
      "in_sandy": false,
      "dep_max_class": 1,
@@ -3069,15 +3490,6 @@
      "any_flood": false
     },
     {
-     "lat": 40.71276,
-     "lon": -73.758855,
-     "address": "94-44 201 Street",
-     "job_type": "A1",
-     "in_sandy": false,
-     "dep_max_class": 0,
-     "any_flood": false
-    },
-    {
      "lat": 40.703754,
      "lon": -73.768366,
      "address": "188-05 Liberty Avenue",
@@ -3090,6 +3502,15 @@
      "lat": 40.708835,
      "lon": -73.807224,
      "address": "150-02 86 Avenue",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.71276,
+     "lon": -73.758855,
+     "address": "94-44 201 Street",
      "job_type": "A1",
      "in_sandy": false,
      "dep_max_class": 0,
@@ -3114,15 +3535,6 @@
      "any_flood": true
     },
     {
-     "lat": 40.714151,
-     "lon": -73.770887,
-     "address": "89-25 190 Street",
-     "job_type": "A1",
-     "in_sandy": false,
-     "dep_max_class": 0,
-     "any_flood": false
-    },
-    {
      "lat": 40.707675,
      "lon": -73.793344,
      "address": "166-20 90 Ave",
@@ -3132,18 +3544,27 @@
      "any_flood": false
     },
     {
-     "lat": 40.683773,
-     "lon": -73.779645,
-     "address": "117-36 166 Street",
+     "lat": 40.714151,
+     "lon": -73.770887,
+     "address": "89-25 190 Street",
+     "job_type": "A1",
+     "in_sandy": false,
+     "dep_max_class": 0,
+     "any_flood": false
+    },
+    {
+     "lat": 40.683764,
+     "lon": -73.779642,
+     "address": "117-38 166 Street",
      "job_type": "NB",
      "in_sandy": false,
      "dep_max_class": 1,
      "any_flood": true
     },
     {
-     "lat": 40.683764,
-     "lon": -73.779642,
-     "address": "117-38 166 Street",
+     "lat": 40.683773,
+     "lon": -73.779645,
+     "address": "117-36 166 Street",
      "job_type": "NB",
      "in_sandy": false,
      "dep_max_class": 1,
@@ -3258,15 +3679,6 @@
      "any_flood": false
     },
     {
-     "lat": 40.707115,
-     "lon": -73.797959,
-     "address": "163-16 89Th. Avenue",
-     "job_type": "NB",
-     "in_sandy": false,
-     "dep_max_class": 2,
-     "any_flood": true
-    },
-    {
      "lat": 40.666951,
      "lon": -73.796589,
      "address": "144-10 135 Avenue",
@@ -3274,6 +3686,15 @@
      "in_sandy": false,
      "dep_max_class": 0,
      "any_flood": false
+    },
+    {
+     "lat": 40.707115,
+     "lon": -73.797959,
+     "address": "163-16 89Th. Avenue",
+     "job_type": "NB",
+     "in_sandy": false,
+     "dep_max_class": 2,
+     "any_flood": true
     },
     {
      "lat": 40.696988,
@@ -3304,7 +3725,7 @@
    "n_inside_sandy_2012": 0,
    "n_in_dep_extreme_2080": 1,
    "n_near_sandy_edge": 0,
-   "narrative": "1 flood-exposed NYC DOE school in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: I.S. 059 Springfield Gardens",
+   "narrative": "1 flood-exposed NYC DOE school in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): I.S. 059 Springfield Gardens",
    "schools": [
     {
      "loc_code": "Q059",
@@ -3341,8 +3762,8 @@
   "nws_alerts_nta": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:45 UTC.",
-   "retrieved_at": "2026-10-01T06:45:54Z",
+   "narrative": "No active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 08:13 UTC.",
+   "retrieved_at": "2026-10-01T08:13:25Z",
    "error": null
   },
   "npcc4_slr_nta": {
@@ -3391,8 +3812,8 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790837154.49903,
-    "elapsed_s": 0.01,
+    "started_at": 1790842405.386645,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "nta_code": "QN12",
@@ -3410,7 +3831,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790837154.504367,
+    "started_at": 1790842405.390738,
     "elapsed_s": 0.0001,
     "err": null,
     "result": {
@@ -3422,7 +3843,7 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1790837154.506235,
+    "started_at": 1790842405.392531,
     "elapsed_s": 0.02,
     "err": null,
     "result": {}
@@ -3430,56 +3851,56 @@
    {
     "step": "sandy_nta",
     "ok": true,
-    "started_at": 1790837154.50695,
-    "elapsed_s": 0.02,
+    "started_at": 1790842405.393194,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_extreme_2080_nta",
     "ok": true,
-    "started_at": 1790837154.507686,
-    "elapsed_s": 0.35,
+    "started_at": 1790842405.394946,
+    "elapsed_s": 0.38,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_2050_nta",
     "ok": true,
-    "started_at": 1790837154.51124,
-    "elapsed_s": 0.14,
+    "started_at": 1790842405.3950799,
+    "elapsed_s": 0.12,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_current_nta",
     "ok": true,
-    "started_at": 1790837154.511492,
-    "elapsed_s": 0.13,
+    "started_at": 1790842405.396202,
+    "elapsed_s": 0.14,
     "err": null,
     "result": {}
    },
    {
     "step": "microtopo_nta",
     "ok": true,
-    "started_at": 1790837154.511319,
-    "elapsed_s": 0.13,
+    "started_at": 1790842405.3973918,
+    "elapsed_s": 0.14,
     "err": null,
     "result": {}
    },
    {
     "step": "nyc311_nta",
     "ok": true,
-    "started_at": 1790837154.5111659,
-    "elapsed_s": 0.26,
+    "started_at": 1790842405.397328,
+    "elapsed_s": 0.41,
     "err": null,
     "result": {}
    },
    {
     "step": "dcp_floodplain_nta",
     "ok": true,
-    "started_at": 1790837154.51142,
-    "elapsed_s": 0.24,
+    "started_at": 1790842405.397485,
+    "elapsed_s": 0.26,
     "err": null,
     "result": {
      "n_buildings": 5,
@@ -3489,8 +3910,8 @@
    {
     "step": "mta_entrances_nta",
     "ok": true,
-    "started_at": 1790837154.512105,
-    "elapsed_s": 0.3,
+    "started_at": 1790842405.398421,
+    "elapsed_s": 0.44,
     "err": null,
     "result": {
      "n_entrances": 36,
@@ -3501,8 +3922,8 @@
    {
     "step": "nycha_developments_nta",
     "ok": true,
-    "started_at": 1790837154.5130339,
-    "elapsed_s": 0.02,
+    "started_at": 1790842405.401302,
+    "elapsed_s": 0.08,
     "err": null,
     "result": {
      "n_developments": 1,
@@ -3513,15 +3934,15 @@
    {
     "step": "dob_permits_nta",
     "ok": true,
-    "started_at": 1790837154.512749,
-    "elapsed_s": 0.34,
+    "started_at": 1790842405.401502,
+    "elapsed_s": 0.48,
     "err": null,
     "result": {}
    },
    {
     "step": "doe_schools_nta",
     "ok": true,
-    "started_at": 1790837154.51492,
+    "started_at": 1790842405.401438,
     "elapsed_s": 0.08,
     "err": null,
     "result": {
@@ -3533,8 +3954,8 @@
    {
     "step": "doh_hospitals_nta",
     "ok": true,
-    "started_at": 1790837154.5155149,
-    "elapsed_s": 0.02,
+    "started_at": 1790842405.401228,
+    "elapsed_s": 0.08,
     "err": null,
     "result": {
      "n_hospitals": 0,
@@ -3545,8 +3966,8 @@
    {
     "step": "nws_alerts_nta",
     "ok": true,
-    "started_at": 1790837154.51486,
-    "elapsed_s": 0.44,
+    "started_at": 1790842405.401568,
+    "elapsed_s": 0.4,
     "err": null,
     "result": {
      "n_active": 0
@@ -3555,7 +3976,7 @@
    {
     "step": "npcc4_slr_nta",
     "ok": true,
-    "started_at": 1790837154.52512,
+    "started_at": 1790842405.414455,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -3563,7 +3984,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790837154.954379,
+    "started_at": 1790842405.885655,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -3572,35 +3993,23 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790837154.954452,
+    "started_at": 1790842405.885727,
     "ok": true,
     "result": {
-     "n_chars": 4599,
+     "n_chars": 4690,
      "n_citations": 15,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0331
+    "elapsed_s": 0.0524
    }
   ],
   "models": [],
   "compliance": {
-   "passed": false,
-   "n_passed": 12,
+   "passed": true,
+   "n_passed": 13,
    "n_total": 13,
-   "failed": [
-    {
-     "name": "projection_has_horizon",
-     "rule": "TCFD 3.2",
-     "description": "Projection sentences must declare a time horizon (short/medium/long-term or an explicit year/duration).",
-     "reason": "",
-     "evidence": [
-      "Inside the DEP extreme scenario (by station): Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z) [mta_entrance_exposure].",
-      "Inside the DEP extreme scenario: CONLON LIHFE TOWER [nycha_development_exposure].",
-      "Inside the DEP extreme scenario: I.S. 059 Springfield Gardens [doe_school_exposure]."
-     ]
-    }
-   ]
+   "failed": []
   },
   "emissions": {
    "n_calls": 0,

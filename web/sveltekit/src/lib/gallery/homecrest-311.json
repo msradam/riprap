@@ -3,8 +3,8 @@
  "neighborhood": "Homecrest, Brooklyn",
  "address": "2017 East 17th Street, Brooklyn, NY 11229",
  "question": "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?",
- "generated_at": "2026-10-01T06:46Z",
- "riprap_commit": "f9c47b9",
+ "generated_at": "2026-10-01T08:13Z",
+ "riprap_commit": "3b15b18",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -1309,7 +1309,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-10-01T01:38:36+0000",
-    "retrieved_at": "2026-10-01T06:46Z",
+    "retrieved_at": "2026-10-01T08:13Z",
     "vintage": "2026-10-01T01:38:36+0000",
     "maturity": "production"
    },
@@ -1331,7 +1331,7 @@
     "url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
     "license": "U.S. Public Domain",
     "date_modified": "2007-09-05",
-    "retrieved_at": "2026-10-01T06:46Z",
+    "retrieved_at": "2026-10-01T08:13Z",
     "vintage": "2007-09-05",
     "maturity": "production"
    },
@@ -1342,7 +1342,7 @@
     "url": "https://hazards.fema.gov/arcgis/rest/services/PrelimPending/Prelim_NFHL/MapServer",
     "license": "U.S. Public Domain",
     "date_modified": "2015-01-30",
-    "retrieved_at": "2026-10-01T06:46Z",
+    "retrieved_at": "2026-10-01T08:13Z",
     "vintage": "2015-01-30",
     "maturity": "production"
    },
@@ -1407,9 +1407,9 @@
     "title": "FloodNet NYC, community-led real-time street-flood sensor network. Data CC-BY-NC-SA 4.0; derivatives must carry the same license. Readings come from the FloodNet API (api.floodnet.nyc), which has no stable page per sensor or event, so the link is the project's data download page. https://www.floodnet.nyc/data-downloads",
     "url": "https://www.floodnet.nyc/data-downloads",
     "license": "CC-BY-NC-SA 4.0",
-    "date_modified": "2026-10-01T06:46Z",
-    "retrieved_at": "2026-10-01T06:46Z",
-    "vintage": "2026-10-01T06:46Z",
+    "date_modified": "2026-10-01T08:13Z",
+    "retrieved_at": "2026-10-01T08:13Z",
+    "vintage": "2026-10-01T08:13Z",
     "maturity": "production"
    },
    "nws_obs": {
@@ -1418,9 +1418,9 @@
     "title": "NWS hourly METAR observations, nearest station to address.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T06:46Z",
-    "retrieved_at": "2026-10-01T06:46Z",
-    "vintage": "2026-10-01T06:46Z",
+    "date_modified": "2026-10-01T08:13Z",
+    "retrieved_at": "2026-10-01T08:13Z",
+    "vintage": "2026-10-01T08:13Z",
     "maturity": "production"
    },
    "noaa_tides": {
@@ -1429,9 +1429,9 @@
     "title": "NOAA CO-OPS tide-gauge water level observations, nearest station to address.",
     "url": "https://tidesandcurrents.noaa.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T06:46Z",
-    "retrieved_at": "2026-10-01T06:46Z",
-    "vintage": "2026-10-01T06:46Z",
+    "date_modified": "2026-10-01T08:13Z",
+    "retrieved_at": "2026-10-01T08:13Z",
+    "vintage": "2026-10-01T08:13Z",
     "maturity": "production"
    },
    "usgs_gauges": {
@@ -1440,9 +1440,9 @@
     "title": "USGS Water Data latest continuous values, nearest active stream gauge to address.",
     "url": "https://api.waterdata.usgs.gov/ogcapi/v1/collections/latest-continuous",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T06:46Z",
-    "retrieved_at": "2026-10-01T06:46Z",
-    "vintage": "2026-10-01T06:46Z",
+    "date_modified": "2026-10-01T08:13Z",
+    "retrieved_at": "2026-10-01T08:13Z",
+    "vintage": "2026-10-01T08:13Z",
     "maturity": "production"
    },
    "mta_entrance_exposure": {
@@ -1495,9 +1495,9 @@
     "title": "NWS active alerts at address (flood / coastal / wind).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T06:46Z",
-    "retrieved_at": "2026-10-01T06:46Z",
-    "vintage": "2026-10-01T06:46Z",
+    "date_modified": "2026-10-01T08:13Z",
+    "retrieved_at": "2026-10-01T08:13Z",
+    "vintage": "2026-10-01T08:13Z",
     "maturity": "production"
    },
    "nws_water_forecast": {
@@ -1506,9 +1506,9 @@
     "title": "National Weather Service, National Water Prediction Service, official water-level forecast and flood stages for the nearest harbor gauge.",
     "url": "https://water.noaa.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T06:46Z",
-    "retrieved_at": "2026-10-01T06:46Z",
-    "vintage": "2026-10-01T06:46Z",
+    "date_modified": "2026-10-01T08:13Z",
+    "retrieved_at": "2026-10-01T08:13Z",
+    "vintage": "2026-10-01T08:13Z",
     "maturity": "production"
    },
    "npcc4_slr": {
@@ -2032,14 +2032,14 @@
    "station_id": "KJFK",
    "station_name": "JFK Airport, NY",
    "distance_km": 15.6,
-   "obs_time": "2026-10-01T06:15:00+00:00",
-   "weather": "Mostly Cloudy",
+   "obs_time": "2026-10-01T07:45:00+00:00",
+   "weather": "Mostly Clear",
    "raining": false,
-   "temp_c": 19.0,
+   "temp_c": 18.0,
    "precip_last_hour_mm": null,
    "precip_last_3h_mm": null,
    "precip_last_6h_mm": null,
-   "narrative": "Latest METAR at JFK Airport, NY (15.6 km away): mostly cloudy, 19.0\u00b0C, no precipitation reported, observed 2026-10-01 06:15 UTC.",
+   "narrative": "Latest METAR at JFK Airport, NY (15.6 km away): mostly clear, 18.0\u00b0C, no precipitation reported, observed 2026-10-01 07:45 UTC.",
    "error": null
   },
   "noaa_tides": {
@@ -2049,12 +2049,12 @@
    "station_lon": -74.0142,
    "distance_km": 12.2,
    "datum": "MLLW",
-   "observed_ft": 3.45,
-   "observed_ft_mllw": 3.45,
-   "predicted_ft_mllw": 2.98,
-   "residual_ft": 0.47,
-   "obs_time": "2026-10-01 06:30",
-   "narrative": "Latest reading at The Battery, NY: 3.45 ft above MLLW (+0.47 ft vs predicted tide), observed 2026-10-01 06:30 UTC.",
+   "observed_ft": 1.69,
+   "observed_ft_mllw": 1.69,
+   "predicted_ft_mllw": 1.27,
+   "residual_ft": 0.42,
+   "obs_time": "2026-10-01 08:00",
+   "narrative": "Latest reading at The Battery, NY: 1.69 ft above MLLW (+0.42 ft vs predicted tide), observed 2026-10-01 08:00 UTC.",
    "error": null
   },
   "usgs_gauges": {
@@ -2069,7 +2069,7 @@
    "footprint_buffer_m": 8,
    "n_inside_sandy_2012": 0,
    "n_in_dep_extreme_2080": 3,
-   "narrative": "5 MTA subway entrances within 800 m of this address: 0 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): Ave U (Q) (232 m), Neck Rd (Q) (635 m)",
+   "narrative": "5 MTA subway entrances within 800 m of this address: 0 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise), by station: Ave U (Q) (232 m), Neck Rd (Q) (635 m)",
    "n_ada_accessible": 0,
    "entrances": [
     {
@@ -2182,7 +2182,7 @@
    "footprint_buffer_m": 50,
    "n_inside_sandy_2012": 0,
    "n_in_dep_extreme_2080": 1,
-   "narrative": "1 flood-exposed NYC DOE school within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: J.H.S. 278 Marine Park (1495 m)",
+   "narrative": "1 flood-exposed NYC DOE school within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): J.H.S. 278 Marine Park (1495 m)",
    "schools": [
     {
      "loc_code": "K278",
@@ -2214,7 +2214,7 @@
    "footprint_buffer_m": 100,
    "n_inside_sandy_2012": 1,
    "n_in_dep_extreme_2080": 2,
-   "narrative": "3 hospitals within 3000 m of this address: 1 inside the 2012 Sandy inundation extent and 2 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: South Brooklyn Health (1837 m). Inside the DEP extreme scenario: Maimonides Midwood Community Hospital (1484 m), South Brooklyn Health (1837 m)",
+   "narrative": "3 hospitals within 3000 m of this address: 1 inside the 2012 Sandy inundation extent and 2 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: South Brooklyn Health (1837 m). Inside the DEP extreme scenario (2080 sea-level rise): Maimonides Midwood Community Hospital (1484 m), South Brooklyn Health (1837 m)",
    "hospitals": [
     {
      "fac_id": "1293",
@@ -2276,25 +2276,25 @@
   "nws_alerts": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS flood, coastal or wind alerts at this point, checked 2026-10-01 06:46 UTC.",
-   "retrieved_at": "2026-10-01T06:46:15Z",
+   "narrative": "No active NWS flood, coastal or wind alerts at this point, checked 2026-10-01 08:13 UTC.",
+   "retrieved_at": "2026-10-01T08:13:44Z",
    "error": null
   },
   "nws_water_forecast": {
    "gauge_id": "BATN6",
    "gauge_name": "The Battery",
    "distance_km": 12.2,
-   "forecast_peak_ft_mllw": 6.0,
+   "forecast_peak_ft_mllw": 6.1,
    "forecast_peak_time_utc": "2026-10-01T16:00:00Z",
-   "issued_utc": "2026-09-30T07:44:00Z",
+   "issued_utc": "2026-10-01T07:34:00Z",
    "flood_stages_ft": {
     "major": 9.4,
     "moderate": 8.3,
     "minor": 7.0
    },
    "flood_category": null,
-   "forecast_until_utc": "2026-10-03T18:00:00Z",
-   "narrative": "The National Weather Service forecasts a peak water level of 6.0 ft above MLLW at The Battery, the nearest forecast gauge (12 km away), on 2026-10-01 16:00 UTC (forecast issued 2026-09-30 07:44 UTC), below the gauge's minor flood stage of 7.0 ft."
+   "forecast_until_utc": "2026-10-04T18:00:00Z",
+   "narrative": "The National Weather Service forecasts a peak water level of 6.1 ft above MLLW at The Battery, the nearest forecast gauge (12 km away), on 2026-10-01 16:00 UTC (forecast issued 2026-10-01 07:34 UTC), below the gauge's minor flood stage of 7.0 ft."
   },
   "npcc4_slr": {
    "available": true,
@@ -2342,7 +2342,7 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790837174.840721,
+    "started_at": 1790842424.441399,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -2355,7 +2355,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790837174.861353,
+    "started_at": 1790842424.4649432,
     "elapsed_s": 0.0001,
     "err": null,
     "result": {
@@ -2367,8 +2367,8 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790837174.862182,
-    "elapsed_s": 0.02,
+    "started_at": 1790842424.466727,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "inside": false,
@@ -2378,7 +2378,7 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790837174.8622348,
+    "started_at": 1790842424.465847,
     "elapsed_s": 0.36,
     "err": null,
     "result": {
@@ -2391,7 +2391,7 @@
    {
     "step": "fema_pfirm",
     "ok": true,
-    "started_at": 1790837174.8629608,
+    "started_at": 1790842424.466346,
     "elapsed_s": 0.36,
     "err": null,
     "result": {
@@ -2404,8 +2404,8 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790837174.862991,
-    "elapsed_s": 0.02,
+    "started_at": 1790842424.4669828,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2415,7 +2415,7 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790837174.864351,
+    "started_at": 1790842424.4680262,
     "elapsed_s": 0.01,
     "err": null,
     "result": {
@@ -2426,8 +2426,8 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790837174.864885,
-    "elapsed_s": 0.02,
+    "started_at": 1790842424.4686131,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2437,7 +2437,7 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790837174.865553,
+    "started_at": 1790842424.471154,
     "elapsed_s": 0.01,
     "err": null,
     "result": {
@@ -2449,8 +2449,8 @@
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790837174.86565,
-    "elapsed_s": 0.02,
+    "started_at": 1790842424.473561,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "elev_m": 6.56,
@@ -2461,8 +2461,8 @@
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790837174.879096,
-    "elapsed_s": 0.25,
+    "started_at": 1790842424.473536,
+    "elapsed_s": 0.35,
     "err": null,
     "result": {
      "n_sensors": 0,
@@ -2472,8 +2472,8 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790837174.878398,
-    "elapsed_s": 13.66,
+    "started_at": 1790842424.473506,
+    "elapsed_s": 0.22,
     "err": null,
     "result": {
      "n": 36
@@ -2482,7 +2482,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790837174.880918,
+    "started_at": 1790842424.473335,
     "elapsed_s": 0.22,
     "err": null,
     "result": {
@@ -2494,20 +2494,20 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790837174.881252,
-    "elapsed_s": 0.26,
+    "started_at": 1790842424.4744241,
+    "elapsed_s": 0.35,
     "err": null,
     "result": {
      "station": "8518750",
-     "observed_ft_mllw": 3.45,
-     "residual_ft": 0.47
+     "observed_ft_mllw": 1.69,
+     "residual_ft": 0.42
     }
    },
    {
     "step": "usgs_gauges",
     "ok": true,
-    "started_at": 1790837174.88189,
-    "elapsed_s": 0.88,
+    "started_at": 1790842424.482023,
+    "elapsed_s": 0.78,
     "err": null,
     "result": {
      "station": null,
@@ -2518,8 +2518,8 @@
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790837174.882346,
-    "elapsed_s": 0.45,
+    "started_at": 1790842424.4819798,
+    "elapsed_s": 0.41,
     "err": null,
     "result": {
      "n_entrances": 5,
@@ -2530,7 +2530,7 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790837174.882452,
+    "started_at": 1790842424.481947,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2542,7 +2542,7 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790837174.8828769,
+    "started_at": 1790842424.482273,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2554,8 +2554,8 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790837174.8830872,
-    "elapsed_s": 0.04,
+    "started_at": 1790842424.4825091,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "n_hospitals": 3,
@@ -2566,7 +2566,7 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790837174.883778,
+    "started_at": 1790842424.483129,
     "elapsed_s": 0.34,
     "err": null,
     "result": {
@@ -2576,19 +2576,19 @@
    {
     "step": "nws_water_forecast",
     "ok": true,
-    "started_at": 1790837174.883827,
-    "elapsed_s": 0.26,
+    "started_at": 1790842424.484124,
+    "elapsed_s": 0.3,
     "err": null,
     "result": {
      "gauge": "BATN6",
-     "forecast_peak_ft_mllw": 6.0,
+     "forecast_peak_ft_mllw": 6.1,
      "flood_category": null
     }
    },
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790837174.884075,
+    "started_at": 1790842424.483974,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2596,7 +2596,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790837188.540149,
+    "started_at": 1790842425.260111,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2609,7 +2609,7 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790837188.540354,
+    "started_at": 1790842425.2603571,
     "ok": true,
     "result": {
      "n_chars": 696,
@@ -2617,7 +2617,7 @@
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0656
+    "elapsed_s": 0.0378
    }
   ],
   "models": [],

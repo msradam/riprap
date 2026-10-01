@@ -3,8 +3,8 @@
  "neighborhood": "Community district BK06, Brooklyn",
  "address": "BK06",
  "question": "Which NYCHA developments in Brooklyn Community District 6 lie inside the 2012 Sandy inundation area?",
- "generated_at": "2026-10-01T06:46Z",
- "riprap_commit": "f9c47b9",
+ "generated_at": "2026-10-01T08:14Z",
+ "riprap_commit": "3b15b18",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -1375,7 +1375,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-10-01T01:38:36+0000",
-    "retrieved_at": "2026-10-01T06:46Z",
+    "retrieved_at": "2026-10-01T08:14Z",
     "vintage": "2026-10-01T01:38:36+0000",
     "maturity": "production"
    },
@@ -1386,7 +1386,7 @@
     "url": "https://communityprofiles.planning.nyc.gov/",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2024-02-01",
-    "retrieved_at": "2026-10-01T06:46Z",
+    "retrieved_at": "2026-10-01T08:14Z",
     "vintage": "2024-02-01",
     "maturity": "production"
    },
@@ -1429,9 +1429,9 @@
     "title": "NWS active alerts for the area (flood / coastal / wind).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T06:46Z",
-    "retrieved_at": "2026-10-01T06:46Z",
-    "vintage": "2026-10-01T06:46Z",
+    "date_modified": "2026-10-01T08:14Z",
+    "retrieved_at": "2026-10-01T08:14Z",
+    "vintage": "2026-10-01T08:14Z",
     "maturity": "production"
    },
    "npcc4_slr": {
@@ -2201,13 +2201,13 @@
    "headline_value": "median ground elevation 6.56 m"
   },
   "nyc311_nta": {
-   "n": 961,
+   "n": 959,
    "capped": false,
    "radius_m": null,
    "where": "in Community District BK06 (by the record's community board field)",
    "years": 3,
    "by_year": {
-    "2023": 115,
+    "2023": 113,
     "2024": 277,
     "2025": 193,
     "2026": 376
@@ -2217,15 +2217,15 @@
     "Sewer Backup (Use Comments) (SA)": 283,
     "Street Flooding (SJ)": 137,
     "Manhole Overflow (Use Comments) (SA1)": 95,
-    "Backup": 57,
+    "Backup": 56,
     "Catch Basin Clogged": 49,
-    "Flooding on Street": 25,
+    "Flooding on Street": 24,
     "Manhole Overflow": 22
    },
    "by_kind": {
     "catch basin": 342,
-    "sewer backup": 340,
-    "street flooding": 162,
+    "sewer backup": 339,
+    "street flooding": 161,
     "manhole overflow": 117
    },
    "most_recent": [
@@ -2255,12 +2255,433 @@
      "address": "197 BUTLER STREET"
     }
    ],
-   "points": [],
-   "headline_value": "961 complaints",
-   "subhead_text": "342 catch basin, 340 sewer backup, 162 street flooding, 117 manhole overflow",
-   "narrative": "961 NYC 311 flood-related complaints filed in Community District BK06 (by the record's community board field) in the last 3 years: 342 catch basin, 340 sewer backup, 162 street flooding, 117 manhole overflow.",
+   "points": [
+    {
+     "lat": 40.6757537468496,
+     "lon": -73.97142204784221,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-28",
+     "address": "8 AVENUE"
+    },
+    {
+     "lat": 40.667282828643934,
+     "lon": -73.98241635612257,
+     "descriptor": "Backup",
+     "date": "2026-09-28",
+     "address": "424 9 STREET"
+    },
+    {
+     "lat": 40.673399234462764,
+     "lon": -74.0083059513347,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-28",
+     "address": "536 COLUMBIA STREET"
+    },
+    {
+     "lat": 40.68239348719654,
+     "lon": -73.98757184206723,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-27",
+     "address": "197 BUTLER STREET"
+    },
+    {
+     "lat": 40.68239348719654,
+     "lon": -73.98757184206723,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-27",
+     "address": "197 BUTLER STREET"
+    },
+    {
+     "lat": 40.6784684883611,
+     "lon": -73.9878213383736,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-26",
+     "address": "PRESIDENT STREET"
+    },
+    {
+     "lat": 40.67443040868527,
+     "lon": -74.0163453844518,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-26",
+     "address": "480 VAN BRUNT STREET"
+    },
+    {
+     "lat": 40.67819703616761,
+     "lon": -73.99084621197056,
+     "descriptor": "Manhole Overflow",
+     "date": "2026-09-26",
+     "address": "372 BOND STREET"
+    },
+    {
+     "lat": 40.67522356576242,
+     "lon": -73.98308120830599,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-26",
+     "address": "30 GARFIELD PLACE"
+    },
+    {
+     "lat": 40.67632766035232,
+     "lon": -73.9887626791857,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-26",
+     "address": "165 2 STREET"
+    },
+    {
+     "lat": 40.66982556612156,
+     "lon": -73.97366318147563,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-24",
+     "address": "566 1 STREET"
+    },
+    {
+     "lat": 40.669342169319584,
+     "lon": -73.98838895748325,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-24",
+     "address": "312 10 STREET"
+    },
+    {
+     "lat": 40.67802645063406,
+     "lon": -73.9866569189013,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-24",
+     "address": "499 PRESIDENT STREET"
+    },
+    {
+     "lat": 40.670061274670076,
+     "lon": -73.98813288914052,
+     "descriptor": "Backup",
+     "date": "2026-09-23",
+     "address": "262 9 STREET"
+    },
+    {
+     "lat": 40.685558866764204,
+     "lon": -74.0017667787778,
+     "descriptor": "Backup",
+     "date": "2026-09-21",
+     "address": "136 DEGRAW STREET"
+    },
+    {
+     "lat": 40.685558866764204,
+     "lon": -74.0017667787778,
+     "descriptor": "Backup",
+     "date": "2026-09-20",
+     "address": "136 DEGRAW STREET"
+    },
+    {
+     "lat": 40.67802645063406,
+     "lon": -73.9866569189013,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-20",
+     "address": "499 PRESIDENT STREET"
+    },
+    {
+     "lat": 40.67994534728925,
+     "lon": -73.9895588557994,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-20",
+     "address": "BOND STREET"
+    },
+    {
+     "lat": 40.66815926758331,
+     "lon": -73.9893948831867,
+     "descriptor": "Backup",
+     "date": "2026-09-20",
+     "address": "237 12 STREET"
+    },
+    {
+     "lat": 40.670061274670076,
+     "lon": -73.98813288914052,
+     "descriptor": "Backup",
+     "date": "2026-09-18",
+     "address": "262 9 STREET"
+    },
+    {
+     "lat": 40.66672846444112,
+     "lon": -73.98295359557906,
+     "descriptor": "Backup",
+     "date": "2026-09-15",
+     "address": "513 10 STREET"
+    },
+    {
+     "lat": 40.670061274670076,
+     "lon": -73.98813288914052,
+     "descriptor": "Backup",
+     "date": "2026-09-14",
+     "address": "262 9 STREET"
+    },
+    {
+     "lat": 40.66934741072643,
+     "lon": -73.98614677430808,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-09",
+     "address": "439 5 AVENUE"
+    },
+    {
+     "lat": 40.670061274670076,
+     "lon": -73.98813288914052,
+     "descriptor": "Backup",
+     "date": "2026-09-08",
+     "address": "262 9 STREET"
+    },
+    {
+     "lat": 40.669373230969,
+     "lon": -73.97620113656845,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-04",
+     "address": "8 AVENUE"
+    },
+    {
+     "lat": 40.66928816001487,
+     "lon": -73.97628407712787,
+     "descriptor": "Manhole Overflow",
+     "date": "2026-09-03",
+     "address": "300 8 AVENUE"
+    },
+    {
+     "lat": 40.673737375945684,
+     "lon": -73.97596525220615,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-02",
+     "address": "114 7 AVENUE"
+    },
+    {
+     "lat": 40.6674033967265,
+     "lon": -73.98114026421592,
+     "descriptor": "Backup",
+     "date": "2026-09-02",
+     "address": "309 7 AVENUE"
+    },
+    {
+     "lat": 40.672713339148885,
+     "lon": -74.00053714150158,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-02",
+     "address": "577 COURT STREET"
+    },
+    {
+     "lat": 40.6784684883611,
+     "lon": -73.9878213383736,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-02",
+     "address": "NEVINS STREET"
+    },
+    {
+     "lat": 40.679209563412954,
+     "lon": -73.98769141124082,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-01",
+     "address": "498 UNION STREET"
+    },
+    {
+     "lat": 40.6674033967265,
+     "lon": -73.98114026421592,
+     "descriptor": "Backup",
+     "date": "2026-08-31",
+     "address": "309 7 AVENUE"
+    },
+    {
+     "lat": 40.67582818448727,
+     "lon": -73.9895378695026,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-31",
+     "address": "175 3 STREET"
+    },
+    {
+     "lat": 40.683870375943584,
+     "lon": -73.98960150818876,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-28",
+     "address": "211 HOYT STREET"
+    },
+    {
+     "lat": 40.66810124337851,
+     "lon": -73.98582981712889,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-27",
+     "address": "404 10 STREET"
+    },
+    {
+     "lat": 40.6619822967871,
+     "lon": -73.9801722142136,
+     "descriptor": "Manhole Overflow",
+     "date": "2026-08-27",
+     "address": "482 14 STREET"
+    },
+    {
+     "lat": 40.681806774491534,
+     "lon": -73.99923203529433,
+     "descriptor": "Backup",
+     "date": "2026-08-27",
+     "address": "170 CARROLL STREET"
+    },
+    {
+     "lat": 40.67901766849421,
+     "lon": -73.99017911562315,
+     "descriptor": "Manhole Overflow",
+     "date": "2026-08-26",
+     "address": "335 BOND STREET"
+    },
+    {
+     "lat": 40.6811150941203,
+     "lon": -73.99978006872696,
+     "descriptor": "Backup",
+     "date": "2026-08-26",
+     "address": "26 1 PLACE"
+    },
+    {
+     "lat": 40.67794487315476,
+     "lon": -74.00135197224324,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-26",
+     "address": "96 LUQUER STREET"
+    },
+    {
+     "lat": 40.6811150941203,
+     "lon": -73.99978006872696,
+     "descriptor": "Backup",
+     "date": "2026-08-25",
+     "address": "26 1 PLACE"
+    },
+    {
+     "lat": 40.66914936427826,
+     "lon": -73.98299623427056,
+     "descriptor": "Backup",
+     "date": "2026-08-25",
+     "address": "407 6 AVENUE"
+    },
+    {
+     "lat": 40.66914936427826,
+     "lon": -73.98299623427056,
+     "descriptor": "Backup",
+     "date": "2026-08-24",
+     "address": "407 6 AVENUE"
+    },
+    {
+     "lat": 40.67623488616279,
+     "lon": -74.00037854252194,
+     "descriptor": "Backup",
+     "date": "2026-08-24",
+     "address": "139 HUNTINGTON STREET"
+    },
+    {
+     "lat": 40.67895483432592,
+     "lon": -73.97430853267706,
+     "descriptor": "Flooding on Street",
+     "date": "2026-08-24",
+     "address": "93 PROSPECT PLACE"
+    },
+    {
+     "lat": 40.67858264962918,
+     "lon": -73.9798536181033,
+     "descriptor": "Backup",
+     "date": "2026-08-24",
+     "address": "405 DOUGLAS STREET"
+    },
+    {
+     "lat": 40.672637077176255,
+     "lon": -73.97773569022647,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-24",
+     "address": "190 GARFIELD PLACE"
+    },
+    {
+     "lat": 40.66914936427826,
+     "lon": -73.98299623427056,
+     "descriptor": "Backup",
+     "date": "2026-08-24",
+     "address": "407 6 AVENUE"
+    },
+    {
+     "lat": 40.670869736893884,
+     "lon": -73.97931882118174,
+     "descriptor": "Backup",
+     "date": "2026-08-24",
+     "address": "488 3 STREET"
+    },
+    {
+     "lat": 40.676305183118046,
+     "lon": -73.98432471781844,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-23",
+     "address": "544 CARROLL STREET"
+    },
+    {
+     "lat": 40.676305183118046,
+     "lon": -73.98432471781844,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-23",
+     "address": "544 CARROLL STREET"
+    },
+    {
+     "lat": 40.68417000370933,
+     "lon": -74.00226070861531,
+     "descriptor": "Backup",
+     "date": "2026-08-23",
+     "address": "132 UNION STREET"
+    },
+    {
+     "lat": 40.67917996590987,
+     "lon": -73.99618195967425,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-23",
+     "address": "134 2 PLACE"
+    },
+    {
+     "lat": 40.67830674555802,
+     "lon": -74.0101272283911,
+     "descriptor": "Backup",
+     "date": "2026-08-23",
+     "address": "98 PIONEER STREET"
+    },
+    {
+     "lat": 40.67800740062635,
+     "lon": -73.98814950148413,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-23",
+     "address": "340 NEVINS STREET"
+    },
+    {
+     "lat": 40.66976433699748,
+     "lon": -73.98399100703745,
+     "descriptor": "Backup",
+     "date": "2026-08-23",
+     "address": "373 7 STREET"
+    },
+    {
+     "lat": 40.67783449059309,
+     "lon": -73.98825408455741,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-23",
+     "address": "CARROLL STREET"
+    },
+    {
+     "lat": 40.67353352839196,
+     "lon": -73.98927506293352,
+     "descriptor": "Backup",
+     "date": "2026-08-23",
+     "address": "399 3 AVENUE"
+    },
+    {
+     "lat": 40.67813569100719,
+     "lon": -73.98254328433215,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-23",
+     "address": "191 4 AVENUE"
+    },
+    {
+     "lat": 40.67682745193514,
+     "lon": -73.99160709692846,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-23",
+     "address": "123 3 STREET"
+    }
+   ],
+   "headline_value": "959 complaints",
+   "subhead_text": "342 catch basin, 339 sewer backup, 161 street flooding, 117 manhole overflow",
+   "narrative": "959 NYC 311 flood-related complaints filed in Community District BK06 (by the record's community board field) in the last 3 years: 342 catch basin, 339 sewer backup, 161 street flooding, 117 manhole overflow.",
    "histogram": [
-    115,
+    113,
     277,
     193,
     376
@@ -2280,7 +2701,7 @@
    "n_inside_sandy_2012": 0,
    "n_in_dep_extreme_2080": 4,
    "n_near_sandy_edge": 1,
-   "narrative": "37 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 4 inside the DEP extreme stormwater scenario (2080 sea-level rise). Outside the 2012 Sandy extent but within 50 m of its mapped edge (the outline is not exact to a building) (by station): Smith-9 Sts (F G). Inside the DEP extreme scenario (by station): 4 Av-9 St (F G R), Union St (R)",
+   "narrative": "37 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 4 inside the DEP extreme stormwater scenario (2080 sea-level rise). Outside the 2012 Sandy extent but within 50 m of its mapped edge (the outline is not exact to a building), by station: Smith-9 Sts (F G). Inside the DEP extreme scenario (2080 sea-level rise), by station: 4 Av-9 St (F G R), Union St (R)",
    "entrances": [
     {
      "station_id": "241",
@@ -3096,8 +3517,8 @@
   "nws_alerts_nta": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:46 UTC.",
-   "retrieved_at": "2026-10-01T06:46:53Z",
+   "narrative": "No active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 08:14 UTC.",
+   "retrieved_at": "2026-10-01T08:14:13Z",
    "error": null
   },
   "npcc4_slr_nta": {
@@ -3146,7 +3567,7 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790837213.441039,
+    "started_at": 1790842453.524488,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -3165,7 +3586,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790837213.442784,
+    "started_at": 1790842453.527571,
     "elapsed_s": 0.0001,
     "err": null,
     "result": {
@@ -3177,7 +3598,7 @@
    {
     "step": "dob_permits_nta",
     "ok": true,
-    "started_at": 1790837213.4431202,
+    "started_at": 1790842453.528036,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -3187,31 +3608,31 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1790837213.444138,
-    "elapsed_s": 0.0,
+    "started_at": 1790842453.529386,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "sandy_nta",
     "ok": true,
-    "started_at": 1790837213.445154,
-    "elapsed_s": 0.04,
+    "started_at": 1790842453.534946,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_extreme_2080_nta",
     "ok": true,
-    "started_at": 1790837213.4486709,
-    "elapsed_s": 0.27,
+    "started_at": 1790842453.540201,
+    "elapsed_s": 0.26,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_2050_nta",
     "ok": true,
-    "started_at": 1790837213.4487948,
+    "started_at": 1790842453.541826,
     "elapsed_s": 0.08,
     "err": null,
     "result": {}
@@ -3219,7 +3640,7 @@
    {
     "step": "dep_moderate_current_nta",
     "ok": true,
-    "started_at": 1790837213.4563358,
+    "started_at": 1790842453.5454369,
     "elapsed_s": 0.05,
     "err": null,
     "result": {}
@@ -3227,24 +3648,24 @@
    {
     "step": "microtopo_nta",
     "ok": true,
-    "started_at": 1790837213.456531,
-    "elapsed_s": 0.05,
+    "started_at": 1790842453.54687,
+    "elapsed_s": 0.06,
     "err": null,
     "result": {}
    },
    {
     "step": "nyc311_nta",
     "ok": true,
-    "started_at": 1790837213.461555,
-    "elapsed_s": 0.14,
+    "started_at": 1790842453.551512,
+    "elapsed_s": 0.17,
     "err": null,
     "result": {}
    },
    {
     "step": "dcp_floodplain_nta",
     "ok": true,
-    "started_at": 1790837213.467139,
-    "elapsed_s": 0.14,
+    "started_at": 1790842453.5529358,
+    "elapsed_s": 0.15,
     "err": null,
     "result": {
      "n_buildings": 1356,
@@ -3254,8 +3675,8 @@
    {
     "step": "mta_entrances_nta",
     "ok": true,
-    "started_at": 1790837213.467086,
-    "elapsed_s": 0.18,
+    "started_at": 1790842453.55522,
+    "elapsed_s": 0.21,
     "err": null,
     "result": {
      "n_entrances": 37,
@@ -3266,8 +3687,8 @@
    {
     "step": "nycha_developments_nta",
     "ok": true,
-    "started_at": 1790837213.467036,
-    "elapsed_s": 0.01,
+    "started_at": 1790842453.556452,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {
      "n_developments": 2,
@@ -3278,8 +3699,8 @@
    {
     "step": "doe_schools_nta",
     "ok": true,
-    "started_at": 1790837213.466487,
-    "elapsed_s": 0.01,
+    "started_at": 1790842453.580322,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {
      "n_schools": 2,
@@ -3290,8 +3711,8 @@
    {
     "step": "doh_hospitals_nta",
     "ok": true,
-    "started_at": 1790837213.4659111,
-    "elapsed_s": 0.04,
+    "started_at": 1790842453.5585139,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {
      "n_hospitals": 2,
@@ -3302,7 +3723,7 @@
    {
     "step": "nws_alerts_nta",
     "ok": true,
-    "started_at": 1790837213.4664268,
+    "started_at": 1790842453.581084,
     "elapsed_s": 0.25,
     "err": null,
     "result": {
@@ -3312,15 +3733,15 @@
    {
     "step": "npcc4_slr_nta",
     "ok": true,
-    "started_at": 1790837213.466985,
-    "elapsed_s": 0.0,
+    "started_at": 1790842453.558592,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {}
    },
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790837213.714528,
+    "started_at": 1790842453.828098,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -3329,7 +3750,7 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790837213.7146041,
+    "started_at": 1790842453.8281758,
     "ok": true,
     "result": {
      "n_chars": 920,
@@ -3337,7 +3758,7 @@
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0192
+    "elapsed_s": 0.0203
    }
   ],
   "models": [],

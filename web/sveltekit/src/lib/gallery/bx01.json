@@ -3,8 +3,8 @@
  "neighborhood": "Community district BX01, Bronx",
  "address": "BX01",
  "question": null,
- "generated_at": "2026-10-01T06:46Z",
- "riprap_commit": "f9c47b9",
+ "generated_at": "2026-10-01T08:13Z",
+ "riprap_commit": "3b15b18",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -1252,9 +1252,9 @@
    "n_matches": 1
   },
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\n395 flood-related 311 complaints were filed in Community District BX01 (by the record's community board field) in the last 3 years [nyc311_nta]. 6.0% is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise, 1.4% is modeled to flood from rainfall in the moderate scenario for 2050 [dep_extreme_2080_nta][dep_moderate_2050_nta]. 14.1% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 14.1% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 5.41 km\u00b2) [sandy_nta]. DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 6.0% of this area is modeled to flood from rainfall, 3.4% as nuisance flooding (4 in to under 1 ft) and 2.6% as deep and contiguous flooding (1 ft or more); 2.1% is in the future high tide area (coastal tidal inundation projected for 2080) [dep_extreme_2080_nta]. DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 1.4% of this area is modeled to flood from rainfall, 1.0% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more); 0.3% is in the future high tide area (coastal tidal inundation projected for 2050) [dep_moderate_2050_nta]. DEP Moderate Stormwater (2.13 in/hr, current SLR): 1.2% of this area is modeled to flood from rainfall, 0.8% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more) [dep_moderate_current_nta]. Median ground elevation 8.4 m (10th percentile 3.04 m); 26.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage) [microtopo_nta].\n\n**Live Observer.**\n395 NYC 311 flood-related complaints filed in Community District BX01 (by the record's community board field) in the last 3 years: 200 sewer backup, 115 catch basin, 53 street flooding, 27 manhole overflow [nyc311_nta].\n\n**Asset Register.**\nNYC Planning's Community District Profile counts 327 buildings, 1,972 residential units and 580 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block) [dcp_floodplain_nta]. 41 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 6 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): E 149 St (6), Jackson Av (2 5) [mta_entrance_exposure]. 1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: MOORE [nycha_development_exposure]. 21 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 1 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise) [dob_permits_nta]. 2 flood-exposed NYC DOE schools in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: Success Academy Charter School - Bronx 1. Inside the DEP extreme scenario: Legacy College Preparatory [doe_school_exposure]. 1 hospital in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:46 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\n395 flood-related 311 complaints were filed in Community District BX01 (by the record's community board field) in the last 3 years [nyc311_nta]. 6.0% of this area is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise and 2.1% is in its future high tide area, 1.4% of this area is modeled to flood from rainfall in the moderate scenario for 2050 and 0.3% is in its future high tide area [dep_extreme_2080_nta][dep_moderate_2050_nta]. 14.1% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 14.1% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 5.41 km\u00b2) [sandy_nta]. DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 6.0% of this area is modeled to flood from rainfall, 3.4% as nuisance flooding (4 in to under 1 ft) and 2.6% as deep and contiguous flooding (1 ft or more); 2.1% is in the future high tide area (coastal tidal inundation projected for 2080) [dep_extreme_2080_nta]. DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 1.4% of this area is modeled to flood from rainfall, 1.0% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more); 0.3% is in the future high tide area (coastal tidal inundation projected for 2050) [dep_moderate_2050_nta]. DEP Moderate Stormwater (2.13 in/hr, current SLR): 1.2% of this area is modeled to flood from rainfall, 0.8% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more) [dep_moderate_current_nta]. Median ground elevation 8.4 m (10th percentile 3.04 m); 26.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage) [microtopo_nta].\n\n**Live Observer.**\n395 NYC 311 flood-related complaints filed in Community District BX01 (by the record's community board field) in the last 3 years: 200 sewer backup, 115 catch basin, 53 street flooding, 27 manhole overflow [nyc311_nta].\n\n**Asset Register.**\nNYC Planning's Community District Profile counts 327 buildings, 1,972 residential units and 580 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block) [dcp_floodplain_nta]. 41 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 6 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise), by station: E 149 St (6), Jackson Av (2 5) [mta_entrance_exposure]. 1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): MOORE [nycha_development_exposure]. 21 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 1 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise) [dob_permits_nta]. 2 flood-exposed NYC DOE schools in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: Success Academy Charter School - Bronx 1. Inside the DEP extreme scenario (2080 sea-level rise): Legacy College Preparatory [doe_school_exposure]. 1 hospital in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 08:13 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\n395 flood-related 311 complaints were filed in Community District BX01 (by the record's community board field) in the last 3 years [nyc311_nta]. 6.0% is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise, 1.4% is modeled to flood from rainfall in the moderate scenario for 2050 [dep_extreme_2080_nta][dep_moderate_2050_nta]. 14.1% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 14.1% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 5.41 km\u00b2) [sandy_nta]. DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 6.0% of this area is modeled to flood from rainfall, 3.4% as nuisance flooding (4 in to under 1 ft) and 2.6% as deep and contiguous flooding (1 ft or more); 2.1% is in the future high tide area (coastal tidal inundation projected for 2080) [dep_extreme_2080_nta]. DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 1.4% of this area is modeled to flood from rainfall, 1.0% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more); 0.3% is in the future high tide area (coastal tidal inundation projected for 2050) [dep_moderate_2050_nta]. DEP Moderate Stormwater (2.13 in/hr, current SLR): 1.2% of this area is modeled to flood from rainfall, 0.8% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more) [dep_moderate_current_nta]. Median ground elevation 8.4 m (10th percentile 3.04 m); 26.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage) [microtopo_nta].\n\n**Live Observer.**\n395 NYC 311 flood-related complaints filed in Community District BX01 (by the record's community board field) in the last 3 years: 200 sewer backup, 115 catch basin, 53 street flooding, 27 manhole overflow [nyc311_nta].\n\n**Asset Register.**\nNYC Planning's Community District Profile counts 327 buildings, 1,972 residential units and 580 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block) [dcp_floodplain_nta]. 41 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 6 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): E 149 St (6), Jackson Av (2 5) [mta_entrance_exposure]. 1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: MOORE [nycha_development_exposure]. 21 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 1 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise) [dob_permits_nta]. 2 flood-exposed NYC DOE schools in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: Success Academy Charter School - Bronx 1. Inside the DEP extreme scenario: Legacy College Preparatory [doe_school_exposure]. 1 hospital in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:46 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\n395 flood-related 311 complaints were filed in Community District BX01 (by the record's community board field) in the last 3 years [nyc311_nta]. 6.0% of this area is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise and 2.1% is in its future high tide area, 1.4% of this area is modeled to flood from rainfall in the moderate scenario for 2050 and 0.3% is in its future high tide area [dep_extreme_2080_nta][dep_moderate_2050_nta]. 14.1% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 14.1% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 5.41 km\u00b2) [sandy_nta]. DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 6.0% of this area is modeled to flood from rainfall, 3.4% as nuisance flooding (4 in to under 1 ft) and 2.6% as deep and contiguous flooding (1 ft or more); 2.1% is in the future high tide area (coastal tidal inundation projected for 2080) [dep_extreme_2080_nta]. DEP Moderate Stormwater (2.13 in/hr, 2050 SLR): 1.4% of this area is modeled to flood from rainfall, 1.0% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more); 0.3% is in the future high tide area (coastal tidal inundation projected for 2050) [dep_moderate_2050_nta]. DEP Moderate Stormwater (2.13 in/hr, current SLR): 1.2% of this area is modeled to flood from rainfall, 0.8% as nuisance flooding (4 in to under 1 ft) and 0.4% as deep and contiguous flooding (1 ft or more) [dep_moderate_current_nta]. Median ground elevation 8.4 m (10th percentile 3.04 m); 26.8% of the area sits less than 1 m above the nearest drainage channel (HAND, height above nearest drainage) [microtopo_nta].\n\n**Live Observer.**\n395 NYC 311 flood-related complaints filed in Community District BX01 (by the record's community board field) in the last 3 years: 200 sewer backup, 115 catch basin, 53 street flooding, 27 manhole overflow [nyc311_nta].\n\n**Asset Register.**\nNYC Planning's Community District Profile counts 327 buildings, 1,972 residential units and 580 residents in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, by census block) [dcp_floodplain_nta]. 41 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 6 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise), by station: E 149 St (6), Jackson Av (2 5) [mta_entrance_exposure]. 1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): MOORE [nycha_development_exposure]. 21 active NYC DOB construction permits inside this area since 2025-04-09: 0 inside the 2012 Sandy extent and 1 inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise) [dob_permits_nta]. 2 flood-exposed NYC DOE schools in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: Success Academy Charter School - Bronx 1. Inside the DEP extreme scenario (2080 sea-level rise): Legacy College Preparatory [doe_school_exposure]. 1 hospital in this area: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise) [doh_hospital_exposure].\n\n**Projector.**\nNo active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 08:13 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s and 0.79 m (31 in) by 2100 at the median, relative to 2000-2004; 90th percentile 0.74 m and 1.65 m [npcc4_slr].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -1337,7 +1337,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-10-01T01:38:36+0000",
-    "retrieved_at": "2026-10-01T06:46Z",
+    "retrieved_at": "2026-10-01T08:13Z",
     "vintage": "2026-10-01T01:38:36+0000",
     "maturity": "production"
    },
@@ -1348,7 +1348,7 @@
     "url": "https://communityprofiles.planning.nyc.gov/",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2024-02-01",
-    "retrieved_at": "2026-10-01T06:46Z",
+    "retrieved_at": "2026-10-01T08:13Z",
     "vintage": "2024-02-01",
     "maturity": "production"
    },
@@ -1381,7 +1381,7 @@
     "url": "https://data.cityofnewyork.us/Housing-Development/DOB-Permit-Issuance/ipu4-2q9a",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-10-01T00:27:21+0000",
-    "retrieved_at": "2026-10-01T06:46Z",
+    "retrieved_at": "2026-10-01T08:13Z",
     "vintage": "2026-10-01T00:27:21+0000",
     "maturity": "production"
    },
@@ -1413,9 +1413,9 @@
     "title": "NWS active alerts for the area (flood / coastal / wind).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T06:46Z",
-    "retrieved_at": "2026-10-01T06:46Z",
-    "vintage": "2026-10-01T06:46Z",
+    "date_modified": "2026-10-01T08:13Z",
+    "retrieved_at": "2026-10-01T08:13Z",
+    "vintage": "2026-10-01T08:13Z",
     "maturity": "production"
    },
    "npcc4_slr": {
@@ -1890,7 +1890,428 @@
      "address": "BROOK AVENUE"
     }
    ],
-   "points": [],
+   "points": [
+    {
+     "lat": 40.81005281617422,
+     "lon": -73.92514352082966,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-23",
+     "address": "ALEXANDER AVENUE"
+    },
+    {
+     "lat": 40.81281294499925,
+     "lon": -73.91565381643201,
+     "descriptor": "Backup",
+     "date": "2026-09-22",
+     "address": "510 EAST 146 STREET"
+    },
+    {
+     "lat": 40.80548151563159,
+     "lon": -73.90811728567155,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-17",
+     "address": "825 EAST 141 STREET"
+    },
+    {
+     "lat": 40.8116901149754,
+     "lon": -73.90477437110616,
+     "descriptor": "Backup",
+     "date": "2026-09-17",
+     "address": "524 SOUTHERN BOULEVARD"
+    },
+    {
+     "lat": 40.810352336067936,
+     "lon": -73.91760042380388,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-13",
+     "address": "BROOK AVENUE"
+    },
+    {
+     "lat": 40.81049775462872,
+     "lon": -73.9175279949478,
+     "descriptor": "Flooding on Street",
+     "date": "2026-09-13",
+     "address": "363 BROOK AVENUE"
+    },
+    {
+     "lat": 40.82277000448228,
+     "lon": -73.91458616821502,
+     "descriptor": "Manhole Overflow",
+     "date": "2026-09-02",
+     "address": "812 MELROSE AVENUE"
+    },
+    {
+     "lat": 40.821767569409246,
+     "lon": -73.9067109990687,
+     "descriptor": "Flooding on Street",
+     "date": "2026-08-30",
+     "address": "672 EAST 161 STREET"
+    },
+    {
+     "lat": 40.81470804535283,
+     "lon": -73.90658361329142,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-28",
+     "address": "EAST 151 STREET"
+    },
+    {
+     "lat": 40.810522848599156,
+     "lon": -73.91807705509963,
+     "descriptor": "Backup",
+     "date": "2026-08-26",
+     "address": "499 EAST 142 STREET"
+    },
+    {
+     "lat": 40.816957949990325,
+     "lon": -73.91630609108499,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-24",
+     "address": "2897 3 AVENUE"
+    },
+    {
+     "lat": 40.804900267811085,
+     "lon": -73.90891637045239,
+     "descriptor": "Backup",
+     "date": "2026-08-24",
+     "address": "816 EAST 140 STREET"
+    },
+    {
+     "lat": 40.821166285763645,
+     "lon": -73.90992381729878,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-22",
+     "address": "820 ST ANNS AVENUE"
+    },
+    {
+     "lat": 40.811551342729594,
+     "lon": -73.90968756785284,
+     "descriptor": "Backup",
+     "date": "2026-08-21",
+     "address": "487 JACKSON AVENUE"
+    },
+    {
+     "lat": 40.81570431087526,
+     "lon": -73.90649912219448,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-20",
+     "address": "766 EAST 152 STREET"
+    },
+    {
+     "lat": 40.8166696032531,
+     "lon": -73.91995897030567,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-20",
+     "address": "349 EAST 149 STREET"
+    },
+    {
+     "lat": 40.81825064470082,
+     "lon": -73.90897035526082,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-08-18",
+     "address": "721 CAULDWELL AVENUE"
+    },
+    {
+     "lat": 40.80722983774388,
+     "lon": -73.91153929846385,
+     "descriptor": "Backup",
+     "date": "2026-08-13",
+     "address": "323 JACKSON AVENUE"
+    },
+    {
+     "lat": 40.80722983774388,
+     "lon": -73.91153929846385,
+     "descriptor": "Backup",
+     "date": "2026-08-12",
+     "address": "323 JACKSON AVENUE"
+    },
+    {
+     "lat": 40.81282010168766,
+     "lon": -73.90711008554773,
+     "descriptor": "Backup",
+     "date": "2026-08-05",
+     "address": "774 EAST 149 STREET"
+    },
+    {
+     "lat": 40.82240811814794,
+     "lon": -73.91515027440741,
+     "descriptor": "Backup",
+     "date": "2026-08-03",
+     "address": "393 EAST 158 STREET"
+    },
+    {
+     "lat": 40.81553784357931,
+     "lon": -73.90432450155502,
+     "descriptor": "Backup",
+     "date": "2026-08-03",
+     "address": "664 UNION AVENUE"
+    },
+    {
+     "lat": 40.816066879046424,
+     "lon": -73.91764392674679,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-07-29",
+     "address": "EAST 149 STREET"
+    },
+    {
+     "lat": 40.806199762400574,
+     "lon": -73.92597866184836,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-28",
+     "address": "80 BRUCKNER BOULEVARD"
+    },
+    {
+     "lat": 40.81486957850174,
+     "lon": -73.9095168817007,
+     "descriptor": "Backup",
+     "date": "2026-07-28",
+     "address": "595 TRINITY AVENUE"
+    },
+    {
+     "lat": 40.82017570516344,
+     "lon": -73.9102611640401,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-07-28",
+     "address": "780 SAINT ANNS AVENUE"
+    },
+    {
+     "lat": 40.82124056350577,
+     "lon": -73.90668644669908,
+     "descriptor": "Street Flooding (SJ)",
+     "date": "2026-07-26",
+     "address": "843 TRINITY AVENUE"
+    },
+    {
+     "lat": 40.806199762400574,
+     "lon": -73.92597866184836,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-25",
+     "address": "80 BRUCKNER BOULEVARD"
+    },
+    {
+     "lat": 40.806199762400574,
+     "lon": -73.92597866184836,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-25",
+     "address": "80 BRUCKNER BOULEVARD"
+    },
+    {
+     "lat": 40.80598940555794,
+     "lon": -73.92753214008152,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-07-25",
+     "address": "331 EAST 132 STREET"
+    },
+    {
+     "lat": 40.806199762400574,
+     "lon": -73.92597866184836,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-25",
+     "address": "80 BRUCKNER BOULEVARD"
+    },
+    {
+     "lat": 40.806199762400574,
+     "lon": -73.92597866184836,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-24",
+     "address": "80 BRUCKNER BOULEVARD"
+    },
+    {
+     "lat": 40.80598940555794,
+     "lon": -73.92753214008152,
+     "descriptor": "Street Flooding (SJ)",
+     "date": "2026-07-24",
+     "address": "331 EAST  132 STREET"
+    },
+    {
+     "lat": 40.806199762400574,
+     "lon": -73.92597866184836,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-21",
+     "address": "80 BRUCKNER BOULEVARD"
+    },
+    {
+     "lat": 40.8194354563634,
+     "lon": -73.90445618913316,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-21",
+     "address": "802 TINTON AVENUE"
+    },
+    {
+     "lat": 40.81186334050576,
+     "lon": -73.91959266142949,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-21",
+     "address": "431 EAST  143 STREET"
+    },
+    {
+     "lat": 40.81212603460825,
+     "lon": -73.90418129247784,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-20",
+     "address": null
+    },
+    {
+     "lat": 40.80598940555794,
+     "lon": -73.92753214008152,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-20",
+     "address": "331 EAST  132 STREET"
+    },
+    {
+     "lat": 40.81282010168766,
+     "lon": -73.90711008554773,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-20",
+     "address": "774 EAST  149 STREET"
+    },
+    {
+     "lat": 40.80598940555794,
+     "lon": -73.92753214008152,
+     "descriptor": "Street Flooding (SJ)",
+     "date": "2026-07-20",
+     "address": "331 EAST  132 STREET"
+    },
+    {
+     "lat": 40.81879549938849,
+     "lon": -73.92212414817566,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-19",
+     "address": null
+    },
+    {
+     "lat": 40.806199762400574,
+     "lon": -73.92597866184836,
+     "descriptor": "Manhole Overflow (Use Comments) (SA1)",
+     "date": "2026-07-18",
+     "address": "80 BRUCKNER BOULEVARD"
+    },
+    {
+     "lat": 40.806199762400574,
+     "lon": -73.92597866184836,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-18",
+     "address": "80 BRUCKNER BOULEVARD"
+    },
+    {
+     "lat": 40.81282010168766,
+     "lon": -73.90711008554773,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-18",
+     "address": "774 EAST  149 STREET"
+    },
+    {
+     "lat": 40.821166285763645,
+     "lon": -73.90992381729878,
+     "descriptor": "Street Flooding (SJ)",
+     "date": "2026-07-18",
+     "address": "820 SAINT ANN'S AVENUE"
+    },
+    {
+     "lat": 40.80598940555794,
+     "lon": -73.92753214008152,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-17",
+     "address": "331 EAST  132 STREET"
+    },
+    {
+     "lat": 40.81545072880893,
+     "lon": -73.90519167730031,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-16",
+     "address": "815 EAST  152 STREET"
+    },
+    {
+     "lat": 40.81282010168766,
+     "lon": -73.90711008554773,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-15",
+     "address": "774 EAST  149 STREET"
+    },
+    {
+     "lat": 40.81282010168766,
+     "lon": -73.90711008554773,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-15",
+     "address": "774 EAST  149 STREET"
+    },
+    {
+     "lat": 40.81282010168766,
+     "lon": -73.90711008554773,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-14",
+     "address": "774 EAST  149 STREET"
+    },
+    {
+     "lat": 40.81282010168766,
+     "lon": -73.90711008554773,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-13",
+     "address": "774 EAST  149 STREET"
+    },
+    {
+     "lat": 40.806005901138086,
+     "lon": -73.92757546848489,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-12",
+     "address": "329 EAST  132 STREET"
+    },
+    {
+     "lat": 40.806005901138086,
+     "lon": -73.92757546848489,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-12",
+     "address": "329 EAST  132 STREET"
+    },
+    {
+     "lat": 40.806005901138086,
+     "lon": -73.92757546848489,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-10",
+     "address": "329 EAST  132 STREET"
+    },
+    {
+     "lat": 40.81282010168766,
+     "lon": -73.90711008554773,
+     "descriptor": "Backup",
+     "date": "2026-07-09",
+     "address": "774 EAST 149 STREET"
+    },
+    {
+     "lat": 40.80598940555794,
+     "lon": -73.92753214008152,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-09",
+     "address": "331 EAST  132 STREET"
+    },
+    {
+     "lat": 40.82324886179806,
+     "lon": -73.91632708384218,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-09",
+     "address": "816 COURTLANDT AVENUE"
+    },
+    {
+     "lat": 40.80598940555794,
+     "lon": -73.92753214008152,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-09",
+     "address": "331 EAST  132 STREET"
+    },
+    {
+     "lat": 40.8198878731224,
+     "lon": -73.90725196387191,
+     "descriptor": "Catch Basin Clogged/Flooding (Use Comments) (SC)",
+     "date": "2026-07-07",
+     "address": null
+    },
+    {
+     "lat": 40.806199762400574,
+     "lon": -73.92597866184836,
+     "descriptor": "Sewer Backup (Use Comments) (SA)",
+     "date": "2026-07-07",
+     "address": "80 BRUCKNER BOULEVARD"
+    }
+   ],
    "headline_value": "395 complaints",
    "subhead_text": "200 sewer backup, 115 catch basin, 53 street flooding, 27 manhole overflow",
    "narrative": "395 NYC 311 flood-related complaints filed in Community District BX01 (by the record's community board field) in the last 3 years: 200 sewer backup, 115 catch basin, 53 street flooding, 27 manhole overflow.",
@@ -1915,7 +2336,7 @@
    "n_inside_sandy_2012": 0,
    "n_in_dep_extreme_2080": 6,
    "n_near_sandy_edge": 0,
-   "narrative": "41 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 6 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): E 149 St (6), Jackson Av (2 5)",
+   "narrative": "41 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 6 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise), by station: E 149 St (6), Jackson Av (2 5)",
    "entrances": [
     {
      "station_id": "391",
@@ -2664,7 +3085,7 @@
    "n_inside_sandy_2012": 0,
    "n_in_dep_extreme_2080": 1,
    "n_near_sandy_edge": 0,
-   "narrative": "1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: MOORE",
+   "narrative": "1 flood-exposed NYCHA development in this area (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): MOORE",
    "developments": [
     {
      "development": "MOORE",
@@ -2925,7 +3346,7 @@
    "n_inside_sandy_2012": 1,
    "n_in_dep_extreme_2080": 1,
    "n_near_sandy_edge": 0,
-   "narrative": "2 flood-exposed NYC DOE schools in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: Success Academy Charter School - Bronx 1. Inside the DEP extreme scenario: Legacy College Preparatory",
+   "narrative": "2 flood-exposed NYC DOE schools in this area (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: Success Academy Charter School - Bronx 1. Inside the DEP extreme scenario (2080 sea-level rise): Legacy College Preparatory",
    "schools": [
     {
      "loc_code": "X585",
@@ -3000,8 +3421,8 @@
   "nws_alerts_nta": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 06:46 UTC.",
-   "retrieved_at": "2026-10-01T06:46:07Z",
+   "narrative": "No active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 08:13 UTC.",
+   "retrieved_at": "2026-10-01T08:13:34Z",
    "error": null
   },
   "npcc4_slr_nta": {
@@ -3050,7 +3471,7 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790837167.0238268,
+    "started_at": 1790842414.6777768,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -3069,7 +3490,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790837167.0266,
+    "started_at": 1790842414.679863,
     "elapsed_s": 0.0001,
     "err": null,
     "result": {
@@ -3081,31 +3502,31 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1790837167.028426,
-    "elapsed_s": 0.01,
+    "started_at": 1790842414.6814551,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {}
    },
    {
     "step": "sandy_nta",
     "ok": true,
-    "started_at": 1790837167.029153,
-    "elapsed_s": 0.04,
+    "started_at": 1790842414.682316,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_extreme_2080_nta",
     "ok": true,
-    "started_at": 1790837167.0381079,
-    "elapsed_s": 0.25,
+    "started_at": 1790842414.6857312,
+    "elapsed_s": 0.26,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_2050_nta",
     "ok": true,
-    "started_at": 1790837167.039907,
+    "started_at": 1790842414.687667,
     "elapsed_s": 0.07,
     "err": null,
     "result": {}
@@ -3113,15 +3534,15 @@
    {
     "step": "dep_moderate_current_nta",
     "ok": true,
-    "started_at": 1790837167.042563,
-    "elapsed_s": 0.06,
+    "started_at": 1790842414.6910028,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {}
    },
    {
     "step": "microtopo_nta",
     "ok": true,
-    "started_at": 1790837167.0473511,
+    "started_at": 1790842414.695658,
     "elapsed_s": 0.05,
     "err": null,
     "result": {}
@@ -3129,16 +3550,16 @@
    {
     "step": "nyc311_nta",
     "ok": true,
-    "started_at": 1790837167.048039,
-    "elapsed_s": 0.16,
+    "started_at": 1790842414.697811,
+    "elapsed_s": 0.21,
     "err": null,
     "result": {}
    },
    {
     "step": "dcp_floodplain_nta",
     "ok": true,
-    "started_at": 1790837167.048565,
-    "elapsed_s": 0.16,
+    "started_at": 1790842414.699001,
+    "elapsed_s": 0.2,
     "err": null,
     "result": {
      "n_buildings": 327,
@@ -3148,8 +3569,8 @@
    {
     "step": "mta_entrances_nta",
     "ok": true,
-    "started_at": 1790837167.0516942,
-    "elapsed_s": 0.23,
+    "started_at": 1790842414.701042,
+    "elapsed_s": 0.26,
     "err": null,
     "result": {
      "n_entrances": 41,
@@ -3160,8 +3581,8 @@
    {
     "step": "nycha_developments_nta",
     "ok": true,
-    "started_at": 1790837167.053969,
-    "elapsed_s": 0.02,
+    "started_at": 1790842414.701748,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "n_developments": 1,
@@ -3172,15 +3593,15 @@
    {
     "step": "dob_permits_nta",
     "ok": true,
-    "started_at": 1790837167.0589309,
-    "elapsed_s": 0.18,
+    "started_at": 1790842414.701597,
+    "elapsed_s": 0.24,
     "err": null,
     "result": {}
    },
    {
     "step": "doe_schools_nta",
     "ok": true,
-    "started_at": 1790837167.064634,
+    "started_at": 1790842414.701797,
     "elapsed_s": 0.02,
     "err": null,
     "result": {
@@ -3192,8 +3613,8 @@
    {
     "step": "doh_hospitals_nta",
     "ok": true,
-    "started_at": 1790837167.065557,
-    "elapsed_s": 0.02,
+    "started_at": 1790842414.707386,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "n_hospitals": 1,
@@ -3204,8 +3625,8 @@
    {
     "step": "nws_alerts_nta",
     "ok": true,
-    "started_at": 1790837167.0705369,
-    "elapsed_s": 0.31,
+    "started_at": 1790842414.708598,
+    "elapsed_s": 0.27,
     "err": null,
     "result": {
      "n_active": 0
@@ -3214,7 +3635,7 @@
    {
     "step": "npcc4_slr_nta",
     "ok": true,
-    "started_at": 1790837167.0711749,
+    "started_at": 1790842414.7152371,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -3222,7 +3643,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790837167.37728,
+    "started_at": 1790842414.982463,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -3231,35 +3652,23 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790837167.377384,
+    "started_at": 1790842414.982541,
     "ok": true,
     "result": {
-     "n_chars": 4547,
+     "n_chars": 4720,
      "n_citations": 15,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0541
+    "elapsed_s": 0.0525
    }
   ],
   "models": [],
   "compliance": {
-   "passed": false,
-   "n_passed": 12,
+   "passed": true,
+   "n_passed": 13,
    "n_total": 13,
-   "failed": [
-    {
-     "name": "projection_has_horizon",
-     "rule": "TCFD 3.2",
-     "description": "Projection sentences must declare a time horizon (short/medium/long-term or an explicit year/duration).",
-     "reason": "",
-     "evidence": [
-      "Inside the DEP extreme scenario (by station): E 149 St (6), Jackson Av (2 5) [mta_entrance_exposure].",
-      "Inside the DEP extreme scenario: MOORE [nycha_development_exposure].",
-      "Inside the DEP extreme scenario: Legacy College Preparatory [doe_school_exposure]."
-     ]
-    }
-   ]
+   "failed": []
   },
   "emissions": {
    "n_calls": 0,
