@@ -111,7 +111,11 @@ def _lead(state, items) -> str | None:
         from app.context.fema_nfhl import zone_reading
 
         reading = None if fema.get("sfha") else zone_reading(fema.get("zone_subty"))
-        add("fema_nfhl", f"in FEMA flood zone {fema['fld_zone']}" + (f" ({reading})" if reading else ""))
+        # The map's year goes with the zone (FEMA 1.5): outside New York the
+        # sentence has no other year and the vintage check failed.
+        year = fema.get("effective_year")
+        add("fema_nfhl", f"in FEMA flood zone {fema['fld_zone']}" + (f" ({reading})" if reading else "")
+            + (f" on the {year} effective map" if year else ""))
     dep = {p: state[p] for p in _DEP_POINT if p in by_pebble and isinstance(state.get(p), dict)}
     if dep:
         ids = [by_pebble[p].doc_id for p in dep]

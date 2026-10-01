@@ -32,12 +32,16 @@ def test_bare_address_opens_with_a_cited_lead():
     paragraph, _ = compose_briefing(STATE)
     lead = paragraph.split("**In brief.**\n", 1)[1].split("\n\n", 1)[0]
     assert lead == ("This address is outside the 2012 Sandy inundation footprint [sandy_inundation], "
-                    "in FEMA flood zone X [fema_nfhl], and inside the future high tide area (coastal tidal "
+                    "in FEMA flood zone X on the 2007 effective map [fema_nfhl], and inside the future high tide area (coastal tidal "
                     "inundation, not rainfall flooding) of the DEP scenario for 2080 sea-level rise "
                     "[dep_extreme_2080]. 82 flood-related 311 complaints were filed "
                     "within 200 m in the last 5 years [nyc311].")
     assert every_numeric_claim_cited(paragraph)
     assert [r.name for r in check_briefing(paragraph).failed] == []
+    # Outside New York the lead has no Sandy clause, so the zone's own map year
+    # is the only vintage in the sentence (the Chicago briefing failed FEMA 1.5).
+    elsewhere = {k: v for k, v in STATE.items() if k in ("intent", "plan", "fema_nfhl")} | {"deployment": "chicago"}
+    assert "firm_citation_has_vintage" not in [r.name for r in check_briefing(compose_briefing(elsewhere)[0]).failed]
 
 
 def test_all_outside_lead_names_the_horizons_and_passes_the_disclosure_checks():
