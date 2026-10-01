@@ -1,5 +1,5 @@
 <script lang="ts">
-  /** What Riprap is for and what other tools do better, as plain prose
+  /** What Riprap is for, and the official sources it works alongside, as plain prose
    *  directly under the hero. */
   import { STATIC_SITE } from '$lib/staticSite';
 </script>
@@ -24,7 +24,7 @@
     storms, and land cover by year. Whatever they say is labelled experimental, with its limits and
     tested accuracy beside it, and it never sets a yes or no about past flooding.
   </p>
-  <p>Other tools do these jobs better, and Riprap points to them:</p>
+  <p>Riprap is built to work alongside the official sources, and links to them where they are the authority:</p>
   <ul>
     <li>
       What is flooding right now: the

@@ -41,7 +41,7 @@ describe('Landing smoke', () => {
     expect(container.textContent).toContain('Riprap returns evidence, not advice.');
   });
 
-  it('LandFor says what Riprap is for, and links the tools that do other jobs better', () => {
+  it('LandFor says what Riprap is for, and links the official sources it works alongside', () => {
     const { container } = render(LandFor);
     expect([...container.querySelectorAll('h2')].map((h) => h.textContent)).toEqual([
       'What Riprap is for, and what it is not'

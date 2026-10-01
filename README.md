@@ -85,16 +85,18 @@ record flooding (the city renamed them in 2026), which sensor readings FloodNet
 flags, which datum a base flood elevation is in, and when a zero means "the
 source failed" and not "none".
 
-## Where other tools are better
+## Works alongside the official sources
 
-| For | Use |
+Riprap is built to sit beside the city's and federal tools, and links to them
+where they are the authority.
+
+| For | Authority |
 |---|---|
-| What is flooding right now | The [FloodNet dashboard](https://dataviz.floodnet.nyc/) shows street depth by the minute, the [National Weather Service](https://www.weather.gov/okx/) issues the warnings and [Notify NYC](https://a858-nycnotify.nyc.gov/) sends them to a phone. Riprap quotes its own readings with their times and points there |
+| What is flooding right now | The [FloodNet dashboard](https://dataviz.floodnet.nyc/) shows street depth by the minute, the [National Weather Service](https://www.weather.gov/okx/) issues the warnings and [Notify NYC](https://a858-nycnotify.nyc.gov/) sends them to a phone. Riprap quotes sensor readings with their times and links there |
 | An official flood zone determination | FEMA's [Map Service Center](https://msc.fema.gov/portal/home) |
 | Insurance and what to do at home | [FloodHelpNY](https://www.floodhelpny.org) |
 | A district's people and housing in the floodplain, on a city-made page | NYC Planning's [Community District Profiles](https://communityprofiles.planning.nyc.gov/) (Riprap quotes their counts) |
 | Maps to explore | Rebuild by Design's [Rainproof NYC Flood Map](https://rebuildbydesign.org/rainproof-nyc-map/) for 311 reports, sensors and green infrastructure near an address; the [EJNYC Mapping Tool](https://experience.arcgis.com/experience/6a3da7b920f248af961554bdf01d668b) for citywide layers |
-| A hosted service | All of the above run in a browser. Riprap's public copy is a static gallery; your own questions need a local install |
 
 ## Who it is for
 
@@ -199,7 +201,7 @@ present they never set the answer's yes or no. One rule in
 | Model | What it answers | What the tests say |
 |---|---|---|
 | [Granite TTM r2 Battery Surge](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge) | How far above the predicted tide the water at the Battery may run in the next four days, and whether the total reaches the gauge's flood stage | On 635 four-day windows since January 2025 its mean error was 11.5 cm, against 13.3 cm for holding the last day's mean. It foresaw 1 of the 23 windows in which the water reached the minor flood stage |
-| [Prithvi-EO 2.0 NYC Pluvial](https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial) | Where satellite scenes showed new surface water after Hurricane Ida, and after which other heavy rains it showed any | Of 153 high-water marks surveyed after Ida, it showed new water within 500 m of 17 (11%), no better than chance (14%). It cannot see street or basement flooding, and it is not used to say a place is prone to standing water |
+| [Prithvi-EO 2.0 NYC Pluvial](https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial) | Where satellite scenes showed new surface water after Hurricane Ida, and after which other heavy rains it showed any | Of 153 high-water marks surveyed after Ida, it showed new water within 500 m of 17 (11%), not yet better than chance (14%). It cannot see street or basement flooding, and it is not used to say a place is prone to standing water |
 | [TerraMind NYC adapters](https://huggingface.co/msradam/TerraMind-NYC-Adapters) | How much of a place is paved or built over and how much is green, in 2018, 2021, 2024 and 2026 | For 2021 it agreed with ESA WorldCover (its own label source) on 87.1% of the city's land as paved, green or water. It found 66.3% of WorldCover's green land and put a typical district's paved share 7.7 points above WorldCover's. Two images of one year differ by under 3.7 points in a district's paved share 19 times in 20, and differences between years beyond that turned up in 3 of 59 districts, which is what that noise alone produces. It is not used to claim a trend |
 
 The surge model runs on CPU when the `ml` extra is installed
