@@ -265,6 +265,21 @@ def sandy_inside(lat: float, lon: float) -> bool:
     return len(hits) > 0
 
 
+@lru_cache(maxsize=1)
+def _sandy_edge():
+    return _sandy().to_crs("EPSG:2263").geometry.boundary.union_all()
+
+
+def sandy_edge_m(lat: float, lon: float) -> float:
+    """Metres from the point to the nearest mapped edge of the Sandy zone,
+    measured on the published polygons (the app measures on its raster)."""
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    p = gpd.GeoSeries([Point(lon, lat)], crs="EPSG:4326").to_crs("EPSG:2263").iloc[0]
+    return round(p.distance(_sandy_edge()) * 0.3048, 1)
+
+
 # NYC DEP stormwater flood maps: the geodatabases as DEP publishes them.
 DEP_FILES = {
     "dep_extreme_2080": "dep_extreme_2080.gdb",
@@ -317,6 +332,7 @@ def all_keys(lat: float, lon: float) -> dict:
         "fema_nfhl": fema_nfhl(lat, lon),
         "fema_pfirm": fema_pfirm(lat, lon),
         "sandy_inside": sandy_inside(lat, lon),
+        "sandy_edge_m": sandy_edge_m(lat, lon),
         "dep": {s: dep_class(lat, lon, s) for s in DEP_FILES},
         "mta_entrances_800m": mta_entrances_within(lat, lon),
     }

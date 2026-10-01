@@ -133,6 +133,10 @@ def expected_lead(question: str, k: dict) -> str:
     if "how many" in q:
         return str(c["n"])
     if "sandy" in q:
+        # The mapped outline is not exact to a building: within 50 m of it,
+        # on either side, the app states the distance and gives no flat yes or no.
+        if k.get("sandy_edge_m") is not None and k["sandy_edge_m"] <= 50:
+            return "other"
         return "yes" if k["sandy_inside"] else "no"
     if "sensor" in q:
         if fn["n_sensors"] == 0:
