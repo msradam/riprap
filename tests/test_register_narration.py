@@ -54,8 +54,12 @@ def test_exposed_assets_are_named_nearest_first():
     from app.registers import exposure
 
     s = exposure.summary_for_point(40.677, -74.0105, "doe_schools")  # Red Hook
-    assert s["narrative"].endswith("Inside the 2012 Sandy extent: P.S. 015 Patrick F. Daly (116 m), "
-                                   "South Brooklyn Community High School (328 m)")
+    assert ("Inside the 2012 Sandy extent: P.S. 015 Patrick F. Daly (116 m), "
+            "South Brooklyn Community High School (328 m). ") in s["narrative"]
+    # A school within 50 m of the outline is named after them, and not counted as exposed.
+    assert s["narrative"].endswith("Outside the 2012 Sandy extent but within 50 m of its mapped edge (the outline is not "
+                                   "exact to a building): Red Hook Neighborhood School (462 m), PAVE Academy Charter "
+                                   "School (570 m)")
     assert _register_counts(s["narrative"] + ".") == (2, 2, 0)  # the counts still parse
 
 

@@ -7,7 +7,7 @@ tier: modeled
 adapter: python_call
 
 spatial:
-  scope: point
+  scope: any
   crs: EPSG:4326
 
 config:

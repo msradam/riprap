@@ -52,9 +52,6 @@ class Registry:
     def all(self) -> list[Pebble]:
         return list(self._pebbles.values())
 
-    def by_stone(self, stone: str) -> list[Pebble]:
-        return [p for p in self._pebbles.values() if p.stone == stone]
-
     def ids(self) -> list[str]:
         return list(self._pebbles.keys())
 

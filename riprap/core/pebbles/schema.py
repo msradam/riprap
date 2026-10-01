@@ -3,11 +3,10 @@
 A pebble manifest declares one data source. The `type:` field discriminates
 how the source is fetched:
 
-  - `live`   — HTTP/socket call against a remote endpoint
-  - `baked`  — file-backed geospatial query (GeoJSON / GeoTIFF / Parquet)
-  - `model`  — model endpoint call (vLLM / Triton / Ollama), with explicit
-               offline-fallback semantics so the briefing degrades cleanly
-               when inference is unavailable.
+  - `live`   — fetched or computed when the briefing runs (an HTTP call,
+               or the experimental surge model on fresh gauge data)
+  - `baked`  — read from a file shipped with the deployment (GeoJSON,
+               GeoTIFF), including the saved outputs of the batch models
 
 The schema is intentionally permissive on `config:` — each adapter validates
 its own config sub-shape. The top-level fields here are the contract every
@@ -70,7 +69,10 @@ class Fallback(BaseModel):
 class Spatial(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    scope: Literal["point", "polygon", "raster"] = "point"
+    # point: runs for an address; polygon: for a neighbourhood or district;
+    # any: for both (a harbour gauge reading is the same for an address and
+    # for the district around it, read at the district's centre).
+    scope: Literal["point", "polygon", "any"] = "point"
     crs: str = "EPSG:4326"
 
 
@@ -144,8 +146,8 @@ class _PebbleBase(BaseModel):
     # planner reads it to choose which pebbles a question needs.
     answers: str | None = None
     stone: str  # which Stone this pebble rolls up to
-    # Model layers say whether their evaluation supports showing them as
-    # evidence (production) or only as a labelled experiment.
+    # experimental: a model output or a city feed whose evaluation does not
+    # support showing it as plain evidence; it is labelled wherever it appears.
     maturity: Literal["production", "experimental"] = "production"
     tier: Tier | None = None  # epistemic tier (empirical/modeled/proxy/synthetic)
                               # Required for production deployments; defaults
@@ -181,12 +183,8 @@ class BakedPebble(_PebbleBase):
     type: Literal["baked"]
 
 
-class ModelPebble(_PebbleBase):
-    type: Literal["model"]
-
-
 PebbleManifest = Annotated[
-    LivePebble | BakedPebble | ModelPebble,
+    LivePebble | BakedPebble,
     Field(discriminator="type"),
 ]
 """A validated pebble manifest. Discriminated on `type`."""

@@ -163,9 +163,38 @@ def _depth(mm: int) -> str:
     return f"{mm} mm ({mm / 25.4:.1f} in)"
 
 
-def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
-    """One-shot summary used by the FSM node and the cited paragraph."""
-    sensors = sensors_near(lat, lon, radius_m)
+_ALL_Q = """
+query All {
+  deployments(limit: 5000) {
+    deployment_id
+    name
+    sensor_address_street
+    sensor_address_borough
+    sensor_status
+    date_deployed
+    location
+  }
+}"""
+
+
+def sensors_in(polygon) -> list[Sensor]:
+    """Sensors inside a WGS84 polygon (a neighbourhood or a district)."""
+    from shapely.geometry import Point
+
+    out = []
+    for row in _gql(_ALL_Q, {})["deployments"]:
+        lat, lon = _parse_location(row.get("location"))
+        if lat is not None and lon is not None and polygon.contains(Point(lon, lat)):
+            out.append(Sensor(row["deployment_id"], row["name"] or "", row.get("sensor_address_street") or "",
+                              row.get("sensor_address_borough") or "", row.get("sensor_status") or "",
+                              row.get("date_deployed"), lat, lon))
+    return out
+
+
+def _summary(sensors: list[Sensor], where: str, none: str) -> dict:
+    """The value and the sentence for a set of sensors. `where` places them
+    ("within 600 m", "inside this area"); `none` is the sentence when
+    there are none."""
     ids = [s.deployment_id for s in sensors]
     events = flood_events_for(ids)
     by_dep: dict[str, list[FloodEvent]] = {}
@@ -184,18 +213,14 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
     latest = max(events, key=lambda e: e.start_time, default=None)
     day_ago = (datetime.now(UTC) - timedelta(hours=24)).isoformat(timespec="seconds").replace("+00:00", "")
     open_now = [e for e in events if not e.end_time and e.start_time >= day_ago]
-    # Templatable narrative for the manifest's narration.template.
-    # Honest negative ("0 sensors within range") still useful — same
-    # contract as the NWS / ida_hwm all-clear cards.
+    # An honest negative ("no sensors in range") is still useful: the same
+    # contract as the NWS and Ida mark all-clear sentences.
     if n_sensors == 0:
-        narrative = (
-            f"No FloodNet sensors deployed within {int(radius_m)} m of "
-            f"this address."
-        )
+        narrative = none
     else:
         narrative = (
-            f"{n_sensors} FloodNet community sensor{'' if n_sensors == 1 else 's'} within "
-            f"{int(radius_m)} m {'has' if n_sensors == 1 else 'have'} logged "
+            f"{n_sensors} FloodNet community sensor{'' if n_sensors == 1 else 's'} {where} "
+            f"{'has' if n_sensors == 1 else 'have'} logged "
             f"{'at least ' if n_events >= EVENT_LIMIT else ''}{n_events} "
             f"above-curb flood event{'' if n_events == 1 else 's'} in the last 3 years"
             # The newest event dates the record, and answers "is it flooding now".
@@ -204,6 +229,11 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
         if open_now:
             narrative += (f" {len(open_now)} event{'' if len(open_now) == 1 else 's'} that started in the last "
                           "24 hours had no end time when this was read.")
+        elif all(is_good(s.status) for s in sensors) and all(e.end_time for e in events):
+            # What "is it flooding right now" asks. Said only when every sensor is in working
+            # order and no event, however old, is still open in the record.
+            narrative += (f" FloodNet's record showed no flood event under way at {'it' if n_sensors == 1 else 'them'} "
+                          "when this was read.")
         if peak is not None and peak.max_depth_mm is not None:
             narrative += (
                 f" Peak depth recorded by the sensors in good working order: "
@@ -212,9 +242,11 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
         if flagged:
             k = len(flagged)
             # "1 sensor" (a number with its noun) so the sentence is cited like the others.
-            narrative += (f" {k} sensor{'' if k == 1 else 's'} that logged events {'is' if k == 1 else 'are'} "
-                          f"flagged by FloodNet for maintenance, so {'its' if k == 1 else 'their'} depths are not "
-                          f"used for the peak.")
+            # How many of the events are theirs is said: "14 events" once hid that 11 came from a flagged sensor.
+            n_theirs = sum(len(by_dep[d]) for d in flagged)
+            narrative += (f" {k} sensor{'' if k == 1 else 's'} that logged {n_theirs} of these events "
+                          f"{'is' if k == 1 else 'are'} flagged by FloodNet for maintenance, so "
+                          f"{'its' if k == 1 else 'their'} depths are not used for the peak.")
             # The flagged reading is still in FloodNet's published record, and
             # others print it (46.1 in at Hollis on 2026-05-20), so it is stated with its flag.
             if flagged_peak is not None:
@@ -222,7 +254,8 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
                               f"on {flagged_peak.start_time[:10]}.")
     return {
         "n_sensors": n_sensors,
-        "sensors": [{**vars(s), "status_words": status_words(s.status)} for s in sensors],
+        "sensors": [{**vars(s), "status_words": status_words(s.status), "n_events": len(by_dep.get(s.deployment_id, ()))}
+                    for s in sensors],
         "n_flood_events_3y": n_events,
         "n_flood_events_good_3y": sum(1 for e in events if e.deployment_id in good),
         "n_sensors_with_events": len(by_dep),
@@ -232,3 +265,19 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
         "n_events_open_24h": len(open_now),
         "narrative": narrative,
     }
+
+
+def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
+    return _summary(sensors_near(lat, lon, radius_m), f"within {int(radius_m)} m",
+                    f"No FloodNet sensors deployed within {int(radius_m)} m of this address.")
+
+
+def summary_for_polygon(polygon) -> dict:
+    """The sensors inside a neighbourhood or a district, with the streets
+    that logged the most events."""
+    out = _summary(sensors_in(polygon), "inside this area", "No FloodNet sensors are deployed inside this area.")
+    busiest = sorted((s for s in out["sensors"] if s["n_events"]), key=lambda s: -s["n_events"])[:3]
+    if busiest:
+        out["narrative"] += " Most events: " + "; ".join(
+            f"{s['street'] or s['name']} ({s['n_events']})" for s in busiest) + "."
+    return out

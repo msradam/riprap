@@ -25,7 +25,7 @@ import httpx
 import stamina
 from hishel.httpx import SyncCacheTransport
 
-USER_AGENT = "Riprap/0.7 (civic flood-evidence tool; +https://github.com/msradam/riprap)"
+USER_AGENT = "Riprap/0.8 (civic flood-evidence tool; +https://github.com/msradam/riprap)"
 DEFAULT_TTL_S = float(os.environ.get("RIPRAP_HTTP_CACHE_TTL_S", "600"))
 TIMEOUT = httpx.Timeout(20.0, connect=5.0)
 

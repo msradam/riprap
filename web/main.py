@@ -14,7 +14,7 @@ from pathlib import Path
 
 warnings.filterwarnings("ignore")
 
-from fastapi import FastAPI, Request  # noqa: E402
+from fastapi import FastAPI, Query, Request  # noqa: E402
 from fastapi.responses import (  # noqa: E402
     FileResponse,
     JSONResponse,
@@ -52,32 +52,6 @@ _DEPLOYMENT = (
 )
 _STONES = _load_stones(_DEPLOYMENT)
 _PEBBLES = _load_pebbles(_DEPLOYMENT)
-
-# Pretty-printed Stone metadata the frontend renders as parent-row labels.
-# Sourced from deployments/<name>/stones.yaml.
-_STONE_META: dict[str, dict] = {
-    s.name: {"name": s.name, "tagline": s.tagline, "description": s.description}
-    for s in _STONES.all()
-}
-
-
-# Map trace step name -> Stone display name. Every pebble contributes
-# (pebble.id -> Stone.name) from the registry; steps not in the map
-# (geocode, nta_resolve, select_deployment) open no Stone boundary.
-def _stone_display(stone_id: str) -> str:
-    return _STONES.get(stone_id).name
-
-
-_STEP_TO_STONE: dict[str, str] = {
-    pebble.id: _stone_display(pebble.stone) for pebble in _PEBBLES.all()
-}
-# Steps that are not data pebbles.
-_STEP_TO_STONE.update(
-    {
-        "reconcile_claims": _stone_display("capstone"),
-        "reconcile_templated": _stone_display("capstone"),
-    }
-)
 
 ROOT = Path(__file__).resolve().parent
 SVELTEKIT_BUILD = ROOT / "sveltekit" / "build"
@@ -156,30 +130,23 @@ def _warm_caches():
 
 
 def _stones_pebbles_for_deployment(deployment_name: str | None):
-    """Resolve (stones_registry, pebble_registry) for a deployment name.
-
-    None means the server's boot-time deployment (back-compat). A bare
-    name like 'chicago' resolves to `deployments/chicago/` regardless of
-    which deployment the server booted with, which is what makes
-    per-query routing reach the UI scaffold.
-    """
+    """(stones registry, pebble registry) for a deployment name, or None
+    for a name that is not a shipped deployment. No name means the
+    server's boot-time deployment; a name such as 'chicago' resolves to
+    `deployments/chicago/` whichever deployment the server booted with."""
     if not deployment_name:
         return _STONES, _PEBBLES
     from riprap.core.pebbles.deployments import deployment_by_name as _dep_by_name  # noqa: PLC0415
 
     dep = _dep_by_name(deployment_name)
-    if dep is None:
-        # Try treating as a path / fallback to boot deployment so the UI
-        # never gets a 500 from a malformed query param.
-        p = Path(deployment_name)
-        if not p.is_absolute():
-            p = Path(__file__).resolve().parent.parent / deployment_name
-        if not p.exists():
-            return _STONES, _PEBBLES
-        stones_root = p
-    else:
-        stones_root = dep.root
-    return _load_stones(stones_root), _load_pebbles(stones_root)
+    return (_load_stones(dep.root), _load_pebbles(dep.root)) if dep else None
+
+
+def _unknown_deployment(name: str) -> JSONResponse:
+    from riprap.core.pebbles.deployments import discover_deployments  # noqa: PLC0415
+
+    return JSONResponse({"error": f"unknown deployment {name!r}",
+                         "known": sorted(d.name for d in discover_deployments())}, status_code=404)
 
 
 @app.get("/api/pebbles")
@@ -198,8 +165,10 @@ def api_pebbles(deployment: str | None = None):
     """
     from riprap.core.pebbles.describe import describe_deployment
 
-    stones_reg, pebble_reg = _stones_pebbles_for_deployment(deployment)
-    return JSONResponse(describe_deployment(stones_reg, pebble_reg))
+    found = _stones_pebbles_for_deployment(deployment)
+    if found is None:
+        return _unknown_deployment(deployment)
+    return JSONResponse(describe_deployment(*found))
 
 
 @app.get("/api/deployment")
@@ -225,7 +194,10 @@ def api_deployment(deployment: str | None = None):
                 "experimental": _STONES.experimental,
             }
         )
-    stones_reg, _ = _stones_pebbles_for_deployment(deployment)
+    found = _stones_pebbles_for_deployment(deployment)
+    if found is None:
+        return _unknown_deployment(deployment)
+    stones_reg, _ = found
     return JSONResponse(
         {
             "name": deployment,
@@ -238,8 +210,9 @@ def api_deployment(deployment: str | None = None):
 
 @app.get("/api/models")
 def api_models():
-    """The LLM endpoint configured. Each briefing's own list is
-    the `models` field of its result."""
+    """The experimental models this server can use and the LLM endpoint
+    configured. Each briefing's own list is the `models` field of its
+    result."""
     from app.models_info import loaded
 
     return loaded()
@@ -288,9 +261,11 @@ def print_page(query_id: str):  # noqa: ARG001 — captured by the SPA router
 
 @app.get("/api/register/{asset_class}")
 def api_register(asset_class: str):
-    """The baked register of exposed assets for a class: every public
-    school or NYCHA development inside the Sandy zone or a DEP scenario,
-    with its flags."""
+    """The baked register for a class: every public school or NYCHA
+    development inside the Sandy zone or a DEP scenario, with its flags,
+    and those outside the Sandy outline but within 50 m of it
+    (`near_sandy_edge`), which are named in a briefing and not counted as
+    exposed."""
     if asset_class not in ("schools", "nycha"):
         return JSONResponse({"error": f"unknown asset class {asset_class!r}"}, status_code=404)
     f = ROOT.parent / "data" / "registers" / f"{asset_class}.json"
@@ -306,7 +281,7 @@ def api_register(asset_class: str):
 
 
 @app.get("/api/agent")
-def api_agent(q: str):
+def api_agent(q: str = Query(min_length=1)):
     """One briefing as JSON: plan (LLM or regex), run the Burr app for the
     intent, return the full result. Used by MCP clients and scripts."""
     from riprap.core.burr.app import run as burr_run
@@ -377,16 +352,12 @@ async def api_agent_stream(q: str):
 
     def runner():
         try:
-            from riprap.core import llm as core_llm
             from riprap.core.burr.app import energy_summary, iter_steps, plan_for, run_compare
 
-            if core_llm.tier() == "no_llm":
-                out_q.put({"kind": "plan_token", "delta": "[heuristic planner, no LLM call]"})
             plan = plan_for(q)
             out_q.put({"kind": "plan", "intent": plan["intent"], "targets": plan.get("targets"),
                        "question": plan.get("question"), "focus": plan.get("focus"),
-                       "pebbles": plan.get("pebbles"), "specialists": [],
-                       "rationale": plan.get("rationale")})
+                       "pebbles": plan.get("pebbles"), "rationale": plan.get("rationale")})
 
             def stream(query: str, sub_plan: dict, label: str | None = None) -> dict:
                 final: dict = {}
@@ -417,88 +388,24 @@ async def api_agent_stream(q: str):
         loop.run_in_executor(_SSE_EXECUTOR, runner)
         yield f"event: hello\ndata: {json.dumps({'query': q})}\n\n"
 
-        # Stone-boundary envelope: track current Stone so we can wrap
-        # contiguous step events in stone_start / stone_done. step
-        # events whose name is not in the map (geocode, nta_resolve,
-        # select_deployment) flow through without opening a Stone: they
-        # are orientation steps, not part of any data-Stone group.
-        current_stone: str | None = None
-        stone_step_count: dict[str, int] = {}
-
-        def _open(stone: str) -> str:
-            stone_step_count[stone] = 0
-            payload = {**_STONE_META.get(stone, {"name": stone})}
-            return f"event: stone_start\ndata: {json.dumps(payload)}\n\n"
-
-        def _close(stone: str) -> str:
-            payload = {
-                **_STONE_META.get(stone, {"name": stone}),
-                "n_steps": stone_step_count.get(stone, 0),
-            }
-            return f"event: stone_done\ndata: {json.dumps(payload)}\n\n"
-
         while True:
             try:
                 ev = await asyncio.to_thread(out_q.get, True, 1.0)
             except Exception:
-                # No event for 1 s — send an SSE comment so the HF Space
-                # proxy doesn't close the idle connection (proxy idle timeout
-                # is ~15-20 s; the reconciler's vLLM call can take longer).
+                # No event for a second: an SSE comment keeps an idle
+                # connection open through a proxy while a source or the LLM is slow.
                 yield ": keepalive\n\n"
                 continue
             kind = ev.get("kind")
             if kind == "_done":
                 break
-
-            # First reconcile token implies the data-Stones are done
-            # and the Capstone has begun, even if the FSM step event
-            # for reconcile hasn't fired yet (it fires AFTER the
-            # generation finishes). Open Capstone here so the UI
-            # shows it lighting up while tokens stream.
-            if kind == "token" and current_stone != "Capstone":
-                if current_stone is not None:
-                    yield _close(current_stone)
-                current_stone = "Capstone"
-                yield _open(current_stone)
-
-            if kind == "step":
-                step_name = ev.get("step") or ""
-                # Per-query routing handshake — when the pipeline
-                # resolves the deployment, push it to the UI so the
-                # header chip + pebble scaffold can pivot off the
-                # deployment that actually fanned out, not whatever
-                # the server booted with.
-                if step_name == "select_deployment":
-                    result = ev.get("result") or {}
-                    dep_name = result.get("deployment")
-                    yield (
-                        "event: deployment\n"
-                        f"data: {json.dumps({'name': dep_name, 'city': result.get('city'), 'state': result.get('state')})}\n\n"
-                    )
-                stone = _STEP_TO_STONE.get(step_name)
-                if stone is not None:
-                    if stone != current_stone:
-                        if current_stone is not None:
-                            yield _close(current_stone)
-                        current_stone = stone
-                        yield _open(current_stone)
-                    stone_step_count[stone] = stone_step_count.get(stone, 0) + 1
-
-            # `final` arrives after the Capstone has produced its
-            # paragraph. Close the Capstone before forwarding final
-            # so the trace cleanly reads: ... stone_done(Capstone),
-            # final, done.
-            if kind == "final" and current_stone is not None:
-                yield _close(current_stone)
-                current_stone = None
-
+            if kind == "step" and ev.get("step") == "select_deployment":
+                # The deployment the query routed to, so the header chip and the
+                # source scaffold show that city and not the server's default.
+                result = ev.get("result") or {}
+                yield ("event: deployment\n"
+                       f"data: {json.dumps({'name': result.get('deployment'), 'city': result.get('city'), 'state': result.get('state')})}\n\n")
             yield f"event: {kind}\ndata: {json.dumps(ev, default=str)}\n\n"
-
-        # Pipeline ended without a final (error / abort) — close any
-        # still-open Stone so the client doesn't render an unbounded
-        # parent row.
-        if current_stone is not None:
-            yield _close(current_stone)
         yield "event: done\ndata: {}\n\n"
 
     return StreamingResponse(
@@ -513,8 +420,13 @@ def api_district(code: str, no_llm: bool = False):
     """Evidence summary for an NYC community district (QN12, BK15): the
     neighbourhood pipeline over the union of the district's NTAs."""
     from riprap.core.burr.app import district_summary
+    from riprap.core.burr.place import parse_district
 
-    return JSONResponse(_to_json_safe(district_summary(code, no_llm=no_llm)))
+    found, refusal = parse_district(code)
+    if not found:
+        return JSONResponse({"error": refusal or f"{code!r} is not a community district code such as QN12"},
+                            status_code=404)
+    return JSONResponse(_to_json_safe(district_summary(found, no_llm=no_llm)))
 
 
 @app.get("/api/nyc311/flood_requests")

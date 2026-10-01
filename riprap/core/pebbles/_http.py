@@ -3,7 +3,6 @@ shared client in riprap/core/http.py (caching, retries, timeouts).
 
   fetch_url_text(url, *, cache_ttl_s, headers, timeout_s) -> str
   fetch_url_json(url, *, cache_ttl_s, headers, timeout_s) -> Any
-  post_url_json(url, body, *, headers, timeout_s) -> Any   (never cached)
 
 A `cache_ttl_s` of 0 disables caching for that call.
 
@@ -55,9 +54,3 @@ def fetch_url_json(url: str, *, cache_ttl_s: int = 300,
     return r.json()
 
 
-def post_url_json(url: str, body: Any, *,
-                  headers: dict[str, str] | None = None,
-                  timeout_s: float = 60.0) -> Any:
-    r = http.post(url, json=body, headers=_interpolate_headers(headers), timeout=timeout_s, ttl_s=0)
-    r.raise_for_status()
-    return r.json()

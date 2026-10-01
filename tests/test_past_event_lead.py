@@ -172,7 +172,7 @@ def test_a_qualifying_sentence_does_not_turn_events_into_an_absence():
 
     doc = ("5 FloodNet community sensors within 600 m have logged 28 above-curb flood events in the last "
            "3 years. Peak depth recorded by the sensors in good working order: 715 mm on 2026-08-23. 1 sensor "
-           "that logged events is flagged by FloodNet for maintenance, so its depths are not used for the peak.")
+           "that logged 3 of these events is flagged by FloodNet for maintenance, so its depths are not used for the peak.")
     assert reports_result(doc)
     assert not reports_result("1 FloodNet community sensor within 600 m has logged 0 above-curb flood events "
                               "in the last 3 years.")

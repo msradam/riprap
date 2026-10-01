@@ -1,5 +1,9 @@
 # Load test results — Granian + Burr pipeline, single worker
 
+> **Historical.** Recorded in May 2026 on an earlier server (Granian, an LLM
+> on every query). The app now runs under uvicorn and answers most queries with
+> no model, so these numbers do not describe it. The k6 scripts still run.
+
 Recorded 2026-05-16 on M3 Pro laptop, Ollama serving `granite4.1:8b-q3_K_M`,
 Granian 2.7.4, 1 worker, against the Burr Application path
 (`RIPRAP_USE_BURR_APP=1`).

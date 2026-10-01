@@ -200,6 +200,15 @@ def _exposure(spec: Spec, lat: float, lon: float) -> tuple[bool, dict[str, int],
             {s: dep_class_buffered(lat, lon, spec.buffer_m, s)[0] for s in spec.scenarios}, None)
 
 
+def _sandy_edge_m(lat: float, lon: float) -> int | None:
+    """Distance to the mapped Sandy edge when within 50 m of it, else None."""
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    pt = gpd.GeoSeries([Point(lon, lat)], crs="EPSG:4326").to_crs("EPSG:2263").iloc[0]
+    return sandy_inundation.at_point(pt)["edge_m"]
+
+
 def _finding(spec: Spec, distance_m: float | None, row: dict) -> dict:
     lat, lon = float(row["lat"]), float(row["lon"])
     f = spec.head(row, lat, lon, None if distance_m is None else round(distance_m, 1))
@@ -209,6 +218,13 @@ def _finding(spec: Spec, distance_m: float | None, row: dict) -> dict:
         micro = snap.get("microtopo") or {}
         elev, hand = micro.get("point_elev_m"), micro.get("aoi_hand_m") or micro.get("hand_m")
         sandy = bool(snap.get("sandy"))
+        if not sandy:
+            # The register tested the asset's bare point. One just outside the
+            # outline is named as near its edge, not left out (PAVE Academy's
+            # point is 3 m outside; another city file puts it 16 m inside).
+            edge = _sandy_edge_m(lat, lon)
+            if edge is not None:
+                f["sandy_edge_m"] = edge
         classes = {}
         for scen in spec.scenarios:
             c = (dep.get(scen) or {}).get("depth_class")
@@ -249,6 +265,13 @@ def _named(spec: Spec, findings: list[dict], limit: int = 20) -> str:
     return out
 
 
+def _n_exposed(spec: Spec, findings: list[dict]) -> int:
+    """How many of a baked register's rows are exposed. The register also
+    keeps assets within 50 m of the Sandy edge; those are named, not counted."""
+    return sum(1 for f in findings
+               if f["inside_sandy_2012"] or any((f[f"{s}_class"] or 0) > 0 for s in spec.scenarios))
+
+
 def summary_for_polygon(polygon, asset_class: str) -> dict:
     """The assets of `asset_class` inside a WGS84 polygon (a neighbourhood,
     or the outline drawn for a community district), with their exposure.
@@ -268,7 +291,7 @@ def summary_for_polygon(polygon, asset_class: str) -> dict:
     findings = sorted((_finding(at_point, None, r) for r in rows), key=spec.name)
     n_sandy = sum(1 for f in findings if f["inside_sandy_2012"])
     n_dep = sum(1 for f in findings if (f["dep_extreme_2080_class"] or 0) > 0)
-    n = len(findings)
+    n = _n_exposed(spec, findings) if spec.register else len(findings)
     return {"available": True, spec.count_key: n, "n_inside_sandy_2012": n_sandy, "n_in_dep_extreme_2080": n_dep,
             "n_near_sandy_edge": sum(1 for f in findings if f.get("sandy_edge_m") is not None),
             "narrative": (f"{n} {spec.singular if n == 1 else spec.plural} in this area{spec.scope}: {n_sandy} inside "
@@ -289,17 +312,18 @@ def summary_for_point(lat: float, lon: float, asset_class: str,
     findings = [_finding(spec, d, r) for d, r in (hits[:max_n] if live else hits)]
     n_sandy = sum(1 for f in findings if f["inside_sandy_2012"])
     n_dep = sum(1 for f in findings if (f["dep_extreme_2080_class"] or 0) > 0)
-    out: dict = {"available": True, spec.count_key: len(hits)}
+    n = len(hits) if live else _n_exposed(spec, findings)
+    out: dict = {"available": True, spec.count_key: n}
     if live:
         out["n_checked"] = len(findings)
     out["radius_m"] = radius_m
-    if spec.buffer_m is not None:
+    if spec.buffer_m is not None and live:  # a baked register tested the bare point
         out["footprint_buffer_m"] = spec.buffer_m
     out["n_inside_sandy_2012"] = n_sandy
     out["n_in_dep_extreme_2080"] = n_dep
     if any(f.get("sandy_edge_m") is not None for f in findings):
         out["n_near_sandy_edge"] = sum(1 for f in findings if f.get("sandy_edge_m") is not None)
-    out["narrative"] = narrative(spec.singular, spec.plural, len(hits), radius_m, n_sandy, n_dep,
+    out["narrative"] = narrative(spec.singular, spec.plural, n, radius_m, n_sandy, n_dep,
                                  scope=spec.scope, n_checked=len(findings) if live else None) + _named(spec, findings)
     for key, flag in spec.rollups.items():
         out[key] = sum(1 for f in findings if f[flag])

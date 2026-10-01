@@ -96,19 +96,22 @@ def _place_match(out: dict) -> str | None:
 
 # Fields a pebble value carries for the page (a sentence, a chart, a map
 # shape), not for a program.
-_PRESENTATION = {"narrative", "geojson", "points", "histogram", "headline_value", "subhead_text", "citation"}
+_PRESENTATION = {"narrative", "geojson", "headline_value", "citation", "inside_or_outside"}
 
 
 def _value(v) -> dict | None:
     """The source's own figures for one evidence item, so a program reads
     numbers and names, not a sentence."""
-    return {k: x for k, x in v.items() if k not in _PRESENTATION} if isinstance(v, dict) else None
+    if not isinstance(v, dict):
+        return None
+    return {k: x for k, x in v.items() if k not in _PRESENTATION and not k.endswith(("_phrasing", "_note"))}
 
 
 def _evidence_payload(out: dict) -> dict:
     from riprap.core.burr import evidence
 
-    stones, registry = evidence.load(out.get("deployment") or "nyc")
+    # A place outside every city ran the federal sources: `deployment` is null.
+    stones, registry = evidence.load(out.get("deployment") or "__none__")
     items = evidence.collect(out, stones, registry)
     heading = {s.id: s.name for s in stones.all()}
     if not items:  # say why, rather than hand back an empty list
@@ -250,6 +253,12 @@ def get_briefing(address: str, question: str | None = None) -> dict:
         "intent": out.get("intent"),
         "paragraph": out.get("paragraph"),
         "mode": g.get("tier"),
+        # Whether the question was answered, by what ("rules" or "extractive",
+        # the model's choice) and with which lead (yes, no, partly, count,
+        # facts, experimental, no_prediction, cannot_answer).
+        "answered": g.get("answered"),
+        "answer_mode": g.get("answer_mode"),
+        "answer_lead": g.get("answer_lead"),
         "dropped_claims": g.get("dropped_claims") or [],
         "citations": out.get("citations") or {},
         "consulted": out.get("consulted") or [],

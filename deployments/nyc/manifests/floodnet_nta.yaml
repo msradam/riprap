@@ -1,0 +1,51 @@
+id: floodnet_nta
+type: live
+title: FloodNet ultrasonic depth sensors (NYC)
+answers: "street flooding recorded by the FloodNet sensors inside a neighborhood or district: event counts over 3 years, peak depth and the streets with the most events"
+stone: touchstone
+tier: empirical
+adapter: python_call
+
+spatial:
+  scope: polygon
+  crs: EPSG:4326
+
+config:
+  module: app.context.floodnet
+  function: summary_for_polygon
+  args:
+    - {source: polygon_4326}
+  on_none: offline
+
+trace_summary:
+  n_sensors: n_sensors
+  n_events_3y: n_flood_events_3y
+
+provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
+  source_name: FloodNet NYC, ultrasonic depth sensor network (CUNY/NYU/Brooklyn College)
+  source_url: https://www.floodnet.nyc/data-downloads
+  license: CC-BY-NC-SA 4.0
+  doc_id: floodnet
+  citation: >-
+    FloodNet NYC, community-led real-time street-flood sensor network.
+    Data CC-BY-NC-SA 4.0; derivatives must carry the same license.
+    Readings come from the FloodNet API (api.floodnet.nyc), which has no
+    stable page per sensor or event, so the link is the project's data
+    download page. https://www.floodnet.nyc/data-downloads
+
+narration:
+  short: FloodNet sensors and historical flood events inside this area.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: FloodNet did not respond when this briefing ran.
+
+display:
+  variant: scalars
+  order: 10
+  kind: stat
+  map_layer: true
+  icon: "📡"

@@ -4,6 +4,8 @@ status code, and its highest reading is stated apart from the peak, with
 its flag (FloodNet's published record and the press print that reading).
 Offline: the API calls are stubbed."""
 
+from datetime import UTC, datetime
+
 from app.context import floodnet
 from app.context.floodnet import FloodEvent, Sensor
 
@@ -23,7 +25,7 @@ def test_a_flagged_sensor_is_not_the_peak(monkeypatch):
     n = out["narrative"]
     assert "noisy" not in n
     assert n.endswith("Peak depth recorded by the sensors in good working order: 300 mm (11.8 in) on 2025-07-14. "
-                      "1 sensor that logged events is flagged by FloodNet for maintenance, "
+                      "1 sensor that logged 1 of these events is flagged by FloodNet for maintenance, "
                       "so its depths are not used for the peak. "
                       "The highest depth a flagged sensor recorded was 1172 mm (46.1 in) on 2026-05-20.")
     assert out["peak_event"]["max_depth_mm"] == 300
@@ -36,7 +38,8 @@ def test_no_good_sensor_with_an_event_means_no_peak(monkeypatch):
     _stub(monkeypatch, "needs_driverail", other="non-ota")
     n = floodnet.summary_for_point(40.71, -73.78)["narrative"]
     assert "Peak depth" not in n and "driverail" not in n and "non-ota" not in n
-    assert n.endswith("2 sensors that logged events are flagged by FloodNet for maintenance, "
+    assert "no flood event under way" not in n  # flagged sensors, and events with no end: nothing is said about now
+    assert n.endswith("2 sensors that logged 2 of these events are flagged by FloodNet for maintenance, "
                       "so their depths are not used for the peak. "
                       "The highest depth a flagged sensor recorded was 1172 mm (46.1 in) on 2026-05-20.")
 
@@ -51,7 +54,7 @@ def test_the_flagged_sentence_is_cited():
     from riprap.core.burr.evidence import cite
 
     t = ("Peak depth recorded by the sensors in good working order: 300 mm on 2025-07-14. "
-         "1 sensor that logged events is flagged by FloodNet for maintenance, so its depths are not used for the peak.")
+         "1 sensor that logged 11 of these events is flagged by FloodNet for maintenance, so its depths are not used for the peak.")
     assert cite(t, "floodnet").endswith("used for the peak [floodnet].")
 
 
@@ -60,4 +63,4 @@ def test_events_are_asked_for_up_to_now(monkeypatch):
     seen = {}
     monkeypatch.setattr(floodnet, "_gql", lambda q, v: seen.update(v) or {"sensor_events": []})
     floodnet.flood_events_for(["frank"])
-    assert "_lte:$until" in floodnet._EVENTS_Q and seen["until"][:4] <= "2027" and seen["since"] < seen["until"]
+    assert "_lte:$until" in floodnet._EVENTS_Q and seen["until"][:4] <= str(datetime.now(UTC).year + 1) and seen["since"] < seen["until"]

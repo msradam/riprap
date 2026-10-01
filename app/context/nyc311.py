@@ -163,10 +163,16 @@ def one_per_incident(cs: list[Complaint]) -> list[Complaint]:
     same address or the same coordinates was created within ten minutes of
     it (an intersection request has coordinates and no address on its coded
     row, and a street-only address on its plain one)."""
+    from bisect import bisect_left
+
     coded: dict[str | None, list[tuple[datetime, Complaint]]] = {}
     for c in cs:
         if c.descriptor not in _NEW_NAMES and c.created_date:
             coded.setdefault(KIND.get(c.descriptor), []).append((datetime.fromisoformat(c.created_date), c))
+    for rows in coded.values():
+        rows.sort(key=lambda r: r[0])
+    times = {kind: [t for t, _ in rows] for kind, rows in coded.items()}
+    window = timedelta(minutes=10)
 
     def same_place(a: Complaint, b: Complaint) -> bool:
         if a.address and a.address == b.address:
@@ -176,11 +182,18 @@ def one_per_incident(cs: list[Complaint]) -> list[Complaint]:
                 and abs(a.lat - b.lat) < 1e-5 and abs(a.lon - b.lon) < 1e-5)
 
     def twin(c: Complaint) -> bool:
-        if c.descriptor not in _NEW_NAMES or not c.created_date:
+        kind = KIND.get(c.descriptor)
+        if c.descriptor not in _NEW_NAMES or not c.created_date or kind not in coded:
             return False
         t = datetime.fromisoformat(c.created_date)
-        return any(abs(t - u) <= timedelta(minutes=10) and same_place(c, other)
-                   for u, other in coded.get(KIND.get(c.descriptor), ()))
+        # Only the coded rows of this kind within ten minutes are compared (a
+        # district has thousands of rows; every pair was once compared).
+        rows, i = coded[kind], bisect_left(times[kind], t - window)
+        while i < len(rows) and rows[i][0] <= t + window:
+            if same_place(c, rows[i][1]):
+                return True
+            i += 1
+        return False
 
     return [c for c in cs if not twin(c)]
 
