@@ -109,6 +109,14 @@ Fixed, each reproduced first:
   counts; a sensor FloodNet flags for maintenance could stand behind a
   "Yes."; a district with 0.8% inside the Sandy extent was "Yes." and is
   "In part.".
+- "Did it flood on Monday", "last summer" or "recently" got "Yes." from a
+  three-year total. A day, a month or a season gets the record with no yes
+  or no. "Before Sandy, had it flooded?" said "Yes." from the Sandy extent.
+- "Is there flood risk here?" was read as "did it flood" and could get "No."
+  from sensors with no events.
+- "New Brighton" resolved to Brighton Beach, "City Island" to Hart Island
+  and "Murray Hill in Queens" to Manhattan. A house number such as 2100 or
+  2050 was read as a future year.
 - FloodNet events stopped at 200 rows: City Island's 436 read as 200.
 - "How many complaints since Ida" got the window's total.
 - "Flushing Avenue, Brooklyn", "Jamaica Hospital" and "woodlawn chicago"
