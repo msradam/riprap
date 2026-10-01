@@ -167,6 +167,9 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
                        key=lambda e: e.max_depth_mm or 0, default=None)
     n_sensors = len(sensors)
     n_events = len(events)
+    latest = max(events, key=lambda e: e.start_time, default=None)
+    day_ago = (datetime.now(UTC) - timedelta(hours=24)).isoformat(timespec="seconds").replace("+00:00", "")
+    open_now = [e for e in events if not e.end_time and e.start_time >= day_ago]
     # Templatable narrative for the manifest's narration.template.
     # Honest negative ("0 sensors within range") still useful — same
     # contract as the NWS / ida_hwm all-clear cards.
@@ -179,8 +182,13 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
         narrative = (
             f"{n_sensors} FloodNet community sensor{'' if n_sensors == 1 else 's'} within "
             f"{int(radius_m)} m {'has' if n_sensors == 1 else 'have'} logged {n_events} "
-            f"above-curb flood event{'' if n_events == 1 else 's'} in the last 3 years."
+            f"above-curb flood event{'' if n_events == 1 else 's'} in the last 3 years"
+            # The newest event dates the record, and answers "is it flooding now".
+            + (f", the most recent starting {latest.start_time[:16].replace('T', ' ')} UTC." if latest else ".")
         )
+        if open_now:
+            narrative += (f" {len(open_now)} event{'' if len(open_now) == 1 else 's'} that started in the last "
+                          "24 hours had no end time when this was read.")
         if peak is not None and peak.max_depth_mm is not None:
             narrative += (
                 f" Peak depth recorded by the sensors in good working order: "
@@ -204,5 +212,7 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
         "n_sensors_with_events": len(by_dep),
         "peak_event": vars(peak) if peak else None,
         "flagged_peak_event": vars(flagged_peak) if flagged_peak else None,
+        "latest_event_start": latest.start_time if latest else None,
+        "n_events_open_24h": len(open_now),
         "narrative": narrative,
     }

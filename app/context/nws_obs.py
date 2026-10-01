@@ -9,6 +9,7 @@ typically <60 min old.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from math import asin, cos, radians, sin, sqrt
@@ -58,6 +59,10 @@ class Obs:
     precip_last_3h_mm: float | None
     precip_last_6h_mm: float | None
     error: str | None = None
+    weather: str | None = None  # the station's own words: "Clear", "Light Rain"
+
+
+_WET_RE = re.compile(r"rain|drizzle|shower|thunder|snow|sleet|hail|precip", re.IGNORECASE)
 
 
 def _haversine_km(lat1, lon1, lat2, lon2) -> float:
@@ -94,6 +99,7 @@ def obs_at(lat: float, lon: float) -> Obs:
         r.raise_for_status()
         p = r.json().get("properties", {}) or {}
         out.obs_time = p.get("timestamp")
+        out.weather = (p.get("textDescription") or "").strip() or None
         out.temp_c = _val_mm(p, "temperature")
         out.precip_last_hour_mm = _val_mm(p, "precipitationLastHour")
         out.precip_last_3h_mm = _val_mm(p, "precipitationLast3Hours")
@@ -115,6 +121,8 @@ def summary_for_point(lat: float, lon: float) -> dict:
         if o.distance_km is not None:
             bits.append(f" ({o.distance_km:.1f} km away)")
         facts = []  # joined with commas, so a missing temperature leaves no stray ":,"
+        if o.weather:
+            facts.append(o.weather.lower())
         if o.temp_c is not None:
             facts.append(f"{o.temp_c}°C")
         p1 = o.precip_last_hour_mm
@@ -123,8 +131,10 @@ def summary_for_point(lat: float, lon: float) -> dict:
             facts.append(f"{p1} mm precip in the last hour")
         elif p6 is not None and p6 > 0:
             facts.append(f"{p6} mm precip in the last 6 hours")
-        elif p1 == 0 or p6 == 0:
-            facts.append("no recent precipitation")
+        elif p1 == 0 or p6 == 0 or (o.weather and not _WET_RE.search(o.weather)):
+            # A station reports precipitation only when there is some: the
+            # sky condition without a wet word is the station saying it is dry.
+            facts.append("no precipitation reported")
         bits.append(": " + ", ".join(facts))
         if o.obs_time:
             t = datetime.fromisoformat(o.obs_time).astimezone(UTC)
@@ -135,6 +145,8 @@ def summary_for_point(lat: float, lon: float) -> dict:
         "station_name": o.station_name,
         "distance_km": o.distance_km,
         "obs_time": o.obs_time,
+        "weather": o.weather,
+        "raining": bool((o.precip_last_hour_mm or 0) > 0 or (o.weather and _WET_RE.search(o.weather))),
         "temp_c": o.temp_c,
         "precip_last_hour_mm": o.precip_last_hour_mm,
         "precip_last_3h_mm": o.precip_last_3h_mm,
