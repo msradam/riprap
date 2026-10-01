@@ -49,17 +49,7 @@ CITIES = [
             "noaa_tides",
         ],
         "no_leak": ["Lake Michigan", "Calumet", "San Francisco", "Seattle",
-                    "Boston Logan", "Charles River"],
-    },
-    {
-        "name": "boston",
-        "query": "100 Atlantic Avenue, Boston, MA",
-        "expect_pebbles": [
-            "water_level", "boston_311", "nws_obs", "nws_alerts",
-        ],
-        "expect_narrative_pebbles": ["water_level", "nws_obs"],
-        "no_leak": ["NYC OEM", "Sandy 2012", "FloodNet", "Lake Michigan",
-                    "San Francisco"],
+                    "Calumet Harbor"],
     },
     {
         "name": "chicago",
@@ -68,8 +58,7 @@ CITIES = [
             "lake_michigan_water_level", "chicago_311", "nws_obs", "nws_alerts",
         ],
         "expect_narrative_pebbles": ["lake_michigan_water_level", "nws_obs"],
-        "no_leak": ["NYC OEM", "Sandy 2012", "FloodNet", "Boston Harbor",
-                    "San Francisco"],
+        "no_leak": ["NYC OEM", "Sandy 2012", "FloodNet"],
     },
     {
         "name": "seattle",
@@ -78,28 +67,17 @@ CITIES = [
             "water_level", "nws_obs", "nws_alerts",  # no 311 manifest yet
         ],
         "expect_narrative_pebbles": ["water_level", "nws_obs"],
-        "no_leak": ["NYC OEM", "Sandy 2012", "Lake Michigan",
-                    "Boston Logan"],
-    },
-    {
-        "name": "sf",
-        "query": "1 Ferry Building, San Francisco, CA",
-        "expect_pebbles": [
-            "water_level", "sf_311", "nws_obs", "nws_alerts",
-        ],
-        "expect_narrative_pebbles": ["water_level", "nws_obs"],
-        "no_leak": ["NYC OEM", "Sandy 2012", "Lake Michigan", "Boston Harbor"],
+        "no_leak": ["NYC OEM", "Sandy 2012", "Lake Michigan"],
     },
     {
         "name": "albany",
         "query": "24 Eagle St, Albany, NY 12207",
         "expect_pebbles": [
-            "water_level", "albany_311", "albany_flood_311",
+            "water_level", "albany_flood_311",
             "fema_nfhl", "usgs_gauges", "nws_obs", "nws_alerts",
         ],
         "expect_narrative_pebbles": ["water_level", "nws_obs"],
-        "no_leak": ["NYC OEM", "Sandy 2012", "Lake Michigan", "Boston Harbor",
-                    "San Francisco"],
+        "no_leak": ["NYC OEM", "Sandy 2012", "Lake Michigan"],
     },
 ]
 

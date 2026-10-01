@@ -98,19 +98,6 @@ def test_311_category_filter_with_missing_field_is_unavailable_not_zero():
     assert kept == [] and info["n_kept"] == 0 and info["n_before_phrase"] == "5"  # a true zero
 
 
-def test_311_text_filter_with_nothing_to_read_is_unavailable_not_zero(monkeypatch, tmp_path):
-    from riprap.core.pebbles import record_filter
-
-    monkeypatch.setattr(record_filter, "available", lambda: (True, ""))
-    monkeypatch.setattr(record_filter, "p_flood", lambda text: 0.0)
-    monkeypatch.setenv("RIPRAP_311_FILTER_CACHE", str(tmp_path / "c.sqlite"))
-    cfg = {"threshold": 0.5, "text_fields": ["description"], "id_field": "id"}
-    with pytest.raises(ValueError):
-        record_filter.apply([{"id": i} for i in range(4)], cfg, "boston_311")
-    kept, info = record_filter.apply([{"id": 1, "description": "pothole"}, {"id": 2}], cfg, "boston_311")
-    assert info["n_kept"] == 0 and "1 had no text to read" in info["filter_note"]
-
-
 def test_dob_permits_missing_coordinates_is_unavailable_not_zero(monkeypatch):
     from app.context import dob_permits
 

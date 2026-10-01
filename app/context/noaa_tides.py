@@ -26,9 +26,7 @@ URL = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter"
 STATIONS = [
     # (id, name, lat, lon) — NOAA CO-OPS Tides & Currents station IDs.
     # The set must cover every spatially-routed deployment so the
-    # `_find_nearest_station` lookup doesn't fall through to an
-    # arbitrarily-distant station (which was the bug behind a Boston
-    # query landing on Albany NY at 222 km).
+    # nearest-station lookup does not fall through to a distant one.
     #
     # NYC harbor + Long Island Sound
     ("8518750", "The Battery, NY",         40.7006, -74.0142),
@@ -39,11 +37,6 @@ STATIONS = [
     ("8518995", "Albany, NY (Hudson)",     42.6469, -73.7464),
     ("8518962", "Turkey Point Hudson, NY", 41.7569, -73.9433),
     ("8519483", "West Point, NY",          41.3845, -73.9536),
-    # Boston Harbor — covers the Boston deployment
-    ("8443970", "Boston, MA",              42.3548, -71.0534),
-    # San Francisco Bay — covers the SF deployment
-    ("9414290", "San Francisco, CA",       37.8063, -122.4659),
-    ("9414750", "Alameda, CA",             37.7717, -122.3000),
     # Puget Sound — covers the Seattle deployment
     ("9447130", "Seattle, WA",             47.6026, -122.3392),
     # Lake Michigan / Calumet Harbor — covers the Chicago deployment.

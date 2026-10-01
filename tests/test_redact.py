@@ -62,8 +62,7 @@ def test_personal_fetch_bypasses_the_cache_and_redacts(monkeypatch):
     assert out == [{"status_notes": f"Spoke with owner, {PHONE}, {EMAIL}"}]
 
 
-@pytest.mark.parametrize("module", ["riprap.core.pebbles.adapters.socrata_records",
-                                    "riprap.core.pebbles.adapters.ckan_records", "app.context.seeclickfix"])
+@pytest.mark.parametrize("module", ["riprap.core.pebbles.adapters.socrata_records", "app.context.seeclickfix"])
 def test_every_311_adapter_fetches_as_personal(module):
     import importlib
     import inspect

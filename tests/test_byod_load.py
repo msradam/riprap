@@ -90,22 +90,22 @@ def test_byod_manifest_resolves_paths_against_manifest_dir(tmp_path, clean_env):
 
 def test_byod_pebble_portable_across_deployments(clean_env):
     """Same BYOD manifest must load + fetch correctly against multiple base
-    deployments. A spatial mismatch (NYC CSV vs Boston address) returns 0
+    deployments. A spatial mismatch (NYC CSV vs Chicago address) returns 0
     within radius rather than erroring."""
     clean_env.setenv("RIPRAP_EXTRA_MANIFESTS", str(EXAMPLE))
 
-    boston_root = REPO / "deployments" / "boston"
-    reg = load_registry(boston_root)
+    chicago_root = REPO / "deployments" / "chicago"
+    reg = load_registry(chicago_root)
     assert "fdny_firehouses" in reg
-    assert "boston_311" in reg  # base Boston pebble still present
+    assert "chicago_311" in reg  # base Chicago pebble still present
 
     pebble = reg.get("fdny_firehouses")
-    boston_city_hall = SpatialQuery(lat=42.3601, lon=-71.0589)
-    result = pebble.fetch(boston_city_hall)
+    chicago_loop = SpatialQuery(lat=41.8781, lon=-87.6298)
+    result = pebble.fetch(chicago_loop)
     assert result.value is not None
     assert result.value["n_within_radius"] == 0
-    # Nearest FDNY firehouse from Boston City Hall is ~280 km away in Manhattan.
-    assert result.value["nearest"]["distance_m"] > 250_000
+    # The nearest FDNY firehouse from the Chicago Loop is over 1,000 km away.
+    assert result.value["nearest"]["distance_m"] > 1_000_000
 
 
 def test_byod_id_collision_overrides_base(tmp_path, clean_env, capsys):

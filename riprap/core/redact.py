@@ -1,14 +1,12 @@
 """Remove email addresses and phone numbers from fetched records (refactor 6).
 
-311 free text (Boston closure_reason, San Francisco status_notes and
-service_details, Albany SeeClickFix summaries and descriptions) sometimes
-holds a resident's email or phone number. The 311 adapters pass every
+311 free text (Albany SeeClickFix summaries and descriptions, a Socrata
+feed's notes fields) sometimes holds a resident's email or phone number. The 311 adapters pass every
 fetched payload through `redact` before it reaches a briefing, a cache, a
 log or a file.
 
 Names are not removed: telling a name from a street or an agency needs
-more than a pattern, and a wrong guess would damage the text the flood
-filter reads.
+more than a pattern, and a wrong guess would damage the text.
 """
 
 from __future__ import annotations

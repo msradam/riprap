@@ -1,6 +1,6 @@
 """Per-query deployment routing — the data-correctness gate.
 
-The architectural promise: a Boston query never fires NYC's `ida_hwm`
+The architectural promise: a Chicago query never fires NYC's `ida_hwm`
 pebble, regardless of which deployment the server happened to boot
 with. These tests are the regression seal on that promise.
 """
@@ -27,7 +27,7 @@ def _pebbles_for(stone: str, deployment: str, lat=None, lon=None) -> list[str]:
 def test_all_shipped_cities_have_a_coverage_bbox():
     """Every city deployment declares a bbox + city."""
     deps = {d.name: d for d in discover_deployments()}
-    for name in ("nyc", "boston", "chicago", "seattle", "sf", "albany"):
+    for name in ("nyc", "chicago", "seattle", "albany"):
         d = deps.get(name)
         assert d is not None, f"deployments/{name} missing from discovery"
         assert d.bbox is not None, f"deployments/{name} has no coverage.bbox"
@@ -37,15 +37,13 @@ def test_all_shipped_cities_have_a_coverage_bbox():
 def test_city_centroids_route_to_their_deployment():
     """Each shipped city's city-hall point picks its own deployment.
 
-    A miss here is the bug the user called out: 'Hurricane Ida ran for
-    Boston' — i.e. the routing put a Boston point into the NYC fan-out.
+    A miss here is the bug once seen: 'Hurricane Ida ran for Boston',
+    i.e. the routing put another city's point into the NYC fan-out.
     """
     cases = [
         ("NYC City Hall",        40.7128, -74.0060, "nyc"),
-        ("Boston City Hall",     42.3601, -71.0589, "boston"),
         ("Chicago Loop",         41.8781, -87.6298, "chicago"),
         ("Seattle Pike Place",   47.6094, -122.3422, "seattle"),
-        ("SF Civic Center",      37.7793, -122.4192, "sf"),
         ("Albany City Hall",     42.6526, -73.7562, "albany"),
     ]
     for label, lat, lon, expected in cases:
@@ -74,7 +72,7 @@ def test_no_coords_returns_none():
 
 def test_deployment_by_name_lookup():
     assert deployment_by_name("nyc") is not None
-    assert deployment_by_name("boston") is not None
+    assert deployment_by_name("chicago") is not None
     assert deployment_by_name("does_not_exist") is None
 
 
@@ -82,18 +80,18 @@ def test_stones_pebbles_for_filters_by_deployment():
     """The Stone fan-out function returns only the active deployment's
     pebbles — the regression seal on the data-leak fix."""
 
-    boston_cornerstone = set(_pebbles_for("cornerstone", "boston"))
+    chicago_cornerstone = set(_pebbles_for("cornerstone", "chicago"))
     nyc_cornerstone = set(_pebbles_for("cornerstone", "nyc"))
 
     # NYC Cornerstone includes ida_hwm, sandy, dep_*, etc.
     assert "ida_hwm" in nyc_cornerstone
     assert "sandy" in nyc_cornerstone
-    # Boston Cornerstone must NOT include them — this is the bug fix.
-    assert "ida_hwm" not in boston_cornerstone, (
-        "Boston cornerstone fan-out contains ida_hwm — Hurricane Ida is "
-        "a New York 2021 event and must not fire for Boston queries."
+    # Chicago Cornerstone must NOT include them.
+    assert "ida_hwm" not in chicago_cornerstone, (
+        "Chicago cornerstone fan-out contains ida_hwm: Hurricane Ida is "
+        "a New York 2021 event and must not fire for Chicago queries."
     )
-    assert "sandy" not in boston_cornerstone
+    assert "sandy" not in chicago_cornerstone
 
 
 def test_pebbles_for_none_sentinel_returns_federal_only():
@@ -117,10 +115,8 @@ def test_federal_pebbles_auto_merge_into_every_city():
 
     for city, lat, lon in [
         ("nyc",     40.7128, -74.0060),
-        ("boston",  42.3601, -71.0589),
         ("chicago", 41.8781, -87.6298),
         ("seattle", 47.6094, -122.3422),
-        ("sf",      37.7793, -122.4192),
     ]:
         touchstone = _pebbles_for("touchstone", city, lat=lat, lon=lon)
         lodestone = _pebbles_for("lodestone", city, lat=lat, lon=lon)
@@ -201,26 +197,20 @@ def test_build_documents_covers_non_nyc_deployment_pebbles():
     assert "200" in doc_311.text
 
 
-def test_build_documents_keeps_two_311_variants_separate():
-    """Albany ships albany_311 (all requests, 300 m) and albany_flood_311
-    (flood-filtered, 800 m) as distinct pebbles. Regression seal for a
-    confirmed live citation-swap bug: a briefing once attributed BOTH
-    counts to a single doc_id, misrepresenting a 300 m-radius total as
-    part of the 800 m-radius flood-specific query. Two separate documents
-    is what lets the model (or an auditor) tell them apart at all."""
+def test_albany_flood_feed_is_its_own_document():
+    """Albany ships one 311 pebble, the flood-category feed at 800 m. The
+    all-requests feed at 300 m was removed (2026-10-01): its count was not
+    a flood count, and a briefing once attributed both counts to one doc_id."""
     from riprap.core.burr.synthesis import _documents as build_documents
 
     state = {
         "deployment": "albany",
         "geocode": {"address": "24 Eagle St", "lat": 42.652, "lon": -73.756},
-        "albany_311": {"n_records": 62, "radius_m": 300, "n_before": 62, "n_kept": 62, "n_before_phrase": "62",
-                       "filter": "none", "filter_note": "were counted without a flood filter (not installed)"},
         "albany_flood_311": {"n_records": 6, "radius_m": 800},
     }
     docs, _, _ = build_documents(state)
     by_id = {d.doc_id: d.text for d in docs}
-    assert "albany_311" in by_id and "albany_flood_311" in by_id
-    assert "62" in by_id["albany_311"] and "300" in by_id["albany_311"]
+    assert "albany_311" not in by_id
     assert "6" in by_id["albany_flood_311"] and "800" in by_id["albany_flood_311"]
 
 
@@ -230,8 +220,7 @@ def test_all_pebble_ids_covers_every_shipped_pebble():
     state.get() inside the action at all."""
     from riprap.core.burr.evidence import all_pebble_ids
     keys = all_pebble_ids()
-    for pid in ("nyc311", "chicago_311", "boston_311", "sf_311",
-                "albany_311", "albany_flood_311", "fema_nfhl", "usgs_gauges"):
+    for pid in ("nyc311", "chicago_311", "seattle_311", "albany_flood_311", "fema_nfhl", "usgs_gauges"):
         assert pid in keys, f"{pid!r} missing from all_pebble_ids()"
 
 

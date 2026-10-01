@@ -7,7 +7,6 @@ source (HTTP live, baked GeoJSON, model endpoint, ...). The manifest's
 from __future__ import annotations
 
 from riprap.core.pebbles.adapters.baked_vector import BakedVectorPebble
-from riprap.core.pebbles.adapters.ckan_records import CKANRecordsPebble
 from riprap.core.pebbles.adapters.csv_points import CSVPointsPebble
 from riprap.core.pebbles.adapters.model_call import ModelCallPebble
 from riprap.core.pebbles.adapters.python_call import PythonCallPebble
@@ -16,7 +15,6 @@ from riprap.core.pebbles.adapters.socrata_records import SocrataRecordsPebble
 
 ADAPTERS: dict[str, type] = {
     "baked_vector": BakedVectorPebble,
-    "ckan_records": CKANRecordsPebble,
     "csv_points": CSVPointsPebble,
     "model_call": ModelCallPebble,
     "python_call": PythonCallPebble,
@@ -27,7 +25,6 @@ ADAPTERS: dict[str, type] = {
 __all__ = [
     "ADAPTERS",
     "BakedVectorPebble",
-    "CKANRecordsPebble",
     "CSVPointsPebble",
     "LocalCorpusWithNERPebble",
     "ModelCallPebble",

@@ -40,7 +40,6 @@ def records_near(
     sample_cap: int = 5,
     cache_ttl_s: int = 1800,
     request_types: str | None = None,
-    record_filter: dict | None = None,
 ) -> dict[str, Any] | None:
     """`request_types` is a comma-separated list of SeeClickFix
     request-type ids (server-side category filter) — city-specific;
@@ -60,11 +59,6 @@ def records_near(
         and isinstance(i.get("lng"), (int, float))
         and _haversine_m(lat, lon, i["lat"], i["lng"]) <= radius_m
     ]
-    fetched_in_radius = len(records)
-    from riprap.core.pebbles import record_filter as rf
-
-    records, filter_info = rf.apply(records, record_filter, "albany_311",
-                                    len(issues) >= _PER_PAGE and fetched_in_radius == len(issues))
     n = len(records)
     sample = [
         {
@@ -80,9 +74,8 @@ def records_near(
         "n_records": n,
         # nearest-first fetch: if every fetched issue was in-radius, the
         # page boundary may have cut off more in-radius issues.
-        "n_truncated": len(issues) >= _PER_PAGE and fetched_in_radius == len(issues),
+        "n_truncated": len(issues) >= _PER_PAGE and n == len(issues),
         "radius_m": radius_m,
         "sample": sample,
         "top_by_request_type": [{"value": v, "count": c} for v, c in counter.most_common(5)],
-        **filter_info,
     }
