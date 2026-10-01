@@ -30,10 +30,10 @@ body:
       label: Open-data portal
       description: |
         URL of your jurisdiction's open-data portal and the platform it
-        runs (Socrata, CKAN, other). If Socrata, the existing adapter
+        runs (Socrata, other). If Socrata, the existing adapter
         probably already works: list the resource IDs and the spatial
-        field name (`location`, `point` or lat-lon columns) for the
-        datasets you want to use.
+        field name (`location` or latitude and longitude columns) for
+        the datasets you want to use.
       placeholder: |
         https://data.cityofchicago.org (Socrata). 311: v6vf-nfxy, spatial field `location`.
     validations:

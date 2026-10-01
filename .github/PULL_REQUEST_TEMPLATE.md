@@ -10,7 +10,7 @@
 - [ ] Local dev server (`uvicorn web.main:app`)
 - [ ] Local Docker (`docker compose up`)
 - [ ] Modal deployment
-- [ ] Mac Mini / self-hosted GPU inference
+- [ ] With an LLM endpoint configured
 
 ## Smoke probe
 

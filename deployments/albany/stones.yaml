@@ -1,10 +1,8 @@
-# Albany, NY — flood-exposure briefing deployment.
-#
-# Same architecture as the NYC reference. Federal pebbles (NWS, NOAA)
-# port unchanged; the Hudson is tidal to the Federal Lock at Troy, so
-# the NOAA water-level pebble resolves to the Albany station (8518995).
-# Albany runs its 311 intake on SeeClickFix, not a Socrata/CKAN portal,
-# so the 311 pebble uses the python_call adapter.
+# Albany, NY, experimental: the federal sources plus SeeClickFix flood
+# reports and the Hudson water-level gauge at Albany (the Hudson is tidal
+# to the Federal Lock at Troy; NOAA station 8518995). Albany takes its 311
+# requests on SeeClickFix, so that source uses the python_call adapter.
+# It has no local flood maps, sensors or asset registers.
 deployment:
   experimental: true
 coverage:
@@ -15,25 +13,25 @@ stones:
   - id: cornerstone
     name: Cornerstone
     tagline: The Hazard Reader
-    description: Reads what Albany remembers about flooding — FEMA flood zones, the tidal Hudson at the head of navigation, Patroon and Normans Kill creeks, and Capital Region ice-jam and snowmelt history.
+    description: Reads the FEMA flood zone for the address.
     order: 1
   - id: touchstone
     name: Touchstone
     tagline: The Live Observer
-    description: Watches current flood signals — Albany SeeClickFix flood reports, the USGS Patroon Creek gauge, NWS Albany forecast office, NOAA Hudson River water levels at the Albany gauge.
+    description: Reads Albany SeeClickFix flood reports, the Hudson water-level gauge at Albany, stream gauges and weather observations.
     order: 2
   - id: keystone
     name: Keystone
     tagline: The Asset Register
-    description: Counts public assets exposed — Albany city schools, Capital District facilities, hospitals — and their accessibility from this address.
+    description: No asset register is read for Albany yet.
     order: 3
   - id: lodestone
     name: Lodestone
     tagline: The Projector
-    description: Projects what's coming — NWS Albany forecasts, Hudson River tidal predictions, Northeast climate projections.
+    description: Quotes active Weather Service alerts.
     order: 4
   - id: capstone
     name: Capstone
     tagline: The Synthesiser
-    description: Writes the cited flood-exposure briefing from the evidence, with or without an LLM.
+    description: Writes the cited briefing from the evidence, with or without an LLM.
     order: 5

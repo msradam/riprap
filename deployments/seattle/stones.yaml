@@ -1,7 +1,6 @@
-# Seattle — flood-exposure briefing deployment.
-#
-# Same architecture as the NYC reference. Federal pebbles (NWS, NOAA)
-# port unchanged; city-specific pebbles point at data.seattle.gov.
+# Seattle, experimental: the federal sources plus a reviewed 311 flood
+# filter (data.seattle.gov) and the Puget Sound water-level gauge. It has
+# no local flood maps, sensors or asset registers.
 deployment:
   experimental: true
 coverage:
@@ -12,22 +11,22 @@ stones:
   - id: cornerstone
     name: Cornerstone
     tagline: The Hazard Reader
-    description: Reads what Seattle remembers about flooding — Puget Sound shoreline, salmon-corridor streams, and Pacific Northwest precipitation.
+    description: Reads the FEMA flood zone for the address.
     order: 1
   - id: touchstone
     name: Touchstone
     tagline: The Live Observer
-    description: Watches current flood signals — Seattle CSR (Find It Fix It), NWS Seattle, Puget Sound water levels.
+    description: Reads Seattle customer service flood requests, the Puget Sound water-level gauge, stream gauges and weather observations.
     order: 2
   - id: keystone
     name: Keystone
     tagline: The Asset Register
-    description: Counts public assets exposed — Seattle Public Schools, King County libraries, hospitals.
+    description: No asset register is read for Seattle yet.
     order: 3
   - id: lodestone
     name: Lodestone
     tagline: The Projector
-    description: Projects what's coming — NWS Pacific Northwest forecasts, NOAA Puget Sound projections.
+    description: Quotes active Weather Service alerts.
     order: 4
   - id: capstone
     name: Capstone

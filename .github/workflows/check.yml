@@ -61,11 +61,9 @@ jobs:
         env:
           RIPRAP_SKIP_WARM: "1"
 
-  # A fully offline probe_cities_smoke.py run would be ideal here, but
-  # the current script hits real upstream APIs (NWS, Socrata, CKAN,
-  # NOAA). Those endpoints are unauthed but rate-limited and
-  # occasionally flaky; gating PRs on remote uptime is a poor trade.
-  # The lint + tests jobs above cover the regression surface that
-  # matters for code review. Run
-  # `.venv/bin/python scripts/probe_cities_smoke.py http://127.0.0.1:7860`
-  # locally before tagging a release — that's the 6/6 PASS gate.
+  # scripts/probe_cities_smoke.py is not run here: it calls the live
+  # public APIs (NWS, Socrata, NOAA, SeeClickFix), which are rate-limited
+  # and sometimes down, and a pull request should not fail on someone
+  # else's uptime. Run it against a local server before a release:
+  # `uv run python scripts/probe_cities_smoke.py http://127.0.0.1:7860`
+  # (New York, Chicago, Seattle and Albany should pass).

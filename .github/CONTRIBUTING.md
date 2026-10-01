@@ -42,8 +42,10 @@ uv sync                # everything the app needs; no torch
 If you already cloned before installing Git LFS, `git lfs pull` inside
 the repo fetches the real files retroactively.
 
-The one extra is `energy` (zeus-apple-silicon, measured energy on Apple
-Silicon): `uv sync --extra energy`.
+Three extras are optional: `ml` (the experimental Battery surge forecast,
+on CPU), `eo` (the batch jobs that make the experimental satellite layers)
+and `energy` (zeus-apple-silicon, measured energy on Apple Silicon). For
+example `uv sync --extra ml`. docs/MODELS.md says what each model does.
 
 SvelteKit (the build is committed; only rebuild when sources change
 under `web/sveltekit/src`):
@@ -121,6 +123,10 @@ riprap/cli/register.py     riprap-register: flood flags per asset, as CSV
 app/
 ├── context/, flood_layers/, assets/, registers/, areas/
 │                          Functions that python_call manifests point at
+├── experimental.py        The three experimental models and the one rule
+│                          for quoting them
+├── live/, eo/             The surge forecast; the satellite models (batch)
+│                          and the readers of their saved output
 ├── planner.py             LLM planner (LLM mode)
 ├── geocode.py             NYC Geosearch, then Nominatim
 ├── emissions.py           Per-call energy and token ledger

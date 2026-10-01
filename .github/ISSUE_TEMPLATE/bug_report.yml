@@ -6,8 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for filing! Riprap is a hackathon-period demo; the more
-        reproducible the report, the faster it gets fixed.
+        Thanks for filing. The more reproducible the report, the faster
+        it gets fixed.
   - type: input
     id: address
     attributes:
@@ -34,10 +34,10 @@ body:
     attributes:
       label: Where did you reproduce this?
       options:
-        - Hosted demo (lablab Space)
+        - The public gallery (msradam.github.io/riprap)
         - Local Docker (`docker compose up`)
         - Local dev server (`uvicorn web.main:app`)
-        - Self-hosted GPU inference
+        - Local server with an LLM endpoint configured
     validations:
       required: true
   - type: input

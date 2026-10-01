@@ -1,8 +1,6 @@
-# Chicago — flood-exposure briefing deployment.
-#
-# Proof that Riprap's architecture generalises beyond NYC. Same five
-# stones; federal pebbles (NWS, NOAA, EPA) port unchanged; city-specific
-# pebbles point at Chicago Data Portal (Socrata) instead of NYC Open Data.
+# Chicago, experimental: the federal sources plus a reviewed 311 flood
+# filter (Chicago Data Portal) and the Lake Michigan water-level gauge.
+# It has no local flood maps, sensors or asset registers.
 deployment:
   experimental: true
 coverage:
@@ -13,25 +11,25 @@ stones:
   - id: cornerstone
     name: Cornerstone
     tagline: The Hazard Reader
-    description: Reads what Chicago's ground remembers about flooding — FEMA floodplains, lake-level baselines, stormwater modeling.
+    description: Reads the FEMA flood zone for the address.
     order: 1
   - id: touchstone
     name: Touchstone
     tagline: The Live Observer
-    description: Watches the current state of the city's flood signals — Chicago 311 flood complaints, Lake Michigan tide gauge, NWS observations.
+    description: Reads Chicago 311 flood requests, the Lake Michigan water-level gauge, stream gauges and weather observations.
     order: 2
   - id: keystone
     name: Keystone
     tagline: The Asset Register
-    description: Counts public assets exposed — CHA developments, CPS schools, hospitals — and their accessibility from this address.
+    description: No asset register is read for Chicago yet.
     order: 3
   - id: lodestone
     name: Lodestone
     tagline: The Projector
-    description: Projects what's coming — NWS forecasts, Great Lakes water-level projections, FEMA scenario maps.
+    description: Quotes active Weather Service alerts.
     order: 4
   - id: capstone
     name: Capstone
     tagline: The Synthesiser
-    description: Writes the cited flood-exposure briefing from the evidence, with or without an LLM.
+    description: Writes the cited briefing from the evidence, with or without an LLM.
     order: 5

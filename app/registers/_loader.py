@@ -1,24 +1,14 @@
-"""Shared loader for pre-built register JSONs in data/registers/.
+"""Shared loader for the pre-built register JSONs in data/registers/.
 
-Each register specialist (`nycha`, `doe_schools`, `doh_hospitals`,
-`mta_entrances`) has a pre-computed JSON catalog of every Tier 1-3
-exposed asset. The catalog is built once by scripts/build_*_register.py
-running the full polygon-overlap math; per-query specialists used to
-recompute that math against multi-million-polygon GDB layers, which
-on the HF Space CPU made `step_nycha` hang for minutes.
+Each asset register (public housing, schools, hospitals, subway
+entrances) is built once by scripts/build_register.py, which joins every
+asset to the Sandy extent and the DEP stormwater scenarios; a query then
+reads the saved rows and finds the nearest by great-circle distance, in
+milliseconds, where the full polygon join took minutes.
 
-This module provides O(1) cached load + haversine-on-prebuilt-rows
-nearest-N retrieval. Per-query latency drops from minutes to ~ms
-without losing the exposure semantics — the per-asset flags
-(snap.sandy, snap.dep[scen].depth_class, snap.microtopo) were already
-computed during the bake.
-
-Asset classes outside this catalog (truly unexposed assets, tier 0)
-are intentionally not surfaced: a Carleton Manor query that returns
-"no NYCHA developments at risk within 1 mi" is a more useful
-result than "we found 5 inland NYCHA developments with 0% Sandy
-overlap."
-"""
+The housing and school registers hold only assets inside one of those
+layers. An asset inside none is left out, and the register sentence says
+so ("the register lists only ...")."""
 from __future__ import annotations
 
 import json

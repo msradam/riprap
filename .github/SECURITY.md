@@ -24,7 +24,8 @@ data. By design, the runtime:
 
 - contacts only **public-record APIs** (NYC Open Data, FloodNet,
   USGS, NOAA, NWS, NYS DOH, MTA, NYCHA, NYC DOE, OpenStreetMap /
-  Nominatim) and the configured inference Spaces;
+  Nominatim), the LLM endpoint an operator configures, and Hugging Face
+  when an optional experimental model is installed;
 - does **not** authenticate against user accounts or store
   user-identifying data — the address bar is the only input;
 - runs the SvelteKit UI as a static SPA over a FastAPI backend
@@ -33,14 +34,14 @@ data. By design, the runtime:
 The vulnerability surface is therefore small. Plausible categories
 worth a report:
 
-- Prompt-injection paths via document content that escape the
-  Mellea grounding loop and surface unverifiable claims as cited.
+- Prompt-injection paths via a question or source text that get past
+  the claim checks and show an unverified claim as cited.
 - SSRF / abuse via crafted address strings that drive backend
   HTTP calls to unintended hosts.
 - Token leakage in proxy headers or SSE streams (`web/main.py`, or
   the inference proxies in the companion `msradam/riprap-inference` repo).
-- Denial-of-service patterns that exceed the hosted Space's
-  resource budget.
+- Denial-of-service patterns against a hosted copy (one query fans out
+  to many public APIs).
 - Supply-chain issues in pinned deps (`pyproject.toml` and `uv.lock`,
   `web/sveltekit/package.json`).
 

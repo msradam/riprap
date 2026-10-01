@@ -20,13 +20,12 @@ spatial:
 #
 #   1. `.riprap/` auto-discovery:
 #         cp examples/byod/fdny_firehouses.{yaml,csv} .riprap/
-#         RIPRAP_DEPLOYMENT=deployments/nyc \
-#           .venv/bin/python -m riprap probe "189 Atlantic Ave, Brooklyn"
+#         uv run uvicorn web.main:app --port 7860
 #
 #   2. RIPRAP_EXTRA_MANIFESTS env var:
-#         RIPRAP_DEPLOYMENT=deployments/nyc \
-#         RIPRAP_EXTRA_MANIFESTS=examples/byod \
-#           .venv/bin/python -m riprap probe "189 Atlantic Ave, Brooklyn"
+#         RIPRAP_EXTRA_MANIFESTS=examples/byod uv run uvicorn web.main:app --port 7860
+#
+#   then ask for "189 Atlantic Ave, Brooklyn" (docs/byod.md).
 #
 # Swap the CSV for your own portfolio (lat/lon columns, anything else
 # carries through as `feature_properties`) and the rest works unchanged.
