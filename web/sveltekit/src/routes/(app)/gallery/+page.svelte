@@ -16,11 +16,13 @@
     'The lead (Yes, No or a count) is set by rules in code, and so is a refusal or a note that the sources do not answer. The model chose which source sentences answer the question, and they are quoted word for word.';
   const NOTE_WRITTEN = 'Written by a language model, with each claim checked against its cited sources.';
   const NOTE_RULES = "Answered by rules in code over the question's words, with no language model.";
+  const NOTE_RULES_PLANNED =
+    "The answer was chosen by rules in code over the question's words; a language model was used only to read the place and choose the sources.";
   type Entry = (typeof data.entries)[number];
   const note = (e: Entry) =>
     e.modelName
       ? e.answerMode === 'extractive' ? NOTE_EXTRACTIVE : NOTE_WRITTEN
-      : e.answerMode === 'rules' ? NOTE_RULES
+      : e.answerMode === 'rules' ? (e.planned ? NOTE_RULES_PLANNED : NOTE_RULES)
       : e.mode !== 'llm' ? `${modeLabel(e.mode)}.` : null;
   let notes = $derived([...new Set(questions.map(note).filter((n) => n !== null))]);
   let sharedNote = $derived(notes.length === 1 ? notes[0] : null);

@@ -26,7 +26,13 @@ export interface PlanInfo {
   focus?: { hazard?: string | null; time?: string | null; asset?: string | null };
   /** Pebble ids the planner chose to run. */
   pebbles?: string[];
+  /** On `final.plan` only: the planner's model calls; absent or empty
+   *  when rules planned the query. */
+  llm_calls?: unknown[];
 }
+
+/** True when a language model planned the query. */
+export const planned = (plan: PlanInfo | null | undefined): boolean => !!plan?.llm_calls?.length;
 
 /** A source in `final.consulted` / `final.not_checked`. */
 export interface SourceRef {

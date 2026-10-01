@@ -12,6 +12,8 @@ import { tidy } from '$lib/client/briefingText';
 export interface GalleryStory extends GalleryIndexEntry {
   lead: string;
   answerMode: string | null;
+  /** A language model planned the query, whatever answered it. */
+  planned: boolean;
 }
 
 const SECTION_RE = /\*\*(?:Answer|In brief)\.\*\*\s*([\s\S]*?)(?=\n\s*\n|\*\*[^*]+\.\*\*|$)/;
@@ -73,7 +75,7 @@ export async function galleryStories(): Promise<GalleryStory[]> {
   const out: GalleryStory[] = [];
   for (const e of galleryIndex) {
     const entry = await loadGalleryEntry(e.slug);
-    out.push({ ...withGrounding(e, entry?.final.grounding), lead: entry ? storyLead(e, entry.final) : '' });
+    out.push({ ...withGrounding(e, entry?.final.grounding, entry?.final.plan), lead: entry ? storyLead(e, entry.final) : '' });
   }
   return out;
 }

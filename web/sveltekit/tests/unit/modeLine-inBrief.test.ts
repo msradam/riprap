@@ -6,6 +6,9 @@
 import { describe, it, expect } from 'vitest';
 import { modeLine } from '$lib/client/cardAdapter';
 import { parseBriefing, splitBriefing } from '$lib/client/parseBriefing';
+import { briefingModel } from '$lib/client/briefingModel';
+import { RunState } from '$lib/client/runState.svelte';
+import type { PlanInfo } from '$lib/client/agentStream';
 
 describe('mode line', () => {
   it('describes an extractive answer as quoted, not as LLM claims', () => {
@@ -33,6 +36,17 @@ describe('mode line', () => {
     expect(modeLine(g)).toBe("Answered by rules over the question's words; no language model was used.");
     expect(modeLine({ ...g, fallback_reason: 'LLM unavailable: timeout' }))
       .toBe("Answered by rules over the question's words; no language model was used. The LLM was unavailable (LLM unavailable: timeout).");
+  });
+  it('says a language model planned the query when the rules answered it', () => {
+    const g = { tier: 'no_llm', answer_mode: 'rules', question: 'How many complaints?', answered: true, answer_lead: 'count' };
+    const planned = "The answer was chosen by rules over the question's words; a language model was used only to read the place and choose the sources.";
+    expect(modeLine(g, true)).toBe(planned);
+    expect(modeLine(g, false)).toBe("Answered by rules over the question's words; no language model was used.");
+    // The page reads it from final.plan.llm_calls: one entry when the planner model was called.
+    const final = { paragraph: '**Answer.**\n12 complaints [nyc311].', intent: 'neighborhood', grounding: g as never };
+    const line = (plan: PlanInfo) => briefingModel(RunState.fromFinal({ ...final, plan }, 'QN12'), 'QN12').modeLine;
+    expect(line({ intent: 'neighborhood', llm_calls: [{ model: 'granite' }] })).toBe(planned);
+    expect(line({ intent: 'neighborhood', llm_calls: [] })).toBe("Answered by rules over the question's words; no language model was used.");
   });
   it('says plainly when neither a rule nor a model answered', () => {
     const g = { tier: 'no_llm', answer_mode: 'rules', question: 'Is the roof sound?', answered: false };

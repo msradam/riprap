@@ -3,7 +3,7 @@
  * into src/lib/gallery/*.json. Pages built from these make no backend
  * requests; everything they show comes from the JSON.
  */
-import type { FinalResult } from './agentStream';
+import { planned, type FinalResult } from './agentStream';
 import type { PebbleManifestResponse } from '$lib/stores/pebbleManifest.svelte';
 import type { Deployment } from '$lib/stores/deployment.svelte';
 import index from '$lib/gallery/index.json';
@@ -34,9 +34,12 @@ export const galleryIndex = index as GalleryIndexEntry[];
 
 /** An entry with `mode`, `model` and `answerMode` read from its own
  *  `final.grounding`, so every label says how that entry was made. The
- *  index fields stand for an entry saved without a grounding. */
-export function withGrounding<T extends GalleryIndexEntry>(e: T, g: FinalResult['grounding']): T & { answerMode: string | null } {
-  return { ...e, mode: g?.tier ?? e.mode, model: g ? g.model ?? null : e.model, answerMode: g?.answer_mode ?? null };
+ *  index fields stand for an entry saved without a grounding. `planned`
+ *  says whether a language model planned the query (`final.plan`). */
+export function withGrounding<T extends GalleryIndexEntry>(
+  e: T, g: FinalResult['grounding'], plan?: FinalResult['plan']
+): T & { answerMode: string | null; planned: boolean } {
+  return { ...e, mode: g?.tier ?? e.mode, model: g ? g.model ?? null : e.model, answerMode: g?.answer_mode ?? null, planned: planned(plan) };
 }
 
 const files = import.meta.glob<GalleryEntry>(

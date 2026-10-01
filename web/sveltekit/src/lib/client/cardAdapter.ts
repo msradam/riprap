@@ -726,10 +726,13 @@ export const UNANSWERED = 'This question was not answered. The evidence for the 
 /** What produced the briefing, in words: the mode line on screen and in
  *  print. An extractive answer is quoted, not model prose, so it does not
  *  say "LLM claims checked" for it. A question the rules answered, or one
- *  that neither a rule nor a model answered, says so. */
+ *  that neither a rule nor a model answered, says so. `planned` is true
+ *  when a language model planned the query (`final.plan.llm_calls`), so a
+ *  rules answer does not claim that no model was used. */
 export function modeLine(g: { tier: string; model?: string; answer_mode?: string; answer_lead?: string; note?: string;
                               question?: string; answered?: boolean | null;
-                              claims?: unknown[]; dropped_claims?: unknown[]; fallback_reason?: string } | null | undefined): string | null {
+                              claims?: unknown[]; dropped_claims?: unknown[]; fallback_reason?: string } | null | undefined,
+                         planned = false): string | null {
   if (!g) return null;
   if (g.tier !== 'llm') {
     if (g.note) return 'Evidence briefing: no question was asked, so no LLM was needed';
@@ -739,7 +742,9 @@ export function modeLine(g: { tier: string; model?: string; answer_mode?: string
       return `No rule and no language model answered the question, so the evidence briefing is shown.${unavailable}`;
     }
     if (g.question && g.answer_mode === 'rules') {
-      return `Answered by rules over the question's words; no language model was used.${unavailable}`;
+      return (planned
+        ? "The answer was chosen by rules over the question's words; a language model was used only to read the place and choose the sources."
+        : "Answered by rules over the question's words; no language model was used.") + unavailable;
     }
     return g.fallback_reason
       ? `Evidence briefing (no LLM). The LLM was unavailable (${g.fallback_reason}), so the evidence briefing is shown.`

@@ -99,4 +99,13 @@ describe('a rules-mode question entry', () => {
     expect(metas[1]).toMatch(/^Language model hf\.co\/x-GGUF:Q4_K_M\. The lead \(Yes, No or a count\) is set by rules in code/);
     expect(page([rules, llm]).querySelector('.gallery-colophon')).toBeNull();
   });
+
+  it('says a language model planned the query when the saved plan lists a model call', () => {
+    const planned = withGrounding(index, { tier: 'no_llm', answer_mode: 'rules' }, { intent: 'neighborhood', llm_calls: [{}] });
+    expect(rules.planned).toBe(false);
+    expect(planned.planned).toBe(true);
+    const text = page([planned]).textContent ?? '';
+    expect(text).toContain('a language model was used only to read the place and choose the sources.');
+    expect(text).not.toContain("over the question's words, with no language model");
+  });
 });
