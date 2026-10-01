@@ -10,7 +10,6 @@ import userEvent from '@testing-library/user-event';
 import LandHero from '$lib/components/landing/LandHero.svelte';
 import LandProof from '$lib/components/landing/LandProof.svelte';
 import LandStones from '$lib/components/landing/LandStones.svelte';
-import LandFor from '$lib/components/landing/LandFor.svelte';
 import LandDevelopers from '$lib/components/landing/LandDevelopers.svelte';
 import LandFrontier from '$lib/components/landing/LandFrontier.svelte';
 import LandCollab from '$lib/components/landing/LandCollab.svelte';
@@ -24,7 +23,7 @@ const text = (el: Element) => (el.textContent ?? '').replace(/\s+/g, ' ');
 describe('Landing smoke', () => {
   it('LandHero links each chip to the live query the gallery entry answers', () => {
     const { getByRole } = render(LandHero, heroProps);
-    const chips = getByRole('list', { name: 'Try a real question' });
+    const chips = getByRole('list', { name: 'Try a real question or place' });
     const hrefs = [...chips.querySelectorAll('a')].map((a) => decodeURIComponent(a.getAttribute('href') ?? ''));
     expect(hrefs).toEqual([
       '/q/Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?',
@@ -49,6 +48,16 @@ describe('Landing smoke', () => {
     expect(mark.getAttribute('href')).toBe('#cite-floodnet');
     expect(figure.querySelector('#cite-floodnet')).not.toBeNull();
     expect(figure.querySelectorAll('.source-note')).toHaveLength(3);
+    // The tier in words comes from the snapshot's manifest.
+    expect([...figure.querySelectorAll('.source-note-line')].map((l) => text(l).split(',')[0].trim())).toEqual([
+      'Measured',
+      'Measured',
+      'Proxy'
+    ]);
+    // The flagged-sensor sentence follows the key sentence.
+    const paras = [...figure.querySelectorAll('p.specimen-key, p.specimen-flag')].map((p) => p.className.split(' ')[0]);
+    expect(paras).toEqual(['specimen-key', 'specimen-flag']);
+    expect(text(figure.querySelector('p.specimen-flag')!)).toContain('is flagged by FloodNet for maintenance');
     expect(figure.querySelector('a[href="/gallery/hollis-since-ida/"]')?.textContent).toBe('Read the full briefing');
   });
 
@@ -73,6 +82,11 @@ describe('Landing smoke', () => {
     expect(text(cards[1])).toContain('Inside the 2012 Sandy extent: RED HOOK EAST, RED HOOK WEST');
     for (const c of cards) expect(c.querySelector('time')?.getAttribute('datetime')).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(text(container)).toContain(`See all ${data.count} briefings in the gallery`);
+    // Who it is for: one sentence, no second link to a proof briefing.
+    const forLine = container.querySelector('.proof-for')!;
+    expect(text(forLine)).toMatch(/^ ?Made for people who have to cite it: reporters/);
+    expect(text(forLine)).toContain('in one printable briefing');
+    expect([...forLine.querySelectorAll('a')].map((a) => a.getAttribute('href'))).toEqual(['#developers']);
   });
 
   it('LandCollab names every shipped city and links one sample address each on the live build', () => {
@@ -81,20 +95,22 @@ describe('Landing smoke', () => {
       expect(text(container), `LandCollab missing ${city}`).toContain(city);
     }
     expect(container.querySelectorAll('a[href^="/q/"]')).toHaveLength(4);
-    const email = [...container.querySelectorAll('a')].filter((a) => a.textContent === 'Email the author');
-    expect(email.map((a) => a.getAttribute('href'))).toEqual([
-      'mailto:msrahmanadam@gmail.com?subject=Riprap',
-      'mailto:msrahmanadam@gmail.com?subject=Riprap'
+    // Each action once: the author's address, the issue tracker and each guide.
+    const hrefs = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href'));
+    expect(new Set(hrefs).size).toBe(hrefs.length);
+    const email = [...container.querySelectorAll('a[href^="mailto:"]')];
+    expect(email.map((a) => [a.textContent, a.getAttribute('href')])).toEqual([
+      ['Email Adam', 'mailto:msrahmanadam@gmail.com?subject=Riprap']
     ]);
     expect(container.querySelector('a[href="https://github.com/msradam/riprap/issues/new/choose"]')?.textContent).toBe('Open an issue');
+    expect(text(container)).toContain('Riprap is built by Adam Munawar Rahman, open source under Apache-2.0.');
   });
 
-  it('UseBand says evidence, not advice, and links the official sources it works alongside', () => {
+  it('UseBand says evidence, not advice, in one line that links the official sources it works alongside', () => {
     const { container } = render(UseBand);
-    expect([...container.querySelectorAll('h2')].map((h) => h.textContent)).toEqual([
-      'Riprap reports evidence, not advice.'
-    ]);
-    expect([...container.querySelectorAll('dd a')].map((a) => a.getAttribute('href'))).toEqual([
+    expect(container.querySelectorAll('p')).toHaveLength(1);
+    expect(container.querySelector('p strong')?.textContent).toBe('Riprap reports evidence, not advice.');
+    expect([...container.querySelectorAll('p a')].map((a) => a.getAttribute('href'))).toEqual([
       'https://dataviz.floodnet.nyc/',
       'https://www.weather.gov/okx/',
       'https://a858-nycnotify.nyc.gov/',
@@ -106,26 +122,13 @@ describe('Landing smoke', () => {
     expect(text(container)).toContain('Not affiliated with FEMA, NOAA, USGS or the City of New York.');
   });
 
-  it('LandFor names four readers, each with an example', () => {
-    const { container } = render(LandFor);
-    expect(container.querySelector('h2')?.textContent).toBe('Made for people who have to cite it');
-    expect([...container.querySelectorAll('h3')].map((h) => h.textContent)).toEqual([
-      'Reporters and data desks',
-      'Community boards and council offices',
-      'Resilience analysts and planners',
-      'Researchers and civic technologists'
-    ]);
-    expect([...container.querySelectorAll('a')].map((a) => a.getAttribute('href'))).toEqual([
-      '/gallery/hollis-since-ida/',
-      '/gallery/qn12/',
-      '/gallery/bk06-nycha/',
-      '#developers'
-    ]);
-  });
-
   it('says the three experimental models are there, labelled experimental, each with a baseline', () => {
     const { container } = render(LandFrontier);
-    expect(text(container)).toContain('labelled experimental, with their tested accuracy in every sentence');
+    expect(text(container)).toContain(
+      'Each is labelled experimental, states its tested accuracy in every sentence, and has a measured baseline to beat.'
+    );
+    expect(text(container)).not.toContain('days and years ahead');
+    expect(text(container)).toContain('87.1% agreement with ESA WorldCover, its own label source,');
     expect(container.querySelectorAll('h3')).toHaveLength(3);
     expect([...container.querySelectorAll('.exp-badge')].map((b) => b.textContent)).toEqual([
       'Experimental',
@@ -135,12 +138,18 @@ describe('Landing smoke', () => {
     expect([...container.querySelectorAll('dt')].filter((d) => d.textContent === 'The open problem')).toHaveLength(3);
   });
 
-  it('LandDevelopers has the anchor the reader cards use, a keyboard-scrollable code block and the seven MCP tools', () => {
+  it('LandDevelopers has the anchor the readers line uses, a captioned keyboard-scrollable code block and the seven MCP tools', () => {
     const { container } = render(LandDevelopers);
     expect(container.querySelector('section')?.id).toBe('developers');
-    const pre = container.querySelector('pre')!;
+    const pre = container.querySelector('figure > pre')!;
     expect(pre).toHaveAttribute('tabindex', '0');
-    expect(pre).toHaveAttribute('aria-label', 'Commands to run Riprap and query it');
+    // aria-label is prohibited on a pre (generic role); the figure's caption names the block.
+    expect(pre).not.toHaveAttribute('aria-label');
+    expect(container.querySelector('figure > figcaption')?.textContent).toBe('Commands to run Riprap and query it');
+    const lines = pre.textContent!.split('\n');
+    expect(lines).toContain('git clone https://github.com/msradam/riprap && cd riprap');
+    expect(lines).toContain('git lfs install && git lfs pull');
+    expect(lines.indexOf('git lfs install && git lfs pull')).toBeLessThan(lines.indexOf('uv run uvicorn web.main:app --port 7860'));
     expect(pre.textContent).toContain('uv run riprap-mcp');
     expect(container.querySelectorAll('.dev-tools li')).toHaveLength(7);
   });
@@ -154,7 +163,19 @@ describe('Landing smoke', () => {
       expect(t).toContain(name);
     }
     expect(container.querySelectorAll('dt')).toHaveLength(5);
+    // A plain label leads each row; the Stone's name is its tag.
+    expect([...container.querySelectorAll('dt')].map((d) => [d.firstChild?.textContent?.trim(), d.querySelector('.stone-tag')?.textContent])).toEqual([
+      ['Hazard maps and storm records', 'Cornerstone'],
+      ['Places at risk', 'Keystone'],
+      ['Live sensors and complaints', 'Touchstone'],
+      ['Forecasts and projections', 'Lodestone'],
+      ['How answers are written', 'Capstone']
+    ]);
     expect(t).toContain('USGS Hurricane Ida high-water marks');
+    expect(t).toContain('FloodNet data is licensed CC-BY-NC-SA 4.0');
+    expect(container.querySelector('.stones-licence a')?.getAttribute('href')).toBe(
+      'https://github.com/msradam/riprap/blob/main/docs/DATA-SOURCES.md'
+    );
   });
 });
 

@@ -7,7 +7,8 @@
   /** Landing top: kind line, h1, subhead, the query box (or, on the
    *  static site, the gallery and the quickstart), real questions as
    *  chips, and a real gallery answer as the specimen. The specimen comes
-   *  after the form in DOM order, so the input stays an early Tab stop. */
+   *  after the form in DOM order, so the input stays an early Tab stop;
+   *  on a phone it is set right under the subhead. */
   interface Chip {
     label: string;
     slug: string;
@@ -62,7 +63,8 @@
       <h1 id="land-h1">The flood record for any New York City block, cited line by line.</h1>
       <p class="hero-sub">
         Riprap joins street sensors, 311 complaints, flood maps and storm records for an address or
-        community district into one page, with a source and a date on every sentence.
+        community district into one page. Every sentence carries its source and date, and the answer
+        is the record's own words: no language model writes it.
       </p>
 
       {#if STATIC_SITE}
@@ -70,10 +72,6 @@
           <li><a class="land-button" href="{resolve('/(app)/gallery')}/">Browse {count} briefings</a></li>
           <li><a class="land-button is-secondary" href={QUICKSTART_URL}>Run it yourself</a></li>
         </ul>
-        <p class="land-small hero-note">
-          This site has saved briefings. To ask your own question, run Riprap on your laptop: no GPU,
-          no API keys.
-        </p>
       {:else}
         <form class="hero-query" role="search" onsubmit={submit}>
           <label for="land-query-input">Address, community district or flood question</label>
@@ -95,8 +93,12 @@
           <p id="land-query-hint" class="hero-hint" role="status">{#if empty}Type an address, a community district such as QN12, or a question.{/if}</p>
         </form>
       {/if}
+      <p class="land-small hero-note">
+        {#if STATIC_SITE}This site has saved briefings. Run it yourself to ask your own question.{/if}
+        Runs in seconds on a laptop: no GPU, no API keys.
+      </p>
 
-      <p class="hero-chips-head" id="land-try">Try a real question</p>
+      <p class="hero-chips-head" id="land-try">Try a real question or place</p>
       <ul class="hero-chips" aria-labelledby="land-try">
         {#each chips as c (c.slug)}
           <li><a class="hero-chip" href={STATIC_SITE ? galleryHref(c.slug) : briefHref(c.query)}>{c.label}</a></li>
@@ -257,6 +259,28 @@
     }
     .hero-specimen {
       margin-top: 32px;
+    }
+  }
+  /* Phone: the answer card right under the subhead, before the actions
+     and chips. Only the visual order changes; the DOM keeps the form first. */
+  @media (max-width: 480px) {
+    .hero-grid {
+      display: flex;
+      flex-direction: column;
+    }
+    .hero-main {
+      display: contents;
+    }
+    .hero-query,
+    .hero-actions,
+    .hero-note,
+    .hero-chips-head,
+    .hero-chips {
+      order: 2;
+    }
+    .hero-specimen {
+      order: 1;
+      margin-top: 24px;
     }
   }
 </style>

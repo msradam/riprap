@@ -4,7 +4,8 @@
 
   /** Proof: real gallery answers as cards. The district card is wide and
    *  comes first; each question card is headed by its question and quotes
-   *  the snapshot word for word (tests/unit/landing.test.ts checks it). */
+   *  the snapshot word for word (tests/unit/landing.test.ts checks it).
+   *  One sentence after the cards names who it is for. */
   export interface ProofCard extends Proof {
     question: string | null;
     place: string;
@@ -51,6 +52,12 @@
         </li>
       {/each}
     </ul>
+    <p class="proof-for">
+      Made for people who have to cite it: reporters quoting a block's record on deadline, community
+      boards and council offices taking a district to the meeting in one printable briefing, planners
+      checking which schools, subway entrances and public housing sit in a flood extent, and
+      researchers who want <a href="#developers">the same evidence in code</a>.
+    </p>
     <p class="proof-more">
       <a class="land-link" href="{resolve('/(app)/gallery')}/">See all {count} briefings in the gallery</a>
     </p>
@@ -105,8 +112,14 @@
     font-size: 14px;
     color: var(--ink-secondary);
   }
-  .proof-more {
+  .proof-for {
     margin: 32px 0 0;
+    max-width: 68ch;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .proof-more {
+    margin: 16px 0 0;
     font-size: 17px;
   }
 </style>

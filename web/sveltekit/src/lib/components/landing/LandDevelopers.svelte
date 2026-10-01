@@ -12,7 +12,11 @@
     'list_sources',
     'get_citation'
   ];
-  const CODE = `# Start the server: no GPU, no API keys
+  const CODE = `# Get the code and its data (needs uv and Git LFS)
+git clone https://github.com/msradam/riprap && cd riprap
+git lfs install && git lfs pull
+
+# Start the server: no GPU, no API keys
 uv run uvicorn web.main:app --port 7860
 
 # A district briefing as JSON
@@ -40,9 +44,12 @@ uv run riprap-mcp`;
         <li><a class="land-button is-secondary" href="https://github.com/msradam/riprap">View the code on GitHub</a></li>
       </ul>
     </div>
-    <!-- tabindex: the block scrolls sideways on a phone, so a keyboard user can scroll it (WCAG 2.1.1). -->
-    <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-    <pre class="dev-code" tabindex="0" aria-label="Commands to run Riprap and query it"><code>{CODE}</code></pre>
+    <figure class="dev-figure">
+      <figcaption class="land-small">Commands to run Riprap and query it</figcaption>
+      <!-- tabindex: the block scrolls sideways on a phone, so a keyboard user can scroll it (WCAG 2.1.1). -->
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+      <pre class="dev-code" tabindex="0"><code>{CODE}</code></pre>
+    </figure>
   </div>
 </section>
 
@@ -76,6 +83,13 @@ uv run riprap-mcp`;
     font-size: 14px;
     line-height: 1.6;
   }
+  .dev-figure {
+    margin: 0;
+    min-width: 0;
+  }
+  .dev-figure figcaption {
+    margin-bottom: 8px;
+  }
   /* The one dark band: Paper on Ink, Overpass Mono 14px. */
   .dev-code {
     margin: 0;
@@ -87,9 +101,10 @@ uv run riprap-mcp`;
     font-size: 14px;
     line-height: 1.6;
   }
-  /* Federal Blue on Ink is about 2.7:1, under 1.4.11's 3:1: a Paper ring. */
+  /* The ring sits outside the block, on the band, so it takes Federal Blue
+     as everywhere else (a Paper ring vanished against Sunken Paper). */
   .dev-code:focus-visible {
-    outline: 3px solid var(--paper);
+    outline: 3px solid var(--riprap-focus);
     outline-offset: 2px;
   }
   @media (max-width: 1099px) {

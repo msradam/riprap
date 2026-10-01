@@ -51,7 +51,6 @@ const EXEMPT_FILES = new Set<string>([
   'landing/LandHero.svelte',
   'landing/LandSpecimen.svelte',
   'landing/LandProof.svelte',
-  'landing/LandFor.svelte',
   'landing/LandStones.svelte',
   'landing/LandDevelopers.svelte',
   'landing/LandFrontier.svelte',

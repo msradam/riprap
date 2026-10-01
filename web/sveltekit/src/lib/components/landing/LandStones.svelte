@@ -1,5 +1,6 @@
 <script lang="ts">
-  /** The public sources behind a briefing, grouped by the five Stones.
+  /** The public sources behind a briefing, grouped by the five Stones:
+   *  a plain label leads each row, the Stone's name is its tag.
    *  Source names are the manifests' own (deployments/nyc/manifests and
    *  deployments/federal/manifests); the experimental model layers are in
    *  LandFrontier. */
@@ -13,7 +14,15 @@
     keystone:
       "NYC public schools, MTA subway entrances, NYCHA developments, hospitals, active DOB construction permits, NYC Planning's floodplain counts",
     lodestone: 'National Weather Service alerts and water-level forecasts, NPCC4 sea-level projections',
-    capstone: 'Writes one cited sentence per record, and answers a question by rules over its words'
+    capstone:
+      "Turns each record into one cited sentence and sets the answer's lead (Yes, No, a count) by fixed rules, not a language model."
+  };
+  const LABELS: Record<StoneKey, string> = {
+    cornerstone: 'Hazard maps and storm records',
+    keystone: 'Places at risk',
+    touchstone: 'Live sensors and complaints',
+    lodestone: 'Forecasts and projections',
+    capstone: 'How answers are written'
   };
   const DOCS = 'https://github.com/msradam/riprap/blob/main/docs';
 </script>
@@ -23,20 +32,24 @@
     <h2 id="stones-h" class="land-h2">Built on 23 public sources</h2>
     <p class="land-intro">
       City, state and federal records, read live or from their published files and sorted into five
-      Stones. No commercial data and no scores.
+      Stones. No commercial data and no scores. Each record has its own portal; we know of no other
+      tool that reads them together for one address.
     </p>
     <dl class="stones">
       {#each STONE_ORDER as key (key)}
         <div class="stone">
-          <dt>{STONE_META[key].name}, {STONE_META[key].role}</dt>
+          <dt>{LABELS[key]} <span class="stone-tag">{STONE_META[key].name}</span></dt>
           <dd>{SOURCES[key]}</dd>
         </div>
       {/each}
     </dl>
-    <ul class="stones-links land-small">
-      <li><a class="land-link" href="{DOCS}/DATA-SOURCES.md">Every source, with its licence and date</a></li>
-      <li><a class="land-link" href="{DOCS}/METHODOLOGY.md">How a briefing is made</a></li>
-    </ul>
+    <p class="land-small stones-licence">
+      FloodNet data is licensed CC-BY-NC-SA 4.0 and the NPCC4 projections CC-BY-NC 4.0; the other
+      sources are public domain or open. <a href="{DOCS}/DATA-SOURCES.md">See every source and licence</a>.
+    </p>
+    <p class="land-small stones-links">
+      <a class="land-link" href="{DOCS}/METHODOLOGY.md">How a briefing is made</a>
+    </p>
   </div>
 </section>
 
@@ -67,13 +80,19 @@
     line-height: 1.55;
     color: var(--ink-secondary);
   }
-  .stones-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 24px;
+  /* The Stone's name: Small, secondary ink, on its own line under the label. */
+  .stone-tag {
+    display: block;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink-secondary);
+  }
+  .stones-licence {
     margin: 24px 0 0;
-    padding: 0;
-    list-style: none;
+    max-width: 68ch;
+  }
+  .stones-links {
+    margin: 8px 0 0;
   }
   @media (max-width: 720px) {
     .stone {

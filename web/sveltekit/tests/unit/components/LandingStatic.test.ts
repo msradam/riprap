@@ -18,8 +18,9 @@ describe('the landing on the static build', () => {
     expect(container.querySelector('form')).toBeNull();
     expect(getByRole('link', { name: `Browse ${data.count} briefings` })).toHaveAttribute('href', '/gallery/');
     expect(getByRole('link', { name: 'Run it yourself' })).toHaveAttribute('href', 'https://example.org/quickstart');
-    expect(container.textContent).toContain('To ask your own question, run Riprap on your laptop');
-    const chips = [...getByRole('list', { name: 'Try a real question' }).querySelectorAll('a')];
+    const note = (container.querySelector('.hero-note')?.textContent ?? '').replace(/\s+/g, ' ').trim();
+    expect(note).toBe('This site has saved briefings. Run it yourself to ask your own question. Runs in seconds on a laptop: no GPU, no API keys.');
+    const chips = [...getByRole('list', { name: 'Try a real question or place' }).querySelectorAll('a')];
     expect(chips.map((a) => a.getAttribute('href'))).toEqual([
       '/gallery/hollis-since-ida/',
       '/gallery/qn12-complaints/',
@@ -31,7 +32,7 @@ describe('the landing on the static build', () => {
 
   it('names the cities without their live sample links', () => {
     const { container } = render(LandCollab);
-    for (const city of ['NYC', 'Chicago', 'Seattle', 'Albany']) expect(container.textContent).toContain(city);
+    for (const city of ['New York City', 'Chicago', 'Seattle', 'Albany']) expect(container.textContent).toContain(city);
     expect(container.textContent).not.toContain('Try a sample address');
     expect(container.querySelector('a[href^="/q/"]')).toBeNull();
   });

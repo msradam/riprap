@@ -40,7 +40,7 @@ export interface Proof {
 export const PROOF: Proof[] = [
   {
     slug: 'qn12',
-    kind: 'A whole district, named',
+    kind: 'A whole district',
     figure: {
       text: '17 of 36',
       label: "QN12 subway entrances inside the city's 2080 extreme stormwater scenario",
@@ -74,7 +74,7 @@ export const PROOF: Proof[] = [
   },
   {
     slug: 'brooklyn-heights-sensors',
-    kind: 'Silence, stated',
+    kind: 'When the record is empty',
     quotes: ['No FloodNet sensors deployed within 600 m of this address.']
   }
 ];

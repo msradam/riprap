@@ -348,18 +348,24 @@ map legend and the tier key only.
 A Persuade page inside the report system. The hero pairs the h1 (52px, 34px
 on phones), one subhead and the query box (or, on the static site, "Browse
 briefings" and "Run it yourself") with a real gallery answer set as a
-specimen: the question, the lead word at Lead size, the key sentence and
-its source notes. Real questions follow as chips. Proof comes next, as
-gallery answers on Card White cards with no border: one wide district card
-with its figure, then question cards with a verbatim quote. Then the
-sources by Stone (`#methodology`), who it is for, developers and MCP, the
-experimental models, how to collaborate, and one "evidence, not advice"
-line with the official sources. Section headings use the Title scale. Tonal
-bands of Sunken Paper and one Ink code block give rhythm. There are no
-shadows, borders, stat rows or numbered cards. Cards and Title-scale
-section headings are for the landing only; briefing, gallery and print
-pages keep the report style. Community districts are written QN12, with no
-space, in copy, examples and placeholders.
+specimen: the question, the lead word at Lead size, the key sentence, the
+briefing's own flagged-sensor sentence and its source notes. Real questions
+follow as chips. On a phone (480px and under) the specimen sits right under
+the subhead, before the actions and chips; the DOM keeps the form first.
+The sections then run in this order: proof, as gallery answers on Card White
+cards with no border (one wide district card with its figure, then question
+cards with a verbatim quote), closed by one sentence on who it is for; the
+experimental models; the sources by Stone (`#methodology`), each row led by
+a plain label with the Stone's name as its tag; developers and MCP; one
+compact "evidence, not advice" line with the official sources; and last,
+"Build it with us". The page ends on the collaboration call, and each action
+in it appears once. Section headings use the Title scale. Tonal bands of
+Sunken Paper and one Ink code block give rhythm. There are no shadows, card
+borders, stat rows or numbered cards. Cards and Title-scale section
+headings are for the landing only; briefing, gallery and print pages keep
+the report style.
+Community districts are written QN12, with no space, in copy, examples and
+placeholders.
 
 ### Gallery index
 The typographic list stays: place over question, snapshot date in Data,

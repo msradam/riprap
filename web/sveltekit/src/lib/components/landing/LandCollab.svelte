@@ -2,8 +2,8 @@
   import { resolve } from '$app/paths';
   import { STATIC_SITE } from '$lib/staticSite';
 
-  /** Build it with us: four ways in, then the contact routes that exist
-   *  today (issues and the author address in CITATION.cff). The city
+  /** Build it with us, the page's last section: four ways in, each action
+   *  once (the author address is the one in CITATION.cff). The city
    *  names always show; their sample links run a live briefing, so the
    *  static site leaves them out. */
   const REPO = 'https://github.com/msradam/riprap';
@@ -21,13 +21,13 @@
   const WAYS = [
     {
       title: 'Run a pilot',
-      body: 'A newsroom data desk, a council office, a community board or a studio course can run its own copy. Tell us what you would ask it.',
-      link: 'Email the author',
+      body: 'A newsroom, council office, university lab, engineering firm or port can run its own copy on its own places and asset list. Tell us what you would ask it.',
+      link: 'Email Adam',
       href: EMAIL
     },
     {
       title: 'Bring your city',
-      body: 'A city with a Socrata open-data portal needs only manifests. Chicago, Seattle and Albany run today as experimental ports, and New York City (NYC) is in production.',
+      body: 'New York City runs in production. Chicago, Seattle and Albany run as experimental ports. A city with a Socrata portal needs only manifests.',
       link: 'How to port a city',
       href: `${DOCS}/PORT-YOUR-CITY.md`,
       cities: true
@@ -51,8 +51,9 @@
   <div class="land-frame">
     <h2 id="collab-h" class="land-h2">Build it with us</h2>
     <p class="land-intro">
-      Riprap is open source under Apache-2.0, on open data and open models. Bring a city, a dataset, a
-      model or a class.
+      Riprap is built by Adam Munawar Rahman, open source under Apache-2.0. I'd like help with three
+      things: a pilot in a studio course, council office or engineering firm; a second city; and
+      better ground truth for the surge and satellite models.
     </p>
     <ul class="land-cards">
       {#each WAYS as w (w.title)}
@@ -72,8 +73,6 @@
     </ul>
     <ul class="land-actions">
       <li><a class="land-button" href="{REPO}/issues/new/choose">Open an issue</a></li>
-      <li><a class="land-button is-secondary" href={REPO}>Read the code</a></li>
-      <li><a class="land-button is-secondary" href={EMAIL}>Email the author</a></li>
     </ul>
   </div>
 </section>
