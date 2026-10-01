@@ -74,10 +74,19 @@ def _parse_location(loc) -> tuple[float | None, float | None]:
 
 
 def sensors_near(lat: float, lon: float, radius_m: float = 1000) -> list[Sensor]:
-    d = _gql(_NEAR_Q, {"lat": lat, "lon": lon, "r": radius_m})
+    """Sensors within radius_m, by the same great-circle distance the Ida
+    marks use. FloodNet's own radius function measures a little differently:
+    a sensor 599 m away by this measure (with nine flood events) was left
+    out of a 600 m search. So the service is asked for a wider ring and the
+    distance is decided here."""
+    from app.flood_layers.ida_hwm import _haversine_m
+
+    d = _gql(_NEAR_Q, {"lat": lat, "lon": lon, "r": radius_m + 50})
     out = []
     for row in d["deployments_within_radius"]:
         slat, slon = _parse_location(row.get("location"))
+        if slat is not None and slon is not None and _haversine_m(lat, lon, slat, slon) > radius_m:
+            continue
         out.append(Sensor(
             deployment_id=row["deployment_id"],
             name=row["name"] or "",

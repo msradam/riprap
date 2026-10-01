@@ -331,3 +331,18 @@ def test_register_name_lists_carry_the_scenario_year():
     v = exposure.summary_for_point(40.5757, -73.986, "mta_entrances")
     assert "Inside the DEP extreme scenario (2080 sea-level rise), by station:" in v["narrative"]
     assert projection_has_horizon(v["narrative"]).passed
+
+
+def test_floodnet_distance_is_decided_here_not_by_the_service(monkeypatch):
+    """The golden set: a sensor 599 m away with nine flood events was left out
+    of a 600 m search by the service's own radius function."""
+    from app.context import floodnet
+
+    asked = {}
+    rows = [{"deployment_id": "near", "name": "Q - 87th St", "sensor_status": "signal",
+             "location": {"type": "Point", "coordinates": [-73.88184068, 40.76466648]}},   # 599 m
+            {"deployment_id": "far", "name": "Q - 77th St", "sensor_status": "good",
+             "location": {"type": "Point", "coordinates": [-73.8827, 40.7648]}}]           # about 670 m
+    monkeypatch.setattr(floodnet, "_gql", lambda q, v: asked.update(v) or {"deployments_within_radius": rows})
+    found = floodnet.sensors_near(40.763193, -73.874995, 600)
+    assert asked["r"] == 650 and [s.deployment_id for s in found] == ["near"]
