@@ -15,9 +15,8 @@
     <time datetime="2026-10-01">2026-10-01</time>.
   </p>
   <p>
-    Each briefing routes through a fixed taxonomy of public-record specialists. Each Stone is a class
-    of evidence. Together they form the briefing, and every claim in the output traces back to the
-    Stone that produced it.
+    A briefing sorts its sources into five Stones. Each Stone is a class of evidence. Together they
+    form the briefing, and every claim in the output traces back to the Stone that produced it.
   </p>
   <dl>
     {#each STONE_ORDER as key (key)}

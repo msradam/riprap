@@ -62,9 +62,9 @@
     },
     'all-silent': {
       kind: 'Outside evidence coverage',
-      headline: 'No specialists found evidence at this point.',
+      headline: 'No source returned evidence for this point.',
       body:
-        `The address resolved, but every flood-evidence specialist returned silent. This is rare and usually means parkland, water, or a point with no nearby civic data. Try a nearby street address or expand to neighborhood-mode.`,
+        `The address resolved, but every flood source came back empty. This is rare and usually means parkland, water, or a point with no civic data nearby. Try a street address nearby, or a neighborhood name.`,
       actions: [edit, sample]
     },
     grounding: {

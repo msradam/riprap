@@ -208,6 +208,22 @@ export function keyedAnswer(
   return { key, paras: key ? [key, ...paras] : paras };
 }
 
+/** An answer with no key sentence (a lead phrase set by code, or no lead
+ *  fact): one paragraph per cited source in the order given, so a long
+ *  answer is not one block, and each paragraph from an experimental source
+ *  carries the badge. A lead phrase that stands before an experimental
+ *  sentence ("From an experimental model, not a measurement:") becomes its
+ *  own paragraph, so the badge sits on the model's sentence. */
+export function sourceParas(answer: ClaimPart[][], isExp: (docId: string) => boolean): ClaimPart[][] {
+  return answer.flatMap(bySource).flatMap((p) => {
+    if (!citedIn([p]).some(isExp)) return [p];
+    const at = p[0].text.search(/(?<=:)\s+Experimental(?: forecast)?:/);
+    if (at <= 0) return [badged(p)];
+    const { cite: _cite, ...head } = p[0];
+    return [[{ ...head, text: p[0].text.slice(0, at) }], badged([{ ...p[0], text: p[0].text.slice(at).trimStart() }, ...p.slice(1)])];
+  });
+}
+
 /** The Answer or In brief section of a parsed briefing, with the lead word
  *  split off its first paragraph (splitLead). The gallery's standfirsts
  *  read the same paragraphs, so they pick the key sentence the page sets. */
@@ -416,7 +432,8 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   const answered = question && !refusal && g?.answer_lead !== 'experimental'
     ? keyedAnswer(answer0, g?.lead_fact, isExp) : null;
   const keyed = answered?.key ?? null;
-  const answerParas = answered?.paras ?? answer0;
+  const bySourceOnly = !!question && !refusal && !answered;
+  const answerParas = answered?.paras ?? (bySourceOnly ? sourceParas(answer0, isExp) : answer0);
   // A count answer whose count sits inside its key sentence leads with that count.
   // An area's In brief opens with its Sandy share ("0.8% of this area ..."),
   // which is not the headline of a district that floods from rain: a
@@ -486,8 +503,9 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     /** The lead is a sentence, not a word or a figure. */
     leadIsSentence: !!refusal,
     answer,
-    /** The first answer paragraph is the key sentence; the rest support it. */
-    keyed: !!keyed,
+    /** The first answer paragraph is the key sentence (or, with none, the
+     *  lead and the first source); the rest support it. */
+    keyed: !!keyed || (bySourceOnly && answerParas.length > 1),
     scope,
     body,
     outOfScope,

@@ -1,7 +1,8 @@
 /**
  * The two leads set only by code, `experimental` and `no_prediction`, are
- * phrases with no yes, no or count. Nothing is set large for them, and an
- * experimental answer keeps its lead phrase at the start of its paragraph.
+ * phrases with no yes, no or count. No word or figure is set large for
+ * them. The answer is one paragraph per source in the order given, and a
+ * model's sentence carries the Experimental badge.
  */
 import { describe, expect, it } from 'vitest';
 import { briefingModel, countLead, splitLead } from '$lib/client/briefingModel';
@@ -10,7 +11,7 @@ import type { FinalResult, Grounding } from '$lib/client/agentStream';
 
 const EXPERIMENTAL = 'From an experimental model, not a measurement:';
 const NO_PREDICTION =
-  'Riprap cannot say whether a particular place will flood on a given day: no source or model here predicts that. What is forecast and mapped:';
+  'Riprap cannot predict whether a particular place floods on a given day: no source or model here does that. What the Weather Service expects, and what the maps show:';
 const SURGE =
   'Experimental forecast: the surge model projects a peak of 0.42 ft above the predicted tide at the Battery in the next 96 hours [ttm_battery_surge].';
 const NWS = 'NWS forecasts a peak water level of 5.1 ft above MLLW at the Battery [nws_water_forecast].';
@@ -37,11 +38,12 @@ describe('the lead phrases themselves', () => {
 });
 
 describe('an answer formed by an experimental model alone', () => {
-  it('sets nothing large and keeps the lead phrase at the start of its sentence', () => {
+  it('sets no word large, opens with the lead phrase and badges the sentence under it', () => {
     const m = model(`${EXPERIMENTAL} ${SURGE}`, { answer_lead: 'experimental', lead_fact: null });
     expect(m.lead).toBeNull();
-    expect(m.keyed).toBe(false);
-    expect(words(m)).toMatch(/^From an experimental model, not a measurement: Experimental forecast: the surge model/);
+    expect(words(m)).toBe('From an experimental model, not a measurement:');
+    expect(m.answer[1][0].exp).toBe('Experimental forecast');
+    expect(words(m, 1)).toMatch(/^The surge model projects a peak of 0.42 ft/);
   });
 
   it('does not move its paragraphs behind another source, even with a lead fact', () => {
@@ -50,10 +52,10 @@ describe('an answer formed by an experimental model alone', () => {
     const m = model(`${EXPERIMENTAL} ${SURGE} ${NWS}`, {
       answer_lead: 'experimental', lead_fact: { doc_id: 'nws_water_forecast', in_lead: false }
     });
-    expect(m.keyed).toBe(false);
     expect(m.lead).toBeNull();
-    expect(words(m)).toMatch(/^From an experimental model, not a measurement: Experimental forecast:/);
-    expect(m.answer.flat().some((p) => p.exp)).toBe(false);
+    expect(words(m)).toBe('From an experimental model, not a measurement:');
+    expect(m.answer[1][0].exp).toBe('Experimental forecast');
+    expect(words(m, 2)).toMatch(/^NWS forecasts a peak water level/);
   });
 });
 
@@ -61,8 +63,10 @@ describe('a question that asks whether a place will flood', () => {
   it('sets nothing large and opens with the statement that no source predicts it', () => {
     const m = model(`${NO_PREDICTION} ${NWS} ${SURGE}`, { answer_lead: 'no_prediction', lead_fact: null });
     expect(m.lead).toBeNull();
-    expect(m.keyed).toBe(false);
-    expect(words(m)).toMatch(/^Riprap cannot say whether a particular place will flood on a given day/);
+    expect(words(m)).toMatch(/^Riprap cannot predict whether a particular place floods on a given day.* NWS forecasts a peak/);
+    // The model's sentence is its own paragraph, badged, after the official forecast.
+    expect(m.answer).toHaveLength(2);
+    expect(m.answer[1][0].exp).toBe('Experimental forecast');
   });
 
   it('sets no figure large even when its first paragraph opens with one', () => {

@@ -125,7 +125,7 @@ describe('/q/[queryId] full-page SSE lifecycle for Chicago', () => {
     // when a templated paragraph arrived via the `final` event.
     const text = container.textContent ?? '';
     expect(text).not.toContain('Outside evidence coverage');
-    expect(text).not.toContain('No specialists found evidence');
+    expect(text).not.toContain('No source returned evidence');
   });
 });
 

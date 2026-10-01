@@ -327,7 +327,7 @@
         </p>
         <p class="generating-expect">
           {isQuestionQuery
-            ? 'A question goes through the language model first and usually takes 10 to 25 seconds.'
+            ? 'A question usually takes under 10 seconds. One that needs the language model takes 10 to 25.'
             : 'A place briefing takes a few seconds.'}
         </p>
       </div>
