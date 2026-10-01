@@ -65,6 +65,6 @@ describe('card labels and no-data sources', () => {
                         radius_m: 800, entrances: [] });
     expect((d.noData ?? []).map((s) => s.id)).not.toContain('mta_entrances');
     expect(mtaCard(d)?.absent).toBeUndefined();
-    expect(mtaCard(d)?.sub).toMatch(/^No .+ within 800 m\.$/);
+    expect(mtaCard(d)?.sub).toBe('No MTA subway/rail entrances listed within 800 m.');
   });
 });

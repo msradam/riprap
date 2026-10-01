@@ -104,6 +104,23 @@ describe('gallery snapshot replay (hollis.json)', () => {
   });
 });
 
+// No gallery snapshot holds an experimental source, so the replay above
+// only ever sees `false`. Chicago's 311 feed is one.
+describe('experimental pebble flag', () => {
+  it('is set on the card of an experimental source and on no other', async () => {
+    const { pebbleManifest } = await import('$lib/stores/pebbleManifest.svelte');
+    const { RunState } = await import('$lib/client/runState.svelte');
+    const { CHICAGO } = await import('../fixtures/cities');
+    expect(CHICAGO.manifest.pebbles.find((p) => p.id === 'chicago_311')?.maturity).toBe('experimental');
+    pebbleManifest.setFromResponse(CHICAGO.manifest, CHICAGO.key);
+    const run = RunState.fromFinal(CHICAGO.agent as Parameters<typeof RunState.fromFinal>[0], CHICAGO.geocode.address);
+    const flag = (docId: string) => run.findingsData.cards.find((c) => c.docId === docId)?.experimental;
+    expect(flag('chicago_311')).toBe(true);
+    expect(flag('lake_michigan_water_level')).toBe(false);
+    expect(flag('nws_obs')).toBe(false);
+  });
+});
+
 describe('run facts inference energy', () => {
   const facts = async (emissions: Record<string, unknown>) => {
     const { runFacts } = await import('$lib/client/briefingModel');

@@ -8,6 +8,7 @@
  *  - the route auto-fires window.print()
  */
 import { test, expect } from '@playwright/test';
+import type { PrintSnapshot } from '$lib/stores/briefingState.svelte';
 
 // The backend serves the gallery pages from the committed build; point
 // RIPRAP_STATIC_URL elsewhere to test another build of them.
@@ -36,6 +37,25 @@ test.describe('curated print flow', () => {
         window.__printed += 1;
       };
     });
+    // No gallery entry has an experimental source, so the snapshot gets
+    // one as the gallery page saves it: the closed group evidenceGroups
+    // (briefingModel) builds for such a source, holding a copy of the
+    // first evidence row.
+    await page.addInitScript(() => {
+      const setItem = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (this: Storage, key: string, value: string) {
+        if (key.startsWith('riprap:print:')) {
+          const snap = JSON.parse(value) as PrintSnapshot;
+          const groups = snap.evidence?.groups;
+          if (groups?.length && !groups.some((g) => g.closed)) {
+            groups.push({ key: 'experimental', name: 'Experimental sources (1)', role: null,
+              cards: [{ ...groups[0].cards[0], experimental: true }], closed: true });
+            value = JSON.stringify(snap);
+          }
+        }
+        setItem.call(this, key, value);
+      };
+    });
     // networkidle: the button works once the page has hydrated.
     await page.goto(`${STATIC}/gallery/red-hook/`, { waitUntil: 'networkidle' });
     await expect(page.locator('#brief-answer')).toBeVisible();
@@ -55,11 +75,16 @@ test.describe('curated print flow', () => {
     await expect(page.locator('.print-answer')).toBeVisible();
     await expect(page.locator('.print-citations h3')).toHaveText('Sources cited');
     // A gallery print dates its live readings to their fetch, as the
-    // briefing page does, and prints any folded experimental group open
-    // (New York City has no experimental source, so there may be none).
+    // briefing page does.
     await expect(page.locator('.ev-asof').filter({ hasText: /\blive\b/ })).toHaveCount(0);
     await expect(page.locator('.ev-asof').filter({ hasText: /fetched \d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC/ }).first()).toBeVisible();
-    await expect(page.locator('.print-doc details.ev-folded:not([open])')).toHaveCount(0);
+    // The folded experimental group is there and prints open: a closed
+    // one would print as its summary only.
+    const folded = page.locator('.print-doc details.ev-folded');
+    await expect(folded).toHaveCount(1);
+    await expect(folded.locator('summary')).toHaveText('Experimental sources (1)');
+    await expect(folded).toHaveJSProperty('open', true);
+    await expect(folded.locator('tr.ev-row')).toBeVisible();
 
     // App chrome is excluded (the @-page break breaks out of root layout).
     await expect(page.locator('.app-header')).toHaveCount(0);

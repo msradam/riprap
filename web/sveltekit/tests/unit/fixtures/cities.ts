@@ -67,6 +67,7 @@ function pebble(
       citation: null, doc_id: id, date_modified: null,
     },
     fallback: { on_offline: 'skip', message: null },
+    ...(opts.maturity && { maturity: opts.maturity }),
   };
 }
 
@@ -155,7 +156,9 @@ export const CHICAGO: CityFixture = {
       capstone:    "Writes the cited briefing, with or without an LLM.",
     }),
     pebbles: [
+      // Experimental in its manifest (deployments/chicago/manifests/chicago_311.yaml).
       pebble('chicago_311',               'touchstone', { map_layer: true, tier: 'proxy',
+        maturity: 'experimental',
         title: 'Chicago 311 service requests near this address' }),
       pebble('lake_michigan_water_level', 'touchstone', { tier: 'empirical',
         title: 'Lake Michigan water level — NOAA Calumet Harbor' }),
