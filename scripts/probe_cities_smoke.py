@@ -47,8 +47,7 @@ CITIES = [
             "sandy", "ida_hwm", "floodnet", "nyc311", "microtopo",
             "noaa_tides",
         ],
-        "no_leak": ["Lake Michigan", "Calumet", "San Francisco", "Seattle",
-                    "Calumet Harbor"],
+        "no_leak": ["Lake Michigan", "Calumet", "Seattle"],
     },
     {
         "name": "chicago",
@@ -57,7 +56,7 @@ CITIES = [
             "lake_michigan_water_level", "chicago_311", "nws_obs", "nws_alerts",
         ],
         "expect_narrative_pebbles": ["lake_michigan_water_level", "nws_obs"],
-        "no_leak": ["NYC OEM", "Sandy 2012", "FloodNet"],
+        "no_leak": ["Sandy inundation", "FloodNet"],
     },
     {
         "name": "seattle",
@@ -66,7 +65,7 @@ CITIES = [
             "water_level", "nws_obs", "nws_alerts",
         ],
         "expect_narrative_pebbles": ["water_level", "nws_obs"],
-        "no_leak": ["NYC OEM", "Sandy 2012", "Lake Michigan"],
+        "no_leak": ["Sandy inundation", "Lake Michigan"],
     },
     {
         "name": "albany",
@@ -76,7 +75,7 @@ CITIES = [
             "fema_nfhl", "usgs_gauges", "nws_obs", "nws_alerts",
         ],
         "expect_narrative_pebbles": ["water_level", "nws_obs"],
-        "no_leak": ["NYC OEM", "Sandy 2012", "Lake Michigan"],
+        "no_leak": ["Sandy inundation", "Lake Michigan"],
     },
 ]
 

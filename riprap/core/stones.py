@@ -98,10 +98,7 @@ _CITY_FALLBACK = {
     "nyc": "NYC",
 }
 
-_HAZARD_FALLBACK = {
-    "heat": "Heat-exposure briefing",
-    "air": "Air-quality briefing",
-}
+_HAZARD_FALLBACK: dict[str, str] = {}
 
 
 def load_stones(deployment_root: str | Path) -> StoneRegistry:

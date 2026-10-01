@@ -24,13 +24,13 @@ uv run python scripts/probe_cities_smoke.py http://127.0.0.1:7860
 
 ## Energy-ledger sanity check
 
-<!-- If this PR touches inference, app/emissions.py, app/llm.py, or
-     app/power_mac.py: paste the n_measured / n_calls ratio and
+<!-- If this PR touches inference, app/emissions.py or
+     riprap/core/llm.py: paste the n_measured / n_calls ratio and
      confirm hardware label. -->
 
 ## Checklist
 
-- [ ] No regression in `app/`, `web/`, or `services/` logic
+- [ ] No regression in `app/`, `riprap/` or `web/` logic
       (typo-only edits OK).
 - [ ] Docs updated (`README.md`, relevant `docs/*.md`) if public
       surface changed.

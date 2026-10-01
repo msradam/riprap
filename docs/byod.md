@@ -124,7 +124,6 @@ Every adapter the base deployments use, registered in
 | `socrata_records` | Any Socrata SODA endpoint (NYC, Chicago, Seattle, DC, ...) |
 | `rest_json` | Generic REST JSON endpoint, with a dotted `response_path` into the response |
 | `python_call` | Call a Python function in your environment, for anything custom |
-| `model_call` | POST to an inference backend you run; no shipped manifest uses it |
 
 ## Override semantics
 

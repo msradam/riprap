@@ -32,7 +32,7 @@ stones:
   - id: touchstone
     name: Touchstone
     tagline: The Live Observer
-    description: Watches the current state of the city's flood signals and EO.
+    description: Reads the city's flood sensors, 311 requests, gauges and weather observations.
     order: 2
   - id: keystone
     name: Keystone
@@ -42,7 +42,7 @@ stones:
   - id: lodestone
     name: Lodestone
     tagline: The Projector
-    description: Projects what's coming — alerts, surge, and recurrence forecasts.
+    description: Quotes what is published about what is coming, alerts, water-level forecasts and sea-level projections.
     order: 4
   - id: capstone
     name: Capstone

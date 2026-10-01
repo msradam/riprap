@@ -5,7 +5,6 @@
 **/__pycache__
 web/sveltekit/build
 web/sveltekit/.svelte-kit
-experiments
 research_notes
 tests
 docs

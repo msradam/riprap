@@ -123,18 +123,8 @@ ignore_decorators = ["@app.get", "@app.post", "@action"]
 #   request   — FastAPI route handler signature
 #   query_id  — FastAPI captured-param routes that forward to the SvelteKit
 #               SPA fallback (the SPA reads it from window.location)
-#   engine    — _hardware_for() param sliced by docstring contract, not by body
-ignore_names = ["request", "query_id", "engine"]
+ignore_names = ["request", "query_id"]
 paths = ["app", "web", "scripts", "riprap"]
-
-# CPU-only torch wheels on Linux (Docker, CI) instead of the CUDA build.
-[tool.uv.sources]
-torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
-
-[[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-explicit = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

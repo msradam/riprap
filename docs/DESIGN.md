@@ -325,7 +325,7 @@ end of the page.
 One header and one footer on every page except print. The header carries
 the wordmark (linked home), the context words, the active deployment when
 one is known, and the links "methodology" and "gallery"; the query box and
-the print and export links appear only on a live briefing. The footer
+the print link appears only on a live briefing. The footer
 carries the disclaimer, the open beta sentence with its feedback link, the
 standards line, the build line and the dam mark credit. A page that already
 states the disclaimer (a briefing's scope note, the landing's "evidence, not

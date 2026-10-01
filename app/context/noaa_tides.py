@@ -2,10 +2,7 @@
 
 api.tidesandcurrents.noaa.gov, no auth, 6-min cadence.
 
-We pick the nearest of three NYC-region stations to the queried address:
-  - 8518750 The Battery, NY
-  - 8516945 Kings Point, NY (Long Island Sound entrance)
-  - 8531680 Sandy Hook, NJ (NY Harbor approach)
+We pick the station in STATIONS nearest to the queried address.
 
 The verified-water-level API returns instantaneous water elevation
 relative to MLLW (Mean Lower Low Water — the local tidal datum). To

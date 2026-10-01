@@ -30,7 +30,7 @@ provenance:
   retrieved_at: 2026-07-11
   source_name: NYS DOH hospitals register
   source_url: https://health.data.ny.gov/Health/Health-Facility-General-Information/vn5v-hh5r
-  license: NYC Open Data Terms of Use
+  license: Health Data NY (New York State open data) terms of use
   doc_id: doh_hospital_exposure
   citation: NYS DOH Health Facility General Information (vn5v-hh5r) hospitals in NYC, cross-referenced with Sandy 2012 + DEP extreme 2080.
 
