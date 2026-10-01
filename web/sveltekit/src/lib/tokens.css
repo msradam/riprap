@@ -133,9 +133,11 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* The citation mark, in the base sheet because the landing's specimen
    answer carries one too (docs/design/handoff/css/components.css
-   .riprap-citation-link): Overpass Mono, inline, so exempt from the
-   2.5.8 target-size minimum (do not enlarge), with its own focus ring. */
+   .riprap-citation-link): Overpass Mono, inline, with its own focus ring.
+   The mark keeps its inline size; an invisible 24px square centred on it
+   gives a finger a 24 by 24 target (2.5.8) without moving the text. */
 .inline-cite {
+  position: relative;
   color: var(--riprap-text-link);
   font-family: var(--riprap-font-mono);
   font-weight: 500;
@@ -144,6 +146,15 @@ a:hover { text-decoration-thickness: 2px; }
   transition: color 120ms ease;
 }
 .inline-cite sup { font-size: 12px; }
+.inline-cite::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(-50%, -50%);
+}
 .inline-cite:hover { color: var(--riprap-tier-modeled); }
 .inline-cite:focus-visible {
   outline: 3px solid var(--riprap-focus);
