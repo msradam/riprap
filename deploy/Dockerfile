@@ -44,13 +44,12 @@ WORKDIR /app
 
 # Dependencies first so a code-only edit doesn't bust the layer cache.
 COPY pyproject.toml uv.lock ./
-# Core plus the `ml` extra (in-process TTM, embeddings, NER). torch comes
-# from the CPU wheel index on Linux (see [tool.uv.sources]).
-# The cache mount keeps uv's download cache (about 1.7 GB) out of the image.
+# Core dependencies only: no model runs in the app process.
+# The cache mount keeps uv's download cache out of the image.
 RUN --mount=type=cache,target=/root/.cache/uv \
-    UV_LINK_MODE=copy uv sync --frozen --no-dev --extra ml --no-install-project
+    UV_LINK_MODE=copy uv sync --frozen --no-dev --no-install-project
 
-# App code, manifests (with the policy corpus under deployments/nyc/corpus/) and fixtures.
+# App code, manifests and data fixtures.
 COPY app/ ./app/
 COPY riprap/ ./riprap/
 COPY deployments/ ./deployments/

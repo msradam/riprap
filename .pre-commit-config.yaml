@@ -6,23 +6,23 @@
 #
 # The `exclude:` regex on the whitespace + EOF hooks keeps them away
 # from upstream-stable artifacts (GIS fixtures, vendored CSS/fonts,
-# built SvelteKit, frozen test snapshots, research notebooks).
+# built SvelteKit, frozen test snapshots).
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: '^(data/|tests/integration/results/|tests/(probe_50_results|queries_50)\.json$|web/sveltekit/build/|web/static/(dist|vendor)/|experiments/|outputs/|deployments/nyc/corpus/|examples/byod/.*\.csv$)'
+        exclude: '^(data/|tests/integration/results/|tests/(probe_50_results|queries_50)\.json$|web/sveltekit/build/|web/static/(dist|vendor)/|outputs/|examples/byod/.*\.csv$)'
       - id: end-of-file-fixer
-        exclude: '^(data/|tests/integration/results/|tests/(probe_50_results|queries_50)\.json$|web/sveltekit/build/|web/static/(dist|vendor)/|experiments/|outputs/|deployments/nyc/corpus/|examples/byod/.*\.csv$)'
+        exclude: '^(data/|tests/integration/results/|tests/(probe_50_results|queries_50)\.json$|web/sveltekit/build/|web/static/(dist|vendor)/|outputs/|examples/byod/.*\.csv$)'
       - id: check-yaml
-        exclude: '^(web/sveltekit/|experiments/)'
+        exclude: '^web/sveltekit/'
       - id: check-toml
       - id: check-merge-conflict
       - id: check-added-large-files
         args: ["--maxkb=2000"]
-        exclude: '^(data/|examples/byod/|assets/|deployments/nyc/corpus/)'
+        exclude: '^(data/|examples/byod/|assets/)'
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.4
@@ -30,4 +30,4 @@ repos:
       - id: ruff
         args: [--fix]
         files: '^(riprap|app|web|scripts|tests|load)/'
-        exclude: '^(experiments/|web/sveltekit/build/|web/static/)'
+        exclude: '^(web/sveltekit/build/|web/static/)'

@@ -41,8 +41,8 @@ def _image() -> modal.Image:
         .workdir("/app")
         # Runtime code + fixtures. The pebble framework resolves
         # `deployments/<name>/manifests` relative to the repo root (cwd),
-        # so deployments/ (with the policy corpus) + data/ must be present. `riprap/`
-        # is the post-refactor core package web.main imports from.
+        # so deployments/ and data/ must be present. `riprap/` is the core
+        # package web.main imports from.
         .add_local_dir(str(REPO / "riprap"), "/app/riprap")
         .add_local_dir(str(REPO / "app"), "/app/app")
         .add_local_dir(str(REPO / "deployments"), "/app/deployments")
@@ -64,9 +64,8 @@ app = modal.App("riprap-frontend")
     secrets=[modal.Secret.from_name("riprap-llm-secret", required_keys=["RIPRAP_LLM_API_KEY"])]
     if FRONTEND_ENV["RIPRAP_LLM_BASE_URL"] else [],
     cpu=2.0,
-    # The lazy-loaded geo files (citywide DEM, Sandy/DEP layers) and the
-    # in-process embedding and TTM models need a few GB under concurrent
-    # first loads.
+    # The lazy-loaded geo files (citywide DEM, Sandy/DEP layers) need a
+    # few GB under concurrent first loads.
     memory=8192,
     scaledown_window=300,
     timeout=600,
