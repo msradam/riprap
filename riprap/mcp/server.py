@@ -33,8 +33,9 @@ mcp = MCPServer(
     instructions=(
         "Riprap composes public-record flood data (FEMA, NOAA, USGS, NWS, "
         "NYC 311, NYC DEP, FloodNet) into cited evidence for a US street "
-        "address. Every evidence sentence carries a doc_id resolvable via "
-        "get_citation. Sentences marked 'Experimental:' come from model "
+        "address. Every evidence item carries its sentence, the source's own "
+        "figures (value), its source URL and data vintage, and a doc_id "
+        "resolvable via get_citation. Sentences marked 'Experimental:' come from model "
         "layers without an evaluation that supports them as evidence. Riprap "
         "is an informational reference, not a FEMA flood zone determination, "
         "a professional engineering opinion, or a substitute for the NFIP "
@@ -93,6 +94,17 @@ def _place_match(out: dict) -> str | None:
     return (out.get("geocode") or {}).get("match")
 
 
+# Fields a pebble value carries for the page (a sentence, a chart, a map
+# shape), not for a program.
+_PRESENTATION = {"narrative", "geojson", "points", "histogram", "headline_value", "subhead_text", "citation"}
+
+
+def _value(v) -> dict | None:
+    """The source's own figures for one evidence item, so a program reads
+    numbers and names, not a sentence."""
+    return {k: x for k, x in v.items() if k not in _PRESENTATION} if isinstance(v, dict) else None
+
+
 def _evidence_payload(out: dict) -> dict:
     from riprap.core.burr import evidence
 
@@ -104,6 +116,7 @@ def _evidence_payload(out: dict) -> dict:
         body = {"place": None, "error": text[1] if len(text) > 1 else text[0], "evidence": [],
                 "failed": _failed(out)}
         return {**body, "record": _record(out, body)}
+    cites = out.get("citations") or {}
     body = {
         "place": (out.get("geocode") or {}).get("address"),
         "place_match": _place_match(out),
@@ -112,8 +125,10 @@ def _evidence_payload(out: dict) -> dict:
         "deployment": out.get("deployment"),
         "intent": out.get("intent"),
         "evidence": [{"doc_id": e.doc_id, "stone": heading.get(e.stone_id, e.stone_id),
-                      "text": e.text, "maturity": e.maturity} for e in items],
-        "citations": out.get("citations") or {},
+                      "text": e.text, "value": _value(e.value), "maturity": e.maturity,
+                      "source_url": (cites.get(e.doc_id) or {}).get("url"),
+                      "vintage": (cites.get(e.doc_id) or {}).get("vintage")} for e in items],
+        "citations": cites,
         "failed": _failed(out),
     }
     return {**body, "record": _record(out, body)}
@@ -125,9 +140,12 @@ def get_evidence(address: str) -> dict:
 
     Geocodes the address, routes it to the deployment covering it, runs
     every data source for that place and returns one entry per source
-    that had data: {doc_id, stone, text, maturity}, plus citations with
-    source URL and vintage. Deterministic: the text is each source's
-    manifest template filled from the fetched values.
+    that had data: {doc_id, stone, text, value, maturity, source_url,
+    vintage}. `text` is the cited sentence and `value` the source's own
+    figures (counts, zones, names, readings), so a program need not parse
+    the sentence; `citations` has each source's full provenance.
+    Deterministic: the text is each source's manifest template filled
+    from the fetched values.
     """
     from riprap.core.burr.app import run
 

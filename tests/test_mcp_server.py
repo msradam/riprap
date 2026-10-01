@@ -65,12 +65,16 @@ def test_get_evidence_lists_manifest_sentences(monkeypatch):
 
     stub = {"deployment": "nyc", "intent": "single_address", "lat": 40.69, "lon": -73.99,
             "geocode": {"address": "189 ATLANTIC AVENUE"},
-            "microtopo": {"narrative": "Elevation 16.89 m; HAND 16.76 m."}, "citations": {}}
+            "microtopo": {"narrative": "Elevation 16.89 m; HAND 16.76 m.", "point_elev_m": 16.89, "hand_m": 16.76},
+            "citations": {"microtopo": {"url": "https://www.usgs.gov/3dep", "vintage": "2018"}}}
     monkeypatch.setattr("riprap.core.burr.app.run", lambda q, no_llm=False: stub)
     out = get_evidence("189 Atlantic Ave, Brooklyn, NY")
     assert out["place"] == "189 ATLANTIC AVENUE"
+    # The sentence, and beside it the figures and the source a program needs:
+    # no parsing of prose, no second call for provenance.
     assert {"doc_id": "microtopo", "stone": "Cornerstone", "text": "Elevation 16.89 m; HAND 16.76 m.",
-            "maturity": "production"} in out["evidence"]
+            "value": {"point_elev_m": 16.89, "hand_m": 16.76}, "maturity": "production",
+            "source_url": "https://www.usgs.gov/3dep", "vintage": "2018"} in out["evidence"]
 
 
 def test_server_imports_and_lists_tools():
