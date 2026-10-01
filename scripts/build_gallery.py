@@ -17,6 +17,11 @@ every other file and index entry as it is.
 Each file carries the full result (the same shape as the SSE `final`
 event, trace included), the deployment's stones and pebbles as
 /api/pebbles serves them, and how and when it was generated.
+
+The landing's briefing preview is a screenshot of hollis-since-ida. After
+rebuilding that entry, rebuild the frontend, serve it, and retake it:
+
+    cd web/sveltekit && node scripts/capture-hero-preview.mjs http://127.0.0.1:7860
 """
 
 from __future__ import annotations

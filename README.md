@@ -171,7 +171,11 @@ npx @modelcontextprotocol/inspector --cli uv run riprap-mcp \
 `web/sveltekit/src/lib/gallery/` (12 addresses, 3 community districts and 12
 questions), with no model. To see them in the app, rebuild the frontend (needs
 Node and [pnpm](https://pnpm.io)): `cd web/sveltekit && pnpm install && pnpm
-build`. Docker and the Modal host are in [docs/DEPLOY.md](docs/DEPLOY.md).
+build`. The landing's scrolling preview is a screenshot of the Hollis "since
+Ida" entry: after rebuilding that entry, retake it with the app running
+(`cd web/sveltekit && node scripts/capture-hero-preview.mjs
+http://127.0.0.1:7860`), then build again. Docker and the Modal host are in
+[docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## How it works
 
