@@ -38,6 +38,9 @@
       under Apache-2.0. The records come from public federal, state and city sources; the
       experimental layers also read Copernicus Sentinel satellite imagery. No commercial data APIs are used; the map's background tiles come from CARTO. Riprap <span class="data">v{APP_VERSION}</span>.
     </p>
+    <p class="app-footer-author">
+      Built by <a href="https://github.com/msradam">Adam Munawar Rahman</a>.
+    </p>
     <p class="app-footer-credits">
       Dam mark: <a href="https://thenounproject.com/icon/dam-4516918/">"Dam" by Chintuza</a> via the Noun Project, CC-BY 3.0.
     </p>
@@ -49,6 +52,7 @@
   .app-footer-guard,
   .app-footer-beta,
   .app-footer-build,
+  .app-footer-author,
   .app-footer-credits {
     max-width: 54ch;
   }

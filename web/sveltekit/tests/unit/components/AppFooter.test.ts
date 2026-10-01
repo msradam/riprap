@@ -74,3 +74,13 @@ describe('AppFooter site lines (the landing uses this footer too)', () => {
     expect(container.textContent).toContain('This is open beta.');
   });
 });
+
+describe('AppFooter names the author', () => {
+  it('links "Adam Munawar Rahman" to his GitHub profile', () => {
+    const { container } = render(AppFooter);
+    expect((container.querySelector('.app-footer-author')?.textContent ?? '').replace(/\s+/g, ' ').trim()).toBe(
+      'Built by Adam Munawar Rahman.'
+    );
+    expect(container.querySelector('.app-footer-author a')?.getAttribute('href')).toBe('https://github.com/msradam');
+  });
+});
