@@ -70,19 +70,19 @@ def test_extractive_answer_puts_experimental_facts_after_the_others(monkeypatch)
     from riprap.core.burr.synthesis import Doc
 
     sandy = "This address sits inside the 2012 Hurricane Sandy inundation footprint (NYC OEM)."
-    prithvi = ("Experimental: satellite-detected surface water about 14 hours after Hurricane Ida: "
+    layer = ("Experimental: satellite-detected surface water about 14 hours after Hurricane Ida: "
                "3 water polygons within 500 m of this address.")
     monkeypatch.setattr(syn, "_documents", lambda state: (
-        [Doc("prithvi_water", "Hazard reader", prithvi, True),
+        [Doc("experimental_layer", "Hazard reader", layer, True),
          Doc("sandy_inundation", "Hazard reader", sandy, False)], [], None))
     monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
-    reply = {"answer": {"lead": "yes", "facts": ["prithvi_water", "sandy_inundation"]}}
+    reply = {"answer": {"lead": "yes", "facts": ["experimental_layer", "sandy_inundation"]}}
     monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (reply, "scripted"))
     out = syn.synthesize({"intent": "single_address",
                           "plan": {"question": "Did this address flood in Hurricane Sandy?"}})
     answer = [c["doc_ids"][0] for c in out["grounding"]["claims"] if c["section"] == "answer"]
-    assert answer == ["sandy_inundation", "prithvi_water"], out["paragraph"]
-    assert (out["grounding"]["lead_fact"] or {}).get("doc_id") != "prithvi_water"
+    assert answer == ["sandy_inundation", "experimental_layer"], out["paragraph"]
+    assert (out["grounding"]["lead_fact"] or {}).get("doc_id") != "experimental_layer"
 
 
 # A future scenario question keeps its neutral lead and names its key fact.

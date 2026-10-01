@@ -26,26 +26,7 @@ PEBBLE_MODELS: dict[str, list[dict]] = {
                        "where": "CPU", "how": "loaded"},
                       {"name": "Flair NER (OntoNotes, fast)", "repo": "flair/ner-english-ontonotes-fast",
                        "where": "CPU", "how": "loaded"}],
-    "prithvi_water": [{"name": "Prithvi-EO 2.0, NYC pluvial fine-tune", "repo": "msradam/Prithvi-EO-2.0-NYC-Pluvial",
-                       "where": "Apple GPU (MPS), in the batch run", "how": "precomputed"}],
-    "prithvi_water_nta": [{"name": "Prithvi-EO 2.0, NYC pluvial fine-tune",
-                           "repo": "msradam/Prithvi-EO-2.0-NYC-Pluvial",
-                           "where": "Apple GPU (MPS), in the batch run", "how": "precomputed"}],
 }
-
-
-def _prithvi_detail(value: dict | None) -> str:
-    if not isinstance(value, dict):
-        return ""
-    def summary(ids: str) -> tuple[str, list[str]]:
-        parts = [i.split("_") for i in (ids or "").split(";") if i.count("_") >= 5]
-        days = sorted({f"{p[2][:4]}-{p[2][4:6]}-{p[2][6:8]}" for p in parts})
-        return ", ".join(days), sorted({p[4][1:] for p in parts})
-
-    post_days, tiles = summary(value.get("post_scene", ""))
-    pre_days, _ = summary(value.get("pre_scene", ""))
-    return (f"batch output for the {value.get('rain_date', '')} event: Sentinel-2 scenes of {post_days} "
-            f"vs {pre_days}, tiles {', '.join(tiles)}; batch run {value.get('batch_run', 'date not recorded')}")
 
 
 def for_briefing(final: dict) -> list[dict]:
@@ -57,10 +38,7 @@ def for_briefing(final: dict) -> list[dict]:
         if step not in PEBBLE_MODELS or not t.get("ok") or res.get("skipped") or final.get(step) is None:
             continue
         for m in PEBBLE_MODELS[step]:
-            row = {**m, "pebble": step, "latency_s": t.get("elapsed_s")}
-            if m["how"] == "precomputed":
-                row["detail"] = _prithvi_detail(final.get(step))
-            out.append(row)
+            out.append({**m, "pebble": step, "latency_s": t.get("elapsed_s")})
     calls = [*((final.get("plan") or {}).get("llm_calls") or []),
              *((final.get("grounding") or {}).get("llm_calls") or [])]
     by_model: dict[str, dict] = {}
@@ -98,15 +76,8 @@ def loaded() -> dict:
             "ibm-granite/granite-embedding-278m-multilingual": attr("app.rag", "_MODEL") is not None,
             "flair/ner-english-ontonotes-fast": bool(attr("app.context.entity_extract", "_TAGGER")),
         },
-        "precomputed": {"msradam/Prithvi-EO-2.0-NYC-Pluvial": _prithvi_available()},
         "llm_endpoints": [{"model": e.model, "base_url": e.base_url} for e in llm.endpoints()],
     }
-
-
-def _prithvi_available() -> bool:
-    from app.flood_layers import prithvi_water
-
-    return prithvi_water._paths()[0].exists()
 
 
 def warm() -> dict:

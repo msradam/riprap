@@ -40,9 +40,6 @@ CLAUDE.md
 CLAUDE.local.md
 .claude/
 
-# legacy / intermediate Prithvi artifacts (not shipped)
-data/hls_stack_*.tif
-data/prithvi_runs/
 data/*.legacy_*
 web/svelte/node_modules/
 web/sveltekit/node_modules/

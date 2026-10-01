@@ -1,11 +1,8 @@
 """Hurricane Ida (Sept 2021) empirical flood extent — USGS high-water marks.
 
-This specialist plays the same role as Prithvi-EO 2.0 (Sen1Floods11)
-in the parent triangulation-engine: it provides empirical post-event
-flood evidence (versus the modeled scenarios from FEMA/DEP). Where
-Prithvi derives extent from Sentinel-1 SAR, USGS HWMs are surveyed
-ground-truth water marks. Both are valid empirical signals; HWMs
-are the public record for Ida specifically.
+Empirical post-event flood evidence, against the modeled scenarios
+from FEMA and DEP: USGS high-water marks are surveyed water marks, and
+they are the public record for Ida.
 
 Output per address: number of HWMs within radius, max water elevation
 (ft), nearest site description.

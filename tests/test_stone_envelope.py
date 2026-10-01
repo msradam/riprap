@@ -21,7 +21,7 @@ def test_step_to_stone_mapping_covers_known_steps():
     from web.main import _STEP_TO_STONE
     missing = [
         step for step in (
-            "sandy", "dep_extreme_2080", "ida_hwm", "prithvi_water", "microtopo",
+            "sandy", "dep_extreme_2080", "ida_hwm", "microtopo",
             "mta_entrances", "nycha_developments", "doe_schools", "doh_hospitals",
             "floodnet", "nyc311", "nws_obs", "noaa_tides",
             "nws_alerts", "ttm_311_forecast", "floodnet_forecast", "ttm_battery_surge",

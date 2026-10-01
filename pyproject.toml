@@ -73,15 +73,6 @@ ml = [
     "pypdf>=5.0,<7",
     "gliclass>=0.1.17,<0.1.18",
 ]
-# Batch earth-observation jobs (scripts/run_eo_batch.py), never per request.
-eo = [
-    "terratorch>=1.1,<2",
-    "planetary-computer>=1.0,<2",
-    "pystac-client>=0.7,<1",
-    "rioxarray>=0.15,<1",
-    "xarray>=2024.1",
-    "pyarrow>=18.0,<25",
-]
 # Server-side PDF export (/api/print); needs system pango and cairo.
 pdf = ["weasyprint>=68,<70"]
 # Measured energy on Apple Silicon (IOReport, no sudo).

@@ -101,10 +101,6 @@ def _layer(kind: str, lat: float, lon: float, r: int) -> dict:
         return _clip_simplify(
             dep_stormwater.load("dep_extreme_2080"), lat, lon, r, props_keep={"Flooding_Category"}
         )
-    if kind == "prithvi":
-        from app.flood_layers import prithvi_water as pw
-
-        return pw.layer_geojson(lat, lon, r)
     raise ValueError(f"unknown layer {kind!r}")
 
 
@@ -347,8 +343,8 @@ async def api_print(request: Request) -> Response:
 
 @app.get("/api/models")
 def api_models():
-    """The models this process has loaded now, the precomputed Prithvi-EO
-    output, and the LLM endpoint configured. Each briefing's own list is
+    """The models this process has loaded now and the LLM endpoint
+    configured. Each briefing's own list is
     the `models` field of its result."""
     from app.models_info import loaded
 
@@ -687,14 +683,6 @@ def layer_sandy(lat: float, lon: float, r: float = 1500):
 @app.get("/api/layers/dep_extreme_2080")
 def layer_dep_2080(lat: float, lon: float, r: float = 1500):
     layer = _layer("dep2080", round(lat, 4), round(lon, 4), int(r))
-    return JSONResponse(layer, headers={"Cache-Control": "public, max-age=3600"})
-
-
-@app.get("/api/layers/prithvi_water")
-def layer_prithvi_water(lat: float, lon: float, r: float = 1500):
-    """New surface water after Ida from the Prithvi-EO batch (experimental):
-    the new-water pixels of data/eo/ within `r` m of the address, as polygons."""
-    layer = _layer("prithvi", round(lat, 4), round(lon, 4), int(r))
     return JSONResponse(layer, headers={"Cache-Control": "public, max-age=3600"})
 
 

@@ -33,8 +33,6 @@ CONTRACTS = {
     "dep_extreme_2080": ["narrative", "depth_class"],
     "dep_moderate_2050": ["narrative", "depth_class"],
     "dep_moderate_current": ["narrative", "depth_class"],
-    "prithvi_water": ["headline_value", "subhead_text", "narrative", "raster_kind"],
-    "prithvi_live": ["ok"],  # ok=False is the offline path
 }
 
 CITIES = [
@@ -42,13 +40,13 @@ CITIES = [
         "name": "nyc",
         "query": "442 East Houston Street, Manhattan",
         "expect_pebbles": [
-            "sandy", "ida_hwm", "prithvi_water", "microtopo",
+            "sandy", "ida_hwm", "microtopo",
             "dep_extreme_2080", "dep_moderate_2050", "dep_moderate_current",
             "floodnet", "nyc311", "noaa_tides",
         ],
         "expect_narrative_pebbles": [
             "sandy", "ida_hwm", "floodnet", "nyc311", "microtopo",
-            "prithvi_water", "noaa_tides",
+            "noaa_tides",
         ],
         "no_leak": ["Lake Michigan", "Calumet", "San Francisco", "Seattle",
                     "Boston Logan", "Charles River"],
@@ -163,8 +161,6 @@ def check_city(spec: dict, result: dict) -> list[str]:
         "sandy_inundation": "sandy",
         "dep_stormwater": "dep",
         "ida_hwm_2021": "ida_hwm",
-        "prithvi_eo_v2": "prithvi_water",
-        "prithvi_eo_live": "prithvi_live",
         "microtopo_lidar": "microtopo",
         "step_311": "nyc311",
     }

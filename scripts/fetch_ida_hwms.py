@@ -1,9 +1,7 @@
 """One-shot fetch of NYC Hurricane Ida 2021 high-water marks from USGS STN.
 
 Output: data/ida_2021_hwms_ny.geojson — point GeoJSON with elev_ft + site
-metadata. Used by the Riprap agent's `step_ida_hwm` action as the
-empirical post-event flood signal (the same role Prithvi-EO plays for
-SAR-derived extents in the parent project).
+metadata. The `ida_hwm` pebble reads it as the surveyed record of Ida.
 """
 from __future__ import annotations
 

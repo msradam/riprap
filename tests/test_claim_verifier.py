@@ -12,7 +12,7 @@ DOCS = [
         "Nearest USGS-surveyed mark: Carroll St. and Nevins St. (1417 m away).", False),
     Doc("microtopo", "Hazard reader",
         "Elevation 16.89 m; HAND 16.76 m above nearest drainage; TWI 7.1.", False),
-    Doc("prithvi_water", "Hazard reader",
+    Doc("experimental_layer", "Hazard reader",
         "Experimental: 0 water polygons within 500 m of this address, nearest 5870.5 m away.", True),
 ]
 
@@ -31,7 +31,7 @@ def test_rounding_and_unit_conversion_pass():
     kept, dropped = verify([
         claim("The nearest Ida high-water mark is about 1.4 km away.", ["ida_hwm"], ["1.4"]),
         claim("The ground sits about 55 ft above sea level.", ["microtopo"], ["55"]),
-        claim("The nearest mapped water is roughly 5,870 m away.", ["prithvi_water"], ["5,870"]),
+        claim("The nearest mapped water is roughly 5,870 m away.", ["experimental_layer"], ["5,870"]),
     ], DOCS)
     assert len(kept) == 3, dropped
 
@@ -95,10 +95,10 @@ def test_number_supported_tolerance_is_bounded():
 
 
 def test_render_labels_experimental_and_fills_empty_sections():
-    kept = [claim("No water polygons were detected within 500 m.", ["prithvi_water"], ["500"])]
+    kept = [claim("No water polygons were detected within 500 m.", ["experimental_layer"], ["500"])]
     text = _render(kept, DOCS, ["Hazard reader", "Live observer"])
     assert "Experimental: No water polygons" in text
-    assert "[prithvi_water]." in text
+    assert "[experimental_layer]." in text
     # Refactor 8: a section the model left empty shows its sources' own cited
     # sentences, never "no grounded evidence" over a section that has evidence.
     live = [d for d in DOCS if d.section == "Live observer"]

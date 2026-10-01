@@ -1,4 +1,4 @@
-"""Smoke tests for the remaining Cornerstone pebbles (microtopo, prithvi_water).
+"""Smoke test for the microtopo Cornerstone pebble.
 
 The legacy functions return dataclasses; the legacy_call adapter auto-unwraps
 them via __dataclass_fields__. Verifies the pebble value matches vars(legacy).
@@ -28,15 +28,3 @@ def test_microtopo_pebble_matches_legacy(registry):
     assert result.error is None, result.error
     assert isinstance(result.value, dict)
     assert result.value == vars(legacy)
-
-
-def test_prithvi_water_pebble_matches_legacy(registry):
-    from app.flood_layers.prithvi_water import summary_for_point  # noqa: PLC0415
-
-    legacy = summary_for_point(TEST_LAT, TEST_LON)
-    if legacy is None:
-        pytest.skip("Prithvi water mask unavailable in this environment")
-    result = registry.get("prithvi_water").fetch(SpatialQuery(lat=TEST_LAT, lon=TEST_LON))
-    assert result.error is None, result.error
-    assert isinstance(result.value, dict)
-    assert result.value == legacy

@@ -86,7 +86,7 @@ def test_stones_pebbles_for_filters_by_deployment():
     boston_cornerstone = set(_pebbles_for("cornerstone", "boston"))
     nyc_cornerstone = set(_pebbles_for("cornerstone", "nyc"))
 
-    # NYC Cornerstone includes ida_hwm, sandy, dep_*, prithvi_water, etc.
+    # NYC Cornerstone includes ida_hwm, sandy, dep_*, etc.
     assert "ida_hwm" in nyc_cornerstone
     assert "sandy" in nyc_cornerstone
     # Boston Cornerstone must NOT include them — this is the bug fix.
@@ -243,7 +243,7 @@ def test_per_pebble_coverage_filter_conus_but_not_city():
     assert "nws_obs" in abq, (
         "Albuquerque is in CONUS — NWS METAR observations should fire."
     )
-    # NYC-specific pebbles (floodnet, nyc311, prithvi_live) should NOT
+    # NYC-specific pebbles (floodnet, nyc311) should NOT
     # fire for Albuquerque because they inherit the NYC bbox.
     assert "floodnet" not in abq
     assert "nyc311" not in abq
