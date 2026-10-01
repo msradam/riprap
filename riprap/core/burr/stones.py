@@ -49,10 +49,9 @@ FLOOR = {
 # Ids outside the intent's scope (point vs area) are ignored.
 FOCUS_FLOOR = {
     ("time_frame", "past"): ("nyc311", "floodnet", "ida_hwm", "sandy", "nyc311_nta", "sandy_nta"),
-    ("time_frame", "now"): ("nws_alerts", "nws_obs", "floodnet", "noaa_tides"),
-    # Refactor 8: a forecast question runs every forecast and projection.
-    ("time_frame", "future"): ("npcc4_slr", "ttm_battery_surge", "floodnet_forecast", "ttm_311_forecast",
-                               "dep_moderate_2050", "dep_extreme_2080",
+    ("time_frame", "now"): ("nws_alerts", "nws_obs", "floodnet", "noaa_tides", "nws_water_forecast"),
+    # A forecast question runs the forecast and every projection.
+    ("time_frame", "future"): ("nws_water_forecast", "npcc4_slr", "dep_moderate_2050", "dep_extreme_2080",
                                "dep_moderate_2050_nta", "dep_extreme_2080_nta"),
     ("assets", "subway"): ("mta_entrances", "mta_entrances_nta"),
     ("assets", "schools"): ("doe_schools", "doe_schools_nta"),
@@ -127,13 +126,11 @@ def pebbles_for(deployment: str | None, lat: float | None = None, lon: float | N
 
 @functools.cache
 def _import_ml_stacks() -> None:
-    """Import transformers and tsfm_public once, on the thread that
-    starts the fan-out. Their lazy module loaders are not thread-safe on
-    first import ("cannot import name 'PreTrainedModel'"), and the TTM
-    pebbles run on worker threads. A no-op when they are not installed."""
+    """Import transformers once, on the thread that starts the fan-out.
+    Its lazy module loader is not thread-safe on first import ("cannot
+    import name 'PreTrainedModel'"). A no-op when it is not installed."""
     try:
         from transformers import PreTrainedModel  # noqa: F401
-        from tsfm_public import TinyTimeMixerForPrediction  # noqa: F401
     except Exception:  # noqa: BLE001 - the ml extra is optional
         pass
 

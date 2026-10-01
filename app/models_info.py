@@ -16,12 +16,6 @@ log = logging.getLogger("riprap.models")
 
 # pebble id -> the models it runs. "where" is where the model itself runs.
 PEBBLE_MODELS: dict[str, list[dict]] = {
-    "ttm_battery_surge": [{"name": "Granite TTM r2, Battery surge fine-tune",
-                           "repo": "msradam/Granite-TTM-r2-Battery-Surge", "where": "CPU", "how": "loaded"}],
-    "ttm_311_forecast": [{"name": "Granite TTM r2", "repo": "ibm-granite/granite-timeseries-ttm-r2",
-                          "where": "CPU", "how": "loaded"}],
-    "floodnet_forecast": [{"name": "Granite TTM r2", "repo": "ibm-granite/granite-timeseries-ttm-r2",
-                           "where": "CPU", "how": "loaded"}],
     "policy_corpus": [{"name": "Granite Embedding 278M", "repo": "ibm-granite/granite-embedding-278m-multilingual",
                        "where": "CPU", "how": "loaded"},
                       {"name": "Flair NER (OntoNotes, fast)", "repo": "flair/ner-english-ontonotes-fast",
@@ -71,8 +65,6 @@ def loaded() -> dict:
 
     return {
         "in_process": {
-            "msradam/Granite-TTM-r2-Battery-Surge": attr("app.live.ttm_battery_surge", "_MODEL") is not None,
-            "ibm-granite/granite-timeseries-ttm-r2": bool(attr("app.live.ttm_forecast", "_MODELS")),
             "ibm-granite/granite-embedding-278m-multilingual": attr("app.rag", "_MODEL") is not None,
             "flair/ner-english-ontonotes-fast": bool(attr("app.context.entity_extract", "_TAGGER")),
         },
@@ -100,12 +92,9 @@ def warm() -> dict:
 
     from app import rag
     from app.context import entity_extract
-    from app.live import ttm_battery_surge, ttm_forecast
 
     step("granite-embedding", lambda: (rag.warm(), rag._model()))  # the index, then the encoder
     step("flair-ner", entity_extract.warm)
-    step("ttm-battery-surge", ttm_battery_surge.warm)
-    step("ttm-r2", ttm_forecast._load_model)
     step("llm", _ping_llm)
     return took
 

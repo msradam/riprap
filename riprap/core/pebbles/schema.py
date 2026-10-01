@@ -106,7 +106,7 @@ class Display(BaseModel):
       - text     plain narration-template prose (default)
       - stat     a single number/boolean with units (e.g. Sandy inside/outside)
       - list     a list of features (e.g. Ida HWM sites, FloodNet sensors)
-      - chart    a time-series chart (e.g. TTM forecasts)
+      - chart    a time-series chart
       - map_only no card body; the data renders only on the map layer
     `variant` is a finer-grained component hint within `kind` — the
     SvelteKit cardAdapter uses it to pick the actual evidence-card

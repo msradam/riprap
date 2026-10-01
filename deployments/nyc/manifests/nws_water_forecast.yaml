@@ -1,0 +1,47 @@
+id: nws_water_forecast
+type: live
+title: NWS water-level forecast (nearest harbor gauge)
+answers: "the National Weather Service's forecast of the peak harbor water level at the nearest gauge over the next days, and whether it reaches a flood stage"
+stone: lodestone
+tier: modeled
+adapter: python_call
+
+spatial:
+  scope: point
+  crs: EPSG:4326
+
+config:
+  module: app.context.nws_water
+  function: summary_for_point
+  args:
+    - {source: lat}
+    - {source: lon}
+  on_none: offline
+
+trace_summary:
+  gauge: gauge_id
+  forecast_peak_ft_mllw: forecast_peak_ft_mllw
+  flood_category: flood_category
+
+provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
+  source_name: NWS National Water Prediction Service, gauge forecast
+  source_url: https://water.noaa.gov/
+  license: U.S. Public Domain
+  doc_id: nws_water_forecast
+  citation: National Weather Service, National Water Prediction Service, official water-level forecast and flood stages for the nearest harbor gauge.
+
+narration:
+  short: The Weather Service's water-level forecast for the nearest harbor gauge.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: The National Water Prediction Service had no current forecast for the nearest gauge when this briefing ran.
+
+display:
+  variant: scalars
+  order: 15
+  kind: stat
+  map_layer: false

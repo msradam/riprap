@@ -129,7 +129,7 @@ def test_focus_floor_adds_what_an_analyst_checks():
             "focus": {"time_frame": "past", "assets": ["schools"]}}
     assert {"nyc311", "floodnet", "ida_hwm", "sandy", "doe_schools"} <= set(select_pebbles(past, NYC))
     now = {**past, "intent": "live_now", "focus": {"time_frame": "now", "assets": []}}
-    assert set(select_pebbles(now, NYC)) == {"nws_alerts", "nws_obs", "floodnet", "noaa_tides"}
+    assert set(select_pebbles(now, NYC)) == {"nws_alerts", "nws_obs", "floodnet", "noaa_tides", "nws_water_forecast"}
     area = {**past, "intent": "neighborhood", "focus": {"time_frame": "past", "assets": []}}
     assert set(select_pebbles(area, NYC)) == {"area_boundary", "sandy_nta", "dep_moderate_2050_nta", "nyc311_nta"}
 

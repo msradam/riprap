@@ -178,17 +178,15 @@ def _warm_caches():
     # 'PreTrainedModel'"). Modules whose deps are not installed no-op.
     try:
         from transformers import PreTrainedModel  # noqa: F401
-        from tsfm_public import TinyTimeMixerForPrediction  # noqa: F401
     except Exception as e:  # noqa: BLE001
         print(f"[startup] ML pre-import skipped: {e}", flush=True)
-    for mod_path in ("app.live.ttm_forecast", "app.live.ttm_battery_surge",
-                     "app.live.floodnet_forecast", "app.context.entity_extract"):
+    for mod_path in ("app.context.entity_extract",):
         try:
             __import__(mod_path)
         except Exception as e:  # noqa: BLE001
             print(f"[startup] {mod_path} pre-import skipped: {type(e).__name__}: {e}", flush=True)
     if os.environ.get("RIPRAP_WARM", "").lower() in ("1", "true", "yes"):
-        # Load the TTM models, NER and embeddings now and ping the LLM, so the
+        # Load NER and the embeddings now and ping the LLM, so the
         # first query of a demo is not the cold one (refactor 8).
         from app.models_info import warm
 

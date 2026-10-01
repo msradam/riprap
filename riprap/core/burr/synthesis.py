@@ -172,11 +172,12 @@ EXTRACTIVE_SYSTEM = """You answer a question about flood exposure at one place b
 
 Return JSON with "answer": "lead" is one of yes, no, partly, count, cannot_answer, and "facts" lists the ids of one to four documents that support the lead, most relevant first. The reader sees a fixed phrase for the lead followed by those documents' text, word for word. Use "no" only when the facts report an absence (outside, none, zero). Use "partly" when some but not all of what was asked about is affected. Use "count" when the question asks how many or how much. Use "cannot_answer" with no facts when the documents do not answer the question. Use only ids from the list."""
 LEADS = ("yes", "no", "partly", "count", "cannot_answer")
-# The facts a forecast question is answered with, in order (refactor 8).
+# The facts a forecast question is answered with, in order: the Weather
+# Service's water-level forecast, then the published projections.
 # What reports the present: a question about now quotes these, chosen in
 # code (the model left out the sensors and the tide gauge).
-LIVE_FACTS = ("nws_alerts", "floodnet", "noaa_tides", "usgs_gauges", "nws_obs")
-FORECAST_FACTS = ("ttm_battery_surge", "ttm_311_forecast", "floodnet_forecast", "npcc4_slr",
+LIVE_FACTS = ("nws_alerts", "floodnet", "noaa_tides", "nws_water_forecast", "usgs_gauges", "nws_obs")
+FORECAST_FACTS = ("nws_water_forecast", "npcc4_slr",
                   "dep_moderate_2050", "dep_extreme_2080", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
 # The owner's decision after refactor 3: extractive cannot paraphrase, and
 # it declines honestly when the evidence does not answer. The guarded mode
