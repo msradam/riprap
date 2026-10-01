@@ -4,6 +4,67 @@ All notable changes to Riprap. The hackathon submission tag is
 `v0.5.0` (build 2026-05-07); subsequent dates record polish work
 that landed on the hackathon-period production deploys.
 
+## [Unreleased] (what Riprap does that other tools do not, 2026-10-01)
+
+A comparison with the public alternatives on eight fixed tasks, and an audit
+of every part against a plain baseline, led to these changes.
+
+Fixed:
+
+- 311 flood requests were undercounted. The city renamed the flood
+  descriptors in 2026 (`Sewer Maintenance`: `Backup`, `Catch Basin Clogged`,
+  `Manhole Overflow`, `Flooding on Street`, `Flooding on Highway`) and Riprap
+  counted the old names. Both are counted now, one per incident, and a live
+  test fails when a descriptor that looks like flooding is not on the list.
+- FloodNet's event table holds events dated in the future; the event window
+  now ends at the time of the query. A flagged sensor's highest reading is
+  stated with its flag, in millimetres and inches.
+- Place parsing: a borough after the street with no comma, borough
+  abbreviations, a Queens house number, "311 street flooding" read as an
+  address, one address read as a comparison of two, a neighbourhood typed in
+  lower case, and the city's three-digit district codes.
+- Found by an independent review of this branch: an asset question could
+  take its yes from the wrong count; a null resident count printed as zero;
+  311 requests logged twice at an intersection counted twice; a hospital
+  just outside the mapped Sandy edge counted as outside with no remark.
+- A district briefing leads with the 311 count, not the Sandy share, and a
+  district question no longer waits for the construction permits source.
+
+Added:
+
+- A question is answered with no language model, by rules over its own
+  words (`riprap/core/burr/rule_answer.py`), part by part when it has two
+  parts. With a model configured the rules still answer first and the model
+  is asked only for what they do not recognise (`RIPRAP_RULES_FIRST=0`
+  reverses it). On 130 unseen questions judged blind the rule answers were
+  preferred on 54 and the model's on 21 (`docs/GROUNDING.md`).
+- District and neighbourhood briefings name the exposed subway entrances,
+  schools, public housing developments and hospitals, and quote NYC
+  Planning's counts of buildings, units and residents in the floodplain.
+- The National Weather Service's water-level forecast for the nearest tide
+  gauge, with its issue time and the flood stage it reaches.
+- MCP evidence items carry `value`, `source_url` and `vintage`.
+- The Sandy sentence says how near the mapped edge a point is (within 50 m);
+  the preliminary FIRM sentence names its datum.
+- A "right now" answer dates each reading and points to the FloodNet
+  dashboard, the Weather Service and Notify NYC.
+
+Removed, each because it did not beat a plain baseline on Riprap's own data
+or served no target user (the code is in history at `8b87165`):
+
+- The three Granite TTM forecasts (311 volume, Battery surge, sensor
+  recurrence) and the Prithvi-EO satellite water layer.
+- The policy corpus with its embedding and entity models, and the `ml` and
+  `eo` extras. A default install has no torch.
+- The composite exposure score. `riprap-register` writes plain flags.
+- The server-side PDF export (the print view remains), the heat and air
+  scaffolds, the San Francisco and Boston deployments, the unfiltered 311
+  feeds, the unused model adapter and `experiments/`.
+
+Said less: the terrain sentence gives elevation and the low-spot percentile
+only; a plain briefing quotes a live reading only when it is notable; a
+district briefing does not lead with one large figure.
+
 ## [0.7.0] - 2026-09-28 (a presentable public repository)
 
 - The README is rewritten to about 170 lines: what Riprap does with a real

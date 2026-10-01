@@ -29,8 +29,8 @@ sentence. A plain place briefing leaves out a live reading that is not notable
 (an observation with no rain, a tide less than a foot above prediction, a
 water-level forecast below flood stage); a right-now question quotes them all. When no source produces evidence, the briefing says Riprap could not
 build it and names the sources that failed to respond. There is no model. This
-is the mode the MCP evidence tools use. The static gallery has 12 address
-entries in this mode and 7 question entries in LLM mode.
+is the mode the MCP evidence tools use. The static gallery is built in this mode: 12
+addresses, 3 community districts and 8 questions.
 
 A question is answered in this mode too, by rules over its words
 (`riprap/core/burr/rule_answer.py`). The rules pick the lead and the facts

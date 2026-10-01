@@ -4,7 +4,8 @@
 
 # Riprap
 
-Cited flood-evidence briefings for New York City places, built from public data.
+The public flood records for a New York City address or community district, on
+one page, with the source and its date beside every sentence.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/msradam/riprap/actions/workflows/check.yml/badge.svg)](https://github.com/msradam/riprap/actions/workflows/check.yml)
@@ -16,58 +17,94 @@ Cited flood-evidence briefings for New York City places, built from public data.
 
 ## What it does
 
-Ask Riprap about an NYC address, a question about one, or a community district
-such as QN12. It gathers the public flood evidence for that place: the 2012
-Sandy footprint, FEMA and DEP flood maps, Hurricane Ida high-water marks, 311
-flood complaints, FloodNet street sensors, tide and stream gauges, and nearby
-subway entrances, public housing, schools and hospitals.
+Type an NYC address, a community district such as QN12, or a question about
+either. Riprap reads the public flood records for that place: FEMA's effective
+and preliminary flood maps, the 2012 Sandy inundation extent, Hurricane Ida
+high-water marks, the city's three stormwater scenarios, 311 flood requests,
+FloodNet street sensors, and the subway entrances, schools, public housing and
+hospitals nearby.
 
-Every sentence in the briefing cites its source, and each citation links to the
-dataset with its vintage. With no model configured, the sentences come straight
-from the data. An optional LLM can phrase an answer, and code then checks its
-citations and numbers and drops what fails.
+Every sentence is written by code from one record, and carries that record's
+source and the date of its data. A question is answered by rules over its own
+words: they pick which of those sentences answer it and whether the evidence
+supports a yes or a no. No language model is needed. An optional LLM can route
+questions the rules do not recognise; it chooses among the same cited
+sentences and code checks its choice.
 
-Riprap reports evidence. It does not give advice, predict a particular day, or
-make a regulatory flood determination.
+Riprap reports evidence. It does not give advice, predict a particular day,
+score a property or make a regulatory flood determination.
 
 A real answer, from the gallery entry
 [Hollis, "since Ida"](https://msradam.github.io/riprap/gallery/hollis-since-ida/):
 
 > **Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?**
 >
-> Yes. 2 FloodNet community sensors within 600 m have logged 14 above-curb flood
-> events in the last 3 years [floodnet]. Peak depth recorded by the sensors in
-> good working order: 815 mm on 2026-05-20 [floodnet]. 1 sensor that logged events
-> is flagged by FloodNet for maintenance, so its depths are not used for the peak
-> [floodnet]. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this
-> address; the highest stood 0.76 ft above ground; the highest water surface
-> elevation was 48.2 ft NAVD88 [ida_hwm]. Nearest mark: Intersection of 182nd St.
-> and 90th Ave., Jamaica, Queens (174 m away) [ida_hwm]. 82 NYC 311 flood-related
-> complaints filed within 200 m of this location in the last 5 years: 47 sewer
-> backup, 22 catch basin, 10 street flooding, 3 manhole overflow [nyc311].
+> Yes. 2 FloodNet community sensors within 600 m have logged 14 above-curb
+> flood events in the last 3 years, the most recent starting 2026-09-01 05:39
+> UTC [floodnet]. Peak depth recorded by the sensors in good working order: 815
+> mm (32.1 in) on 2026-05-20 [floodnet]. 1 sensor that logged events is flagged
+> by FloodNet for maintenance, so its depths are not used for the peak
+> [floodnet]. The highest depth a flagged sensor recorded was 1172 mm (46.1 in)
+> on 2026-05-20 [floodnet]. USGS surveyed 2 Hurricane Ida high-water marks
+> within 800 m of this address; the highest stood 0.76 ft above ground; the
+> highest water surface elevation was 48.2 ft NAVD88 [ida_hwm]. Nearest mark:
+> Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174 m away)
+> [ida_hwm]. 89 NYC 311 flood-related complaints filed within 200 m of this
+> location in the last 5 years: 48 sewer backup, 28 catch basin, 10 street
+> flooding, 3 manhole overflow [nyc311].
 
-The "Yes." is set by a rule, not by the model: at least one observed source
-reports flooding since Ida, on 1 September 2021.
+The "Yes." is set by a rule: at least one observed source reports flooding
+since Ida, on 1 September 2021. No language model wrote or chose any of it.
+The two depths are the same storm at two sensors: FloodNet flags the one that
+read 46.1 in, so Riprap takes the peak from the other and says so.
 
-## Who it is for, and not for
+## What it does that other tools do not
 
-For data journalists, community board and council staff, city resilience
-analysts, civic researchers and open-data communities who need defensible,
-source-linked numbers about flood exposure in a place.
+The records are public and each has its own map or portal. As of October 2026
+we know of no other tool that does these four things together for New York
+City:
 
-Not for resident decisions, real estate, lending, insurance or hydraulic design.
-Residents should use [FloodHelpNY](https://www.floodhelpny.org); for an official
-flood zone, use FEMA's [Map Service Center](https://msc.fema.gov). More in
-[docs/BACKGROUND.md](docs/BACKGROUND.md).
+- reads the observed record (311, FloodNet events, Ida high-water marks) and
+  the mapped one (two FEMA maps, three city stormwater scenarios, the Sandy
+  extent) for the same address or district in one step;
+- puts a source and a data date on every sentence, so a figure can be quoted
+  with its citation;
+- names the exposed assets of a district (which schools, which public housing
+  developments, which subway entrances), by one method for all 59 districts;
+- returns the same evidence to a program: JSON over HTTP and
+  [MCP](#quickstart), each item with its figures, source URL and vintage, a
+  digest of the result and the list of sources that failed to answer.
+
+It also carries rules for the traps in these sources: which 311 descriptors
+record flooding (the city renamed them in 2026), which sensor readings FloodNet
+flags, which datum a base flood elevation is in, and when a zero means "the
+source failed" and not "none".
+
+## Where other tools are better
+
+| For | Use |
+|---|---|
+| What is flooding right now | The [FloodNet dashboard](https://dataviz.floodnet.nyc/) shows street depth by the minute, the [National Weather Service](https://www.weather.gov/okx/) issues the warnings and [Notify NYC](https://a858-nycnotify.nyc.gov/) sends them to a phone. Riprap quotes its own readings with their times and points there |
+| An official flood zone determination | FEMA's [Map Service Center](https://msc.fema.gov/portal/home) |
+| Insurance and what to do at home | [FloodHelpNY](https://www.floodhelpny.org) |
+| A district's people and housing in the floodplain, on a city-made page | NYC Planning's [Community District Profiles](https://communityprofiles.planning.nyc.gov/) (Riprap quotes their counts) |
+| Maps to explore | Rebuild by Design's [Rainproof NYC Flood Map](https://rebuildbydesign.org/rainproof-nyc-map/) for 311 reports, sensors and green infrastructure near an address; the [EJNYC Mapping Tool](https://experience.arcgis.com/experience/6a3da7b920f248af961554bdf01d668b) for citywide layers |
+| A hosted service | All of the above run in a browser. Riprap's public copy is a static gallery; your own questions need a local install |
+
+## Who it is for
+
+Data journalists, community board and council staff, resilience analysts,
+civic technologists and researchers who need source-linked numbers about flood
+exposure in a place. Not for resident decisions, real estate, lending,
+insurance or hydraulic design. More in [docs/BACKGROUND.md](docs/BACKGROUND.md).
 
 ## Status
 
 | Area | Status |
 |---|---|
-| New York City flood | Production: 32 data sources (5 marked experimental), addresses, questions and all 59 community districts |
-| Chicago, Seattle, San Francisco, Boston, Albany | Experimental: federal sources plus a 311 feed and a water-level gauge ([docs/multi-city.md](docs/multi-city.md)) |
-| Heat and air quality | Not reachable yet: scaffolds with no coverage area ([docs/multi-hazard.md](docs/multi-hazard.md)) |
-| LLM | Optional. Without one, the briefing is the cited evidence itself |
+| New York City flood | Production: 23 public sources, for addresses, questions and all 59 community districts |
+| Chicago, Seattle, Albany | Experimental: federal sources plus a reviewed 311 flood filter and a water-level gauge ([docs/multi-city.md](docs/multi-city.md)) |
+| Models | None required. No model writes, scores or forecasts anything. An optional LLM routes questions the rules do not recognise |
 | Checks | Citations and numbers on every claim, rules on answer leads, 13 disclosure checks. They are patterns and rules: they do not read meaning and can miss a wrong inference ([docs/GROUNDING.md](docs/GROUNDING.md)) |
 
 ## Quickstart
@@ -84,19 +121,19 @@ uv run uvicorn web.main:app --port 7860
 
 Open <http://localhost:7860> and type an address (`90-01 183rd Street, Queens`),
 a district (`QN12`) or a question (`Has 80 Pioneer Street, Brooklyn flooded?`).
-Without an LLM, a question gets the cited evidence for its place, and the app
-says it was not answered directly (the JSON reports `grounding.tier` as
-`no_llm`). The first district query on a cold server takes about half a
+A question is answered by rules, with no model (the JSON reports
+`grounding.answer_mode` as `rules`); one the rules do not recognise gets the
+cited evidence for its place, and the page says it was not answered. The first
+district query on a cold server takes about half a
 minute while the layers load. The same briefing from the command line:
 
 ```bash
 curl -s "http://localhost:7860/api/agent?q=QN12" | python3 -c "import json, sys; print(json.load(sys.stdin)['paragraph'])"
 ```
 
-`uv sync --extra ml` adds the optional in-process models (forecasts, policy
-retrieval); without them those sources skip themselves.
-
-**With an LLM.** Any OpenAI-compatible endpoint works. With
+**With an LLM (optional).** The rules answer first; a model is asked only
+when they do not recognise a question or cannot read its place. Any
+OpenAI-compatible endpoint works. With
 [Ollama](https://ollama.com):
 
 ```bash
@@ -109,10 +146,10 @@ RIPRAP_LLM_MODEL=hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M \
 **MCP server.** `uv run riprap-mcp` serves seven tools over stdio
 (`get_evidence`, `get_district_summary`, `get_briefing`,
 `nyc311_flood_requests`, `plan_query`, `list_sources`, `get_citation`); every
-tool works without an LLM, and `get_briefing` answers a question when the
-server has one (set the two `RIPRAP_LLM_*` variables in your client's server
-config). Every result carries a `record` block (query, time, version, commit,
-SHA-256 of the body) and a `failed` list naming sources that did not answer.
+tool works without an LLM. Each evidence item carries its sentence, the
+source's own figures (`value`), its `source_url` and `vintage`. Every result
+carries a `record` block (query, time, version, commit, SHA-256 of the body)
+and a `failed` list naming sources that did not answer.
 Try one from the command line with the MCP Inspector (needs Node):
 
 ```bash
@@ -120,11 +157,11 @@ npx @modelcontextprotocol/inspector --cli uv run riprap-mcp \
   --method tools/call --tool-name get_district_summary --tool-arg community_district=QN12
 ```
 
-**Gallery.** `uv run python scripts/build_gallery.py` rebuilds the address
-entries in `web/sveltekit/src/lib/gallery/`; the question entries (one of them
-about a district) are kept as they are unless an LLM is configured. To see them in the app, rebuild the frontend
-(needs Node and [pnpm](https://pnpm.io)): `cd web/sveltekit && pnpm install &&
-pnpm build`. Docker and the Modal host are in [docs/DEPLOY.md](docs/DEPLOY.md).
+**Gallery.** `uv run python scripts/build_gallery.py` rebuilds every entry in
+`web/sveltekit/src/lib/gallery/` (12 addresses, 3 community districts and 8
+questions), with no model. To see them in the app, rebuild the frontend (needs
+Node and [pnpm](https://pnpm.io)): `cd web/sveltekit && pnpm install && pnpm
+build`. Docker and the Modal host are in [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## How it works
 
@@ -135,9 +172,9 @@ parallel, grouped into five roles:
 |---|---|---|
 | Cornerstone | What the ground remembers | Sandy extent, DEP and FEMA maps, Ida high-water marks, terrain |
 | Keystone | What is exposed | Subway entrances, public housing, schools, hospitals |
-| Touchstone | What is happening now | FloodNet sensors, 311 complaints, weather, tide and stream gauges |
-| Lodestone | What is coming | NWS alerts, sea-level projections, experimental forecasts |
-| Capstone | The briefing | The cited sentences, or an LLM's claims checked in code |
+| Touchstone | What has been observed | FloodNet sensors, 311 requests, weather, tide and stream gauges |
+| Lodestone | What is coming | NWS alerts, the NWS water-level forecast, sea-level projections |
+| Capstone | The briefing | The cited sentences, and the answer chosen from them |
 
 More in [docs/METHODOLOGY.md](docs/METHODOLOGY.md),
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and
@@ -145,12 +182,12 @@ More in [docs/METHODOLOGY.md](docs/METHODOLOGY.md),
 
 ## Data sources
 
-The NYC deployment reads 32 sources: 28 NYC manifests and 4 federal ones (FEMA
-flood zones, NWS observations and alerts, USGS stream gauges). All are
-public-record city, state and federal data; there are no commercial APIs or
-proprietary scores. Each manifest records its URL, licence and vintage. The full
-list is in [docs/DATA-SOURCES.md](docs/DATA-SOURCES.md), and the models in
-[docs/MODELS.md](docs/MODELS.md).
+A New York City briefing reads 23 public sources (a source read for a point
+and for an area is counted once): 19 from the NYC deployment and 4 federal ones
+(FEMA flood zones, NWS observations and alerts, USGS stream gauges). All are
+public-record city, state and federal data; there are no commercial APIs and no
+scores. Each manifest records its URL, licence and vintage. The full list is in
+[docs/DATA-SOURCES.md](docs/DATA-SOURCES.md).
 
 ## Privacy
 
@@ -177,7 +214,9 @@ Cite with [CITATION.cff](CITATION.cff). Apache 2.0: see [LICENSE](LICENSE) and
 
 Riprap is independent and not affiliated with FEMA, NOAA, USGS, the City of New
 York or any agency. Thanks to AMD Developer Cloud, the AMD x lablab.ai Developer
-Hackathon, IBM Research (Granite), NASA and IBM (Prithvi-EO 2.0), IBM and ESA
-(TerraMind), NYU CUSP and FloodNet, and Andrew Hicks for civil-engineering
-review. The dam mark is ["Dam" by Chintuza](https://thenounproject.com/icon/dam-4516918/)
+Hackathon, IBM Research (Granite), NYU CUSP and FloodNet, and Andrew Hicks for
+civil-engineering review. Earlier versions also ran NASA and IBM's Prithvi-EO
+2.0, IBM and ESA's TerraMind and IBM's Granite TTM; they were removed in
+October 2026 when they did not beat plain baselines on Riprap's own data
+([CHANGELOG.md](CHANGELOG.md)). The dam mark is ["Dam" by Chintuza](https://thenounproject.com/icon/dam-4516918/)
 via the Noun Project, licensed CC-BY 3.0.

@@ -100,9 +100,10 @@ answer, it says so instead of guessing.
 
 - 30 author-written questions and 20 held-out questions with recorded runs
   (`tests/question_eval/`).
-- The static gallery (`web/sveltekit/src/lib/gallery/`): twelve no-LLM address
-  briefings across all five boroughs and seven question briefings (a yes, a
-  No, counts, a scenario, a district, honest silence and a refusal), each
+- The static gallery (`web/sveltekit/src/lib/gallery/`), built with no model:
+  twelve address briefings across all five boroughs, three community
+  districts and eight question briefings (a yes, a No, counts, a scenario,
+  two district questions, honest silence and a refusal), each
   with a one-line reason in `scripts/gallery_addresses.json`.
 - Methodology and grounding documentation (`docs/GROUNDING.md`,
   `docs/METHODOLOGY.md`).
