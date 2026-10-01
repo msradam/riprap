@@ -332,7 +332,7 @@ SENSORS = {"floodnet": {"n_sensors": 2, "n_flood_events_3y": 14, "n_flood_events
 @pytest.mark.parametrize("question", [
     "Did 80 Pioneer Street, Brooklyn flood on Monday?", "Did it flood here over the weekend?",
     "Did it flood here two days ago?", "Did it flood here last Friday?", "Did it flood here this afternoon?",
-    "Did it flood here in August?", "Has it flooded here recently?",
+    "Did it flood here in August?", "Has it flooded here recently?", "Did 80 Pioneer Street, Brooklyn flood last summer?",
     "Before Sandy, had 2940 West 21st Street, Brooklyn flooded?", "Did it flood before Ida?",
 ])
 def test_no_yes_or_no_about_a_day_a_month_or_the_time_before_a_storm(question):

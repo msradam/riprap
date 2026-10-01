@@ -363,7 +363,8 @@ _SHORT_PERIOD_RE = re.compile(
     r"|\b(on|last|this) (mon|tues|wednes|thurs|fri|satur|sun)day\b"
     r"|\b(\d+|a|a few|a couple of|two|three|four|five|six) (days?|weeks?|months?) ago\b"
     r"|\b(last|past) (few|couple of|\d+|two|three|four|five|six) (days|weeks|months)\b"
-    r"|\b(in|last|this) (january|february|march|april|may|june|july|august|september|october|november|december)\b",
+    r"|\b(in|last|this) (january|february|march|april|may|june|july|august|september|october|november|december)\b"
+    r"|\b(last|this) (spring|summer|fall|autumn|winter)\b",
     re.IGNORECASE)
 _STORM_YEAR = {"ida": 2021, "sandy": 2012}
 # The day each named storm struck NYC, so "since Ida" starts on its date,
