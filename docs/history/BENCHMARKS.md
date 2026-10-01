@@ -4,8 +4,9 @@
 > Modal/L4 stack on 2026-05-09 and cannot be reproduced with the current
 > code. That stack ran a Granite 4.1 8B reconciler with Mellea rerolls, a
 > remote LitServe ML server (Prithvi live, TerraMind, zero-shot TTM,
-> GLiNER) and NVML power sampling. All of those are removed. The app now
-> runs no per-request earth-observation models, and hosted LLM endpoints
+> GLiNER) and NVML power sampling. That stack is gone. The app now
+> runs no per-request earth-observation models (two run in batch jobs and
+> are labelled experimental), and hosted LLM endpoints
 > get no energy figure ([`EMISSIONS.md`](../EMISSIONS.md)). The page is kept
 > as a record of what that stack cost.
 

@@ -4,7 +4,150 @@ All notable changes to Riprap. The hackathon submission tag is
 `v0.5.0` (build 2026-05-07); subsequent dates record polish work
 that landed on the hackathon-period production deploys.
 
-## [Unreleased] (what Riprap does that other tools do not, 2026-10-01)
+## [0.8.0] - 2026-10-01
+
+Four passes since 0.7.0, newest first: an independent review that restored
+three experimental models and fixed what it found, a comparison with the
+public alternatives, a pass over the live experience, and a polish pass for
+demos.
+
+### Breaking
+
+For a program that reads Riprap's output, between 0.7.0 and 0.8.0:
+
+- `POST /api/print` (the server-side PDF) and the `pdf` extra are gone; the
+  print view remains. `GET /api/layers/prithvi_water` and
+  `/api/register/mta_entrances` are gone.
+- `/api/register/{schools,nycha}` rows no longer carry `score` or `tier`;
+  `riprap-register` writes plain flags to `outputs/<class>_flood_flags.csv`
+  and has no `--top`.
+- `?deployment=` with a name that is not a shipped deployment (for example
+  `boston`, `sf`) returns 404, not New York data. `/api/district/{code}`
+  returns 404 for a code that is not a district. `/api/agent` needs a
+  non-empty `q`.
+- The stream no longer sends `plan_token`, `stone_start`, `stone_done` or
+  `token` events, and the `plan` event has no `specialists`.
+- `grounding.tier` is `no_llm` whenever no model was called in synthesis
+  (a refusal was `llm` with zero attempts). `grounding.answer_mode` is null
+  when nothing answered. `grounding.answer_lead` has two new values,
+  `experimental` and `no_prediction`.
+- `/api/models` reports `in_process`, `precomputed`, `installed` and
+  `llm_endpoints`; a result's `models` rows have `how`: `loaded`,
+  `precomputed` or `endpoint`.
+- Manifests: the adapters `ckan_records`, `local_corpus_with_ner` and
+  `model_call`, the record filter `flood_311_model`, the pebble type `model`
+  and the tier `synthetic` no longer exist. `spatial.scope` is `point`,
+  `polygon` or `any`.
+- The San Francisco and Boston deployments and the heat and air scaffolds
+  are gone.
+
+### Second independent review (2026-10-01)
+
+Experimental models, restored and labelled:
+
+- The author's three fine-tunes are back as experimental sources:
+  `msradam/Granite-TTM-r2-Battery-Surge` (a 96-hour surge forecast at the
+  Battery, on CPU with the `ml` extra), `msradam/Prithvi-EO-2.0-NYC-Pluvial`
+  (new surface water in satellite scenes after 15 heavy-rain events since
+  2017) and `msradam/TerraMind-NYC-Adapters` (land cover by year), the last
+  two as saved batch output the app reads with no extra. Weights are pinned
+  by commit and loaded from safetensors.
+- One function, `app.experimental.hedge`, writes every sentence from them:
+  "Experimental" or "Experimental forecast", the value with unit, window and
+  place, the model's limits and tested accuracy, and the official source to
+  rely on. The accuracy comes from result files the test scripts write
+  (`data/experimental/`).
+- Questions about the future get an answer: a surge question quotes the
+  Weather Service's forecast and then the model's; land-cover questions get
+  the model's sentence under "From an experimental model, not a
+  measurement:"; "will it flood here next week" is no longer refused, it
+  gets "Riprap cannot predict whether a particular place floods on a given
+  day" followed by what the Weather Service expects and the maps show. For a
+  question about past flooding a model never sets the yes or no, and a
+  question about what a model showed gets no yes or no from the record
+  above it.
+- What the tests found, stated in the sentences and in `docs/MODELS.md`: the
+  surge model beats holding the last day's mean (11.5 cm against 13.3 cm on
+  635 windows) and foresaw 1 of 23 minor-flood windows; the satellite water
+  layer is no better than chance against 153 surveyed Ida marks, and is not
+  used to say a place is prone to standing water; the land-cover adapter's
+  radar and elevation inputs carry nothing, its model card names its
+  classes wrongly, its paved share for a district reads about 8 points above
+  ESA WorldCover's, and it claims no trend: differences between years beyond
+  its noise turned up in 3 of 59 districts, which is what the noise alone
+  produces.
+
+Added:
+
+- A district or neighbourhood reads the FloodNet sensors inside it, and the
+  harbour gauge and its Weather Service forecast, read at its centre.
+- MCP `get_briefing` reports `answered`, `answer_mode` and `answer_lead`.
+- A school or public housing development whose point is outside the Sandy
+  outline but within 50 m of it is named as near the edge. The registers held
+  only assets inside, so one 3 m outside was left out without a word.
+- The FloodNet sentence says how many of the events came from sensors
+  flagged for maintenance, and whether an event was under way when read.
+- A fourth golden question set written by an agent that saw nothing else,
+  with questions about the future and queries that should be declined. The
+  golden runner scores a neutral lead strictly and a district's sensors
+  against its own key.
+
+Fixed, each reproduced first:
+
+- "Has it flooded at 100 Main St. since Sandy?" was cut at the abbreviation
+  and answered "No." from sources that do not reach 2012.
+- "Did any water reach it during Ida" said "Yes." from marks up to 800 m
+  away; "any street flooding" said "Yes." on 311 complaints alone; a school
+  question about the FEMA flood zone said "No." from Sandy and stormwater
+  counts; a sensor FloodNet flags for maintenance could stand behind a
+  "Yes."; a district with 0.8% inside the Sandy extent was "Yes." and is
+  "In part.".
+- FloodNet events stopped at 200 rows: City Island's 436 read as 200.
+- "How many complaints since Ida" got the window's total.
+- "Flushing Avenue, Brooklyn", "Jamaica Hospital" and "woodlawn chicago"
+  were briefed as New York neighbourhoods; "450 St. Nicholas Avenue" lost
+  its number; "my place at Ocean Parkway" was refused as an intersection;
+  "Pike Place Market in Seattle ... right now" was sent to New York.
+- Advice and heat questions phrased another way ("should I take it", "the
+  hottest in summer") were briefed, not declined.
+- An offline source with no fallback message was recorded as fine.
+- MCP read an out-of-coverage run against the New York registry.
+- The disclosure checks joined "flood zone X. 3 sensors" into one sentence,
+  missed the citation on a sentence with a percentage, and did not count a
+  dated forecast as stating its horizon.
+- A review of the restored models found more, fixed before release: "green",
+  "surge" and "ozone" matched place names and the Sandy surge zone ("100 Green
+  Street", "Ozone Park"); "standing water right now" was not read as live; a
+  flood question after a preamble about renting or summer heat was refused;
+  the satellite layer always reported 100% of an area observed; the
+  land-cover year map broke ties toward paved; the surge model spliced over
+  gaps in the gauge record; a language model could rest a "Yes." on an
+  experimental source.
+- The same-incident rule for 311 compared every pair of rows.
+- In the page: a server error set the header to "Outside the covered
+  cities"; a rules answer that found nothing said "Answered by rules"; a
+  gallery snapshot's live region kept saying "Resolving the place".
+
+Removed: the stream's stone envelope and plan tokens (nothing read them),
+the synthetic tier, test data and a probe with no reader (about 5.4 MB),
+unused development dependencies.
+
+### The live experience (2026-09-30)
+
+- An intersection, a ZIP code alone and an invalid district are refused
+  with the reason, before any model call. A numbered address resolves to
+  its own street or not at all. A query naming another city skips the New
+  York lookup, and coverage is the city's polygon, so Hoboken no longer
+  gets New York's Sandy layer.
+- FEMA zone X reads as an absence in the lead rules; the source a question
+  is about leads its answer; a question stays a question when the planner
+  cannot reach the model; a temperature-only observation is not an answer.
+- Every source has a 45 second budget (`RIPRAP_SOURCE_BUDGET_S`); past it
+  the briefing goes on and names the source.
+- The page says what it is waiting for, holds a long query in the header,
+  announces "Briefing ready" and offers a next step on a refusal.
+
+### What Riprap does that other tools do not (2026-10-01)
 
 A comparison with the public alternatives on eight fixed tasks, and an audit
 of every part against a plain baseline, led to these changes.
@@ -59,10 +202,11 @@ Added:
 Removed, each because it did not beat a plain baseline on Riprap's own data
 or served no target user (the code is in history at `8b87165`):
 
-- The three Granite TTM forecasts (311 volume, Battery surge, sensor
-  recurrence) and the Prithvi-EO satellite water layer.
-- The policy corpus with its embedding and entity models, and the `ml` and
-  `eo` extras. A default install has no torch.
+- The two zero-shot Granite TTM forecasts (311 volume, sensor recurrence).
+  The Battery surge forecast and the Prithvi-EO satellite layer were removed
+  in this pass too and came back, labelled experimental, in the review above.
+- The policy corpus with its embedding and entity models. A default install
+  has no torch.
 - The composite exposure score. `riprap-register` writes plain flags.
 - The server-side PDF export (the print view remains), the heat and air
   scaffolds, the San Francisco and Boston deployments, the unfiltered 311
@@ -72,29 +216,7 @@ Said less: the terrain sentence gives elevation and the low-spot percentile
 only; a plain briefing quotes a live reading only when it is notable; a
 district briefing does not lead with one large figure.
 
-## [0.7.0] - 2026-09-28 (a presentable public repository)
-
-- The README is rewritten to about 170 lines: what Riprap does with a real
-  cited answer from the gallery, who it is for and not for, a status table,
-  a Quickstart whose commands were run from a fresh clone, the Five Stones,
-  data sources, privacy and how to get involved. The long sections it
-  dropped moved, unchanged, to `docs/BACKGROUND.md`, `docs/MODELS.md`,
-  `docs/DATA-SOURCES.md` and `docs/REPOSITORY.md`.
-- `docs/PRIVACY.md` says what Riprap stores and sends, how 311 free text is
-  redacted, and what it should not be used for.
-- The gallery can be published on GitHub Pages
-  (`.github/workflows/pages.yml`). The public build has no backend: it makes
-  no API calls, puts the gallery one click from the landing page, and points
-  to the Quickstart for your own questions.
-- A tidier root: community files in `.github/`, `PRODUCT.md` and `DESIGN.md`
-  in `docs/`, the Dockerfile and Modal host in `deploy/`, the policy corpus
-  in `deployments/nyc/corpus/`, the load tests in `tests/load/`, historical
-  docs in `docs/history/`, and `riprap.py` as the `riprap-register` command.
-  Unused files (an old Space entrypoint, May screenshots) are deleted.
-- A new hero image from the current Hollis "since Ida" answer.
-- `scripts/check_links.py --local` checks every relative link in the docs.
-
-## [Unreleased] (polish for stakeholder demos, 2026-09-30)
+### Polish for stakeholder demos (2026-09-30)
 
 - A golden set (`tests/golden/`) scores the app against keys computed by a
   separate implementation that reads the public datasets directly; half of
@@ -130,10 +252,32 @@ district briefing does not lead with one large figure.
   no backend, experimental deployments say so in the header, the refusal
   names FloodHelpNY.
 - Smaller: the four register modules are one table-driven module; the
-  browser BYOD flow, dead scripts, unused packages (deck.gl, js-yaml,
-  papaparse, idb-keyval) and dead frontend tables are gone; one deployment
+  browser BYOD flow, dead scripts, unused packages (js-yaml, papaparse,
+  idb-keyval) and dead frontend tables are gone; one deployment
   resolver and one registry cache; one StaticFiles mount serves the
   prerendered gallery locally; the Playwright suite runs on one Playwright.
+
+## [0.7.0] - 2026-09-28 (a presentable public repository)
+
+- The README is rewritten to about 170 lines: what Riprap does with a real
+  cited answer from the gallery, who it is for and not for, a status table,
+  a Quickstart whose commands were run from a fresh clone, the Five Stones,
+  data sources, privacy and how to get involved. The long sections it
+  dropped moved, unchanged, to `docs/BACKGROUND.md`, `docs/MODELS.md`,
+  `docs/DATA-SOURCES.md` and `docs/REPOSITORY.md`.
+- `docs/PRIVACY.md` says what Riprap stores and sends, how 311 free text is
+  redacted, and what it should not be used for.
+- The gallery can be published on GitHub Pages
+  (`.github/workflows/pages.yml`). The public build has no backend: it makes
+  no API calls, puts the gallery one click from the landing page, and points
+  to the Quickstart for your own questions.
+- A tidier root: community files in `.github/`, `PRODUCT.md` and `DESIGN.md`
+  in `docs/`, the Dockerfile and Modal host in `deploy/`, the policy corpus
+  in `deployments/nyc/corpus/`, the load tests in `tests/load/`, historical
+  docs in `docs/history/`, and `riprap.py` as the `riprap-register` command.
+  Unused files (an old Space entrypoint, May screenshots) are deleted.
+- A new hero image from the current Hollis "since Ida" answer.
+- `scripts/check_links.py --local` checks every relative link in the docs.
 
 ## [Unreleased] (refactors 2 to 6 and the design pass)
 
@@ -501,9 +645,8 @@ Plain-language summary of the work on branches `refactor/mvp-2` to
 ### Infrastructure note
 - The DigitalOcean MI300X droplet was decommissioned 2026-05-06.
   All production inference now serves from `msradam/riprap-vllm`
-  (NVIDIA L4). The MI300X runbook is preserved in
-  [`docs/DROPLET-RUNBOOK.md`](docs/DROPLET-RUNBOOK.md) for anyone
-  reproducing the AMD-judging setup; setting
+  (NVIDIA L4). The MI300X runbook is kept outside this repository;
+  setting
   `RIPRAP_HARDWARE_LABEL=AMD MI300X` swaps the emissions profile
   back when redeploying to that hardware.
 

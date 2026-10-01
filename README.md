@@ -31,8 +31,11 @@ supports a yes or a no. No language model is needed. An optional LLM can route
 questions the rules do not recognise; it chooses among the same cited
 sentences and code checks its choice.
 
-Riprap reports evidence. It does not give advice, predict a particular day,
-score a property or make a regulatory flood determination.
+Riprap reports evidence. It does not give advice, score a property or make a
+regulatory flood determination, and it does not say whether a particular place
+will flood on a particular day. Three [experimental models](#experimental-models)
+answer a few questions about the days and years ahead; whatever they say is
+labelled experimental, with their limits and tested accuracy beside it.
 
 A real answer, from the gallery entry
 [Hollis, "since Ida"](https://msradam.github.io/riprap/gallery/hollis-since-ida/):
@@ -104,9 +107,9 @@ insurance or hydraulic design. More in [docs/BACKGROUND.md](docs/BACKGROUND.md).
 
 | Area | Status |
 |---|---|
-| New York City flood | Production: 23 public sources for an address (15 of them for a neighbourhood or district), questions, and all 59 community districts |
+| New York City flood | Production: 23 public sources (20 read for an address, 18 for a neighbourhood or district), questions, and all 59 community districts |
 | Chicago, Seattle, Albany | Experimental: federal sources plus a reviewed 311 flood filter and a water-level gauge ([docs/multi-city.md](docs/multi-city.md)) |
-| Models | None required. No model writes, scores or forecasts anything. An optional LLM routes questions the rules do not recognise |
+| Models | None required, and none writes a sentence or sets a yes or no. An optional LLM routes questions the rules do not recognise. Three experimental models answer some questions about the future, always labelled ([below](#experimental-models)) |
 | Checks | Citations and numbers on every claim, rules on answer leads, 13 disclosure checks. They are patterns and rules: they do not read meaning and can miss a wrong inference ([docs/GROUNDING.md](docs/GROUNDING.md)) |
 
 ## Quickstart
@@ -127,7 +130,8 @@ A question is answered by rules, with no model (the JSON reports
 `grounding.answer_mode` as `rules`); one the rules do not recognise gets the
 cited evidence for its place, and the page says it was not answered. The first
 district query on a cold server takes about half a
-minute while the layers load. The same briefing from the command line:
+minute while the layers load. `uv sync --extra ml` adds the
+[experimental](#experimental-models) surge forecast. The same briefing from the command line:
 
 ```bash
 curl -s "http://localhost:7860/api/agent?q=QN12" | python3 -c "import json, sys; print(json.load(sys.stdin)['paragraph'])"
@@ -182,14 +186,39 @@ More in [docs/METHODOLOGY.md](docs/METHODOLOGY.md),
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and
 [docs/GROUNDING.md](docs/GROUNDING.md).
 
+## Experimental models
+
+Riprap is an app in development, and three models its author fine-tuned are
+part of it. None has been shown to beat an official product, so their output
+is never a measurement: every sentence from one opens with "Experimental" or
+"Experimental forecast", states the model's limits and its tested accuracy, and
+names the official source to rely on. For a question about the past or the
+present they never set the answer's yes or no. One rule in
+[`app/experimental.py`](app/experimental.py) writes all of it.
+
+| Model | What it answers | What the tests say |
+|---|---|---|
+| [Granite TTM r2 Battery Surge](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge) | How far above the predicted tide the water at the Battery may run in the next four days, and whether the total reaches the gauge's flood stage | On 635 four-day windows since January 2025 its mean error was 11.5 cm, against 13.3 cm for holding the last day's mean. It foresaw 1 of the 23 windows in which the water reached the minor flood stage |
+| [Prithvi-EO 2.0 NYC Pluvial](https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial) | Where satellite scenes showed new surface water after Hurricane Ida, and after which other heavy rains it showed any | Of 153 high-water marks surveyed after Ida, it showed new water within 500 m of 17 (11%), no better than chance (14%). It cannot see street or basement flooding, and it is not used to say a place is prone to standing water |
+| [TerraMind NYC adapters](https://huggingface.co/msradam/TerraMind-NYC-Adapters) | How much of a place is paved or built over and how much is green, in 2018, 2021, 2024 and 2026 | For 2021 it agreed with ESA WorldCover (its own label source) on 87.1% of the city's land as paved, green or water. It found 66.3% of WorldCover's green land and put a typical district's paved share 7.7 points above WorldCover's. Two images of one year differ by under 3.7 points in a district's paved share 19 times in 20, and differences between years beyond that turned up in 3 of 59 districts, which is what that noise alone produces. It is not used to claim a trend |
+
+The surge model runs on CPU when the `ml` extra is installed
+(`uv sync --extra ml`); without it the app says the model is not installed.
+The two satellite models run in batch jobs with the `eo` extra, and the app
+reads their saved output with no extra. What each can and cannot answer, the
+backtests and how to rerun them are in [docs/MODELS.md](docs/MODELS.md). The
+models are reproduced independently at
+[github.com/msradam/riprap-models](https://github.com/msradam/riprap-models).
+
 ## Data sources
 
 A New York City briefing reads 23 public sources (a source read for a point
 and for an area is counted once): 19 from the NYC deployment and 4 federal ones
 (FEMA flood zones, NWS observations and alerts, USGS stream gauges). All are
 public-record city, state and federal data; there are no commercial APIs and no
-scores. Each manifest records its URL, licence and vintage. The full list is in
-[docs/DATA-SOURCES.md](docs/DATA-SOURCES.md).
+scores. The experimental satellite layers also read Copernicus Sentinel-2
+imagery. Each manifest records its URL, licence and
+vintage. The full list is in [docs/DATA-SOURCES.md](docs/DATA-SOURCES.md).
 
 ## Privacy
 
@@ -215,10 +244,21 @@ Cite with [CITATION.cff](CITATION.cff). Apache 2.0: see [LICENSE](LICENSE) and
 [NOTICE](NOTICE). Data sources keep their own terms, recorded in each manifest.
 
 Riprap is independent and not affiliated with FEMA, NOAA, USGS, the City of New
-York or any agency. Thanks to AMD Developer Cloud, the AMD x lablab.ai Developer
-Hackathon, IBM Research (Granite), NYU CUSP and FloodNet, and Andrew Hicks for
-civil-engineering review. Earlier versions also ran NASA and IBM's Prithvi-EO
-2.0, IBM and ESA's TerraMind and IBM's Granite TTM; they were removed in
-October 2026 when they did not beat plain baselines on Riprap's own data
-([CHANGELOG.md](CHANGELOG.md)). The dam mark is ["Dam" by Chintuza](https://thenounproject.com/icon/dam-4516918/)
+York or any agency. Thanks to AMD Developer Cloud and the AMD x lablab.ai
+Developer Hackathon, where it began and where the three models were trained;
+to IBM Research for Granite; to NYU's Center for Urban Science and Progress;
+to FloodNet (researchers at New York University and the City University of New
+York working with city agencies) for the sensor network and its open data; and
+to Andrew Hicks for civil-engineering review.
+
+The experimental models are fine-tunes of other people's work: NASA and IBM's
+[Prithvi-EO 2.0](https://huggingface.co/ibm-nasa-geospatial), IBM and ESA's
+[TerraMind 1.0](https://huggingface.co/ibm-esa-geospatial/TerraMind-1.0-base)
+and IBM's [Granite TTM r2](https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2),
+all Apache 2.0. The fine-tunes and their evaluation are at
+[github.com/msradam/riprap-models](https://github.com/msradam/riprap-models).
+Their limits are Riprap's to state, not their makers'. Satellite imagery is
+Copernicus Sentinel data, read through Microsoft's Planetary Computer.
+
+The dam mark is ["Dam" by Chintuza](https://thenounproject.com/icon/dam-4516918/)
 via the Noun Project, licensed CC-BY 3.0.

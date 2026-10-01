@@ -1,5 +1,9 @@
 # Riprap MVP demo: flood, heat, air
 
+> **Historical.** A demo script from May 2026. The heat and air scaffolds it
+> describes (`deployments/heat`, `deployments/air`) were removed in October
+> 2026; the code is in git history at `8b87165`.
+
 > **History.** This records the demo script for the flood, heat and air
 > deployments from mid-2026. It is not current: only the flood part runs today.
 

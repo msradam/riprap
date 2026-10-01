@@ -53,7 +53,7 @@ Source-of-truth pointers:
 | `riprap/core/http.py` | Shared cached HTTP client with retries |
 | `riprap/core/compliance/` | Disclosure checks: substring tests for required caveat phrases. They do not measure quality. |
 | `deployments/<city>/` | Manifests and `stones.yaml` for one deployment |
-| `app/` | Pebble implementations (`context/`, `flood_layers/`, `assets/`, `registers/`, `areas/`), planner, geocoder, energy ledger |
+| `app/` | Pebble implementations (`context/`, `flood_layers/`, `assets/`, `registers/`, `areas/`), the experimental models (`experimental.py`, `live/`, `eo/`), planner, geocoder, energy ledger |
 | `web/main.py` | FastAPI: `/api/agent`, `/api/agent/stream` (SSE), `/api/agent/batch`, `/api/district/{code}`, `/api/nyc311/flood_requests`, `/api/register/{asset_class}`, layer endpoints |
 | `riprap/mcp/server.py` | MCP server (stdio or `--http`) |
 | `web/sveltekit/` | UI and static gallery (adapter-static, build committed) |
@@ -84,8 +84,8 @@ deployments/               One directory per deployment
 
 data/                      NYC flood layers, rasters and baked registers (Git LFS)
 
-app/                       Pebble implementations, planner, geocoder,
-                           energy ledger, register builder
+app/                       Pebble implementations, the experimental models,
+                           planner, geocoder, energy ledger, register builder
 
 web/                       FastAPI + SvelteKit
 ├── main.py                FastAPI app, SSE stream, layer endpoints

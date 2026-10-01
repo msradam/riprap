@@ -7,7 +7,7 @@ you're new; jump directly if you know what you need.
 |---|---|
 | [BACKGROUND.md](BACKGROUND.md) | Why Riprap exists, who it is for and not for, the Five Stones in full and how they generalise beyond NYC. |
 | [DATA-SOURCES.md](DATA-SOURCES.md) | The public sources behind the NYC deployment and what each is used for. |
-| [MODELS.md](MODELS.md) | The one optional model (an LLM endpoint) and how its energy is recorded. |
+| [MODELS.md](MODELS.md) | The optional LLM, the three experimental models (what each can and cannot answer, with their backtests), and how energy is recorded. |
 | [REPOSITORY.md](REPOSITORY.md) | Code map: the pipeline at a glance, source-of-truth paths and the repository tree. |
 | [PRIVACY.md](PRIVACY.md) | What Riprap stores and sends, 311 redaction, and a do-no-harm note. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Full system shape: the one Burr app, Five-Stone taxonomy, evidence and LLM claims checked in code for citations and numbers, SvelteKit + FastAPI + MCP surface. Start here. |
@@ -29,7 +29,7 @@ Records of earlier states of the project, kept for reference. None of them descr
 | [history/BENCHMARKS.md](history/BENCHMARKS.md) | Latency and energy on four addresses from the retired Modal/L4 stack (2026-05-09). |
 | [history/RESEARCH.md](history/RESEARCH.md) | A May 2026 research note on existing flood-risk tools and how Riprap differed then. |
 | [history/VERIFICATION.md](history/VERIFICATION.md) | A deterministic verification pass on 2026-05-16: sweep results, pytest, lint, BYOD evidence. |
-| [history/demo.md](history/demo.md) | The flood, heat and air demo script; only the flood part runs today. |
+| [history/demo.md](history/demo.md) | The May 2026 flood, heat and air demo script. The heat and air scaffolds it describes were removed in October 2026. |
 
 Design records: [PRODUCT.md](PRODUCT.md) (product context) and [DESIGN.md](DESIGN.md) (the design system), read by the Impeccable design tooling from `docs/`.
 

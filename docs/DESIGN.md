@@ -146,16 +146,15 @@ blues carry evidence and links, amber and red are reserved for signal.
 - **Survey Cyan** (cyan-700): the Touchstone (live signals) stone hint.
 
 ### Tertiary (signal only)
-- **Hazard Amber** (amber-800): warnings, severity 2 and 3, the Lodestone
-  stone hint.
-- **Alert Red** (red-700): active flood alerts and severity 4 only.
+- **Hazard Amber** (amber-800): warnings and the Lodestone stone hint.
+- **Alert Red** (red-700): active flood alerts only.
 - **Done Green** (green-800): success and completed steps, always with text.
 
 ### Neutral
 - **Ink** (slate-950): primary text, the answer, headings.
 - **Secondary Ink** (slate-700): meta lines, source notes, captions.
 - **Tertiary Ink** (slate-tertiary): the least important metadata.
-- **Proxy Slate** (slate-600): proxy tier, severity 1, Cornerstone stone.
+- **Proxy Slate** (slate-600): proxy tier, Cornerstone stone.
 - **Soft Rule** (slate-300) and **Hairline** (slate-250): row separators
   and the one input border.
 - **Paper**, **Sunken Paper**, **Inset Paper**, **Card White**: the

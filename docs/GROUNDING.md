@@ -28,7 +28,10 @@ cited sentence per pebble, with the three point DEP scenarios merged into one
 sentence. A plain place briefing leaves out a live reading that is not notable
 (an observation with no rain, a tide less than a foot above prediction, a
 water-level forecast below flood stage); a right-now question quotes them all. When no source produces evidence, the briefing says Riprap could not
-build it and names the sources that failed to respond. There is no model. This
+build it and names the sources that failed to respond. No language model is
+involved. (The experimental models are sources like any other here: their
+sentences are written by code, labelled and hedged, and stay out of a plain
+briefing unless they show something; see [MODELS.md](MODELS.md).) This
 is the mode the MCP evidence tools use. The static gallery is built in this mode: 12
 addresses, 3 community districts and 8 questions.
 
@@ -45,23 +48,42 @@ sources' sentences word for word. They are tried in a fixed order:
    register. Yes or no comes from the register's own count for what the
    question names (inside the Sandy extent, inside the DEP extreme scenario);
    "is the school safe" and "has it flooded since Ida" get no yes or no;
-3. "has it flooded": the past-event rule described below sets yes, no or
+3. "will it flood" at a place or on a day: no yes or no and no refusal. The
+   lead says no source or model here predicts that, and the alerts, the
+   Weather Service's water-level forecast, the current stormwater scenario and
+   the Sandy extent follow, then the experimental surge forecast, labelled;
+4. a question an experimental model answers (a surge at the Battery, land
+   cover and its change, what satellite scenes showed): the official source
+   for the same thing first when there is one, then the model's hedged
+   sentence. With no official source the lead is "From an experimental model,
+   not a measurement:". If the question is about past flooding, rule 5 sets
+   the lead from the record and the model's sentence only follows it
+   ([MODELS.md](MODELS.md));
+5. "has it flooded": the past-event rule described below sets yes, no or
    cannot say. An Ida high-water mark says the block flooded only when it is
    within 250 m; a point within 50 m of the mapped Sandy edge gets no flat
-   yes or no;
-4. "how many": the counted source, and the count of the 311 kind the question
-   names;
-5. forecasts, projections and scenarios: those sources, with no yes or no.
-   "Does the 2080 map show water here" is a fact about the map and takes yes
-   or no from the scenario's depth class; "will it flood" does not;
-6. "are there any": yes or no from the named source's own count;
-7. any other source the question names (FEMA zone, terrain, permits, a
-   district's floodplain counts);
-8. any other question about flooding: the observed record.
+   yes or no; events only at a sensor FloodNet flags for maintenance do not
+   make a yes;
+6. "how many": the counted source, and the count of the 311 kind the question
+   names. "Since 2024" sums the years from then; "since Ida" starts mid-year
+   and gets the source's own window, stated, with no count as the lead;
+7. forecasts, projections and scenarios: those sources, with no yes or no. A
+   question about the next hours or days gets the water-level forecast, one
+   about the 2050s the projections. "Does the 2080 map show water here" is a
+   fact about the map and takes yes or no from the scenario's depth class;
+8. "are there any marks, complaints, sensors": yes or no from the named
+   source's own count, only when the question asks about the thing counted
+   ("did any water reach it" asks whether it flooded, and gets no yes from a
+   count of marks);
+9. any other source the question names (FEMA zone, terrain, permits, a
+   district's floodplain counts; water that lingers after rain is a question
+   for the city's stormwater scenarios);
+10. any other question about flooding: the observed record.
 
 A question in two parts ("was it in the Sandy area, and how many 311
 complaints") is split into its clauses and each is answered, in the order
-asked; the first part's yes or no leads.
+asked; the first part's yes or no leads. A share of an area is "In part."
+unless nearly all of it is inside ("was QN12 inside the Sandy zone" at 0.8%).
 
 A lead the rules chose still goes through the lead checks below; one that
 fails is dropped and the facts stand. When no rule recognises the question,

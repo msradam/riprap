@@ -196,10 +196,13 @@ short result summary) that streams to the UI as `step` events on
 
 ### 3.1 NYC pebbles, plain language
 
-The NYC deployment has 35 pebbles: 16 point pebbles and 15 polygon pebbles
-in `deployments/nyc/manifests/`, and 4 federal pebbles from
-`deployments/federal/` (`fema_nfhl`, `nws_alerts`, `nws_obs`,
-`usgs_gauges`) that are merged into every deployment. Other deployments
+The NYC deployment has 41 pebbles: 37 in `deployments/nyc/manifests/` and
+4 federal ones from `deployments/federal/` (`fema_nfhl`, `nws_alerts`,
+`nws_obs`, `usgs_gauges`) that are merged into every deployment. Of the 37,
+16 run for a point, 18 for a neighbourhood or district, and 3 for both
+(`noaa_tides`, `nws_water_forecast` and the experimental
+`ttm_battery_surge`, which read a harbour gauge). Five are experimental
+model layers ([MODELS.md](MODELS.md)); the rest are public records. Other deployments
 have their own, smaller, experimental sets (see
 [`docs/multi-city.md`](multi-city.md)).
 
@@ -222,11 +225,16 @@ Point pebbles:
 | **nws_alerts** *(live, federal)* | Active NWS alerts intersecting this address. | modeled |
 | **nws_obs** *(live, federal)* | Latest NWS hourly observation at the nearest station. | empirical |
 | **usgs_gauges** *(live, federal)* | Live stage at the nearest USGS stream gauge (OGC API). | empirical |
+| **ttm_battery_surge** *(live, experimental)* | A 96-hour forecast of the surge at the Battery from the author's Granite TTM fine-tune, hedged. Says it is not installed without the `ml` extra. | modeled |
+| **prithvi_water** *(experimental)* | New surface water a satellite model showed near this address after Hurricane Ida and other heavy rain, from saved batch output. | modeled |
+| **landcover** *(experimental)* | Paved and green shares near this address by year, from a satellite land-cover model's saved output. | modeled |
 
 Polygon pebbles, for a neighbourhood or a community district: `sandy_nta`,
 the three `dep_*_nta` scenarios, `microtopo_nta`, `nyc311_nta`,
-`nws_alerts_nta` and `npcc4_slr_nta` are area versions of the point
-pebbles. The four register manifests (`mta_entrances_nta`,
+`floodnet_nta` (the sensors inside the area), `nws_alerts_nta`,
+`npcc4_slr_nta` and the experimental `prithvi_water_nta` and
+`landcover_nta` are area versions of the point pebbles. The harbour gauge
+pebbles run for an area too, read at its centre. The four register manifests (`mta_entrances_nta`,
 `doe_schools_nta`, `nycha_developments_nta`, `doh_hospitals_nta`) name the
 exposed assets inside the area. `dcp_floodplain_nta` quotes NYC Planning's
 count of buildings, residential units and residents in a district's 1%
@@ -347,17 +355,22 @@ check work with any model and any endpoint.
 
 ## 7. Models
 
-Riprap runs no model in its own process. The one optional model is an LLM
-at any OpenAI-compatible endpoint (for example Granite 4.1 8B over
-Ollama), used as the planner and to choose a question's lead and facts.
-See [MODELS.md](MODELS.md).
+A briefing needs no model. An LLM at any OpenAI-compatible endpoint is
+optional (for example Granite 4.1 8B over Ollama), used as the planner and
+to choose a question's lead and facts. Three experimental models, the
+author's fine-tunes, answer a few questions about the future: a surge
+forecast that runs on CPU in the server when the `ml` extra is installed,
+and two satellite models whose saved batch output the app reads. Every
+sentence from them goes through one hedging function. See
+[MODELS.md](MODELS.md).
 
 ---
 
 ## 8. Live signals
 
 Live pebbles (`noaa_tides`, `nws_alerts`, `nws_obs`, `usgs_gauges`,
-`floodnet`, `nyc311` and `nws_water_forecast`) are handled apart from the
+`floodnet`, `nyc311`, `nws_water_forecast` and the experimental
+`ttm_battery_surge`) are handled apart from the
 static Cornerstone layers:
 
 - They appear as evidence cards and a "Right now" section in the UI.
@@ -400,8 +413,9 @@ Three things a file listing does not make obvious:
   `compliance/` (the 13 disclosure checks) and `http.py`.
 - **`app/`** holds the Python functions that `python_call` manifests
   point at (`context/`, `flood_layers/`, `assets/`, `registers/`,
-  `areas/`), plus the planner, geocoder, energy ledger and register
-  builder. Adding a pebble usually means pointing a manifest at an
+  `areas/`, and `live/` and `eo/` for the experimental models, with
+  `experimental.py` holding the one rule for quoting them), plus the
+  planner, geocoder, energy ledger and register builder. Adding a pebble usually means pointing a manifest at an
   existing function or a new one shaped the same way.
 - **`deployments/<city>/`** is a directory of manifests and a
   `stones.yaml`. The NYC geospatial fixtures the manifests reference are
@@ -475,7 +489,10 @@ hackathon organisation, not this project, and does not track the code.
 
 ## 14. License
 
-Apache-2.0. Riprap ships no model weights. The input datasets (NYC Open
-Data, FEMA, USGS, NOAA, NWS, FloodNet NYC) are public; each manifest
-records its source's licence. Visual idiom adapted from
+Apache-2.0. Riprap ships no model weights; the experimental models are
+downloaded from Hugging Face at pinned commits when their extra is
+installed. The input datasets (NYC Open Data, FEMA, USGS, NOAA, NWS,
+FloodNet NYC, Copernicus Sentinel imagery) are public; each manifest
+records its source's licence, and [NOTICE](../NOTICE) carries the
+attributions. Visual idiom adapted from
 [NYC Planning Labs](https://planninglabs.nyc/).

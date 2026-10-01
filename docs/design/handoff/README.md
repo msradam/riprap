@@ -1,5 +1,13 @@
 # Riprap design handoff — research + gates, not a finished system
 
+> **Historical, September 2026.** This is the brief a design pass started
+> from. The tokens, gates and reference files here are still the source of
+> the visual identity. The product it describes has since changed: the
+> server-side PDF export, the exposure score (`app/score.py`), the heat and
+> air scaffolds and the San Francisco and Boston deployments were removed
+> in October 2026, so the tasks in the prompt files that name them no
+> longer apply.
+
 This package is a **brief**, not a delivered design. It hands a future
 design session (Claude or otherwise) two research threads, Riprap's real
 current state, a fixed accessibility floor, and working-but-empty

@@ -40,6 +40,10 @@ and the storage table and the 311 section again on 2026-10-01.
 - **An LLM, only if you configure one.** With `RIPRAP_LLM_BASE_URL` set,
   the question and the evidence text are sent to that endpoint. Without
   it, no model service is contacted.
+- **Hugging Face, only with the `ml` extra.** The experimental surge
+  model's weights are downloaded once from Hugging Face. Nothing about a
+  query is sent there. The model reads NOAA's public gauge at The Battery,
+  the same for every query.
 
 The public gallery on GitHub Pages is static: it makes no API calls of
 its own, and GitHub's own privacy terms apply to its hosting.

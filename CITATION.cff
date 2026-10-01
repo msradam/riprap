@@ -18,13 +18,15 @@ abstract: >-
   Riprap gathers public flood evidence for a New York City address, a
   question about one, or a community district, and cites every sentence
   to its source. NYC is the production deployment, with 23 public-record
-  city, state and federal sources (35 manifests: a source read for a point
-  and for an area has two); Chicago, Seattle and Albany are
-  experimental deployments on the same code. With no model configured,
-  the briefing is built directly from the data and a question is
-  answered by rules over its words; an optional LLM can choose the
-  answer's lead and facts instead, and code checks that choice against
-  the evidence. Thirteen disclosure checks drawn from
+  city, state and federal sources; Chicago, Seattle and Albany are
+  experimental deployments on the same code. The briefing is built
+  directly from the data, and a question is answered by rules over its
+  words; an optional LLM can choose the answer's lead and facts instead,
+  and code checks that choice against the evidence. Three experimental
+  models fine-tuned by the author (a surge forecast for the Battery and
+  two satellite layers) answer some questions about the future; their
+  output is always labelled experimental, with its limits and tested
+  accuracy. Thirteen disclosure checks drawn from
   FEMA, IPCC AR6, TCFD, ASTM E1527-21, EPA/CDC CERC, the AP Stylebook
   and the SPJ Code report on every briefing. Riprap reports evidence; it
   does not give advice or make regulatory flood determinations.
@@ -40,20 +42,46 @@ keywords:
   - noaa-coops
   - npcc4
 license: Apache-2.0
-version: 0.7.0
-date-released: "2026-09-28"
+version: 0.8.0
+date-released: "2026-10-01"
 
 # How Riprap depends on prior work. We cite the data sources Riprap
 # composes in each per-pebble manifest's `provenance` block (see
 # deployments/<city>/manifests/*.yaml); the items below are the
 # model and methodology references.
 references:
-  - type: article
+  - type: software
     title: "Granite 4.1 Language Models"
     authors:
-      - family-names: "IBM Research"
+      - name: "IBM Research"
     year: 2025
-    notes: "One of the optional LLMs used for answers and the gallery question entries. Apache-2.0. https://huggingface.co/ibm-granite"
+    notes: "An optional LLM, used when the gallery's question entries were made with a model. Apache-2.0. https://huggingface.co/ibm-granite"
+  - type: software
+    title: "Granite TimeSeries TTM r2 (Tiny Time Mixers)"
+    authors:
+      - name: "IBM Research"
+    year: 2024
+    notes: "Base of the experimental Battery surge forecast, msradam/Granite-TTM-r2-Battery-Surge. Apache-2.0. https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2"
+  - type: software
+    title: "Prithvi-EO-2.0: A Versatile Multi-Temporal Foundation Model for Earth Observation Applications"
+    authors:
+      - name: "NASA IMPACT and IBM Research"
+    year: 2024
+    notes: "Base of the experimental surface-water layer, msradam/Prithvi-EO-2.0-NYC-Pluvial. Apache-2.0. arXiv:2412.02732"
+  - type: software
+    title: "TerraMind 1.0"
+    authors:
+      - name: "IBM Research and the European Space Agency"
+    year: 2025
+    notes: "Base of the experimental land-cover layer, msradam/TerraMind-NYC-Adapters. Apache-2.0. https://huggingface.co/ibm-esa-geospatial/TerraMind-1.0-base"
+  - type: software
+    title: "riprap-models: reproduction of three NYC fine-tuned foundation models"
+    authors:
+      - given-names: Adam
+        family-names: Rahman
+        name-particle: Munawar
+    year: 2026
+    url: "https://github.com/msradam/riprap-models"
   - type: article
     title: "New York City Panel on Climate Change 2024 Report (NPCC4)"
     authors:

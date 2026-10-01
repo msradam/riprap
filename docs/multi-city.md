@@ -11,7 +11,7 @@ forecast layers.
 
 | Deployment | Pebbles | 311 data | Platform | Water level |
 |---|---|---|---|---|
-| `nyc/` | 35 | NYC Open Data `erm2-nwe9` | Socrata | NOAA Battery 8518750 |
+| `nyc/` | 41 | NYC Open Data `erm2-nwe9` | Socrata | NOAA Battery 8518750 |
 | `chicago/` | 6 | Chicago Data Portal `v6vf-nfxy`, reviewed category table | Socrata | NOAA Calumet Harbor 9087044 |
 | `seattle/` | 6 | Seattle Open Data `5ngg-rpne`, reviewed category table | Socrata | NOAA Seattle 9447130 |
 | `albany/` | 6 | SeeClickFix public API, flood request types | SeeClickFix | NOAA Albany, Hudson River 8518995 |

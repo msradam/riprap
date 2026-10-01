@@ -78,4 +78,13 @@ traffic. `deploy/modal_app.py` can also host the app itself on Modal as a
 CPU-only function.
 
 The per-request ML specialist server in riprap-inference (`modal_app.py`,
-LitServe) is not used: the LLM is the only model Riprap calls.
+LitServe) is not used: Riprap calls no remote model but the LLM.
+
+## 5. The experimental models
+
+`uv sync --extra ml` adds the Battery surge forecast, which then runs on
+CPU inside the server (it downloads 12 MB of weights from Hugging Face on
+first use). The Docker image and the Modal host install the core
+dependencies only, so there the surge source says it is not installed. The
+satellite layers need nothing: they are saved files under `data/eo/`, made
+by batch jobs that need the `eo` extra ([MODELS.md](MODELS.md)).

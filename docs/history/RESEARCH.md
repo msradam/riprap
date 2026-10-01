@@ -1,8 +1,8 @@
 # Riprap: landscape research
 
 > **Historical research note from May 2026.** The mechanisms it describes
-> (rerolls, four-section prose, GLiNER, TerraMind, the MI300X stack) are
-> removed; see [GROUNDING.md](../GROUNDING.md) for the current checks.
+> (rerolls, four-section prose, GLiNER, per-request TerraMind, the MI300X
+> stack) are removed; see [GROUNDING.md](../GROUNDING.md) for the current checks.
 
 Captured 2026-05-06 as part of the AMD x lablab.ai hackathon polish
 phase. This document underpinned the pitch deck (not in the repository)
