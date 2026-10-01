@@ -3,8 +3,8 @@
  "neighborhood": "Red Hook, Brooklyn",
  "address": "80 Pioneer Street, Brooklyn, NY",
  "question": "Should I buy the house at 80 Pioneer Street, Brooklyn?",
- "generated_at": "2026-10-01T16:56Z",
- "riprap_commit": "c025f6e",
+ "generated_at": "2026-10-01T17:37Z",
+ "riprap_commit": "9c9891d",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -1448,7 +1448,7 @@
   "trace": [
    {
     "step": "reconcile_templated",
-    "started_at": 1790873795.592059,
+    "started_at": 1790876251.421355,
     "ok": true,
     "result": {
      "n_chars": 526,

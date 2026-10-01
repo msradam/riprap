@@ -3,8 +3,8 @@
  "neighborhood": "Hunts Point, Bronx",
  "address": "355 Food Center Drive, Bronx, NY",
  "question": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 since 2022?",
- "generated_at": "2026-10-01T16:56Z",
- "riprap_commit": "c025f6e",
+ "generated_at": "2026-10-01T17:37Z",
+ "riprap_commit": "9c9891d",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -1485,7 +1485,7 @@
    "n_dropped": 0,
    "llm_calls": [],
    "question": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 since 2022?",
-   "n_documents": 22,
+   "n_documents": 23,
    "answer_mode": "rules",
    "answer_lead": "no",
    "lead_fact": {
@@ -1507,7 +1507,7 @@
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-10-01T01:38:36+0000",
-    "retrieved_at": "2026-10-01T16:56Z",
+    "retrieved_at": "2026-10-01T17:37Z",
     "vintage": "2026-10-01T01:38:36+0000",
     "maturity": "production"
    },
@@ -1529,7 +1529,7 @@
     "url": "https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS",
     "license": "U.S. Public Domain",
     "date_modified": "2007-09-05",
-    "retrieved_at": "2026-10-01T16:56Z",
+    "retrieved_at": "2026-10-01T17:37Z",
     "vintage": "2007-09-05",
     "maturity": "production"
    },
@@ -1540,7 +1540,7 @@
     "url": "https://hazards.fema.gov/arcgis/rest/services/PrelimPending/Prelim_NFHL/MapServer",
     "license": "U.S. Public Domain",
     "date_modified": "2015-01-30",
-    "retrieved_at": "2026-10-01T16:56Z",
+    "retrieved_at": "2026-10-01T17:37Z",
     "vintage": "2015-01-30",
     "maturity": "production"
    },
@@ -1627,9 +1627,9 @@
     "title": "FloodNet NYC, community-led real-time street-flood sensor network. Data CC-BY-NC-SA 4.0; derivatives must carry the same license. Readings come from the FloodNet API (api.floodnet.nyc), which has no stable page per sensor or event, so the link is the project's data download page. https://www.floodnet.nyc/data-downloads",
     "url": "https://www.floodnet.nyc/data-downloads",
     "license": "CC-BY-NC-SA 4.0",
-    "date_modified": "2026-10-01T16:56Z",
-    "retrieved_at": "2026-10-01T16:56Z",
-    "vintage": "2026-10-01T16:56Z",
+    "date_modified": "2026-10-01T17:37Z",
+    "retrieved_at": "2026-10-01T17:37Z",
+    "vintage": "2026-10-01T17:37Z",
     "maturity": "production"
    },
    "nws_obs": {
@@ -1638,9 +1638,9 @@
     "title": "NWS hourly METAR observations, nearest station to address.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T16:56Z",
-    "retrieved_at": "2026-10-01T16:56Z",
-    "vintage": "2026-10-01T16:56Z",
+    "date_modified": "2026-10-01T17:37Z",
+    "retrieved_at": "2026-10-01T17:37Z",
+    "vintage": "2026-10-01T17:37Z",
     "maturity": "production"
    },
    "noaa_tides": {
@@ -1649,9 +1649,20 @@
     "title": "NOAA CO-OPS tide-gauge water level observations, nearest station to address.",
     "url": "https://tidesandcurrents.noaa.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T16:56Z",
-    "retrieved_at": "2026-10-01T16:56Z",
-    "vintage": "2026-10-01T16:56Z",
+    "date_modified": "2026-10-01T17:37Z",
+    "retrieved_at": "2026-10-01T17:37Z",
+    "vintage": "2026-10-01T17:37Z",
+    "maturity": "production"
+   },
+   "usgs_gauges": {
+    "doc_id": "usgs_gauges",
+    "source": "USGS Water Data OGC API, latest continuous values",
+    "title": "USGS Water Data latest continuous values, nearest active stream gauge to address.",
+    "url": "https://api.waterdata.usgs.gov/ogcapi/v1/collections/latest-continuous",
+    "license": "U.S. Public Domain",
+    "date_modified": "2026-10-01T17:37Z",
+    "retrieved_at": "2026-10-01T17:37Z",
+    "vintage": "2026-10-01T17:37Z",
     "maturity": "production"
    },
    "mta_entrance_exposure": {
@@ -1704,9 +1715,9 @@
     "title": "NWS active alerts at address (flood / coastal / wind).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T16:56Z",
-    "retrieved_at": "2026-10-01T16:56Z",
-    "vintage": "2026-10-01T16:56Z",
+    "date_modified": "2026-10-01T17:37Z",
+    "retrieved_at": "2026-10-01T17:37Z",
+    "vintage": "2026-10-01T17:37Z",
     "maturity": "production"
    },
    "nws_water_forecast": {
@@ -1715,9 +1726,9 @@
     "title": "National Weather Service, National Water Prediction Service, official water-level forecast and flood stages for the nearest harbor gauge.",
     "url": "https://water.noaa.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T16:56Z",
-    "retrieved_at": "2026-10-01T16:56Z",
-    "vintage": "2026-10-01T16:56Z",
+    "date_modified": "2026-10-01T17:37Z",
+    "retrieved_at": "2026-10-01T17:37Z",
+    "vintage": "2026-10-01T17:37Z",
     "maturity": "production"
    },
    "ttm_battery_surge": {
@@ -1726,9 +1737,9 @@
     "title": "msradam/Granite-TTM-r2-Battery-Surge (Apache-2.0), the owner's fine-tune of IBM's Granite TTM r2, run on the last 1,024 hourly surge residuals at NOAA station 8518750 (The Battery). Experimental: no wind or pressure input; backtest in data/experimental/surge.json.",
     "url": "https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge",
     "license": "Apache-2.0 (model); U.S. Public Domain (gauge data)",
-    "date_modified": "2026-10-01T16:56Z",
-    "retrieved_at": "2026-10-01T16:56Z",
-    "vintage": "2026-10-01T16:56Z",
+    "date_modified": "2026-10-01T17:37Z",
+    "retrieved_at": "2026-10-01T17:37Z",
+    "vintage": "2026-10-01T17:37Z",
     "maturity": "experimental"
    },
    "npcc4_slr": {
@@ -2050,14 +2061,14 @@
    "station_id": "KLGA",
    "station_name": "LaGuardia Airport, NY",
    "distance_km": 3.2,
-   "obs_time": "2026-10-01T16:30:00+00:00",
+   "obs_time": "2026-10-01T17:10:00+00:00",
    "weather": "Clear",
    "raining": false,
-   "temp_c": 23.0,
+   "temp_c": 25.0,
    "precip_last_hour_mm": null,
    "precip_last_3h_mm": null,
    "precip_last_6h_mm": null,
-   "narrative": "Latest METAR at LaGuardia Airport, NY (3.2 km away): clear, 23.0\u00b0C, no precipitation reported, observed 2026-10-01 16:30 UTC.",
+   "narrative": "Latest METAR at LaGuardia Airport, NY (3.2 km away): clear, 25.0\u00b0C, no precipitation reported, observed 2026-10-01 17:10 UTC.",
    "error": null
   },
   "noaa_tides": {
@@ -2067,13 +2078,23 @@
    "station_lon": -73.7649,
    "distance_km": 9.1,
    "datum": "MLLW",
-   "observed_ft": 6.61,
-   "observed_ft_mllw": 6.61,
-   "predicted_ft_mllw": 5.53,
-   "residual_ft": 1.08,
-   "obs_time": "2026-10-01 16:48",
-   "narrative": "Latest reading at Kings Point, NY: 6.61 ft above MLLW (+1.08 ft vs predicted tide), observed 2026-10-01 16:48 UTC.",
+   "observed_ft": 7.64,
+   "observed_ft_mllw": 7.64,
+   "predicted_ft_mllw": 6.74,
+   "residual_ft": 0.9,
+   "obs_time": "2026-10-01 17:18",
+   "narrative": "Latest reading at Kings Point, NY: 7.64 ft above MLLW (+0.9 ft vs predicted tide), observed 2026-10-01 17:18 UTC.",
    "error": null
+  },
+  "usgs_gauges": {
+   "site_no": "01302020",
+   "site_name": "USGS 01302020",
+   "distance_km": 6.1,
+   "stage_ft": 0.66,
+   "obs_time": "2026-10-01 16:30 UTC",
+   "n_gauges_in_area": 1,
+   "narrative": "Nearest USGS stream gauge, USGS 01302020 (01302020, 6.1 km away): stage 0.66 ft, discharge 49.1 ft\u00b3/s, observed 2026-10-01 16:30 UTC.",
+   "discharge_cfs": 49.1
   },
   "mta_entrances": {
    "available": true,
@@ -2123,8 +2144,8 @@
   "nws_alerts": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS flood, coastal or wind alerts at this point, checked 2026-10-01 16:56 UTC.",
-   "retrieved_at": "2026-10-01T16:56:27Z",
+   "narrative": "No active NWS flood, coastal or wind alerts at this point, checked 2026-10-01 17:37 UTC.",
+   "retrieved_at": "2026-10-01T17:37:23Z",
    "error": null
   },
   "nws_water_forecast": {
@@ -2151,118 +2172,118 @@
    "station_name": "The Battery",
    "context_hours": 1024,
    "horizon_hours": 96,
-   "last_observation_utc": "2026-10-01 16:00",
+   "last_observation_utc": "2026-10-01 17:00",
    "forecast_peak_residual_m": 0.2,
    "forecast_peak_residual_ft": 0.7,
-   "forecast_peak_residual_time_utc": "2026-10-04 15:00",
+   "forecast_peak_residual_time_utc": "2026-10-02 06:00",
    "forecast_residual_m": [
-    0.102,
-    0.095,
-    0.096,
-    0.111,
-    0.123,
-    0.124,
-    0.135,
-    0.154,
-    0.164,
-    0.156,
-    0.146,
-    0.147,
-    0.163,
-    0.17,
-    0.165,
-    0.151,
-    0.147,
-    0.158,
-    0.172,
-    0.177,
-    0.179,
-    0.178,
-    0.183,
-    0.178,
-    0.164,
-    0.146,
     0.134,
-    0.141,
-    0.151,
-    0.154,
-    0.161,
-    0.175,
-    0.185,
-    0.181,
-    0.173,
-    0.168,
-    0.179,
-    0.182,
-    0.17,
-    0.15,
-    0.144,
-    0.159,
-    0.178,
-    0.182,
-    0.185,
-    0.187,
-    0.193,
-    0.183,
-    0.164,
-    0.144,
-    0.127,
     0.128,
-    0.135,
-    0.137,
-    0.146,
-    0.162,
-    0.175,
-    0.178,
-    0.174,
+    0.138,
+    0.157,
+    0.168,
     0.169,
-    0.174,
-    0.173,
-    0.16,
-    0.14,
-    0.136,
-    0.156,
-    0.177,
-    0.182,
-    0.185,
-    0.191,
-    0.202,
-    0.194,
-    0.171,
-    0.149,
-    0.133,
-    0.131,
-    0.135,
-    0.137,
-    0.146,
-    0.162,
-    0.175,
     0.178,
-    0.176,
+    0.193,
+    0.188,
+    0.175,
     0.173,
+    0.187,
+    0.203,
+    0.196,
+    0.182,
+    0.176,
+    0.188,
+    0.201,
+    0.199,
+    0.199,
+    0.199,
+    0.201,
+    0.199,
+    0.183,
+    0.169,
+    0.154,
+    0.152,
+    0.164,
+    0.174,
+    0.176,
+    0.183,
+    0.195,
+    0.191,
     0.179,
     0.173,
-    0.155,
-    0.128,
-    0.12,
-    0.137,
-    0.16,
-    0.166,
-    0.168,
-    0.174,
+    0.18,
+    0.191,
+    0.179,
+    0.159,
+    0.151,
+    0.165,
+    0.184,
     0.187,
-    0.183
+    0.187,
+    0.189,
+    0.189,
+    0.184,
+    0.162,
+    0.144,
+    0.128,
+    0.123,
+    0.134,
+    0.142,
+    0.147,
+    0.155,
+    0.171,
+    0.174,
+    0.168,
+    0.163,
+    0.167,
+    0.171,
+    0.155,
+    0.134,
+    0.128,
+    0.147,
+    0.171,
+    0.178,
+    0.181,
+    0.187,
+    0.192,
+    0.189,
+    0.167,
+    0.147,
+    0.13,
+    0.123,
+    0.13,
+    0.139,
+    0.145,
+    0.155,
+    0.173,
+    0.177,
+    0.172,
+    0.167,
+    0.171,
+    0.174,
+    0.155,
+    0.13,
+    0.118,
+    0.134,
+    0.159,
+    0.168,
+    0.17,
+    0.175,
+    0.183,
+    0.183,
+    0.163
    ],
    "flood_stages_ft": {
     "major": 9.4,
     "moderate": 8.3,
     "minor": 7.0
    },
-   "forecast_peak_total_ft_mllw": 5.9,
+   "forecast_peak_total_ft_mllw": 6.0,
    "forecast_peak_total_time_utc": "2026-10-02 17:00",
    "flood_category": null,
    "notable": false,
-   "narrative": "Experimental forecast: the water at The Battery may run up to 0.20 m (0.7 ft) above NOAA's predicted tide in the next 96 hours, counted from 2026-10-01 16:00 UTC, most around 2026-10-04 15:00 UTC; added to the predicted tide, the highest total would be 5.9 ft above MLLW on 2026-10-02 17:00 UTC, below the gauge's minor flood stage of 7.0 ft. Limits: it reads only the last 1,024 hours of the Battery gauge, with no wind or pressure input, so it cannot see a storm that has not yet reached the gauge; on 635 past 96-hour windows (2025-01-01 to 2026-09-27) its mean error was 11.5 cm, against 13.3 cm for assuming the last day's mean continues, and it foresaw 1 of the 23 windows in which the water reached the minor flood stage. Rely on the National Weather Service (weather.gov/okx) and Notify NYC; NOAA's ETSS and the Stevens Flood Advisory System model surge from the weather.",
+   "narrative": "Experimental forecast: the water at The Battery may run up to 0.20 m (0.7 ft) above NOAA's predicted tide in the next 96 hours, counted from 2026-10-01 17:00 UTC, most around 2026-10-02 06:00 UTC; added to the predicted tide, the highest total would be 6.0 ft above MLLW on 2026-10-02 17:00 UTC, below the gauge's minor flood stage of 7.0 ft. Limits: it reads only the last 1,024 hours of the Battery gauge, with no wind or pressure input, so it cannot see a storm that has not yet reached the gauge; on 635 past 96-hour windows (2025-01-01 to 2026-09-27) its mean error was 11.5 cm, against 13.3 cm for assuming the last day's mean continues, and it foresaw 1 of the 23 windows in which the water reached the minor flood stage. Rely on the National Weather Service (weather.gov/okx) and Notify NYC; NOAA's ETSS and the Stevens Flood Advisory System model surge from the weather.",
    "installed": true
   },
   "npcc4_slr": {
@@ -2347,8 +2368,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790873787.392117,
-    "elapsed_s": 0.04,
+    "started_at": 1790876242.98635,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {
      "address": "355 FOOD CENTER DRIVE, Bronx, NY, USA",
@@ -2360,7 +2381,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790873787.4334211,
+    "started_at": 1790876243.038531,
     "elapsed_s": 0.0001,
     "err": null,
     "result": {
@@ -2372,7 +2393,7 @@
    {
     "step": "sandy",
     "ok": true,
-    "started_at": 1790873787.434282,
+    "started_at": 1790876243.0400472,
     "elapsed_s": 0.01,
     "err": null,
     "result": {
@@ -2383,8 +2404,8 @@
    {
     "step": "fema_nfhl",
     "ok": true,
-    "started_at": 1790873787.436228,
-    "elapsed_s": 0.53,
+    "started_at": 1790876243.040815,
+    "elapsed_s": 0.56,
     "err": null,
     "result": {
      "zone": "X",
@@ -2396,8 +2417,8 @@
    {
     "step": "fema_pfirm",
     "ok": true,
-    "started_at": 1790873787.435829,
-    "elapsed_s": 0.53,
+    "started_at": 1790876243.0400069,
+    "elapsed_s": 0.56,
     "err": null,
     "result": {
      "zone": "X",
@@ -2409,8 +2430,8 @@
    {
     "step": "dep_extreme_2080",
     "ok": true,
-    "started_at": 1790873787.437091,
-    "elapsed_s": 0.02,
+    "started_at": 1790876243.0407739,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "depth_label": "outside",
@@ -2420,7 +2441,7 @@
    {
     "step": "dep_moderate_2050",
     "ok": true,
-    "started_at": 1790873787.438056,
+    "started_at": 1790876243.0413282,
     "elapsed_s": 0.01,
     "err": null,
     "result": {
@@ -2431,7 +2452,7 @@
    {
     "step": "dep_moderate_current",
     "ok": true,
-    "started_at": 1790873787.437797,
+    "started_at": 1790876243.041225,
     "elapsed_s": 0.01,
     "err": null,
     "result": {
@@ -2442,8 +2463,8 @@
    {
     "step": "ida_hwm",
     "ok": true,
-    "started_at": 1790873787.440577,
-    "elapsed_s": 0.0,
+    "started_at": 1790876243.0418901,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {
      "n_within_800m": 0,
@@ -2454,15 +2475,15 @@
    {
     "step": "prithvi_water",
     "ok": true,
-    "started_at": 1790873787.4416351,
-    "elapsed_s": 0.1,
+    "started_at": 1790876243.044362,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {}
    },
    {
     "step": "microtopo",
     "ok": true,
-    "started_at": 1790873787.4420109,
+    "started_at": 1790876243.045161,
     "elapsed_s": 0.01,
     "err": null,
     "result": {
@@ -2474,16 +2495,16 @@
    {
     "step": "landcover",
     "ok": true,
-    "started_at": 1790873787.4431438,
-    "elapsed_s": 0.09,
+    "started_at": 1790876243.045127,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {}
    },
    {
     "step": "floodnet",
     "ok": true,
-    "started_at": 1790873787.444384,
-    "elapsed_s": 0.5,
+    "started_at": 1790876243.04766,
+    "elapsed_s": 0.38,
     "err": null,
     "result": {
      "n_sensors": 0,
@@ -2493,8 +2514,8 @@
    {
     "step": "nyc311",
     "ok": true,
-    "started_at": 1790873787.444546,
-    "elapsed_s": 0.81,
+    "started_at": 1790876243.0479538,
+    "elapsed_s": 0.97,
     "err": null,
     "result": {
      "n": 0
@@ -2503,7 +2524,7 @@
    {
     "step": "nws_obs",
     "ok": true,
-    "started_at": 1790873787.445188,
+    "started_at": 1790876243.047798,
     "elapsed_s": 0.38,
     "err": null,
     "result": {
@@ -2515,28 +2536,32 @@
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790873787.445152,
-    "elapsed_s": 0.5,
+    "started_at": 1790876243.0491898,
+    "elapsed_s": 0.55,
     "err": null,
     "result": {
      "station": "8516945",
-     "observed_ft_mllw": 6.61,
-     "residual_ft": 1.08
+     "observed_ft_mllw": 7.64,
+     "residual_ft": 0.9
     }
    },
    {
     "step": "usgs_gauges",
-    "ok": false,
-    "started_at": 1790873787.4544158,
-    "elapsed_s": 0.5,
-    "err": "python_call: summary_for_point raised: HTTP 429 after 0/1 chunks; catch QuotaExhausted (or FanOutInterrupted) to access .partial_frame or .call.resume() once the rate-limit window has rolled over. Cause: RateLimited: 429: Too many requests made. Please obtain an API token or try again later. (URL: https://api.waterdata.usgs.gov/ogcapi/v0/collections/latest-continuous/items?parameter_code=00065%2C00060&limit=50000&bbox=-73.997917%2C40.682808%2C-73.747917%2C40.932808)",
-    "result": null
+    "ok": true,
+    "started_at": 1790876243.0506408,
+    "elapsed_s": 0.92,
+    "err": null,
+    "result": {
+     "station": "01302020",
+     "stage_ft": 0.66,
+     "discharge_cfs": 49.1
+    }
    },
    {
     "step": "mta_entrances",
     "ok": true,
-    "started_at": 1790873787.455861,
-    "elapsed_s": 0.06,
+    "started_at": 1790876243.050933,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "n_entrances": 0,
@@ -2547,8 +2572,8 @@
    {
     "step": "nycha_developments",
     "ok": true,
-    "started_at": 1790873787.455759,
-    "elapsed_s": 0.06,
+    "started_at": 1790876243.053257,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "n_developments": 0,
@@ -2559,8 +2584,8 @@
    {
     "step": "doe_schools",
     "ok": true,
-    "started_at": 1790873787.456165,
-    "elapsed_s": 0.06,
+    "started_at": 1790876243.0546181,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "n_schools": 0,
@@ -2571,8 +2596,8 @@
    {
     "step": "doh_hospitals",
     "ok": true,
-    "started_at": 1790873787.45598,
-    "elapsed_s": 0.06,
+    "started_at": 1790876243.053683,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "n_hospitals": 0,
@@ -2583,8 +2608,8 @@
    {
     "step": "nws_alerts",
     "ok": true,
-    "started_at": 1790873787.456118,
-    "elapsed_s": 0.51,
+    "started_at": 1790876243.054143,
+    "elapsed_s": 0.55,
     "err": null,
     "result": {
      "n_active": 0
@@ -2593,8 +2618,8 @@
    {
     "step": "nws_water_forecast",
     "ok": true,
-    "started_at": 1790873787.520458,
-    "elapsed_s": 0.42,
+    "started_at": 1790876243.0547352,
+    "elapsed_s": 0.52,
     "err": null,
     "result": {
      "gauge": "KPTN6",
@@ -2605,12 +2630,12 @@
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790873787.519948,
-    "elapsed_s": 0.58,
+    "started_at": 1790876243.05513,
+    "elapsed_s": 0.71,
     "err": null,
     "result": {
      "forecast_peak_residual_m": 0.2,
-     "forecast_peak_total_ft_mllw": 5.9,
+     "forecast_peak_total_ft_mllw": 6.0,
      "flood_category": null,
      "installed": true
     }
@@ -2618,7 +2643,7 @@
    {
     "step": "npcc4_slr",
     "ok": true,
-    "started_at": 1790873787.5203068,
+    "started_at": 1790876243.055447,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2626,7 +2651,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790873788.2584262,
+    "started_at": 1790876244.0192509,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2639,15 +2664,15 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790873788.258593,
+    "started_at": 1790876244.0194829,
     "ok": true,
     "result": {
      "n_chars": 663,
-     "n_citations": 22,
+     "n_citations": 23,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0279
+    "elapsed_s": 0.0374
    }
   ],
   "models": [
@@ -2670,7 +2695,7 @@
     "repo": "msradam/Granite-TTM-r2-Battery-Surge",
     "where": "CPU, in this server",
     "how": "loaded",
-    "latency_s": 0.58
+    "latency_s": 0.71
    }
   ],
   "compliance": {
