@@ -125,65 +125,37 @@ describe('cardAdapter — stat-kind pebble with a non-numeric shaped value', () 
   });
 });
 
-/** Real production bug found 2026-07-14: policy_corpus.yaml declares
- * `display: {kind: list, variant: list}` — 'list' isn't a real
- * CardVariant (the real value is 'tabular'), and local_corpus_with_ner's
- * value shape (`{rag_hits: [...], n_hits, n_entities}`) matched neither
- * of the 'tabular' branch's two recognized shapes (GeoJSON `features` or
- * a records `sample`). With no narration.template to fall back to
- * either, a genuine retrieval success (real hits, real entities)
- * rendered as "Policy-corpus index unavailable" — confirmed live: the
- * FSM trace showed n_hits=1, n_entities=5 for the same query. */
-const POLICY_CORPUS_MANIFEST: PebbleManifest = {
-  id: 'policy_corpus',
-  type: 'live',
-  title: 'NYC flood-policy corpus — agency reports + plans',
-  stone: 'cornerstone',
-  tier: 'empirical',
-  display: { order: 60, kind: 'list', variant: 'list' as never, map_layer: false, icon: null },
-  narration: { short: 'NYC flood-policy passages and typed entities extracted from agency reports relevant to this address.', template: null },
-  provenance: {
-    source_name: 'NYC flood-policy corpus',
-    source_url: null, license: null,
-    citation: 'NYC flood-policy corpus', doc_id: 'policy_corpus', date_modified: null,
-  },
-  fallback: { on_offline: 'skip', message: 'Policy-corpus index unavailable (RAG embeddings or NER model offline).' },
-};
+/** sandy.yaml's template ends with `{edge_note}`: "" for most addresses,
+ *  a clause starting with a comma near the mapped edge, and absent from
+ *  snapshots saved before the field existed. */
+describe('cardAdapter: an optional template clause', () => {
+  const EDGE_MANIFEST: PebbleManifest = {
+    ...SANDY_MANIFEST,
+    narration: {
+      ...SANDY_MANIFEST.narration,
+      template: 'This address {inside_phrasing} the empirical 2012 Hurricane Sandy inundation footprint (NYC Open Data){edge_note}.',
+    },
+  };
+  const body = (sandy: Record<string, unknown>) => {
+    seedManifest([EDGE_MANIFEST]);
+    const findings = adaptFinalToFindings({ sandy: { inside: true, inside_phrasing: 'is inside', ...sandy }, trace: [] } as never, null, 1.0);
+    return findings.cards.find((c) => c.id === 'pebble-sandy')?.body;
+  };
+  const PLAIN = 'This address is inside the empirical 2012 Hurricane Sandy inundation footprint (NYC Open Data).';
 
-describe('cardAdapter — policy_corpus rag_hits shape', () => {
-  it('renders retrieved passages as a table, not fallback.message', () => {
-    seedManifest([POLICY_CORPUS_MANIFEST]);
-    const final = {
-      geocode: { address: '80 Pioneer St', lat: 40.678, lon: -74.01 },
-      policy_corpus: {
-        query: 'flood risk, resilience',
-        rag_hits: [
-          { doc_id: 'rag_nycha', citation: 'NYCHA, Flood Resilience: Lessons Learned', page: 3, text: 'Hurricane Sandy devastated New York City in October 2012.', score: 0.87 },
-        ],
-        entities: {},
-        n_hits: 1,
-        n_entities: 5,
-      },
-      trace: [],
-    };
-    const findings = adaptFinalToFindings(final as never, null, 1.0);
-    const card = findings.cards.find((c) => c.id === 'pebble-policy_corpus' || c.id === 'policy_corpus');
-    expect(card, 'no card rendered for policy_corpus').toBeTruthy();
-    expect(card?.rows?.flat().join(' ')).toContain('NYCHA, Flood Resilience: Lessons Learned');
-    expect(JSON.stringify(card)).not.toContain('unavailable');
+  it('renders an empty or missing edge_note as no text, never as braces', () => {
+    expect(body({ edge_note: '' })).toBe(PLAIN);
+    expect(body({})).toBe(PLAIN);
+    expect(body({ edge_note: null })).toBe(PLAIN);
   });
 
-  it('still falls back to fallback.message when there really are no hits', () => {
-    seedManifest([POLICY_CORPUS_MANIFEST]);
-    const final = {
-      geocode: { address: '80 Pioneer St', lat: 40.678, lon: -74.01 },
-      policy_corpus: { query: 'flood risk', rag_hits: [], entities: {}, n_hits: 0, n_entities: 0 },
-      trace: [],
-    };
-    const findings = adaptFinalToFindings(final as never, null, 1.0);
-    const card = findings.cards.find((c) => c.id === 'pebble-policy_corpus' || c.id === 'policy_corpus');
-    expect(card?.absent).toBe('Not available');
-    expect(card?.sub).toContain('unavailable');
+  it('prints the clause when the source gives one', () => {
+    expect(body({ edge_note: ', about 40 m from the mapped edge (the outline is not exact to a building)' }))
+      .toBe('This address is inside the empirical 2012 Hurricane Sandy inundation footprint (NYC Open Data), about 40 m from the mapped edge (the outline is not exact to a building).');
+  });
+
+  it('still refuses a template whose required field is missing', () => {
+    expect(body({ inside_phrasing: '' })).toBeUndefined();
   });
 });
 
@@ -197,13 +169,13 @@ describe('cardAdapter: absent sources and unfilled templates', () => {
 
   it('never renders a line that still holds a {field} placeholder', () => {
     const card = dropUnfilled({
-      id: 'x', stone: 'lodestone', tier: 'modeled', variant: 'timeseries',
+      id: 'x', stone: 'lodestone', tier: 'modeled', variant: 'scalars',
       source: 'S', agency: 'A', vintage: 'v', title: 'T', docId: 'd',
-      headline: '12 cm',
-      sub: 'forecasts a peak surge residual of {forecast_peak_m} m',
+      headline: '5.9 ft',
+      sub: 'forecasts a peak water level of {forecast_peak_ft_mllw} ft',
       metaRows: [{ k: 'a', v: '{narrative}' }, { k: 'b', v: '3' }],
     });
-    expect(card.headline).toBe('12 cm');
+    expect(card.headline).toBe('5.9 ft');
     expect(card.sub).toBeUndefined();
     expect(card.metaRows).toEqual([{ k: 'b', v: '3' }]);
   });

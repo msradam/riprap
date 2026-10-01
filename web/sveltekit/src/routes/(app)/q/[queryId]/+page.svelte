@@ -9,7 +9,7 @@
   import { deployment } from '$lib/stores/deployment.svelte';
   import { openAgentStream, NO_BACKEND } from '$lib/client/agentStream';
   import {
-    fetchSandy, fetchDep, fetchPrithviSynthetic, fetchProxyDots,
+    fetchSandy, fetchDep, fetchProxyDots,
     fetchIdaHwm, fetchSandyNta, fetchDepNta
   } from '$lib/client/mapLayers';
 
@@ -39,12 +39,9 @@
     if (source === 'nta' && run.ntaCode) {
       fetchSandyNta(run.ntaCode).then((fc) => { run.sandyFc = fc; });
       fetchDepNta(run.ntaCode).then((fc) => { run.depFc = fc; });
-      // No NTA-scope synthetic endpoint: radius query around the centroid.
-      fetchPrithviSynthetic(lat, lon, 2500).then((fc) => { run.synFc = fc; });
     } else {
       fetchSandy(lat, lon).then((fc) => { run.sandyFc = fc; });
       fetchDep(lat, lon).then((fc) => { run.depFc = fc; });
-      fetchPrithviSynthetic(lat, lon).then((fc) => { run.synFc = fc; });
     }
   });
   $effect(() => {
@@ -52,7 +49,6 @@
     const { lat, lon } = run.compareAddressA;
     fetchSandy(lat, lon).then((fc) => { run.sandyFcA = fc; });
     fetchDep(lat, lon).then((fc) => { run.depFcA = fc; });
-    fetchPrithviSynthetic(lat, lon).then((fc) => { run.synFcA = fc; });
     fetchProxyDots(lat, lon).then((fc) => { run.proxyFcA = fc; });
     fetchIdaHwm(lat, lon).then((fc) => { run.idaHwmFcA = fc; });
   });
@@ -61,7 +57,6 @@
     const { lat, lon } = run.compareAddressB;
     fetchSandy(lat, lon).then((fc) => { run.sandyFcB = fc; });
     fetchDep(lat, lon).then((fc) => { run.depFcB = fc; });
-    fetchPrithviSynthetic(lat, lon).then((fc) => { run.synFcB = fc; });
     fetchProxyDots(lat, lon).then((fc) => { run.proxyFcB = fc; });
     fetchIdaHwm(lat, lon).then((fc) => { run.idaHwmFcB = fc; });
   });
@@ -116,7 +111,7 @@
       onDone: () => {
         if (runStartedAt != null) run.runWallSeconds = (Date.now() - runStartedAt) / 1000;
         run.finish();
-        // Snapshot for the /print/<queryId> route and PDF export.
+        // Snapshot for the /print/<queryId> route.
         if (!run.errorState && run.briefing.blocks.length > 0) {
           persistSnapshot(snapshotFromRun(run, queryId, queryText, run.finishedAt ?? undefined));
         }

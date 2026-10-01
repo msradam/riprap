@@ -54,17 +54,15 @@ function manifest(
   };
 }
 
-/** NYC manifest — the 22 pebbles deployments/nyc ships. */
+/** NYC manifest: the point pebbles deployments/nyc ships. */
 export const NYC_MANIFEST: PebbleManifest[] = [
   // Cornerstone
   manifest('sandy', 'cornerstone'),
   manifest('ida_hwm', 'cornerstone'),
-  manifest('prithvi_water', 'cornerstone'),
   manifest('microtopo', 'cornerstone'),
   manifest('dep_extreme_2080', 'cornerstone'),
   manifest('dep_moderate_2050', 'cornerstone'),
   manifest('dep_moderate_current', 'cornerstone'),
-  manifest('policy_corpus', 'cornerstone'),
   // Touchstone
   manifest('floodnet', 'touchstone'),
   manifest('nyc311', 'touchstone'),
@@ -72,9 +70,7 @@ export const NYC_MANIFEST: PebbleManifest[] = [
   manifest('noaa_tides', 'touchstone'),
   // Lodestone
   manifest('nws_alerts', 'lodestone'),
-  manifest('ttm_battery_surge', 'lodestone'),
-  manifest('ttm_311_forecast', 'lodestone'),
-  manifest('floodnet_forecast', 'lodestone'),
+  manifest('nws_water_forecast', 'lodestone'),
   manifest('npcc4_slr', 'lodestone'),
   // Keystone
   manifest('mta_entrances', 'keystone'),
@@ -83,40 +79,39 @@ export const NYC_MANIFEST: PebbleManifest[] = [
   manifest('doh_hospitals', 'keystone'),
 ];
 
-/** Boston manifest — what /api/pebbles SHOULD return for a Boston route. */
-export const BOSTON_MANIFEST: PebbleManifest[] = [
-  manifest('boston_311', 'touchstone'),
-  manifest('water_level', 'touchstone'),
+/** Chicago manifest: what /api/pebbles SHOULD return for a Chicago route. */
+export const CHICAGO_MANIFEST: PebbleManifest[] = [
+  manifest('chicago_311', 'touchstone'),
+  manifest('lake_michigan_water_level', 'touchstone'),
   manifest('nws_obs', 'touchstone'),
   manifest('nws_alerts', 'lodestone'),
 ];
 
-/** Pebble-id sets we assert against — the bug-fix seal: a Boston
- *  render must contain only Boston ids and no NYC-only ids. */
+/** Pebble-id sets we assert against. The bug-fix seal: a Chicago
+ *  render must contain only Chicago ids and no NYC-only ids. */
 export const NYC_ONLY_IDS = new Set([
-  'sandy', 'ida_hwm', 'prithvi_water',
+  'sandy', 'ida_hwm',
   'microtopo', 'floodnet', 'nyc311', 'noaa_tides',
   'mta_entrances', 'nycha_developments', 'doe_schools', 'doh_hospitals',
-  'ttm_311_forecast', 'ttm_battery_surge',
-  'floodnet_forecast', 'npcc4_slr',
+  'nws_water_forecast', 'npcc4_slr',
   'dep_extreme_2080', 'dep_moderate_2050', 'dep_moderate_current',
 ]);
 
-/** A trimmed Boston `/api/agent` response — only the keys cardAdapter reads. */
-export const BOSTON_FINAL = {
+/** A trimmed Chicago `/api/agent` response: only the keys cardAdapter reads. */
+export const CHICAGO_FINAL = {
   intent: 'single_address',
   paragraph: '',
   geocode: {
-    address: 'Boston City Hall, 1, Congress Street, Boston, Suffolk County, Massachusetts, 02201, United States',
-    lat: 42.3603713, lon: -71.0579762, borough: 'Downtown',
+    address: 'Willis Tower, 233, South Wacker Drive, Loop, Chicago, Cook County, Illinois, 60606, United States',
+    lat: 41.878738, lon: -87.6359612, borough: 'Loop',
   },
-  lat: 42.3603713,
-  lon: -71.0579762,
-  deployment: 'boston',
+  lat: 41.878738,
+  lon: -87.6359612,
+  deployment: 'chicago',
   // Pebble fan-out values (what reduce wrote)
-  boston_311:  { n_records: 396, radius_m: 500, sample: [], top_by_reason: {} },
-  nws_obs:     { station_id: 'KBOS', precip_last_hour_mm: 0, distance_km: 0.3 },
-  water_level: { station_id: '8443970', observed_ft_mllw: 5.2, distance_km: 1.8 },
+  chicago_311: { n_records: 3, radius_m: 200, sample: [], top_by_sr_type: [] },
+  nws_obs:     { station_id: 'KORD', precip_last_hour_mm: 0, distance_km: 22.0 },
+  lake_michigan_water_level: { station_id: '9087044', observed_ft: 579.4, distance_km: 18.1 },
   nws_alerts:  { n_active: 0, alerts: [] },
   citations: [],
   grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
@@ -139,7 +134,6 @@ export const NYC_FINAL = {
   dep_moderate_2050: { depth_label: 'outside', depth_class: 0 },
   dep_moderate_current: { depth_label: 'outside', depth_class: 0 },
   microtopo: { aoi_max_m: 4.2, aoi_min_m: 0.1, basin_relief_m: 0.9 },
-  prithvi_water: { n_polygons_within_500m: 0 },
   floodnet: { n_sensors: 2, n_flood_events_3y: 7 },
   nyc311: { n: 12, by_descriptor: {} },
   nws_obs: { station_id: 'KJFK', precip_last_hour_mm: 0 },

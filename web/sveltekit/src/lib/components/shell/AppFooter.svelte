@@ -4,10 +4,10 @@
 
   const FEEDBACK = 'https://github.com/msradam/riprap/issues/new/choose';
   // NYC-only "for residents, see" resource links. Only render when
-  // the active deployment is NYC. Under a Boston / Chicago / SF /
-  // Seattle / out-of-coverage chip these resources would be either
-  // out of scope (FloodHelpNY is a NY-state nonprofit) or
-  // misdirection (FloodNet NYC has no Boston coverage).
+  // the active deployment is NYC. Under a Chicago / Seattle / Albany /
+  // out-of-coverage chip these resources would be either out of scope
+  // (FloodHelpNY covers New York City) or misdirection (FloodNet NYC
+  // has no Chicago coverage).
   let showNycResources = $derived(deployment.current?.name === 'nyc');
 
   /** False on briefing pages, whose scope note already carries the

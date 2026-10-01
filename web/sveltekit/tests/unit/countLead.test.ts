@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { render } from '@testing-library/svelte';
+import ResultsView from '$lib/components/results/ResultsView.svelte';
 import { briefingModel, countLead } from '$lib/client/briefingModel';
 import { RunState } from '$lib/client/runState.svelte';
 import type { FinalResult } from '$lib/client/agentStream';
@@ -39,5 +41,47 @@ describe('countLead', () => {
 
   it('adds no lead word to an answer that is not a count', () => {
     expect(model('yes').lead).toBeNull();
+  });
+});
+
+describe('a place briefing that opens with a figure', () => {
+  const BRIEF = '0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_inundation]. ' +
+    '4226 flood-related 311 complaints were filed in Community District QN12 in the last 3 years [nyc311_nta].';
+  const brief = (intent: string, place: string) => briefingModel(RunState.fromFinal({
+    intent, paragraph: `**In brief.**\n${BRIEF}`, citations: {}, grounding: { tier: 'no_llm', note: 'no question' }
+  } as unknown as FinalResult, place), place);
+
+  it.each(['neighborhood', 'development_check'])('sets no figure large on a %s briefing, and keeps its In brief text', (intent) => {
+    const m = brief(intent, 'QN12');
+    expect(m.lead).toBeNull();
+    expect(m.leadLabel).toBe('In brief');
+    expect(m.answer[0].map((p) => p.text).join('')).toContain('0.8% of this area lies inside the 2012 Sandy inundation extent');
+  });
+
+  it('still leads an address briefing with its opening count', () => {
+    expect(brief('single_address', '90-01 183rd Street, Queens').lead).toBe('0.8%');
+  });
+});
+
+describe('a question neither a rule nor a model answered', () => {
+  const final = {
+    intent: 'single_address',
+    paragraph: 'Scope.\n\n**Hazard Reader.**\nThis address sits in FEMA flood zone X [fema_nfhl].',
+    citations: {},
+    grounding: { tier: 'no_llm', question: QUESTION, answered: false, answer_mode: 'rules', claims: [] }
+  } as unknown as FinalResult;
+  const m = briefingModel(RunState.fromFinal(final, '2017 East 17th Street, Brooklyn'), QUESTION);
+
+  it('is flagged unanswered, with the mode line saying why', () => {
+    expect(m.unanswered).toBe(true);
+    expect(m.lead).toBeNull();
+    expect(m.modeLine).toBe('No rule and no language model answered the question, so the evidence briefing is shown.');
+  });
+
+  it('says so plainly on the page, in a status line', () => {
+    const run = RunState.fromFinal(final, '2017 East 17th Street, Brooklyn');
+    const { container } = render(ResultsView, { props: { run, queryText: QUESTION, snapshot: true } });
+    expect(container.querySelector('.brief-status[role=status]')?.textContent)
+      .toBe('This question was not answered. The evidence for the place is shown below.');
   });
 });

@@ -62,31 +62,31 @@ describe('DEP scenarios and experimental sources', () => {
     expect(groups[1].cards.map((c) => c.id)).toEqual(['sandy']);
   });
 
-  it('closes the table with one folded group of experimental and forecast sources, counted', () => {
+  it('closes the table with one folded group of experimental sources, counted', () => {
     const cards = [
-      card('sandy', 'cornerstone'),
-      exp('prithvi', 'cornerstone'),
-      exp('policy', 'cornerstone'),
-      { ...card('ttm-311', 'lodestone'), docId: 'ttm_311_forecast' },
+      card('fema', 'cornerstone'),
+      exp('city-311', 'touchstone'),
+      exp('water-level', 'touchstone'),
+      { ...card('water-forecast', 'lodestone'), docId: 'nws_water_forecast' },
       { ...card('npcc4', 'lodestone'), docId: 'npcc4_slr' },
       { ...card('alerts', 'lodestone'), docId: 'nws_alerts' }
     ];
     const groups = evidenceGroups(cards, []);
     const last = groups[groups.length - 1];
-    expect(last).toMatchObject({ key: 'experimental', name: 'Experimental and forecast sources (3)', closed: true });
-    expect(last.cards.map((c) => c.id)).toEqual(['prithvi', 'policy', 'ttm-311']);
-    // NPCC4 and the NWS alerts stay open; nothing is lost.
-    expect(groups.find((g) => g.key === 'lodestone')?.cards.map((c) => c.id)).toEqual(['npcc4', 'alerts']);
+    expect(last).toMatchObject({ key: 'experimental', name: 'Experimental sources (2)', closed: true });
+    expect(last.cards.map((c) => c.id)).toEqual(['city-311', 'water-level']);
+    // The Weather Service forecast, NPCC4 and the NWS alerts stay open; nothing is lost.
+    expect(groups.find((g) => g.key === 'lodestone')?.cards.map((c) => c.id)).toEqual(['water-forecast', 'npcc4', 'alerts']);
     expect(groups.flatMap((g) => g.cards).length).toBe(cards.length);
     expect(groups.filter((g) => g.closed).length).toBe(1);
   });
 
   it('keeps an experimental source the answer cites behind the answer, open', () => {
-    const groups = evidenceGroups([exp('prithvi', 'cornerstone'), exp('policy', 'cornerstone')], ['prithvi']);
+    const groups = evidenceGroups([exp('city-311', 'touchstone'), exp('water-level', 'touchstone')], ['city-311']);
     expect(groups[0]).toMatchObject({ key: 'answer' });
     expect(groups[0].closed).toBeUndefined();
-    expect(groups[0].cards.map((c) => c.id)).toEqual(['prithvi']);
-    expect(groups[1]).toMatchObject({ name: 'Experimental and forecast sources (1)', closed: true });
+    expect(groups[0].cards.map((c) => c.id)).toEqual(['city-311']);
+    expect(groups[1]).toMatchObject({ name: 'Experimental sources (1)', closed: true });
   });
 });
 

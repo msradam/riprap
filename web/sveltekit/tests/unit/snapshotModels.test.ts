@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { snapshotModels } from '$lib/client/briefingModel';
 
-const line = (where: string) => ({ name: 'LLM', repo: 'hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M', href: null, where, how: 'LLM endpoint', latency: null, detail: null });
+const line = (where: string) => ({ name: 'LLM', repo: 'hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M', href: null, where, how: 'LLM endpoint', latency: null });
 
 describe('snapshotModels', () => {
   it('names no local endpoint on a snapshot', () => {

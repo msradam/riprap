@@ -2,9 +2,9 @@
  * ErrorCard — the polite-redirect card for geocoder / all-silent /
  * grounding / backend failure states. Previously each spec was
  * hardcoded with NYC-specific language (FloodNet sensor, Sandy
- * overlap, "five boroughs only") so a Boston query that triggered
+ * overlap, "five boroughs only") so a Chicago query that triggered
  * all-silent rendered nonsense like "no nearby FloodNet sensor and
- * no Sandy overlap" under a Boston chip.
+ * no Sandy overlap" under a Chicago chip.
  *
  * Now message text interpolates `deployment.current.city` and avoids
  * city-specific civic-infrastructure names. These tests are the
@@ -14,7 +14,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { render } from '@testing-library/svelte';
 import ErrorCard from '$lib/components/states/ErrorCard.svelte';
 import { resetStores, seedForCity } from '../helpers/stores';
-import { ALL_CITIES, BOSTON, NYC, ELSEWHERE, NYC_LEAK_NEEDLES } from '../fixtures/cities';
+import { ALL_CITIES, CHICAGO, NYC, ELSEWHERE, NYC_LEAK_NEEDLES } from '../fixtures/cities';
 import type { ErrorKey } from '$lib/types/states';
 
 const ERROR_STATES: ErrorKey[] = ['geocoder', 'all-silent', 'grounding', 'backend'];
@@ -22,11 +22,11 @@ const ERROR_STATES: ErrorKey[] = ['geocoder', 'all-silent', 'grounding', 'backen
 beforeEach(resetStores);
 
 describe('ErrorCard renders city-aware text per deployment', () => {
-  it('geocoder under Boston names Boston, not NYC', () => {
-    seedForCity(BOSTON);
+  it('geocoder under Chicago names Chicago, not NYC', () => {
+    seedForCity(CHICAGO);
     const { container } = render(ErrorCard, { props: { state: 'geocoder' } });
     const text = container.textContent ?? '';
-    expect(text).toContain('Boston');
+    expect(text).toContain('Chicago');
     expect(text).not.toMatch(/\bNYC\b/);
     expect(text).not.toContain('five boroughs');
   });
@@ -37,8 +37,8 @@ describe('ErrorCard renders city-aware text per deployment', () => {
     expect(container.textContent ?? '').toContain('NYC');
   });
 
-  it('all-silent body has no FloodNet/Sandy/borough leakage for Boston', () => {
-    seedForCity(BOSTON);
+  it('all-silent body has no FloodNet/Sandy/borough leakage for Chicago', () => {
+    seedForCity(CHICAGO);
     const { container } = render(ErrorCard, { props: { state: 'all-silent' } });
     const text = container.textContent ?? '';
     expect(text).not.toContain('FloodNet sensor');
@@ -47,7 +47,7 @@ describe('ErrorCard renders city-aware text per deployment', () => {
   });
 
   it('backend body uses generic phrasing (no NYC-only msradam/L4 specifics)', () => {
-    seedForCity(BOSTON);
+    seedForCity(CHICAGO);
     const { container } = render(ErrorCard, { props: { state: 'backend' } });
     const text = container.textContent ?? '';
     expect(text).not.toContain('msradam/riprap-vllm');

@@ -14,6 +14,7 @@
   import SkeletonBriefing from '$lib/components/states/SkeletonBriefing.svelte';
   import ErrorCard from '$lib/components/states/ErrorCard.svelte';
   import { looksLikeQuestion, type RunState } from '$lib/client/runState.svelte';
+  import { UNANSWERED } from '$lib/client/cardAdapter';
   import { boldFirstSentence, briefingModel, firstSentence, suggestedDistrict, type SnapshotMeta } from '$lib/client/briefingModel';
   import { resolve } from '$app/paths';
   import { briefingState } from '$lib/stores/briefingState.svelte';
@@ -171,7 +172,6 @@
         citations={model.citationsById}
         notRun={model.notRun}
         notRunHref={showSources && model.lists.notChecked?.length ? '#not-checked' : undefined}
-        snapshotAt={model.generated}
         labelledby="brief-evidence-h"
       />
     </section>
@@ -253,10 +253,7 @@
     {/each}
     <DroppedClaims claims={model.dropped} />
     {#if model.unanswered}
-      <p class="brief-status" role="status">
-        This question was not answered directly. Riprap is running without a language model here,
-        so this is the evidence briefing for the place above.
-      </p>
+      <p class="brief-status" role="status">{UNANSWERED}</p>
     {/if}
     {#if model.nyc && !run.stopped}
       <p class="brief-quiet brief-scope">
@@ -358,15 +355,13 @@
           structuredB={run.compareStepsB}
         />
         <div class="brief-compare-maps">
-          {#each [{ key: 'A', place: run.compareAddressA, sandy: run.sandyFcA, dep: run.depFcA, syn: run.synFcA, proxy: run.proxyFcA, ida: run.idaHwmFcA }, { key: 'B', place: run.compareAddressB, sandy: run.sandyFcB, dep: run.depFcB, syn: run.synFcB, proxy: run.proxyFcB, ida: run.idaHwmFcB }] as m (m.key)}
+          {#each [{ key: 'A', place: run.compareAddressA, sandy: run.sandyFcA, dep: run.depFcA, proxy: run.proxyFcA, ida: run.idaHwmFcA }, { key: 'B', place: run.compareAddressB, sandy: run.sandyFcB, dep: run.depFcB, proxy: run.proxyFcB, ida: run.idaHwmFcB }] as m (m.key)}
             {#if m.place}
               <figure class="brief-compare-map">
                 <LazyMap
                   address={m.place}
-                  activeLayers={{ empirical: true, modeled: true, synthetic: true, proxy: true }}
                   sandyEmpirical={m.sandy}
                   depModeled={m.dep}
-                  syntheticPrior={m.syn}
                   proxy311={m.proxy}
                   idaHwm={m.ida}
                 />

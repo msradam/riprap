@@ -17,7 +17,7 @@
  * a `meta` card listing whatever scalars it returned.
  */
 import type {
-  Card, CardVariant, FindingsData, ModelLine, RasterKind, StoneKey, StoneMember, StoneTrace
+  Card, CardVariant, FindingsData, ModelLine, StoneKey, StoneMember, StoneTrace
 } from '$lib/types/card';
 import type { TraceNode, TraceStatus } from '$lib/types/trace';
 import { citationList, type FinalResult, type ModelRow } from '$lib/client/agentStream';
@@ -27,9 +27,6 @@ import { pebbleManifest, type PebbleManifest } from '$lib/stores/pebbleManifest.
  *  back to the Riprap publication date. */
 const RIPRAP_VINTAGE = '2026-05';
 
-/** Card-header source: the part of `source_name` before a spaced dash or
- *  an em dash. Splitting on any hyphen cut "NOAA CO-OPS" to "NOAA CO"
- *  and "NYC flood-policy corpus" to "NYC flood". */
 /** The publisher part of a source name: "NOAA CO-OPS, tide gauge water
  *  level" is "NOAA CO-OPS". Splits at a spaced dash or at the first comma
  *  outside parentheses (titles use a comma now), never at a hyphen. */
@@ -62,6 +59,12 @@ const FIELD_LABELS: Record<string, string> = {
   twi: 'TWI',
   // fema_nfhl
   effective_year: 'FIRM panel effective year',
+  // dcp_floodplain_nta (no parentheses: a closing one reads as a unit)
+  n_buildings: 'Buildings in the floodplain',
+  n_residential_units: 'Residential units in the floodplain',
+  n_residents_2010: 'Residents in the floodplain, 2010 census',
+  // nws_water_forecast
+  forecast_peak_ft_mllw: 'Forecast peak water level (ft above MLLW)',
   // floodnet
   n_sensors: 'Sensors nearby',
   n_flood_events_3y: 'Flood events, last 3 years',
@@ -91,7 +94,14 @@ const FIELD_LABELS: Record<string, string> = {
  * card for an outside address would print "NYC's footprint  this
  * address" with a doubled space where {inside_phrasing} silently
  * resolved to "".
+ *
+ * OPTIONAL_FIELDS are clauses the backend leaves empty on purpose
+ * (sandy's `{edge_note}` is "" or ", about 40 m from the mapped edge
+ * ..."); empty or absent (a snapshot saved before the field existed),
+ * they render as no text.
  */
+const OPTIONAL_FIELDS = new Set(['edge_note']);
+
 function formatTemplate(template: string, value: unknown): string | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const v = value as Record<string, unknown>;
@@ -99,7 +109,7 @@ function formatTemplate(template: string, value: unknown): string | null {
   const out = template.replace(/\{(\w+)\}/g, (_, key: string) => {
     const x = v[key];
     if (x === undefined || x === null || x === '') {
-      missing = true;
+      if (!OPTIONAL_FIELDS.has(key)) missing = true;
       return '';
     }
     return String(x);
@@ -108,7 +118,7 @@ function formatTemplate(template: string, value: unknown): string | null {
 }
 
 const UNFILLED = /\{\w+\}/;
-const TEXT_FIELDS = ['headline', 'subhead', 'body', 'sub', 'sparkSub', 'spatialNote'] as const;
+const TEXT_FIELDS = ['headline', 'subhead', 'body', 'sub', 'sparkSub'] as const;
 
 /** Drop any card text line that still holds a `{field}` placeholder: an
  *  unfilled template is worse than no line. Every card passes through
@@ -132,11 +142,9 @@ export function dropUnfilled(card: Card): Card {
  *  not `errored`. The FSM marks both as `silent` in the trace; we
  *  conservatively classify any successful trace-`silent` as
  *  silent_by_design (the spec voice). Anything that raised in the FSM
- *  becomes `errored`. `fan`/`merge` are structural; the few callers
- *  that look at them treat them as fired.
+ *  becomes `errored`.
  */
 function mapStatus(s: TraceStatus): StoneMember['status'] {
-  if (s === 'fan' || s === 'merge') return 'fired';
   if (s === 'silent') return 'silent_by_design';
   if (s === 'error') return 'errored';
   return 'fired';
@@ -257,141 +265,6 @@ function obj(v: unknown): Record<string, unknown> | null {
 // instead. The `boolean_zone` shaper wraps the bare bool so the
 // template can phrase inside-vs-outside correctly. The templated
 // path renders the card.
-
-// ─── Type-keyed bespoke variant renderers ─────────────────────────
-//
-// The framework move (per the user's "type-specific, not city-specific"
-// note): bespoke builders are kept for value shapes that earn rich
-// rendering — forecasts, ML rasters, asset registers, lulc class
-// breakdowns — but each builder is keyed by VALUE SHAPE / display
-// variant, not by a hardcoded pebble id. Any pebble that emits the
-// expected shape and declares the right `display.variant` gets the
-// same bespoke card.
-//
-// Below: `buildTimeseriesForecast` unifies the previous
-// buildTtmForecast + buildTtmBatterySurge. The pebble's value shape
-// declares the unit and horizon ("ft" + minutes vs "cm" + hours,
-// derived from which `forecast_peak_*` keys are present). The
-// manifest's display.variant ('timeseries' | 'timeseries-ft') picks
-// the chrome (fine-tune footer for `timeseries-ft`). Future TTM /
-// forecast / surge pebbles use this same renderer — drop the
-// curated id-keyed builders.
-
-type ForecastValue = {
-  available?: boolean;
-  interesting?: boolean;
-  // Surge — zero-shot (ft / minutes) and fine-tune (m / hours).
-  forecast_peak_ft?: number;
-  forecast_peak_minutes_ahead?: number;
-  forecast_peak_m?: number;
-  forecast_peak_hours_ahead?: number;
-  // 311 weekly forecast — per-day peak, day offset.
-  forecast_peak_day?: number;
-  forecast_peak_day_offset?: number;
-  forecast_weekly_equivalent?: number;
-  // FloodNet sensor — per-day-value peak, day offset.
-  forecast_peak_day_value?: number;
-  forecast_28d_expected_events?: number;
-  history_recent_28d_events?: number;
-  // Fine-tune footer fields (only on timeseries-ft variant).
-  rmse_m?: number;
-  hf_model_card?: string;
-  skill_vs_persistence?: string;
-  hardware_badge?: string;
-  spatial_note?: string;
-};
-
-function buildTimeseriesForecast(m: PebbleManifest, value: unknown): Card | null {
-  const t = value as ForecastValue | null;
-  if (!t || !t.available) return null;
-  // Every available forecast gets its row, including a small surge
-  // (`interesting` false): the written briefing cites it, so its evidence
-  // row must exist; it sits in the folded forecast group.
-  // Detect unit from which fields the adapter populated. Each branch is
-  // its own pebble-family contract:
-  //   ft + minutes_ahead       → surge (zero-shot)
-  //   m + hours_ahead          → surge (fine-tune, cm display)
-  //   peak_day + day_offset    → weekly cadence (311 forecasts)
-  //   peak_day_value + offset  → daily cadence (FloodNet sensor)
-  let peakLabel: string;
-  let headline: string;
-  let timeseries: NonNullable<Card['timeseries']>;
-  let subhead: string;
-  if (num(t.forecast_peak_ft) != null && num(t.forecast_peak_minutes_ahead) != null) {
-    const peak = num(t.forecast_peak_ft)!;
-    const ahead = num(t.forecast_peak_minutes_ahead)!;
-    peakLabel = `${peak} ft @ +${Math.round(ahead / 60)}h`;
-    headline = `${peak} ft`;
-    timeseries = { hours: 96, peak: { x: 38, y: 47 }, peakLabel };
-    subhead = m.narration.short ?? 'peak surge residual';
-  } else if (num(t.forecast_peak_m) != null
-             && num(t.forecast_peak_hours_ahead) != null) {
-    const peak = num(t.forecast_peak_m)!;
-    const ahead = num(t.forecast_peak_hours_ahead)!;
-    peakLabel = `${(peak * 100).toFixed(0)} cm @ +${ahead}h`;
-    headline = `${(peak * 100).toFixed(0)} cm`;
-    timeseries = {
-      hours: 96,
-      peak: { x: ahead, y: Math.round(peak * 100) },
-      peakLabel,
-    };
-    subhead = m.narration.short ?? 'peak surge';
-  } else if (num(t.forecast_peak_day) != null
-             && num(t.forecast_peak_day_offset) != null) {
-    const peak = num(t.forecast_peak_day)!;
-    const offset = num(t.forecast_peak_day_offset)!;
-    const weekly = num(t.forecast_weekly_equivalent);
-    peakLabel = `${peak.toFixed(2)}/day @ +${offset}d`;
-    headline = weekly != null
-      ? `${weekly.toFixed(1)}/wk`
-      : `${peak.toFixed(2)}/day`;
-    timeseries = { hours: 96, peak: { x: offset, y: peak }, peakLabel };
-    subhead = m.narration.short ?? 'forecast peak';
-  } else if (num(t.forecast_peak_day_value) != null
-             && num(t.forecast_peak_day_offset) != null) {
-    const peak = num(t.forecast_peak_day_value)!;
-    const offset = num(t.forecast_peak_day_offset)!;
-    const expected = num(t.forecast_28d_expected_events);
-    peakLabel = `${peak.toFixed(2)}/day @ +${offset}d`;
-    headline = expected != null
-      ? `${expected.toFixed(1)} events`
-      : `${peak.toFixed(2)}/day`;
-    timeseries = { hours: 96, peak: { x: offset, y: peak }, peakLabel };
-    subhead = m.narration.short ?? 'sensor forecast peak';
-  } else {
-    return null;
-  }
-  const variant: CardVariant =
-    (m.display.variant === 'timeseries-ft' || m.display.variant === 'timeseries')
-      ? m.display.variant
-      : 'timeseries';
-  const tier = (m.tier ?? 'modeled') as Card['tier'];
-  const source = shortSource(m.provenance.source_name);
-  return {
-    id: `fsm-${m.id.replace(/_/g, '-')}`,
-    stone: m.stone, tier, variant,
-    source, agency: m.provenance.source_name,
-    vintage: m.provenance.date_modified?.toString() ?? RIPRAP_VINTAGE,
-    title: m.title,
-    timeseries,
-    headline,
-    subhead,
-    sub: m.narration.template ? formatTemplate(m.narration.template, t) ?? undefined : undefined,
-    spatialNote: t.spatial_note,
-    docId: m.provenance.doc_id ?? m.id,
-    citeId: m.provenance.doc_id ?? m.id,
-    // Fine-tune footer: only when the variant is timeseries-ft AND
-    // the manifest's provenance carries an HF model card url. Each
-    // fine-tuned pebble's adapter emits rmse_m / skill_vs_persistence
-    // / hardware_badge alongside the forecast — same shape across
-    // any future model-specialised forecast pebble.
-    hfModelCard: variant === 'timeseries-ft' ? t.hf_model_card : undefined,
-    rmse: variant === 'timeseries-ft' && num(t.rmse_m) != null
-      ? `${num(t.rmse_m)!.toFixed(3)} m` : undefined,
-    skillVsPersistence: variant === 'timeseries-ft' ? t.skill_vs_persistence : undefined,
-    hardwareBadge: variant === 'timeseries-ft' ? t.hardware_badge : undefined,
-  };
-}
 
 // ── Type-keyed register card renderer ───────────────────────────
 //
@@ -536,8 +409,7 @@ function buildRegisterCard(m: PebbleManifest, value: unknown): Card | null {
 //   { n, histogram: number[], headline_value, subhead_text, narrative,
 //     radius_m?, years? }
 // nyc311 is the canonical case; future "count me over time" pebbles
-// (e.g. boston 311 trended, sea-level rise count series) get the same
-// bespoke chrome by declaring the variant + emitting the shape.
+// get the same bespoke chrome by declaring the variant + emitting the shape.
 type HistogramValue = {
   n?: number;
   histogram?: number[];
@@ -580,61 +452,7 @@ function buildHistogramCard(m: PebbleManifest, value: unknown): Card | null {
   };
 }
 
-// ── Type-keyed raster card renderer ─────────────────────────────
-//
-// Pebbles that declare `display.variant: raster` or `raster-pred`
-// and emit a normalized value shape:
-//   { headline_value, subhead_text, narrative, raster_kind, illustrative,
-//     ok?: bool }
-// All raster pebbles (prithvi_water, future flood-mask
-// models) flow through here — no per-pebble id check.
-type RasterValue = {
-  ok?: boolean;
-  available?: boolean;
-  headline_value?: string;
-  subhead_text?: string;
-  narrative?: string;
-  raster_kind?: string;
-  illustrative?: boolean;
-  spatial_note?: string;
-};
-
-function buildRasterCard(m: PebbleManifest, value: unknown): Card | null {
-  const t = value as RasterValue | null;
-  if (!t) return null;
-  // Both shapes used: raster-pred (model) sets `ok`; raster (baked)
-  // doesn't gate. Drop only when an explicit ok=false is present
-  // (the inference-offline case).
-  if (t.ok === false || t.available === false) return null;
-  const headline = t.headline_value;
-  if (!headline) return null;  // adapter didn't emit the contract shape
-  const variant: CardVariant =
-    (m.display.variant === 'raster' || m.display.variant === 'raster-pred')
-      ? m.display.variant
-      : 'raster';
-  const tier = (m.tier ?? 'modeled') as Card['tier'];
-  const source = shortSource(m.provenance.source_name);
-  return {
-    id: `fsm-${m.id.replace(/_/g, '-')}`,
-    stone: m.stone, tier, variant,
-    source, agency: m.provenance.source_name,
-    vintage: m.provenance.date_modified?.toString() ?? RIPRAP_VINTAGE,
-    title: m.title,
-    rasterKind: (t.raster_kind ?? 'prithvi') as RasterKind,
-    headline,
-    subhead: t.subhead_text,
-    sub: t.narrative,
-    illustrative: t.illustrative ?? false,
-    spatialNote: t.spatial_note,
-    docId: m.provenance.doc_id ?? m.id,
-    citeId: m.provenance.doc_id ?? m.id,
-    mapLayer: m.display.map_layer ? m.id : null,
-  };
-}
-
-const HOW_LABEL: Record<ModelRow['how'], string> = {
-  loaded: 'loaded', precomputed: 'precomputed', endpoint: 'LLM endpoint',
-};
+const HOW_LABEL: Record<ModelRow['how'], string> = { endpoint: 'LLM endpoint' };
 
 /** Hugging Face page for a repo id ("org/name") or an Ollama "hf.co/org/name:tag" id. */
 function hfHref(repo: string): string | null {
@@ -654,7 +472,6 @@ export function modelLines(rows: ModelRow[] | undefined): ModelLine[] {
       where: r.where,
       how: HOW_LABEL[r.how] ?? r.how,
       latency,
-      detail: r.how === 'precomputed' ? r.detail ?? null : null,
     };
   });
 }
@@ -726,12 +543,11 @@ const KIND_TO_VARIANT: Record<PebbleManifest['display']['kind'], CardVariant | n
  *  before trusting it as an override in buildTemplated. */
 const VALID_CARD_VARIANTS: Record<CardVariant, true> = {
   headline: true, tabular: true, scalars: true, histogram: true,
-  timeseries: true, 'timeseries-ft': true, raster: true,
-  'raster-pred': true, register: true, meta: true,
+  register: true, meta: true,
 };
 
 /** Intents that run polygon (neighborhood) pebbles instead of point ones. */
-const POLYGON_INTENTS = new Set(['neighborhood', 'development_check']);
+export const POLYGON_INTENTS = new Set(['neighborhood', 'development_check']);
 
 /** True when a pebble belongs to the given intent's card scaffold. Keeps
  *  neighborhood-only pebbles off address pages (and vice versa) instead
@@ -831,8 +647,8 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
       'aoi_radius_m', 'radius_m', 'cache_age_s',
       // Back-compat alias of observed_ft (the datum-aware key) the
       // noaa_tides adapter keeps for legacy LLM-citation paths; if
-      // both are present (Boston, Chicago) the card would show the
-      // same value twice.
+      // both are present (Chicago) the card would show the same value
+      // twice.
       'observed_ft_mllw', 'predicted_ft_mllw',
     ]);
     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
@@ -889,19 +705,14 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
   if (variant === 'tabular') {
     const v = value as {
       features?: { properties?: Record<string, unknown>; distance_m?: number }[];
-      // socrata / ckan-records adapters: summary-shape with n_records +
-      // a sample[] of plain row objects + top_by_*.
+      // socrata_records adapter and seeclickfix: summary-shape with
+      // n_records + a sample[] of plain row objects + top_by_*.
       // n_truncated=true means n_records hit the SQL LIMIT cap, so
       // the real count is >= n_records — render as "N+ records".
       sample?: Record<string, unknown>[];
       n_records?: number;
       n_truncated?: boolean;
       radius_m?: number;
-      // local_corpus_with_ner (policy_corpus): retrieved passages, not
-      // geospatial features or a records sample.
-      rag_hits?: { doc_id?: string; citation?: string; page?: number;
-                    text?: string; score?: number }[];
-      n_hits?: number;
     };
     // Path A — GeoJSON-style features
     const feats = Array.isArray(v?.features) ? v.features : [];
@@ -919,11 +730,8 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
       return { ...base, columns: cols.length ? cols : ['feature'], rows,
                sub: `${feats.length} feature${feats.length === 1 ? '' : 's'} within range` };
     }
-    // Path B — socrata / ckan-records summary shape (city_311 pebbles).
-    // Boston / Chicago / SF emit { n_records, sample, top_by_reason }.
-    // Without this branch the card silently returned null, so users
-    // saw "Boston 311 received 283 records" in the briefing paragraph
-    // but no card under the Touchstone Stone.
+    // Path B: records summary shape (city 311 pebbles). Chicago,
+    // Seattle and Albany emit { n_records, sample, top_by_* }.
     const sample = Array.isArray(v?.sample) ? v.sample : [];
     if (sample.length) {
       const cols = Object.keys(sample[0]);
@@ -933,21 +741,13 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
           return typeof val === 'number' || typeof val === 'string' ? val : '—';
         }),
       );
-      // Humanize the column headers so the card reads "Case title"
-      // instead of "case_title". The raw API field names are kept on
-      // the underlying data; only the rendered header swaps.
+      // Humanize the column headers so the card reads "Type" instead
+      // of "sr_type". The raw API field names are kept on the
+      // underlying data; only the rendered header swaps.
       const HEADER_LABELS: Record<string, string> = {
-        // Boston Analyze CKAN — 311
-        case_title: 'Case', reason: 'Reason', type: 'Type',
-        open_dt: 'Opened', neighborhood: 'Neighborhood',
-        // Chicago Socrata — 311
+        // Chicago Socrata 311
         sr_type: 'Type', sr_short_code: 'Code',
         status: 'Status', created_date: 'Opened',
-        // SF Socrata — 311
-        service_name: 'Service', service_subtype: 'Subtype',
-        status_description: 'Status',
-        requested_datetime: 'Opened',
-        analysis_neighborhood: 'Neighborhood',
       };
       const prettyCols = cols.map((c) => HEADER_LABELS[c] ?? c);
       const n = v?.n_records ?? sample.length;
@@ -960,26 +760,7 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
           : `${nLabel} record${n === 1 ? '' : 's'}`,
       };
     }
-    // Path C — local_corpus_with_ner's retrieved-passage shape
-    // ({rag_hits: [{doc_id, citation, page, text, score}]}). Neither a
-    // geospatial feature list nor a records sample, so it fell through
-    // to the generic "no records" fallback message before this — a
-    // real retrieval success (n_hits=1, n_entities=5 in the trace)
-    // rendered as "Policy-corpus index unavailable" regardless.
-    const ragHits = Array.isArray(v?.rag_hits) ? v.rag_hits : [];
-    if (ragHits.length) {
-      const rows: (string | number)[][] = ragHits.slice(0, 8).map((h) => [
-        h.citation ?? h.doc_id ?? '—',
-        h.page ?? '—',
-        h.text ? `${h.text.slice(0, 140)}${h.text.length > 140 ? '…' : ''}` : '—',
-      ]);
-      const n = v?.n_hits ?? ragHits.length;
-      return {
-        ...base, columns: ['Source', 'Page', 'Excerpt'], rows,
-        sub: `${n} passage${n === 1 ? '' : 's'} matched`,
-      };
-    }
-    // No features, sample, or rag_hits — fall back to the pebble's
+    // No features or sample: fall back to the pebble's
     // narration.template formatted against the value (e.g. nws_alerts
     // returns {n_active: 0, alerts: [], narrative: "No active NWS..."};
     // the narrative is the human-readable card body). If the template
@@ -1058,10 +839,6 @@ export function adaptFinalToFindings(
         // A register that did not run has no card (it never had one).
         card = buildRegisterCard(m, value);
         if (!card) continue;
-      } else if (m.display.variant === 'timeseries' || m.display.variant === 'timeseries-ft') {
-        card = buildTimeseriesForecast(m, value);
-      } else if (m.display.variant === 'raster' || m.display.variant === 'raster-pred') {
-        card = buildRasterCard(m, value);
       } else if (m.display.variant === 'histogram') {
         card = buildHistogramCard(m, value);
       }
@@ -1080,14 +857,28 @@ export function adaptFinalToFindings(
   };
 }
 
+/** Said above the evidence when a question got the place's evidence and
+ *  no answer (no rule named what it asks and no model answered). */
+export const UNANSWERED = 'This question was not answered. The evidence for the place is shown below.';
+
 /** What produced the briefing, in words: the mode line on screen and in
  *  print. An extractive answer is quoted, not model prose, so it does not
- *  say "LLM claims checked" for it. */
+ *  say "LLM claims checked" for it. A question the rules answered, or one
+ *  that neither a rule nor a model answered, says so. */
 export function modeLine(g: { tier: string; model?: string; answer_mode?: string; answer_lead?: string; note?: string;
+                              question?: string; answered?: boolean | null;
                               claims?: unknown[]; dropped_claims?: unknown[]; fallback_reason?: string } | null | undefined): string | null {
   if (!g) return null;
   if (g.tier !== 'llm') {
     if (g.note) return 'Evidence briefing: no question was asked, so no LLM was needed';
+    const unavailable = g.fallback_reason ? ` The LLM was unavailable (${g.fallback_reason}).` : '';
+    // No answer lead at all: the evidence briefing stands in for an answer.
+    if (g.question && g.answered === false && !g.answer_lead) {
+      return `No rule and no language model answered the question, so the evidence briefing is shown.${unavailable}`;
+    }
+    if (g.question && g.answer_mode === 'rules') {
+      return `Answered by rules over the question's words; no language model was used.${unavailable}`;
+    }
     return g.fallback_reason
       ? `Evidence briefing (no LLM). The LLM was unavailable (${g.fallback_reason}), so the evidence briefing is shown.`
       : 'Evidence briefing (no LLM)';

@@ -41,8 +41,9 @@ describe('card labels and no-data sources', () => {
   });
 
   it('lists null or unavailable pebbles as no data', () => {
-    const ids = (data.noData ?? []).map((s) => s.id);
-    expect(ids).toContain('floodnet_forecast');
+    const nulled = RunState.fromFinal({ ...final, noaa_tides: null, nws_obs: { available: false } } as unknown as FinalResult, redHook.address);
+    const ids = (nulled.findingsData.noData ?? []).map((s) => s.id);
+    expect(ids).toEqual(expect.arrayContaining(['noaa_tides', 'nws_obs']));
     // A register with items is not "no data".
     expect(ids).not.toContain('doe_schools');
   });

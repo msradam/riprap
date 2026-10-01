@@ -1,6 +1,6 @@
 import type { Tier } from './tier';
 
-export type TraceStatus = 'ok' | 'silent' | 'error' | 'fan' | 'merge';
+export type TraceStatus = 'ok' | 'silent' | 'error';
 
 export interface TraceNode {
   id: string;
@@ -18,9 +18,6 @@ export interface TraceNode {
   /** Doc id this specialist contributed (when known). Surfaced in the
    *  expanded panel so a judge can cross-reference to a citation chip. */
   docId?: string;
-  /** Foundation model that produced this specialist's output. Used by
-   *  the trace renderer to group co-model specialists under a parent. */
-  model?: string;
   claims?: number;
   children?: TraceNode[];
 }

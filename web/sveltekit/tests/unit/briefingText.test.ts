@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { asOfDate, asOfPhrase, citedIn, figureOf, findingOf, keepTogether, leadClause, sharedStem, snapshotNote, termsIn, tidy, withoutSubject } from '$lib/client/briefingText';
+import { asOfDate, asOfPhrase, citedIn, figureOf, findingOf, keepTogether, leadClause, sharedStem, termsIn, tidy, withoutSubject } from '$lib/client/briefingText';
 import type { Card } from '$lib/types/card';
 
 const card = (over: Partial<Card>): Card => ({
@@ -164,20 +164,6 @@ describe('sharedStem', () => {
     ])).toBeNull();
     expect(sharedStem([`${dep} (2.13 in/hr, 2050 SLR).`])).toBeNull();
     expect(sharedStem(['No parenthetical.', 'No parenthetical.'])).toBeNull();
-  });
-});
-
-describe('snapshotNote', () => {
-  const at = '2026-09-29 12:34 UTC';
-  it('dates forecasts to the snapshot', () => {
-    expect(snapshotNote('ttm_311_forecast', at)).toBe('Forecast made at the snapshot, 2026-09-29 12:34 UTC.');
-    expect(snapshotNote('floodnet_forecast', at)).toBe('Forecast made at the snapshot, 2026-09-29 12:34 UTC.');
-  });
-  it('says nothing for other sources or a live run', () => {
-    // The alerts sentence carries its own "checked <time>".
-    expect(snapshotNote('nws_alerts', at)).toBeNull();
-    expect(snapshotNote('sandy_inundation', at)).toBeNull();
-    expect(snapshotNote('ttm_battery_surge', null)).toBeNull();
   });
 });
 

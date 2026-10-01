@@ -28,6 +28,18 @@ describe('mode line', () => {
     expect(modeLine({ tier: 'no_llm', note: 'x' }))
       .toBe('Evidence briefing: no question was asked, so no LLM was needed');
   });
+  it('says a question was answered by rules, with no language model', () => {
+    const g = { tier: 'no_llm', answer_mode: 'rules', question: 'How many complaints?', answered: true, answer_lead: 'count' };
+    expect(modeLine(g)).toBe("Answered by rules over the question's words; no language model was used.");
+    expect(modeLine({ ...g, fallback_reason: 'LLM unavailable: timeout' }))
+      .toBe("Answered by rules over the question's words; no language model was used. The LLM was unavailable (LLM unavailable: timeout).");
+  });
+  it('says plainly when neither a rule nor a model answered', () => {
+    const g = { tier: 'no_llm', answer_mode: 'rules', question: 'Is the roof sound?', answered: false };
+    expect(modeLine(g)).toBe('No rule and no language model answered the question, so the evidence briefing is shown.');
+    expect(modeLine({ ...g, answer_mode: 'extractive', fallback_reason: 'LLM unavailable: timeout' }))
+      .toMatch(/^No rule and no language model answered the question.*The LLM was unavailable \(LLM unavailable: timeout\)\.$/);
+  });
   it('omits "Other claims" when every extractive claim is in the answer', () => {
     const line = modeLine({ tier: 'llm', answer_mode: 'extractive', claims: [{ section: 'answer' }, { section: 'answer' }] });
     expect(line).not.toContain('Other claims');

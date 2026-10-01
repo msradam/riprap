@@ -37,7 +37,7 @@
   let looksLikeDistrict = $derived(/^\s*(MN|BX|BK|QN|SI)\s*\d{1,2}\s*$/i.test(query));
 
   // The routed deployment decides whether the geocoder hint may name
-  // an NYC community district; under a Boston chip it would mislead.
+  // an NYC community district; under a Chicago chip it would mislead.
   let depName = $derived(deployment.current?.name);
   let cityName = $derived(deployment.current?.city ?? '');
   let isUnknown = $derived(!depName || depName === 'unknown' || depName === '__none__' || depName === 'federal');

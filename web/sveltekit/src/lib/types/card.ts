@@ -27,8 +27,7 @@ export type StoneMeta = { name: string; role: string; tag: string };
 
 // Stone taglines — kept city-agnostic here since they're the *fallback*
 // when a deployment's stones.yaml description hasn't loaded yet (or is
-// empty in the out-of-coverage state). The city-specific phrasing —
-// "Reads what Boston remembers about flooding…" — comes from
+// empty in the out-of-coverage state). The city-specific phrasing comes from
 // pebbleManifest.stones[].description, applied by StoneRegion and
 // MapLegend so a per-query render reflects the routed deployment.
 export const STONE_META: Record<StoneKey, StoneMeta> = {
@@ -39,20 +38,12 @@ export const STONE_META: Record<StoneKey, StoneMeta> = {
   capstone:    { name: 'Capstone',    role: 'the synthesizer',    tag: 'writes it all down with citations' },
 };
 
-/** Card body variants, one renderer per shape.
- *
- *    timeseries-ft  — v0.4.5 §5: timeseries + fine-tuned-model footer
- *                     (HF model-card link, RMSE, hardware badge).
- */
+/** Card body variants, one renderer per shape. */
 export type CardVariant =
   | 'headline'
   | 'tabular'
   | 'scalars'
   | 'histogram'
-  | 'timeseries'
-  | 'timeseries-ft'
-  | 'raster'
-  | 'raster-pred'
   | 'register'
   | 'meta';
 
@@ -81,17 +72,7 @@ export type ModelLine = {
   where: string;
   how: string;
   latency: string | null;
-  /** Shown for precomputed rows only. */
-  detail: string | null;
 };
-
-export type RasterKind =
-  | 'stormwater'
-  | 'stormwater-dry'
-  | 'fema-ae'
-  | 'hwm'
-  | 'prithvi'
-  | 'floodnet-density';
 
 /** A single Findings card. Most fields are variant-specific. */
 export type Card = {
@@ -117,10 +98,6 @@ export type Card = {
    *  layer; hovering the layer outlines this card. */
   mapLayer?: string | null;
 
-  /** Marks the card visually as illustrative (dashed top-rule on synthetic
-   *  / preview cards). Always implied true for tier=synthetic. */
-  illustrative?: boolean;
-
   /** Set when the source produced nothing: a short label such as "Not
    *  available" or "Not run". The card renders as a muted absence line,
    *  never as a finding; `sub` carries the reason when there is one. */
@@ -128,10 +105,6 @@ export type Card = {
 
   /** The pebble behind this card is marked experimental in its manifest. */
   experimental?: boolean;
-
-  /** Optional spatial-index callout (e.g. "regional · The Battery, not
-   *  point-of-query") rendered next to the body sub. */
-  spatialNote?: string;
 
   /** Variant-specific body fields. Only the relevant ones are populated. */
   headline?: string;
@@ -150,28 +123,12 @@ export type Card = {
   // histogram
   histogram?: number[];
 
-  // timeseries
-  timeseries?: {
-    hours: number;
-    peak: { x: number; y: number };
-    peakLabel: string;
-  };
-
-  // raster / raster-pred
-  rasterKind?: RasterKind;
-
   // register
   registers?: RegisterRow[];
 
   // meta
   metaRows?: MetaRow[];
   models?: ModelLine[];
-
-  // timeseries-ft — fine-tuned-model footer chrome (v0.4.5 §5)
-  hfModelCard?: string;
-  rmse?: string;
-  skillVsPersistence?: string;
-  hardwareBadge?: string;
 };
 
 /** Per-specialist run-state. v0.4.5 splits the v0.4.4 `ok|warn|error|silent`

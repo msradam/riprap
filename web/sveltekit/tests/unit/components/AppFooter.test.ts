@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { render } from '@testing-library/svelte';
 import AppFooter from '$lib/components/shell/AppFooter.svelte';
 import { resetStores, seedForCity } from '../helpers/stores';
-import { ALL_CITIES, BOSTON, NYC } from '../fixtures/cities';
+import { ALL_CITIES, CHICAGO, NYC } from '../fixtures/cities';
 
 beforeEach(resetStores);
 
@@ -21,8 +21,8 @@ describe('AppFooter NYC-only resource links are deployment-gated', () => {
     expect(text).toContain('FloodNet NYC');
   });
 
-  it('hides FloodHelpNY + FloodNet NYC under Boston chip', () => {
-    seedForCity(BOSTON);
+  it('hides FloodHelpNY + FloodNet NYC under Chicago chip', () => {
+    seedForCity(CHICAGO);
     const { container } = render(AppFooter);
     const text = container.textContent ?? '';
     expect(text).not.toContain('FloodHelpNY');
@@ -44,7 +44,7 @@ describe('AppFooter NYC-only resource links are deployment-gated', () => {
   );
 
   it('always shows the universal disclaimer regardless of deployment', () => {
-    seedForCity(BOSTON);
+    seedForCity(CHICAGO);
     const { container } = render(AppFooter);
     const text = container.textContent ?? '';
     expect(text).toContain('Riprap is a reference dossier');

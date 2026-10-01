@@ -9,6 +9,7 @@
   import EvidenceTable from '$lib/components/briefing/EvidenceTable.svelte';
   import { loadSnapshot, type PrintSnapshot } from '$lib/stores/briefingState.svelte';
   import { formatGeneratedAt } from '$lib/client/gallery';
+  import { UNANSWERED } from '$lib/client/cardAdapter';
   import { APP_VERSION } from '$lib/version';
   import { STATIC_SITE, QUICKSTART_URL } from '$lib/staticSite';
 
@@ -140,10 +141,7 @@
         <AnswerProse {parts} citations={snapshot.citations} class={snapshot.keyed && i > 0 ? 'print-answer-p is-support' : 'print-answer-p'} />
       {/each}
       {#if snapshot.unanswered}
-        <p class="print-answer-p">
-          This question was not answered directly. Riprap is running without a language model here,
-          so this is the evidence briefing for the place above.
-        </p>
+        <p class="print-answer-p">{UNANSWERED}</p>
       {/if}
       {#each snapshot.scope ?? [] as parts, i (i)}
         <AnswerProse {parts} citations={snapshot.citations} class="print-quiet" />
@@ -167,7 +165,6 @@
             citations={snapshot.citations}
             notRun={snapshot.evidence.notRun}
             labelledby="print-evidence-h"
-            snapshotAt={snapshot.origin === 'gallery' ? generated : null}
           />
         </section>
       {/if}

@@ -34,7 +34,6 @@ const NYC_PATTERNS: { re: RegExp; description: string }[] = [
   { re: /Ida HWM/g,                description: 'Ida HWM reference' },
   { re: /FloodHelpNY/g,            description: 'FloodHelpNY link' },
   { re: /FloodNet NYC/g,           description: 'FloodNet NYC link' },
-  { re: /Prithvi-NYC/g,            description: 'Prithvi-NYC model reference' },
   { re: /five boroughs/gi,         description: '"five boroughs" phrase' },
   { re: /the Battery/gi,           description: '"the Battery" NYC reference' },
   { re: /Brooklyn|Manhattan|Queens|the Bronx|Staten Island/gi, description: 'NYC borough name' },
@@ -47,14 +46,14 @@ const NYC_PATTERNS: { re: RegExp; description: string }[] = [
  */
 const EXEMPT_FILES = new Set<string>([
   // Landing pages: marketing copy that references shipped cities
-  // (NYC, Boston, Chicago, Seattle, SF) as features — this is by
+  // (NYC, Chicago, Seattle, Albany) as features. This is by
   // design, not a leak.
   'landing/CityPicker.svelte',
   'landing/LandHero.svelte',
   'landing/LandStones.svelte',
   'landing/UseBand.svelte',
   // RipMap layer descriptions reference NYC-specific data sources
-  // (FloodNet NYC, Prithvi-NYC). Map layers visibility is itself
+  // (FloodNet NYC). Map layers visibility is itself
   // gated on the per-query manifest's display.map_layer flag, so
   // these strings only render when their data source is active.
   'map/RipMap.svelte',
@@ -90,10 +89,9 @@ function stripComments(src: string): string {
  *  deployment. Skip lines that look like dictionary KEYS containing
  *  NYC pebble names. */
 function isPebbleIdMapKey(line: string): boolean {
-  // Matches `  nycXXX: 'value'` or `  nycha_developments: 'value'`
-  // or `  ttm_battery_surge: 'TTM Battery (NYC fine-tune)'`
-  // — these are pebble-id → short-label maps in StatusPill.
-  return /^\s*(nyc311\w*|nycha_\w+|ttm_battery_surge|nycha_development_exposure)\s*:/i.test(line);
+  // Matches `  nycXXX: 'value'` or `  nycha_developments: 'value'`:
+  // these are pebble-id → short-label maps in StatusPill.
+  return /^\s*(nyc311\w*|nycha_\w+|nycha_development_exposure)\s*:/i.test(line);
 }
 
 interface Leak {

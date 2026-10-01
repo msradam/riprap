@@ -42,7 +42,7 @@
           <li>
             <span class="how-made-model">{m.name}</span>,
             {#if m.href}<a class="data" href={m.href} target="_blank" rel="noopener noreferrer">{m.repo}</a>{:else}<span class="data">{m.repo}</span>{/if}.
-            {m.where}; {m.how}{#if m.latency}, <span class="data">{m.latency}</span>{/if}.{#if m.detail}{` ${m.detail}.`}{/if}
+            {m.where}; {m.how}{#if m.latency}, <span class="data">{m.latency}</span>{/if}.
           </li>
         {/each}
       </ul>

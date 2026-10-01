@@ -30,24 +30,6 @@ export async function fetchDep(lat: number, lon: number, r = 1500): Promise<Feat
 }
 
 /**
- * Prithvi water-mask polygons cover Hurricane Ida 2021 flood extents
- * across NYC. The polygons are *sparse* at street-block scale — most
- * single addresses fall in zero-feature neighborhoods. We use the same
- * 1.5 km radius as Sandy/DEP so the layer reflects what flooded *near*
- * the queried address. A wider radius pulled in features from across
- * the city (Manhattan polygons rendering on a Red Hook briefing) which
- * read as confabulation. If a neighborhood wasn't hit by Ida, silence
- * is the right answer — the legend drops the layer automatically.
- */
-export async function fetchPrithviSynthetic(
-  lat: number,
-  lon: number,
-  r = 1500
-): Promise<FeatureCollection> {
-  return fetchFc(`/api/layers/prithvi_water?lat=${lat}&lon=${lon}&r=${r}`);
-}
-
-/**
  * Neighborhood / development_check intents emit `nta_resolve` instead of
  * `geocode`. The matching layer endpoints clip to the NTA polygon's bbox
  * — same FeatureCollection contract as the address-mode endpoints.

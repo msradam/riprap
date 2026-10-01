@@ -45,7 +45,7 @@ export function citedIn(paras: ClaimPart[][]): string[] {
 
 /** A figure and its unit at the start of a headline: a unit symbol ("22
  *  cm", "0.2/wk") or, when the headline is the figure and its noun alone
- *  ("82 complaints", "0.5 events"), that noun. */
+ *  ("82 complaints", "57 permits"), that noun. */
 const FIGURE_RE = /^\d[\d.,]*(?:\s?(?:%|m²|cm|mm|ft|in|m\b|\/wk)|\s[a-z]+(?=$|[.,;:]))?/;
 
 /** A scalar that places or dates the finding ("Distance to station (km)",
@@ -84,17 +84,6 @@ export function figureOf(c: Pick<Card, 'scalars' | 'headline' | 'title'>): { val
     ? countNoun(c.headline!.slice(m[0].length).trim()) ?? (c.title ? countNoun(c.title) : null)
     : null;
   return { value: noun ? `${value} ${noun}` : value, label: null };
-}
-
-/** The forecasts, whatever their maturity (district pages add `_nta`). */
-export const FORECASTS = ['ttm_battery_surge', 'ttm_311_forecast', 'floodnet_forecast'];
-
-/** Gallery pages: a forecast was made when the snapshot was made (`at`,
- *  "2026-09-29 12:34 UTC"), so its row says when. The NWS alerts sentence
- *  carries its own "checked <time>" and needs no note. */
-export function snapshotNote(docId: string, at: string | null | undefined): string | null {
-  if (!at) return null;
-  return FORECASTS.includes(docId.replace(/_nta$/, '')) ? `Forecast made at the snapshot, ${at}.` : null;
 }
 
 /** The space after a full stop that starts a new sentence. */

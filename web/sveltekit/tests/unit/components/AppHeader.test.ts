@@ -1,6 +1,6 @@
 /**
  * AppHeader — the header chip the user kept catching showing "NYC"
- * for a Boston query. With per-query routing wired through the SSE
+ * for a Chicago query. With per-query routing wired through the SSE
  * `deployment` event, the chip should reflect whichever city
  * `deployment.current` resolves to.
  */
@@ -40,7 +40,7 @@ describe('AppHeader chip text per deployment', () => {
       });
       const text = container.textContent ?? '';
       // The header chip should not contain the string "NYC" anywhere
-      // when the deployment is not NYC. (Hits the bug where a Boston
+      // when the deployment is not NYC. (Hits the bug where a Chicago
       // run still showed "NYC" pill.)
       expect(text, `${city.key} chip contains 'NYC': ${text.slice(0, 200)}`)
         .not.toMatch(/\bNYC\b/);

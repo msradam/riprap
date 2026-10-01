@@ -2,24 +2,19 @@
  * Active-deployment descriptor — fetched once on app load from
  * `/api/deployment`. Drives the header chip text, browser title, and
  * the city-name shown in the hero on app pages.
- *
- * Landing page intentionally renders the hazard-agnostic
- * "Climate-exposure briefing" chip regardless of the active deployment
- * — the city is implied by the cycling H1 + city picker, not the chip.
- * App pages use the active deployment's actual hazard + city.
  */
 
 import { STATIC_SITE } from '$lib/staticSite';
 
 export interface Deployment {
-  /** Directory name — `nyc`, `boston`, `chicago`, `heat`, `air`, ... */
+  /** Directory name: `nyc`, `chicago`, `seattle`, `albany`. */
   name: string;
-  /** Display city — `NYC`, `Boston`, `Chicago`, ... */
+  /** Display city: `NYC`, `Chicago`, ... */
   city: string;
-  /** Hazard tagline — `Flood-exposure briefing`, `Heat-exposure briefing`, ... */
+  /** Hazard tagline: `Flood-exposure briefing`. */
   hazard: string;
-  /** A deployment still being built out (albany, boston, chicago, seattle,
-   *  sf): the chip and the briefing say so. Missing means false. */
+  /** A deployment still being built out (albany, chicago, seattle): the
+   *  chip and the briefing say so. Missing means false. */
   experimental?: boolean;
 }
 

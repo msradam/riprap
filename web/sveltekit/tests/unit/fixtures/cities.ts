@@ -3,12 +3,12 @@
  * /api/deployment + /api/agent return for each shipped deployment.
  *
  * Fixtures are HAND-MAINTAINED, not generated. The reason: tests using
- * them assert exact strings ("Boston", "Reads what Boston remembers
- * about flooding…") and we want a deliberate edit when those strings
+ * them assert exact strings ("Chicago", "Reads what Chicago's ground
+ * remembers about flooding…") and we want a deliberate edit when those strings
  * drift, not silent regeneration from a live server. If a backend
  * change makes a fixture stale, the test FAILS — that's the contract.
  *
- * Coverage: NYC, Boston, Chicago, Seattle, SF, plus an out-of-coverage
+ * Coverage: NYC, Chicago, Seattle, plus an out-of-coverage
  * "elsewhere" fixture for Albuquerque to assert the neutral chip path.
  */
 import type {
@@ -91,20 +91,16 @@ export const NYC: CityFixture = {
     pebbles: [
       pebble('sandy',                'cornerstone', { map_layer: true,  title: 'NYC Sandy Inundation Zone (2012 empirical extent)' }),
       pebble('ida_hwm',              'cornerstone', { map_layer: true,  title: 'Hurricane Ida 2021 — USGS high-water marks' }),
-      pebble('prithvi_water',        'cornerstone', { map_layer: true,  tier: 'modeled' }),
       pebble('microtopo',            'cornerstone', { tier: 'proxy' }),
       pebble('dep_extreme_2080',     'cornerstone', { map_layer: true,  tier: 'modeled' }),
       pebble('dep_moderate_2050',    'cornerstone', { map_layer: true,  tier: 'modeled' }),
       pebble('dep_moderate_current', 'cornerstone', { map_layer: true,  tier: 'modeled' }),
-      pebble('policy_corpus',        'cornerstone'),
       pebble('floodnet',             'touchstone',  { map_layer: true,  tier: 'proxy' }),
       pebble('nyc311',               'touchstone',  { map_layer: true,  tier: 'proxy' }),
       pebble('nws_obs',              'touchstone'),
       pebble('noaa_tides',           'touchstone'),
       pebble('nws_alerts',           'lodestone',   { tier: 'modeled' }),
-      pebble('ttm_battery_surge',    'lodestone',   { tier: 'modeled' }),
-      pebble('ttm_311_forecast',     'lodestone',   { tier: 'modeled' }),
-      pebble('floodnet_forecast',    'lodestone',   { tier: 'modeled' }),
+      pebble('nws_water_forecast',   'lodestone',   { tier: 'modeled' }),
       pebble('npcc4_slr',            'lodestone',   { tier: 'modeled' }),
       pebble('mta_entrances',        'keystone',    { map_layer: true,  title: 'MTA subway entrances exposed nearby' }),
       pebble('nycha_developments',   'keystone',    { map_layer: true,  title: 'NYCHA developments exposed nearby' }),
@@ -126,65 +122,19 @@ export const NYC: CityFixture = {
     dep_moderate_2050: { depth_label: 'outside', depth_class: 0 },
     dep_moderate_current: { depth_label: 'outside', depth_class: 0 },
     microtopo: { aoi_max_m: 4.2, basin_relief_m: 0.9 },
-    prithvi_water: { n_polygons_within_500m: 0 },
     floodnet: { n_sensors: 2, n_flood_events_3y: 7 },
     nyc311: { n: 29 },
     nws_obs: { station_id: 'KJFK', precip_last_hour_mm: 0 },
     noaa_tides: { station_id: '8518750', station_name: 'The Battery, NY',
                   observed_ft_mllw: 4.5, distance_km: 0.8 },
     nws_alerts: { n_active: 0, alerts: [] },
-    ttm_battery_surge: { available: true },
-    ttm_311_forecast: { available: true },
-    floodnet_forecast: { available: true },
+    nws_water_forecast: { gauge_id: 'BATN6', gauge_name: 'The Battery', distance_km: 0.8,
+                          forecast_peak_ft_mllw: 5.9, flood_category: null },
     npcc4_slr: { '2050': 12, '2100': 24, available: true },
     mta_entrances: { n_ada_accessible: 1 },
     nycha_developments: { n_developments: 0 },
     doe_schools: { n_schools: 0 },
     doh_hospitals: { n_hospitals: 0 },
-    citations: [],
-    grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
-  },
-};
-
-// ─────────────────────────────────────────────────────────── Boston
-export const BOSTON: CityFixture = {
-  key: 'boston',
-  deployment: { name: 'boston', city: 'Boston', hazard: 'Flood-exposure briefing' },
-  geocode: {
-    address: 'Boston City Hall, 1, Congress Street, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02201, United States',
-    lat: 42.3603713, lon: -71.0579762,
-  },
-  manifest: {
-    stones: deploymentStones({
-      cornerstone: "Reads what Boston remembers about flooding — Back Bay landfill, Boston Harbor surge exposure, nor'easter shoreline impact.",
-      touchstone:  "Watches current flood signals — Boston 311 cases, NWS Boston/Norton, Boston Harbor tide observations.",
-      keystone:    "Counts public assets exposed — BPS schools, City of Boston facilities, hospitals.",
-      lodestone:   "Projects what's coming — NWS Boston/Norton forecasts, NOAA SLR Viewer for Boston Harbor.",
-      capstone:    "Writes the cited briefing, with or without an LLM.",
-    }),
-    pebbles: [
-      pebble('boston_311',  'touchstone', { map_layer: true,  tier: 'proxy',
-        title: 'Boston 311 service requests near this address' }),
-      pebble('water_level', 'touchstone', { tier: 'empirical',
-        title: 'Local water level — NOAA Boston, MA (station 8443970)' }),
-      pebble('nws_obs',     'touchstone'),
-      pebble('nws_alerts',  'lodestone',  { tier: 'modeled' }),
-    ],
-  },
-  agent: {
-    intent: 'single_address',
-    paragraph: 'Templated reconciliation paragraph for Boston.',
-    geocode: { address: 'Boston City Hall, 1, Congress Street, Boston, MA',
-               lat: 42.3603713, lon: -71.0579762, borough: 'Downtown' },
-    lat: 42.3603713,
-    lon: -71.0579762,
-    deployment: 'boston',
-    boston_311:  { n_records: 396, radius_m: 500, sample: [] },
-    nws_obs:     { station_id: 'KBOS', precip_last_hour_mm: 0, distance_km: 0.3 },
-    water_level: { station_id: '8443970', station_name: 'Boston, MA',
-                   observed_ft_mllw: 2.17, predicted_ft_mllw: 1.06,
-                   residual_ft: 1.11, distance_km: 0.7 },
-    nws_alerts:  { n_active: 0, alerts: [] },
     citations: [],
     grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
   },
@@ -267,46 +217,6 @@ export const SEATTLE: CityFixture = {
   },
 };
 
-// ─────────────────────────────────────────────────────────── SF
-export const SF: CityFixture = {
-  key: 'sf',
-  deployment: { name: 'sf', city: 'San Francisco', hazard: 'Flood-exposure briefing' },
-  geocode: { address: 'San Francisco City Hall, 1, Dr. Carlton B. Goodlett Place, San Francisco, CA',
-             lat: 37.7792929, lon: -122.4192601 },
-  manifest: {
-    stones: deploymentStones({
-      cornerstone: "Reads what SF remembers about flooding — Bay shoreline, fog-prone microclimates, fault-adjacent fills, and Pacific storm exposure.",
-      touchstone:  "Watches current flood signals — SF311 cases, NWS Bay Area, SF Bay tide observations.",
-      keystone:    "Counts public assets exposed — SFUSD schools, City and County of SF public assets, hospitals.",
-      lodestone:   "Projects what's coming — NWS Bay Area forecasts, NOAA SLR Viewer for SF Bay.",
-      capstone:    "Writes the cited briefing, with or without an LLM.",
-    }),
-    pebbles: [
-      pebble('sf_311',     'touchstone', { map_layer: true, tier: 'proxy',
-        title: 'SF 311 service requests near this address' }),
-      pebble('water_level','touchstone', { tier: 'empirical',
-        title: 'Local water level — NOAA San Francisco (station 9414290)' }),
-      pebble('nws_obs',    'touchstone'),
-      pebble('nws_alerts', 'lodestone',  { tier: 'modeled' }),
-    ],
-  },
-  agent: {
-    intent: 'single_address',
-    paragraph: 'Templated reconciliation paragraph for SF.',
-    geocode: { address: 'San Francisco City Hall, San Francisco, CA',
-               lat: 37.7792929, lon: -122.4192601, borough: 'Civic Center' },
-    lat: 37.7792929,
-    lon: -122.4192601,
-    deployment: 'sf',
-    sf_311:      { n_records: 200 },
-    nws_obs:     { station_id: 'KSFO', distance_km: 12.1 },
-    water_level: { station_id: '9414290', distance_km: 5.1 },
-    nws_alerts:  { n_active: 0 },
-    citations: [],
-    grounding: { tier: 'no_llm', claims: [], dropped_claims: [] },
-  },
-};
-
 // ─────────────────────────────────────────────────────────── Out-of-coverage
 export const ELSEWHERE: CityFixture = {
   key: 'federal',
@@ -330,11 +240,11 @@ export const ELSEWHERE: CityFixture = {
   },
 };
 
-export const ALL_CITIES: readonly CityFixture[] = [NYC, BOSTON, CHICAGO, SEATTLE, SF, ELSEWHERE] as const;
+export const ALL_CITIES: readonly CityFixture[] = [NYC, CHICAGO, SEATTLE, ELSEWHERE] as const;
 
 /** Strings that, if seen in a non-NYC render, indicate NYC content leakage.
  *  These are the substrings the user has actually screenshotted appearing
- *  in Boston / Chicago / SF renders. */
+ *  in non-NYC renders. */
 export const NYC_LEAK_NEEDLES: readonly string[] = [
   // Stone-tagline leak (StoneRegion's `tag` from STONE_META)
   "what NYC's ground remembers",
@@ -347,7 +257,6 @@ export const NYC_LEAK_NEEDLES: readonly string[] = [
   'DOH hospitals',
   'FloodNet sensors',
   'TerraMind',
-  'Prithvi-NYC',
   // Trust-signal / footer leaks
   'FloodHelpNY',
   'FloodNet NYC',

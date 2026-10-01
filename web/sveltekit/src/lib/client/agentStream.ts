@@ -75,7 +75,9 @@ export interface DroppedClaim extends GroundedClaim {
 
 /** How the briefing was produced. `llm`: model-written claims checked
  *  against their cited sources (failures land in dropped_claims).
- *  `no_llm`: evidence briefing built directly from pebble values. */
+ *  `no_llm`: no model was called. The answer was picked by code rules
+ *  from the question's words (`answer_mode: "rules"`), or nothing
+ *  answered and the evidence briefing stands (`answered: false`). */
 export interface Grounding {
   tier: 'llm' | 'no_llm';
   model?: string;
@@ -85,8 +87,10 @@ export interface Grounding {
   retried_claims?: GroundedClaim[];
   fallback_reason?: string;
   question?: string;
-  answered?: boolean;
-  /** "extractive": the answer quotes model-chosen source sentences under a lead set by rule in code. */
+  /** False when the question got no answer; null when none was asked. */
+  answered?: boolean | null;
+  /** "extractive": the answer quotes model-chosen source sentences under a lead set by rule in code.
+   *  "rules": lead and facts were chosen by code rules; no model was called. */
   answer_mode?: string;
   /** The fact the answer's lead rests on (synthesis.py `_lead_fact`):
    *  `in_lead` when the backend's lead sentence states it, else the doc
@@ -140,10 +144,8 @@ export interface ModelRow {
   name: string;
   repo: string;
   where: string;
-  how: 'loaded' | 'precomputed' | 'endpoint';
+  how: 'endpoint';
   latency_s?: number | null;
-  pebble?: string;
-  detail?: string;
   calls?: number;
 }
 
@@ -193,7 +195,7 @@ export interface AgentStreamHandlers {
   onDone?: () => void;
   /** Fired after the backend resolves the deployment for this query
    *  (post-geocode). `name` is the deployment directory name (e.g.
-   *  `boston`) or null when out-of-coverage. Used by /q/[queryId] to
+   *  `chicago`) or null when out-of-coverage. Used by /q/[queryId] to
    *  swap the header chip + reload the pebble scaffold so the UI
    *  renders the routed-to city, not the server's boot deployment. */
   onDeployment?: (d: { name: string | null; city?: string | null; state?: string | null }) => void;

@@ -9,7 +9,7 @@ export const TIER_WORDS: Record<Tier, string> = {
 };
 
 /**
- * Map a Riprap doc_id (e.g. "mta_entrance_56", "nycha_dev_239", "rag_mta",
+ * Map a Riprap doc_id (e.g. "mta_entrance_56", "nycha_dev_239",
  * "dep_extreme", "sandy", "syn_sar_20250914") to its epistemic tier.
  *
  * Empirical = direct measurement. Modeled = scenario predictions.
@@ -22,12 +22,12 @@ export function tierForDocId(docId: string): Tier {
       id.startsWith('mta_entrance') || id.startsWith('nycha_dev') ||
       id.startsWith('doe_school') || id.startsWith('doh_hospital') ||
       id.startsWith('ida_hwm') || id.startsWith('hwm') || id.startsWith('noaa') ||
-      id.startsWith('nws_obs') || id.startsWith('prithvi_eo')) return 'empirical';
+      id.startsWith('nws_obs') || id.startsWith('dcp_floodplain')) return 'empirical';
   if (id.startsWith('dep') || id.startsWith('fema_firm') || id.startsWith('npcc') ||
       id.startsWith('wrp') || id.includes('scenario') || id.includes('forecast') ||
-      id.startsWith('prithvi') || id.startsWith('ttm') || id.startsWith('nws_alert')) return 'modeled';
+      id.startsWith('nws_alert')) return 'modeled';
   if (id.startsWith('nyc311') || id.startsWith('311') || id.startsWith('nfip') ||
-      id.startsWith('rag') || id.startsWith('dob') || id.startsWith('hand') ||
+      id.startsWith('dob') || id.startsWith('hand') ||
       id.startsWith('twi') || id.startsWith('microtopo')) return 'proxy';
   return 'proxy';
 }

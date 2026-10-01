@@ -2,7 +2,7 @@
  * Component-level rendering tests for cardAdapter — the heart of the
  * UI bug the user reported.
  *
- * The user-visible failure: querying a Boston address showed the NYC
+ * The user-visible failure: querying a Chicago address showed the NYC
  * scaffold ("□ sandy not invoked", "□ ida_hwm not invoked", …) below
  * a header chip that read "NYC". This file is the regression seal for
  * that whole class of bug:
@@ -20,9 +20,9 @@ import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 import type { PebbleManifest, PebbleStone } from '$lib/stores/pebbleManifest.svelte';
 import {
   STONES,
-  NYC_MANIFEST, BOSTON_MANIFEST,
+  NYC_MANIFEST, CHICAGO_MANIFEST,
   NYC_ONLY_IDS,
-  NYC_FINAL, BOSTON_FINAL,
+  NYC_FINAL, CHICAGO_FINAL,
 } from './fixtures/cardAdapter';
 
 /**
@@ -97,73 +97,73 @@ describe('adaptFinalToFindings — per-query scaffold seal', () => {
     }
   });
 
-  // ───────────────────────────────────────── the actual bug — Boston
-  it('Boston manifest + Boston final → ZERO NYC-only ids in cards', () => {
-    seedManifest(STONES, BOSTON_MANIFEST);
-    const findings = adaptFinalToFindings(BOSTON_FINAL as never, null, 3.4);
+  // ───────────────────────────────────────── the actual bug: Chicago
+  it('Chicago manifest + Chicago final → ZERO NYC-only ids in cards', () => {
+    seedManifest(STONES, CHICAGO_MANIFEST);
+    const findings = adaptFinalToFindings(CHICAGO_FINAL as never, null, 3.4);
     const ids = pebbleIdsInCards(findings.cards);
 
     const leaked = [...ids].filter(id => NYC_ONLY_IDS.has(id));
-    expect(leaked, `NYC-only pebble cards leaked into Boston render: ${leaked.join(', ')}`).toEqual([]);
+    expect(leaked, `NYC-only pebble cards leaked into Chicago render: ${leaked.join(', ')}`).toEqual([]);
   });
 
-  it('Boston manifest + Boston final → renders boston_311 + water_level', () => {
-    seedManifest(STONES, BOSTON_MANIFEST);
-    const findings = adaptFinalToFindings(BOSTON_FINAL as never, null, 3.4);
+  it('Chicago manifest + Chicago final → renders chicago_311 + lake_michigan_water_level', () => {
+    seedManifest(STONES, CHICAGO_MANIFEST);
+    const findings = adaptFinalToFindings(CHICAGO_FINAL as never, null, 3.4);
     const ids = pebbleIdsInCards(findings.cards);
 
-    for (const expected of ['boston_311', 'water_level']) {
+    for (const expected of ['chicago_311', 'lake_michigan_water_level']) {
       expect(ids.has(expected),
-        `${expected} missing from Boston render. Got: [${[...ids].sort().join(', ')}]`,
+        `${expected} missing from Chicago render. Got: [${[...ids].sort().join(', ')}]`,
       ).toBe(true);
     }
   });
 
   // ───────────────────────────────────────── THE bug the user reported
-  it('NYC manifest + Boston final (mis-loaded scaffold) → ghost NYC rows in stones roster', () => {
-    // The WRONG state — Boston run but the UI loaded the NYC scaffold.
+  it('NYC manifest + Chicago final (mis-loaded scaffold) → ghost NYC rows in stones roster', () => {
+    // The WRONG state: Chicago run but the UI loaded the NYC scaffold.
     // The user's screenshot showed "□ sandy not invoked", "□ ida_hwm not
     // invoked"… coming from the per-Stone roster (NOT from cards[]).
     // fillRosterFromManifests reads pebbleManifest.byStone for *every*
     // stone; with the NYC scaffold loaded those rows get rendered as
-    // not_invoked even when the run was Boston.
+    // not_invoked even when the run was Chicago.
     seedManifest(STONES, NYC_MANIFEST);
-    const findings = adaptFinalToFindings(BOSTON_FINAL as never, null, 3.4);
+    const findings = adaptFinalToFindings(CHICAGO_FINAL as never, null, 3.4);
 
     // findings.stones[].members has every pebble in the loaded scaffold;
-    // a Boston run with NYC scaffold puts NYC ids into Cornerstone /
+    // a Chicago run with NYC scaffold puts NYC ids into Cornerstone /
     // Keystone with status='not_invoked'. That IS the visible bug.
     const rosterIds = pebbleIdsInStoneRoster(findings);
     const ghosts = [...rosterIds].filter(id => NYC_ONLY_IDS.has(id));
 
     expect(
       ghosts.length,
-      'expected ghost NYC ids in the stones roster under the (incorrect) NYC-scaffold-for-Boston-run mode — the bug the user reported. If this drops to 0 with a real Boston scaffold loaded, the UI fix has landed.',
+      'expected ghost NYC ids in the stones roster under the (incorrect) NYC-scaffold-for-Chicago-run mode, the bug the user reported. If this drops to 0 with a real Chicago scaffold loaded, the UI fix has landed.',
     ).toBeGreaterThan(0);
 
     // Document the specific ghosts so the test failure is informative.
     expect(ghosts).toEqual(expect.arrayContaining(['sandy', 'ida_hwm', 'doe_schools']));
   });
 
-  it('Boston manifest + Boston final → ZERO NYC ghosts in stones roster (the fix)', () => {
-    // The CORRECT state — Boston scaffold loaded for a Boston run. The
-    // per-Stone roster should contain ONLY Boston (and federal) ids.
+  it('Chicago manifest + Chicago final → ZERO NYC ghosts in stones roster (the fix)', () => {
+    // The CORRECT state: Chicago scaffold loaded for a Chicago run. The
+    // per-Stone roster should contain ONLY Chicago (and federal) ids.
     // This is the regression seal: once the UI loads the per-query
     // scaffold, this assertion holds.
-    seedManifest(STONES, BOSTON_MANIFEST);
-    const findings = adaptFinalToFindings(BOSTON_FINAL as never, null, 3.4);
+    seedManifest(STONES, CHICAGO_MANIFEST);
+    const findings = adaptFinalToFindings(CHICAGO_FINAL as never, null, 3.4);
 
     const rosterIds = pebbleIdsInStoneRoster(findings);
     const ghosts = [...rosterIds].filter(id => NYC_ONLY_IDS.has(id));
     expect(ghosts,
-      `Boston roster contains NYC ghosts: ${ghosts.join(', ')}`,
+      `Chicago roster contains NYC ghosts: ${ghosts.join(', ')}`,
     ).toEqual([]);
-    expect(rosterIds.has('boston_311')).toBe(true);
+    expect(rosterIds.has('chicago_311')).toBe(true);
   });
 
-  it('empty manifest + Boston final → no NYC-only cards even with no scaffold', () => {
+  it('empty manifest + Chicago final → no NYC-only cards even with no scaffold', () => {
     seedManifest(STONES, []);
-    const findings = adaptFinalToFindings(BOSTON_FINAL as never, null, 3.4);
+    const findings = adaptFinalToFindings(CHICAGO_FINAL as never, null, 3.4);
     const ids = pebbleIdsInCards(findings.cards);
     const leaked = [...ids].filter(id => NYC_ONLY_IDS.has(id));
     expect(leaked).toEqual([]);

@@ -14,7 +14,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { render } from '@testing-library/svelte';
 import type { Component } from 'svelte';
 import { resetStores, seedForCity } from './helpers/stores';
-import { BOSTON } from './fixtures/cities';
+import { CHICAGO } from './fixtures/cities';
 
 // Shell
 import AppHeader from '$lib/components/shell/AppHeader.svelte';
@@ -87,10 +87,10 @@ const CASES: SmokeCase[] = [
 beforeEach(() => {
   resetStores();
   // Most components read from the stores (deployment, pebbleManifest);
-  // seeding Boston is the strictest test — non-NYC + non-trivial
+  // seeding Chicago is the strictest test: non-NYC + non-trivial
   // manifest means a component reaching for a hardcoded NYC string
   // is more likely to fail.
-  seedForCity(BOSTON);
+  seedForCity(CHICAGO);
 });
 
 describe('Universal smoke: every shipped component mounts under happy-dom', () => {

@@ -65,11 +65,6 @@ export function briefingFromFinal(
   return { blocks: r.blocks, citations };
 }
 
-/** Steps that share the Granite TTM r2 foundation model, grouped under a
- *  synthetic parent in the trace. */
-const TTM_STEPS = new Set(['ttm_311_forecast', 'floodnet_forecast']);
-const TTM_PARENT_ID = 'group-ttm-r2';
-
 /** Per-step headline fields for the collapsed trace row. Unknown steps
  *  fall back to their first two scalar fields. */
 const STEP_NOTE_KEYS: Record<string, string[]> = {
@@ -78,9 +73,7 @@ const STEP_NOTE_KEYS: Record<string, string[]> = {
   noaa_tides: ['observed_ft_mllw', 'residual_ft', 'station'],
   nws_alerts: ['n_active'],
   nws_obs: ['p1h_mm', 'p6h_mm', 'station'],
-  ttm_311_forecast: ['forecast_mean', 'forecast_peak'],
-  prithvi_water: ['new_water_m2_within_radius', 'frac_observed_within_radius'],
-  floodnet_forecast: ['sensor_id', 'distance_m', 'forecast_28d']
+  nws_water_forecast: ['gauge_name', 'forecast_peak_ft_mllw', 'flood_category']
 };
 
 function fmtKV(k: string, v: unknown): string {
@@ -341,7 +334,6 @@ export class RunState {
   // Written by the live route from /api/layers/*; empty on the gallery.
   sandyFc = $state<FeatureCollection | undefined>(undefined);
   depFc = $state<FeatureCollection | undefined>(undefined);
-  synFc = $state<FeatureCollection | undefined>(undefined);
   // Evidence points from `final` (applyFinal), on both routes.
   proxyFc = $state<FeatureCollection | undefined>(undefined);
   idaHwmFc = $state<FeatureCollection | undefined>(undefined);
@@ -354,12 +346,10 @@ export class RunState {
   compareStepsB = $state<Rec>({});
   sandyFcA = $state<FeatureCollection | undefined>(undefined);
   depFcA = $state<FeatureCollection | undefined>(undefined);
-  synFcA = $state<FeatureCollection | undefined>(undefined);
   proxyFcA = $state<FeatureCollection | undefined>(undefined);
   idaHwmFcA = $state<FeatureCollection | undefined>(undefined);
   sandyFcB = $state<FeatureCollection | undefined>(undefined);
   depFcB = $state<FeatureCollection | undefined>(undefined);
-  synFcB = $state<FeatureCollection | undefined>(undefined);
   proxyFcB = $state<FeatureCollection | undefined>(undefined);
   idaHwmFcB = $state<FeatureCollection | undefined>(undefined);
 
@@ -432,7 +422,6 @@ export class RunState {
     empirical: (this.sandyFc?.features.length ?? 0) + (this.idaHwmFc?.features.length ?? 0) +
       (this.floodnetFc?.features.length ?? 0),
     modeled: this.depFc?.features.length ?? 0,
-    synthetic: this.synFc?.features.length ?? 0,
     proxy: this.proxyFc?.features.length ?? 0
   });
 
@@ -481,7 +470,6 @@ export class RunState {
 
     const status: TraceNode['status'] = !s.ok ? 'error' : (s.result == null && s.err == null ? 'silent' : 'ok');
     const elapsedMs = Math.round((s.elapsed_s ?? 0) * 1000);
-    const isTtm = TTM_STEPS.has(s.step);
     const node: TraceNode = {
       id: `step-${countAllNodes(this.traceRoot)}`,
       name: s.step,
@@ -491,37 +479,13 @@ export class RunState {
       note: summarizeStepNote(s.step, s.result, s.err, status),
       // Raw structured payload, shown on click in the trace.
       output: s.result != null ? (s.result as object) : (s.err ?? null),
-      error: status === 'error' ? (s.err ?? 'unknown error') : undefined,
-      model: isTtm ? 'granite-timeseries-ttm-r2' : undefined
+      error: status === 'error' ? (s.err ?? 'unknown error') : undefined
     };
-
-    const root = { ...this.traceRoot, ms: (this.traceRoot.ms ?? 0) + elapsedMs };
-    const children = [...(root.children ?? [])];
-    if (!isTtm) {
-      this.traceRoot = { ...root, children: [...children, node] };
-      return;
-    }
-    let parent = children.find((n) => n.id === TTM_PARENT_ID);
-    if (!parent) {
-      parent = {
-        id: TTM_PARENT_ID,
-        name: 'forecasting.granite-timeseries-ttm-r2',
-        status: 'fan', // auto-expand + excluded from leaf counts
-        ms: 0,
-        tier: 'modeled',
-        model: 'granite-timeseries-ttm-r2',
-        children: []
-      };
-      children.push(parent);
-    }
-    const kids = [...(parent.children ?? []), node];
-    const updated: TraceNode = {
-      ...parent,
-      ms: (parent.ms ?? 0) + elapsedMs,
-      note: `${kids.length} instance${kids.length === 1 ? '' : 's'}`,
-      children: kids
+    this.traceRoot = {
+      ...this.traceRoot,
+      ms: (this.traceRoot.ms ?? 0) + elapsedMs,
+      children: [...(this.traceRoot.children ?? []), node]
     };
-    this.traceRoot = { ...root, children: children.map((c) => (c.id === TTM_PARENT_ID ? updated : c)) };
   }
 
   applyFinal(f: FinalResult): void {

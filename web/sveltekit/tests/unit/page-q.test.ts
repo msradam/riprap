@@ -2,11 +2,11 @@
  * Page-level integration test for /q/[queryId]/+page.svelte.
  *
  * Mounts the actual page component with a mocked EventSource +
- * deployment-aware fetch mock. Drives a scripted Boston SSE run
+ * deployment-aware fetch mock. Drives a scripted Chicago SSE run
  * through the lifecycle and asserts the UI pivots correctly:
  *
- *   - chip swaps from boot NYC → Boston after the `deployment` event
- *   - pebble scaffold reloads via /api/pebbles?deployment=boston
+ *   - chip swaps from boot NYC → Chicago after the `deployment` event
+ *   - pebble scaffold reloads via /api/pebbles?deployment=chicago
  *   - status pill hides after `done` (the "stuck on Gathering
  *     evidence (9/10)" bug from the user's screenshot)
  *   - no NYC string leaks anywhere in the final DOM
@@ -24,10 +24,10 @@ import { briefingState } from '$lib/stores/briefingState.svelte';
 import { deployment } from '$lib/stores/deployment.svelte';
 import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 import {
-  installMockEventSource, getMockEventSource, scriptBostonRun, scriptCityRun,
+  installMockEventSource, getMockEventSource, scriptChicagoRun, scriptCityRun,
 } from './helpers/sse';
 import {
-  ALL_CITIES, BOSTON, NYC, CHICAGO, SEATTLE, SF,
+  ALL_CITIES, NYC, CHICAGO, SEATTLE,
   NYC_LEAK_NEEDLES, type CityFixture,
 } from './fixtures/cities';
 
@@ -68,7 +68,7 @@ beforeEach(() => {
   globalThis.fetch = fetchMockForCities();
 });
 
-describe('/q/[queryId] full-page SSE lifecycle for Boston', () => {
+describe('/q/[queryId] full-page SSE lifecycle for Chicago', () => {
   it('pivots chip + scaffold + status across the handshake', async () => {
     const { container } = render(Page);
     const es = getMockEventSource();
@@ -77,19 +77,19 @@ describe('/q/[queryId] full-page SSE lifecycle for Boston', () => {
     // scaffold loading. Status pill should be visible (phase != idle).
     await tick();
 
-    // Drive the full Boston run through SSE
-    await scriptBostonRun(es);
+    // Drive the full Chicago run through SSE
+    await scriptChicagoRun(es);
     // Allow microtasks: deployment.setForQuery + pebbleManifest.loadForDeployment
     // both await fetch promises before mutating stores.
     await waitFor(
       () => {
-        expect(deployment.current?.name).toBe('boston');
+        expect(deployment.current?.name).toBe('chicago');
       },
       { timeout: 1000 },
     );
     await waitFor(
       () => {
-        expect(pebbleManifest.loadedFor).toBe('boston');
+        expect(pebbleManifest.loadedFor).toBe('chicago');
       },
       { timeout: 1000 },
     );
@@ -102,18 +102,18 @@ describe('/q/[queryId] full-page SSE lifecycle for Boston', () => {
     const text = container.textContent ?? '';
     const leaked = NYC_LEAK_NEEDLES.filter((needle) => text.includes(needle));
     expect(leaked,
-      `Boston-run page leaked NYC needles: ${leaked.join(', ')}`,
+      `Chicago-run page leaked NYC needles: ${leaked.join(', ')}`,
     ).toEqual([]);
 
-    // And contains Boston-specific content
-    expect(text).toContain('Boston');
+    // And contains Chicago-specific content
+    expect(text).toContain('Chicago');
   });
 
   it('no error card when templated paragraph arrived (all-silent guard)', async () => {
     const { container } = render(Page);
     const es = getMockEventSource();
     await tick();
-    await scriptBostonRun(es);
+    await scriptChicagoRun(es);
 
     await waitFor(
       () => expect(briefingState.phase).toBe('done'),
@@ -129,7 +129,7 @@ describe('/q/[queryId] full-page SSE lifecycle for Boston', () => {
 });
 
 describe('/q/[queryId] full-page SSE × all shipped cities — no cross-city leakage', () => {
-  for (const city of [NYC, BOSTON, CHICAGO, SEATTLE, SF]) {
+  for (const city of [NYC, CHICAGO, SEATTLE]) {
     it(`${city.key} run: chip + scaffold settle, only city-appropriate content`, async () => {
       const { container } = render(Page);
       const es = getMockEventSource();

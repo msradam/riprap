@@ -4,7 +4,6 @@
   import 'maplibre-gl/dist/maplibre-gl.css';
   import type { Map as MapLibreMap, GeoJSONSource, Popup as PopupT } from 'maplibre-gl';
   import { POSITRON_NO_LABELS } from './baseStyle';
-  import { registerSynStripe } from './synStripe';
   import { MapboxOverlay } from '@deck.gl/mapbox';
   import { GeoJsonLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
   import { PathStyleExtension } from '@deck.gl/extensions';
@@ -36,7 +35,6 @@
      */
     sandyEmpirical?: GeoJSON.FeatureCollection;
     depModeled?: GeoJSON.FeatureCollection;
-    syntheticPrior?: GeoJSON.FeatureCollection;
     proxy311?: GeoJSON.FeatureCollection;
     /** Asset-register pins: subway entrances, schools, hospitals
      *  (Points) plus NYCHA developments (Polygons). Each feature
@@ -52,7 +50,7 @@
     /** Search radii around the address, drawn as labelled hairline rings
      *  and hidden with their tier's layer. */
     radii?: { label: string; radius_m: number; tier: 'empirical' | 'proxy' }[];
-    activeLayers?: { empirical: boolean; modeled: boolean; synthetic: boolean; proxy: boolean };
+    activeLayers?: { empirical: boolean; modeled: boolean; proxy: boolean };
     /** Neighbourhood or district outline. When set, the map fits to it
      *  and hides the centroid pin, which is not an address. */
     areaBoundary?: GeoJSON.Polygon | GeoJSON.MultiPolygon;
@@ -66,13 +64,12 @@
     address,
     sandyEmpirical,
     depModeled,
-    syntheticPrior,
     proxy311,
     registerPoints,
     idaHwm,
     floodnet,
     radii = [],
-    activeLayers = { empirical: true, modeled: true, synthetic: true, proxy: true },
+    activeLayers = { empirical: true, modeled: true, proxy: true },
     areaBoundary,
     selectedPoint = null,
     onSelectPoint,
@@ -297,7 +294,6 @@
     ];
   }
 
-  $effect(() => { setSourceData('syn-prior', syntheticPrior); });
   $effect(() => { setSourceData('register-points', registerPoints); });
   $effect(() => { setSourceData('area-boundary', boundaryFc()); });
 
@@ -325,8 +321,6 @@
   });
 
   $effect(() => {
-    setLayerVisibility('tier-synthetic-fill', activeLayers.synthetic);
-    setLayerVisibility('tier-synthetic-line', activeLayers.synthetic);
     setLayerVisibility('area-boundary-fill', activeLayers.empirical);
     setLayerVisibility('area-boundary-line', activeLayers.empirical);
   });
@@ -388,19 +382,15 @@
     map.on('load', () => {
       if (!map) return;
 
-      // Expose for E2E tests. Harmless in production — just a global
-      // ref to the live map instance, which Playwright reads to assert
-      // on syn-stripe-45 image registration, layer wiring, etc.
+      // Expose for E2E tests. Harmless in production: a global ref to
+      // the live map instance, which Playwright reads to assert on
+      // layer wiring.
       (window as unknown as { __riprapMap?: typeof map }).__riprapMap = map;
-
-      // v0.4.2 §14: synthetic-prior fill pattern (SVG source)
-      registerSynStripe(map);
 
       // sources — sandy-empirical / dep-modeled / proxy-311 / ida-hwm
       // moved to deck.gl (see buildDeckLayers above); no MapLibre source
       // needed for them any more.
       const fcEmpty = (): GeoJSON.FeatureCollection => ({ type: 'FeatureCollection', features: [] });
-      map.addSource('syn-prior', { type: 'geojson', data: syntheticPrior ?? fcEmpty() });
       map.addSource('register-points', { type: 'geojson', data: registerPoints ?? fcEmpty() });
       map.addSource('area-boundary', { type: 'geojson', data: boundaryFc() });
       map.addSource('queried-address', {
@@ -416,16 +406,6 @@
       });
 
       // empirical (Sandy) + modeled (DEP) fill/line: deck.gl now (buildDeckLayers).
-
-      // synthetic fill (pattern) + dashed line
-      map.addLayer({
-        id: 'tier-synthetic-fill', type: 'fill', source: 'syn-prior',
-        paint: { 'fill-pattern': 'syn-stripe-45', 'fill-opacity': 0.65 }
-      });
-      map.addLayer({
-        id: 'tier-synthetic-line', type: 'line', source: 'syn-prior',
-        paint: { 'line-color': '#2A6FA8', 'line-width': 1.5, 'line-dasharray': [4, 3] }
-      });
 
       // proxy 311 complaints: deck.gl hollow rings now (buildDeckLayers).
 

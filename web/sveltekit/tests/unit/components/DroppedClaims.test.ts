@@ -12,7 +12,7 @@ import { briefingFromFinal } from '$lib/client/runState.svelte';
 const DROPPED = [
   { section: 'Hazard Reader', text: 'The site flooded 3 m in 2012.', doc_ids: ['sandy_inundation'],
     numbers: ['3'], reason: 'number 3 not found in sandy_inundation' },
-  { section: 'Projector', text: 'Surge will peak at 9 ft.', doc_ids: ['ttm_battery_surge'],
+  { section: 'Projector', text: 'The water level will peak at 9 ft.', doc_ids: ['nws_water_forecast'],
     numbers: ['9'], reason: 'cited source does not state 9 ft' },
 ];
 
@@ -31,7 +31,7 @@ describe('DroppedClaims', () => {
     expect(summary).toContain('Dropped claims (2)');
     expect(summary).toContain('not part of the briefing');
     const text = container.textContent ?? '';
-    expect(text).toContain('Surge will peak at 9 ft.');
+    expect(text).toContain('The water level will peak at 9 ft.');
     expect(text).toContain('cited source does not state 9 ft');
     expect(container.querySelectorAll('li')).toHaveLength(2);
   });
@@ -45,14 +45,14 @@ describe('briefingFromFinal', () => {
       '**Hazard Reader.**',
       'Outside the 2012 Sandy extent [sandy_inundation].',
       '',
-      '**Projector.**',
-      'Experimental surge forecast of 0.59 m [ttm_battery_surge].',
+      '**Live Observer.**',
+      'Experimental: 3 of 17 Chicago 311 service requests within 200 m of this address are in categories reviewed as flood-related [chicago_311].',
       '',
       '**Out of scope.** No structural assessment.',
     ].join('\n'),
     citations: {
       sandy_inundation: { doc_id: 'sandy_inundation', source: 'NYC Open Data', maturity: 'production' as const },
-      ttm_battery_surge: { doc_id: 'ttm_battery_surge', source: 'TTM', maturity: 'experimental' as const,
+      chicago_311: { doc_id: 'chicago_311', source: 'Chicago Data Portal', maturity: 'experimental' as const,
         retrieved_at: '2026-09-26T19:33Z' },
     },
   };
@@ -60,7 +60,7 @@ describe('briefingFromFinal', () => {
   it('keeps the scope sentence and heads each Stone section', () => {
     const { blocks } = briefingFromFinal(final);
     const heads = blocks.filter((b) => b.kind === 'head').map((b) => (b.kind === 'head' ? b.label : ''));
-    expect(heads).toEqual(['Hazard Reader', 'Projector', 'Out of scope']);
+    expect(heads).toEqual(['Hazard Reader', 'Live Observer', 'Out of scope']);
     expect(blocks[0].kind).toBe('prose');
     const flat = JSON.stringify(blocks);
     expect(flat).toContain('informational only');
@@ -69,13 +69,13 @@ describe('briefingFromFinal', () => {
 
   it('carries citation maturity and retrieval date, and the source list badges experimental ones', () => {
     const { citations } = briefingFromFinal(final);
-    expect(citations.ttm_battery_surge.maturity).toBe('experimental');
+    expect(citations.chicago_311.maturity).toBe('experimental');
     // The full stamp: a live reading prints "fetched 2026-09-26 19:33 UTC".
-    expect(citations.ttm_battery_surge.retrieved).toBe('2026-09-26T19:33Z');
+    expect(citations.chicago_311.retrieved).toBe('2026-09-26T19:33Z');
     const { container } = render(SourceList, { props: { citations: Object.values(citations), noted: [] } });
     const badges = container.querySelectorAll('.exp-badge');
     expect(badges).toHaveLength(1);
-    expect(badges[0].closest('li')?.id).toBe('cite-ttm_battery_surge');
+    expect(badges[0].closest('li')?.id).toBe('cite-chicago_311');
   });
 });
 
@@ -93,8 +93,13 @@ describe('gallery snapshot replay (hollis.json)', () => {
     expect(run.errorState).toBeNull();
     expect(run.address?.lat).toBeCloseTo(40.711, 2);
     expect(run.briefing.blocks.length).toBeGreaterThan(3);
-    const cards = run.findingsData.cards;
-    expect(cards.find((c) => c.docId === 'prithvi_water')?.experimental).toBe(true);
+    // Every card carries its pebble's maturity, whichever sources the
+    // snapshot holds.
+    const experimental = new Set(entry.pebbles.pebbles.filter((p) => p.maturity === 'experimental')
+      .map((p) => p.provenance.doc_id ?? p.id));
+    const cards = run.findingsData.cards.filter((c) => c.variant !== 'meta');
+    expect(cards.length).toBeGreaterThan(3);
+    for (const c of cards) expect(c.experimental, c.docId).toBe(experimental.has(c.docId));
     expect(cards.find((c) => c.docId === 'sandy_inundation')?.experimental).toBe(false);
   });
 });

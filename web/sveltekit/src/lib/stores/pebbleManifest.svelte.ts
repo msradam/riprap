@@ -101,7 +101,7 @@ class PebbleManifestStore {
   }
 
   /** Re-fetch the manifest scoped to the deployment that was actually
-   *  routed-to for the current query (boston, chicago, …) instead of
+   *  routed-to for the current query (chicago, seattle, …) instead of
    *  the server's boot-time deployment. Called from /q/[queryId] when
    *  the SSE stream emits the `deployment` event. No-op when the same
    *  deployment is already loaded.
@@ -126,7 +126,7 @@ class PebbleManifestStore {
    *  that was in flight when loadForDeployment() landed can't clobber
    *  the per-query manifest with the boot one. The race is real and
    *  the page integration test would otherwise see NYC ghost pebbles
-   *  rendered for a Boston query. */
+   *  rendered for a Chicago query. */
   private async _fetchInto(name: string | null): Promise<void> {
     // Snapshot whether this is the per-query call vs the boot call.
     // If lockedForQuery is true and name is null, this is the racing

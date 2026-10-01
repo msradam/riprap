@@ -3,13 +3,13 @@
   import { citationOf, type EvidenceCard } from '$lib/client/briefingModel';
   import { shortSource } from '$lib/client/cardAdapter';
   import { TIER_WORDS } from '$lib/types/tier';
-  import { asOfPhrase, figureOf, leadClause, sharedStem, snapshotNote, withoutSubject } from '$lib/client/briefingText';
+  import { asOfPhrase, figureOf, leadClause, sharedStem, withoutSubject } from '$lib/client/briefingText';
   import { activateCitation } from '$lib/stores/citations.svelte';
   import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
 
   /** The evidence exhibit: one row per source that found something, the
    *  rows the answer cites first, then one group per Stone. A `closed`
-   *  group (experimental and forecast sources) follows the table as its own
+   *  group (experimental sources) follows the table as its own
    *  folded table. On phones each row is a stacked block; the cells keep
    *  their table semantics. In a narrow column (a place briefing's main
    *  column) the Source, Tier and Data as of cells are clipped to one
@@ -24,11 +24,8 @@
     /** Where the page lists the sources not run; the footer then points
      *  there instead of repeating the list. */
     notRunHref?: string;
-    /** Gallery pages: when the snapshot was made ("2026-09-29 12:34 UTC"),
-     *  so a forecast row says when it was made. */
-    snapshotAt?: string | null;
   }
-  let { groups, findings, citations, notRun, labelledby, notRunHref, snapshotAt = null }: Props = $props();
+  let { groups, findings, citations, notRun, labelledby, notRunHref }: Props = $props();
 
   let open = $derived(groups.filter((g) => !g.closed));
   let folded = $derived(groups.filter((g) => g.closed));
@@ -109,7 +106,6 @@
   {@const cit = c.parts ? null : citationOf(c, citations)}
   {@const longLabel = !!fig?.label && fig.label.length > SHORT_LABEL}
   {@const same = oneDate(c)}
-  {@const note = snapshotNote(c.docId, snapshotAt)}
   {@const h = (name: Col) => (gid ? `${col(t, name)} ${gid}` : col(t, name))}
   <tr class="ev-row">
     <td class="ev-source" headers={h('source')}>
@@ -140,7 +136,6 @@
       {:else}
         <div class="ev-measure">
           {#if find}{@render sentence(find.first)}{#if find.rest}{` ${find.rest}`}{/if}{/if}
-          {#if note}<span class="ev-snap">{note}</span>{/if}
           <span class="ev-dataset">{c.title}</span>
           {#if longLabel}<span class="ev-dataset">Figure: {fig?.label}</span>{/if}
         </div>
@@ -187,7 +182,7 @@
     </tbody>
   {/each}
 </table>
-<!-- Experimental and forecast sources the answer does not cite: worth
+<!-- Experimental sources the answer does not cite: worth
      seeing, folded so they do not sit at the weight of the records. A
      citation mark pointing inside opens it (activateCitation). -->
 {#each folded as g (g.key)}

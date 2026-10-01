@@ -76,14 +76,14 @@ export function getMockEventSource(): MockEventSource {
   return CURRENT;
 }
 
-/** Convenience: drive a clean Boston run through the SSE handshake. */
-export async function scriptBostonRun(es: MockEventSource): Promise<void> {
+/** Convenience: drive a clean Chicago run through the SSE handshake. */
+export async function scriptChicagoRun(es: MockEventSource): Promise<void> {
   await scriptCityRun(es, {
-    name: 'boston', city: 'Boston', state: 'MA',
-    address: 'Boston City Hall',
-    lat: 42.36, lon: -71.06,
-    pebbles: ['nws_obs', 'water_level', 'boston_311'],
-    paragraph: 'Boston templated paragraph.',
+    name: 'chicago', city: 'Chicago', state: 'IL',
+    address: 'Willis Tower',
+    lat: 41.88, lon: -87.64,
+    pebbles: ['nws_obs', 'lake_michigan_water_level', 'chicago_311'],
+    paragraph: 'Chicago templated paragraph.',
   });
 }
 

@@ -11,15 +11,14 @@
   }
   let { run }: Props = $props();
 
-  type TierKey = 'empirical' | 'modeled' | 'synthetic' | 'proxy';
+  type TierKey = 'empirical' | 'modeled' | 'proxy';
   const LAYERS: { key: TierKey; label: string }[] = [
     { key: 'empirical', label: 'Measured (empirical)' },
     { key: 'modeled', label: 'Modeled scenarios' },
-    { key: 'synthetic', label: 'Synthetic' },
     { key: 'proxy', label: '311 complaints (proxy)' }
   ];
 
-  let active = $state({ empirical: true, modeled: true, synthetic: true, proxy: true });
+  let active = $state({ empirical: true, modeled: true, proxy: true });
   /** pid of the register point selected on the map or in its list; a new
    *  run starts with none. */
   let selectedPoint = $derived.by<string | null>(() => (void run, null));
@@ -55,7 +54,6 @@
         activeLayers={active}
         sandyEmpirical={run.sandyFc}
         depModeled={run.depFc}
-        syntheticPrior={run.synFc}
         proxy311={run.proxyFc}
         idaHwm={run.idaHwmFc}
         floodnet={run.floodnetFc}

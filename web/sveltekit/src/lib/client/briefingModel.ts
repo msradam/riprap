@@ -5,9 +5,9 @@
  */
 import { looksLikeQuestion, type RunState } from '$lib/client/runState.svelte';
 import { splitBriefing } from '$lib/client/parseBriefing';
-import { modeLine } from '$lib/client/cardAdapter';
+import { modeLine, POLYGON_INTENTS } from '$lib/client/cardAdapter';
 import { formatGeneratedAt } from '$lib/client/gallery';
-import { citedIn, findingOf, FORECASTS, termsIn } from '$lib/client/briefingText';
+import { citedIn, findingOf, termsIn } from '$lib/client/briefingText';
 import { sourceLists, type PrintSnapshot } from '$lib/stores/briefingState.svelte';
 import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 import { deployment } from '$lib/stores/deployment.svelte';
@@ -20,7 +20,7 @@ export type SnapshotMeta = { generatedAt: string; commit: string; stamp: string 
 /** An evidence table row: a card, or several cards merged into one row
  *  (`parts`, the DEP stormwater scenarios), one finding per part. */
 export type EvidenceRow = Card & { parts?: Card[] };
-/** `closed` groups (experimental and forecast sources) start folded. */
+/** `closed` groups (experimental sources) start folded. */
 export type EvidenceGroup = { key: string; name: string; role: string | null; cards: EvidenceRow[]; closed?: boolean };
 /** The card fields the evidence table prints. */
 export type EvidenceCard = Pick<Card, 'id' | 'source' | 'experimental' | 'title' | 'tier' | 'vintage' | 'citeId' | 'docId' | 'scalars' | 'headline' | 'variant'> & { parts?: EvidenceCard[] };
@@ -242,10 +242,6 @@ const DEP_SCENARIOS = ['dep_moderate_current', 'dep_moderate_2050', 'dep_extreme
 const baseDoc = (docId: string) => docId.replace(/_nta$/, '');
 const scenario = (c: Card) => DEP_SCENARIOS.indexOf(baseDoc(c.docId));
 
-/** An experimental or forecast source. NPCC4 and the NWS alerts are
- *  neither: they stay in the open table. */
-export const isExperimentalRow = (c: Card) => !!c.experimental || FORECASTS.includes(baseDoc(c.docId));
-
 /** The citation a row's Cite column links to. */
 export function citationOf(c: Pick<Card, 'citeId' | 'docId'>, citations: Record<string, Citation>): Citation | null {
   return (c.citeId && citations[c.citeId]) || citations[c.docId] || null;
@@ -272,8 +268,8 @@ export function mergeDepScenarios(cards: Card[]): EvidenceRow[] {
 }
 
 /** The first found cards cite what the answer cites (in the answer's
- *  order); the rest follow grouped by Stone, and experimental and forecast
- *  sources the answer does not cite close the table in one folded group.
+ *  order); the rest follow grouped by Stone, and experimental sources the
+ *  answer does not cite close the table in one folded group.
  *  The DEP scenarios share one row. Absent and meta cards are not
  *  evidence and are left out by the caller. */
 /** A row is dated as its citation is: the backend dates every source it
@@ -302,12 +298,12 @@ export function evidenceGroups(cards: Card[], cited: string[], firstLabel = 'Beh
     ? [{ key: 'answer', name: firstLabel, role: null, cards: behind }]
     : [];
   for (const key of STONE_ORDER) {
-    const inStone = rest.filter((c) => c.stone === key && !isExperimentalRow(c));
+    const inStone = rest.filter((c) => c.stone === key && !c.experimental);
     if (inStone.length) groups.push({ key, name: STONE_META[key].name, role: STONE_META[key].role, cards: inStone });
   }
-  const trial = STONE_ORDER.flatMap((key) => rest.filter((c) => c.stone === key && isExperimentalRow(c)));
+  const trial = STONE_ORDER.flatMap((key) => rest.filter((c) => c.stone === key && c.experimental));
   if (trial.length) {
-    groups.push({ key: 'experimental', name: `Experimental and forecast sources (${trial.length})`, role: null, cards: trial, closed: true });
+    groups.push({ key: 'experimental', name: `Experimental sources (${trial.length})`, role: null, cards: trial, closed: true });
   }
   return groups;
 }
@@ -418,7 +414,12 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   const keyed = answered?.key ?? null;
   const answerParas = answered?.paras ?? answer0;
   // A count answer whose count sits inside its key sentence leads with that count.
-  const leadWord = refusal ? null : first.word ?? (keyed && g?.answer_lead === 'count' ? countLead(keyed) : null);
+  // An area's In brief opens with its Sandy share ("0.8% of this area ..."),
+  // which is not the headline of a district that floods from rain: a
+  // district or neighbourhood briefing sets no figure large, only its text.
+  const areaBrief = !question && POLYGON_INTENTS.has(f?.intent ?? run.plan?.intent ?? '');
+  const leadWord = refusal || areaBrief
+    ? null : first.word ?? (keyed && g?.answer_lead === 'count' ? countLead(keyed) : null);
 
   // "Checks run: ..." closes the Out of scope note; it is its own line here.
   const outParas = sections(split.outOfScope).flatMap((s) => s.paras);
