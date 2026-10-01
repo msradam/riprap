@@ -29,6 +29,13 @@ Fixed:
   just outside the mapped Sandy edge counted as outside with no remark.
 - A district briefing leads with the 311 count, not the Sandy share, and a
   district question no longer waits for the construction permits source.
+- Found by a walkthrough of the running app: "how many last year" led with
+  the three-year total (a one-year count now comes from that year); "has it
+  flooded" said Yes on 311 complaints alone (complaints are quoted with no
+  yes or no unless a sensor or a surveyed mark reports flooding); a named
+  future day was declined as a past date.
+- A FloodNet sensor 599 m away was left out of a 600 m search by the
+  service's own radius function; the app now applies its own distance.
 
 Added:
 
