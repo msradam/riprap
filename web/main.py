@@ -158,10 +158,10 @@ def _warm_caches():
 def _stones_pebbles_for_deployment(deployment_name: str | None):
     """Resolve (stones_registry, pebble_registry) for a deployment name.
 
-    None → the server's boot-time deployment (back-compat). A bare name
-    like 'boston' resolves to `deployments/boston/` regardless of which
-    deployment the server booted with — this is what makes per-query
-    routing reach the UI scaffold.
+    None means the server's boot-time deployment (back-compat). A bare
+    name like 'chicago' resolves to `deployments/chicago/` regardless of
+    which deployment the server booted with, which is what makes
+    per-query routing reach the UI scaffold.
     """
     if not deployment_name:
         return _STONES, _PEBBLES
@@ -187,10 +187,9 @@ def api_pebbles(deployment: str | None = None):
     """Return a deployment's stones + pebbles for evidence-card rendering.
 
     With per-query routing, the frontend MUST pass `?deployment=<name>`
-    once the SSE stream resolves the deployment for a given query —
-    otherwise the UI renders the server's boot-time scaffold (which
-    e.g. lists NYC pebbles for a Boston run, the exact bug the user
-    reported via the screenshot).
+    once the SSE stream resolves the deployment for a given query.
+    Otherwise the UI renders the server's boot-time scaffold, which
+    lists NYC pebbles for a Chicago run.
 
     Per-pebble payload is the manifest minus implementation guts (config /
     shaper / trace_summary / spatial.crs) — just the parts the UI needs to
@@ -213,9 +212,9 @@ def api_deployment(deployment: str | None = None):
     deployment directory name when the block is absent).
 
     Without `?deployment`, returns the server's boot-time deployment
-    (back-compat). With `?deployment=<name>` (e.g. `boston`), returns
-    that deployment's descriptor — what the per-query header chip
-    consumes once the SSE stream resolves the deployment for a query.
+    (back-compat). With `?deployment=<name>` (e.g. `chicago`), returns
+    that deployment's descriptor, which the per-query header chip
+    reads once the SSE stream resolves the deployment for a query.
     """
     if not deployment:
         return JSONResponse(
@@ -330,12 +329,11 @@ async def api_agent_batch(request: Request) -> JSONResponse:
 
     Body: {"addresses": ["123 Main St, Brooklyn", "456 Oak Ave, Queens"]}
 
-    Runs sequentially, not concurrently: each address holds the local
-    Ollama reconciler and the RAG/specialist stack, and this is one
-    shared instance, not a pool. Capped at _BATCH_MAX_ADDRESSES to
-    protect that shared instance from an unbounded request. One
-    address's failure doesn't fail the batch — its slot in `results`
-    carries an `error` key instead of a briefing.
+    Runs sequentially, not concurrently: every address uses the same
+    upstream data APIs and, when one is configured, the same LLM
+    endpoint. Capped at _BATCH_MAX_ADDRESSES so one request cannot hold
+    them without bound. One address's failure doesn't fail the batch:
+    its slot in `results` carries an `error` key instead of a briefing.
     """
     try:
         payload = await request.json()
@@ -421,9 +419,9 @@ async def api_agent_stream(q: str):
 
         # Stone-boundary envelope: track current Stone so we can wrap
         # contiguous step events in stone_start / stone_done. step
-        # events whose name maps to None (geocode, rag, gliner) flow
-        # through without opening a Stone — those are orientation /
-        # ancillary, not part of any data-Stone group.
+        # events whose name is not in the map (geocode, nta_resolve,
+        # select_deployment) flow through without opening a Stone: they
+        # are orientation steps, not part of any data-Stone group.
         current_stone: str | None = None
         stone_step_count: dict[str, int] = {}
 

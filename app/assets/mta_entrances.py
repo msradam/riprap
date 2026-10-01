@@ -1,10 +1,7 @@
 """MTA Subway Entrances and Exits (NY OpenData i9wp-a4ja).
 
-~1,900 subway entrances city-wide. The MTA Climate Resilience Roadmap
-(Oct 2025) names ~1,500 of these as priorities for sealing — this is
-exactly the asset class our RAG corpus has the most to say about, and
-exactly the audience (MTA capital planners, transit advocacy) the
-register is built for.
+About 2,100 subway entrances citywide. The register is built for MTA
+capital planners and transit advocates.
 """
 from __future__ import annotations
 

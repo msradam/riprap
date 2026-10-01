@@ -37,7 +37,7 @@ class DeploymentDescriptor(BaseModel):
     deployment descriptors the UI shell renders in the chip + page title:
 
         deployment:
-          city: Boston                 # for the chip pill / browser title
+          city: Chicago                # for the chip pill / browser title
           hazard: Flood-exposure briefing   # for the chip text on app pages
 
     Both are optional; load_stones() fills sensible defaults when the
@@ -57,7 +57,7 @@ class CoverageDescriptor(BaseModel):
     """Optional top-level block declaring this deployment's spatial
     coverage. Used by `riprap.core.pebbles.deployments.pick_deployment`
     to route each query to the deployment whose bbox contains the
-    geocoded point — so a Boston query never fires NYC's `ida_hwm`."""
+    geocoded point, so a Chicago query never fires NYC's `ida_hwm`."""
     model_config = ConfigDict(extra="forbid")
     bbox: list[float] | None = None  # [min_lon, min_lat, max_lon, max_lat]
     # Optional repo-relative vector file; the point must also fall inside

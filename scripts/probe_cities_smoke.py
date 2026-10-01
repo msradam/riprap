@@ -1,13 +1,12 @@
 """Cross-city smoke probe — verifies the type-keyed dispatch refactor
 didn't break the live data probes for any deployment.
 
-For each of the 5 supported cities, fires one canonical-address query
+For each of the 4 city deployments, fires one canonical-address query
 against /api/agent/stream and checks:
   - SSE handshake emits the right `deployment` event
   - All cornerstone + touchstone pebbles for that deployment write
     their state key
-  - The final paragraph mentions city-specific content (sandy / lake /
-    bay) and doesn't leak content from other cities
+  - The final paragraph doesn't leak content from other cities
   - Each pebble in `expect_narrative_pebbles` carries the fields in
     CONTRACTS (a `narrative` string by default) in its final value.
 
@@ -64,7 +63,7 @@ CITIES = [
         "name": "seattle",
         "query": "400 Broad Street, Seattle, WA",
         "expect_pebbles": [
-            "water_level", "nws_obs", "nws_alerts",  # no 311 manifest yet
+            "water_level", "nws_obs", "nws_alerts",
         ],
         "expect_narrative_pebbles": ["water_level", "nws_obs"],
         "no_leak": ["NYC OEM", "Sandy 2012", "Lake Michigan"],

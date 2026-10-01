@@ -26,7 +26,6 @@ __all__ = [
     "ADAPTERS",
     "BakedVectorPebble",
     "CSVPointsPebble",
-    "LocalCorpusWithNERPebble",
     "ModelCallPebble",
     "PythonCallPebble",
     "RestJSONPebble",

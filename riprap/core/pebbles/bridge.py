@@ -24,7 +24,7 @@ def _registry_at(root: Path) -> Registry:
 
 
 def get_registry(deployment: str | None = None) -> Registry:
-    """The pebble registry for a deployment name ('boston'), loaded once
+    """The pebble registry for a deployment name ('chicago'), loaded once
     per directory and shared by every caller, so a run never sees two
     views of the same deployment. None means the server's default."""
     return _registry_at(deployment_root(deployment))
@@ -46,8 +46,8 @@ def fetch_pebble(pebble_id: str, lat: float, lon: float,
     string, dependent pebbles need an upstream pebble's value, etc.
 
     `deployment` is the short name from per-query routing (e.g.
-    `'boston'`). When set, the pebble is looked up in that deployment's
-    registry — so a Boston run finds `boston_311` even when the server's
+    `'chicago'`). When set, the pebble is looked up in that deployment's
+    registry, so a Chicago run finds `chicago_311` even when the server's
     env var defaults to `nyc`.
     """
     reg = get_registry(deployment)

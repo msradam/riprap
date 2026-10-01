@@ -66,11 +66,11 @@ def pebble_action(pebble_id: str):
                 return state.update(**{pebble_id: None}, trace=trace)
             # Per-query deployment routing: fetch_pebble must look up
             # this pebble in the SELECTED deployment's registry, not in
-            # whatever the env var defaulted to. Without this, a Boston
-            # query would route to the Boston deployment for fan-out
+            # whatever the env var defaulted to. Without this, a Chicago
+            # query would route to the Chicago deployment for fan-out
             # (correct) but then call fetch_pebble against the NYC
-            # registry — which doesn't contain boston_311 — and crash
-            # with KeyError('boston_311').
+            # registry, which has no chicago_311, and crash with
+            # KeyError('chicago_311').
             deployment = state.get("deployment")
             fetch = _FETCHES.submit(
                 fetch_pebble, pebble_id, lat, lon, deployment=deployment,

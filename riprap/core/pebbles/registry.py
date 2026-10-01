@@ -5,7 +5,6 @@ Layout expected:
   deployments/<name>/
     manifests/*.yaml      # one pebble per file
     data/                 # adapter-relative file references resolve here
-    corpus/               # rag pdfs (unused by registry directly)
 
 The registry also merges **BYOD** (Bring Your Own Data) pebbles from two
 optional sources, in this precedence order — later writers win:

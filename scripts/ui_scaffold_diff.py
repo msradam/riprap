@@ -7,8 +7,8 @@ Hits the three endpoints the SvelteKit UI consumes per query:
   /api/agent?q=<address>  — feeds the actual briefing data + trace
 
 …and reports the three-way disagreement that produces visible bugs like
-"querying Boston shows the NYC chip and an NYC pebble scaffold while the
-data shows Boston pebbles fired."
+"querying Chicago shows the NYC chip and an NYC pebble scaffold while the
+data shows Chicago pebbles fired."
 
 Why this exists: spotting these desyncs in a browser took 20+ minutes of
 Playwright wrangling. This script does it in 5 seconds with no DOM, no
@@ -17,7 +17,7 @@ browser, no SSE. Designed to run against a live uvicorn on :7860.
 Usage:
     .venv/bin/python scripts/ui_scaffold_diff.py
     .venv/bin/python scripts/ui_scaffold_diff.py --base-url http://127.0.0.1:7860
-    .venv/bin/python scripts/ui_scaffold_diff.py --only boston
+    .venv/bin/python scripts/ui_scaffold_diff.py --only chicago
 
 Exit code 0 iff every probe is internally consistent: chip city matches
 the geocoded city, the pebble scaffold loaded by the UI matches the
@@ -38,31 +38,29 @@ from urllib.request import Request, urlopen
 # set in lockstep so they cover the same matrix.
 PROBES: list[tuple[str, str, str | None]] = [
     ("NYC / Atlantic Ave",      "189 Atlantic Avenue, Brooklyn, NY",                  "nyc"),
-    ("Boston / City Hall",      "1 City Hall Square, Boston, MA",                     "boston"),
     ("Chicago / Loop",          "233 S Wacker Drive, Chicago, IL",                    "chicago"),
     ("Seattle / Downtown",      "600 4th Avenue, Seattle, WA",                        "seattle"),
-    ("SF / Civic Center",       "1 Dr Carlton B Goodlett Place, San Francisco, CA",   "sf"),
+    ("Albany / City Hall",      "24 Eagle St, Albany, NY 12207",                      "albany"),
     ("Albuquerque NM",          "1 Civic Plaza NW, Albuquerque, NM",                  None),
 ]
 
 # Pebble ids the UI cardAdapter has *hardcoded* NYC-specific builder
-# functions for (buildSandy, buildIdaHwm, buildPrithviWater, ...).
+# functions for (buildSandy, buildIdaHwm, ...).
 # These render as empty "□" cards when the API data doesn't include
-# them — the exact failure mode the user reported when a Boston query
-# rendered an NYC scaffold.
+# them, which is what a non-NYC query shows when it is given an NYC
+# scaffold.
 NYC_ONLY_CARD_BUILDERS = {
-    "sandy", "ida_hwm", "prithvi_water", "prithvi_live",
+    "sandy", "ida_hwm",
     "microtopo", "floodnet", "nyc311", "noaa_tides",
     "mta_entrances", "nycha_developments", "doe_schools", "doh_hospitals",
-    "ttm_forecast", "ttm_battery_surge", "npcc4_slr", "floodnet_forecast",
+    "npcc4_slr",
     "dep_extreme_2080", "dep_moderate_2050", "dep_moderate_current",
-    "terramind_buildings", "terramind_lulc",
 }
 
 PIPELINE_STEPS = {
-    "plan_heuristic", "plan_intent", "geocode", "select_deployment",
-    "assemble_legacy_state", "policy_corpus", "reconcile_templated",
-    "step_reconcile", "rag", "gliner", "step_gliner", "step_rag",
+    "plan_heuristic", "plan_intent", "geocode", "nta_resolve",
+    "select_deployment", "assemble_legacy_state", "reconcile_templated",
+    "reconcile_claims",
 }
 
 

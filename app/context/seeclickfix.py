@@ -6,9 +6,9 @@ but the native v2 API (seeclickfix.com/api/v2/issues) supports lat/lng +
 distance sorting directly. The API has no hard radius cutoff we can trust
 (`max_distance` is only honoured together with `sort=distance` and is in
 miles), so we over-fetch nearest-first and haversine-filter to `radius_m`
-in Python — same contract as the CKAN adapter's bbox-then-refine approach.
+in Python.
 
-Returns the records shape the socrata/ckan pebbles emit
+Returns the records shape the socrata_records pebbles emit
 (`n_records`, `n_truncated`, `radius_m`, `sample`, `top_by_request_type`)
 so narration templates and UI cards work unchanged.
 """

@@ -13,9 +13,8 @@ Every call record says how its energy figure was obtained:
              report no energy, and power times duration on shared
              hardware would be invented.
 
-In-process CPU models (TTM, embeddings, NER) are not in the ledger. The
-2026-05 benchmark measured them at about 0.3% of a briefing's inference
-energy (docs/history/BENCHMARKS.md).
+The LLM is the only model Riprap runs, so the ledger covers every model
+call in a briefing.
 """
 
 from __future__ import annotations

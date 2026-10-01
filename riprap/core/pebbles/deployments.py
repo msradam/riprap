@@ -16,13 +16,12 @@ Hoboken and Nassau County, and the city's own layers then reported them
 
 When a query is geocoded, `pick_deployment(lat, lon)` picks the deployment
 whose bbox contains the resolved point. That deployment's manifest set is
-the one that fans out for the run — so a Boston query never fires NYC's
+the one that fans out for the run, so a Chicago query never fires NYC's
 `ida_hwm` pebble, regardless of which deployment the server happened to
 boot with as its default.
 
-Falls back to `None` when no deployment covers the point; the caller is
-responsible for short-circuiting the briefing to a "not covered yet"
-response in that case.
+Returns `None` when no deployment covers the point; the caller then runs
+the federal pebbles only.
 """
 from __future__ import annotations
 
@@ -35,7 +34,7 @@ import yaml
 
 @dataclass(frozen=True)
 class Deployment:
-    name: str                    # 'nyc', 'boston', ...
+    name: str                    # 'nyc', 'chicago', ...
     root: Path                   # absolute path to deployments/<name>/
     bbox: tuple[float, float, float, float] | None  # (min_lon, min_lat, max_lon, max_lat)
     city: str | None
@@ -116,10 +115,10 @@ def discover_deployments() -> tuple[Deployment, ...]:
 def pick_deployment(lat: float | None, lon: float | None) -> Deployment | None:
     """Return the deployment whose bbox contains the point, else None.
 
-    With overlapping bboxes (won't happen for our five shipped cities,
-    but is theoretically possible for a custom site), the first match in
-    discovery order wins. Discovery order is alphabetical by directory
-    name — deterministic across machines.
+    With overlapping bboxes (not the case for the shipped cities, but
+    possible for a custom site), the first match in discovery order
+    wins. Discovery order is alphabetical by directory name, so it is
+    the same on every machine.
     """
     if lat is None or lon is None:
         return None
@@ -138,7 +137,7 @@ def deployment_by_name(name: str) -> Deployment | None:
 
 
 def deployment_root(name: str | None) -> Path:
-    """The directory of a deployment named by its short name ('boston'),
+    """The directory of a deployment named by its short name ('chicago'),
     a path, None (the RIPRAP_DEPLOYMENT env var, default deployments/nyc)
     or the out-of-coverage sentinel `__none__` (the federal sources still
     narrate). The one place this is decided."""

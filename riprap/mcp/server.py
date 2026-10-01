@@ -13,8 +13,9 @@ operations through curation, not mirroring (arxiv.org/html/2507.16044).
   plan_query(question, address)       how a question would be routed, without running it
   get_briefing(address, question)     the briefing, answering the question when given
 
-Every tool works without an LLM; get_briefing answers the question only
-when one is configured. Run over stdio (for a local MCP client config) or
+Every tool works without an LLM. Without one, get_briefing answers a
+question by rules over its words; with one, the model chooses the lead and
+the facts and code checks them. Run over stdio (for a local MCP client config) or
 streamable HTTP:
 
     uv run riprap-mcp                     # or: uv run python -m riprap.mcp.server
@@ -157,7 +158,9 @@ def get_district_summary(community_district: str) -> dict:
     """The same evidence for an NYC community district, such as QN12
     (Jamaica, St. Albans, Hollis) or BK15 (Sheepshead Bay, Homecrest):
     shares of the district in the Sandy and DEP extents, terrain, 311 flood
-    complaints and DOB permits, without an LLM."""
+    complaints, the exposed subway entrances, schools, NYCHA developments
+    and hospitals, NYC Planning's floodplain counts and DOB permits, without
+    an LLM."""
     from riprap.core.burr.app import district_summary
 
     return _evidence_payload(district_summary(community_district, no_llm=True))
@@ -226,8 +229,9 @@ def plan_query(question: str, address: str | None = None) -> dict:
 def get_briefing(address: str, question: str | None = None) -> dict:
     """The flood-exposure briefing for a US street address, optionally
     answering a question about it ("Has this block flooded since Ida?").
-    Works without an LLM: the briefing is then the cited evidence and
-    `mode` is "no_llm" (the HTTP API calls the same value `grounding.tier`).
+    Works without an LLM: the briefing is then the cited evidence, a
+    question is answered by rules over its words, and `mode` is "no_llm"
+    (the HTTP API calls the same value `grounding.tier`).
     With an LLM endpoint configured on the server
     (RIPRAP_LLM_BASE_URL and RIPRAP_LLM_MODEL), the planner picks the
     sources the question needs and the answer is the lead plus cited
@@ -271,7 +275,7 @@ def list_sources(deployment: str = "nyc") -> dict:
     doc_id and maturity (production or experimental).
 
     `deployment` is a shipped deployment directory name (nyc, chicago,
-    seattle, sf, boston, albany, ...).
+    seattle, albany or federal).
     """
     from riprap.core.pebbles import load_registry
     from riprap.core.pebbles.describe import describe_deployment
