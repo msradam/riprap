@@ -40,5 +40,4 @@ def test_intent_selects_point_or_polygon_pebbles():
     live = pebbles_for("nyc", 40.71, -73.98, "live_now")
     assert "sandy" in point and "sandy_nta" not in point
     assert "sandy_nta" in polygon and "sandy" not in polygon
-    assert "policy_corpus" not in point + polygon
     assert "nyc311" in live and "sandy" not in live

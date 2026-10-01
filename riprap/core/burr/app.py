@@ -6,7 +6,7 @@
     │  development_check          -> resolve_area (NTA polygon)
     └─ single_address, live_now   -> geocode_target (point)
   select_deployment -> stones (parallel fan-out) -> assemble_legacy_state
-    -> policy_corpus -> reconcile
+    -> reconcile
 
 `compare` runs the single_address graph once per target and merges the
 two briefings (`run_compare`). The intent decides which pebbles the
@@ -27,7 +27,7 @@ from pathlib import Path
 from burr.core import ApplicationBuilder, State, expr
 from burr.lifecycle import PostRunStepHook
 
-from riprap.core.burr.capstone import assemble_legacy_state, step_policy_corpus
+from riprap.core.burr.capstone import assemble_legacy_state
 from riprap.core.burr.intake import (
     forecast_question,
     geocode_target,
@@ -150,7 +150,6 @@ def build_app(query: str, plan: dict | None = None, *, step_queue=None, no_llm: 
             select_sources=select_sources,
             stones=StonesAction(),
             assemble_legacy_state=assemble_legacy_state,
-            policy_corpus=step_policy_corpus,
             reconcile=_reconciler(no_llm),
         )
         .with_transitions(
@@ -166,8 +165,7 @@ def build_app(query: str, plan: dict | None = None, *, step_queue=None, no_llm: 
             ("select_deployment", "select_sources"),
             ("select_sources", "stones"),
             ("stones", "assemble_legacy_state"),
-            ("assemble_legacy_state", "policy_corpus"),
-            ("policy_corpus", "reconcile"),
+            ("assemble_legacy_state", "reconcile"),
         )
     )
     if os.environ.get("RIPRAP_BURR_TRACKING", "").lower() in ("1", "true", "yes"):
@@ -178,7 +176,7 @@ def build_app(query: str, plan: dict | None = None, *, step_queue=None, no_llm: 
     return builder.build()
 
 
-_PIPELINE_KEYS = ("query", "intent", "plan", "geocode", "lat", "lon", "nta", "policy_corpus",
+_PIPELINE_KEYS = ("query", "intent", "plan", "geocode", "lat", "lon", "nta",
                   "dep", "paragraph", "audit", "grounding", "citations", "consulted", "not_checked")
 
 

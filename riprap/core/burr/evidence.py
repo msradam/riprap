@@ -131,33 +131,13 @@ def collect(state, stones: StoneRegistry, registry: Registry) -> list[Evidence]:
     return out
 
 
-def policy_passages(state, registry: Registry, limit: int = 3) -> list[Evidence]:
-    """Retrieved policy-corpus passages as their own documents (rag_*),
-    for the LLM path. Citations resolve to the policy_corpus manifest."""
-    value = state.get("policy_corpus") or {}
-    if "policy_corpus" not in registry.ids():
-        return []
-    manifest = registry.get("policy_corpus").manifest
-    out = []
-    for hit in (value.get("rag_hits") or [])[:limit]:
-        text = " ".join((hit.get("text") or "").split())[:400]
-        if text:
-            out.append(Evidence(
-                doc_id=hit["doc_id"], pebble_id="policy_corpus", stone_id=manifest.stone,
-                text=f"{hit.get('title', '')}, page {hit.get('page', '?')}: {text}",
-                maturity=manifest.maturity, manifest=manifest,
-            ))
-    return out
-
-
 def citations(items: list[Evidence]) -> dict[str, dict]:
     """doc_id -> citation record, from manifest provenance only."""
     out: dict[str, dict] = {}
     for e in items:
         if e.doc_id in out:
             continue
-        title = e.text.split(":", 1)[0] if e.doc_id.startswith("rag_") else None
-        out[e.doc_id] = citation(e.manifest, doc_id=e.doc_id, title=title,
+        out[e.doc_id] = citation(e.manifest, doc_id=e.doc_id,
                                  value=e.value if isinstance(e.value, dict) else None)
     return out
 

@@ -62,14 +62,12 @@ riprap-register = "riprap.cli.register:main"
 riprap-mcp = "riprap.mcp.server:main"
 
 [project.optional-dependencies]
-# In-process CPU models: policy-corpus embeddings, NER.
+# The 311 flood filter for cities whose feed gives free text
+# (riprap/core/pebbles/record_filter.py); nothing else runs a model in process.
 ml = [
     "torch>=2.5,<3",
     "transformers>=4.55,<5",
     "huggingface_hub>=0.34,<1",
-    "sentence-transformers>=3.3,<4",
-    "flair>=0.13.0,<0.16",
-    "pypdf>=5.0,<7",
     "gliclass>=0.1.17,<0.1.18",
 ]
 # Server-side PDF export (/api/print); needs system pango and cairo.

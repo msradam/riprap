@@ -116,7 +116,6 @@ EXPECTED_STEPS = [
     "nws_obs",
     "microtopo",
     "ida_hwm",
-    "policy_corpus",
 ]
 
 

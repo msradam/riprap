@@ -73,11 +73,9 @@ def _stone_display(stone_id: str) -> str:
 _STEP_TO_STONE: dict[str, str] = {
     pebble.id: _stone_display(pebble.stone) for pebble in _PEBBLES.all()
 }
-# Steps that are not data pebbles. policy_corpus is a manifest pebble but
-# runs in the Capstone, after the data Stones.
+# Steps that are not data pebbles.
 _STEP_TO_STONE.update(
     {
-        "policy_corpus": _stone_display("capstone"),
         "reconcile_claims": _stone_display("capstone"),
         "reconcile_templated": _stone_display("capstone"),
     }
@@ -152,45 +150,11 @@ def _warm_caches():
     for scen in ["dep_extreme_2080", "dep_moderate_2050", "dep_moderate_current"]:
         dep_stormwater.load(scen)
     print("[startup] flood layers ready", flush=True)
-    print("[startup] loading the policy-corpus index...", flush=True)
-    # RAG warm loads sentence-transformers, which on some HF Space rebuilds
-    # has hit transformers-lazy-import edge cases (CodeCarbonCallback). The
-    # Space *must* start even if RAG fails — the FSM still works without
-    # RAG citations (specialists deliver their own grounded data, and the
-    # rag step in fsm.py already handles `rag=[]` gracefully). Surface the
-    # failure loudly in logs but don't kill the app.
-    try:
-        from app import rag
-
-        rag.warm()
-        print("[startup] RAG ready", flush=True)
-    except Exception as e:  # noqa: BLE001
-        print(
-            f"[startup] RAG warm FAILED — continuing without RAG: {type(e).__name__}: {e}",
-            flush=True,
-        )
-        import traceback
-
-        traceback.print_exc()
-    # Import the in-process model stacks on the main thread before any
-    # worker thread does: transformers' lazy module loader races under
-    # concurrent first imports ("Could not import module
-    # 'PreTrainedModel'"). Modules whose deps are not installed no-op.
-    try:
-        from transformers import PreTrainedModel  # noqa: F401
-    except Exception as e:  # noqa: BLE001
-        print(f"[startup] ML pre-import skipped: {e}", flush=True)
-    for mod_path in ("app.context.entity_extract",):
-        try:
-            __import__(mod_path)
-        except Exception as e:  # noqa: BLE001
-            print(f"[startup] {mod_path} pre-import skipped: {type(e).__name__}: {e}", flush=True)
     if os.environ.get("RIPRAP_WARM", "").lower() in ("1", "true", "yes"):
-        # Load NER and the embeddings now and ping the LLM, so the
-        # first query of a demo is not the cold one (refactor 8).
+        # Ping the LLM now, so the first question of a demo is not the cold one.
         from app.models_info import warm
 
-        print(f"[startup] warm models (seconds, -1 = skipped): {warm()}", flush=True)
+        print(f"[startup] warm (seconds, -1 = skipped): {warm()}", flush=True)
 
 
 def _stones_pebbles_for_deployment(deployment_name: str | None):
@@ -341,8 +305,7 @@ async def api_print(request: Request) -> Response:
 
 @app.get("/api/models")
 def api_models():
-    """The models this process has loaded now and the LLM endpoint
-    configured. Each briefing's own list is
+    """The LLM endpoint configured. Each briefing's own list is
     the `models` field of its result."""
     from app.models_info import loaded
 

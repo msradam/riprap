@@ -1,11 +1,10 @@
-"""Which models took part in a briefing, and which are loaded now (refactor 8).
+"""Which model took part in a briefing.
 
-`for_briefing(final)` reads the trace and the LLM call records of one
-result and lists each model that ran: its name and Hugging Face repo (or
-the LLM endpoint's model id), where it ran, whether it was loaded in
-process or read from a precomputed batch output, and its latency for this
-briefing. `loaded()` backs /api/models: the models this process has in
-memory now. `warm()` loads them at startup when RIPRAP_WARM=1.
+`for_briefing(final)` reads the LLM call records of one result and lists
+each model that ran: the endpoint's model id, where it ran and its latency
+for this briefing. A briefing made without a language model lists nothing:
+no other model runs. `loaded()` backs /api/models; `warm()` pings the LLM
+at startup when RIPRAP_WARM=1.
 """
 
 from __future__ import annotations
@@ -14,25 +13,9 @@ import logging
 
 log = logging.getLogger("riprap.models")
 
-# pebble id -> the models it runs. "where" is where the model itself runs.
-PEBBLE_MODELS: dict[str, list[dict]] = {
-    "policy_corpus": [{"name": "Granite Embedding 278M", "repo": "ibm-granite/granite-embedding-278m-multilingual",
-                       "where": "CPU", "how": "loaded"},
-                      {"name": "Flair NER (OntoNotes, fast)", "repo": "flair/ner-english-ontonotes-fast",
-                       "where": "CPU", "how": "loaded"}],
-}
-
 
 def for_briefing(final: dict) -> list[dict]:
-    """The models that ran for one result, in trace order, then the LLM."""
-    out: list[dict] = []
-    for t in final.get("trace") or []:
-        step = t.get("step")
-        res = t.get("result") if isinstance(t.get("result"), dict) else {}
-        if step not in PEBBLE_MODELS or not t.get("ok") or res.get("skipped") or final.get(step) is None:
-            continue
-        for m in PEBBLE_MODELS[step]:
-            out.append({**m, "pebble": step, "latency_s": t.get("elapsed_s")})
+    """The LLM endpoints that answered for one result, with calls and time."""
     calls = [*((final.get("plan") or {}).get("llm_calls") or []),
              *((final.get("grounding") or {}).get("llm_calls") or [])]
     by_model: dict[str, dict] = {}
@@ -43,7 +26,7 @@ def for_briefing(final: dict) -> list[dict]:
                                         "latency_s": 0.0, "calls": 0})
         row["latency_s"] = round(row["latency_s"] + float(c.get("duration_s") or 0), 2)
         row["calls"] += 1
-    return out + list(by_model.values())
+    return list(by_model.values())
 
 
 def _where(endpoint: str) -> str:
@@ -54,49 +37,25 @@ def _where(endpoint: str) -> str:
 
 
 def loaded() -> dict:
-    """What this process has in memory now, and the LLM endpoint configured."""
-    import sys
-
-    def attr(mod: str, name: str):
-        m = sys.modules.get(mod)
-        return getattr(m, name, None) if m else None
-
+    """The LLM endpoint configured, if any. No model runs in this process."""
     from riprap.core import llm
 
-    return {
-        "in_process": {
-            "ibm-granite/granite-embedding-278m-multilingual": attr("app.rag", "_MODEL") is not None,
-            "flair/ner-english-ontonotes-fast": bool(attr("app.context.entity_extract", "_TAGGER")),
-        },
-        "llm_endpoints": [{"model": e.model, "base_url": e.base_url} for e in llm.endpoints()],
-    }
+    return {"in_process": {}, "llm_endpoints": [{"model": e.model, "base_url": e.base_url} for e in llm.endpoints()]}
 
 
 def warm() -> dict:
-    """Load the in-process models and send one tiny request to the LLM, so
-    the first query is not the cold one. Each step is optional: a missing
-    extra or an unreachable endpoint is logged and skipped. Returns the
-    seconds each step took."""
+    """Send one tiny request to the LLM, so the first question is not the
+    cold one. An unreachable endpoint is logged and skipped. Returns the
+    seconds it took (-1 when skipped)."""
     import time
 
-    took: dict[str, float] = {}
-
-    def step(name, fn):
-        t0 = time.perf_counter()
-        try:
-            fn()
-            took[name] = round(time.perf_counter() - t0, 1)
-        except Exception as e:  # noqa: BLE001 - warming is best effort
-            log.warning("warm %s skipped: %s", name, e)
-            took[name] = -1.0
-
-    from app import rag
-    from app.context import entity_extract
-
-    step("granite-embedding", lambda: (rag.warm(), rag._model()))  # the index, then the encoder
-    step("flair-ner", entity_extract.warm)
-    step("llm", _ping_llm)
-    return took
+    t0 = time.perf_counter()
+    try:
+        _ping_llm()
+        return {"llm": round(time.perf_counter() - t0, 1)}
+    except Exception as e:  # noqa: BLE001 - warming is best effort
+        log.warning("warm llm skipped: %s", e)
+        return {"llm": -1.0}
 
 
 def _ping_llm() -> None:

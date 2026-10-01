@@ -26,11 +26,11 @@ def test_step_to_stone_mapping_covers_known_steps():
             "floodnet", "nyc311", "nws_obs", "noaa_tides",
             "nws_alerts", "nws_water_forecast", "npcc4_slr",
             "sandy_nta", "nyc311_nta", "dob_permits_nta",
-            "policy_corpus", "reconcile_claims", "reconcile_templated",
+            "reconcile_claims", "reconcile_templated",
         )
         if step not in _STEP_TO_STONE
     ]
-    assert _STEP_TO_STONE["policy_corpus"] == "Capstone"
+    assert _STEP_TO_STONE["reconcile_templated"] == "Capstone"
     assert not missing, f"_STEP_TO_STONE missing step mappings: {missing}"
 
 

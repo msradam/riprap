@@ -13,13 +13,9 @@ Which pebbles run depends on the intent:
   live_now                  point pebbles of `type: live`
   neighborhood,
   development_check         polygon pebbles (spatial.scope: polygon)
-
-`policy_corpus` is excluded here; the Capstone runs it with a query built
-from the other evidence.
 """
 from __future__ import annotations
 
-import functools
 import re
 from collections.abc import Generator, Iterable
 from typing import Any
@@ -115,24 +111,13 @@ def pebbles_for(deployment: str | None, lat: float | None = None, lon: float | N
     bbox = dep.bbox if dep is not None else None
     order = {s: i for i, s in enumerate(DATA_STONES)}
     pebbles = [p for p in get_registry(deployment).all()
-               if p.stone in order and p.id != "policy_corpus" and _wants(p.manifest, intent)]
+               if p.stone in order and _wants(p.manifest, intent)]
     if lat is not None and lon is not None:
         pebbles = [p for p in pebbles if p.fires_at(lat, lon, bbox)]
     pebbles.sort(key=lambda p: (order[p.stone],
                                 p.manifest.display.order if p.manifest.display.order is not None else 999,
                                 p.id))
     return [p.id for p in pebbles]
-
-
-@functools.cache
-def _import_ml_stacks() -> None:
-    """Import transformers once, on the thread that starts the fan-out.
-    Its lazy module loader is not thread-safe on first import ("cannot
-    import name 'PreTrainedModel'"). A no-op when it is not installed."""
-    try:
-        from transformers import PreTrainedModel  # noqa: F401
-    except Exception:  # noqa: BLE001 - the ml extra is optional
-        pass
 
 
 def _all_data_pebble_ids() -> list[str]:
@@ -148,7 +133,7 @@ def _all_data_pebble_ids() -> list[str]:
             reg = get_registry(dep.name)
         except Exception:  # noqa: BLE001 - one malformed deployment must not break the rest
             continue
-        ids.update(p.id for p in reg.all() if p.stone in DATA_STONES and p.id != "policy_corpus")
+        ids.update(p.id for p in reg.all() if p.stone in DATA_STONES)
     return sorted(ids)
 
 
@@ -173,7 +158,6 @@ class StonesAction(MapActions):
 
     def actions(self, state: State, inputs: dict[str, Any],  # noqa: ARG002 - Burr API
                 context: ApplicationContext) -> Generator[Any, None, None]:  # noqa: ARG002
-        _import_ml_stacks()
         for pid in _to_run(state):
             yield pebble_action(pid)
 

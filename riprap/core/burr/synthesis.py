@@ -39,7 +39,6 @@ NO_EVIDENCE_LINE = "No grounded evidence for this section."
 ANSWER_SECTION = "answer"
 CANNOT_ANSWER = ("The sources consulted do not answer this question directly. "
                  "Here is what they show.")
-POLICY_SECTION = "Policy context"
 
 # A number is not preceded by a letter, digit or '.', so 'Extreme-2080'
 # gives 2080 and a FIRM panel '3604970203F' gives 3604970203.
@@ -271,11 +270,8 @@ LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From
 def _documents(state) -> tuple[list[Doc], list, object]:
     stones, registry = evidence.load(state.get("deployment"))
     heading = {s.id: evidence.stone_heading(s).rstrip(".") for s in stones.all()}
-    items = evidence.collect(state, stones, registry) + evidence.policy_passages(state, registry)
-    # Retrieved policy passages are verbatim quotes: their own section,
-    # not labelled experimental (the retrieval summary sentence is).
-    docs = [Doc(e.doc_id, POLICY_SECTION, e.text, False) if e.doc_id.startswith("rag_")
-            else Doc(e.doc_id, heading.get(e.stone_id, e.stone_id), e.text, e.maturity == "experimental")
+    items = evidence.collect(state, stones, registry)
+    docs = [Doc(e.doc_id, heading.get(e.stone_id, e.stone_id), e.text, e.maturity == "experimental")
             for e in items]
     return docs, items, stones
 
@@ -498,12 +494,11 @@ def synthesize(state) -> dict:
     paragraph = _render(kept, docs, sections, question, lead_phrase, empty, brief)
     # Every consulted source with a value is citable (its evidence row gets a
     # number), the ones the text cites first, in order of appearance, so the
-    # numbering still starts with the answer. An uncited policy passage has
-    # no row and is left out.
+    # numbering still starts with the answer.
     cited = list(dict.fromkeys(re.findall(r"\[([a-z0-9_]+)\]", paragraph)))
     every = evidence.citations(items)
     citations = {k: every[k] for k in cited if k in every}
-    citations.update({k: v for k, v in every.items() if k not in citations and not k.startswith("rag_")})
+    citations.update({k: v for k, v in every.items() if k not in citations})
     return {
         "paragraph": paragraph + f"\n\nChecks run: {'; '.join(checks)}.",
         "citations": citations,
@@ -520,7 +515,7 @@ def synthesize(state) -> dict:
 
 
 @action(
-    reads=["geocode", "intent", "deployment", "plan", "policy_corpus", *evidence.all_pebble_ids()],
+    reads=["geocode", "intent", "deployment", "plan", *evidence.all_pebble_ids()],
     writes=["paragraph", "audit", "grounding", "citations", "trace"],
 )
 def reconcile_claims(state: State) -> State:

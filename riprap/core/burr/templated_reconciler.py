@@ -265,7 +265,7 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
 
 
 @action(
-    reads=["geocode", "intent", "deployment", "policy_corpus", *evidence.all_pebble_ids()],
+    reads=["geocode", "intent", "deployment", *evidence.all_pebble_ids()],
     writes=["paragraph", "audit", "grounding", "citations", "trace"],
 )
 def reconcile_templated(state: State) -> State:

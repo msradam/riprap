@@ -14,7 +14,7 @@ TEXTS = {"nyc311": "82 NYC 311 flood-related complaints filed within 200 m in th
 
 def test_uncited_consulted_sources_keep_their_citation(monkeypatch):
     docs = [Doc(i, "Live Observer", t, False) for i, t in TEXTS.items()]
-    items = [SimpleNamespace(doc_id=i, pebble_id=i) for i in [*TEXTS, "rag_npcc_1"]]
+    items = [SimpleNamespace(doc_id=i, pebble_id=i) for i in TEXTS]
     monkeypatch.setattr(syn, "_documents", lambda state: (docs, items, None))
     monkeypatch.setattr(syn.evidence, "citations", lambda items: {e.doc_id: {"doc_id": e.doc_id} for e in items})
     reply = {"answer": {"lead": "count", "facts": ["nyc311"]}}
@@ -22,7 +22,7 @@ def test_uncited_consulted_sources_keep_their_citation(monkeypatch):
     out = syn.synthesize({"intent": "single_address",
                           "plan": {"question": "How many 311 complaints near 80 Pioneer Street?"}})
     assert "[sandy_inundation]" not in out["paragraph"]
-    # The answer's source first, then every other consulted source; no uncited policy passage.
+    # The answer's source first, then every other consulted source.
     assert list(out["citations"]) == ["nyc311", "sandy_inundation", "floodnet"]
 
 

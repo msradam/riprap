@@ -379,9 +379,6 @@ def select_sources(state: State) -> State:
     selected = select_pebbles(plan, registry)
     available = pebbles_for(state.get("deployment"), state.get("lat"), state.get("lon"),
                             state.get("intent"))
-    if "policy_corpus" in registry.ids() and state.get("intent") not in ("neighborhood", "development_check",
-                                                                         "live_now"):
-        available.append("policy_corpus")
 
     def entry(pid):
         m = registry.get(pid).manifest
