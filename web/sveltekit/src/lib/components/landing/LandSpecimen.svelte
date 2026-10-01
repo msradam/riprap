@@ -5,13 +5,16 @@
   import type { Citation, ClaimPart } from '$lib/types/claim';
 
   /** A real gallery answer, set as on its briefing: the question, the
-   *  lead word, the key sentence with its citation mark, and the answer's
-   *  source notes. Every text comes from the snapshot at build time. */
+   *  lead word, the key sentence with its citation mark, the briefing's
+   *  own flagged-sensor sentence, and the answer's source notes. Every
+   *  text comes from the snapshot at build time. */
   export interface Specimen {
     slug: string;
     question: string;
     lead: string | null;
     key: ClaimPart[];
+    /** The sentence where the briefing flags one of its own sensors. */
+    flagged: ClaimPart[];
     citations: Citation[];
     date: string;
   }
@@ -31,6 +34,7 @@
   </p>
   {#if specimen.lead}<p class="specimen-lead">{specimen.lead}</p>{/if}
   <AnswerProse parts={specimen.key} citations={byId} class="specimen-key" />
+  <AnswerProse parts={specimen.flagged} citations={byId} class="specimen-flag" />
   <div class="specimen-notes">
     <SourceNotes citations={specimen.citations} label="Sources for the answer" />
   </div>
@@ -70,6 +74,12 @@
     max-width: 64ch;
     font-size: 20px;
     line-height: 1.5;
+  }
+  .specimen :global(.specimen-flag) {
+    margin: 12px 0 0;
+    max-width: 64ch;
+    font-size: 17px;
+    line-height: 1.55;
   }
   .specimen-notes {
     margin: 24px 0 8px;

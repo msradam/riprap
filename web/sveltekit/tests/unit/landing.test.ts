@@ -6,6 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { CHIPS, PROOF, SPECIMEN_SLUG } from '$lib/landing';
 import { galleryIndex, loadGalleryEntry } from '$lib/client/gallery';
+import { TIER_WORDS } from '$lib/types/tier';
 import { load } from '../../src/routes/+page.server';
 
 /** A briefing paragraph as a reader sees it: `[doc_id]` markers removed. */
@@ -68,5 +69,24 @@ describe('landing load', () => {
       [2, 'ida_hwm'],
       [3, 'nyc311']
     ]);
+  });
+
+  it("reads each source's tier from the snapshot's manifest: sensors and high-water marks Measured, 311 Proxy", async () => {
+    const { specimen } = await load();
+    expect(specimen.citations.map((c) => [c.id, TIER_WORDS[c.tier]])).toEqual([
+      ['floodnet', 'Measured'],
+      ['ida_hwm', 'Measured'],
+      ['nyc311', 'Proxy']
+    ]);
+  });
+
+  it("sets the briefing's own flagged-sensor sentence, verbatim, right after the key sentence", async () => {
+    const { specimen } = await load();
+    const flagged = specimen.flagged.map((p) => p.text).join('').replace(/\s+/g, ' ').replace(/ \.$/, '.');
+    expect(flagged).toBe(
+      '1 sensor that logged 11 of these events is flagged by FloodNet for maintenance, so its depths are not used for the peak.'
+    );
+    expect(specimen.flagged[0].cite).toBe('floodnet');
+    expect(await plainBriefing(SPECIMEN_SLUG)).toContain(flagged);
   });
 });

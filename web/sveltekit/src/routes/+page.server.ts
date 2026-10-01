@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import { galleryIndex, loadGalleryEntry } from '$lib/client/gallery';
 import { RunState } from '$lib/client/runState.svelte';
 import { briefingModel } from '$lib/client/briefingModel';
+import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 import { CHIPS, PROOF, SPECIMEN_SLUG } from '$lib/landing';
 import type { Citation } from '$lib/types/claim';
 
@@ -18,13 +19,20 @@ export async function load() {
   // key sentence and source notes are the briefing's own.
   const entry = await loadGalleryEntry(SPECIMEN_SLUG);
   if (!entry?.question) error(500, `Gallery entry "${SPECIMEN_SLUG}" is not a question`);
+  // The tiers come from the snapshot's manifest, as on /gallery/[slug].
+  pebbleManifest.setFromResponse(entry.pebbles, entry.deployment.name);
   const model = briefingModel(RunState.fromFinal(entry.final, entry.address), entry.question);
   const cites: Citation[] = model.citations.filter((c) => model.cited.includes(c.id));
+  // The briefing flags its own sensor data; the specimen shows that sentence too.
+  const parts = model.answer.flat();
+  const f = parts.findIndex((p) => p.text.includes('is flagged by FloodNet'));
+  if (f < 0) error(500, `Gallery entry "${SPECIMEN_SLUG}" no longer flags a sensor`);
   const specimen = {
     slug: SPECIMEN_SLUG,
     question: entry.question,
     lead: model.lead,
     key: model.answer[0] ?? [],
+    flagged: parts.slice(f, parts[f + 1]?.text === '.' ? f + 2 : f + 1),
     citations: cites,
     date: entry.generated_at.slice(0, 10)
   };
