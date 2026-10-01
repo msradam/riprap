@@ -102,9 +102,10 @@ answer, it says so instead of guessing.
   (`tests/question_eval/`).
 - The static gallery (`web/sveltekit/src/lib/gallery/`), built with no model:
   twelve address briefings across all five boroughs, three community
-  districts and eight question briefings (a yes, a No, counts, a scenario,
-  two district questions, honest silence and a refusal), each
-  with a one-line reason in `scripts/gallery_addresses.json`.
+  districts and twelve question briefings (a yes, a No, counts, a scenario,
+  two district questions, honest silence, a refusal, a next-week question
+  that gets no prediction, and three answers from the experimental models),
+  each with a one-line reason in `scripts/gallery_addresses.json`.
 - Methodology and grounding documentation (`docs/GROUNDING.md`,
   `docs/METHODOLOGY.md`).
 - No user research, testimonials, adoption figures or partner endorsements

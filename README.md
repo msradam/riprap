@@ -4,8 +4,12 @@
 
 # Riprap
 
-The public flood records for a New York City address or community district, on
-one page, with the source and its date beside every sentence.
+**The flood record for any New York City block, cited line by line.**
+
+Ask about an address, a community district such as QN12, or a question such as
+"Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?"
+Riprap answers in seconds with a one-page briefing, and every sentence cites a
+public record and its date.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/msradam/riprap/actions/workflows/check.yml/badge.svg)](https://github.com/msradam/riprap/actions/workflows/check.yml)
@@ -13,29 +17,24 @@ one page, with the source and its date beside every sentence.
 
 ![Riprap answering "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?" with a cited "Yes."](assets/screenshots/hero.png)
 
-**[Browse the gallery](https://msradam.github.io/riprap/)** · **[Run it locally](#quickstart)**
+**[Browse the briefings](https://msradam.github.io/riprap/)** ·
+**[Run it on your laptop](#quickstart)** ·
+**[Build with us](#get-involved)**
 
 ## What it does
 
-Type an NYC address, a neighbourhood, a community district such as QN12, or a
-question about one. Riprap reads the public flood records for that place: FEMA's effective
-and preliminary flood maps, the 2012 Sandy inundation extent, Hurricane Ida
-high-water marks, the city's three stormwater scenarios, 311 flood requests,
-FloodNet street sensors, and the subway entrances, schools, public housing and
-hospitals nearby.
+- Joins FloodNet street sensors, 311 flood complaints, two FEMA flood maps, three
+  city stormwater scenarios, the Sandy extent and USGS Ida high-water marks for
+  one address or community district.
+- Cites every sentence with its source and the date of its data, ready to quote.
+- Names the schools, subway entrances, public housing and hospitals inside the
+  flood extents, for all 59 community districts.
+- Returns the same evidence to code and AI agents, as JSON over HTTP and as seven
+  MCP tools. Open source, open data, no GPU and no API keys.
 
-Every sentence is written by code from one record, and carries that record's
-source and the date of its data. A question is answered by rules over its own
-words: they pick which of those sentences answer it and whether the evidence
-supports a yes or a no. No language model is needed. An optional LLM can route
-questions the rules do not recognise; it chooses among the same cited
-sentences and code checks its choice.
-
-Riprap reports evidence. It does not give advice, score a property or make a
-regulatory flood determination, and it does not say whether a particular place
-will flood on a particular day. Three [experimental models](#experimental-models)
-answer a few questions about the days and years ahead; whatever they say is
-labelled experimental, with their limits and tested accuracy beside it.
+Three open models fine-tuned for New York answer questions about the days and
+years ahead, labelled experimental with their tested accuracy:
+[help improve them](#experimental-models). Riprap reports evidence, not advice.
 
 A real answer, from the gallery entry
 [Hollis, "since Ida"](https://msradam.github.io/riprap/gallery/hollis-since-ida/):
@@ -103,7 +102,10 @@ where they are the authority.
 Data journalists, community board and council staff, resilience analysts,
 civic technologists and researchers who need source-linked numbers about flood
 exposure in a place. Not for resident decisions, real estate, lending,
-insurance or hydraulic design. More in [docs/BACKGROUND.md](docs/BACKGROUND.md).
+insurance or hydraulic design. Riprap does not give advice, score a property
+or make a regulatory flood determination, and it does not say whether a
+particular place will flood on a particular day. More in
+[docs/BACKGROUND.md](docs/BACKGROUND.md).
 
 ## Status
 
@@ -166,12 +168,19 @@ npx @modelcontextprotocol/inspector --cli uv run riprap-mcp \
 ```
 
 **Gallery.** `uv run python scripts/build_gallery.py` rebuilds every entry in
-`web/sveltekit/src/lib/gallery/` (12 addresses, 3 community districts and 8
+`web/sveltekit/src/lib/gallery/` (12 addresses, 3 community districts and 12
 questions), with no model. To see them in the app, rebuild the frontend (needs
 Node and [pnpm](https://pnpm.io)): `cd web/sveltekit && pnpm install && pnpm
 build`. Docker and the Modal host are in [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## How it works
+
+Every sentence is written by code from one record, and carries that record's
+source and the date of its data. A question is answered by rules over its own
+words: they pick which of those sentences answer it and whether the evidence
+supports a yes or a no. No language model is needed. An optional LLM can route
+questions the rules do not recognise; it chooses among the same cited
+sentences and code checks its choice.
 
 Each data source is a YAML manifest (a "pebble"). For every query they run in
 parallel, grouped into five roles:
