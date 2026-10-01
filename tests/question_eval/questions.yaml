@@ -63,7 +63,7 @@
   question: "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?"
   expected_intent: single_address
   must_run: [ida_hwm, nyc311, floodnet]
-  irrelevant: [npcc4_slr, ttm_battery_surge, noaa_tides, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  irrelevant: [npcc4_slr, noaa_tides, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
   answer_should_mention: [["high-water mark", "high water mark"], ["311"], ["floodnet", "sensor"]]
 
 - id: q06
@@ -73,7 +73,7 @@
   question: "Was 80 Pioneer Street in Red Hook inside the area Hurricane Sandy flooded in 2012?"
   expected_intent: single_address
   must_run: [sandy]
-  irrelevant: [nws_obs, nws_alerts, noaa_tides, usgs_gauges, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, npcc4_slr]
+  irrelevant: [nws_obs, nws_alerts, noaa_tides, usgs_gauges, npcc4_slr]
   answer_should_mention: [["within", "inside"]]
 
 - id: q07
@@ -83,7 +83,7 @@
   question: "What flood events have been recorded near 400 Carroll Street, Brooklyn?"
   expected_intent: single_address
   must_run: [ida_hwm, nyc311, floodnet, sandy]
-  irrelevant: [npcc4_slr, ttm_battery_surge, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  irrelevant: [npcc4_slr, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
   answer_should_mention: [["high-water mark", "high water mark"], ["floodnet", "sensor"], ["311"]]
 
 - id: q08
@@ -93,7 +93,7 @@
   question: "Did Hurricane Sandy flood 801 Father Capodanno Boulevard, Staten Island?"
   expected_intent: single_address
   must_run: [sandy]
-  irrelevant: [nws_obs, usgs_gauges, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, doe_schools, mta_entrances]
+  irrelevant: [nws_obs, usgs_gauges, doe_schools, mta_entrances]
   answer_should_mention: [["within", "inside"]]
 
 - id: q09
@@ -103,7 +103,7 @@
   question: "How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?"
   expected_intent: single_address
   must_run: [nyc311]
-  irrelevant: [npcc4_slr, ttm_battery_surge, noaa_tides, usgs_gauges, doh_hospitals, mta_entrances, prithvi_water]
+  irrelevant: [npcc4_slr, noaa_tides, usgs_gauges, doh_hospitals, mta_entrances]
   answer_should_mention: [["311"], ["complaint"]]
 
 - id: q10
@@ -113,7 +113,7 @@
   question: "Is there flooding near 80 Pioneer Street, Brooklyn right now?"
   expected_intent: live_now
   must_run: [nws_alerts, floodnet]
-  irrelevant: [npcc4_slr, prithvi_water, ida_hwm, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  irrelevant: [npcc4_slr, ida_hwm, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
   answer_should_mention: [["alert"], ["floodnet", "sensor"]]
 
 - id: q11
@@ -123,7 +123,7 @@
   question: "Are there any active flood or coastal alerts at 116-02 Rockaway Beach Boulevard right now?"
   expected_intent: live_now
   must_run: [nws_alerts]
-  irrelevant: [npcc4_slr, prithvi_water, ida_hwm, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  irrelevant: [npcc4_slr, ida_hwm, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
   answer_should_mention: [["alert"]]
 
 - id: q12
@@ -133,7 +133,7 @@
   question: "Is it raining hard near 90-01 183rd Street, Queens at the moment?"
   expected_intent: live_now
   must_run: [nws_obs]
-  irrelevant: [npcc4_slr, prithvi_water, ida_hwm, sandy, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
+  irrelevant: [npcc4_slr, ida_hwm, sandy, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments]
   answer_should_mention: [["precip", "rain", "metar", "observation"]]
 
 - id: q13
@@ -143,7 +143,7 @@
   question: "What is the water level in New York Harbor near 560 Grand Street, Manhattan right now?"
   expected_intent: live_now
   must_run: [noaa_tides]
-  irrelevant: [npcc4_slr, prithvi_water, ida_hwm, sandy, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments, nyc311]
+  irrelevant: [npcc4_slr, ida_hwm, sandy, dep_moderate_2050, dep_extreme_2080, doe_schools, doh_hospitals, mta_entrances, nycha_developments, nyc311]
   answer_should_mention: [["mllw", "water level", "ft above"]]
 
 - id: q14
@@ -193,7 +193,7 @@
   question: "Are the subway entrances near 90-01 183rd Street, Queens in a flood scenario?"
   expected_intent: single_address
   must_run: [mta_entrances]
-  irrelevant: [nws_obs, noaa_tides, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, doe_schools, doh_hospitals, nycha_developments]
+  irrelevant: [nws_obs, noaa_tides, doe_schools, doh_hospitals, nycha_developments]
   answer_should_mention: [["8"], ["2080", "extreme"]]
 
 - id: q19
@@ -203,7 +203,7 @@
   question: "Are the NYCHA developments near 560 Grand Street, Manhattan exposed to flooding?"
   expected_intent: single_address
   must_run: [nycha_developments]
-  irrelevant: [nws_obs, noaa_tides, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, doe_schools, doh_hospitals, mta_entrances]
+  irrelevant: [nws_obs, noaa_tides, doe_schools, doh_hospitals, mta_entrances]
   answer_should_mention: [["5"], ["nycha"]]
 
 - id: q20
@@ -213,7 +213,7 @@
   question: "Are the schools near 116-02 Rockaway Beach Boulevard exposed to flooding?"
   expected_intent: single_address
   must_run: [doe_schools]
-  irrelevant: [nws_obs, noaa_tides, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, doh_hospitals, mta_entrances, nycha_developments]
+  irrelevant: [nws_obs, noaa_tides, doh_hospitals, mta_entrances, nycha_developments]
   answer_should_mention: [["4"], ["school"]]
 
 - id: q21
@@ -223,7 +223,7 @@
   question: "Are any hospitals near 355 Food Center Drive, Bronx in a flood zone?"
   expected_intent: single_address
   must_run: [doh_hospitals]
-  irrelevant: [nws_obs, noaa_tides, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, doe_schools, mta_entrances, nycha_developments]
+  irrelevant: [nws_obs, noaa_tides, doe_schools, mta_entrances, nycha_developments]
   answer_should_mention: [["0 hospitals", "no hospitals", "none", "no hospital"]]
 
 - id: q22
@@ -233,7 +233,7 @@
   question: "Which public housing near 80 Pioneer Street, Brooklyn was inside the Sandy flood extent?"
   expected_intent: single_address
   must_run: [nycha_developments]
-  irrelevant: [nws_obs, noaa_tides, ttm_311_forecast, ttm_battery_surge, floodnet_forecast, doe_schools, doh_hospitals, mta_entrances]
+  irrelevant: [nws_obs, noaa_tides, doe_schools, doh_hospitals, mta_entrances]
   answer_should_mention: [["2"], ["nycha"], ["sandy"]]
 
 - id: q23

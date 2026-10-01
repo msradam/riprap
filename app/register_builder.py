@@ -26,9 +26,11 @@ def _snap(lat: float, lon: float) -> dict:
     from riprap.core.pebbles.bridge import fetch_pebble  # noqa: PLC0415
 
     sandy, _, _ = fetch_pebble("sandy", lat, lon)
+    if not isinstance(sandy, dict):
+        raise RuntimeError("the Sandy layer did not answer; a register built without it would say no asset was inside")
     dep = {s: {"depth_class": (v or {}).get("depth_class")} for s in SCENARIOS
            if (v := fetch_pebble(s, lat, lon)[0]) is not None}
-    return {"sandy": bool(sandy), "dep": dep, "microtopo": fetch_pebble("microtopo", lat, lon)[0]}
+    return {"sandy": bool(sandy.get("inside")), "dep": dep, "microtopo": fetch_pebble("microtopo", lat, lon)[0]}
 
 
 def build_register(asset_class: str, loader: Callable, *,

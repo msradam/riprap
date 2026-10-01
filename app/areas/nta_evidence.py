@@ -126,14 +126,21 @@ def floodplain(polygon, query=None) -> dict | None:  # noqa: ARG001 - polygon ke
     if not rows:
         raise ValueError(f"the district profiles table has no row for {borocd}")
     v = {k: rows[0].get(k) for k in ("fp_100_bldg", "fp_100_resunits", "fp_100_pop", "fp_100_area")}
-    bldg, units, pop = (int(v[k] or 0) for k in ("fp_100_bldg", "fp_100_resunits", "fp_100_pop"))
+    # A null field is "not published" (12 districts have no resident count), never a zero.
+    bldg, units, pop = (None if v[k] is None else int(v[k]) for k in ("fp_100_bldg", "fp_100_resunits", "fp_100_pop"))
+    counts = [f"{n:,} {one if n == 1 else many}" for n, one, many in (
+        (bldg, "building", "buildings"), (units, "residential unit", "residential units"), (pop, "resident", "residents"))
+        if n is not None]
+    if not counts:
+        return None
+    listed = counts[0] if len(counts) == 1 else f"{', '.join(counts[:-1])} and {counts[-1]}"
+    basis = ("; residents from the 2010 census, by census block)." if pop is not None
+             else "). The profile gives no resident count for this district.")
     return {"community_district": code, "n_buildings": bldg, "n_residential_units": units, "n_residents_2010": pop,
             "floodplain_sq_mi": v["fp_100_area"],
-            "narrative": (f"NYC Planning's Community District Profile counts {bldg:,} building{'s' if bldg != 1 else ''}, "
-                          f"{units:,} residential unit{'s' if units != 1 else ''} and {pop:,} "
-                          f"resident{'s' if pop != 1 else ''} in the 1% annual chance floodplain of this district "
-                          "(the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, "
-                          "by census block).")}
+            "narrative": (f"NYC Planning's Community District Profile counts {listed} "
+                          "in the 1% annual chance floodplain of this district "
+                          f"(the floodplain of FEMA's 2015 preliminary and 2007 maps{basis}")}
 
 
 def alerts(polygon) -> dict:

@@ -182,19 +182,22 @@ def _sample_raster(raster_path: Path, lat: float, lon: float) -> float | None:
         return None
 
 
-def _exposure(spec: Spec, lat: float, lon: float) -> tuple[bool, dict[str, int]]:
-    """Sandy flag and DEP class per scenario for one live asset. A failed
-    join raises: counting the asset as outside would print a failure as
-    a zero."""
+def _exposure(spec: Spec, lat: float, lon: float) -> tuple[bool, dict[str, int], int | None]:
+    """Sandy flag, DEP class per scenario and, for an asset sampled at its
+    point, its distance to the mapped Sandy edge when within 50 m (Bellevue's
+    point is 46 m outside the outline of a flood that closed it). A failed
+    join raises: counting the asset as outside would print a failure as a
+    zero."""
     if spec.raster:
         import geopandas as gpd
         from shapely.geometry import Point
         pt = (gpd.GeoDataFrame(geometry=[Point(lon, lat)], crs="EPSG:4326")
               .to_crs("EPSG:2263").iloc[0].geometry)
-        return (sandy_inundation.inside_raster(pt),
-                {s: dep_stormwater.join_raster(pt, s) for s in spec.scenarios})
+        sandy = sandy_inundation.at_point(pt)
+        return (sandy["inside"], {s: dep_stormwater.join_raster(pt, s) for s in spec.scenarios},
+                None if sandy["inside"] else sandy["edge_m"])
     return (inside_sandy_buffered(lat, lon, spec.buffer_m),
-            {s: dep_class_buffered(lat, lon, spec.buffer_m, s)[0] for s in spec.scenarios})
+            {s: dep_class_buffered(lat, lon, spec.buffer_m, s)[0] for s in spec.scenarios}, None)
 
 
 def _finding(spec: Spec, distance_m: float | None, row: dict) -> dict:
@@ -213,7 +216,9 @@ def _finding(spec: Spec, distance_m: float | None, row: dict) -> dict:
     else:
         elev = _sample_raster(DATA / "nyc_dem_30m.tif", lat, lon)
         hand = _sample_raster(DATA / "hand.tif", lat, lon)
-        sandy, classes = _exposure(spec, lat, lon)
+        sandy, classes, edge = _exposure(spec, lat, lon)
+        if edge is not None:
+            f["sandy_edge_m"] = edge  # outside the outline, within 50 m of it
     f[spec.elev_key] = round(float(elev), 2) if elev is not None else None
     f[spec.hand_key] = round(float(hand), 2) if hand is not None else None
     f["inside_sandy_2012"] = sandy
@@ -229,6 +234,8 @@ def _named(spec: Spec, findings: list[dict], limit: int = 6) -> str:
     which schools gets the schools, not only how many."""
     out = ""
     for label, hit in (("Inside the 2012 Sandy extent", lambda f: f["inside_sandy_2012"]),
+                       ("Outside the 2012 Sandy extent but within 50 m of its mapped edge (the outline is not exact to a building)",
+                        lambda f: f.get("sandy_edge_m") is not None),
                        ("Inside the DEP extreme scenario", lambda f: (f["dep_extreme_2080_class"] or 0) > 0)):
         nearest: dict[str, float | None] = {}  # one station has several entrances: its nearest one
         for f in findings:
@@ -237,7 +244,8 @@ def _named(spec: Spec, findings: list[dict], limit: int = 6) -> str:
         names = [n if d is None else f"{n} ({d:.0f} m)" for n, d in nearest.items()]
         if names:
             more = f", and {len(names) - limit} more" if len(names) > limit else ""
-            out += f". {label}: {', '.join(names[:limit])}{more}"
+            # Entrances are counted; a station has several, so the names are stations.
+            out += f". {label}{' (by station)' if spec.plural.endswith('entrances') else ''}: {', '.join(names[:limit])}{more}"
     return out
 
 
@@ -262,6 +270,7 @@ def summary_for_polygon(polygon, asset_class: str) -> dict:
     n_dep = sum(1 for f in findings if (f["dep_extreme_2080_class"] or 0) > 0)
     n = len(findings)
     return {"available": True, spec.count_key: n, "n_inside_sandy_2012": n_sandy, "n_in_dep_extreme_2080": n_dep,
+            "n_near_sandy_edge": sum(1 for f in findings if f.get("sandy_edge_m") is not None),
             "narrative": (f"{n} {spec.singular if n == 1 else spec.plural} in this area{spec.scope}: {n_sandy} inside "
                           f"the 2012 Sandy inundation extent and {n_dep} inside the DEP extreme stormwater "
                           f"scenario (2080 sea-level rise)" + _named(spec, findings)),
@@ -288,6 +297,8 @@ def summary_for_point(lat: float, lon: float, asset_class: str,
         out["footprint_buffer_m"] = spec.buffer_m
     out["n_inside_sandy_2012"] = n_sandy
     out["n_in_dep_extreme_2080"] = n_dep
+    if any(f.get("sandy_edge_m") is not None for f in findings):
+        out["n_near_sandy_edge"] = sum(1 for f in findings if f.get("sandy_edge_m") is not None)
     out["narrative"] = narrative(spec.singular, spec.plural, len(hits), radius_m, n_sandy, n_dep,
                                  scope=spec.scope, n_checked=len(findings) if live else None) + _named(spec, findings)
     for key, flag in spec.rollups.items():

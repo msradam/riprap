@@ -61,7 +61,7 @@ class Obs:
     weather: str | None = None  # the station's own words: "Clear", "Light Rain"
 
 
-_WET_RE = re.compile(r"rain|drizzle|shower|thunder|snow|sleet|hail|precip", re.IGNORECASE)
+_WET_RE = re.compile(r"rain|drizzle|shower|thunder|snow|sleet|hail|ice pellets|squall|precip", re.IGNORECASE)
 
 
 def _haversine_km(lat1, lon1, lat2, lon2) -> float:
@@ -130,7 +130,9 @@ def summary_for_point(lat: float, lon: float) -> dict:
             facts.append(f"{p1} mm precip in the last hour")
         elif p6 is not None and p6 > 0:
             facts.append(f"{p6} mm precip in the last 6 hours")
-        elif p1 == 0 or p6 == 0 or (o.weather and not _WET_RE.search(o.weather)):
+        elif o.weather and _WET_RE.search(o.weather):
+            pass  # the sky says it is falling; a zero on the gauge lags it
+        elif p1 == 0 or p6 == 0 or o.weather:
             # A station reports precipitation only when there is some: the
             # sky condition without a wet word is the station saying it is dry.
             facts.append("no precipitation reported")

@@ -107,8 +107,8 @@ def test_weather_service_forecast_names_the_stage_it_reaches(monkeypatch):
     v = nws_water.summary_for_point(40.7074, -74.0048)
     assert v["gauge_id"] == "BATN6" and v["forecast_peak_ft_mllw"] == 8.5 and v["flood_category"] == "moderate"
     assert v["narrative"] == ("The National Weather Service forecasts a peak water level of 8.5 ft above MLLW at The "
-                              "Battery on 2999-01-01 16:00 UTC (forecast issued 2026-09-30 07:44 UTC), which reaches "
-                              "the gauge's moderate flood stage of 8.3 ft.")
+                              "Battery, the nearest forecast gauge (1 km away), on 2999-01-01 16:00 UTC (forecast "
+                              "issued 2026-09-30 07:44 UTC), which reaches the gauge's moderate flood stage of 8.3 ft.")
     fc["data"][2]["primary"] = 6.5
     assert nws_water.summary_for_point(40.7074, -74.0048)["narrative"].endswith(
         "below the gauge's minor flood stage of 7.0 ft.")

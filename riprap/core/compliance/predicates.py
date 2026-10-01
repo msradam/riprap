@@ -63,9 +63,22 @@ class ComplianceReport:
 # Small helpers
 # ---------------------------------------------------------------------------
 
+_ABBREV_END_RE = re.compile(r"(?:(?:^|[^A-Za-z])[A-Z]\.|\bSt\.)$")
+
+
 def _sentences(text: str) -> list[str]:
-    """Naive sentence split — good enough for predicate scanning."""
-    return [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+    """Naive sentence split, good enough for predicate scanning. A name
+    such as "P.S. 90" or "St. Mary's" is not a sentence end."""
+    out: list[str] = []
+    for s in (p.strip() for p in re.split(r"(?<=[.!?])\s+", text)):
+        if not s:
+            continue
+        if out and _ABBREV_END_RE.search(out[-1]) and (s[0].isdigit() or out[-1].endswith("St.")
+                                                       or re.match(r"[A-Z]\.", s)):
+            out[-1] = f"{out[-1]} {s}"
+        else:
+            out.append(s)
+    return out
 
 
 _HEDGES = (

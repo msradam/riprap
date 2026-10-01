@@ -52,8 +52,9 @@ def summary_for_point(lat: float, lon: float) -> dict | None:
               if k in STAGES and v.get("stage") is not None and float(v["stage"]) > -900}
     category = next((k for k in STAGES if k in stages and peak >= stages[k]), None)
     when = lambda t: t[:16].replace("T", " ")  # noqa: E731
-    text = (f"The National Weather Service forecasts a peak water level of {peak:.1f} ft above MLLW at {name} "
-            f"on {when(peak_time)} UTC (forecast issued {when(fc.get('issuedTime', ''))} UTC)")
+    km = _km(lat, lon, glat, glon)
+    text = (f"The National Weather Service forecasts a peak water level of {peak:.1f} ft above MLLW at {name}, "
+            f"the nearest forecast gauge ({km:.0f} km away), on {when(peak_time)} UTC (forecast issued {when(fc.get('issuedTime', ''))} UTC)")
     if category:
         text += f", which reaches the gauge's {category} flood stage of {stages[category]:.1f} ft."
     elif "minor" in stages:

@@ -29,7 +29,8 @@ UA = "Mozilla/5.0 (compatible; Riprap golden keys; +https://github.com/msradam/r
 _FLOOD = ("(complaint_type='Sewer' OR complaint_type='Sewer Maintenance') AND ("
           "upper(descriptor) like '%FLOOD%' OR upper(descriptor) like '%BACKUP%' OR "
           "upper(descriptor) like '%CATCH BASIN CLOGGED%' OR upper(descriptor) like '%MANHOLE OVERFLOW%')")
-_KIND_WORDS = ("HIGHWAY", "RAIN GARDEN", "FLOOD", "BACKUP", "CATCH BASIN", "MANHOLE")
+# "Catch Basin Clogged/Flooding" is a catch basin row: that word is looked for before FLOOD.
+_KIND_WORDS = ("HIGHWAY", "RAIN GARDEN", "CATCH BASIN", "BACKUP", "MANHOLE", "FLOOD")
 
 
 def _kind(descriptor: str) -> str:
@@ -40,17 +41,24 @@ def _kind(descriptor: str) -> str:
 def _once(rows: list[dict]) -> list[dict]:
     """A request logged under both descriptor names counts once: the
     plain-name row ("Backup") is dropped when a coded-name row ("Sewer
-    Backup (Use Comments) (SA)") of the same kind at the same address was
-    created within ten minutes of it. Written apart from the app's rule."""
+    Backup (Use Comments) (SA)") of the same kind at the same address or at
+    the same coordinates (an intersection has no address on its coded row)
+    was created within ten minutes of it. Written apart from the app's rule."""
     def secs(r):
         return datetime.fromisoformat(r["created_date"]).timestamp()
 
-    coded = [r for r in rows if "(" in r["descriptor"] and r.get("incident_address")]
+    def same_place(a, b):
+        if a.get("incident_address") and a.get("incident_address") == b.get("incident_address"):
+            return True
+        return bool(a.get("latitude")) and all(
+            abs(float(a[k]) - float(b[k])) < 1e-5 for k in ("latitude", "longitude") if b.get(k)) and bool(b.get("latitude"))
+
+    coded = [r for r in rows if "(" in r["descriptor"]]
     keep = []
     for r in rows:
-        plain = "(" not in r["descriptor"] and r.get("incident_address")
-        if plain and any(c["incident_address"] == r["incident_address"] and _kind(c["descriptor"]) == _kind(r["descriptor"])
-                         and abs(secs(c) - secs(r)) <= 600 for c in coded):
+        if "(" not in r["descriptor"] and any(
+                same_place(c, r) and _kind(c["descriptor"]) == _kind(r["descriptor"])
+                and abs(secs(c) - secs(r)) <= 600 for c in coded):
             continue
         keep.append(r)
     return keep
@@ -60,7 +68,7 @@ def _flood_rows(where: str, years: int) -> list[dict]:
     since = (datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
              - timedelta(days=365 * years)).replace(tzinfo=None).isoformat(timespec="seconds")
     rows = _get("https://data.cityofnewyork.us/resource/erm2-nwe9.json",
-                {"$select": "descriptor, created_date, incident_address",
+                {"$select": "descriptor, created_date, incident_address, latitude, longitude",
                  "$where": f"{_FLOOD} AND {where} AND created_date >= '{since}'", "$limit": 50000})
     return _once(rows)
 

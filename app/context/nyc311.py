@@ -177,19 +177,27 @@ def summary_for_district(code: str, years: int = 3) -> dict:
 def one_per_incident(cs: list[Complaint]) -> list[Complaint]:
     """Drop a request filed under both names. During the storm of 29
     September 2023 and the days after, 311 logged many requests twice, once
-    under each descriptor name, a minute or two apart at the same address.
+    under each descriptor name, a minute or two apart at the same place.
     The plain-name row goes when a coded-name row of the same kind at the
-    same address was created within ten minutes of it."""
+    same address or the same coordinates was created within ten minutes of
+    it (an intersection request has coordinates and no address on its coded
+    row, and a street-only address on its plain one)."""
+    def places(c: Complaint) -> list:
+        point = (round(c.lat, 5), round(c.lon, 5)) if c.lat is not None and c.lon is not None else None
+        return [p for p in (c.address, point) if p]
+
     coded: dict[tuple, list[datetime]] = {}
     for c in cs:
-        if c.descriptor not in _NEW_NAMES and c.address and c.created_date:
-            coded.setdefault((c.address, KIND.get(c.descriptor)), []).append(datetime.fromisoformat(c.created_date))
+        if c.descriptor not in _NEW_NAMES and c.created_date:
+            for p in places(c):
+                coded.setdefault((p, KIND.get(c.descriptor)), []).append(datetime.fromisoformat(c.created_date))
 
     def twin(c: Complaint) -> bool:
-        if c.descriptor not in _NEW_NAMES or not c.address or not c.created_date:
+        if c.descriptor not in _NEW_NAMES or not c.created_date:
             return False
         t = datetime.fromisoformat(c.created_date)
-        return any(abs(t - u) <= timedelta(minutes=10) for u in coded.get((c.address, KIND.get(c.descriptor)), ()))
+        return any(abs(t - u) <= timedelta(minutes=10)
+                   for p in places(c) for u in coded.get((p, KIND.get(c.descriptor)), ()))
 
     return [c for c in cs if not twin(c)]
 
@@ -290,13 +298,15 @@ def flood_requests(*, lat: float | None = None, lon: float | None = None,
                 "definition": f"requests geocoded within {radius_m:g} m of the point"}
     else:
         return {"error": "give lat and lon, or a community district"}
-    cs = one_per_incident(_complaints_where(where_place, since, limit=50000))
+    fetched = _complaints_where(where_place, since, limit=50000)
+    cs = one_per_incident(fetched)
     by_desc = Counter(c.descriptor for c in cs)
     by_month = Counter(c.created_date[:7] for c in cs)
     return {
         **area,
         "days": days,
         "n": len(cs),
+        "capped": len(fetched) >= 50000,  # at the fetch limit `n` is a floor
         "by_descriptor": dict(by_desc.most_common()),
         "by_kind": dict(Counter(KIND.get(c.descriptor, c.descriptor) for c in cs).most_common()),
         "by_month": dict(sorted(by_month.items())),

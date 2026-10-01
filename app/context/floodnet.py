@@ -118,7 +118,9 @@ def flood_events_for(deployment_ids: list[str],
     d = _gql(_EVENTS_Q, {
         "ids": deployment_ids,
         "since": since.isoformat(timespec="seconds").replace("+00:00", ""),
-        "until": datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", ""),
+        # (the end of the current hour, so an hour's queries share one cache key)
+        "until": (datetime.now(UTC).replace(minute=0, second=0, microsecond=0) + timedelta(hours=1))
+        .isoformat(timespec="seconds").replace("+00:00", ""),
     })
     return [
         FloodEvent(
