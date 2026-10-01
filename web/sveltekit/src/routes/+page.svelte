@@ -1,9 +1,10 @@
 <script lang="ts">
   /** Landing at `/`: a front page at report restraint (docs/DESIGN.md,
-   *  "Landing"). The query box and examples, the gallery as stories, what
-   *  a briefing contains, then the cities and responsible use as quiet
+   *  "Landing"). The query box and examples, what Riprap is for, the gallery
+   *  as stories, what a briefing contains, then the cities and responsible use as quiet
    *  sections. Live briefings render at /q/<query>. */
   import LandHero from '$lib/components/landing/LandHero.svelte';
+  import LandFor from '$lib/components/landing/LandFor.svelte';
   import LandStories from '$lib/components/landing/LandStories.svelte';
   import LandStones from '$lib/components/landing/LandStones.svelte';
   import CityPicker from '$lib/components/landing/CityPicker.svelte';
@@ -22,6 +23,7 @@
 <div class="land">
   <div class="land-page">
     <LandHero />
+    <LandFor />
     <LandStories stories={data.stories} />
     <LandStones />
     <!-- City samples run a live briefing: not on the static site. -->

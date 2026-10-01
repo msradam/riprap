@@ -10,6 +10,7 @@ import userEvent from '@testing-library/user-event';
 import LandHero from '$lib/components/landing/LandHero.svelte';
 import CityPicker from '$lib/components/landing/CityPicker.svelte';
 import UseBand from '$lib/components/landing/UseBand.svelte';
+import LandFor from '$lib/components/landing/LandFor.svelte';
 import LandStones from '$lib/components/landing/LandStones.svelte';
 import LandStories from '$lib/components/landing/LandStories.svelte';
 
@@ -40,19 +41,22 @@ describe('Landing smoke', () => {
     expect(container.textContent).toContain('Riprap returns evidence, not advice.');
   });
 
-  it('UseBand says what Riprap is for first, and links the tools that do other jobs better', () => {
-    const { container } = render(UseBand);
+  it('LandFor says what Riprap is for, and links the tools that do other jobs better', () => {
+    const { container } = render(LandFor);
     expect([...container.querySelectorAll('h2')].map((h) => h.textContent)).toEqual([
-      'What Riprap is for, and what it is not',
-      'Riprap returns evidence, not advice.'
+      'What Riprap is for, and what it is not'
     ]);
     expect([...container.querySelectorAll('li a')].map((a) => a.getAttribute('href'))).toEqual([
       'https://dataviz.floodnet.nyc/',
       'https://www.weather.gov/okx/',
       'https://a858-nycnotify.nyc.gov/',
       'https://msc.fema.gov/portal/home',
-      'https://www.floodhelpny.org/'
+      'https://www.floodhelpny.org/',
+      'https://communityprofiles.planning.nyc.gov/',
+      'https://rebuildbydesign.org/rainproof-nyc-map/'
     ]);
+    // The saved-briefings sentence is for the static site only.
+    expect(container.textContent).not.toContain('This public copy shows saved briefings only');
   });
 
   it('LandStones names all five Stones', () => {

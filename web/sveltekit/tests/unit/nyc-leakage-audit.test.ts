@@ -50,6 +50,7 @@ const EXEMPT_FILES = new Set<string>([
   // design, not a leak.
   'landing/CityPicker.svelte',
   'landing/LandHero.svelte',
+  'landing/LandFor.svelte',
   'landing/LandStones.svelte',
   'landing/UseBand.svelte',
   // RipMap layer descriptions reference NYC-specific data sources

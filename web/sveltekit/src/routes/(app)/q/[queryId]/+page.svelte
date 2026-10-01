@@ -17,6 +17,12 @@
   // SvelteKit already decodes route params; decoding again would rewrite
   // a question that contains a literal "%20" or similar.
   let queryText = $derived(queryId);
+  // The tab names the place first, so several briefings can be told apart.
+  let title = $derived(
+    queryText
+      ? `${queryText.length > 60 ? `${queryText.slice(0, 59).trimEnd()}…` : queryText}, flood-exposure briefing, Riprap`
+      : 'Riprap: flood-exposure briefing'
+  );
 
   const run = new RunState();
   const STOPPED_LABEL: Record<string, string> = {
@@ -128,7 +134,7 @@
 </script>
 
 <svelte:head>
-  <title>Riprap: flood-exposure briefing</title>
+  <title>{title}</title>
   <meta name="description" content="Riprap: cited flood-exposure briefings for New York City places, from public data. Open source, Apache-2.0." />
 </svelte:head>
 

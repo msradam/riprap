@@ -36,7 +36,7 @@
     <p class="app-footer-build">
       Built to USWDS, WCAG 2.2 AA, Section 508 and the Plain Writing Act. Riprap is open source
       under Apache-2.0. All data comes from public-record federal, state
-      and city sources. No commercial APIs are contacted at runtime. Riprap <span class="data">v{APP_VERSION}</span>.
+      and city sources. No commercial data APIs are used; the map's background tiles come from CARTO. Riprap <span class="data">v{APP_VERSION}</span>.
     </p>
     <p class="app-footer-credits">
       Dam mark: <a href="https://thenounproject.com/icon/dam-4516918/">"Dam" by Chintuza</a> via the Noun Project, CC-BY 3.0.
