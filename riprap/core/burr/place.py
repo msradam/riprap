@@ -46,8 +46,11 @@ _SUFFIX = (r"(?:street|st|avenue|ave|av|boulevard|blvd|road|rd|place|pl|drive|dr
 # Water Street" finds "200 Water Street", not "311 near 200 Water Street".
 _STREET_WORD = r"(?!(?:near|at|in|on|around|of|for|by|from|to|and|or)\b)[A-Za-z0-9'.]*[A-Za-z][A-Za-z0-9'.]*"
 # A quadrant after the street ("Pennsylvania Ave NW") stays with it.
-_ADDRESS_RE = re.compile(rf"\b(\d{{1,6}}(?:-\d{{1,4}})?[A-Za-z]?)\s+((?:{_STREET_WORD}\s+){{0,5}}?{_SUFFIX})\b\.?"
-                         r"(?:\s+(?:NW|NE|SW|SE)\b)?", re.IGNORECASE)
+# A street name is a word and a suffix ("Water Street"), so "450 St. Nicholas
+# Avenue" is not cut at "450 St" and "311 street flooding" is no address;
+# Broadway, the Bowery and Brooklyn's lettered avenues ("Avenue U") stand alone.
+_ADDRESS_RE = re.compile(rf"\b(\d{{1,6}}(?:-\d{{1,4}})?[A-Za-z]?)\s+((?:{_STREET_WORD}\s+){{1,5}}?{_SUFFIX}|broadway|bowery|avenue\s+[a-z]\b)"
+                         r"\b\.?(?:\s+(?:NW|NE|SW|SE)\b)?", re.IGNORECASE)
 # After the street: ", Queens", " in the Bronx", ", Red Hook, Brooklyn", ", NY", " 11423".
 _TAIL_AREA_RE = re.compile(r"^\s*(?:,\s*|\s+in\s+(?:the\s+)?)([A-Z][\w.'-]*(?:\s+[A-Z][\w.'-]*){0,2})")
 # A borough right after the street, with or without a comma, in any case or
@@ -59,8 +62,6 @@ _TAIL_BORO_RE = re.compile(r"^\s*,?\s*(?:(?:in|on)\s+)?(?:the\s+)?(manhattan|bro
                            r"(?!\s+(?:Beach|Heights|Village|Valley|Bridge|Terrace|Park|Hills?|Navy|Gardens)\b)", re.IGNORECASE)
 _BORO_FULL = {"manhattan": "Manhattan", "brooklyn": "Brooklyn", "bklyn": "Brooklyn", "bkln": "Brooklyn",
               "queens": "Queens", "qns": "Queens", "bronx": "Bronx", "bx": "Bronx", "staten island": "Staten Island"}
-# A street that is its own name; any other suffix needs a street word before it.
-_STANDALONE_STREETS = {"broadway", "bowery"}
 _TAIL_STATE_RE = re.compile(r"^\s*,?\s*(?:NY|New York)\b(?!\s+(?:City|County))")
 _TAIL_ZIP_RE = re.compile(r"^\s*,?\s*(\d{5})\b")
 _CAPS_RUN_RE = re.compile(r"\b[A-Z][\w.'-]*(?:\s+[A-Z][\w.'-]*)*")
@@ -68,8 +69,19 @@ _CAPS_RUN_RE = re.compile(r"\b[A-Z][\w.'-]*(?:\s+[A-Z][\w.'-]*)*")
 # geocoder Riprap uses places an intersection (NYC GeoSearch parses the
 # cross street and returns nothing; Nominatim returns nothing), so it is
 # refused with the reason rather than sent to a street's nearest point.
-_INTERSECTION_RE = re.compile(rf"\b((?:{_STREET_WORD}\s+){{0,3}}?{_SUFFIX})\s+(?:and|&|at)\s+"
-                              rf"((?:{_STREET_WORD}\s+){{0,3}}?{_SUFFIX})\b", re.IGNORECASE)
+_NAMED_STREET = rf"((?:{_STREET_WORD}\s+){{1,3}}?{_SUFFIX}|broadway|bowery|avenue\s+[a-z]\b)"
+_INTERSECTION_RE = re.compile(rf"\b{_NAMED_STREET}\s+(?:and|&|at)\s+{_NAMED_STREET}\b", re.IGNORECASE)
+# "my place at Ocean Parkway", "my street and the next street": a street
+# word after one of these is a common noun, not a street's name.
+_NOT_A_STREET_NAME = {"my", "our", "your", "their", "his", "her", "the", "this", "that", "a", "an", "next", "same",
+                      "which", "what", "any", "every", "each", "one", "whole"}
+
+
+def _intersection(text: str) -> bool:
+    """True when the text joins two named streets ("Atlantic Avenue and
+    Court Street"), each with a name before its suffix."""
+    return any(not any(len(g.split()) > 1 and g.split()[-2].lower() in _NOT_A_STREET_NAME for g in m.groups())
+               for m in _INTERSECTION_RE.finditer(text or ""))
 _ZIP_ONLY_RE = re.compile(r"^\s*(\d{5})(?:-\d{4})?\s*[?.!]?\s*$")
 # Capitalised words that start a question or name an agency or storm, not a place.
 _NOT_PLACE = {"is", "are", "was", "were", "what", "how", "has", "have", "does", "did", "do", "tell", "show",
@@ -119,11 +131,8 @@ def extract_address(text: str) -> str | None:
     """The street-address span in free text, with its borough,
     neighbourhood, state and ZIP when they follow it; None when there is no
     house number plus street."""
-    # "311 street flooding complaints near 80 Pioneer St": a number and a
-    # bare street word are not an address; the next match is.
     text = _ORDINAL_STREET_RE.sub(lambda m: m.group(1) + _ordinal_suffix(int(m.group(1))), text or "")
-    m = next((m for m in _ADDRESS_RE.finditer(text or "")
-              if len(m.group(2).split()) > 1 or m.group(2).lower().rstrip(".") in _STANDALONE_STREETS), None)
+    m = _ADDRESS_RE.search(text)
     if not m:
         return None
     span, rest = m.group(0).rstrip("."), (text or "")[m.end():]
@@ -183,14 +192,33 @@ def place_phrase(text: str) -> str | None:
                                                                  re.IGNORECASE)):
             return phrase
     # Typed in lower case ("whats going on in hunts point"): a known
-    # neighbourhood name as whole words, the longest one.
+    # neighbourhood name as whole words, the longest one. Not when the name
+    # is part of a street or a landmark ("Flushing Avenue", "Jamaica
+    # Hospital"), and not when the text names another city or state
+    # ("woodlawn chicago").
     # ponytail: a name that is also a word ("flushing") matches; a part-of-speech
     # check is the upgrade if that ever misroutes a real question.
     low = (text or "").lower()
-    known = [n for n in _known_neighbourhoods() if re.search(rf"\b{re.escape(n)}\b", low)]
+    if ELSEWHERE_RE.search(low):
+        return found[0] if found else None
+    known = [n for n in _known_neighbourhoods()
+             if re.search(rf"\b{re.escape(n)}\b(?!\s+(?:{_SUFFIX}|{_LANDMARK})\b)", low)]
     if known:
         return max(known, key=len).title()
     return found[0] if found else None
+
+
+# After a neighbourhood's name these make it a building or a station, not the area.
+_LANDMARK = (r"(?:hospital|houses|station|terminal|cent(?:er|re)|college|university|library|school|mall|airport"
+             r"|stadium|bridge|tunnel|cemetery|medical|market|pier|ferry|yards?|depot)")
+# Another city Riprap covers, or another state by name: the place is not an
+# NYC neighbourhood that happens to share a word with it.
+ELSEWHERE_RE = re.compile(
+    r"\b(chicago|seattle|albany|alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida"
+    r"|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan"
+    r"|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|north carolina"
+    r"|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah"
+    r"|vermont|virginia|washington state|west virginia|wisconsin|wyoming)\b", re.IGNORECASE)
 
 
 _NEIGHBOURHOODS: list[str] = []
@@ -224,7 +252,7 @@ def resolve_query(text: str) -> dict:
         return {"kind": "invalid", "text": None, "certain": True, "message": (
             f"A ZIP code such as {z.group(1)} covers many blocks, and Riprap briefs one place at a time. "
             "Give a street address in it, a neighbourhood name, or a community district such as QN12.")}
-    if _INTERSECTION_RE.search(text or ""):
+    if _intersection(text):
         return {"kind": "invalid", "text": None, "certain": True, "message": (
             "Riprap cannot place a street intersection: its geocoders resolve house numbers, not "
             "corners. Give a street address on that block, with the house number.")}

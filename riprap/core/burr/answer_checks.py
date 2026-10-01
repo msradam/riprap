@@ -52,6 +52,11 @@ RELEVANT = (
 )
 
 
+_AREA_SHARE_RE = re.compile(r"([\d.]+)% of this area lies inside")
+# "Is there any ...", "are there ...": a yes needs only one.
+ANY_RE = re.compile(r"\b(any|is there an?|are there|was there an?|were there)\b", re.I)
+
+
 def words_to_digits(text: str) -> str:
     """'Four schools' -> '4 schools', so number words are checked like digits."""
     return _WORD_RE.sub(lambda m: str(_WORDS[m.group(1).lower()]), text)
@@ -64,6 +69,9 @@ def reports_result(doc: str) -> bool:
     counts = _register_counts(doc)
     if counts:
         return max(counts[1:]) > 0
+    share = _AREA_SHARE_RE.search(doc or "")
+    if share:
+        return float(share.group(1)) > 0  # "0.0% of this area lies inside" is an absence
     # The finding is the first sentence; a later sentence may qualify it
     # ("1 sensor ... is flagged ..., so its depths are not used for the peak")
     # without turning 28 events into an absence.
@@ -72,9 +80,11 @@ def reports_result(doc: str) -> bool:
 
 
 def _partial(doc: str) -> bool:
-    """An asset register with some, but not all, of its assets inside."""
+    """An asset register with some, but not all, of its assets inside, or
+    an area with part of it inside a mapped extent."""
     counts = _register_counts(doc)
-    return bool(counts) and any(0 < k < counts[0] for k in counts[1:])
+    share = _AREA_SHARE_RE.search(doc or "")
+    return (bool(counts) and any(0 < k < counts[0] for k in counts[1:])) or (bool(share) and 0 < float(share.group(1)) < 95)
 
 
 def is_count_question(question: str) -> bool:
@@ -198,6 +208,20 @@ def count_lead(question: str, docs: dict[str, str], values: dict | None, today=N
     m = _YEAR_RE.search(q)
     year = (today.year - 1 if re.search(r"\blast year\b", q, re.I) else today.year if re.search(r"\bthis year\b", q, re.I)
             else int(m.group(1)) if m else None)
+    since = _period_start_date(q)
+    if year is None and since:
+        # "since 2023": the years from then on, when the window reaches back to
+        # that January. "Since Ida" starts mid-year and the value splits by
+        # year only, so the window's total is not offered as the answer.
+        try:
+            window_start = today.replace(year=today.year - int(v.get("years") or 0))
+        except ValueError:  # February 29
+            window_start = today.replace(year=today.year - int(v.get("years") or 0), day=28)
+        if (since.month, since.day) != (1, 1) or window_start > since or kind_asked(rel, q, v):
+            return None, True
+        n = sum(int(k) for y, k in (v.get("by_year") or {}).items() if int(y) >= since.year)
+        return (f"{n} flood-related 311 complaint{'s' if n != 1 else ''} filed since the start of {since.year}, "
+                "by the year each was filed."), False
     if year is None:
         return (None, True) if _OTHER_PERIOD_RE.search(q) else (kind_lead(q, docs, values), False)
     try:
@@ -298,7 +322,7 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str],
     if lead == "yes":
         if not positive:
             hits.append(("absence", "lead 'yes', but every fact reports an absence"))
-        if partial:
+        if partial and not ANY_RE.search(question or ""):
             hits.append(("universal", f"lead 'yes', but {', '.join(partial)} counts only some; use 'partly'"))
     if lead == "partly" and not (positive and (negative or partial)):
         hits.append(("universal", "lead 'partly' needs one fact reporting a result and one reporting "
@@ -395,6 +419,10 @@ def _event(doc_id: str, v: dict, start: int | None, this_year: int, start_date=N
             return None  # no sensor in range: silence, not "no flooding"
         window_start = this_year - _FLOODNET_WINDOW_YEARS
         if v["n_flood_events_3y"] > 0:
+            # Events only at sensors FloodNet flags for maintenance do not
+            # settle it: the sentence quotes them with the flag, and no yes.
+            if not v.get("n_flood_events_good_3y", v["n_flood_events_3y"]):
+                return None
             return True if start is None or window_start >= start else None
         return False if start is None or window_start <= start else None
     if doc_id == "ida_hwm" and "n_within_radius" in v:

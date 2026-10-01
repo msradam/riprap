@@ -100,13 +100,16 @@ def sensors_near(lat: float, lon: float, radius_m: float = 1000) -> list[Sensor]
     return out
 
 
+# The limit is far above any place's count (City Island's sensors logged
+# 436 events in three years, and a limit of 200 once reported 200).
+EVENT_LIMIT = 5000
 _EVENTS_Q = """
 query Events($ids: [String!], $since: timestamp!, $until: timestamp!) {
   sensor_events(where:{
       deployment_id:{_in:$ids},
       start_time:{_gte:$since, _lte:$until},
       label:{_eq:"flood"}
-  }, order_by:{start_time: desc}, limit: 200) {
+  }, order_by:{start_time: desc}, limit: 5000) {
     deployment_id
     start_time
     end_time
@@ -192,7 +195,8 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
     else:
         narrative = (
             f"{n_sensors} FloodNet community sensor{'' if n_sensors == 1 else 's'} within "
-            f"{int(radius_m)} m {'has' if n_sensors == 1 else 'have'} logged {n_events} "
+            f"{int(radius_m)} m {'has' if n_sensors == 1 else 'have'} logged "
+            f"{'at least ' if n_events >= EVENT_LIMIT else ''}{n_events} "
             f"above-curb flood event{'' if n_events == 1 else 's'} in the last 3 years"
             # The newest event dates the record, and answers "is it flooding now".
             + (f", the most recent starting {latest.start_time[:16].replace('T', ' ')} UTC." if latest else ".")
@@ -220,6 +224,7 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
         "n_sensors": n_sensors,
         "sensors": [{**vars(s), "status_words": status_words(s.status)} for s in sensors],
         "n_flood_events_3y": n_events,
+        "n_flood_events_good_3y": sum(1 for e in events if e.deployment_id in good),
         "n_sensors_with_events": len(by_dep),
         "peak_event": vars(peak) if peak else None,
         "flagged_peak_event": vars(flagged_peak) if flagged_peak else None,

@@ -71,11 +71,18 @@ _CLAUSE_SPLIT_RE = re.compile(r"(?<=[.!?;:])\s+|,\s+(?:and|but)\s+"
                               r"|\s+and\s+(?=(?:has|have|had|did|does|do|was|were|is|are|how|which|what)\b)", re.I)
 
 
+# The period of an abbreviation ends no clause: "100 Main St. since Sandy" was
+# once split there and answered "No." with the period lost.
+_ABBREV_RE = re.compile(r"\b(St|Ave|Av|Blvd|Rd|Pl|Dr|Ln|Pkwy|Ter|Ct|Hwy|Expy|Mt|Ft|No|Apt)\.", re.I)
+_INITIALS_RE = re.compile(r"\b(?:[A-Za-z]\.){2,}")  # "P.S. 90", "U.S."
+
+
 def _clauses(question: str) -> list[str]:
     """The question's clauses: people open with a preamble ("I'm writing a
     piece about ... Did the block flood during Ida?") and join two
     questions with "and"."""
-    parts = (re.sub(r"^\W*(and|but|so|also)\s+", "", c, flags=re.I).strip() for c in _CLAUSE_SPLIT_RE.split(question or ""))
+    q = _INITIALS_RE.sub(lambda m: m.group(0).replace(".", ""), _ABBREV_RE.sub(r"\1", question or ""))
+    parts = (re.sub(r"^\W*(and|but|so|also)\s+", "", c, flags=re.I).strip() for c in _CLAUSE_SPLIT_RE.split(q))
     return [c for c in parts if c]
 
 
@@ -143,8 +150,16 @@ def named(question: str, texts: dict[str, str]) -> list[str]:
 _CRITERIA = (*DEP, "sandy_inundation", "sandy_nta")
 _WEATHER_RE = re.compile(r"\brain|pouring|downpour|\bstorm|weather", re.I)
 _MAP_SHOWS_RE = re.compile(r"\b(shows?|shown|inside|within|mapped|modell?ed|appears?|covers?|puts?)\b", re.I)
-_ANY_RE = re.compile(r"\b(any|is there an?|are there|was there an?|were there)\b", re.I)
+_ANY_RE = ac.ANY_RE
 _COUNT_KEYS = {"ida_hwm": "n_within_radius", "nyc311": "n", "nyc311_nta": "n", "floodnet": "n_sensors"}
+# "Are there any ..." gets a yes or no from a source's count only when it
+# asks about the thing counted: marks, complaints, sensors. "Did any water
+# reach it" and "any street flooding" ask whether it flooded, which a count
+# of marks 640 m away or of complaints does not settle.
+_COUNTED = {"ida_hwm": re.compile(r"\bmarks?\b|high.water", re.I),
+            "nyc311": re.compile(r"complain|\breports?\b|\brequests?\b|\bcalls?\b|\b311\b", re.I),
+            "floodnet": re.compile(r"\bsensors?\b|floodnet", re.I)}
+_COUNTED["nyc311_nta"] = _COUNTED["nyc311"]
 _HISTORY_RE = re.compile(r"\bflood(ing)? (history|record)|history of flood|past flood|flooded before", re.I)
 _RAIN_NOW_RE = re.compile(r"\b(is it|still) raining|how much (rain|precip)|rainfall (so far|today)|precipitation", re.I)
 _FAR_RE = re.compile(r"\b20[3-9]\ds?\b|\b2100\b|decades?|century|sea.level", re.I)
@@ -180,6 +195,8 @@ def _asset_lead(question: str, docs: list[str], values: dict | None) -> str:
     if not ac.is_yes_no_question(q) or _SAFE_RE.search(q) or ac._SINCE_RE.search(q) or re.search(r"\bida\b", q, re.I):
         return "facts"
     sandy, scenario = re.search(r"\bsandy\b", q, re.I), _SCENARIO_RE.search(q)
+    if TOPICS[0][0].search(q) and not (sandy or scenario):
+        return "facts"  # "in the FEMA flood zone": the registers do not read FEMA zones, so neither yes nor no
     keys = (["n_inside_sandy_2012"] if sandy and not scenario else ["n_in_dep_extreme_2080"] if scenario and not sandy
             else ["n_inside_sandy_2012", "n_in_dep_extreme_2080"] if sandy or scenario or _EXPOSED_RE.search(q) else [])
     vals = [(values or {}).get(d) for d in docs]
@@ -207,6 +224,15 @@ def _count_of(doc: str, question: str, value) -> int | None:
     if doc == "floodnet" and re.search(r"\b(flood(ed|ing|s)?|events?|logged|recorded|water|depth)\b", question, re.I):
         return value.get("n_flood_events_3y") if value.get("n_sensors") else None  # no sensor: cannot say
     return value.get(_COUNT_KEYS.get(doc, ""))
+
+
+def _share_lead(fraction: float, question: str) -> str:
+    """Yes, no or in part for "was QN12 inside the Sandy zone" from the
+    share of the area inside: a district with 0.8% inside is not a plain
+    yes, unless the question asks whether any part was."""
+    if not fraction:
+        return "no"
+    return "yes" if fraction >= 0.95 or _ANY_RE.search(question) else "partly"
 
 
 def soften(lead: str, facts: list[str], values: dict | None) -> str:
@@ -293,12 +319,12 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
         # area says yes or no by itself.
         share = (values or {}).get("sandy_nta") if "sandy_nta" in subjects else None
         if isinstance(share, dict) and share.get("fraction") is not None and ac.is_yes_no_question(happened):
-            return ("yes" if share["fraction"] > 0 else "no"), ["sandy_nta"]
+            return _share_lead(share["fraction"], happened), ["sandy_nta"]
         return "facts", subjects[:6]
     share = (values or {}).get("sandy_nta")
     if subjects[:1] == ["sandy_nta"] and isinstance(share, dict) and share.get("fraction") is not None \
             and ac.is_yes_no_question(question):
-        return with_named("yes" if share["fraction"] > 0 else "no", ["sandy_nta"])  # "was any part of QN12 inside"
+        return with_named(_share_lead(share["fraction"], question), ["sandy_nta"])  # "was any part of QN12 inside"
     rel = ac.relevant_doc(question, texts)
     if ac.is_count_question(question) and rel:
         return with_named("count", [rel])
@@ -316,7 +342,8 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
                 or [i for i in FORECAST_FACTS if texts.get(i) and not (far and i == "nws_water_forecast")][:4])
         return with_named("facts", docs) if docs else None
     n = _count_of(subjects[0], question, (values or {}).get(subjects[0])) if subjects else None
-    if isinstance(n, int) and ac.is_yes_no_question(question) and _ANY_RE.search(question):
+    if (isinstance(n, int) and ac.is_yes_no_question(question) and _ANY_RE.search(question)
+            and _COUNTED[subjects[0]].search(question)):
         # "Were any high-water marks surveyed near here": the source's own count says yes or no.
         return with_named("yes" if n else "no", [subjects[0]])
     if subjects:

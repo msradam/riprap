@@ -28,7 +28,7 @@ from typing import Any
 from burr.core import State, action
 
 from riprap.core.burr.pebble import trace_rec_for
-from riprap.core.burr.place import extract_address, geocode_matches, resolve_query
+from riprap.core.burr.place import ELSEWHERE_RE, extract_address, geocode_matches, resolve_query
 from riprap.core.burr.rule_answer import asks_now  # one definition of "now"
 
 # Trailing risk phrases ("... at risk of flooding?", "... flood risk").
@@ -108,6 +108,11 @@ _FUTURE_DAY_RE = re.compile(
 _FORECAST_Q_RE = re.compile(
     r"\b(forecasts?|forecasting|projections?|projected|outlook|predictions?|what is coming|what's coming"
     r"|in the (coming|next) (years|decades)|in the future|by 20\d\d)\b", re.IGNORECASE)
+
+
+# A sentence that asks something, as opposed to a place typed alone.
+_QUESTION_RE = re.compile(r"\?\s*$|^\W*(is|are|was|were|has|have|had|do|does|did|can|could|will|would|should|what|which"
+                          r"|where|when|why|who|how)\b", re.IGNORECASE)
 
 
 def forecast_question(query: str) -> bool:
@@ -197,6 +202,8 @@ def heuristic_plan(query: str) -> dict:
         return {"intent": area_intent, "rationale": f"Heuristic match: community district {place['text']}.",
                 "targets": [{"type": "district", "text": place["text"]}], "place": place}
     live = asks_now(q) and not forecast_question(q)
+    # Another city or state named in the question ("Pike Place Market in Seattle").
+    elsewhere = ELSEWHERE_RE.search(q) if place["text"] and not ELSEWHERE_RE.search(place["text"]) else None
     if place["kind"] == "address":
         target = _address_from_query(q) if _OTHER_STATE_RE.search(q) else _with_borough(place["text"], q)
         intent = "live_now" if live else "single_address"
@@ -210,7 +217,8 @@ def heuristic_plan(query: str) -> dict:
         # answered for City Hall, with "no sensors within 600 m").
         return {"intent": "not_implemented", "rationale": NO_PLACE_NOW, "targets": [], "place": place}
     elif live:
-        intent, target = "live_now", f"{place['text']}, New York, NY"  # a place by name: the geocoder decides
+        # A place by name: the geocoder decides, in the city the question names.
+        intent, target = "live_now", f"{place['text']}, {elsewhere.group(0).title() if elsewhere else 'New York, NY'}"
     elif place["kind"] == "neighborhood" and nta.resolve(place["text"]):
         intent, target = area_intent, place["text"]
     else:
@@ -222,9 +230,11 @@ def heuristic_plan(query: str) -> dict:
         # "Hamilton Beach, Queens. Two things: ...": the place and its borough, not the whole question.
         if named:
             target = f"{place['text']}, {named.group(1)}, NY"
-        elif place["kind"] == "neighborhood" and len(q.split()) > 6 and not _OTHER_STATE_RE.search(q):
-            # A place name inside a long question ("Did Hamilton Beach flood during Sandy and ..."): the
-            # name for the geocoder, never the rest of the sentence.
+        elif place["kind"] == "neighborhood" and elsewhere and not _OTHER_STATE_RE.search(q):
+            target = f"{place['text']}, {elsewhere.group(0).title()}"
+        elif place["kind"] == "neighborhood" and _QUESTION_RE.search(q) and not _OTHER_STATE_RE.search(q):
+            # A place name inside a question ("Did Hamilton Beach flood during Sandy and ...", "Does
+            # Rockaway Boulevard flood?"): the name for the geocoder, never the rest of the sentence.
             target = f"{place['text']}, New York, NY"
         else:
             target = _address_from_query(q)
