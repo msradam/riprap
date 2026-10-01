@@ -42,9 +42,11 @@
 </figure>
 
 <style>
+  /* A supporting excerpt beside the h1 (52px): its lead word stays the
+     card's focal point at no more than about half the headline's size. */
   .specimen {
     margin: 0;
-    padding: 32px;
+    padding: 24px 28px;
     background: var(--riprap-white);
   }
   .specimen-caption {
@@ -53,43 +55,43 @@
     color: var(--ink-secondary);
   }
   .specimen-q {
-    margin: 16px 0 0;
-    font-size: 22px;
+    margin: 12px 0 0;
+    font-size: 18px;
     font-weight: 600;
-    line-height: 1.25;
+    line-height: 1.4;
     text-wrap: balance;
   }
   .nowrap {
     white-space: nowrap;
   }
   .specimen-lead {
-    margin: 16px 0 0;
-    font-size: 64px;
+    margin: 12px 0 0;
+    font-size: 32px;
     font-weight: 700;
-    line-height: 1;
-    letter-spacing: -0.02em;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
   }
   .specimen :global(.specimen-key) {
-    margin: 12px 0 0;
+    margin: 8px 0 0;
     max-width: 64ch;
-    font-size: 20px;
+    font-size: 17px;
     line-height: 1.5;
   }
   .specimen :global(.specimen-flag) {
-    margin: 12px 0 0;
+    margin: 8px 0 0;
     max-width: 64ch;
-    font-size: 17px;
-    line-height: 1.55;
+    font-size: 15px;
+    line-height: 1.5;
   }
   .specimen-notes {
-    margin: 24px 0 8px;
+    margin: 16px 0 4px;
   }
   @media (max-width: 640px) {
     .specimen {
       padding: 24px 16px;
     }
     .specimen-lead {
-      font-size: 44px;
+      font-size: 28px;
     }
     /* Compact on a phone: the first source note only; the briefing has the rest. */
     .specimen-notes :global(.source-note:nth-child(n + 2)) {
