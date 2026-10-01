@@ -93,7 +93,7 @@ build-backend = "setuptools.build_meta"
 where = ["."]
 include = ["riprap*", "app*"]
 exclude = [
-    "tests*", "scripts*", "experiments*", "load*", "examples*",
+    "tests*", "scripts*", "load*", "examples*",
     "deployments*", "docs*", "web*", "outputs*", "data*",
 ]
 

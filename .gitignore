@@ -41,23 +41,12 @@ CLAUDE.local.md
 .claude/
 
 data/*.legacy_*
+pitch/screenshots-*/
 web/svelte/node_modules/
 web/sveltekit/node_modules/
 web/sveltekit/.svelte-kit/
 # web/sveltekit/build/ (uncommented to allow deployment to HF Space)
 # web/sveltekit/build/
-
-# Experiments — cached HF model downloads, training artifacts, intermediate
-# fixtures. RESULTS.md, NOTES.md, and source code stay tracked.
-experiments/**/.cache/
-experiments/**/restore/
-experiments/**/publish/
-experiments/**/*.tif
-experiments/**/*.png
-experiments/**/*.jpg
-experiments/**/*.parquet
-experiments/**/*.npy
-pitch/screenshots-*/
 
 # Presentation slides and internal working materials (→ riprap-work)
 slides/
@@ -118,7 +107,6 @@ Riprap.zip
 # 311 training pools hold residents' free text (emails, phone numbers);
 # never commit them (refactor 6)
 data/calibration/distill_pool.csv
-experiments/**/distill_pool.csv
 
 # Golden-set score files (regenerable evidence, kept out of the repo)
 tests/golden/results/

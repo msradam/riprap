@@ -10,7 +10,7 @@ Per-query latency drops from ~10 ms (warm) / ~33 s (cold-load) on the
 HF Space CPU to ~3 ms with a 73 ms one-time cold-load. Baked footprint
 is ~7 MB total versus ~46 MB GDBs + 87 MB Sandy GeoJSON.
 
-See experiments/22_cornerstone_optim/RESULTS.md for the bench.
+The bench that chose this is in history (experiments/22_cornerstone_optim at 8b87165).
 
 Run:
     uv run python scripts/bake_cornerstone_rasters.py
