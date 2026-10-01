@@ -17,12 +17,13 @@ url: "https://msradam.github.io/riprap/"
 abstract: >-
   Riprap gathers public flood evidence for a New York City address, a
   question about one, or a community district, and cites every sentence
-  to its source. NYC is the production deployment, with 32 public-record
-  city, state and federal sources; Chicago, Seattle, San Francisco,
-  Boston and Albany are experimental deployments on the same code. With
-  no model configured, the briefing is built directly from the data; an
-  optional LLM can phrase an answer, and code checks its citations and
-  numbers and drops what fails. Thirteen disclosure checks drawn from
+  to its source. NYC is the production deployment, with 35 public-record
+  city, state and federal sources; Chicago, Seattle and Albany are
+  experimental deployments on the same code. With no model configured,
+  the briefing is built directly from the data and a question is
+  answered by rules over its words; an optional LLM can choose the
+  answer's lead and facts instead, and code checks that choice against
+  the evidence. Thirteen disclosure checks drawn from
   FEMA, IPCC AR6, TCFD, ASTM E1527-21, EPA/CDC CERC, the AP Stylebook
   and the SPJ Code report on every briefing. Riprap reports evidence; it
   does not give advice or make regulatory flood determinations.
@@ -31,11 +32,9 @@ keywords:
   - flood-risk
   - climate-exposure
   - citation-grounded
-  - rag
   - grounded-llm
   - open-data
   - socrata
-  - ckan
   - fema-nfhl
   - noaa-coops
   - npcc4
@@ -46,7 +45,7 @@ date-released: "2026-09-28"
 # How Riprap depends on prior work. We cite the data sources Riprap
 # composes in each per-pebble manifest's `provenance` block (see
 # deployments/<city>/manifests/*.yaml); the items below are the
-# foundation-model and methodology references.
+# model and methodology references.
 references:
   - type: article
     title: "Granite 4.1 Language Models"
@@ -54,18 +53,6 @@ references:
       - family-names: "IBM Research"
     year: 2025
     notes: "One of the optional LLMs used for answers and the gallery question entries. Apache-2.0. https://huggingface.co/ibm-granite"
-  - type: article
-    title: "Prithvi-EO 2.0: A versatile multi-temporal foundation model for Earth observation"
-    authors:
-      - family-names: "Jakubik"
-        given-names: "Johannes"
-    year: 2024
-    notes: "Satellite-attributable flood segmentation. Apache-2.0."
-  - type: software
-    title: "TerraMind: a foundation model for Earth observation"
-    authors:
-      - family-names: "ESA"
-    notes: "LULC + buildings. Apache-2.0."
   - type: article
     title: "New York City Panel on Climate Change 2024 Report (NPCC4)"
     authors:

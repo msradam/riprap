@@ -1,4 +1,4 @@
-Riprap — Composable, Citation-Grounded Civic Climate-Exposure Briefings
+Riprap: cited flood-evidence briefings for New York City places, from public data
 Copyright 2026 Adam Munawar Rahman
 
 This product is licensed under the Apache License, Version 2.0
@@ -11,33 +11,40 @@ file at the root of this repository or at:
 Third-party components and data
 ================================================================================
 
-Riprap incorporates and depends on third-party open-source software,
-foundation models, and public-record datasets. Each retains its own
-upstream licence; the list below records attribution where required.
+Riprap depends on third-party open-source software and public-record
+datasets. Each retains its own upstream licence; the list below records
+attribution where required.
 
-Models used by the application (each under its upstream licence):
-  - IBM Granite Embedding 278M (granite-embedding-278m-multilingual)
-  - IBM Granite TimeSeries TTM r2 (granite-timeseries-ttm-r2)
-  - Flair NER (flair/ner-english-ontonotes-fast)
-  - NASA / IBM Prithvi-EO 2.0 (offline batch jobs only)
-  - Optional: any LLM behind an OpenAI-compatible endpoint the operator
-    configures, for example IBM Granite 4 (granite4:micro, Granite 4.1).
-    No LLM weights ship with Riprap.
+Models:
+  Riprap ships no model weights and runs no model in its own process.
+  The only model it can use is an optional LLM behind an
+  OpenAI-compatible endpoint the operator configures, for example IBM
+  Granite 4.1 8B (Apache 2.0).
 
-NYC-specialised fine-tunes published by this project (Apache 2.0):
-  - msradam/Granite-TTM-r2-Battery-Surge (used by the app, experimental)
-  - msradam/Prithvi-EO-2.0-NYC-Pluvial (offline batch only, experimental)
-  - msradam/TerraMind-NYC-Adapters (LULC, Buildings, TiM LoRA family;
-    built on IBM / ESA TerraMind 1.0; not used by the app)
-
-Public-record data sources contacted at runtime (no commercial APIs):
-  See the "Data sources" table in README.md. Each pebble manifest's
-  provenance block records its source's licence, URL and vintage.
-
-Third-party code kept in the experiments:
-  experiments/05_terramind_nyc_finetune/data/MajorTOM/ adapts the grid,
-  dataset and metadata helpers of Major-TOM (ESA PhiLab,
-  https://github.com/ESA-PhiLab/Major-TOM), Apache License 2.0.
+Public-record data sources (no commercial APIs):
+  Each pebble manifest's provenance block records its source's licence,
+  URL and vintage; docs/DATA-SOURCES.md lists the NYC sources.
+  - FEMA National Flood Hazard Layer, effective and preliminary
+    (U.S. public domain)
+  - National Weather Service alerts, observations and National Water
+    Prediction Service water-level forecasts (U.S. public domain)
+  - NOAA CO-OPS water levels and tide predictions (U.S. public domain)
+  - USGS Water Data, the Short-Term Network Hurricane Ida high-water
+    marks and the 3DEP elevation model (U.S. public domain)
+  - NYC Open Data: Sandy Inundation Zone, DEP Stormwater Flood Maps,
+    311 Service Requests, DOB Permit Issuance, school locations, NYCHA
+    developments, 2020 Neighborhood Tabulation Areas (NYC Open Data
+    Terms of Use)
+  - NYC Department of City Planning, Community District Profiles,
+    floodplain indicators (NYC Open Data Terms of Use)
+  - New York State open data: MTA subway entrances and exits, Health
+    Facility General Information (the publishers' open data terms)
+  - FloodNet NYC sensor data (CC BY-NC-SA 4.0)
+  - New York City Panel on Climate Change 2024 Report, NPCC4, Annals of
+    the New York Academy of Sciences vol. 1539 (CC BY-NC 4.0)
+  - Experimental deployments: Chicago Data Portal and Seattle Open Data
+    311 service requests (each portal's terms of use), SeeClickFix
+    public API for Albany, NY
 
 Logo attribution:
   The Riprap dam mark is derived from "Dam" by Chintuza, via the
@@ -57,17 +64,11 @@ language models. All output was reviewed and accepted by Adam Rahman, who
 takes responsibility for the resulting code, claims, and reproducibility
 guarantees made by this project.
 
-The Riprap system runs third-party models (IBM Granite Embedding 278M,
-IBM Granite TTM r2, Flair NER) at inference time, reads precomputed
-NASA-IBM Prithvi-EO 2.0 outputs, and optionally calls an operator-chosen
-LLM endpoint. It does not generate model weights. The NYC fine-tunes referenced by this system are trained
-separately and documented at github.com/msradam/riprap-models.
-
 This repository's initial commit consolidates work developed across many
 commits in the project's working repository (msradam/riprap-nyc) between
 May and July 2026, starting with the AMD Developer Cloud hackathon
 (May 4-10, 2026) and continuing through the open-source release cut here.
-That working history — including any "Co-Authored-By" trailers referencing
-Anthropic Claude on individual commits — lives in msradam/riprap-nyc, not
+That working history, including any "Co-Authored-By" trailers referencing
+Anthropic Claude on individual commits, lives in msradam/riprap-nyc, not
 in this repository's git log. This NOTICE is the artifact-level disclosure
 for what ships here.

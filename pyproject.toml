@@ -1,7 +1,7 @@
 [project]
 name = "riprap"
 version = "0.7.0"
-description = "Composable, citation-grounded civic climate-exposure briefings for any US place."
+description = "Cited flood-evidence briefings for New York City places, from public records."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { file = "LICENSE" }
@@ -14,12 +14,10 @@ keywords = [
     "flood-risk",
     "climate-exposure",
     "citation-grounded",
-    "rag",
     "grounded-llm",
     "fema",
     "noaa",
     "socrata",
-    "ckan",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
