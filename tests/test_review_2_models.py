@@ -314,3 +314,9 @@ def test_the_sea_level_sentence_quotes_the_published_table():
         "30 to 50 in (0.76 to 1.27 m) by 2100, relative to 1995-2014, as its middle range (25th to 75th "
         "percentile); the 90th percentile is 23 in (0.58 m) by the 2050s and 65 in (1.65 m) by 2100.")
     assert predicates.projection_has_horizon(v["narrative"] + " [npcc4_slr]").passed
+
+
+def test_will_it_flood_quotes_the_fema_map_among_what_is_mapped():
+    # A blind judge marked the answer down for leaving the flood map out of "what the maps show".
+    lead, facts = ra.answer("Will my building at 30 Waterside Plaza flood next week?", T, {})
+    assert lead == "no_prediction" and facts[:4] == ["nws_alerts", "nws_water_forecast", "fema_nfhl", "dep_moderate_current"]

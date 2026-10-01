@@ -91,8 +91,8 @@ EXPERIMENTAL = (
 # ("Will this be in a flood zone" and "will flood insurance ..." ask about a map and a price.)
 _WILL_FLOOD_RE = re.compile(r"\b(will|going to|gonna|likely to|expected to|about to)\b[^.?!]*"
                             r"\bflood(?!net|[- ]?(zone|plain|insurance|map))", re.I)
-NO_PREDICTION_FACTS = ("nws_alerts", "nws_water_forecast", "dep_moderate_current", "dep_moderate_current_nta",
-                       "sandy_inundation", "sandy_nta")
+NO_PREDICTION_FACTS = ("nws_alerts", "nws_water_forecast", "fema_nfhl", "dcp_floodplain_nta",
+                       "dep_moderate_current", "dep_moderate_current_nta", "sandy_inundation", "sandy_nta")
 
 
 def experimental(question: str, texts: dict[str, str]) -> tuple[list[str], list[str]]:
