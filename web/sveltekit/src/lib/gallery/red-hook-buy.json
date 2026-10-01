@@ -3,8 +3,8 @@
  "neighborhood": "Red Hook, Brooklyn",
  "address": "80 Pioneer Street, Brooklyn, NY",
  "question": "Should I buy the house at 80 Pioneer Street, Brooklyn?",
- "generated_at": "2026-10-01T16:41Z",
- "riprap_commit": "45272b1",
+ "generated_at": "2026-10-01T16:56Z",
+ "riprap_commit": "c025f6e",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -1355,17 +1355,17 @@
      "icon": "\ud83c\udf0a"
     },
     "narration": {
-     "short": "NYC Panel on Climate Change (2024) sea-level rise projections, Battery, NY.",
+     "short": "NYC Panel on Climate Change (2024) sea-level rise projections for New York City.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NPCC4, New York City Panel on Climate Change (2024)",
      "source_url": "https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15116",
      "license": "CC-BY-NC 4.0 (Annals of the New York Academy of Sciences)",
-     "citation": "Rosenzweig, C. et al. (eds.). New York City Panel on Climate Change 2024 Report (NPCC4). Annals of the New York Academy of Sciences, Vol. 1539 (parent doi:10.1111/nyas.15116). Sea-level rise projections from the NPCC4 climate-science chapter, Battery (NOAA station 8518750) reference.",
+     "citation": "Braneon, C. et al. (2024). NPCC4: New York City climate risk information 2022, observations and projections. Annals of the New York Academy of Sciences, Vol. 1539 (doi:10.1111/nyas.15116), Table 1: projections for sea level rise in New York City, relative to 1995-2014.",
      "doc_id": "npcc4_slr",
      "date_modified": "2024",
-     "retrieved_at": "2026-07-11"
+     "retrieved_at": "2026-10-01"
     },
     "fallback": {
      "on_offline": "error",
@@ -1388,17 +1388,17 @@
      "icon": "\ud83c\udf0a"
     },
     "narration": {
-     "short": "NYC Panel on Climate Change (2024) sea-level rise projections, Battery, NY.",
+     "short": "NYC Panel on Climate Change (2024) sea-level rise projections for New York City.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NPCC4, New York City Panel on Climate Change (2024)",
      "source_url": "https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15116",
      "license": "CC-BY-NC 4.0 (Annals of the New York Academy of Sciences)",
-     "citation": "Rosenzweig, C. et al. (eds.). New York City Panel on Climate Change 2024 Report (NPCC4). Annals of the New York Academy of Sciences, Vol. 1539 (parent doi:10.1111/nyas.15116). Sea-level rise projections from the NPCC4 climate-science chapter, Battery (NOAA station 8518750) reference.",
+     "citation": "Braneon, C. et al. (2024). NPCC4: New York City climate risk information 2022, observations and projections. Annals of the New York Academy of Sciences, Vol. 1539 (doi:10.1111/nyas.15116), Table 1: projections for sea level rise in New York City, relative to 1995-2014.",
      "doc_id": "npcc4_slr",
      "date_modified": "2024",
-     "retrieved_at": "2026-07-11"
+     "retrieved_at": "2026-10-01"
     },
     "fallback": {
      "on_offline": "error",
@@ -1448,7 +1448,7 @@
   "trace": [
    {
     "step": "reconcile_templated",
-    "started_at": 1790872906.688786,
+    "started_at": 1790873795.592059,
     "ok": true,
     "result": {
      "n_chars": 526,
