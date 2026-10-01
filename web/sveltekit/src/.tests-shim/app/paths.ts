@@ -7,3 +7,5 @@ export function resolve(path: string, params: Record<string, string> = {}): stri
     .replace(/\[(\w+)\]/g, (_, k: string) => params[k] ?? '');
   return out || '/';
 }
+/** Like SvelteKit's asset: a file in static/, under the (empty) base. */
+export const asset = (file: string): string => base + file;

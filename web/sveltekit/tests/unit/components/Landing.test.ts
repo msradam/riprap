@@ -33,7 +33,7 @@ describe('Landing smoke', () => {
     ]);
   });
 
-  it('LandHero has one h1, and sets the specimen as a figure after the form, with its citation mark linked to its source note', () => {
+  it('LandHero has one h1, and sets the specimen as a figure after the form: a briefing window and its question as text', () => {
     const { container } = render(LandHero, heroProps);
     expect([...container.querySelectorAll('h1')].map((h) => h.textContent)).toEqual([
       'The flood record for any New York City block, cited line by line.'
@@ -43,22 +43,22 @@ describe('Landing smoke', () => {
     expect(form.compareDocumentPosition(figure) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     // The question is a paragraph, not a heading.
     expect(figure.querySelector('h1, h2, h3')).toBeNull();
-    expect(text(figure)).toContain('Yes.');
-    const mark = figure.querySelector('a.inline-cite')!;
-    expect(mark.getAttribute('href')).toBe('#cite-floodnet');
-    expect(figure.querySelector('#cite-floodnet')).not.toBeNull();
-    expect(figure.querySelectorAll('.source-note')).toHaveLength(3);
-    // The tier in words comes from the snapshot's manifest.
-    expect([...figure.querySelectorAll('.source-note-line')].map((l) => text(l).split(',')[0].trim())).toEqual([
-      'Measured',
-      'Measured',
-      'Proxy'
-    ]);
-    // The flagged-sensor sentence follows the key sentence.
-    const paras = [...figure.querySelectorAll('p.specimen-key, p.specimen-flag')].map((p) => p.className.split(' ')[0]);
-    expect(paras).toEqual(['specimen-key', 'specimen-flag']);
-    expect(text(figure.querySelector('p.specimen-flag')!)).toContain('is flagged by FloodNet for maintenance');
-    expect(figure.querySelector('a[href="/gallery/hollis-since-ida/"]')?.textContent).toBe('Read the full briefing');
+    // The window is one link to the briefing; its image loads first, at a fixed size.
+    const win = figure.querySelector('a.window')!;
+    expect(win.getAttribute('href')).toBe('/gallery/hollis-since-ida/');
+    const img = win.querySelector('img')!;
+    expect(img.getAttribute('src')).toBe('/landing/hero-briefing.webp');
+    expect(img.getAttribute('srcset')).toBe('/landing/hero-briefing-720.webp 720w, /landing/hero-briefing.webp 1200w');
+    expect(img.getAttribute('alt')).toMatch(/^The Riprap briefing for this question: the answer Yes\./);
+    expect([img.getAttribute('width'), img.getAttribute('height')]).toEqual(['1200', '2700']);
+    expect(img.getAttribute('fetchpriority')).toBe('high');
+    expect(img.getAttribute('decoding')).toBe('async');
+    expect(text(win.querySelector('.window-bar')!)).toBe('riprap / gallery / hollis-since-ida');
+    // The caption is real text: the question, the lead word and the link.
+    const caption = figure.querySelector('figcaption')!;
+    expect(text(caption.querySelector('.specimen-q')!).trim()).toBe(data.specimen.question);
+    expect(caption.querySelector('.specimen-lead')?.textContent).toBe('Yes.');
+    expect(caption.querySelector('a[href="/gallery/hollis-since-ida/"]')?.textContent).toBe('Read the full briefing');
   });
 
   it('LandProof sets the district card first, then each question as a linked h3 with its quote and date', () => {

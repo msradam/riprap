@@ -131,8 +131,8 @@ a:hover { text-decoration-thickness: 2px; }
 /* Mono Means Data: figures, identifiers, dates and citation numbers. */
 .data { font-family: var(--font-mono); font-size: 13px; font-weight: 400; font-variant-numeric: tabular-nums; }
 
-/* The citation mark, in the base sheet because the landing's specimen
-   answer carries one too (docs/design/handoff/css/components.css
+/* The citation mark, in the base sheet because the answer, the evidence
+   table and the print view all carry one (docs/design/handoff/css/components.css
    .riprap-citation-link): Overpass Mono, inline, with its own focus ring.
    The mark keeps its inline size; an invisible 24px square centred on it
    gives a finger a 24 by 24 target (2.5.8) without moving the text. */

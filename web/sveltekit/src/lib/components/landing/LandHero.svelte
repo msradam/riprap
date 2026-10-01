@@ -6,9 +6,9 @@
 
   /** Landing top: kind line, h1, subhead, the query box (or, on the
    *  static site, the gallery and the quickstart), real questions as
-   *  chips, and a real gallery answer as the specimen. The specimen comes
-   *  after the form in DOM order, so the input stays an early Tab stop;
-   *  on a phone it is set right under the subhead. */
+   *  chips, and a real gallery briefing as the specimen. The specimen
+   *  comes after the form in DOM order, so the input stays an early Tab
+   *  stop; on a phone it is set between the actions and the chips. */
   interface Chip {
     label: string;
     slug: string;
@@ -261,8 +261,8 @@
       margin-top: 32px;
     }
   }
-  /* Phone: the answer card right under the subhead, before the actions
-     and chips. Only the visual order changes; the DOM keeps the form first. */
+  /* Phone: the briefing window after the actions, so they stay near the
+     fold, and before the chips. Only the visual order changes. */
   @media (max-width: 480px) {
     .hero-grid {
       display: flex;
@@ -271,16 +271,13 @@
     .hero-main {
       display: contents;
     }
-    .hero-query,
-    .hero-actions,
-    .hero-note,
     .hero-chips-head,
     .hero-chips {
       order: 2;
     }
     .hero-specimen {
       order: 1;
-      margin-top: 24px;
+      margin-top: 32px;
     }
   }
 </style>

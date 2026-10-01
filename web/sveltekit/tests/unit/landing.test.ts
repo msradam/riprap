@@ -6,7 +6,6 @@
 import { describe, it, expect } from 'vitest';
 import { CHIPS, PROOF, SPECIMEN_SLUG } from '$lib/landing';
 import { galleryIndex, loadGalleryEntry } from '$lib/client/gallery';
-import { TIER_WORDS } from '$lib/types/tier';
 import { load } from '../../src/routes/+page.server';
 
 /** A briefing paragraph as a reader sees it: `[doc_id]` markers removed. */
@@ -56,37 +55,14 @@ describe('landing load', () => {
     expect(data.count).toBe(galleryIndex.length);
   });
 
-  it("sets the specimen from the snapshot: lead word, key sentence and the answer's three sources", async () => {
+  it("sets the specimen from the snapshot: the entry's own question and the briefing's lead word", async () => {
     const { specimen } = await load();
+    const entry = await loadGalleryEntry(SPECIMEN_SLUG);
     expect(specimen.slug).toBe(SPECIMEN_SLUG);
+    expect(specimen.question).toBe(entry!.question);
+    expect(specimen.question).toBe('Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?');
     expect(specimen.lead).toBe('Yes.');
-    // The key sentence is the first answer sentence after the lead word.
-    const key = specimen.key.map((p) => p.text).join('').replace(/\s+/g, ' ').replace(/ \.$/, '.');
-    expect(key).toMatch(/^\d+ FloodNet community sensors? .+\.$/);
-    expect(await plainBriefing(SPECIMEN_SLUG)).toContain(`Yes. ${key}`);
-    expect(specimen.citations.map((c) => [c.n, c.id])).toEqual([
-      [1, 'floodnet'],
-      [2, 'ida_hwm'],
-      [3, 'nyc311']
-    ]);
-  });
-
-  it("reads each source's tier from the snapshot's manifest: sensors and high-water marks Measured, 311 Proxy", async () => {
-    const { specimen } = await load();
-    expect(specimen.citations.map((c) => [c.id, TIER_WORDS[c.tier]])).toEqual([
-      ['floodnet', 'Measured'],
-      ['ida_hwm', 'Measured'],
-      ['nyc311', 'Proxy']
-    ]);
-  });
-
-  it("sets the briefing's own flagged-sensor sentence, verbatim, right after the key sentence", async () => {
-    const { specimen } = await load();
-    const flagged = specimen.flagged.map((p) => p.text).join('').replace(/\s+/g, ' ').replace(/ \.$/, '.');
-    expect(flagged).toBe(
-      '1 sensor that logged 11 of these events is flagged by FloodNet for maintenance, so its depths are not used for the peak.'
-    );
-    expect(specimen.flagged[0].cite).toBe('floodnet');
-    expect(await plainBriefing(SPECIMEN_SLUG)).toContain(flagged);
+    // The briefing's answer opens with the lead word, then its key sentence.
+    expect(await plainBriefing(SPECIMEN_SLUG)).toMatch(/\*\*Answer\.\*\* Yes\. \d+ FloodNet community sensors? /);
   });
 });
