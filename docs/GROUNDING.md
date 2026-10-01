@@ -37,16 +37,31 @@ A question is answered in this mode too, by rules over its words
 from the question and from the values the sources returned; the facts are the
 sources' sentences word for word. They are tried in a fixed order:
 
-1. "right now": the live readings, with no yes or no (no alert is not an
-   observation that nothing is flooding);
+1. "right now": the live readings, each with its time, and no yes or no (no
+   alert is not an observation that nothing is flooding). A word for now
+   beside a mapped subject ("currently in a FEMA flood zone") is a question
+   about that subject, not about now;
 2. a named asset class (subway, schools, public housing, hospitals): its
-   register;
+   register. Yes or no comes from the register's own count for what the
+   question names (inside the Sandy extent, inside the DEP extreme scenario);
+   "is the school safe" and "has it flooded since Ida" get no yes or no;
 3. "has it flooded": the past-event rule described below sets yes, no or
-   cannot say;
-4. "how many": the counted source;
-5. forecasts, projections and scenarios: those sources, with no yes or no;
-6. any other source the question names (FEMA zone, terrain, permits);
-7. any other question about flooding: the observed record.
+   cannot say. An Ida high-water mark says the block flooded only when it is
+   within 250 m; a point within 50 m of the mapped Sandy edge gets no flat
+   yes or no;
+4. "how many": the counted source, and the count of the 311 kind the question
+   names;
+5. forecasts, projections and scenarios: those sources, with no yes or no.
+   "Does the 2080 map show water here" is a fact about the map and takes yes
+   or no from the scenario's depth class; "will it flood" does not;
+6. "are there any": yes or no from the named source's own count;
+7. any other source the question names (FEMA zone, terrain, permits, a
+   district's floodplain counts);
+8. any other question about flooding: the observed record.
+
+A question in two parts ("was it in the Sandy area, and how many 311
+complaints") is split into its clauses and each is answered, in the order
+asked; the first part's yes or no leads.
 
 A lead the rules chose still goes through the lead checks below; one that
 fails is dropped and the facts stand. When no rule recognises the question,

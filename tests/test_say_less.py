@@ -37,3 +37,14 @@ def test_nycha_developments_are_not_a_construction_question():
     assert heuristic_plan("Which NYCHA developments in BK06 are in the Sandy flood area?")["intent"] == "neighborhood"
     assert heuristic_plan("How many buildings in QN12 are in the floodplain?")["intent"] == "neighborhood"
     assert heuristic_plan("What construction is underway in Gowanus?")["intent"] == "development_check"
+
+
+def test_a_district_question_does_not_wait_for_the_permits_source():
+    from riprap.core.burr.stones import select_pebbles
+    from riprap.core.pebbles.bridge import get_registry
+
+    nyc = get_registry("nyc")
+    asked = {"intent": "neighborhood", "question": "Which schools in QN12 are exposed?", "pebbles": None}
+    assert "dob_permits_nta" not in select_pebbles(asked, nyc) and "doe_schools_nta" in select_pebbles(asked, nyc)
+    assert "dob_permits_nta" in select_pebbles({"intent": "neighborhood", "pebbles": None}, nyc)  # a plain briefing
+    assert "dob_permits_nta" in select_pebbles({**asked, "intent": "development_check"}, nyc)
