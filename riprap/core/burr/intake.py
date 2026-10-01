@@ -244,8 +244,12 @@ def heuristic_plan(query: str) -> dict:
     elif live:
         # A place by name: the geocoder decides, in the city the question names.
         intent, target = "live_now", f"{place['text']}, {elsewhere.group(0).title() if elsewhere else 'New York, NY'}"
-    elif place["kind"] == "neighborhood" and nta.resolve(place["text"]):
-        intent, target = area_intent, place["text"]
+    elif place["kind"] == "neighborhood" and (hits := nta.resolve(place["text"])):
+        # "Murray Hill in Queens": the borough picks among areas of one name.
+        boro = re.search(re.escape(place["text"]) + r"\s*,?\s*(?:in\s+)?(?:the\s+)?(Manhattan|Brooklyn|Queens|Bronx|Staten Island)\b",
+                         q, re.IGNORECASE)
+        named_in = boro and boro.group(1).title() in {h["borough"] for h in hits}
+        intent, target = area_intent, f"{place['text']}, {boro.group(1).title()}" if named_in else place["text"]
     else:
         # A landmark or anything else: the whole place text, so "Ferry
         # Building, San Francisco" keeps its city; the geocoder decides, and
@@ -257,6 +261,8 @@ def heuristic_plan(query: str) -> dict:
             target = f"{place['text']}, {named.group(1)}, NY"
         elif place["kind"] == "neighborhood" and elsewhere and not _OTHER_STATE_RE.search(q):
             target = f"{place['text']}, {elsewhere.group(0).title()}"
+        elif place["kind"] is None and not ELSEWHERE_RE.search(q) and (mark := landmark_phrase(q)):
+            target = f"{mark}, New York, NY"  # "is jamaica hospital flooding right now": the landmark, for the geocoder
         elif place["kind"] == "neighborhood" and _QUESTION_RE.search(q) and not _OTHER_STATE_RE.search(q):
             # A place name inside a question ("Did Hamilton Beach flood during Sandy and ...", "Does
             # Rockaway Boulevard flood?"): the name for the geocoder, never the rest of the sentence.
@@ -434,7 +440,9 @@ def resolve_area(state: State) -> State:
                                                                re.IGNORECASE) else None
         # No whole-question fallback: scanning the question for any place
         # name matched a borough first ("Queens") and returned Astoria.
-        matches = ([district] if district else []) or (nta.resolve(target) if target else [])
+        name, _, boro = target.partition(", ")
+        matches = ([district] if district else []) or (nta.resolve(name) if name else [])
+        matches = [m for m in matches if m["borough"] == boro] or matches  # "Murray Hill, Queens"
         if not matches:
             rec["ok"], rec["err"] = False, f"no neighborhood matches {target!r}"
             trace.append(rec)

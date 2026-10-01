@@ -182,7 +182,7 @@ def kind_asked(rel: str, question: str, value: dict | None) -> str | None:
 
 _ASKS_REPORTS_RE = re.compile(r"\b311\b|complain|report", re.I)
 _YEAR_RE = re.compile(r"\b(?:in|during|for|of)\s+(20[12]\d)\b", re.I)
-_OTHER_PERIOD_RE = re.compile(r"\b(last|this|past) (month|week|weekend|night|morning|few|couple|\d+)|yesterday|today|this (spring|summer|fall|"
+_OTHER_PERIOD_RE = re.compile(r"\b(last|this|past) (month|week|few|couple|\d+)|yesterday|today|this (spring|summer|fall|"
                               r"autumn|winter)|last (spring|summer|fall|autumn|winter)\b", re.I)
 
 
@@ -343,9 +343,26 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str],
 # Refactor 6: the lead of a yes or no question about past flooding is set
 # by rule, not chosen by the model. The model still picks and orders the
 # facts. A rule is simpler than a prompt and can be checked.
-_HAPPENED_RE = re.compile(r"^\W*(has|have|had|did|was|were|is there|are there)\b.*\bflood", re.IGNORECASE)
+# ("Is there flood risk here?" asks about risk: a "No." from sensors with no events once answered it.)
+_HAPPENED_RE = re.compile(r"^\W*(has|have|had|did|was|were|is there|are there)\b.*"
+                          r"\bflood(?![- ]?(risk|zone|plain|map|insurance|hazard|prone))", re.IGNORECASE)
 # One word may stand before the storm's name ("hurricane", "superstorm", or a misspelling of either).
-_SINCE_RE = re.compile(r"\bsince\s+(?:[a-z]+\s+)?(ida|sandy|(?:19|20)\d\d)\b", re.IGNORECASE)
+# "Has it flooded after Ida?" asks about the time since, like "since Ida" (it was once answered
+# "Yes." from Ida's own marks). "Marks surveyed after Ida" and "imagery after Ida" are about the storm.
+_SINCE_RE = re.compile(r"\b(?:since|flood(?:ed|ing|s)?(?: here| there)?\s+after)\s+(?:[a-z]+\s+)?(ida|sandy|(?:19|20)\d\d)\b",
+                       re.IGNORECASE)
+# "Before Sandy, had it flooded?": no source here says what happened before a storm or a year.
+_BEFORE_RE = re.compile(r"\bbefore\s+(?:[a-z]+\s+)?(ida|sandy|(?:19|20)\d\d)\b", re.IGNORECASE)
+# A few days, a named day or a month: the sources count over years, so their
+# totals say neither yes nor no about it. ("The last few years" is not short.)
+_SHORT_PERIOD_RE = re.compile(
+    r"\b(this|last|past|over the) (week|weekend|month|night|morning|afternoon|evening)\b"
+    r"|\b(yesterday|today|tonight|recently|lately)\b"
+    r"|\b(on|last|this) (mon|tues|wednes|thurs|fri|satur|sun)day\b"
+    r"|\b(\d+|a|a few|a couple of|two|three|four|five|six) (days?|weeks?|months?) ago\b"
+    r"|\b(last|past) (few|couple of|\d+|two|three|four|five|six) (days|weeks|months)\b"
+    r"|\b(in|last|this) (january|february|march|april|may|june|july|august|september|october|november|december)\b",
+    re.IGNORECASE)
 _STORM_YEAR = {"ida": 2021, "sandy": 2012}
 # The day each named storm struck NYC, so "since Ida" starts on its date,
 # not on January 1 of its year.
@@ -504,9 +521,10 @@ def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: d
     if not is_past_event_question(question, focus):
         return None
     relevant, verdict = _past_event_verdict(question, docs, values, this_year)
-    if _OTHER_PERIOD_RE.search(question or "") and _period_start(question) is None:
-        # "Did it flood this weekend?": the sources count over years, and a
-        # total over three years says neither yes nor no about a few days.
+    if (_SHORT_PERIOD_RE.search(question or "") and _period_start(question) is None) or _BEFORE_RE.search(question or ""):
+        # "Did it flood this weekend?", "on Monday?": the sources count over
+        # years, and a total over three years says neither yes nor no about a
+        # few days. "Before Sandy?": no source here reaches back before it.
         # The record is quoted (its newest event is dated), with no lead.
         return "facts", [i for i in relevant if i in verdict and not unavailable(i, docs, values)]
     positive = [i for i, e in verdict.items() if e is True]

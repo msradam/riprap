@@ -59,7 +59,7 @@ TOPICS = (
     (re.compile(r"\bsandy\b", re.I), ("sandy_inundation", "sandy_nta")),
     (re.compile(r"stormwater|storm water|\bdep\b|scenarios?\b|(extreme|moderate) (rain|flood)|rain(fall)? (flood )?maps?"
                 r"|flood maps?", re.I), DEP),
-    (re.compile(r"elevation|low spot|low.lying|terrain|topograph|how high (is|above)(?! the (surge|tide|water))"
+    (re.compile(r"elevation|low spot|low.lying|terrain|topograph|how high (is|above)(?![^?]*\b(surge|tides?|water)\b)"
                 r"|above sea level", re.I),
      ("microtopo", "microtopo_nta")),
     (re.compile(r"\bpermits?\b|construction|being built", re.I), ("dob_permits_nta",)),
@@ -77,7 +77,7 @@ _PONDING_RE = re.compile(r"\blinger|standing water|\bponding|slow to drain|water
 EXPERIMENTAL = (
     (re.compile(r"satellite|sentinel|from space|imagery", re.I), ("prithvi_water", "prithvi_water_nta"), ("ida_hwm",)),
     # ("Green" alone is a street, a park and a cemetery: "100 Green Street", "Bowling Green".)
-    (re.compile(r"\bpaved|\bpaving|pavement|impervious|\bgreen(ery|er| spaces?| cover| areas?)\b|\b(how|is|are) green\b"
+    (re.compile(r"\bpaved|\bpaving|pavement|impervious|\bgreen(ery|er| spaces?| cover| areas?)\b|\b(how|is|are) green\b(?!-| (st|street|ave|avenue|pl|place|rd|road|ln|lane|point)\b)"
                 r"|much (of (it|this|the \w+) )?is green|\bland.?cover|built.?(over|up)|tree (cover|canopy)|vegetat|\brunoff",
                 re.I), ("landcover", "landcover_nta"), ()),
     # ("The Sandy surge zone" is a map, and a surge that happened is the record's to answer.)
@@ -90,7 +90,8 @@ EXPERIMENTAL = (
 # one, so the lead says so and the forecasts that exist follow.
 # ("Will this be in a flood zone" and "will flood insurance ..." ask about a map and a price.)
 _WILL_FLOOD_RE = re.compile(r"\b(will|going to|gonna|likely to|expected to|about to)\b[^.?!]*"
-                            r"\bflood(?!net|[- ]?(zone|plain|insurance|map))", re.I)
+                            r"\bflood(?!net|[- ]?(zone|plain|insurance|map))"
+                            r"|\bflood\w*\s+(?:is\s+|are\s+)?(?:expected|likely|forecast|predicted)\b", re.I)
 NO_PREDICTION_FACTS = ("nws_alerts", "nws_water_forecast", "fema_nfhl", "dcp_floodplain_nta",
                        "dep_moderate_current", "dep_moderate_current_nta", "sandy_inundation", "sandy_nta")
 
@@ -120,13 +121,13 @@ _NOW_RE = re.compile(r"\b(right now|rite now|rn|currently|tonight|at the moment|
                      r"|happening now|going on now|as we speak)\b|" + _FLOODING_NOW_RE.pattern, re.I)
 _FUTURE_RE = re.compile(r"\b(forecasts?|forecasting|projections?|projected|outlook|predictions?|what is coming|what's coming"
                         r"|in the (coming|next) (years|decades)|in the future|by (the )?20\d\ds?|20[5-9]0s?|2100"
-                        r"|(next|coming) (few |couple of |\w+ )?(hours|days)|tomorrow|next week|this (coming )?weekend)\b", re.I)
+                        r"|(next|coming) (few |couple of |\w+ )?(hours|days)|tomorrow|next week|this (coming )?week(end)?)\b", re.I)
 _FLOOD_RE = re.compile(r"\bflood", re.I)
 _DURING_RE = re.compile(r"\b(during|in|after|by)\s+(?:tropical storm\s+|[a-z]+\s+)?(ida|sandy)\b", re.I)
 
 
 _CLAUSE_SPLIT_RE = re.compile(r"(?<=[.!?;:])\s+|,\s+(?:and|but)\s+"
-                              r"|\s+and\s+(?=(?:has|have|had|did|does|do|was|were|is|are|how|which|what)\b)", re.I)
+                              r"|\s+and\s+(?=(?:has|have|had|did|does|do|was|were|is|are|will|would|could|how|which|what)\b)", re.I)
 
 
 # The period of an abbreviation ends no clause: "100 Main St. since Sandy" was
@@ -163,7 +164,8 @@ def _clauses(question: str) -> list[str]:
     q = _INITIALS_RE.sub(lambda m: m.group(0).replace(".", ""), _ABBREV_RE.sub(_abbreviation, question or ""))
     parts = (re.sub(r"^\W*(and|but|so|also)\s+", "", c, flags=re.I).strip() for c in _CLAUSE_SPLIT_RE.split(q))
     # "Since Ida, has it flooded?" reads as "has it flooded since Ida?": the rules look at how a clause opens.
-    parts = (re.sub(r"^((?:since|during|after|before)\b[^,?]*),\s*(.+?)([?.!]*)$", r"\2 \1\3", c, flags=re.I) for c in parts)
+    parts = (re.sub(r"^((?:since|during|after|before)\b[^,?]*?)(?:,\s*|\s+(?=(?:has|have|had|did|was|were|is|are)\b))"
+                    r"(.+?)([?.!]*)$", r"\2 \1\3", c, flags=re.I) for c in parts)
     return [c for c in parts if c]
 
 
@@ -186,11 +188,19 @@ def asks_now(question: str) -> bool:
     return not mapped or bool(_FLOODING_NOW_RE.search(q))
 
 
+# A house number that reads as a year ("2100 Bartow Avenue", "2050 Grand Concourse") is not one.
+_HOUSE_YEAR_RE = re.compile(r"\b(20[3-9]\d|2100)(?=\s+(?:(?:[nsew]\.?|east|west|north|south)\s+)?(?:[\w']+\s+){0,2}"
+                            r"(?:street|st|avenue|ave|av|boulevard|blvd|road|rd|place|pl|drive|dr|lane|ln|parkway"
+                            r"|pkwy|terrace|court|ct|way|plaza|highway|expressway|turnpike|broadway|concourse)\b)", re.I)
+
+
 def _asks_future(q: str) -> bool:
     """A word for the future, except "this weekend" in a question that asks
     whether it flooded ("Did it flood this weekend?" is about the past)."""
+    q = _HOUSE_YEAR_RE.sub("", q)
     words = [m.group(0).lower() for m in _FUTURE_RE.finditer(q)]
-    return any(not w.endswith("weekend") for w in words) or bool(words and not _happened_clause(q))
+    this = ("week", "weekend")  # "this week" and "this weekend" are the past in "did it flood this week"
+    return any(not w.endswith(this) for w in words) or bool(words and not _happened_clause(q))
 
 
 def time_frame(question: str) -> str:
@@ -346,6 +356,7 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     of each part, and the first part's yes or no when it has one."""
     if not question:
         return None
+    question = _HOUSE_YEAR_RE.sub("", question)
     parts = [(c, _answer_one(c, texts, values, generic=False)) for c in _clauses(question)]
     parts = [(c, a) for c, a in parts if a and a[1]]
     if len(_clauses(question)) > 1 and parts and time_frame(question) != "now":
@@ -380,7 +391,7 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
         # and a question about what the model showed gets no yes or no from
         # the record above it ("did satellite imagery show flooding" is not
         # answered "Yes." by a surveyed mark).
-        lead = "facts" if models and lead in ("yes", "no", "partly") else lead
+        lead = "facts" if (models or EXPERIMENTAL[0][0].search(question)) and lead in ("yes", "no", "partly") else lead
         return lead, [*[*facts, *(d for d in subjects if d not in facts)][:6], *models]
 
     if tf == "now":
@@ -409,7 +420,8 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
         # "Has the pavement here ever flooded?" is not a land-cover question.
         models = [d for d in models if d.startswith("prithvi_water")]
     # (A statement is not a question: "My landlord says it will never flood." is a preamble.)
-    if _WILL_FLOOD_RE.search(question) and not question.rstrip().endswith((".", "!")) and not (
+    stated = question.rstrip().endswith((".", "!")) and not ac.is_yes_no_question(question)
+    if _WILL_FLOOD_RE.search(question) and not stated and not (
             _MAP_SHOWS_RE.search(question) or _FAR_RE.search(question) or _SCENARIO_RE.search(question)):
         # (A question about a named scenario or a far horizon is answered by that projection, below.)
         ahead = [d for d in NO_PREDICTION_FACTS if texts.get(d)]
@@ -428,6 +440,10 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
             # of its own, so the observed record it does have, with no yes or no.
             seen = [i for i in OBSERVED if texts.get(i)]
             return ("facts", seen) if seen else (lead, facts)
+        if models:
+            # No record near enough to say, and the question asks what the model
+            # showed: the record's sentence, then the model's, with no lead.
+            return ("facts" if facts else "experimental"), [*facts, *models]
         if facts or not subjects:
             return lead, [*facts, *models]
         # The storm's point record does not exist for an area ("did Sandy flood
@@ -466,11 +482,15 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
         return with_named("yes" if n else "no", [subjects[0]])
     if subjects:
         return "facts", subjects[:6]
-    if any(i.partition("#")[0] != "nws_obs" for i in _named_ids(question)):
+    period = ("sandy", "ida") if ac._SINCE_RE.search(question) else ()  # "since Sandy" names a period, not a subject
+    if any(i.partition("#")[0] != "nws_obs" and not i.startswith(period) for i in _named_ids(question)):
         # The question names a source and that source returned nothing (it
         # failed, or it does not exist for this kind of place): say so, do
-        # not answer with something else.
-        return "cannot_answer", []
+        # not answer with something else. A flood-zone question about a
+        # neighbourhood, which has no FEMA reading of its own, still gets
+        # the two maps the area does have, under the cannot-answer line.
+        mapped = [d for d in ("sandy_nta", "dep_moderate_current_nta") if texts.get(d)] if TOPICS[0][0].search(question) else []
+        return "cannot_answer", mapped
     if generic and _FLOOD_RE.search(question):
         seen = [i for i in OBSERVED if texts.get(i)]
         return ("facts", seen) if seen else None

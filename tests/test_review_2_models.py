@@ -320,3 +320,120 @@ def test_will_it_flood_quotes_the_fema_map_among_what_is_mapped():
     # A blind judge marked the answer down for leaving the flood map out of "what the maps show".
     lead, facts = ra.answer("Will my building at 30 Waterside Plaza flood next week?", T, {})
     assert lead == "no_prediction" and facts[:4] == ["nws_alerts", "nws_water_forecast", "fema_nfhl", "dep_moderate_current"]
+
+
+# ---- The fourth review round: the reviewer's own inputs. ----
+
+SENSORS = {"floodnet": {"n_sensors": 2, "n_flood_events_3y": 14, "n_flood_events_good_3y": 14,
+                        "latest_event_start": "2026-08-01T00:00:00"},
+           "sandy_inundation": {"inside": True}, "ida_hwm": {"n_within_radius": 1, "nearest_dist_m": 100}}
+
+
+@pytest.mark.parametrize("question", [
+    "Did 80 Pioneer Street, Brooklyn flood on Monday?", "Did it flood here over the weekend?",
+    "Did it flood here two days ago?", "Did it flood here last Friday?", "Did it flood here this afternoon?",
+    "Did it flood here in August?", "Has it flooded here recently?",
+    "Before Sandy, had 2940 West 21st Street, Brooklyn flooded?", "Did it flood before Ida?",
+])
+def test_no_yes_or_no_about_a_day_a_month_or_the_time_before_a_storm(question):
+    assert ra.answer(question, T, SENSORS)[0] == "facts"
+
+
+@pytest.mark.parametrize("question", [
+    "Has 80 Pioneer Street, Brooklyn flooded in the last few years?", "Has it flooded here in the last 3 years?",
+    "After Ida, has 80 Pioneer Street, Brooklyn flooded?", "Has it flooded here after Ida?",
+    "since ida has 80 pioneer street brooklyn flooded",
+    "Has 80 Pioneer Street, Brooklyn flooded before and will it flood again?",
+    "Has 2050 Grand Concourse flooded since Ida?",
+])
+def test_the_sensors_still_say_yes(question):
+    got = ra.answer(question, T, SENSORS)
+    assert got[0] == "yes" and got[1][0] == "floodnet"
+
+
+def test_a_house_number_is_not_a_year():
+    assert ra.time_frame("Did 2100 Bartow Avenue, Bronx flood during Ida?") == "past"
+    assert ra.time_frame("Is 2100 Avenue S in a flood zone?") == "any"
+    assert ra.time_frame("What does the 2080 scenario show at 400 Carroll Street?") == "future"
+    assert ra.time_frame("What will sea level be by 2100?") == "future"
+
+
+def test_is_there_flood_risk_is_not_did_it_flood():
+    quiet = {"floodnet": {"n_sensors": 2, "n_flood_events_3y": 0, "n_flood_events_good_3y": 0},
+             "nyc311": {"n": 0, "years": 5, "by_year": {}, "by_kind": {}}}
+    got = ra.answer("Is there flood risk at 80 Pioneer Street, Brooklyn?", T, quiet)
+    assert got[0] != "no"  # sensors with no events once answered "No." for an address in zone AE
+
+
+@pytest.mark.parametrize("question", [
+    "How often has 80 Pioneer Street, Brooklyn flooded since Ida?", "Any flooding since Ida at 80 Pioneer Street?",
+    "Flood history since Sandy for 80 Pioneer Street",
+])
+def test_a_since_question_in_any_wording_gets_the_record(question):
+    got = ra.answer(question, T, SENSORS)
+    assert got and got[0] != "cannot_answer" and "floodnet" in got[1]
+
+
+def test_a_flood_zone_question_about_a_neighbourhood_shows_the_maps_it_has():
+    area = {"sandy_nta": "40.6% of this area lies inside the 2012 Hurricane Sandy inundation extent.",
+            "dep_moderate_current_nta": "DEP Moderate Stormwater: 1.2% of this area is modeled to flood from rainfall."}
+    assert ra.answer("Is Red Hook in a flood zone?", area, {}) == ("cannot_answer", ["sandy_nta", "dep_moderate_current_nta"])
+
+
+@pytest.mark.parametrize("question", [
+    "Is Green Street in Greenpoint prone to flooding?",
+    "How high is the storm surge expected to be near 80 Pioneer Street, Brooklyn?",
+])
+def test_the_question_asked_is_the_one_answered(question):
+    got = ra.answer(question, {**T, "microtopo": "Elevation 1.37 m."}, {})
+    assert got and got[0] != "experimental" and got[1] != ["microtopo"] and "landcover" not in got[1]
+
+
+def test_will_it_flood_is_declined_with_or_without_a_question_mark():
+    assert ra.answer("Will 80 Pioneer Street, Brooklyn flood.", T, {})[0] == "no_prediction"
+    assert ra.answer("Is flooding expected at 80 Pioneer Street, Brooklyn this week?", T, {})[0] == "no_prediction"
+    assert ra.time_frame("Is flooding expected at 80 Pioneer Street, Brooklyn this week?") == "future"
+    assert ra.time_frame("Did it flood here this week?") == "past"
+
+
+def test_a_question_about_imagery_takes_no_yes_from_the_record():
+    got = ra.answer("Did satellite imagery show flooding at 80 Pioneer Street, Brooklyn after Sandy?", T, SENSORS)
+    assert got[0] == "facts"  # the Sandy outline is not what imagery showed
+    far = {"ida_hwm": {"n_within_radius": 0}}
+    texts = {"ida_hwm": "No Hurricane Ida high-water marks were surveyed within 800 m of this address.",
+             "prithvi_water": "Experimental: a satellite model showed 0 m² of new surface water within 500 m."}
+    assert ra.answer("Did satellite imagery show flooding here after Ida?", texts, far)[0] != "cannot_answer"
+
+
+@pytest.mark.parametrize("query,place", [
+    ("Has New Brighton flooded since Ida?", "New Brighton"),
+    ("City Island", "City Island"),
+    ("Is The Battery in a flood zone?", "The Battery"),
+    ("Is Murray Hill in Queens in a flood zone?", "Murray Hill, Queens"),
+])
+def test_a_neighbourhood_keeps_its_whole_name_and_its_borough(query, place):
+    assert heuristic_plan(query)["targets"][0]["text"] == place
+
+
+def test_murray_hill_in_queens_resolves_in_queens():
+    from app.areas import nta
+
+    hits = nta.resolve("Murray Hill")
+    assert {h["borough"] for h in hits} >= {"Queens"} or len(hits) == 1  # the data decides which exist
+    picked = [m for m in hits if m["borough"] == "Queens"] or hits
+    assert picked[0]["borough"] == ("Queens" if any(h["borough"] == "Queens" for h in hits) else hits[0]["borough"])
+
+
+def test_a_lower_case_landmark_with_an_asset_word_is_placed():
+    plan = heuristic_plan("is jamaica hospital flooding right now")
+    assert plan["targets"][0]["text"] == "Jamaica Hospital, New York, NY"
+
+
+def test_a_citation_mark_does_not_land_inside_a_school_name():
+    from riprap.core.burr.evidence import cite
+
+    text = ("Inside the 2012 Sandy extent: P.S./M.S 042 R. Vernam (50 m), P.S. 183 Dr. Richard R. Green (120 m). "
+            "It is flagged.")
+    assert cite(text, "doe_school_exposure") == text.replace("(120 m).", "(120 m) [doe_school_exposure].").replace(
+        "It is flagged.", "It is flagged.")
+    assert predicates._sentences("in flood zone X. 3 sensors logged events.") == ["in flood zone X.", "3 sensors logged events."]

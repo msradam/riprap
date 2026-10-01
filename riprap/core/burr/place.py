@@ -178,12 +178,16 @@ def place_phrase(text: str) -> str | None:
     found: list[str] = []
     for run in _CAPS_RUN_RE.findall(text or ""):
         words = run.split()
+        # A known neighbourhood is kept whole, before any word is stripped
+        # from it: "East New York" was once cut to "East" (the East Village)
+        # and "Has New Brighton" to "Brighton" (Brighton Beach).
+        whole = next((w for i in range(len(words)) if (w := " ".join(words[i:]).strip(" ,.?")).lower()
+                      in _known_neighbourhoods()), None)
+        if whole:
+            found.append(whole)
+            continue
         while words and words[0].lower().strip(".,") in _NOT_PLACE:
             words = words[1:]
-        whole = " ".join(words).strip(" ,.?")
-        if whole.lower() in _known_neighbourhoods():
-            found.append(whole)  # "East New York" whole: stripping "New York" left "East", the East Village
-            continue
         while words and words[-1].lower().strip(".,") in _NOT_PLACE:
             words = words[:-1]
         phrase = " ".join(words).strip(" ,")

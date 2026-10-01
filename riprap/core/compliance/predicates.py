@@ -82,7 +82,10 @@ def _sentences(text: str) -> list[str]:
         prev = out[-1] if out else ""
         if prev and (s[0].islower() or (_INITIALS_END_RE.search(prev) and re.match(r"[A-Z0-9]", s))
                      or (prev.endswith("St.") and not _STARTS_SENTENCE_RE.match(s))
-                     or (re.search(r"\b[NSEW]\.$", prev) and re.match(r"\d+(st|nd|rd|th)\b", s))):
+                     or (re.search(r"\b[NSEW]\.$", prev) and re.match(r"\d+(st|nd|rd|th)\b", s))
+                     # An initial or a title inside a name ("P.S. 042 R. Vernam", "P.S. 183 Dr. Richard R. Green").
+                     or (re.search(r"(?:\b[A-Z]|\b(?:Dr|Jr|Sr|Mr|Mrs|Ms|Rev|Msgr))\.$", prev)
+                         and re.match(r"[A-Z][a-z]", s) and not _STARTS_SENTENCE_RE.match(s))):
             out[-1] = f"{prev} {s}"
         else:
             out.append(s)

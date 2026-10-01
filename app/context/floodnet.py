@@ -224,16 +224,18 @@ def _summary(sensors: list[Sensor], where: str, none: str) -> dict:
             f"{'at least ' if n_events >= EVENT_LIMIT else ''}{n_events} "
             f"above-curb flood event{'' if n_events == 1 else 's'} in the last 3 years"
             # The newest event dates the record, and answers "is it flooding now".
-            + (f", the most recent starting {latest.start_time[:16].replace('T', ' ')} UTC." if latest else ".")
+            + (f", the most recent starting {latest.start_time[:16].replace('T', ' ')} UTC" if latest else "")
         )
+        if not open_now and all(is_good(s.status) for s in sensors) and all(e.end_time for e in events):
+            # What "is it flooding right now" asks. Said only when every sensor is in working
+            # order and no event, however old, is still open in the record. It rides in the
+            # first sentence so that it carries the citation.
+            narrative += (f"; FloodNet's record showed no flood event under way at {'it' if n_sensors == 1 else 'them'} "
+                          "when this was read")
+        narrative += "."
         if open_now:
             narrative += (f" {len(open_now)} event{'' if len(open_now) == 1 else 's'} that started in the last "
                           "24 hours had no end time when this was read.")
-        elif all(is_good(s.status) for s in sensors) and all(e.end_time for e in events):
-            # What "is it flooding right now" asks. Said only when every sensor is in working
-            # order and no event, however old, is still open in the record.
-            narrative += (f" FloodNet's record showed no flood event under way at {'it' if n_sensors == 1 else 'them'} "
-                          "when this was read.")
         if peak is not None and peak.max_depth_mm is not None:
             narrative += (
                 f" Peak depth recorded by the sensors in good working order: "

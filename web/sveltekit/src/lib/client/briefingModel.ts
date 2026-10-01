@@ -87,8 +87,8 @@ export function splitLead(parts: ClaimPart[]): { word: string | null; parts: Cla
 
 /** A count lead taken from a key sentence: the number it opens with
  *  ("From the sources consulted: 34 NYC 311 ..." gives "34"). A sentence
- *  that opens with words gives none: "NPCC4 (2024) projects 0.38 m" once
- *  led with a 4. The sentence stays whole below the lead. */
+ *  that opens with words gives none: a sentence opening "NPCC4 (2024)
+ *  projects" once led with a 4. The sentence stays whole below the lead. */
 export function countLead(key: ClaimPart[]): string | null {
   return COUNT_RE.exec(text(key).replace(FACTS_PHRASE, '').trimStart())?.[1] ?? null;
 }

@@ -28,7 +28,7 @@ describe('countLead', () => {
 
   it('takes no number from inside a word or later in the sentence', () => {
     // Live: "How much sea-level rise ... by the 2050s?" led with a bare "4".
-    const npcc = 'From the sources consulted: NPCC4 (2024) projects sea-level rise at the Battery of 0.38 m (15 in) by the 2050s.';
+    const npcc = 'From the sources consulted: NPCC4 (2024) projects sea-level rise in New York City of 14 to 19 in (0.36 to 0.48 m) by the 2050s.';
     expect(countLead([{ text: npcc, cite: 'npcc4_slr' }])).toBeNull();
   });
 

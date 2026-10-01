@@ -45,7 +45,8 @@ def test_floodnet_dates_its_newest_event_and_flags_one_still_open(monkeypatch):
     monkeypatch.setattr(floodnet, "sensors_near", lambda *a, **k: sensors)
     monkeypatch.setattr(floodnet, "flood_events_for", lambda ids: events)
     v = floodnet.summary_for_point(40.71, -73.78)
-    assert "in the last 3 years, the most recent starting 2026-08-20 22:57 UTC." in v["narrative"]
+    assert ("in the last 3 years, the most recent starting 2026-08-20 22:57 UTC; FloodNet's record showed no flood "
+            "event under way at it when this was read.") in v["narrative"]
     assert v["n_events_open_24h"] == 0 and "no end time" not in v["narrative"]
     events.append(FloodEvent("a", recent, None, 60, "flood"))
     v = floodnet.summary_for_point(40.71, -73.78)
