@@ -1,73 +1,86 @@
 <script lang="ts">
-  /** What a briefing contains: the Five Stones as a definition list, with
-   *  the taglines from STONE_META. */
-  import { STONE_META, STONE_ORDER } from '$lib/types/card';
+  /** The public sources behind a briefing, grouped by the five Stones.
+   *  Source names are the manifests' own (deployments/nyc/manifests and
+   *  deployments/federal/manifests); the experimental model layers are in
+   *  LandFrontier. */
+  import { STONE_META, STONE_ORDER, type StoneKey } from '$lib/types/card';
 
-  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  const SOURCES: Record<StoneKey, string> = {
+    cornerstone:
+      "FEMA's effective and preliminary flood maps, NYC DEP stormwater scenarios for today, 2050 and 2080, the 2012 Sandy inundation extent, USGS Hurricane Ida high-water marks, USGS terrain",
+    touchstone:
+      'FloodNet street sensors, NYC 311 flood complaints, NOAA tide gauges, USGS stream gauges, National Weather Service observations',
+    keystone:
+      "NYC public schools, MTA subway entrances, NYCHA developments, hospitals, active DOB construction permits, NYC Planning's floodplain counts",
+    lodestone: 'National Weather Service alerts and water-level forecasts, NPCC4 sea-level projections',
+    capstone: 'Writes one cited sentence per record, and answers a question by rules over its words'
+  };
+  const DOCS = 'https://github.com/msradam/riprap/blob/main/docs';
 </script>
 
 <section class="land-section" id="methodology" aria-labelledby="stones-h">
-  <h2 id="stones-h">What a briefing contains</h2>
-  <p>
-    Every claim cites its source: a public record from FEMA, NOAA, USGS or city open data, or, where
-    it is labelled experimental, one of three models. Riprap reads 23 public data sources for New
-    York City; the methodology was last updated
-    <time datetime="2026-10-01">2026-10-01</time>.
-  </p>
-  <p>
-    A briefing sorts its sources into five Stones. Each Stone is a class of evidence. Together they
-    form the briefing, and every claim in the output traces back to the Stone that produced it.
-  </p>
-  <dl>
-    {#each STONE_ORDER as key (key)}
-      <div>
-        <dt>{STONE_META[key].name}, {STONE_META[key].role}</dt>
-        <dd>{cap(STONE_META[key].tag)}.</dd>
-      </div>
-    {/each}
-  </dl>
+  <div class="land-frame">
+    <h2 id="stones-h" class="land-h2">Built on 23 public sources</h2>
+    <p class="land-intro">
+      City, state and federal records, read live or from their published files and sorted into five
+      Stones. No commercial data and no scores.
+    </p>
+    <dl class="stones">
+      {#each STONE_ORDER as key (key)}
+        <div class="stone">
+          <dt>{STONE_META[key].name}, {STONE_META[key].role}</dt>
+          <dd>{SOURCES[key]}</dd>
+        </div>
+      {/each}
+    </dl>
+    <ul class="stones-links land-small">
+      <li><a class="land-link" href="{DOCS}/DATA-SOURCES.md">Every source, with its licence and date</a></li>
+      <li><a class="land-link" href="{DOCS}/METHODOLOGY.md">How a briefing is made</a></li>
+    </ul>
+  </div>
 </section>
 
 <style>
-  .land-section {
-    margin-top: 64px;
-    max-width: 60ch;
+  .stones {
+    margin: 0;
+    border-bottom: 1px solid var(--riprap-rule-hairline);
   }
-  h2 {
-    margin: 0 0 12px;
-    font-size: 22px;
-    font-weight: 600;
-    line-height: 1.25;
-  }
-  p {
-    margin: 0 0 12px;
-    font-size: 17px;
-    line-height: 1.55;
-  }
-  time {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 400;
-  }
-  dl {
-    margin: 20px 0 0;
-  }
-  dl div {
-    padding: 10px 0;
+  /* A table row per Stone: the Stone in 4 columns, its sources in 8. */
+  .stone {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 32px;
+    padding: 16px 0;
     border-top: 1px solid var(--riprap-rule-hairline);
   }
   dt {
+    grid-column: span 4;
     font-size: 17px;
     font-weight: 600;
+    line-height: 1.45;
   }
   dd {
-    margin: 2px 0 0;
+    grid-column: span 8;
+    margin: 0;
+    max-width: 68ch;
     font-size: 17px;
+    line-height: 1.55;
     color: var(--ink-secondary);
   }
-  @media (max-width: 640px) {
-    .land-section {
-      margin-top: 48px;
+  .stones-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (max-width: 720px) {
+    .stone {
+      display: block;
+    }
+    dd {
+      margin-top: 4px;
     }
   }
 </style>

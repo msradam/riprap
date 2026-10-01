@@ -48,10 +48,14 @@ const EXEMPT_FILES = new Set<string>([
   // Landing pages: marketing copy that references shipped cities
   // (NYC, Chicago, Seattle, Albany) as features. This is by
   // design, not a leak.
-  'landing/CityPicker.svelte',
   'landing/LandHero.svelte',
+  'landing/LandSpecimen.svelte',
+  'landing/LandProof.svelte',
   'landing/LandFor.svelte',
   'landing/LandStones.svelte',
+  'landing/LandDevelopers.svelte',
+  'landing/LandFrontier.svelte',
+  'landing/LandCollab.svelte',
   'landing/UseBand.svelte',
   // RipMap layer descriptions reference NYC-specific data sources
   // (FloodNet NYC). Map layers visibility is itself

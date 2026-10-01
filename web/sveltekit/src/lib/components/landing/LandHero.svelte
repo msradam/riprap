@@ -1,12 +1,26 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
-  import { EXAMPLES } from '$lib/samples';
   import { STATIC_SITE, QUICKSTART_URL } from '$lib/staticSite';
+  import LandSpecimen, { type Specimen } from './LandSpecimen.svelte';
 
-  /** Landing top: kind line, title, one deck sentence, the query box and
-   *  one runnable example per kind of input. The static site has no
-   *  backend, so the gallery replaces the query box there. */
+  /** Landing top: kind line, h1, subhead, the query box (or, on the
+   *  static site, the gallery and the quickstart), real questions as
+   *  chips, and a real gallery answer as the specimen. The specimen comes
+   *  after the form in DOM order, so the input stays an early Tab stop. */
+  interface Chip {
+    label: string;
+    slug: string;
+    /** The entry's own question or address, which the live app answers. */
+    query: string;
+  }
+  interface Props {
+    chips: Chip[];
+    specimen: Specimen;
+    /** Saved briefings in the gallery. */
+    count: number;
+  }
+  let { chips, specimen, count }: Props = $props();
 
   let q = $state('');
   let input: HTMLInputElement | undefined;
@@ -26,9 +40,8 @@
     }
   }
 
-  function briefHref(v: string) {
-    return resolve('/(app)/q/[queryId]', { queryId: encodeURIComponent(v) });
-  }
+  const briefHref = (v: string) => resolve('/(app)/q/[queryId]', { queryId: encodeURIComponent(v) });
+  const galleryHref = (slug: string) => `${resolve('/(app)/gallery/[slug]', { slug })}/`;
 
   function submit(e: SubmitEvent) {
     e.preventDefault();
@@ -42,92 +55,102 @@
   }
 </script>
 
-<section class="land-hero">
-  <p class="land-kind">Riprap, open beta</p>
-  <h1>Flood-exposure briefings for New York City</h1>
-  <p class="land-deck">
-    Type a New York City address or community district. Riprap reads the public flood records
-    for that place and writes them up on one page, with the source and its date beside every
-    sentence.
-  </p>
+<section class="land-section land-hero" aria-labelledby="land-h1">
+  <div class="land-frame hero-grid">
+    <p class="hero-kind">Riprap, open-source flood evidence for New York City</p>
+    <div class="hero-main">
+      <h1 id="land-h1">The flood record for any New York City block, cited line by line.</h1>
+      <p class="hero-sub">
+        Riprap joins street sensors, 311 complaints, flood maps and storm records for an address or
+        community district into one page, with a source and a date on every sentence.
+      </p>
 
-  {#if STATIC_SITE}
-    <p class="land-static">
-      <a class="land-button" href="{resolve('/(app)/gallery')}/">Read the precomputed briefings</a>
-    </p>
-    <p class="land-note">
-      This public copy has no backend. <a href={QUICKSTART_URL}>Run locally to ask your own question</a>.
-    </p>
-  {:else}
-    <form class="land-query" role="search" onsubmit={submit}>
-      <label for="land-query-input">Address, community district, or flood question</label>
-      <div class="land-query-row">
-        <input
-          id="land-query-input"
-          type="text"
-          {@attach prefill}
-          bind:value={q}
-          oninput={() => (empty = false)}
-          aria-describedby={empty ? 'land-query-hint' : undefined}
-          placeholder="Address, QN12, or a question"
-          autocomplete="off"
-          enterkeyhint="search"
-        />
-        <button type="submit" class="land-button">Brief this place</button>
-      </div>
-      <!-- Always in the DOM so screen readers announce the message when it appears. -->
-      <p id="land-query-hint" class="land-query-hint" role="status">{#if empty}Type an address, a community district such as QN12, or a question.{/if}</p>
-    </form>
+      {#if STATIC_SITE}
+        <ul class="land-actions hero-actions">
+          <li><a class="land-button" href="{resolve('/(app)/gallery')}/">Browse {count} briefings</a></li>
+          <li><a class="land-button is-secondary" href={QUICKSTART_URL}>Run it yourself</a></li>
+        </ul>
+        <p class="land-small hero-note">
+          This site has saved briefings. To ask your own question, run Riprap on your laptop: no GPU,
+          no API keys.
+        </p>
+      {:else}
+        <form class="hero-query" role="search" onsubmit={submit}>
+          <label for="land-query-input">Address, community district or flood question</label>
+          <div class="hero-query-row">
+            <input
+              id="land-query-input"
+              type="text"
+              {@attach prefill}
+              bind:value={q}
+              oninput={() => (empty = false)}
+              aria-describedby={empty ? 'land-query-hint' : undefined}
+              placeholder="90-01 183rd Street, Queens or QN12"
+              autocomplete="off"
+              enterkeyhint="search"
+            />
+            <button type="submit" class="land-button">Get the briefing</button>
+          </div>
+          <!-- Always in the DOM so screen readers announce the message when it appears. -->
+          <p id="land-query-hint" class="hero-hint" role="status">{#if empty}Type an address, a community district such as QN12, or a question.{/if}</p>
+        </form>
+      {/if}
 
-    <p class="land-try-head" id="land-try">Or try one of these:</p>
-    <ul class="land-try" aria-labelledby="land-try">
-      {#each EXAMPLES as ex (ex.kind)}
-        <li><span class="land-try-kind">{ex.kind}</span> <a href={briefHref(ex.q)}>{ex.q}</a></li>
-      {/each}
-    </ul>
-  {/if}
+      <p class="hero-chips-head" id="land-try">Try a real question</p>
+      <ul class="hero-chips" aria-labelledby="land-try">
+        {#each chips as c (c.slug)}
+          <li><a class="hero-chip" href={STATIC_SITE ? galleryHref(c.slug) : briefHref(c.query)}>{c.label}</a></li>
+        {/each}
+      </ul>
+    </div>
+    <div class="hero-specimen">
+      <LandSpecimen {specimen} />
+    </div>
+  </div>
 </section>
 
 <style>
   .land-hero {
-    max-width: 800px;
-    padding: 48px 0 0;
+    padding-top: 48px;
   }
-  .land-kind {
-    margin: 0 0 12px;
+  .hero-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 32px;
+  }
+  .hero-kind {
+    grid-column: 1 / -1;
+    margin: 0 0 16px;
     font-size: 14px;
+    line-height: 1.45;
     color: var(--ink-secondary);
+  }
+  .hero-main {
+    grid-column: 1 / span 7;
+  }
+  .hero-specimen {
+    grid-column: 8 / span 5;
+    align-self: start;
   }
   h1 {
     margin: 0;
-    font-size: 56px;
+    font-size: 52px;
     font-weight: 700;
     line-height: 1.05;
     letter-spacing: -0.02em;
     text-wrap: balance;
   }
-  .land-deck {
-    margin: 20px 0 0;
-    max-width: 58ch;
+  .hero-sub {
+    margin: 24px 0 0;
+    max-width: 56ch;
     font-size: 20px;
     line-height: 1.5;
     color: var(--ink-secondary);
     text-wrap: pretty;
   }
-  a {
-    color: var(--riprap-text-link);
-    text-underline-offset: 0.2em;
-  }
-  a:focus-visible,
-  input:focus-visible,
-  button:focus-visible {
-    outline: 3px solid var(--riprap-focus);
-    outline-offset: 2px;
-  }
 
-  .land-query {
+  .hero-query {
     margin-top: 32px;
-    max-width: 720px;
   }
   label {
     display: block;
@@ -135,19 +158,9 @@
     font-size: 17px;
     font-weight: 600;
   }
-  .land-query-row {
+  .hero-query-row {
     display: flex;
     gap: 8px;
-  }
-  /* Small in ink: a prompt, not an error, so no red. */
-  .land-query-hint {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.45;
-    color: var(--ink);
-  }
-  .land-query-hint:not(:empty) {
-    margin-top: 8px;
   }
   input {
     flex: 1;
@@ -167,79 +180,83 @@
   input:focus-visible {
     outline-offset: 0;
   }
-  .land-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 56px;
-    padding: 0 24px;
-    border: 0;
-    background: var(--ink);
-    color: var(--paper);
-    font: inherit;
-    font-size: 17px;
-    font-weight: 600;
+  .hero-query .land-button {
     white-space: nowrap;
-    text-decoration: none;
-    cursor: pointer;
   }
-  .land-button:hover {
-    background: #000;
+  /* Small in ink: a prompt, not an error, so no red. */
+  .hero-hint {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+  .hero-hint:not(:empty) {
+    margin-top: 8px;
+  }
+  .hero-note {
+    margin: 12px 0 0;
+    max-width: 56ch;
   }
 
-  .land-try-head {
-    margin: 20px 0 4px;
+  .hero-chips-head {
+    margin: 32px 0 8px;
     font-size: 14px;
+    line-height: 1.45;
     color: var(--ink-secondary);
   }
-  .land-try {
+  .hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+  .hero-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 8px 16px;
+    border-radius: 3px;
+    background: var(--sky);
+    color: var(--ink);
     font-size: 17px;
+    line-height: 1.3;
+    text-decoration: none;
   }
-  .land-try li {
-    padding: 2px 0;
-  }
-  .land-try-kind {
-    display: inline-block;
-    min-width: 5.5em;
-    color: var(--ink-secondary);
-  }
-  .land-try a,
-  .land-note a {
-    display: inline-block;
-    min-height: 24px;
-  }
-  .land-static {
-    margin: 32px 0 12px;
-  }
-  .land-note {
-    margin: 0;
-    font-size: 14px;
-    color: var(--ink-secondary);
+  .hero-chip:hover,
+  .hero-chip:focus-visible {
+    text-decoration: underline;
   }
 
+  @media (max-width: 1099px) {
+    .hero-main,
+    .hero-specimen {
+      grid-column: 1 / -1;
+    }
+    .hero-specimen {
+      margin-top: 48px;
+    }
+  }
   @media (max-width: 640px) {
     .land-hero {
       padding-top: 24px;
     }
     h1 {
-      font-size: 36px;
+      font-size: 34px;
       line-height: 1.1;
     }
-    .land-deck {
+    .hero-sub {
       font-size: 18px;
     }
-    .land-query-row {
+    .hero-query-row {
       flex-direction: column;
     }
     input {
       flex: none;
     }
-    .land-try li {
-      display: flex;
-      flex-direction: column;
+    .hero-specimen {
+      margin-top: 32px;
     }
   }
 </style>

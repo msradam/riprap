@@ -1,53 +1,44 @@
 <script lang="ts">
-  /** Landing at `/`: a front page at report restraint (docs/DESIGN.md,
-   *  "Landing"). The query box and examples, what Riprap is for, the gallery
-   *  as stories, what a briefing contains, then the cities and responsible use as quiet
-   *  sections. Live briefings render at /q/<query>. */
+  /** Landing at `/`: a Persuade page inside the report system
+   *  (docs/DESIGN.md, "Landing"). It widens in scale: one real answer in
+   *  the hero, real answers as proof, the sources by Stone, who it is for,
+   *  developers and MCP, the experimental models, how to collaborate, and
+   *  evidence, not advice. Live briefings render at /q/<query>. */
+  import '$lib/components/landing/landing.css';
   import LandHero from '$lib/components/landing/LandHero.svelte';
-  import LandFor from '$lib/components/landing/LandFor.svelte';
-  import LandStories from '$lib/components/landing/LandStories.svelte';
+  import LandProof from '$lib/components/landing/LandProof.svelte';
   import LandStones from '$lib/components/landing/LandStones.svelte';
-  import CityPicker from '$lib/components/landing/CityPicker.svelte';
+  import LandFor from '$lib/components/landing/LandFor.svelte';
+  import LandDevelopers from '$lib/components/landing/LandDevelopers.svelte';
+  import LandFrontier from '$lib/components/landing/LandFrontier.svelte';
+  import LandCollab from '$lib/components/landing/LandCollab.svelte';
   import UseBand from '$lib/components/landing/UseBand.svelte';
-  import { STATIC_SITE } from '$lib/staticSite';
   import type { PageProps } from './$types';
 
   let { data }: PageProps = $props();
 </script>
 
 <svelte:head>
-  <title>Riprap: flood-exposure briefings for New York City</title>
-  <meta name="description" content="Riprap reads the public flood records for a New York City address or community district and writes them up on one page, with the source and date beside every sentence. Open source, Apache-2.0. New York City is in production; Chicago, Seattle and Albany are experimental." />
+  <title>Riprap: the flood record for any New York City block, cited</title>
+  <meta name="description" content="Ask about a New York City address, community district or flood question and get a one-page briefing in seconds, with every sentence cited to a public record and its date. Open source, open data, runs on a laptop." />
 </svelte:head>
 
 <div class="land">
-  <div class="land-page">
-    <LandHero />
-    <LandFor />
-    <LandStories stories={data.stories} />
-    <LandStones />
-    <!-- City samples run a live briefing: not on the static site. -->
-    {#if !STATIC_SITE}
-      <CityPicker />
-    {/if}
-    <UseBand />
-  </div>
+  <LandHero chips={data.chips} specimen={data.specimen} count={data.count} />
+  <LandProof cards={data.proof} count={data.count} />
+  <LandStones />
+  <LandFor />
+  <LandDevelopers />
+  <LandFrontier />
+  <LandCollab />
+  <UseBand />
 </div>
 
 <style>
   .land {
+    padding-bottom: 48px;
     background: var(--paper);
     color: var(--ink);
     font-family: var(--font-sans);
-  }
-  .land-page {
-    max-width: 1040px;
-    margin: 0 auto;
-    padding: 0 32px 96px;
-  }
-  @media (max-width: 640px) {
-    .land-page {
-      padding: 0 16px 48px;
-    }
   }
 </style>

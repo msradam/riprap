@@ -1,0 +1,173 @@
+/* Landing page frame, section rhythm, cards and buttons (docs/DESIGN.md,
+   "Landing"). Only routes/+page.svelte imports this sheet, and every class
+   is prefixed land-, so the briefing pages keep their report style. */
+
+.land-section {
+  padding: 48px 0;
+  /* The sticky header covers the top of a section reached by #id. */
+  scroll-margin-top: 72px;
+}
+/* A full-bleed Sunken Paper band paces the scroll. */
+.land-band {
+  margin: 48px 0;
+  padding: 72px 0;
+  background: var(--paper-deep);
+}
+.land-frame {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* One h2 style for the page: Title. */
+.land-h2 {
+  margin: 0 0 24px;
+  max-width: 30ch;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.land-intro {
+  margin: 0 0 32px;
+  max-width: 64ch;
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+  text-wrap: pretty;
+}
+.land-small {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-secondary);
+}
+
+/* Cards: Card White, square, no border, no shadow. */
+.land-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.land-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  background: var(--riprap-white);
+}
+.land-card h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+.land-card p {
+  margin: 0;
+  max-width: 68ch;
+  font-size: 17px;
+  line-height: 1.55;
+}
+.land-card .land-kind {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-secondary);
+}
+/* The card's link sits last, at the foot of the card. */
+.land-card .land-card-link {
+  margin-top: auto;
+}
+
+/* A link that stands alone, not inside a sentence: at least 24px tall. */
+.land-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
+.land-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.land-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 24px;
+  border: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.land-button:hover {
+  background: #000;
+  text-decoration: underline;
+}
+.land-button.is-secondary {
+  background: var(--paper-deep);
+  color: var(--ink);
+}
+/* On a Sunken band the secondary button takes Card White to stay visible. */
+.land-band .land-button.is-secondary {
+  background: var(--riprap-white);
+}
+
+@media (min-width: 1200px) {
+  .land-cards.is-four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .land-cards.is-three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 720px) and (max-width: 1199px) {
+  .land-cards.is-three {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 719px) {
+  .land-cards {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+@media (max-width: 640px) {
+  .land-section {
+    padding: 32px 0;
+  }
+  .land-band {
+    margin: 32px 0;
+    padding: 48px 0;
+  }
+  .land-frame {
+    padding: 0 16px;
+  }
+  .land-h2 {
+    font-size: 26px;
+  }
+  .land-intro {
+    font-size: 18px;
+  }
+  .land-card {
+    padding: 20px 16px;
+  }
+  .land-actions {
+    flex-direction: column;
+  }
+  .land-button {
+    width: 100%;
+  }
+}
