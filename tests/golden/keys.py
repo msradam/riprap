@@ -166,6 +166,7 @@ def floodnet(lat: float, lon: float, radius_m: int = 600, years: int = 3) -> dic
     flagged_depths = [e["max_depth_proc_mm"] for e in events
                       if e["deployment_id"] not in good and e.get("max_depth_proc_mm") is not None]
     return {"n_sensors": len(near), "n_events": len(events),
+            "n_events_good": sum(1 for e in events if e["deployment_id"] in good),
             "peak_mm_good": max(good_depths) if good_depths else None,
             "peak_mm_flagged": max(flagged_depths) if flagged_depths else None,
             "statuses": sorted(d.get("sensor_status") or "" for d in near)}

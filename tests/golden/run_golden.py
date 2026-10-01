@@ -125,33 +125,45 @@ def score_district(base: str, code: str) -> dict:
     return res
 
 
+_TWO_PARTS_RE = re.compile(r"(,|\band\b|\?)\s*(and\s+)?(did|was|were|has|have|had|is|are|how|which|what)\b", re.I)
+_DISTRICT_RE = re.compile(r"\b(MN|BX|BK|QN|SI)\s?(\d\d)\b", re.I)
+
+
 def expected_lead(question: str, k: dict) -> str:
     """The lead a past-event question should get from the keys: yes, no,
-    or other (the sources cannot say). Count questions return the count."""
+    other (the sources cannot settle it, so any yes or no is wrong), or
+    unscored (a kind of question this runner has no independent rule for).
+    Count questions return the count."""
     q = question.lower()
     fn, c = k["floodnet"], k["nyc311"]
+    if _TWO_PARTS_RE.search(q.split(" ", 1)[-1]):
+        return "unscored"  # two questions in one: the app answers part by part
     if "how many" in q:
         return str(c["n"])
+    if not re.match(r"\W*(is|are|was|were|has|have|had|do|does|did)\b", q):
+        return "unscored"  # "which schools ...", "what does the map show": no yes or no to check
     if "sandy" in q:
         # The mapped outline is not exact to a building: within 50 m of it,
         # on either side, the app states the distance and gives no flat yes or no.
         if k.get("sandy_edge_m") is not None and k["sandy_edge_m"] <= 50:
             return "other"
         return "yes" if k["sandy_inside"] else "no"
+    # A yes rests on a sensor in good working order: events only at sensors
+    # FloodNet flags for maintenance are quoted with the flag and no yes.
     if "sensor" in q:
-        if fn["n_sensors"] == 0:
+        if fn["n_sensors"] == 0 or (fn["n_events"] and not fn["n_events_good"]):
             return "other"
-        return "yes" if fn["n_events"] > 0 else "no"
+        return "yes" if fn["n_events_good"] else "no"
     if "since" in q and "ida" in q:
         after = sum(n for y, n in c["by_year"].items() if int(y) > 2021)
-        if fn["n_sensors"] and fn["n_events"]:
+        if fn["n_sensors"] and fn["n_events_good"]:
             return "yes"
-        if after:
+        if after or fn["n_events"]:
             return "other"  # 311 requests alone are reports of trouble: they are quoted, with no flat yes
-        if fn["n_sensors"] and fn["n_events"] == 0:
+        if fn["n_sensors"]:
             return "no"
         return "other"
-    return "other"
+    return "unscored"
 
 
 def score_question(base: str, question: str) -> dict:
@@ -162,17 +174,27 @@ def score_question(base: str, question: str) -> dict:
     if lat is None:
         res["error"] = "the app resolved no point"
         return res
+    ans = res["answer"]
+    d = _DISTRICT_RE.search(question)
+    if d and out.get("intent") in ("neighborhood", "development_check"):
+        # A question about a district: the one independent key is its 311 count.
+        board = f"{d.group(2)} {BOROUGH[d.group(1).upper()]}"
+        v = out.get("nyc311_nta") or {}
+        if "how many" in question.lower() and "311" in question:
+            want = keys.nyc311_district(board, years=int(v.get("years") or 3))
+            got = re.search(r"\b(\d+) NYC 311", ans)
+            check(res["facts"], f"311 count in {board} answered", int(got.group(1)) if got else None, want)
+        return res
     k = keys.all_keys(lat, lon)
     res["keys"] = k
     want = expected_lead(question, k)
-    ans = res["answer"]
     lead = ans.split(".")[0].strip().lower() if ans else ""
     if want.isdigit():
         got = re.search(r"\b(\d+) NYC 311", ans)
         check(res["facts"], "count answered", got.group(1) if got else None, want)
-    else:
+    elif want != "unscored":
         got = "yes" if lead == "yes" else "no" if lead == "no" else "other"
-        check(res["facts"], "answer lead", got, want, ok=(got == want) or want == "other")
+        check(res["facts"], "answer lead", got, want)
     # Every number the answer quotes must be a key number for this point.
     quoted = {int(n) for n in re.findall(r"\b(\d+) (?:NYC 311|FloodNet|above-curb|Hurricane Ida high)", ans)}
     known = {k["nyc311"]["n"], k["floodnet"]["n_sensors"], k["floodnet"]["n_events"], k["ida_hwm"]["n"]}

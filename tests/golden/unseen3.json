@@ -1,0 +1,218 @@
+[
+  {
+    "id": "n01",
+    "kind": "address",
+    "query": "16-26 Cross Bay Blvd, Queens",
+    "expect": "Resolves to that building in Broad Channel, Queens and reports its flood records, with a source and date on each sentence."
+  },
+  {
+    "id": "n02",
+    "kind": "address",
+    "query": "535 west 179th st manhattan",
+    "expect": "Resolves to that building in Washington Heights, Manhattan and reports what each record shows, saying plainly where a source has nothing for the place instead of implying a risk."
+  },
+  {
+    "id": "n03",
+    "kind": "address",
+    "query": "2550 Victory Blvd, Staten Island, NY 10314",
+    "expect": "Resolves to that building on Staten Island despite the trailing state and ZIP code, and reports its records with sources and dates."
+  },
+  {
+    "id": "n04",
+    "kind": "address",
+    "query": "320 City Island Ave Bronx",
+    "expect": "Resolves to that building on City Island in the Bronx with no comma before the borough and reports its FEMA, Sandy, stormwater and 311 records with sources and dates."
+  },
+  {
+    "id": "n05",
+    "kind": "address",
+    "query": "108-19 71st Ave, Queens 11375",
+    "expect": "Resolves the hyphenated Queens house number to that building in Forest Hills and reports its records, stating clearly when a coastal source shows nothing there."
+  },
+  {
+    "id": "n06",
+    "kind": "address",
+    "query": "2808 Gerritsen Ave, Bklyn",
+    "expect": "Reads Bklyn as Brooklyn, resolves to that building in Gerritsen Beach and reports its records with sources and dates."
+  },
+  {
+    "id": "n07",
+    "kind": "address",
+    "query": "310 E Kingsbridge Rd, Bronx, NY",
+    "expect": "Expands the abbreviations, resolves to that building in the Bronx and reports its records, without overstating exposure where the sources show little or nothing."
+  },
+  {
+    "id": "n08",
+    "kind": "address",
+    "query": "180 7th avenue brooklyn ny 11215",
+    "expect": "Resolves to that building in Park Slope, Brooklyn (not Seventh Avenue in Manhattan) and reports its records with sources and dates."
+  },
+  {
+    "id": "n09",
+    "kind": "district",
+    "query": "BX10",
+    "expect": "Resolves to Bronx Community District 10 and reports district-level flood records with sources and dates, not a single building."
+  },
+  {
+    "id": "n10",
+    "kind": "district",
+    "query": "SI02",
+    "expect": "Resolves to Staten Island Community District 2 and reports district-level flood records with sources and dates."
+  },
+  {
+    "id": "n11",
+    "kind": "district",
+    "query": "BK18",
+    "expect": "Resolves to Brooklyn Community District 18 and reports district-level flood records with sources and dates."
+  },
+  {
+    "id": "n12",
+    "kind": "district",
+    "query": "mn11",
+    "expect": "Treats the lower-case code as Manhattan Community District 11 and reports district-level flood records with sources and dates."
+  },
+  {
+    "id": "n13",
+    "kind": "question",
+    "query": "has the area around 98-30 57th Ave in Corona flooded since Ida?",
+    "expect": "Resolves to that address in Queens and reports the dated records after September 2021 near it (311 flood requests, sensor readings), or says the records show none, without claiming flooding the records do not show."
+  },
+  {
+    "id": "n14",
+    "kind": "question",
+    "query": "Was 7 Wolcott St, Brooklyn inside the area that Sandy flooded?",
+    "expect": "Answers from the 2012 Sandy inundation extent whether that address falls inside it, with the source and date."
+  },
+  {
+    "id": "n15",
+    "kind": "question",
+    "query": "how many 311 flood complaints have there been near 89-11 Merrick Blvd Jamaica",
+    "expect": "Gives a count of 311 flood requests near that Queens address, stating the area and time period counted and the source."
+  },
+  {
+    "id": "n16",
+    "kind": "question",
+    "query": "Have any FloodNet sensors recorded flooding around 214 3rd St, Brooklyn, NY 11215?",
+    "expect": "Reports what nearby FloodNet sensors have recorded, with dates, or says plainly that no sensor is nearby or none has recorded a flood."
+  },
+  {
+    "id": "n17",
+    "kind": "question",
+    "query": "is 475 Seaview Ave Staten Island in a FEMA flood zone",
+    "expect": "States what FEMA's effective and preliminary maps show at that address with their dates, and does not present this as a regulatory determination."
+  },
+  {
+    "id": "n18",
+    "kind": "question",
+    "query": "Which schools in QN14 are in the area Sandy flooded?",
+    "expect": "Resolves to Queens Community District 14 and names or counts the schools inside the 2012 Sandy inundation extent, with sources and dates."
+  },
+  {
+    "id": "n19",
+    "kind": "question",
+    "query": "what subway entrances near 321 East 140th St, Bronx are exposed to flooding?",
+    "expect": "Identifies subway entrances near that Mott Haven address and says which flood maps or scenarios each one falls in, with sources, or says none do."
+  },
+  {
+    "id": "n20",
+    "kind": "question",
+    "query": "What does the city's stormwater map show for 54-22 Skillman Ave, Woodside?",
+    "expect": "Reports what the city's three stormwater flood scenarios show at that Queens address, naming the scenarios and the source and date."
+  },
+  {
+    "id": "n21",
+    "kind": "question",
+    "query": "Is 1901 Mermaid Ave Bklyn in a FEMA flood zone and did Sandy reach it",
+    "expect": "Answers both parts for that Coney Island address, the FEMA map status and the Sandy inundation extent, each with its own source and date."
+  },
+  {
+    "id": "n22",
+    "kind": "question",
+    "query": "how many 311 flood calls in BK15, and have any of the street sensors there picked up flooding?",
+    "expect": "Resolves to Brooklyn Community District 15 and answers both parts, the 311 flood request count with its period and what FloodNet sensors recorded, or says no sensors are there."
+  },
+  {
+    "id": "n23",
+    "kind": "question",
+    "query": "For 415 E Houston St, Manhattan: was it flooded in Sandy, and which public housing nearby is in the flood zone?",
+    "expect": "Answers both parts for that Lower East Side address, its place relative to the Sandy extent and the nearby public housing inside FEMA or Sandy flood areas, with sources and dates."
+  },
+  {
+    "id": "n24",
+    "kind": "question",
+    "query": "any Ida high water marks near 291 W 231st St in the Bronx? and what do the stormwater scenarios show there",
+    "expect": "Reports any USGS Ida high-water marks near that Kingsbridge address (or says there are none nearby) and what the city stormwater scenarios show there, each with source and date."
+  },
+  {
+    "id": "n25",
+    "kind": "predictive",
+    "query": "Is the water at the Battery going to run higher than the predicted tide over the next few days? by how much",
+    "expect": "Must quote the official water-level forecast for the Battery gauge against the predicted tide, with the difference, source and issue time, and must not invent a figure or state the outcome as certain if the forecast is unavailable or does not cover the period."
+  },
+  {
+    "id": "n26",
+    "kind": "predictive",
+    "query": "could tonight's high tide get to flood level in lower manhattan",
+    "expect": "Must compare the official forecast at the harbor gauge with the gauge's flood threshold and cite source and time, and must not claim that particular streets or buildings will or will not flood tonight."
+  },
+  {
+    "id": "n27",
+    "kind": "predictive",
+    "query": "Is Canarsie the kind of place where water sits around for a long time after heavy rain?",
+    "expect": "Must base any statement about lingering water on sourced evidence for Canarsie (stormwater scenarios, 311 requests, sensor records) and label it as a tendency or estimate, and must not promise how long water will stand after any particular storm."
+  },
+  {
+    "id": "n28",
+    "kind": "predictive",
+    "query": "how much of BX02 is paved over and how much is green?",
+    "expect": "Must either give paved and green shares for Bronx Community District 2 with a source and date or say it has no such record, and must not make up percentages."
+  },
+  {
+    "id": "n29",
+    "kind": "predictive",
+    "query": "Has the land cover in SI03 changed much in the last few years?",
+    "expect": "Must report change in Staten Island Community District 3 only from dated, sourced land cover data covering named years, or say it cannot tell, and must not assert a trend or project it forward without evidence."
+  },
+  {
+    "id": "n30",
+    "kind": "predictive",
+    "query": "I live at 30 Waterside Plaza, Manhattan. Will my building flood next week?",
+    "expect": "Must say it does not predict flooding for a particular building or day and may give the building's sourced flood records and the current gauge forecast, and must not answer yes or no or give a probability for the property."
+  },
+  {
+    "id": "n31",
+    "kind": "predictive",
+    "query": "if a storm surge comes in this weekend what is likely to flood in Howard Beach",
+    "expect": "Must describe what the FEMA maps, Sandy extent and current official water-level forecast show for Howard Beach and what lies inside those areas, framed as a scenario, and must not claim that a surge will happen this weekend or that named buildings will flood."
+  },
+  {
+    "id": "n32",
+    "kind": "predictive",
+    "query": "How might flood exposure at 47-40 Center Blvd, Long Island City change by the 2050s?",
+    "expect": "Must give the sourced sea-level projections for the 2050s as a range alongside the address's current flood map status, and must not state a specific future flood depth, a date, or a property score."
+  },
+  {
+    "id": "n33",
+    "kind": "refuse",
+    "query": "Thinking about renting a ground floor apt at 2636 East 14th St, Brooklyn 11235. should I take it or is the flood risk too high?",
+    "expect": "Declines to say whether to rent, says it does not give advice, and at most offers the sourced flood records for the address without a recommendation or a risk score."
+  },
+  {
+    "id": "n34",
+    "kind": "refuse",
+    "query": "which blocks around 104 W 136th St in Harlem get the hottest in summer?",
+    "expect": "Declines, says it covers flood records only and does not answer questions about heat."
+  },
+  {
+    "id": "n35",
+    "kind": "refuse",
+    "query": "94 Washington St, Hoboken, NJ 07030",
+    "expect": "Says the address is outside New York City and that it has no records there, and does not match it to a similarly named street inside the city."
+  },
+  {
+    "id": "n36",
+    "kind": "refuse",
+    "query": "10305",
+    "expect": "Does not treat the bare ZIP code as a building; either asks for an address, neighbourhood or community district, or says plainly what area it took the ZIP to mean."
+  }
+]
