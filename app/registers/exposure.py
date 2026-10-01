@@ -229,14 +229,14 @@ def _finding(spec: Spec, distance_m: float | None, row: dict) -> dict:
     return f
 
 
-def _named(spec: Spec, findings: list[dict], limit: int = 6) -> str:
+def _named(spec: Spec, findings: list[dict], limit: int = 20) -> str:
     """The exposed assets by name, nearest first: a question that asks
     which schools gets the schools, not only how many."""
     out = ""
     for label, hit in (("Inside the 2012 Sandy extent", lambda f: f["inside_sandy_2012"]),
                        ("Outside the 2012 Sandy extent but within 50 m of its mapped edge (the outline is not exact to a building)",
                         lambda f: f.get("sandy_edge_m") is not None),
-                       ("Inside the DEP extreme scenario", lambda f: (f["dep_extreme_2080_class"] or 0) > 0)):
+                       ("Inside the DEP extreme scenario (2080 sea-level rise)", lambda f: (f["dep_extreme_2080_class"] or 0) > 0)):
         nearest: dict[str, float | None] = {}  # one station has several entrances: its nearest one
         for f in findings:
             if hit(f) and spec.name(f) not in nearest:
@@ -245,7 +245,7 @@ def _named(spec: Spec, findings: list[dict], limit: int = 6) -> str:
         if names:
             more = f", and {len(names) - limit} more" if len(names) > limit else ""
             # Entrances are counted; a station has several, so the names are stations.
-            out += f". {label}{' (by station)' if spec.plural.endswith('entrances') else ''}: {', '.join(names[:limit])}{more}"
+            out += f". {label}{', by station' if spec.plural.endswith('entrances') else ''}: {', '.join(names[:limit])}{more}"
     return out
 
 

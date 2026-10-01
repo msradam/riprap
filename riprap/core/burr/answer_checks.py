@@ -171,6 +171,47 @@ def kind_asked(rel: str, question: str, value: dict | None) -> str | None:
     return None
 
 
+_ASKS_REPORTS_RE = re.compile(r"\b311\b|complain|report", re.I)
+_YEAR_RE = re.compile(r"\b(?:in|during|for|of)\s+(20[12]\d)\b", re.I)
+_OTHER_PERIOD_RE = re.compile(r"\b(last|this|past) (month|week|few|couple|\d+)|yesterday|today|this (spring|summer|fall|"
+                              r"autumn|winter)|last (spring|summer|fall|autumn|winter)\b", re.I)
+
+
+def count_lead(question: str, docs: dict[str, str], values: dict | None, today=None) -> tuple[str | None, bool]:
+    """(lead sentence, undetermined) for a count question about 311.
+
+    The source states one window ("in the last 3 years"). A question about
+    one year ("last year", "in 2024") gets that year's count from the
+    value's by_year when the window covers the whole year, or the year so
+    far for the current one. A period the value cannot give (a month, a
+    year the window only partly covers, one kind in one year) is
+    undetermined: the caller drops the count lead, so the window's total
+    is not shown as the answer to another question."""
+    import datetime
+
+    q = question or ""
+    rel = relevant_doc(q, docs)
+    v = (values or {}).get(rel) if rel else None
+    if rel not in ("nyc311", "nyc311_nta") or not isinstance(v, dict) or "by_year" not in v:
+        return kind_lead(q, docs, values), False
+    today = today or datetime.date.today()
+    m = _YEAR_RE.search(q)
+    year = (today.year - 1 if re.search(r"\blast year\b", q, re.I) else today.year if re.search(r"\bthis year\b", q, re.I)
+            else int(m.group(1)) if m else None)
+    if year is None:
+        return (None, True) if _OTHER_PERIOD_RE.search(q) else (kind_lead(q, docs, values), False)
+    try:
+        start = today.replace(year=today.year - int(v.get("years") or 0))
+    except ValueError:  # February 29
+        start = today.replace(year=today.year - int(v.get("years") or 0), day=28)
+    covered = year == today.year or (year < today.year and start <= datetime.date(year, 1, 1))
+    if not covered or kind_asked(rel, q, v):
+        return None, True
+    n = int((v.get("by_year") or {}).get(str(year), 0))
+    return (f"{n} flood-related 311 complaint{'s' if n != 1 else ''} filed in {year}"
+            f"{' so far' if year == today.year else ''}, by the year each was filed."), False
+
+
 def kind_lead(question: str, docs: dict[str, str], values: dict | None) -> str | None:
     """For a question about one kind of 311 complaint, the lead that states
     that kind's count and the descriptors counted, built from the pebble's
@@ -437,6 +478,13 @@ def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: d
         return None
     relevant, verdict = _past_event_verdict(question, docs, values, this_year)
     positive = [i for i, e in verdict.items() if e is True]
+    if positive and all(i in ("nyc311", "nyc311_nta") for i in positive) and not _ASKS_REPORTS_RE.search(question or ""):
+        # 311 requests are reports, most of them sewer backups and clogged
+        # basins: alone they do not make "has it flooded" a Yes. The count is
+        # quoted with no yes or no. "Have people reported flooding to 311"
+        # asks about the reports and keeps its yes.
+        return "facts", [*positive, *(i for i in relevant if i not in positive and i in verdict
+                                      and not unavailable(i, docs, values))]
     if positive:
         # A "yes" quotes only the evidence for yes: the sources that report an
         # event, and the storm's own record when it reports something here.

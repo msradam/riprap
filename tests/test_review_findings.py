@@ -264,3 +264,70 @@ def test_a_district_count_carries_coordinates_so_intersection_twins_drop(monkeyp
     monkeypatch.setattr(nyc311.http, "get", lambda url, params=None, **k: asked.update(params) or R())
     v = nyc311.summary_for_district("BK06")
     assert "latitude" in asked["$select"] and v["n"] == 1
+
+
+# What a fresh-context walkthrough of the running app found.
+
+def test_a_count_for_one_year_comes_from_that_year_not_the_window():
+    import datetime
+
+    from riprap.core.burr import answer_checks as ac
+
+    docs = {"nyc311_nta": "871 NYC 311 flood-related complaints filed in Community District BX10 in the last 3 years."}
+    v = {"nyc311_nta": {"n": 871, "years": 3, "by_kind": {"sewer backup": 500},
+                        "by_year": {"2023": 92, "2024": 360, "2025": 203, "2026": 216}}}
+    day = datetime.date(2026, 10, 1)
+    last, undetermined = ac.count_lead("How many flood complaints did Bronx CD 10 get last year?", docs, v, day)
+    assert last == "203 flood-related 311 complaints filed in 2025, by the year each was filed." and not undetermined
+    assert ac.count_lead("How many flood complaints in 2024 in BX10?", docs, v, day)[0].startswith("360 ")
+    assert ac.count_lead("How many flood complaints this year in BX10?", docs, v, day)[0].startswith("216 flood-related 311 complaints filed in 2026 so far")
+    # The window starts in October 2023, so 2023 is partly outside it; a month is not in the value at all.
+    assert ac.count_lead("How many flood complaints in 2023 in BX10?", docs, v, day) == (None, True)
+    assert ac.count_lead("How many flood complaints last month in BX10?", docs, v, day) == (None, True)
+    assert ac.count_lead("How many flood complaints in BX10?", docs, v, day) == (None, False)
+
+
+def test_311_complaints_alone_do_not_make_has_it_flooded_a_yes():
+    texts = {"nyc311": "29 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years."}
+    v = {"nyc311": {"n": 29, "years": 5, "by_year": {"2022": 9, "2023": 10, "2024": 10}}}
+    assert ra.answer("Has 350 Fifth Avenue, Manhattan flooded since Hurricane Ida?", texts, v) == ("facts", ["nyc311"])
+    assert ra.answer("Have people near 350 Fifth Avenue reported flooding to 311 since 2022?", texts, v)[0] == "yes"
+    sensors = {**texts, "floodnet": "2 FloodNet community sensors within 600 m have logged 14 flood events."}
+    v2 = {**v, "floodnet": {"n_sensors": 2, "n_flood_events_3y": 14}}
+    assert ra.answer("Has this block flooded since Hurricane Ida?", sensors, v2)[0] == "yes"
+
+
+@pytest.mark.parametrize("query,intent", [
+    ("Will 90-01 183rd Street, Queens flood on October 15?", "out_of_scope"),      # a prediction, not a past date
+    ("Is it safe to rent a basement apartment at 153-10 Peck Avenue, Queens?", "out_of_scope"),
+    ("what is flooding right now", "not_implemented"),                              # no place: point to the live tools
+])
+def test_declines(query, intent):
+    plan = heuristic_plan(query)
+    assert plan["intent"] == intent
+    if intent == "not_implemented":
+        assert "FloodNet sensor dashboard" in plan["rationale"] and "names none" in plan["rationale"]
+
+
+def test_a_numbered_street_typed_without_its_ordinal_is_read():
+    assert heuristic_plan("131 beach 96 st queens")["targets"][0]["text"] == "131 beach 96th st, Queens"
+    assert heuristic_plan("560 5 avenue brooklyn")["targets"][0]["text"] == "560 5th avenue, Brooklyn"
+    assert "311th" not in str(heuristic_plan("How many 311 street flooding complaints near 80 Pioneer St since Ida?"))
+
+
+def test_a_place_outside_every_city_says_what_was_not_read():
+    out = tr.compose_briefing({"intent": "single_address", "deployment": "__none__", "plan": {"question": ""},
+                               "fema_nfhl": {"fld_zone": "X", "effective_year": 2006,
+                                             "narrative": "This address sits in FEMA flood zone X, effective 2006."}})[0]
+    assert "outside the cities Riprap covers" in out and "no local record of past flooding" in out
+
+
+def test_register_name_lists_carry_the_scenario_year():
+    """The disclosure check for projections wants a horizon in every sentence
+    that names a scenario; the name list is its own sentence."""
+    from app.registers import exposure
+    from riprap.core.compliance.predicates import projection_has_horizon
+
+    v = exposure.summary_for_point(40.5757, -73.986, "mta_entrances")
+    assert "Inside the DEP extreme scenario (2080 sea-level rise), by station:" in v["narrative"]
+    assert projection_has_horizon(v["narrative"]).passed

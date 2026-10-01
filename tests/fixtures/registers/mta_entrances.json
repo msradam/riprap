@@ -118,7 +118,7 @@
 "n_entrances": 6,
 "n_in_dep_extreme_2080": 5,
 "n_inside_sandy_2012": 6,
-"narrative": "6 MTA subway entrances within 800 m of this address: 6 inside the 2012 Sandy inundation extent and 5 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent (by station): Coney Island-Stillwell Av (D F N Q) (410 m), W 8 St-NY Aquarium (F Q) (776 m). Inside the DEP extreme scenario (by station): Coney Island-Stillwell Av (D F N Q) (410 m), W 8 St-NY Aquarium (F Q) (776 m)",
+"narrative": "6 MTA subway entrances within 800 m of this address: 6 inside the 2012 Sandy inundation extent and 5 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent, by station: Coney Island-Stillwell Av (D F N Q) (410 m), W 8 St-NY Aquarium (F Q) (776 m). Inside the DEP extreme scenario (2080 sea-level rise), by station: Coney Island-Stillwell Av (D F N Q) (410 m), W 8 St-NY Aquarium (F Q) (776 m)",
 "radius_m": 800
 },
 "40.6436,-74.0781": {
@@ -515,7 +515,7 @@
 "n_entrances": 16,
 "n_in_dep_extreme_2080": 8,
 "n_inside_sandy_2012": 0,
-"narrative": "16 MTA subway entrances within 800 m of this address; of the nearest 8: 0 inside the 2012 Sandy inundation extent and 8 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (by station): Jamaica-179 St (F) (445 m)",
+"narrative": "16 MTA subway entrances within 800 m of this address; of the nearest 8: 0 inside the 2012 Sandy inundation extent and 8 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise), by station: Jamaica-179 St (F) (445 m)",
 "radius_m": 800
 },
 "40.8296,-73.9262": {

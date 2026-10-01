@@ -88,8 +88,13 @@ _HOUSE_NUMBER_RE = re.compile(r"^\s*\d+(-\d+)?\s+\S")
 _OTHER_STATE_RE = re.compile(
     r",\s*(?!NY\b)(A[KLRZ]|C[AOT]|D[CE]|FL|GA|HI|I[ADLN]|K[SY]|LA|M[ADEINOST]|N[CDEHJMV]|O[HKR]|PA|RI|S[CD]"
     r"|T[NX]|UT|V[AT]|W[AIVY])\.?(?:\s+\d{5})?\s*\??\s*$")
-_OUT_OF_SCOPE_RE = re.compile(r"\b(should i (buy|rent|sell|move)|insurance (cost|premium|price|rate)"
-                              r"|cost me|sue|lawsuit|lawyer|mortgage)\b", re.IGNORECASE)
+_OUT_OF_SCOPE_RE = re.compile(r"\b(should (i|we) (buy|rent|sell|move|live|stay|evacuate|leave)"
+                              r"|(is|would) it (be )?safe\b|safe to (buy|rent|live|stay|move|park)|worth (buying|renting)"
+                              r"|insurance (cost|premium|price|rate)|cost me|sue|lawsuit|lawyer|mortgage)\b", re.IGNORECASE)
+NO_PLACE_NOW = ("Riprap reads the records for one place at a time, and this question names none. For what is "
+                "flooding across the city right now, use the FloodNet sensor dashboard (dataviz.floodnet.nyc); "
+                "official warnings come from the National Weather Service (weather.gov/okx) and Notify NYC. "
+                "Add an address or a neighbourhood to get the readings near it.")
 # A forecast for a named future day or date ("Will X flood next Tuesday?").
 # Needs a future word, so "Did it flood on Monday?" stays a history question.
 _FUTURE_DAY_RE = re.compile(
@@ -157,7 +162,9 @@ def heuristic_plan(query: str) -> dict:
     from app.planner import _not_implemented_message  # noqa: PLC0415
 
     q = (query or "").strip()
-    msg = _not_implemented_message(q)
+    # A named future day is a prediction, declined as one ("Will it flood on
+    # October 15" was once told Riprap cannot reconstruct a past date).
+    msg = None if _FUTURE_DAY_RE.search(q) else _not_implemented_message(q)
     if msg:
         return {"intent": "not_implemented", "rationale": msg, "targets": []}
     for hazard, pattern in _OTHER_HAZARD_RE.items():
@@ -197,8 +204,13 @@ def heuristic_plan(query: str) -> dict:
         # "Broad Channel high tide tonight": the live sources read at a point,
         # so the neighbourhood by name, for the geocoder (it was City Hall).
         intent, target = "live_now", f"{place['text']}, {hits[0]['borough']}, NY"
+    elif live and place["kind"] is None:
+        # "What is flooding right now" names no place, and Riprap reads one
+        # place at a time: say where the citywide picture is (it was once
+        # answered for City Hall, with "no sensors within 600 m").
+        return {"intent": "not_implemented", "rationale": NO_PLACE_NOW, "targets": [], "place": place}
     elif live:
-        intent, target = "live_now", "New York City Hall, New York, NY"
+        intent, target = "live_now", f"{place['text']}, New York, NY"  # a place by name: the geocoder decides
     elif place["kind"] == "neighborhood" and nta.resolve(place["text"]):
         intent, target = area_intent, place["text"]
     else:

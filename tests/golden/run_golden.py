@@ -144,8 +144,10 @@ def expected_lead(question: str, k: dict) -> str:
         return "yes" if fn["n_events"] > 0 else "no"
     if "since" in q and "ida" in q:
         after = sum(n for y, n in c["by_year"].items() if int(y) > 2021)
-        if (fn["n_sensors"] and fn["n_events"]) or after:
+        if fn["n_sensors"] and fn["n_events"]:
             return "yes"
+        if after:
+            return "other"  # 311 requests alone are reports of trouble: they are quoted, with no flat yes
         if fn["n_sensors"] and fn["n_events"] == 0:
             return "no"
         return "other"

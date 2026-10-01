@@ -20,15 +20,15 @@ def test_district_lead_is_cited_and_checked():
     # The same three sentences, the reported record first: for an inland
     # district the Sandy share is the smallest number and it used to lead.
     assert lead == ("4263 flood-related 311 complaints were filed inside this area in the last 3 years [nyc311_nta]. "
-                    "16.4% is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise "
+                    "16.4% of this area is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise "
                     "[dep_extreme_2080_nta]. 0.8% of this area lies inside the 2012 Sandy inundation extent "
                     "[sandy_nta].")
 
 
-def test_coastal_district_lead_states_the_rainfall_share_not_the_tide():
+def test_coastal_district_lead_states_the_rainfall_share_and_the_tide_share():
     """QN14's DEP value: 2.2% rainfall (classes 1 and 2), 43.1% future high
-    tide (class 3). The lead quotes the rainfall share the sentence states,
-    so the verifier keeps it."""
+    tide (class 3). The lead quotes both shares as the sentence states them,
+    so the verifier keeps it; 2.2% alone hid most of the district's exposure."""
     state = {"dep_extreme_2080_nta": {"fraction_any": 0.4527,
                                       "fraction_class": {"1": 0.0121, "2": 0.01, "3": 0.4306}}}
     text = ("DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 2.2% of this area is modeled to flood from rainfall, "
@@ -36,5 +36,6 @@ def test_coastal_district_lead_states_the_rainfall_share_not_the_tide():
             "area (the 2080 sea-level rise scenario).")
     items = [Evidence(pebble_id="dep_extreme_2080_nta", doc_id="dep_extreme_2080_nta", stone_id="cornerstone",
                       maturity="production", manifest=None, text=text)]
-    assert _area_lead(state, items) == ("2.2% is modeled to flood from rainfall in the DEP extreme scenario for "
-                                        "2080 sea-level rise [dep_extreme_2080_nta].")
+    assert _area_lead(state, items) == ("2.2% of this area is modeled to flood from rainfall in the DEP extreme "
+                                        "scenario for 2080 sea-level rise and 43.1% is in its future high tide area "
+                                        "[dep_extreme_2080_nta].")

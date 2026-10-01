@@ -490,8 +490,12 @@ def synthesize(state, use_llm: bool = True) -> dict:
         facts = sorted(facts, key=lambda f: f in experimental)  # the rule's order, experimental sources last
         kept = [{"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts]
         lead_phrase = CANNOT_ANSWER if lead == "cannot_answer" and facts else LEAD_PHRASES.get(lead, "")
-        if lead == "count" and rel in facts and (kl := answer_checks.kind_lead(question, texts, values)):
-            lead_phrase = f"{kl} {lead_phrase}"
+        if lead == "count" and rel in facts:
+            sentence, undetermined = answer_checks.count_lead(question, texts, values)
+            if undetermined:  # the period asked is not the source's window: no count as the answer
+                lead, lead_phrase = "facts", LEAD_PHRASES["facts"]
+            elif sentence:
+                lead_phrase = f"{sentence} {lead_phrase}"
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
                                focus, texts, values, experimental)
     elif question:
@@ -531,8 +535,12 @@ def synthesize(state, use_llm: bool = True) -> dict:
         # Honest silence still shows what the sources say: facts under a
         # cannot-answer lead follow the silence line, with no key figure.
         lead_phrase = CANNOT_ANSWER if lead == "cannot_answer" and facts else LEAD_PHRASES.get(lead, "")
-        if lead == "count" and rel in facts and (kl := answer_checks.kind_lead(question, texts, values)):
-            lead_phrase = f"{kl} {lead_phrase}"
+        if lead == "count" and rel in facts:
+            sentence, undetermined = answer_checks.count_lead(question, texts, values)
+            if undetermined:  # the period asked is not the source's window: no count as the answer
+                lead, lead_phrase = "facts", LEAD_PHRASES["facts"]
+            elif sentence:
+                lead_phrase = f"{sentence} {lead_phrase}"
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
                                focus, texts, values, experimental)
     checks = ["citations and numbers on every claim"]
@@ -544,6 +552,7 @@ def synthesize(state, use_llm: bool = True) -> dict:
     brief = _lead(state, items) if not question and state.get("intent") == "single_address" else None
     paragraph = _render(kept, docs, sections, question, lead_phrase, empty, brief,
                         now=bool(question) and (focus or {}).get("time_frame") == "now")
+    paragraph = paragraph.replace(_scope_header(), _scope_header(state), 1)  # outside every city: say what was not read
     # Every consulted source with a value is citable (its evidence row gets a
     # number), the ones the text cites first, in order of appearance, so the
     # numbering still starts with the answer.

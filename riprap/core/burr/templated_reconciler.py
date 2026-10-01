@@ -26,12 +26,18 @@ from burr.core import State, action
 from riprap.core.burr import evidence
 from riprap.core.pebbles.shapers.dep_scenario import result as dep_result
 
+OUTSIDE_COVERAGE = ("This place is outside the cities Riprap covers. Only federal sources were read (FEMA flood "
+                    "zones, the Weather Service, USGS gauges); no local record of past flooding, complaints or "
+                    "sensors is included.")
 
-def _scope_header() -> str:
-    """The scope declaration every briefing opens with."""
-    return ("This is an automated hazard-exposure briefing produced by Riprap from "
+
+def _scope_header(state=None) -> str:
+    """The scope declaration every briefing opens with, and for a place
+    outside every deployment, what was not read."""
+    head = ("This is an automated hazard-exposure briefing produced by Riprap from "
             "live and precomputed data sources. It is informational only and not a "
             "substitute for a professional risk assessment.")
+    return f"{head} {OUTSIDE_COVERAGE}" if state is not None and state.get("deployment") == "__none__" else head
 
 
 SCOPE_REFUSAL = (
@@ -184,7 +190,9 @@ def _area_lead(state, items) -> str | None:
             # Classes 1 and 2 are rainfall flooding, the share the cited
             # sentence states; class 3 is the scenario's future high tide.
             rain = sum(f for k, f in v["fraction_class"].items() if str(k) in ("1", "2"))
-            shares.append((pid, f"{round(rain * 100, 1)}% is modeled to flood from rainfall in {label}"))
+            tide = round(float(v["fraction_class"].get("3", v["fraction_class"].get(3, 0)) or 0) * 100, 1)
+            shares.append((pid, f"{round(rain * 100, 1)}% of this area is modeled to flood from rainfall in {label}"
+                           + (f" and {tide}% is in its future high tide area" if tide else "")))
     if shares:
         claims.append({"section": "lead", "doc_ids": [by_pebble[p].doc_id for p, _ in shares],
                        "text": ", ".join(t for _, t in shares)})
@@ -251,7 +259,7 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
         return refusal(state), {}
     stones, registry = evidence.load(state.get("deployment"))
     items = evidence.collect(state, stones, registry)
-    sections = [_scope_header()]
+    sections = [_scope_header(state)]
     question = (state.get("plan") or {}).get("question")
     intent = state.get("intent")
     lead = (_lead(state, items) if intent == "single_address" and not question

@@ -6,7 +6,7 @@
 "n_in_dep_extreme_2080": 4,
 "n_inside_sandy_2012": 10,
 "n_schools": 10,
-"narrative": "10 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 10 inside the 2012 Sandy inundation extent and 4 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: Liberation Diploma Plus (150 m), P.S. 90 Edna Cohen School (549 m), P.S. 288 The Shirley Tanyhill (571 m), Mark Twain I.S. 239 for the Gifted & Talented (635 m), P.S. 329 Surfside (833 m), P.S. 188 Michael E. Berdy (1229 m), and 4 more. Inside the DEP extreme scenario: Liberation Diploma Plus (150 m), P.S. 288 The Shirley Tanyhill (571 m), P.S. 329 Surfside (833 m), P.S. 188 Michael E. Berdy (1229 m)",
+"narrative": "10 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 10 inside the 2012 Sandy inundation extent and 4 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: Liberation Diploma Plus (150 m), P.S. 90 Edna Cohen School (549 m), P.S. 288 The Shirley Tanyhill (571 m), Mark Twain I.S. 239 for the Gifted & Talented (635 m), P.S. 329 Surfside (833 m), P.S. 188 Michael E. Berdy (1229 m), P.S. 100 The Coney Island School (1298 m), P.S. 212 Lady Deborah Moody (1326 m), P.S. 370 (1380 m), Coney Island Preparatory Public Charter School (1404 m). Inside the DEP extreme scenario (2080 sea-level rise): Liberation Diploma Plus (150 m), P.S. 288 The Shirley Tanyhill (571 m), P.S. 329 Surfside (833 m), P.S. 188 Michael E. Berdy (1229 m)",
 "radius_m": 1500,
 "schools": [
 {
@@ -193,7 +193,7 @@
 "n_in_dep_extreme_2080": 1,
 "n_inside_sandy_2012": 5,
 "n_schools": 5,
-"narrative": "5 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 5 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: The Peck Slip School (274 m), Millennium High School (622 m), Jacob Riis School (715 m), District 2 Pre-K Center (954 m), John V. Lindsay Wildcat Academy Charter School (956 m). Inside the DEP extreme scenario: Jacob Riis School (715 m)",
+"narrative": "5 flood-exposed NYC DOE schools within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 5 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: The Peck Slip School (274 m), Millennium High School (622 m), Jacob Riis School (715 m), District 2 Pre-K Center (954 m), John V. Lindsay Wildcat Academy Charter School (956 m). Inside the DEP extreme scenario (2080 sea-level rise): Jacob Riis School (715 m)",
 "radius_m": 1500,
 "schools": [
 {
@@ -311,7 +311,7 @@
 "n_in_dep_extreme_2080": 1,
 "n_inside_sandy_2012": 1,
 "n_schools": 1,
-"narrative": "1 flood-exposed NYC DOE school within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: P.S. 046 Arthur Tappan (874 m). Inside the DEP extreme scenario: P.S. 046 Arthur Tappan (874 m)",
+"narrative": "1 flood-exposed NYC DOE school within 1500 m of this address (the register lists only schools found inside the 2012 Sandy extent or a DEP stormwater scenario, not every school): 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: P.S. 046 Arthur Tappan (874 m). Inside the DEP extreme scenario (2080 sea-level rise): P.S. 046 Arthur Tappan (874 m)",
 "radius_m": 1500,
 "schools": [
 {

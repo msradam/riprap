@@ -121,6 +121,7 @@ def extract_address(text: str) -> str | None:
     house number plus street."""
     # "311 street flooding complaints near 80 Pioneer St": a number and a
     # bare street word are not an address; the next match is.
+    text = _ORDINAL_STREET_RE.sub(lambda m: m.group(1) + _ordinal_suffix(int(m.group(1))), text or "")
     m = next((m for m in _ADDRESS_RE.finditer(text or "")
               if len(m.group(2).split()) > 1 or m.group(2).lower().rstrip(".") in _STANDALONE_STREETS), None)
     if not m:
@@ -142,6 +143,19 @@ def extract_address(text: str) -> str | None:
     if z := _TAIL_ZIP_RE.match(rest):
         span += f" {z.group(1)}"
     return span
+
+
+# "131 beach 96 st", "560 5 avenue": a numbered street typed without its
+# ordinal, which neither the address pattern nor the geocoders match. Only
+# after a house number or a street prefix, so "at 1 St Marks Place" and
+# "311 street flooding" are left alone.
+_ORDINAL_STREET_RE = re.compile(
+    r"(?:(?<=\d\s)|(?<=beach\s)|(?<=east\s)|(?<=west\s)|(?<=north\s)|(?<=south\s)|(?<=\b[ewns]\s))"
+    r"(\d{1,3})(?=\s+(?:st|street|ave|avenue|av|rd|road|pl|place|dr|drive)\b)", re.IGNORECASE)
+
+
+def _ordinal_suffix(n: int) -> str:
+    return "th" if 10 <= n % 100 <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
 
 
 def place_phrase(text: str) -> str | None:

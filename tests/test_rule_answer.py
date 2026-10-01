@@ -114,10 +114,11 @@ def test_district_floodplain_counts_and_flood_history():
     assert ra.answer("How many people in Brooklyn Community District 6 live in the floodplain?", area) == (
         "facts", ["dcp_floodplain_nta"])
     # An area has no storm record of its own: the observed record it has, with no yes or no.
-    # The district's 311 record answers "since Ida", misspelt or not.
+    # The district's 311 record is quoted for "since Ida", misspelt or not, with
+    # no Yes: complaints are reports, not a measurement of flooding.
     assert ra.answer("Has Manhattan Community District 12 had any flooding since Hurricaine Ida?", area,
                      {"nyc311_nta": {"n": 4530, "years": 3, "by_year": {"2024": 1500, "2025": 1600}}}) == (
-        "yes", ["nyc311_nta"])
+        "facts", ["nyc311_nta"])
     assert ra.answer("Was any part of Queens CD 12 inside the 2012 Sandy inundation zone?", area,
                      {"sandy_nta": {"fraction": 0.008}}) == ("yes", ["sandy_nta"])
     assert ra.asks_something("flooding history") and not ra.asks_something("flooding")
