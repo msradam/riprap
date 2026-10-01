@@ -82,7 +82,7 @@ def is_count_question(question: str) -> bool:
 
 
 _COUNT_QUESTION_RE = re.compile(r"\bhow (many|much)\b|\bshare\b|\bpercent|\bproportion\b|\bfraction\b"
-                                r"|\bnumber of\b", re.IGNORECASE)
+                                r"|\bnumber of\b|\bcount\b", re.IGNORECASE)
 
 
 def _register_counts(doc: str) -> tuple[int, int, int] | None:
@@ -117,7 +117,7 @@ def count_numbers(doc: str, near: str = "") -> list[str]:
 
 # A DEP stormwater scenario named in a question, by its year, and the words
 # that mark a stormwater question (not a sea-level one).
-_DEP_YEAR = ((re.compile(r"\b2080\b"), "dep_extreme_2080"), (re.compile(r"\b2050\b"), "dep_moderate_2050"),
+_DEP_YEAR = ((re.compile(r"\b2080\b|\bextre+m", re.I), "dep_extreme_2080"), (re.compile(r"\b2050\b"), "dep_moderate_2050"),
              (re.compile(r"\bcurrent\b", re.I), "dep_moderate_current"))
 _STORMWATER_RE = re.compile(r"stormwater|\bdep\b|\bscenario\b", re.I)
 _NOT_STORMWATER_RE = re.compile(r"sea.level|surge|\btide", re.I)
@@ -277,7 +277,8 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str],
 # by rule, not chosen by the model. The model still picks and orders the
 # facts. A rule is simpler than a prompt and can be checked.
 _HAPPENED_RE = re.compile(r"^\W*(has|have|had|did|was|were|is there|are there)\b.*\bflood", re.IGNORECASE)
-_SINCE_RE = re.compile(r"\bsince\s+(?:hurricane\s+|superstorm\s+)?(ida|sandy|(?:19|20)\d\d)\b", re.IGNORECASE)
+# One word may stand before the storm's name ("hurricane", "superstorm", or a misspelling of either).
+_SINCE_RE = re.compile(r"\bsince\s+(?:[a-z]+\s+)?(ida|sandy|(?:19|20)\d\d)\b", re.IGNORECASE)
 _STORM_YEAR = {"ida": 2021, "sandy": 2012}
 # The day each named storm struck NYC, so "since Ida" starts on its date,
 # not on January 1 of its year.

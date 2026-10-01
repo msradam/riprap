@@ -85,3 +85,66 @@ def test_an_area_sandy_question_says_yes_from_the_share():
 def test_no_rule_no_answer():
     assert ra.answer("Who is the council member here?", T) is None
     assert ra.asks_something("FEMA flood zone") and not ra.asks_something("flooding")
+
+
+def test_a_two_part_question_is_answered_part_by_part():
+    # The first part's yes or no leads; the facts follow in the order asked.
+    q = ("Was 204 Van Dyke Street, Brooklyn inside the area Hurricane Sandy flooded in 2012, and how many "
+         "flood-related 311 complaints were filed within 200 m of it in the last five years?")
+    assert ra.answer(q, T, {"sandy_inundation": {"inside": True}}) == ("yes", ["sandy_inundation", "nyc311"])
+    # A district's Sandy share and its schools: both parts, the share first.
+    area = {"sandy_nta": "14.2% of this area lies inside the 2012 Hurricane Sandy inundation extent.",
+            "doe_school_exposure": "3 public schools in this area: 2 inside the 2012 Sandy inundation extent: P.S. 5."}
+    lead, facts = ra.answer("Queens CD 14: how much of the district did Sandy flood, and which public schools are "
+                            "inside that area?", area, {"sandy_nta": {"fraction": 0.142}})
+    assert facts == ["sandy_nta", "doe_school_exposure"] and lead == "facts"
+    # A preamble that names nothing adds nothing.
+    lead, facts = ra.answer("We keep hearing about flooding. Is 80 Pioneer Street in a FEMA flood zone?", T)
+    assert facts == ["fema_nfhl"]
+
+
+def test_district_floodplain_counts_and_flood_history():
+    area = {"dcp_floodplain_nta": "NYC Planning's Community District Profile counts 1,204 buildings in the floodplain.",
+            "nyc311_nta": "4,530 NYC 311 flood-related complaints filed in this district in the last 3 years.",
+            "sandy_nta": "0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent."}
+    # ("facts" and "count" print the same neutral opening.)
+    assert ra.answer("How many people in Brooklyn Community District 6 live in the floodplain?", area) == (
+        "facts", ["dcp_floodplain_nta"])
+    # An area has no storm record of its own: the observed record it has, with no yes or no.
+    # The district's 311 record answers "since Ida", misspelt or not.
+    assert ra.answer("Has Manhattan Community District 12 had any flooding since Hurricaine Ida?", area,
+                     {"nyc311_nta": {"n": 4530, "years": 3, "by_year": {"2024": 1500, "2025": 1600}}}) == (
+        "yes", ["nyc311_nta"])
+    assert ra.answer("Was any part of Queens CD 12 inside the 2012 Sandy inundation zone?", area,
+                     {"sandy_nta": {"fraction": 0.008}}) == ("yes", ["sandy_nta"])
+    assert ra.asks_something("flooding history") and not ra.asks_something("flooding")
+
+
+def test_a_source_s_own_count_answers_were_there_any():
+    texts = {"ida_hwm": "USGS surveyed 0 Hurricane Ida high-water marks within 800 m of this address."}
+    q = "Were any high-water marks surveyed after Ida near 1040 Grand Concourse?"
+    assert ra.answer(q, texts, {"ida_hwm": {"n_within_radius": 0}}) == ("no", ["ida_hwm"])
+    assert ra.answer(q, texts, {"ida_hwm": {"n_within_radius": 2}}) == ("yes", ["ida_hwm"])
+    assert ra.answer(q, texts, {})[0] == "facts"  # no count, no yes or no
+
+
+def test_what_a_scenario_map_shows_is_a_fact_and_a_prediction_is_not():
+    v = {"dep_extreme_2080": {"depth_class": 2}}
+    shows = "Does the city's stormwater map show water at 515 Malcolm X Boulevard in an extreme rainstorm?"
+    assert ra.answer(shows, T, v) == ("yes", ["dep_extreme_2080"])
+    assert ra.answer(shows, T, {"dep_extreme_2080": {"depth_class": 0}}) == ("no", ["dep_extreme_2080"])
+    lead, facts = ra.answer("Will 515 Malcolm X Boulevard flood by 2080 under the stormwater scenario?", T, v)
+    assert lead == "facts" and facts[0] == "dep_extreme_2080"
+
+
+def test_weather_words_bring_the_observation_into_a_now_answer():
+    dry = {"nws_obs": {"raining": False}}
+    assert "nws_obs" in ra.answer("Its pouring. Is the street flooding near 79-01 Broadway right now?", T, dry)[1]
+    assert "nws_obs" not in ra.answer("Is the street flooding near 79-01 Broadway right now?", T, dry)[1]
+
+
+def test_a_follow_on_part_about_an_asset_does_not_quote_the_address_layer():
+    q = ("Is the NYCHA development next to 80 Pioneer Street in the Sandy flood area, and does it also show up in "
+         "the 2050 stormwater flood map?")
+    texts = {**T, "nycha_development_exposure": "2 flood-exposed NYCHA developments within 2000 m: Red Hook East."}
+    assert ra.answer(q, texts, {})[1] == ["nycha_development_exposure"]
