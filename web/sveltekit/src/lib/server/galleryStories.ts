@@ -14,6 +14,8 @@ export interface GalleryStory extends GalleryIndexEntry {
   answerMode: string | null;
   /** A language model planned the query, whatever answered it. */
   planned: boolean;
+  /** The query was refused: the entry is a statement, not an answer. */
+  refused: boolean;
 }
 
 const SECTION_RE = /\*\*(?:Answer|In brief)\.\*\*\s*([\s\S]*?)(?=\n\s*\n|\*\*[^*]+\.\*\*|$)/;

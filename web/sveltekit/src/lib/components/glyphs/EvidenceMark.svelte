@@ -2,7 +2,7 @@
   /**
    * docs/design/handoff/RIPRAP-MAPPING.md, evidence tier axis.
    * A square whose FILL carries directness: solid (empirical), hatched
-   * (modeled), hollow (proxy), stippled (synthetic). Hue reinforces but
+   * (modeled), hollow (proxy). Hue reinforces but
    * is never the sole carrier, so the tier survives grayscale and print
    * (WCAG 1.4.1), verified by docs/design/handoff/gates/grayscale-gate.mjs.
    *
@@ -23,8 +23,7 @@
   const TIER_DESC: Record<Tier, string> = {
     empirical: 'Empirical: directly measured or observed',
     modeled: 'Modeled: scenario-based prediction',
-    proxy: 'Proxy: indirect indicator',
-    synthetic: 'Synthetic prior: generated, not observed'
+    proxy: 'Proxy: indirect indicator'
   };
 
   let { tier, size = 12, color = 'currentColor', title = TIER_DESC[tier] }: Props = $props();
@@ -59,22 +58,11 @@
       width={size - stroke} height={size - stroke}
       fill="url(#{patternId})" stroke={color} stroke-width={stroke}
     />
-  {:else if tier === 'proxy'}
+  {:else}
     <rect
       x={stroke / 2} y={stroke / 2}
       width={size - stroke} height={size - stroke}
       fill="none" stroke={color} stroke-width={stroke}
-    />
-  {:else}
-    <defs>
-      <pattern id={patternId} width="3" height="3" patternUnits="userSpaceOnUse">
-        <circle cx="1.5" cy="1.5" r="0.75" fill={color} />
-      </pattern>
-    </defs>
-    <rect
-      x={stroke / 2} y={stroke / 2}
-      width={size - stroke} height={size - stroke}
-      fill="url(#{patternId})" stroke={color} stroke-width={stroke}
     />
   {/if}
 </svg>

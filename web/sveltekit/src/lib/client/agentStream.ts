@@ -2,12 +2,10 @@
  * SSE client for the Riprap agent stream (`GET /api/agent/stream?q=…`).
  *
  * The FastAPI backend emits these events:
- *   hello            { query }
- *   plan_token       { delta }                     planner JSON, token-by-token
+ *   hello            { query }                      (unused here)
  *   plan             { intent, targets, rationale } planner finished
  *   deployment       { name, city, state }          routed deployment
  *   step             { step, ok, elapsed_s, result?, err?, target_label? }
- *   stone_start / stone_done                        Stone boundaries (unused here)
  *   final            { paragraph, grounding, citations, compliance, ... }
  *   error            { err }
  *   done             {}
@@ -19,7 +17,6 @@ import type { Tier } from '$lib/types/tier';
 export interface PlanInfo {
   intent: string;
   targets?: unknown;
-  specialists?: string[];
   rationale?: string;
   /** The user's question; empty for a bare address. */
   question?: string;
@@ -33,6 +30,11 @@ export interface PlanInfo {
 
 /** True when a language model planned the query. */
 export const planned = (plan: PlanInfo | null | undefined): boolean => !!plan?.llm_calls?.length;
+
+/** True for an intent the planner answers with a statement instead of a
+ *  briefing: the question is out of scope, or asks for something not built. */
+export const refusedIntent = (intent: string | null | undefined): boolean =>
+  intent === 'out_of_scope' || intent === 'not_implemented';
 
 /** A source in `final.consulted` / `final.not_checked`. */
 export interface SourceRef {
@@ -79,41 +81,43 @@ export interface DroppedClaim extends GroundedClaim {
   reason: string;
 }
 
+/** The kind of lead an answer takes. "yes", "no" and "partly" open it with
+ *  that word and "count" with a figure. "facts" is the facts with no lead
+ *  word, and "cannot_answer" says the sources do not answer. Two are set
+ *  only by code and have no yes, no or count: "experimental" (the answer is
+ *  formed by an experimental model alone) and "no_prediction" (the question
+ *  asked whether a place will flood). */
+export type AnswerLead =
+  | 'yes' | 'no' | 'partly' | 'count' | 'facts' | 'cannot_answer' | 'experimental' | 'no_prediction';
+
 /** How the briefing was produced. `llm`: model-written claims checked
  *  against their cited sources (failures land in dropped_claims).
  *  `no_llm`: no model was called. The answer was picked by code rules
  *  from the question's words (`answer_mode: "rules"`), or nothing
- *  answered and the evidence briefing stands (`answered: false`). */
+ *  answered and the evidence briefing stands (`answered: false`), or the
+ *  query was refused. */
 export interface Grounding {
   tier: 'llm' | 'no_llm';
   model?: string;
   attempts?: number;
   claims?: GroundedClaim[];
   dropped_claims?: DroppedClaim[];
-  retried_claims?: GroundedClaim[];
   fallback_reason?: string;
   question?: string;
   /** False when the question got no answer; null when none was asked. */
   answered?: boolean | null;
   /** "extractive": the answer quotes model-chosen source sentences under a lead set by rule in code.
-   *  "rules": lead and facts were chosen by code rules; no model was called. */
-  answer_mode?: string;
+   *  "rules": lead and facts were chosen by code rules; no model was called.
+   *  Null when neither a rule nor a model answered. */
+  answer_mode?: 'extractive' | 'rules' | null;
   /** The fact the answer's lead rests on (synthesis.py `_lead_fact`):
    *  `in_lead` when the backend's lead sentence states it, else the doc
    *  whose first answer sentence does. Null or absent: none singled out. */
   lead_fact?: { doc_id: string; in_lead: boolean } | null;
-  /** The kind of lead the answer takes: "yes", "no", "count" and so on. */
-  answer_lead?: string;
+  /** Null when no question was asked. */
+  answer_lead?: AnswerLead | null;
   /** Set when LLM mode skipped the LLM because no question was asked. */
   note?: string;
-}
-
-/** Substring checks for required disclosure phrases. Not a quality score. */
-export interface ComplianceChecks {
-  passed: boolean;
-  n_passed: number;
-  n_total: number;
-  failed: string[];
 }
 
 export interface FinalResult {
@@ -121,8 +125,6 @@ export interface FinalResult {
   grounding?: Grounding;
   /** Keyed by doc_id. Legacy backends sent an array; handle both. */
   citations?: Record<string, CitationMeta> | CitationMeta[];
-  compliance?: ComplianceChecks;
-  audit?: unknown;
   intent?: string;
   plan?: PlanInfo;
   nta?: { nta_code: string; nta_name: string; borough: string; bbox: number[] } | null;
@@ -150,7 +152,9 @@ export interface ModelRow {
   name: string;
   repo: string;
   where: string;
-  how: 'endpoint';
+  /** `endpoint`: an LLM endpoint was called. `loaded`: an experimental
+   *  model ran in the server. `precomputed`: its saved output was read. */
+  how: 'endpoint' | 'loaded' | 'precomputed';
   latency_s?: number | null;
   calls?: number;
 }
@@ -192,8 +196,6 @@ export interface EmissionsSummary {
 }
 
 export interface AgentStreamHandlers {
-  onHello?: (q: string) => void;
-  onPlanToken?: (delta: string) => void;
   onPlan?: (plan: PlanInfo) => void;
   onStep?: (s: StepEvent) => void;
   onFinal?: (f: FinalResult) => void;
@@ -231,8 +233,6 @@ export function openAgentStream(query: string, handlers: AgentStreamHandlers): A
     });
   }
 
-  on<{ query: string }>('hello', (d) => handlers.onHello?.(d.query));
-  on<{ delta: string }>('plan_token', (d) => handlers.onPlanToken?.(d.delta));
   on<PlanInfo>('plan', (d) => handlers.onPlan?.(d));
   on<{ name: string | null; city?: string | null; state?: string | null }>(
     'deployment', (d) => handlers.onDeployment?.(d));

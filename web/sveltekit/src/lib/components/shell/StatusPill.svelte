@@ -3,7 +3,7 @@
 
   /** Live status for the AppHeader.
    *
-   *  Tracks pipeline phase, active step and fired count so a user staring at a half-rendered briefing knows what's
+   *  Tracks pipeline phase and active step so a user staring at a half-rendered briefing knows what's
    *  actually being crunched. Reads from the briefingState rune store
    *  which q/[queryId]/+page.svelte writes into from SSE callbacks.
    *
@@ -91,14 +91,6 @@
     return SHORT[s] || null;
   });
 
-  // "12/26" once the plan has said how many sources run; a bare count
-  // reads as seconds beside the elapsed timer, so none until then.
-  let progress = $derived.by(() => {
-    if (briefingState.phase !== 'specialists' && briefingState.phase !== 'reconciling') return null;
-    const total = briefingState.totalSpecialists;
-    return total ? `${briefingState.firedCount}/${total}` : null;
-  });
-
   // Drives the colour: red for real errors, neutral for a run that
   // stopped on purpose, otherwise the accent pulse.
   let kind = $derived(
@@ -113,9 +105,6 @@
     {#if stepLabel}
       <span class="status-step-sep">:</span>
       <span class="status-step">{stepLabel}</span>
-    {/if}
-    {#if progress}
-      <span class="status-progress data">{progress}</span>
     {/if}
     {#if briefingState.phase === 'error' && briefingState.errorMessage}
       <span class="status-sep">:</span>
@@ -181,7 +170,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .status-progress { flex: none; color: var(--ink); }
   .status-err { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: #B91C1C; }
   @keyframes pulse {
     0%, 100% { opacity: 0.35; transform: scale(0.85); }
@@ -190,8 +178,8 @@
   @media (prefers-reduced-motion: reduce) {
     .status-dot { animation: none; opacity: 0.7; }
   }
-  /* A narrow header row has no room for the step name beside the phase
-     and count, so it is hidden visually but still read by the live region. */
+  /* A narrow header row has no room for the step name beside the phase,
+     so it is hidden visually but still read by the live region. */
   @container (max-width: 380px) {
     .status-step, .status-step-sep {
       position: absolute;

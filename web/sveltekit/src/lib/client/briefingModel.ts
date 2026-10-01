@@ -12,7 +12,7 @@ import { citedIn, findingOf, termsIn } from '$lib/client/briefingText';
 import { sourceLists, type PrintSnapshot } from '$lib/stores/briefingState.svelte';
 import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 import { deployment } from '$lib/stores/deployment.svelte';
-import { STONE_META, STONE_ORDER, type Card, type ModelLine, type StoneTrace } from '$lib/types/card';
+import { STONE_META, STONE_ORDER, type Card, type ModelLine } from '$lib/types/card';
 import type { BriefingBlock, Citation, ClaimPart } from '$lib/types/claim';
 
 export type Kind = 'question' | 'address' | 'district';
@@ -175,15 +175,17 @@ export function keySentence(
   return null;
 }
 
-const EXP_LABEL = /^\s*Experimental:\s+/;
+const EXP_LABEL = /^\s*(Experimental(?: forecast)?):\s+/;
 
 /** A paragraph from an experimental source opens with the badge part; the
- *  badge replaces the sentence's own "Experimental:" label. The space
- *  after the badge is in the text, where the template cannot trim it. */
+ *  badge takes the sentence's own label ("Experimental:" or "Experimental
+ *  forecast:") and the text does not repeat it. The space after the badge
+ *  is in the text, where the template cannot trim it. */
 function badged(parts: ClaimPart[]): ClaimPart[] {
   const [first, ...rest] = parts;
+  const label = EXP_LABEL.exec(first.text)?.[1] ?? 'Experimental';
   const t = first.text.replace(EXP_LABEL, '').trimStart();
-  return [{ text: '', exp: true }, { ...first, text: ` ${t.charAt(0).toUpperCase()}${t.slice(1)}` }, ...rest];
+  return [{ text: '', exp: label }, { ...first, text: ` ${t.charAt(0).toUpperCase()}${t.slice(1)}` }, ...rest];
 }
 
 /** A question's answer with a lead fact: the key sentence (keySentence),
@@ -337,20 +339,15 @@ export function sortMarks(parts: ClaimPart[], citations: Record<string, Citation
   return out;
 }
 
-function flatten(ms: StoneTrace['members']): StoneTrace['members'] {
-  return ms.flatMap((m) => (m.children ? [m, ...flatten(m.children)] : [m]));
-}
-
 /** RunHealthStrip's facts as plain sentences. Unknown values (no wall
  *  clock, an unlabelled energy figure) are left out, not printed. */
 export function runFacts(run: RunState): string[] {
   const d = run.findingsData;
-  const all = d.stones.flatMap((s) => flatten(s.members));
+  const all = d.stones.flatMap((s) => s.members);
   const count = (s: string) => all.filter((m) => m.status === s).length;
   const parts = [
-    `${count('fired') + count('warned')} ran`,
+    `${count('fired')} ran`,
     count('silent_by_design') && `${count('silent_by_design')} ran with nothing to report`,
-    count('warned') && `${count('warned')} returned a warning`,
     count('errored') && `${count('errored')} failed`,
     count('not_invoked') && `${count('not_invoked')} ${count('not_invoked') === 1 ? 'was' : 'were'} not run`
   ].filter(Boolean);
@@ -359,7 +356,6 @@ export function runFacts(run: RunState): string[] {
   ];
   const wall = d.wallSeconds ?? run.runWallSeconds;
   if (wall != null && Number.isFinite(wall)) facts.push(`The run took ${wall < 1 ? `${Math.round(wall * 1000)} ms` : `${wall.toFixed(1)} s`}.`);
-  if (d.cacheHit != null) facts.push(`${Math.round(d.cacheHit * 100)}% of lookups came from the cache.`);
   const em = d.emissions;
   if (em?.n_calls) {
     const tok = em.tokens?.total;
@@ -375,11 +371,14 @@ export function runFacts(run: RunState): string[] {
 }
 
 const LOCAL_RE = /\s*(?:on this machine\s*)?\((?:localhost|127\.0\.0\.1):\d+\)/i;
+const THIS_SERVER = /\bin this server\b/i;
 
 /** A static snapshot names no local endpoint: "Ollama on this machine
- *  (localhost:11434)" reads "Ollama, run when the snapshot was generated". */
+ *  (localhost:11434)" reads "Ollama, run when the snapshot was generated".
+ *  A model that ran "in this server" ran in the one that made the snapshot. */
 export function snapshotModels(models: ModelLine[]): ModelLine[] {
   return models.map((m) => {
+    if (THIS_SERVER.test(m.where)) return { ...m, where: m.where.replace(THIS_SERVER, 'in the server that made the snapshot') };
     if (!LOCAL_RE.test(m.where)) return m;
     const host = m.where.replace(LOCAL_RE, '').trim();
     return { ...m, where: host ? `${host}, run when the snapshot was generated` : 'Run when the snapshot was generated' };
@@ -410,8 +409,12 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   // one size smaller, as support, one short paragraph per cited source.
   // Place briefings keep their In brief.
   // Experimental sources come after the answer, badged, and never lead it.
+  // An answer formed by an experimental model alone opens with its lead
+  // phrase ("From an experimental model, not a measurement:"), which is
+  // the start of the first paragraph: its paragraphs keep their order.
   const isExp = (id: string) => run.briefing.citations[id]?.maturity === 'experimental';
-  const answered = question && !refusal ? keyedAnswer(answer0, g?.lead_fact, isExp) : null;
+  const answered = question && !refusal && g?.answer_lead !== 'experimental'
+    ? keyedAnswer(answer0, g?.lead_fact, isExp) : null;
   const keyed = answered?.key ?? null;
   const answerParas = answered?.paras ?? answer0;
   // A count answer whose count sits inside its key sentence leads with that count.
@@ -419,7 +422,10 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   // which is not the headline of a district that floods from rain: a
   // district or neighbourhood briefing sets no figure large, only its text.
   const areaBrief = !question && POLYGON_INTENTS.has(f?.intent ?? run.plan?.intent ?? '');
-  const leadWord = refusal || areaBrief
+  // The "experimental" and "no_prediction" leads are phrases set by code,
+  // with no yes, no or count: nothing is set large.
+  const neutralLead = g?.answer_lead === 'experimental' || g?.answer_lead === 'no_prediction';
+  const leadWord = refusal || areaBrief || neutralLead
     ? null : first.word ?? (keyed && g?.answer_lead === 'count' ? countLead(keyed) : null);
 
   // "Checks run: ..." closes the Out of scope note; it is its own line here.
@@ -485,11 +491,11 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     scope,
     body,
     outOfScope,
-    /** A cannot-answer line cites nothing, so the backend's "answer is the
-     *  cited text word for word" reason is left off. */
+    /** A cannot-answer line quotes nothing, so the backend's "which is the
+     *  cited text word for word" clause is left off. */
     checks: checks
       ? g?.answer_lead === 'cannot_answer'
-        ? text(checks).replace(/; no entailment check needed[^.;]*/, '')
+        ? text(checks).replace(', which is the cited text word for word', '')
         : text(checks)
       : null,
     citations,
@@ -517,7 +523,7 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     stamp: meta && !modelListed ? meta.stamp : null,
     /** Live runs without a models list still name the model once. */
     modelLine: !meta && modelId && !modelListed ? modelId : null,
-    terms: termsIn(shownText, cards.length > 0, cards.some((c) => c.tier === 'synthetic')),
+    terms: termsIn(shownText, cards.length > 0),
     runFacts: runFacts(run),
     /** NYC-only resident resources are offered only on NYC runs. */
     nyc: (f?.deployment ?? deployment.current?.name) === 'nyc'
@@ -548,7 +554,6 @@ export function snapshotFromRun(
     queryText,
     origin,
     intent: run.plan?.intent ?? null,
-    specialists: run.plan?.specialists?.length ?? 0,
     blocks: run.briefing.blocks,
     citations: m.citationsById,
     generatedAt,

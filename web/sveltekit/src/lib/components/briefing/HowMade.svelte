@@ -13,10 +13,6 @@
     open?: boolean;
   }
   let { model, stones, open = $bindable(false) }: Props = $props();
-
-  function count(ms: StoneTrace['members']): number {
-    return ms.reduce((n, m) => n + 1 + count(m.children ?? []), 0);
-  }
 </script>
 
 <details id="how-made" class="how-made" bind:open>
@@ -52,7 +48,7 @@
       <h3>Trace, by Stone</h3>
       {#each stones.filter((s) => s.members.length) as s (s.key)}
         <details class="how-made-stone">
-          <summary>{STONE_META[s.key].name}, {STONE_META[s.key].role} ({count(s.members)} source function{count(s.members) === 1 ? '' : 's'})</summary>
+          <summary>{STONE_META[s.key].name}, {STONE_META[s.key].role} ({s.members.length} source function{s.members.length === 1 ? '' : 's'})</summary>
           <ProvenanceTrace members={s.members} />
         </details>
       {/each}

@@ -7,7 +7,8 @@
   /** One paragraph of claim parts as plain prose: no tier marks, and a
    *  small citation number after the closing punctuation. A run of
    *  adjacent parts citing the same source shows its number once. A part
-   *  marked `exp` sets the Experimental badge. */
+   *  marked `exp` sets a badge with that label ("Experimental" or
+   *  "Experimental forecast"). */
   interface Props {
     parts: ClaimPart[];
     citations: Record<string, Citation>;
@@ -22,7 +23,7 @@
 {#snippet words(text: string)}{#each linkHosts(text) as seg, j (j)}{#if seg.href}<a href={seg.href} target="_blank" rel="noopener noreferrer">{seg.text}</a>{:else}{#each keepTogether(seg.text) as t, k (k)}{#if k % 2}<span class="nowrap">{t}</span>{:else}{t}{/if}{/each}{/if}{/each}{/snippet}
 
 <p class={className}>
-  {#each tidied as p, i (i)}{#if p.exp}<span class="exp-badge">Experimental</span>{/if}{#if p.bold}<strong>{@render words(p.text)}</strong>{:else}{@render words(p.text)}{/if}{#if p.cite && citations[p.cite] && tidied[i + 1]?.cite !== p.cite}{@const c = citations[p.cite]}<a
+  {#each tidied as p, i (i)}{#if p.exp}<span class="exp-badge">{p.exp === true ? 'Experimental' : p.exp}</span>{/if}{#if p.bold}<strong>{@render words(p.text)}</strong>{:else}{@render words(p.text)}{/if}{#if p.cite && citations[p.cite] && tidied[i + 1]?.cite !== p.cite}{@const c = citations[p.cite]}<a
         href="#cite-{c.id}"
         class="inline-cite"
         data-cite={c.id}

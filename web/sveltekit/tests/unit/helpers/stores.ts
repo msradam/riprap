@@ -51,8 +51,6 @@ export function seedForCity(fixture: CityFixture): void {
   briefingState.phase = 'done';
   briefingState.ready = true;
   briefingState.activeStep = null;
-  briefingState.firedCount = fixture.manifest.pebbles.length;
-  briefingState.totalSpecialists = fixture.manifest.pebbles.length;
 }
 
 /** A `forEach`-friendly helper: run a callback for every city fixture. */

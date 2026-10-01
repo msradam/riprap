@@ -6,9 +6,9 @@
 import { describe, it, expect } from 'vitest';
 import { modeLine } from '$lib/client/cardAdapter';
 import { parseBriefing, splitBriefing } from '$lib/client/parseBriefing';
-import { briefingModel } from '$lib/client/briefingModel';
+import { briefingModel, snapshotFromRun } from '$lib/client/briefingModel';
 import { RunState } from '$lib/client/runState.svelte';
-import type { PlanInfo } from '$lib/client/agentStream';
+import type { FinalResult, PlanInfo } from '$lib/client/agentStream';
 
 describe('mode line', () => {
   it('describes an extractive answer as quoted, not as LLM claims', () => {
@@ -53,6 +53,26 @@ describe('mode line', () => {
     expect(modeLine(g)).toBe('No rule and no language model answered the question, so the evidence briefing is shown.');
     expect(modeLine({ ...g, answer_mode: 'extractive', fallback_reason: 'LLM unavailable: timeout' }))
       .toMatch(/^No rule and no language model answered the question.*The LLM was unavailable \(LLM unavailable: timeout\)\.$/);
+  });
+  it('says the same when the backend sends no answer mode for an unanswered question', () => {
+    expect(modeLine({ tier: 'no_llm', answer_mode: null, question: 'Is the roof sound?', answered: false }))
+      .toBe('No rule and no language model answered the question, so the evidence briefing is shown.');
+  });
+  it('does not say the rules answered when they found no source that answers', () => {
+    const g = { tier: 'no_llm', answer_mode: 'rules', answer_lead: 'cannot_answer', question: 'Have the sensors recorded flooding?', answered: false };
+    expect(modeLine(g)).toBe('The rules found no source that answers the question; no language model was used.');
+    expect(modeLine(g, true)).toBe('The rules found no source that answers the question; a language model was used only to read the place and choose the sources.');
+    expect(modeLine(g)).not.toMatch(/^Answered/);
+  });
+  it('gives a refused query no mode line, on the page or in print', () => {
+    const final = {
+      intent: 'out_of_scope', paragraph: 'Riprap does not answer this question. It reports public flood evidence for a place.',
+      plan: { intent: 'out_of_scope' }, grounding: { tier: 'no_llm', claims: [], dropped_claims: [] }
+    } as unknown as FinalResult;
+    const run = RunState.fromFinal(final, '80 Pioneer Street, Brooklyn');
+    expect(run.refused).toBe(true);
+    expect(briefingModel(run, 'Should I buy the house at 80 Pioneer Street, Brooklyn?').modeLine).toBeNull();
+    expect(snapshotFromRun(run, 'q', 'Should I buy the house at 80 Pioneer Street, Brooklyn?').mode).toBeNull();
   });
   it('omits "Other claims" when every extractive claim is in the answer', () => {
     const line = modeLine({ tier: 'llm', answer_mode: 'extractive', claims: [{ section: 'answer' }, { section: 'answer' }] });

@@ -21,7 +21,6 @@ export interface PrintSnapshot {
    *  their live readings as "live". */
   origin?: 'gallery' | 'live';
   intent: string | null;
-  specialists: number;
   blocks: BriefingBlock[];
   citations: Record<string, Citation>;
   generatedAt: string;
@@ -102,7 +101,7 @@ export function sourceLists(run: RunState) {
  *  Phases are picked from the SSE event stream in /q/[queryId]/+page.svelte. */
 export type RunPhase =
   | 'idle'
-  | 'planning'      // planner JSON is streaming
+  | 'planning'      // the planner is reading the query
   | 'specialists'   // FSM is firing data Stones (cornerstone → lodestone)
   | 'reconciling'   // Capstone is composing the briefing (arrives whole in `final`)
   | 'done'
@@ -119,11 +118,6 @@ class BriefingState {
   /** The most recent step name the FSM emitted, e.g. `floodnet` or
    *  `nyc311`. Pretty-printed by AppHeader via STEP_LABELS. */
   activeStep = $state<string | null>(null);
-  /** How many specialists have fired (any non-error status) so far. */
-  firedCount = $state(0);
-  /** Total specialists registered for this run. Set when the planner
-   *  resolves an intent or when the FSM trace settles. */
-  totalSpecialists = $state(0);
   /** Last error message — shown in the header status when phase = error. */
   errorMessage = $state<string | null>(null);
 
@@ -131,8 +125,6 @@ class BriefingState {
     this.ready = false;
     this.phase = 'idle';
     this.activeStep = null;
-    this.firedCount = 0;
-    this.totalSpecialists = 0;
     this.errorMessage = null;
   }
 

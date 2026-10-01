@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { featureSentence, leadSentence, modelName, standfirst, storyLead } from '$lib/server/galleryStories';
+import { featureSentence, galleryStories, leadSentence, modelName, standfirst, storyLead } from '$lib/server/galleryStories';
 import { llmStamp, withGrounding, type GalleryIndexEntry } from '$lib/client/gallery';
 import { render } from '@testing-library/svelte';
 import GalleryPage from '../../src/routes/(app)/gallery/+page.svelte';
@@ -98,6 +98,26 @@ describe('a rules-mode question entry', () => {
     expect(metas[0]).toBe("Answered by rules in code over the question's words, with no language model.");
     expect(metas[1]).toMatch(/^Language model hf\.co\/x-GGUF:Q4_K_M\. The lead \(Yes, No or a count\) is set by rules in code/);
     expect(page([rules, llm]).querySelector('.gallery-colophon')).toBeNull();
+  });
+
+  it('gives a refusal no note, so the note the other questions share is shown once', () => {
+    const refusal = withGrounding(
+      { ...index, slug: 'x', question: 'Should I buy the house?' },
+      { tier: 'no_llm', claims: [], dropped_claims: [] }, { intent: 'out_of_scope' });
+    expect(refusal).toMatchObject({ mode: 'no_llm', answerMode: null, refused: true });
+    expect(rules.refused).toBe(false);
+    const c = page([rules, refusal]);
+    const shared = [...c.querySelectorAll('.gallery-note')].filter((p) => p.textContent?.includes('Answered by rules in code'));
+    expect(shared).toHaveLength(1);
+    expect(c.querySelector('.gallery-meta')).toBeNull();
+    expect(c.textContent).not.toContain('Evidence briefing (no LLM)');
+  });
+
+  it('reads the refusal in the shipped gallery as refused', async () => {
+    const stories = await galleryStories();
+    const refused = (slug: string) => stories.find((s) => s.slug === slug)?.refused;
+    expect(refused('red-hook-buy')).toBe(true);
+    expect(refused('hollis-since-ida')).toBe(false);
   });
 
   it('says a language model planned the query when the saved plan lists a model call', () => {

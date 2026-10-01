@@ -175,7 +175,7 @@
    *
    *  Deviation from the handoff's layer table: 311 flood requests are
    *  tagged PROXY here, not empirical — matching this codebase's own
-   *  established epistemic taxonomy (tierForDocId: 'nyc311'/'311' ->
+   *  established epistemic taxonomy (the nyc311 manifest declares
    *  'proxy', an indirect indicator, not a direct measurement). The
    *  handoff's table appears to use "empirical" loosely for "point
    *  data" rather than the strict tier; following the app's own tested

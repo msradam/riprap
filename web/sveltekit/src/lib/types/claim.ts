@@ -20,8 +20,10 @@ export interface ClaimPart {
   cite?: string;
   bold?: boolean;
   /** An empty part that opens a paragraph from an experimental source:
-   *  the paragraph is set with the Experimental badge at its start. */
-  exp?: boolean;
+   *  the badge's label, taken off the sentence ("Experimental" or
+   *  "Experimental forecast"). `true` in print snapshots saved before the
+   *  label was kept. */
+  exp?: string | true;
 }
 
 export type BriefingBlock =

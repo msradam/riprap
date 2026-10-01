@@ -1,5 +1,5 @@
 /**
- * StatusPill — the top-right "gathering evidence · X · n/m" indicator.
+ * StatusPill: the top-right "gathering evidence: X" indicator.
  * Two bugs landed here:
  *   - stuck visible after run completed (phase never transitioned
  *     to 'done' in no-LLM templated mode → pill never hid)
@@ -29,8 +29,6 @@ describe('StatusPill visibility per phase', () => {
     // was still showing "gathering evidence · X · 9/10". Once phase
     // transitions to 'done', it must hide.
     briefingState.phase = 'done';
-    briefingState.firedCount = 10;
-    briefingState.totalSpecialists = 10;
     const { container } = render(StatusPill);
     expect(container.querySelector('.status')).toBeNull();
   });
@@ -47,16 +45,16 @@ describe('StatusPill visibility per phase', () => {
 });
 
 describe('StatusPill content per phase', () => {
-  it('phase=specialists with progress → "gathering evidence" + "fired/total"', () => {
+  it('phase=specialists → "gathering evidence" and the step, with no count', () => {
+    // The plan event no longer says how many sources run, so no "n/N" shows.
     briefingState.phase = 'specialists';
     briefingState.activeStep = 'floodnet';
-    briefingState.firedCount = 8;
-    briefingState.totalSpecialists = 11;
     const { container } = render(StatusPill);
     const text = container.textContent ?? '';
     expect(text).toContain('gathering evidence');
     expect(text).toContain('FloodNet sensors');
-    expect(text).toContain('8/11');
+    expect(text).not.toMatch(/\d+\/\d+/);
+    expect(container.querySelector('.status-progress')).toBeNull();
   });
 
   it('phase=error → red border + error message', () => {

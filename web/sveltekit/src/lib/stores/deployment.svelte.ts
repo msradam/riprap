@@ -48,6 +48,13 @@ class DeploymentStore {
     }
   }
 
+  /** The run failed before the backend routed it, so no deployment is
+   *  known: the chip names no city and makes no claim about coverage. */
+  clear(): void {
+    this.lockedForQuery = true;  // a slow boot load() must not bring its city back
+    this.current = null;
+  }
+
   /** Set the deployment without fetching (static gallery snapshots). */
   setStatic(d: Deployment): void {
     this.lockedForQuery = true;

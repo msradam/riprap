@@ -75,11 +75,9 @@
     runStartedAt = Date.now();
     briefingState.phase = 'planning';
     const stream = openAgentStream(queryText, {
-      onPlanToken: (d) => (run.planTokens += d),
       onPlan: (p) => {
         run.plan = p;
         briefingState.phase = 'specialists';
-        briefingState.totalSpecialists = p.specialists?.length ?? 0;
       },
       onDeployment: async (d) => {
         // Pivot the header chip and pebble scaffold to the routed-to
@@ -92,12 +90,8 @@
         deploymentResolved = true;
       },
       onStep: (s) => {
-        // Header status pill: reconcile steps do not count as fired
-        // specialists.
-        if (!s.step.startsWith('reconcile')) {
-          briefingState.activeStep = s.step;
-          if (s.ok) briefingState.firedCount = briefingState.firedCount + 1;
-        }
+        // Header status pill: the reconcile steps are not sources.
+        if (!s.step.startsWith('reconcile')) briefingState.activeStep = s.step;
         run.applyStep(s, queryText);
       },
       onFinal: (f) => run.applyFinal(f),
@@ -107,11 +101,13 @@
         if (!run.finalResult) run.errorState = err === NO_BACKEND ? 'no-backend' : 'backend';
         briefingState.markError(err);
         // Failed before the `deployment` event: clear the boot-time NYC
-        // scaffold so no NYC ghost rows show under a non-NYC query. With
-        // no backend at all the chip keeps its fallback text.
+        // scaffold so no NYC ghost rows show under a non-NYC query. The
+        // query was never routed, so the chip names no city: it does not
+        // say the place is outside the covered cities, which nothing
+        // checked. With no backend at all the chip keeps its fallback text.
         if (!deploymentResolved && err !== NO_BACKEND) {
           void pebbleManifest.loadForDeployment(null);
-          void deployment.setForQuery(null);
+          deployment.clear();
         }
       },
       onDone: () => {

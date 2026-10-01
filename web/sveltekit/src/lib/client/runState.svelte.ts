@@ -11,7 +11,7 @@ import type { FeatureCollection } from 'geojson';
 import { adaptFinalToFindings } from './cardAdapter';
 import { parseBriefing, citationFromMeta } from './parseBriefing';
 import { isoNow } from './gallery';
-import { citationList, type FinalResult, type PlanInfo, type StepEvent } from './agentStream';
+import { citationList, refusedIntent, type FinalResult, type PlanInfo, type StepEvent } from './agentStream';
 import type { TraceNode } from '$lib/types/trace';
 import type { ErrorKey } from '$lib/types/states';
 import type { FindingsData } from '$lib/types/card';
@@ -54,9 +54,6 @@ export function briefingFromFinal(
       retrieved: c.retrieved_at,
       maturity: c.maturity
     });
-    // The manifest's tier wins over the doc-id heuristic, as on the cards.
-    const tier = pebbleManifest.tierForDoc(docId);
-    if (tier) seed[docId].tier = tier;
   });
   const r = parseBriefing(f.paragraph, seed);
   const citations: Record<string, Citation> = {};
@@ -312,7 +309,6 @@ export function areaBoundaryGeometry(
 
 export class RunState {
   plan = $state<PlanInfo | null>(null);
-  planTokens = $state('');
   finalResult = $state.raw<FinalResult | null>(null);
   streamDone = $state(false);
   /** When the stream closed (ISO), the run date the page and its print
@@ -411,7 +407,7 @@ export class RunState {
 
   /** The planner answered with a statement instead of a briefing: the
    *  question is out of scope, or asks for something not built yet. */
-  refused = $derived((this.finalResult?.intent ?? this.plan?.intent) === 'out_of_scope' || this.notImplemented);
+  refused = $derived(refusedIntent(this.finalResult?.intent ?? this.plan?.intent));
 
   /** The run ended without evidence to show: refused, the place did not
    *  resolve, or the backend failed. Map and findings are hidden. */

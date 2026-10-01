@@ -14,12 +14,17 @@
  * but mid-stream we still tolerate inline forms ourselves.
  *
  * Within a section, every sentence with a `[doc_id]` citation is a Claim.
- * The claim's tier is inferred from the cited doc_id family via
- * tierForDocId(). Multiple cites on one sentence: the tier of the first
+ * The claim's tier is the one the cited source's manifest declares
+ * (tierOf). Multiple cites on one sentence: the tier of the first
  * cited doc wins (visual margin glyph), all cites still rendered.
  */
 import type { BriefingBlock, Citation, ClaimPart } from '$lib/types/claim';
-import { tierForDocId, type Tier } from '$lib/types/tier';
+import type { Tier } from '$lib/types/tier';
+import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
+
+/** A cited doc's tier, as its manifest declares it. A doc no loaded
+ *  manifest declares is a proxy: it is never shown as measured. */
+const tierOf = (docId: string): Tier => pebbleManifest.tierForDoc(docId) ?? 'proxy';
 
 // `answer` opens a question briefing (the direct answer, before the
 // place-level sections). Numbered 00 so the four legacy heads keep theirs.
@@ -71,7 +76,7 @@ export function citationFromMeta(
   return {
     id: docId,
     n,
-    tier: tierForDocId(docId),
+    tier: tierOf(docId),
     source: meta?.source ?? docId.split(/[_-]/)[0].toUpperCase(),
     title: meta?.title ?? docId,
     docId,
@@ -143,7 +148,7 @@ function parseSentenceParts(
     const docIds = m[1].split(/\s*,\s*/).filter(Boolean);
     cursor = (m.index ?? 0) + m[0].length;
 
-    const tier = tierForDocId(docIds[0]);
+    const tier = tierOf(docIds[0]);
     if (!firstTier) firstTier = tier;
 
     parts.push(...expandPart({ text: before, tier, cite: docIds[0] }));

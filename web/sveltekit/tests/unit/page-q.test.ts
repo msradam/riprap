@@ -19,6 +19,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import Page from '../../src/routes/(app)/q/[queryId]/+page.svelte';
+import AppHeader from '$lib/components/shell/AppHeader.svelte';
 import { resetStores, seedForCity } from './helpers/stores';
 import { briefingState } from '$lib/stores/briefingState.svelte';
 import { deployment } from '$lib/stores/deployment.svelte';
@@ -190,8 +191,7 @@ describe('/q/[queryId] no-deployment (out-of-coverage) lifecycle', () => {
 
     // Emit the geocode + deployment-null sequence
     es.emit('hello', { query: 'Albuquerque' });
-    es.emit('plan', { intent: 'single_address', targets: [], specialists: [],
-                      rationale: '' });
+    es.emit('plan', { intent: 'single_address', targets: [], rationale: '' });
     es.emit('step', { kind: 'step', step: 'geocode', ok: true,
                       result: { address: 'Civic Plaza, Albuquerque, NM',
                                 lat: 35.0844, lon: -106.6504 } });
@@ -248,6 +248,12 @@ describe('/q/[queryId] SSE error BEFORE the deployment handshake', () => {
     // error, but with the deployment handshake never completing the
     // page must not claim it's an NYC briefing.
     expect(deployment.current?.name).not.toBe('nyc');
+    // The query was never routed, so the chip makes no claim about
+    // coverage either: it names no city at all.
+    expect(deployment.current).toBeNull();
+    const chip = render(AppHeader, { props: { query: '600 4th Avenue, Seattle, WA' } }).container;
+    expect(chip.querySelector('.app-header-city-pill')).toBeNull();
+    expect(chip.textContent ?? '').not.toMatch(/Outside the covered cities|federal sources only|\bNYC\b/);
 
     // The rendered DOM no longer carries NYC needles.
     const text = container.textContent ?? '';

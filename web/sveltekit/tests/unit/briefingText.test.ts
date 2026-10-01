@@ -121,12 +121,12 @@ describe('termsIn', () => {
     expect(termsIn('water level 1.2 ft above MLLW', false).map((t) => t.term)).toEqual(['MLLW']);
   });
 
-  it('names the synthetic tier only when a row on the page has it', () => {
-    expect(termsIn('', true)[0].reading).not.toMatch(/synthetic/i);
-    expect(termsIn('', true, true)).toEqual([{
-      term: 'Measured, Modeled, Proxy, Synthetic',
-      reading: expect.stringMatching(/indirectly; synthetic layers are generated, not observed\.$/)
+  it('names the three tiers, and no synthetic one', () => {
+    expect(termsIn('', true)).toEqual([{
+      term: 'Measured, Modeled, Proxy',
+      reading: expect.stringMatching(/indicate it indirectly\.$/)
     }]);
+    expect(termsIn('', true)[0].reading).not.toMatch(/synthetic/i);
   });
 });
 
@@ -140,6 +140,10 @@ describe('leadClause', () => {
   it('skips a short label and keeps a sentence without a break whole', () => {
     expect(leadClause('Experimental: 34 complaints in 512 days; about 0.3 a week.').lead).toBe('Experimental: 34 complaints in 512 days;');
     expect(leadClause('This address sits in FEMA flood zone X.')).toEqual({ lead: 'This address sits in FEMA flood zone X.', tail: '' });
+  });
+  it('does not take the label of an experimental forecast for a clause', () => {
+    expect(leadClause('Experimental forecast: a peak surge of 0.4 ft at the Battery in the next 96 hours; the model is not a measurement.').lead)
+      .toBe('Experimental forecast: a peak surge of 0.4 ft at the Battery in the next 96 hours;');
   });
 });
 

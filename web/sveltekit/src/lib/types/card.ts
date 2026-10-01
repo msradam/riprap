@@ -5,13 +5,12 @@
  * is one specialist's structured output, with explicit epistemic tiering
  * and a citation fan-out that ties back into the briefing prose.
  *
- * Schema mirrors `docs/design_handoff/design_files/findings.jsx` exactly.
- * Body fields are variant-specific — only the fields a given variant
+ * Body fields are variant-specific: only the fields a given variant
  * needs are populated. The renderer dispatches on `variant`.
  */
 import type { Tier } from './tier';
 
-/** Stone keys, fixed order. Mirrors `app/stones/__init__.py`. */
+/** Stone keys, fixed order. */
 export type StoneKey =
   | 'cornerstone'
   | 'keystone'
@@ -100,13 +99,12 @@ export type Card = {
 };
 
 /** Per-specialist run-state. v0.4.5 splits the v0.4.4 `ok|warn|error|silent`
- *  enum into five distinct epistemic outcomes so the run-health tally
+ *  enum into distinct epistemic outcomes so the run-health tally
  *  stops conflating "spec'd silent" with "specialist crashed":
  *
  *    fired             — completed and produced output the reconciler used
  *    silent_by_design  — completed and correctly produced no output
  *                        (e.g. "no entrances within radius")
- *    warned            — output produced with a non-fatal warning
  *    errored           — failed to complete, no usable output
  *    not_invoked       — FSM skipped the specialist (precondition unmet
  *                        / feature flag off / never wired)
@@ -116,7 +114,6 @@ export type Card = {
 export type SpecialistStatus =
   | 'fired'
   | 'silent_by_design'
-  | 'warned'
   | 'errored'
   | 'not_invoked';
 
@@ -132,7 +129,6 @@ export type StoneMember = {
    *  "311 history fetch failed: HTTP 503 at NYC OpenData (3 retries)").
    *  Match v0.4.1–v0.4.4 voice — precise, slightly understated. */
   note?: string;
-  children?: StoneMember[];
 };
 
 /** A Stone's provenance + counts, fed by the FSM trace. */
@@ -147,8 +143,6 @@ export type FindingsData = {
   stones: StoneTrace[];
   /** Wall-clock seconds for the run; surfaced in RunHealthStrip. */
   wallSeconds?: number;
-  /** Optional cache-hit ratio, dev-mode surfaced. */
-  cacheHit?: number;
   /** Per-call inference emissions (energy + tokens). Surfaced as a
    *  chip in RunHealthStrip; full breakdown available via tooltip. */
   emissions?: import('$lib/client/agentStream').EmissionsSummary;

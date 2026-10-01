@@ -103,17 +103,21 @@ export function findingOf(c: Card, narration?: string | null): { first: string; 
   return m ? { first: t.slice(0, m.index), rest: t.slice(m.index + m[0].length) } : { first: t, rest: '' };
 }
 
+const EXP_LABEL = /^Experimental(?: forecast)?: /;
+
 /** A finding sentence split after its first clause, at the first ";" or
  *  ":" outside parentheses, so a narrow table can set only that clause
- *  heavier. A label that short ("Experimental:") is not a clause; a
+ *  heavier. A short label, or the label of an experimental sentence
+ *  ("Experimental:", "Experimental forecast:"), is not a clause; a
  *  sentence with no such break is all lead. */
 export function leadClause(s: string): { lead: string; tail: string } {
+  const from = Math.max(16, EXP_LABEL.exec(s)?.[0].length ?? 0);
   let depth = 0;
   for (let i = 0; i < s.length - 1; i++) {
     const ch = s[i];
     if (ch === '(') depth++;
     else if (ch === ')') depth = Math.max(0, depth - 1);
-    else if (depth === 0 && (ch === ';' || ch === ':') && s[i + 1] === ' ' && i >= 16) {
+    else if (depth === 0 && (ch === ';' || ch === ':') && s[i + 1] === ' ' && i >= from) {
       return { lead: s.slice(0, i + 1), tail: s.slice(i + 1) };
     }
   }
@@ -167,19 +171,17 @@ export const GLOSSARY: { term: string; re: RegExp; reading: string }[] = [
   }
 ];
 
-const tierTerm = (synthetic: boolean) => ({
-  term: `Measured, Modeled, Proxy${synthetic ? ', Synthetic' : ''}`,
+const TIER_TERM = {
+  term: 'Measured, Modeled, Proxy',
   reading:
-    'how directly a source observes flooding. Measured sources record it; modeled sources simulate a scenario; proxy sources, such as 311 complaints, indicate it indirectly' +
-    (synthetic ? '; synthetic layers are generated, not observed.' : '.')
-});
+    'how directly a source observes flooding. Measured sources record it; modeled sources simulate a scenario; proxy sources, such as 311 complaints, indicate it indirectly.'
+};
 
 /** The glossary entries whose term appears in `text`, plus the tier words
- *  when the evidence table is on the page. The synthetic tier is named
- *  only when a row on the page has it. */
-export function termsIn(text: string, withTiers: boolean, synthetic = false): { term: string; reading: string }[] {
+ *  when the evidence table is on the page. */
+export function termsIn(text: string, withTiers: boolean): { term: string; reading: string }[] {
   const found = GLOSSARY.filter((g) => g.re.test(text)).map(({ term, reading }) => ({ term, reading }));
-  return withTiers ? [...found, tierTerm(synthetic)] : found;
+  return withTiers ? [...found, TIER_TERM] : found;
 }
 
 const SUBJECT_RE = /^This (?:address|area) (?:sits|is) /;

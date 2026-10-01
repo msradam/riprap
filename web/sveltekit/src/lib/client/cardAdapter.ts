@@ -396,7 +396,14 @@ function buildHistogramCard(m: PebbleManifest, value: unknown): Card | null {
   };
 }
 
-const HOW_LABEL: Record<ModelRow['how'], string> = { endpoint: 'LLM endpoint' };
+/** How a model took part, in plain words. An experimental model either ran
+ *  for this briefing (`loaded`) or ran earlier and its saved output was
+ *  read (`precomputed`). */
+const HOW_LABEL: Record<ModelRow['how'], string> = {
+  endpoint: 'LLM endpoint',
+  loaded: 'run for this briefing',
+  precomputed: 'not run for this briefing',
+};
 
 /** Hugging Face page for a repo id ("org/name") or an Ollama "hf.co/org/name:tag" id. */
 function hfHref(repo: string): string | null {
@@ -404,7 +411,9 @@ function hfHref(repo: string): string | null {
   return id.includes('/') && !id.includes(':') ? `https://huggingface.co/${id}` : null;
 }
 
-/** Shape `final.models` into the capstone card's model list. */
+/** Shape `final.models` into the capstone card's model list. A row with
+ *  no latency (a precomputed model) prints none. `where` opens a sentence
+ *  in the list, so it takes a capital. */
 export function modelLines(rows: ModelRow[] | undefined): ModelLine[] {
   return (rows ?? []).map((r) => {
     let latency = r.latency_s != null ? `${r.latency_s.toFixed(1)} s` : null;
@@ -413,7 +422,7 @@ export function modelLines(rows: ModelRow[] | undefined): ModelLine[] {
       name: r.name,
       repo: r.repo,
       href: hfHref(r.repo),
-      where: r.where,
+      where: r.where.charAt(0).toUpperCase() + r.where.slice(1),
       how: HOW_LABEL[r.how] ?? r.how,
       latency,
     };
@@ -477,10 +486,12 @@ export const POLYGON_INTENTS = new Set(['neighborhood', 'development_check']);
 
 /** True when a pebble belongs to the given intent's card scaffold. Keeps
  *  neighborhood-only pebbles off address pages (and vice versa) instead
- *  of rendering them as "No data" cards. */
+ *  of rendering them as "No data" cards. A pebble with scope `any` runs
+ *  for both. */
 export function pebbleInScope(m: PebbleManifest, intent: string | null | undefined): boolean {
   const want = intent && POLYGON_INTENTS.has(intent) ? 'polygon' : 'point';
-  return (m.scope ?? 'point') === want;
+  const scope = m.scope ?? 'point';
+  return scope === 'any' || scope === want;
 }
 
 /** A scalar with its unit apart from its label ("Elevation (m)" is 14.87
@@ -725,11 +736,13 @@ export const UNANSWERED = 'This question was not answered. The evidence for the 
 
 /** What produced the briefing, in words: the mode line on screen and in
  *  print. An extractive answer is quoted, not model prose, so it does not
- *  say "LLM claims checked" for it. A question the rules answered, or one
- *  that neither a rule nor a model answered, says so. `planned` is true
+ *  say "LLM claims checked" for it. A question the rules answered, one
+ *  they found no source for, or one that neither a rule nor a model
+ *  answered, says so. A refusal has no mode line: the callers pass none
+ *  for a refused run (`RunState.refused`). `planned` is true
  *  when a language model planned the query (`final.plan.llm_calls`), so a
  *  rules answer does not claim that no model was used. */
-export function modeLine(g: { tier: string; model?: string; answer_mode?: string; answer_lead?: string; note?: string;
+export function modeLine(g: { tier: string; model?: string; answer_mode?: string | null; answer_lead?: string | null; note?: string;
                               question?: string; answered?: boolean | null;
                               claims?: unknown[]; dropped_claims?: unknown[]; fallback_reason?: string } | null | undefined,
                          planned = false): string | null {
@@ -740,6 +753,13 @@ export function modeLine(g: { tier: string; model?: string; answer_mode?: string
     // No answer lead at all: the evidence briefing stands in for an answer.
     if (g.question && g.answered === false && !g.answer_lead) {
       return `No rule and no language model answered the question, so the evidence briefing is shown.${unavailable}`;
+    }
+    // The rules ran and found nothing that answers: the answer says so, and
+    // this line must not say the question was answered.
+    if (g.question && g.answer_mode === 'rules' && g.answer_lead === 'cannot_answer') {
+      return (planned
+        ? 'The rules found no source that answers the question; a language model was used only to read the place and choose the sources.'
+        : 'The rules found no source that answers the question; no language model was used.') + unavailable;
     }
     if (g.question && g.answer_mode === 'rules') {
       return (planned

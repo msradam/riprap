@@ -15,6 +15,7 @@
  * propagate to the UI with no TS edits.
  */
 import type { StoneKey } from '$lib/types/card';
+import type { Tier } from '$lib/types/tier';
 import { STATIC_SITE } from '$lib/staticSite';
 
 /** One stone descriptor from /api/pebbles. */
@@ -32,13 +33,13 @@ export interface PebbleManifest {
   type: 'live' | 'baked' | 'model';
   title: string;
   stone: StoneKey;
-  /** Epistemic tier — drives the EMP/MOD/PRX/SYN chip on the card. */
-  tier: 'empirical' | 'modeled' | 'proxy' | 'synthetic' | null;
+  /** Epistemic tier: drives the tier mark on the card. */
+  tier: Tier | null;
   /** 'experimental' pebbles get a visible badge on their card. */
   maturity?: 'production' | 'experimental';
   /** 'polygon' pebbles run for neighborhood queries, 'point' for
-   *  address queries. Missing means 'point'. */
-  scope?: 'point' | 'polygon';
+   *  address queries, 'any' for both. Missing means 'point'. */
+  scope?: 'point' | 'polygon' | 'any';
   display: {
     order: number | null;
     kind: 'text' | 'stat' | 'list' | 'chart' | 'map_only';
@@ -147,7 +148,15 @@ class PebbleManifestStore {
       this.setFromResponse(data, name);
     } catch (e) {
       this.error = String(e);
-      // Leave partial state alone — stale > broken.
+      // A failed boot fetch leaves the store as it was. A failed per-query
+      // fetch clears it: the manifest still held belongs to another
+      // deployment, and its rows must not show under this query's chip.
+      if (name !== null) {
+        this.byId = {};
+        this.stones = [];
+        this.byStone = {};
+        this.loaded = false;
+      }
     }
   }
 

@@ -20,6 +20,7 @@
   import { briefingState } from '$lib/stores/briefingState.svelte';
   import { deployment } from '$lib/stores/deployment.svelte';
   import { formatGeneratedAt } from '$lib/client/gallery';
+  import { STATIC_SITE } from '$lib/staticSite';
 
   /** One briefing, laid out as a public report: the question and its
    *  answer lead, the map is a figure, the evidence is a table, and how
@@ -109,9 +110,7 @@
         // The route sets this phase as soon as the plan arrives, before
         // the geocoder (or nta_resolve, for a district) has answered.
         if (!run.geocodeSucceeded && !run.address) return 'Resolving the place';
-        return briefingState.totalSpecialists
-          ? `Gathering evidence (${briefingState.firedCount}/${briefingState.totalSpecialists})`
-          : 'Gathering evidence';
+        return 'Gathering evidence';
       case 'reconciling': return 'Reconciling';
       case 'error': return `Error${briefingState.errorMessage ? `: ${briefingState.errorMessage}` : ''}`;
       default: return 'Resolving the place';
@@ -317,8 +316,10 @@
     </header>
 
     <!-- One live region for the whole run: what is happening, then that
-         the briefing has landed. -->
-    <span class="visually-hidden" aria-live="polite">{readyText ?? srStatus ?? firstText}</span>
+         the briefing has landed. A loading status is announced only while
+         the run is loading: a static snapshot never loads, and an errored
+         run has its alert. -->
+    <span class="visually-hidden" aria-live="polite">{readyText ?? (loading ? srStatus ?? firstText : '')}</span>
     {#if loading}
       <div class="generating-status">
         <p class="generating-line" aria-hidden="true">
@@ -329,12 +330,6 @@
             ? 'A question goes through the language model first and usually takes 10 to 25 seconds.'
             : 'A place briefing takes a few seconds.'}
         </p>
-        {#if !run.plan && run.planTokens}
-          <details class="plan-details">
-            <summary>Planner streaming ({run.planTokens.length} characters)</summary>
-            <pre class="plan-stream">{run.planTokens}</pre>
-          </details>
-        {/if}
       </div>
       {#if run.geocodeSucceeded || run.address}
         <!-- Place resolved (geocode, or nta_resolve for a district); the
@@ -405,13 +400,17 @@
           {@render sections()}
         {:else}
           {@render sections()}
-          <!-- The next step, as ErrorCard sets it: each link starts a new run. -->
-          <ul class="error-card-actions">
-            {#if didYouMean}
-              <li><a class="error-card-action" href={resolve('/(app)/q/[queryId]', { queryId: didYouMean })} data-sveltekit-reload>Briefing for {didYouMean}</a></li>
-            {/if}
-            <li><a class="error-card-action" href="{resolve('/')}?q={encodeURIComponent(queryText)}" data-sveltekit-reload>Edit query</a></li>
-          </ul>
+          <!-- The next step, as ErrorCard sets it: each link starts a new
+               run. The static site has no query box and no backend, so it
+               offers neither. -->
+          {#if !STATIC_SITE}
+            <ul class="error-card-actions">
+              {#if didYouMean}
+                <li><a class="error-card-action" href={resolve('/(app)/q/[queryId]', { queryId: didYouMean })} data-sveltekit-reload>Briefing for {didYouMean}</a></li>
+              {/if}
+              <li><a class="error-card-action" href="{resolve('/')}?q={encodeURIComponent(queryText)}" data-sveltekit-reload>Edit query</a></li>
+            </ul>
+          {/if}
         {/if}
       {/if}
     {/if}
@@ -864,22 +863,6 @@
   .generating-expect {
     margin: 0;
     max-width: 54ch;
-  }
-  .plan-details {
-    margin-top: 8px;
-  }
-  .plan-details summary {
-    min-height: 24px;
-    cursor: pointer;
-  }
-  .plan-stream {
-    margin: 4px 0 0;
-    max-height: 240px;
-    overflow: auto;
-    white-space: pre-wrap;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--ink-secondary);
   }
 
   /* Compare intent */

@@ -20,7 +20,8 @@
     "The answer was chosen by rules in code over the question's words; a language model was used only to read the place and choose the sources.";
   type Entry = (typeof data.entries)[number];
   const note = (e: Entry) =>
-    e.modelName
+    e.refused ? null
+      : e.modelName
       ? e.answerMode === 'extractive' ? NOTE_EXTRACTIVE : NOTE_WRITTEN
       : e.answerMode === 'rules' ? (e.planned ? NOTE_RULES_PLANNED : NOTE_RULES)
       : e.mode !== 'llm' ? `${modeLabel(e.mode)}.` : null;

@@ -100,7 +100,7 @@ export async function scriptCityRun(
   es.emit('plan', {
     intent: 'single_address',
     targets: [{ type: 'address', text: spec.address }],
-    specialists: spec.pebbles, rationale: '',
+    rationale: '',
   });
   es.emit('step', {
     kind: 'step', step: 'geocode', ok: true, elapsed_s: 0.2,

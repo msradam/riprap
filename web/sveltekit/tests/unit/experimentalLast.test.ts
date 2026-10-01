@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { render } from '@testing-library/svelte';
+import AnswerProse from '$lib/components/briefing/AnswerProse.svelte';
 import { keyedAnswer, splitLead } from '$lib/client/briefingModel';
 import { parseBriefing } from '$lib/client/parseBriefing';
 import { tidy } from '$lib/client/briefingText';
@@ -29,6 +31,18 @@ describe('keyedAnswer', () => {
     // The badge takes the place of the sentence's own "Experimental:" label.
     expect(words(last)).toBe('The nearest gauge read 579.4 ft, 18.1 km from this address. The reading is for the lake, not for this street.');
     expect(last.some((p) => p.cite === 'lake_michigan_water_level')).toBe(true);
+  });
+
+  it('gives the badge the label the sentence opened with, and the text does not repeat it', () => {
+    const FORECAST = IDA.replace('Experimental: the nearest gauge read', 'Experimental forecast: the nearest gauge will read');
+    const last = (md: string) => keyedAnswer(answerOf(md), { doc_id: 'nyc311', in_lead: false }, isExp)!.paras[2];
+    expect(last(IDA)[0].exp).toBe('Experimental');
+    const forecast = last(FORECAST);
+    expect(forecast[0].exp).toBe('Experimental forecast');
+    expect(words(forecast)).toBe('The nearest gauge will read 579.4 ft, 18.1 km from this address. The reading is for the lake, not for this street.');
+    const { container } = render(AnswerProse, { props: { parts: forecast, citations: {} } });
+    expect(container.querySelector('.exp-badge')?.textContent).toBe('Experimental forecast');
+    expect(container.querySelector('p')?.textContent?.trim()).toMatch(/^Experimental forecast The nearest gauge will read/);
   });
 
   it('never makes an experimental sentence the key sentence', () => {

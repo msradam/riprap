@@ -18,6 +18,23 @@ describe('modelLines', () => {
     expect(lines.map((l) => l.how)).toEqual(['LLM endpoint', 'LLM endpoint', 'LLM endpoint']);
   });
 
+  it('labels the experimental models in plain words, with no latency for a precomputed one', () => {
+    const lines = modelLines([
+      { name: 'Granite TTM r2 Battery Surge (experimental)', repo: 'msradam/granite-ttm-r2-battery-surge',
+        where: 'CPU, in this server', how: 'loaded', latency_s: 0.42 },
+      { name: 'Prithvi-EO 2.0 NYC Pluvial (experimental)', repo: 'msradam/Prithvi-EO-2.0-NYC-Pluvial',
+        where: 'an earlier batch run; its saved output is read', how: 'precomputed', latency_s: null },
+      { name: 'LLM', repo: 'ibm-granite/granite-4.1-8b', where: 'LLM endpoint api.example.org', how: 'endpoint', latency_s: 2, calls: 1 },
+    ]);
+    expect(lines.map((l) => l.how)).toEqual(['run for this briefing', 'not run for this briefing', 'LLM endpoint']);
+    expect(lines.map((l) => l.latency)).toEqual(['0.4 s', null, '2.0 s over 1 call']);
+    // Each `where` opens a sentence in the list.
+    expect(lines.map((l) => l.where)).toEqual([
+      'CPU, in this server', 'An earlier batch run; its saved output is read', 'LLM endpoint api.example.org',
+    ]);
+    expect(lines[1].href).toBe('https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial');
+  });
+
   it('returns nothing when models is missing', () => {
     expect(modelLines(undefined)).toEqual([]);
   });

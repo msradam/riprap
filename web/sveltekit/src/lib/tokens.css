@@ -11,13 +11,12 @@
   /* ── Epistemic tier colors ─────────────────────────────────────────
      Tier palette anchored to USWDS blue-60v (#005EA2) — the canonical
      federal civic blue. Tier is ALSO encoded via glyph + label, so
-     deutan/protan/tritan-safe even though all three top tiers share
-     the blue family.
+     deutan/protan/tritan-safe even though the tiers share the blue
+     family.
   */
   --tier-empirical:        #005EA2; /* USWDS blue-60v   7.07:1 vs paper ✓ AAA */
   --tier-modeled:          #1A4480; /* USWDS blue-warm-70v  10.4:1 ✓ AAA */
   --tier-proxy:            #475569; /* slate-600         7.6:1   ✓ AAA */
-  --tier-synthetic:        #1A4480; /* same hue as modeled — pattern carries the difference */
 
   /* ── Accent ── */
   --accent:                #005EA2;  /* USWDS federal blue (was burnt orange) */
@@ -39,12 +38,10 @@
   /* ── Type — app-wide, not just report content (docs/design/handoff/) ──
      Sofia Sans + Overpass Mono everywhere; IBM Plex retired. No serif:
      HANDOFF.md explicitly rejects the "serif headline + sans body" combo
-     as a current AI-generated-site trope, so --font-serif now aliases
-     Sofia Sans too. There is no italic in the app (DESIGN.md), and no
-     italic face is vendored. */
+     as a current AI-generated-site trope. There is no italic in the app
+     (DESIGN.md), and no italic face is vendored. */
   --font-sans: "Sofia Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --font-mono: "Overpass Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --font-serif: "Sofia Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 
   /* ── Scale ── */
   --leading-prose: 1.55;
@@ -135,9 +132,10 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* ── Report-content tokens (--riprap-*) ──
    The report content (briefing, register, marks, citations, print, map
-   layer encoding) reads these names, and RipMap reads the tier ones by
-   computed name (tokenColor). Each aliases the block above instead
-   of restating its hex, so one colour cannot drift under two names. */
+   layer encoding) reads these names, and RipMap reads the tier, paper,
+   slate and amber ones by computed name (tokenColor). Each aliases the
+   block above instead of restating its hex, so one colour cannot drift
+   under two names. */
 :root {
   --riprap-white:          #FFFFFF;
   --riprap-paper:          var(--paper);

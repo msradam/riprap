@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
+import { render } from '@testing-library/svelte';
+import ResultsView from '$lib/components/results/ResultsView.svelte';
+import { RunState } from '$lib/client/runState.svelte';
 import { firstSentence, suggestedDistrict } from '$lib/client/briefingModel';
+import { REFUSAL, REFUSAL_QUERY } from './fixtures/refusal';
 
 describe('suggestedDistrict', () => {
   it('finds the district a refusal suggests', () => {
@@ -21,5 +25,14 @@ describe('firstSentence', () => {
   it('is null for an empty paragraph', () => {
     expect(firstSentence(undefined)).toBeNull();
     expect(firstSentence([])).toBeNull();
+  });
+});
+
+describe('a refusal on a live server', () => {
+  it('offers the suggested district and the query box', () => {
+    const run = RunState.fromFinal(REFUSAL, REFUSAL_QUERY);
+    const { container } = render(ResultsView, { props: { run, queryText: REFUSAL_QUERY } });
+    const links = [...container.querySelectorAll('.error-card-actions a')].map((a) => a.textContent);
+    expect(links).toEqual(['Briefing for QN14', 'Edit query']);
   });
 });
