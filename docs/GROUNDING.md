@@ -124,9 +124,10 @@ same process; a second agent judged the pairs blind. Over 130 judged pairs
 (four sets, 2026-10-01) the rule answers were preferred on 54, the model's on
 21, and 55 were ties; wrong openings 7 against 8, wrong places 13 against 12,
 sentences beside the point 70 against 145, and a median of about 2 s against
-9 to 13 s. One of the three sets that were clean (never seen while the rules
-were written) went against the rules on wrong openings and places, 3 and 5
-against 1 and 4; the defects behind it were fixed before the last set.
+9 to 13 s. Two of the four sets were never seen while the rules were
+written. The first of those went against the rules on wrong openings and
+places, 3 and 5 against 1 and 4; the defects behind it were fixed, and the
+second met the bar.
 
 ### Questions
 
