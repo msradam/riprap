@@ -28,19 +28,10 @@ from riprap.core.pebbles.shapers.dep_scenario import result as dep_result
 
 
 def _scope_header() -> str:
-    """Hazard-agnostic scope declaration. Riprap-flood ships with the
-    canonical flood phrasing; other deployments can override the wording
-    by setting RIPRAP_BRIEFING_SCOPE (e.g. "automated heat-exposure
-    briefing"). Defaults to the safe generic "hazard-exposure briefing."
-    """
-    import os
-
-    scope_kind = os.environ.get("RIPRAP_BRIEFING_SCOPE", "hazard-exposure")
-    return (
-        f"This is an automated {scope_kind} briefing produced by Riprap from "
-        "live and precomputed data sources. It is informational only and not a "
-        "substitute for a professional risk assessment."
-    )
+    """The scope declaration every briefing opens with."""
+    return ("This is an automated hazard-exposure briefing produced by Riprap from "
+            "live and precomputed data sources. It is informational only and not a "
+            "substitute for a professional risk assessment.")
 
 
 SCOPE_REFUSAL = (

@@ -25,8 +25,7 @@ def _pebbles_for(stone: str, deployment: str, lat=None, lon=None) -> list[str]:
 
 
 def test_all_shipped_cities_have_a_coverage_bbox():
-    """Every place-routed deployment declares a bbox + city. Heat/air
-    deployments are hazard-routed and intentionally bbox-less."""
+    """Every city deployment declares a bbox + city."""
     deps = {d.name: d for d in discover_deployments()}
     for name in ("nyc", "boston", "chicago", "seattle", "sf", "albany"):
         d = deps.get(name)
