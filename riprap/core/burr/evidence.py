@@ -15,11 +15,12 @@ to `narration.short`.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from riprap.core.compliance.predicates import _CITATION_RE, _NUM_TOKEN_RE, _sentences
+from riprap.core.compliance.predicates import _CITATION_RE, _sentences
 from riprap.core.pebbles import load_registry
 from riprap.core.pebbles.registry import Registry
 from riprap.core.pebbles.vintage import citation
@@ -93,14 +94,17 @@ def sentence_for(value: Any, manifest) -> str | None:
     return body if body[-1] in ".!?" else body + "."
 
 
-def cite(text: str, doc_id: str) -> str:
-    """Append [doc_id] to every sentence that states a number (the
-    per-sentence rule `every_numeric_claim_cited` audits), and to the
-    last sentence in any case."""
+def cite(text: str, doc_id: str, every: bool = False) -> str:
+    """Append [doc_id] to every sentence with a figure in it, and to the
+    last sentence in any case. (The audit `every_numeric_claim_cited` looks
+    for a number with a unit; a district's "13 FloodNet community sensors
+    ... 358 above-curb flood events" has none next to its numbers and once
+    went uncited.) With `every`, to every sentence: an experimental
+    source's statement, limits and pointer each carry it."""
     marker = f"[{doc_id}]"
     out = []
     for s in _sentences(text):
-        if _NUM_TOKEN_RE.search(s) and not _CITATION_RE.search(s):
+        if (every or re.search(r"\d", s)) and not _CITATION_RE.search(s):
             s = f"{s[:-1].rstrip()} {marker}{s[-1]}" if s[-1] in ".!?" else f"{s} {marker}"
         out.append(s)
     body = " ".join(out)

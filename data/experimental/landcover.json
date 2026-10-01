@@ -1,0 +1,47 @@
+{
+ "model": "msradam/TerraMind-NYC-Adapters",
+ "revision": "984341631d10db4fb699f76cd5d5bc7d8b3690b3",
+ "adapter": "lulc_nyc",
+ "run_date": "2026-10-01",
+ "years": {
+  "2018": [
+   "2018-07-02"
+  ],
+  "2021": [
+   "2021-06-16",
+   "2021-09-29"
+  ],
+  "2024": [
+   "2024-09-03"
+  ],
+  "2026": [
+   "2026-06-20",
+   "2026-07-20"
+  ]
+ },
+ "noise_points": 3.7,
+ "noise_points_median": 0.8,
+ "noise_points_small": 5.8,
+ "noise_points_small_median": 1.0,
+ "eval_year": 2021,
+ "agreement_pct": 82.2,
+ "group_agreement_pct": 87.1,
+ "class_recall_pct": {
+  "water": 81.8,
+  "built": 97.5,
+  "trees": 42.8,
+  "grass": 68.5,
+  "bare": 14.8
+ },
+ "green_found_pct": 66.3,
+ "district_built_minus_worldcover_points_median": 7.7,
+ "district_built_gap_points_max": 19.0,
+ "district_built_vs_worldcover": "7.7 points above",
+ "by_borough_agreement_pct": {
+  "Bronx": 80.7,
+  "Brooklyn": 86.4,
+  "Manhattan": 81.0,
+  "Queens": 83.3,
+  "Staten Island": 76.7
+ }
+}

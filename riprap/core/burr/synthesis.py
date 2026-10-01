@@ -217,6 +217,8 @@ def _lead_fact(lead: str | None, facts: list[str], kind_lead: bool, rel: str | N
         # it is about (the DEP scenario it names), when that is among the facts.
         asked = answer_checks.dep_scenario_asked(question)
         doc = rel if rel in facts else next((f for f in facts if asked and f.startswith(asked)), None)
+        if "nws_water_forecast" in facts and rule_answer._NEAR_RE.search(question or ""):
+            doc = "nws_water_forecast"  # the days ahead: the Weather Service's forecast, not the last reading
         return {"doc_id": doc, "in_lead": False} if doc else None
     if lead == "count":
         if kind_lead:
@@ -227,8 +229,8 @@ def _lead_fact(lead: str | None, facts: list[str], kind_lead: bool, rel: str | N
     return {"doc_id": doc, "in_lead": False} if doc and doc in facts else None
 
 
-def _extract(out: dict, question: str, texts: dict[str, str],
-             values: dict | None = None, focus: dict | None = None) -> tuple[str, list[str], list[tuple[str, str]]]:
+def _extract(out: dict, question: str, texts: dict[str, str], values: dict | None = None, focus: dict | None = None,
+             experimental: frozenset[str] = frozenset()) -> tuple[str, list[str], list[tuple[str, str]]]:
     a = out.get("answer") or {}
     lead = a.get("lead") if a.get("lead") in LEADS else "cannot_answer"
     facts = [f for f in dict.fromkeys(a.get("facts") or []) if f in texts]
@@ -268,10 +270,21 @@ def _extract(out: dict, question: str, texts: dict[str, str],
         if lead == "facts" and asked and any(f.startswith(asked) for f in facts):
             facts = [f for f in facts if not f.startswith("dep_") or f.startswith(asked)]
     lead = rule_answer.soften(lead, facts, values)
-    return lead, facts, answer_checks.check_lead(lead, facts, question, texts, values)
+    # A yes or no is checked against the measured facts only: a model's
+    # output neither supports nor contradicts one, and alone it gets no lead.
+    measured = [f for f in facts if f not in experimental]
+    if lead in ("yes", "no", "partly") and not measured:
+        lead = "facts"
+    return lead, facts, answer_checks.check_lead(lead, measured if lead in ("yes", "no", "partly") else facts,
+                                                 question, texts, values)
 # "facts" is set only by code: the facts with no yes or no in front of them.
+# "experimental" and "no_prediction" are set only by rule_answer: an answer
+# formed by an experimental model alone, and "will it flood" at a place.
 LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:",
-                "facts": "From the sources consulted:"}
+                "facts": "From the sources consulted:",
+                "experimental": "From an experimental model, not a measurement:",
+                "no_prediction": "Riprap cannot predict whether a particular place floods on a given day: no source "
+                                 "or model here does that. What the Weather Service expects, and what the maps show:"}
 
 
 def _documents(state) -> tuple[list[Doc], list, object]:
@@ -337,7 +350,7 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
             if any(i in experimental for i in c["doc_ids"]) and "experimental" not in text.lower():
                 text = f"Experimental: {text}"
             if len(c["doc_ids"]) == 1:  # a multi-sentence template fact: cite each numeric sentence
-                out.append(evidence.cite(f"{text}.", c["doc_ids"][0]))
+                out.append(evidence.cite(f"{text}.", c["doc_ids"][0], every=c["doc_ids"][0] in experimental))
             else:
                 out.append(f"{text} {''.join(f'[{i}]' for i in c['doc_ids'])}.")
         return " ".join(out)
@@ -361,7 +374,7 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
             # sources' own template sentences (cited, correct by construction),
             # never "no evidence" over a section that has some.
             body = " ".join(evidence.cite(f"Experimental: {d.text}" if d.experimental and "experimental"
-                                          not in d.text.lower() else d.text, d.doc_id)
+                                          not in d.text.lower() else d.text, d.doc_id, every=d.experimental)
                             for d in docs if d.section == sec)
         parts.append(f"**{sec}.**\n" + (body or NO_EVIDENCE_LINE))
     parts.append(NON_SCOPE_FOOTER.replace("**Out of scope.** ", f"**Out of scope.** {LIVE_POINTER} ", 1)
@@ -370,7 +383,8 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
 
 
 def synthesize(state, use_llm: bool = True) -> dict:
-    """The briefing for a state. A question is answered by the rules of
+    """The briefing for a state. `grounding.tier` is "llm" when a model was
+    called here and "no_llm" when none was. A question is answered by the rules of
     rule_answer (always when `use_llm` is False; first when RULES_FIRST) or
     by the model's choice of lead and facts, checked by the lead rules.
     Returns paragraph, citations and a `grounding` record (the answer's
@@ -380,13 +394,13 @@ def synthesize(state, use_llm: bool = True) -> dict:
     if state.get("intent") in ("not_implemented", "out_of_scope"):
         paragraph, _ = compose_briefing(state)
         return {"paragraph": paragraph, "citations": {},
-                "grounding": {"tier": "llm", "claims": [], "dropped_claims": [], "attempts": 0}}
+                "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": 0}}
     docs, items, stones = _documents(state)
     if not docs:
         from riprap.core.burr.templated_reconciler import nothing_built
 
         return {"paragraph": nothing_built(state), "citations": {},
-                "grounding": {"tier": "llm", "claims": [], "dropped_claims": [], "attempts": 0}}
+                "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": 0}}
     plan = state.get("plan") or {}
     question, focus = plan.get("question") or "", plan.get("focus")
     if not question and not (use_llm and llm_bare()):
@@ -435,7 +449,8 @@ def synthesize(state, use_llm: bool = True) -> dict:
         notes: list[str] = []
         lead, facts, lead_hits = "", [], []
         if question:
-            lead, facts, lead_hits = _extract(out, question, texts, values, focus)
+            lead, facts, lead_hits = _extract(out, question, texts, values, focus,
+                                              frozenset(d.doc_id for d in docs if d.experimental))
             notes = [f"answer lead {lead!r}: {r}" for _, r in lead_hits]
         return kept, dropped, notes, (lead, facts, lead_hits)
 
@@ -474,13 +489,24 @@ def synthesize(state, use_llm: bool = True) -> dict:
         return {"paragraph": paragraph, "citations": cites,
                 "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": attempts,
                               "llm_calls": calls, "question": question, "answered": False if question else None,
-                              "answer_mode": "extractive" if fallback_reason else "rules",
+                              # Nothing answered: neither a rule nor the model.
+                              "answer_mode": None,
                               **({"fallback_reason": fallback_reason} if fallback_reason else {})}}
     if ruled is not None:
         focus = {"time_frame": rule_answer.time_frame(question)}
         lead, facts = ruled
-        if any(k != "dropped_count" for k, _ in answer_checks.check_lead(lead, facts, question, texts, values)):
+        absent = {d: t for d, t in texts.items() if isinstance(values.get(d), dict) and values[d].get("installed") is False}
+        # The lead is checked against the measured facts only: a model's
+        # sentence, or its "not available", neither supports nor undoes one.
+        models = {d.doc_id for d in docs if d.experimental}
+        measured = [f for f in facts if f not in models] if lead in ("yes", "no", "partly") else facts
+        if any(k != "dropped_count" for k, _ in answer_checks.check_lead(lead, measured, question, texts, values)):
             lead = "facts"  # the facts stand; a lead that fails the lead rules does not
+        if lead in ("facts", "experimental") and focus["time_frame"] != "past":
+            # The question asks what an experimental model answers and this
+            # server cannot run it: its "not available" sentence closes the
+            # answer. Never under a yes, a no or a count, and never for the past.
+            facts = [*facts, *(d for d in rule_answer.experimental(question, texts)[1] if d in absent and d not in facts)]
         answer = (rule_answer.soften(lead, facts, values), facts, [])
     lead_phrase, answer_flags, lead, lead_fact = "", notes, None, None
     if question and ruled is not None:
@@ -508,7 +534,12 @@ def synthesize(state, use_llm: bool = True) -> dict:
         if (answer_checks.is_count_question(question) and lead not in ("count", "cannot_answer")
                 and any(answer_checks.count_numbers(texts[f]) for f in facts)):
             lead = "count"  # a count or share question gets the number, not "In part."
-        lead_hits = answer_checks.check_lead(lead, facts, question, texts, values)
+        experimental = frozenset(d.doc_id for d in docs if d.experimental)
+        measured = [f for f in facts if f not in experimental]
+        if lead in ("yes", "no", "partly") and not measured:
+            lead = "facts"  # the model chose only an experimental source: that is not a measurement
+        lead_hits = answer_checks.check_lead(lead, measured if lead in ("yes", "no", "partly") else facts,
+                                             question, texts, values)
         if appended and any(k != "dropped_count" for k, _ in lead_hits):
             lead, lead_hits = "facts", []  # the appended fact no longer fits the lead: drop the lead
         if any(k != "dropped_count" for k, _ in lead_hits):
@@ -518,7 +549,6 @@ def synthesize(state, use_llm: bool = True) -> dict:
             lead, facts = "cannot_answer", []
         if lead == "count" and rel in facts:
             facts = [rel]  # a count answers with the counted source alone, not unrelated facts
-        experimental = frozenset(d.doc_id for d in docs if d.experimental)
         # The source the question is about leads the facts when the model
         # chose it ("Are the schools ... exposed?" opened with the FEMA zone
         # of the address, and the school register came fourth). A record

@@ -63,19 +63,27 @@ class ComplianceReport:
 # Small helpers
 # ---------------------------------------------------------------------------
 
-_ABBREV_END_RE = re.compile(r"(?:(?:^|[^A-Za-z])[A-Z]\.|\bSt\.)$")
+# Where a period and a space do not end a sentence: before a lower-case
+# word ("182nd St. and 90th Ave."), after initials ("P.S. 90", "John F.
+# Kennedy"), and after "St." unless a sentence plainly starts ("Water St.
+# It may flood" ends one; "St. Albans" does not). A lone capital does end
+# one ("flood zone X. 3 sensors"), but not a compass point before a numbered
+# street ("W. 4th St").
+_INITIALS_END_RE = re.compile(r"(?:\b[A-Z]\.){2,}$|\b[A-Z][a-z]+ [A-Z]\.$")
+_STARTS_SENTENCE_RE = re.compile(r"(It|The|This|That|There|These|No|A|An|In|On|At)\b")
 
 
 def _sentences(text: str) -> list[str]:
-    """Naive sentence split, good enough for predicate scanning. A name
-    such as "P.S. 90" or "St. Mary's" is not a sentence end."""
+    """Naive sentence split, good enough for predicate scanning."""
     out: list[str] = []
     for s in (p.strip() for p in re.split(r"(?<=[.!?])\s+", text)):
         if not s:
             continue
-        if out and _ABBREV_END_RE.search(out[-1]) and (s[0].isdigit() or out[-1].endswith("St.")
-                                                       or re.match(r"[A-Z]\.", s)):
-            out[-1] = f"{out[-1]} {s}"
+        prev = out[-1] if out else ""
+        if prev and (s[0].islower() or (_INITIALS_END_RE.search(prev) and re.match(r"[A-Z0-9]", s))
+                     or (prev.endswith("St.") and not _STARTS_SENTENCE_RE.match(s))
+                     or (re.search(r"\b[NSEW]\.$", prev) and re.match(r"\d+(st|nd|rd|th)\b", s))):
+            out[-1] = f"{prev} {s}"
         else:
             out.append(s)
     return out
@@ -215,19 +223,7 @@ def firm_citation_has_vintage(paragraph: str, context: dict | None = None) -> Pr
     )
 
 
-# 2.1, 2.2 — IPCC likelihood vocabulary
-_IPCC_LIKELIHOOD_TERMS = {
-    "virtually certain": (99, 100),
-    "extremely likely":  (95, 100),
-    "very likely":       (90, 100),
-    "likely":            (66, 100),
-    "more likely than not": (50, 100),
-    "about as likely as not": (33, 66),
-    "unlikely":          (0, 33),
-    "very unlikely":     (0, 10),
-    "extremely unlikely": (0, 5),
-    "exceptionally unlikely": (0, 1),
-}
+# 2.1, 2.2: IPCC likelihood vocabulary
 _UNCALIBRATED_HEDGES = ("probably", "fairly likely", "good chance",
                         "decent chance", "pretty likely", "kinda likely")
 
@@ -259,6 +255,7 @@ _PROJECTION_TOKENS_RE = re.compile(
 _HORIZON_RE = re.compile(
     r"(by\s+(?:19|20)\d{2}|"
     r"in\s+(?:19|20)\d{2}|"
+    r"on\s+(?:19|20)\d{2}-\d{2}-\d{2}|"  # a dated forecast: "a peak ... on 2026-10-01 17:00 UTC"
     r"(?:19|20)\d{2}\s+(?:slr|sea[- ]level rise|baseline|scenario)|"
     r"(?:next|over\s+the\s+next|past|last|previous)\s+\d+(?:\.\d+)?\s*[- ]?\s*(?:year|month|week|day|hour|minute)s?|"
     r"\d+(?:\.\d+)?\s*[- ]?\s*(?:year|month|week|day|hour|minute)s?\s+(?:ahead|out|horizon|window|forecast|nowcast|cadence|projection|outlook)|"
@@ -435,7 +432,8 @@ def no_rounding_to_false_precision(paragraph: str, context: dict | None = None) 
 
 
 # 7.1 / AP 6.1 — every numeric claim has a citation nearby
-_NUM_TOKEN_RE = re.compile(r"\b\d+(?:\.\d+)?\s*(?:%|ft|m|mm|cm|km|in|inches|feet|complaints?|events?|sensors?)\b",
+# (The word boundary closes a unit word; a percent sign has none after it.)
+_NUM_TOKEN_RE = re.compile(r"\b\d+(?:\.\d+)?\s*(?:%|(?:ft|m|mm|cm|km|in|inches|feet|complaints?|events?|sensors?)\b)",
                            re.IGNORECASE)
 _CITATION_RE = re.compile(r"\[[a-z][a-z0-9_]*\]", re.IGNORECASE)
 

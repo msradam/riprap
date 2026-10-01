@@ -20,7 +20,6 @@ _WORDS.update({"thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 7
                "eighty": 80, "ninety": 90})
 _WORD_RE = re.compile(r"\b(" + "|".join(_WORDS) + r")\b", re.IGNORECASE)
 
-ABSENCE_RE = re.compile(r"\b(no|none|not|zero|without|never)\b|n't\b", re.IGNORECASE)
 # A document that itself reports an absence or a zero. FEMA's zone X is
 # "an area of minimal flood hazard": outside the mapped floodplain, so an
 # absence, not a result a "no" would contradict.
@@ -183,7 +182,7 @@ def kind_asked(rel: str, question: str, value: dict | None) -> str | None:
 
 _ASKS_REPORTS_RE = re.compile(r"\b311\b|complain|report", re.I)
 _YEAR_RE = re.compile(r"\b(?:in|during|for|of)\s+(20[12]\d)\b", re.I)
-_OTHER_PERIOD_RE = re.compile(r"\b(last|this|past) (month|week|few|couple|\d+)|yesterday|today|this (spring|summer|fall|"
+_OTHER_PERIOD_RE = re.compile(r"\b(last|this|past) (month|week|weekend|night|morning|few|couple|\d+)|yesterday|today|this (spring|summer|fall|"
                               r"autumn|winter)|last (spring|summer|fall|autumn|winter)\b", re.I)
 
 
@@ -301,8 +300,8 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str],
     """Extractive mode: check the model's lead against the facts it chose.
     The facts are template sentences shown verbatim, so only the lead and
     the choice of facts can be wrong."""
-    if lead == "cannot_answer":
-        return []
+    if lead in ("cannot_answer", "experimental", "no_prediction"):
+        return []  # no yes, no or count to check: silence, or a neutral lead set by code
     if not facts:
         return [("empty", f"lead {lead!r} with no facts")]
     texts = dict(zip(facts, (docs.get(i, "") for i in facts), strict=True))
@@ -505,6 +504,11 @@ def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: d
     if not is_past_event_question(question, focus):
         return None
     relevant, verdict = _past_event_verdict(question, docs, values, this_year)
+    if _OTHER_PERIOD_RE.search(question or "") and _period_start(question) is None:
+        # "Did it flood this weekend?": the sources count over years, and a
+        # total over three years says neither yes nor no about a few days.
+        # The record is quoted (its newest event is dated), with no lead.
+        return "facts", [i for i in relevant if i in verdict and not unavailable(i, docs, values)]
     positive = [i for i, e in verdict.items() if e is True]
     if positive and all(i in ("nyc311", "nyc311_nta") for i in positive) and not _ASKS_REPORTS_RE.search(question or ""):
         # 311 requests are reports, most of them sewer backups and clogged

@@ -1,0 +1,81 @@
+{
+ "model": "msradam/Prithvi-EO-2.0-NYC-Pluvial",
+ "revision": "25ce564199d8cfa8fefd5ac0e80e2d911b65ea60",
+ "run_date": "2026-10-01",
+ "event": "2021-09-01",
+ "post_scene": "S2A_MSIL2A_20210902T154911_R054_T18TXL_20210903T042643;S2A_MSIL2A_20210902T154911_R054_T18TWK_20210903T055945;S2A_MSIL2A_20210902T154911_R054_T18TXK_20210903T042442;S2A_MSIL2A_20210902T154911_R054_T18TWL_20210903T050849",
+ "n_marks": 153,
+ "n_marks_with_water": 17,
+ "marks_pct": 11,
+ "chance_pct": 14,
+ "new_water_km2": 3.79,
+ "land_seen_share": 0.883,
+ "against_chance": "no better than chance",
+ "events": {
+  "2017-05-05": {
+   "land_seen_share": 0.003,
+   "new_water_share_of_seen": 0.04374
+  },
+  "2017-10-29": {
+   "land_seen_share": 0.196,
+   "new_water_share_of_seen": 0.00983
+  },
+  "2019-10-16": {
+   "land_seen_share": 0.108,
+   "new_water_share_of_seen": 0.01221
+  },
+  "2020-04-13": {
+   "land_seen_share": 0.883,
+   "new_water_share_of_seen": 0.00091
+  },
+  "2020-07-10": {
+   "land_seen_share": 0.007,
+   "new_water_share_of_seen": 0.00059
+  },
+  "2021-09-01": {
+   "land_seen_share": 0.883,
+   "new_water_share_of_seen": 0.00549
+  },
+  "2022-07-18": {
+   "land_seen_share": 0.89,
+   "new_water_share_of_seen": 0.00119
+  },
+  "2023-09-11": {
+   "land_seen_share": 0.509,
+   "new_water_share_of_seen": 0.00373
+  },
+  "2023-11-22": {
+   "land_seen_share": 1.0,
+   "new_water_share_of_seen": 0.00168
+  },
+  "2024-03-23": {
+   "land_seen_share": 0.902,
+   "new_water_share_of_seen": 0.00237
+  },
+  "2024-07-13": {
+   "land_seen_share": 0.074,
+   "new_water_share_of_seen": 0.00048
+  },
+  "2025-03-05": {
+   "land_seen_share": 0.198,
+   "new_water_share_of_seen": 0.00266
+  },
+  "2025-07-14": {
+   "land_seen_share": 0.048,
+   "new_water_share_of_seen": 0.00119
+  },
+  "2026-07-18": {
+   "land_seen_share": 0.966,
+   "new_water_share_of_seen": 0.00137
+  },
+  "2026-08-03": {
+   "land_seen_share": 0.694,
+   "new_water_share_of_seen": 0.00129
+  }
+ },
+ "recurrence_check": {
+  "recurrent_km2": 1.73,
+  "share_of_land_in_dep_flood_map_pct": 1.4,
+  "share_of_recurrent_land_in_dep_flood_map_pct": 0.7
+ }
+}

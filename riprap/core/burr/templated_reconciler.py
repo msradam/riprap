@@ -240,6 +240,13 @@ _QUIET_UNLESS = {
     "usgs_gauges": lambda v: v.get("n_gauges_in_area"),
     "noaa_tides": lambda v: (v.get("residual_ft") or 0) >= 1.0,
     "nws_water_forecast": lambda v: v.get("flood_category"),
+    # The experimental models: quoted in a plain briefing only when they show
+    # something, never as a wall of caveats. A question that asks gets them.
+    "ttm_battery_surge": lambda v: v.get("notable"),
+    "prithvi_water": lambda v: v.get("new_water_m2"),
+    "prithvi_water_nta": lambda v: v.get("new_water_m2"),
+    "landcover": lambda v: False,
+    "landcover_nta": lambda v: False,
 }
 
 
@@ -272,14 +279,15 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
             continue  # Capstone is the synthesis output, not a data stone
         out = []
         for e in items:
-            if e.stone_id != stone.id or (not question and _quiet(state, e)):
+            # An experimental source stays quiet under an unanswered question too.
+            if e.stone_id != stone.id or ((not question or e.maturity == "experimental") and _quiet(state, e)):
                 continue
             if dep and e.pebble_id in _DEP_POINT:
                 if not dep_done:  # the merged sentence goes where the first scenario was
                     out.append(dep)
                     dep_done = True
                 continue
-            out.append(evidence.cite(e.text, e.doc_id))
+            out.append(evidence.cite(e.text, e.doc_id, every=e.maturity == "experimental"))
         body = " ".join(out)
         if body:
             sections.append(f"**{evidence.stone_heading(stone)}**\n{body}")

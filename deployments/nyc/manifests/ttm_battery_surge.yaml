@@ -1,0 +1,51 @@
+id: ttm_battery_surge
+type: live
+title: Battery surge forecast, 96 hours, Granite TTM r2 fine-tune (experimental)
+answers: "experimental 96-hour forecast of how far above the predicted tide the water at the Battery may run, and whether the total reaches the gauge's flood stage (no weather input)"
+stone: lodestone
+maturity: experimental
+tier: modeled
+adapter: python_call
+
+# The one model that runs per request, on CPU, when the ml extra is
+# installed. Without it the value is the not-installed sentence.
+spatial:
+  scope: any
+
+config:
+  module: app.live.ttm_battery_surge
+  function: fetch
+  args: []
+  on_none: passthrough
+
+trace_summary:
+  forecast_peak_residual_m: forecast_peak_residual_m
+  forecast_peak_total_ft_mllw: forecast_peak_total_ft_mllw
+  flood_category: flood_category
+  installed: installed
+
+provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
+  source_name: Granite TTM r2 Battery Surge (msradam, experimental) on NOAA CO-OPS station 8518750
+  source_url: https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge
+  license: Apache-2.0 (model); U.S. Public Domain (gauge data)
+  doc_id: ttm_battery_surge
+  citation: >-
+    msradam/Granite-TTM-r2-Battery-Surge (Apache-2.0), the owner's fine-tune of
+    IBM's Granite TTM r2, run on the last 1,024 hourly surge residuals at NOAA
+    station 8518750 (The Battery). Experimental: no wind or pressure input;
+    backtest in data/experimental/surge.json.
+
+narration:
+  short: An experimental 96-hour forecast of the surge at The Battery.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: The experimental Battery surge forecast did not run.
+
+display:
+  variant: scalars
+  order: 21
+  kind: stat

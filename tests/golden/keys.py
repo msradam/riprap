@@ -141,13 +141,7 @@ def _floodnet_deployments() -> list[dict]:
     return _post_json(_FLOODNET, {"query": q})["data"]["deployments"]
 
 
-def floodnet(lat: float, lon: float, radius_m: int = 600, years: int = 3) -> dict:
-    near = []
-    for d in _floodnet_deployments():
-        loc = d.get("location") or {}
-        coords = loc.get("coordinates") or []
-        if len(coords) == 2 and haversine_m(lat, lon, coords[1], coords[0]) <= radius_m:
-            near.append(d)
+def _floodnet_summary(near: list[dict], years: int) -> dict:
     ids = [d["deployment_id"] for d in near]
     since = (datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
              - timedelta(days=365 * years)).replace(tzinfo=None).isoformat(timespec="seconds")
@@ -170,6 +164,31 @@ def floodnet(lat: float, lon: float, radius_m: int = 600, years: int = 3) -> dic
             "peak_mm_good": max(good_depths) if good_depths else None,
             "peak_mm_flagged": max(flagged_depths) if flagged_depths else None,
             "statuses": sorted(d.get("sensor_status") or "" for d in near)}
+
+
+def floodnet(lat: float, lon: float, radius_m: int = 600, years: int = 3) -> dict:
+    near = []
+    for d in _floodnet_deployments():
+        coords = (d.get("location") or {}).get("coordinates") or []
+        if len(coords) == 2 and haversine_m(lat, lon, coords[1], coords[0]) <= radius_m:
+            near.append(d)
+    return _floodnet_summary(near, years)
+
+
+def floodnet_district(code: str, years: int = 3) -> dict:
+    """Sensors inside a community district ('QN12'): the union of the
+    city's 2020 neighborhood tabulation areas that carry that district code."""
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    areas = gpd.read_file(ROOT / "data" / "nyc_ntas_2020.geojson")
+    outline = areas[areas["cdta2020"] == code.upper()].union_all()
+    inside = []
+    for d in _floodnet_deployments():
+        coords = (d.get("location") or {}).get("coordinates") or []
+        if len(coords) == 2 and outline.contains(Point(coords[0], coords[1])):
+            inside.append(d)
+    return _floodnet_summary(inside, years)
 
 
 # USGS STN high-water marks for Hurricane Ida (event 312), read live.

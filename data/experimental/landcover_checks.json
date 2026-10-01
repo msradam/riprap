@@ -1,0 +1,247 @@
+{
+ "what": "One-off checks of the TerraMind NYC adapters' inputs and classes against ESA WorldCover 2021, on one box of Manhattan, Brooklyn and Queens (lon -74.03 to -73.84, lat 40.60 to 40.80), run 2026-10-01 on an Apple M5.",
+ "classes": [
+  "water",
+  "built",
+  "trees",
+  "grass",
+  "bare"
+ ],
+ "inputs_2021-06-16": [
+  {
+   "s2_plus_1000": false,
+   "s1": "db",
+   "dem": "real",
+   "agreement": 0.8959,
+   "miou": 0.535,
+   "iou": [
+    0.934,
+    0.884,
+    0.435,
+    0.422,
+    0.0
+   ]
+  },
+  {
+   "s2_plus_1000": false,
+   "s1": "db",
+   "dem": "zero",
+   "agreement": 0.8957,
+   "miou": 0.5346,
+   "iou": [
+    0.935,
+    0.884,
+    0.43,
+    0.424,
+    0.0
+   ]
+  },
+  {
+   "s2_plus_1000": false,
+   "s1": "linear",
+   "dem": "real",
+   "agreement": 0.9041,
+   "miou": 0.5494,
+   "iou": [
+    0.938,
+    0.903,
+    0.497,
+    0.409,
+    0.0
+   ]
+  },
+  {
+   "s2_plus_1000": false,
+   "s1": "linear",
+   "dem": "zero",
+   "agreement": 0.9043,
+   "miou": 0.5506,
+   "iou": [
+    0.937,
+    0.903,
+    0.495,
+    0.418,
+    0.0
+   ]
+  },
+  {
+   "s2_plus_1000": false,
+   "s1": "zero",
+   "dem": "real",
+   "agreement": 0.9047,
+   "miou": 0.5495,
+   "iou": [
+    0.939,
+    0.903,
+    0.5,
+    0.405,
+    0.0
+   ]
+  },
+  {
+   "s2_plus_1000": false,
+   "s1": "zero",
+   "dem": "zero",
+   "agreement": 0.9049,
+   "miou": 0.5508,
+   "iou": [
+    0.939,
+    0.903,
+    0.498,
+    0.414,
+    0.0
+   ]
+  },
+  {
+   "s2_plus_1000": true,
+   "s1": "db",
+   "dem": "real",
+   "agreement": 0.8911,
+   "miou": 0.5283,
+   "iou": [
+    0.928,
+    0.881,
+    0.39,
+    0.442,
+    0.0
+   ]
+  },
+  {
+   "s2_plus_1000": true,
+   "s1": "db",
+   "dem": "zero",
+   "agreement": 0.8908,
+   "miou": 0.5273,
+   "iou": [
+    0.929,
+    0.882,
+    0.384,
+    0.442,
+    0.0
+   ]
+  },
+  {
+   "s2_plus_1000": true,
+   "s1": "linear",
+   "dem": "real",
+   "agreement": 0.9007,
+   "miou": 0.5434,
+   "iou": [
+    0.94,
+    0.901,
+    0.451,
+    0.424,
+    0.001
+   ]
+  },
+  {
+   "s2_plus_1000": true,
+   "s1": "linear",
+   "dem": "zero",
+   "agreement": 0.9006,
+   "miou": 0.5433,
+   "iou": [
+    0.94,
+    0.901,
+    0.448,
+    0.427,
+    0.001
+   ]
+  },
+  {
+   "s2_plus_1000": true,
+   "s1": "zero",
+   "dem": "real",
+   "agreement": 0.9019,
+   "miou": 0.5451,
+   "iou": [
+    0.943,
+    0.902,
+    0.457,
+    0.424,
+    0.0
+   ]
+  },
+  {
+   "s2_plus_1000": true,
+   "s1": "zero",
+   "dem": "zero",
+   "agreement": 0.9018,
+   "miou": 0.5451,
+   "iou": [
+    0.943,
+    0.902,
+    0.453,
+    0.428,
+    0.0
+   ]
+  }
+ ],
+ "sentinel2_offset_2024-09-03": [
+  {
+   "s2": "as_published",
+   "date": "2024-09-03",
+   "agreement": 0.9073,
+   "miou": 0.5493,
+   "iou": [
+    0.934,
+    0.907,
+    0.502,
+    0.399,
+    0.004
+   ],
+   "pred_share": [
+    0.196,
+    0.669,
+    0.106,
+    0.029,
+    0.0
+   ]
+  },
+  {
+   "s2": "minus_1000",
+   "date": "2024-09-03",
+   "agreement": 0.9006,
+   "miou": 0.5341,
+   "iou": [
+    0.915,
+    0.9,
+    0.507,
+    0.347,
+    0.001
+   ],
+   "pred_share": [
+    0.202,
+    0.655,
+    0.121,
+    0.023,
+    0.0
+   ]
+  }
+ ],
+ "tim_nyc_without_generation_weights": {
+  "adapter": "tim_nyc",
+  "agreement": 0.9034,
+  "miou": 0.5495,
+  "iou": [
+   0.926,
+   0.902,
+   0.501,
+   0.418,
+   0.0
+  ],
+  "seconds": 162
+ },
+ "buildings_nyc_two_dates_of_2021": {
+  "adapter": "buildings_nyc",
+  "dates": [
+   "2021-06-16",
+   "2021-09-29"
+  ],
+  "building_share": [
+   0.567,
+   0.568
+  ],
+  "pixels_that_flip_between_two_dates_of_one_year": 0.046
+ }
+}

@@ -67,7 +67,7 @@ def test_a_register_gives_no_yes_or_no_about_fema_zones(question):
 
 def test_events_only_at_a_flagged_sensor_are_not_a_yes():
     texts = {"floodnet": "1 FloodNet community sensor within 600 m has logged 5 above-curb flood events in the last 3 "
-                         "years. 1 sensor that logged events is flagged by FloodNet for maintenance."}
+                         "years. 1 sensor that logged 5 of these events is flagged by FloodNet for maintenance."}
     flagged = {"floodnet": {"n_sensors": 1, "n_flood_events_3y": 5, "n_flood_events_good_3y": 0}}
     focus = {"time_frame": "past"}
     assert ac.past_event_lead("Has 80 Pioneer Street flooded?", focus, ["floodnet"], texts, flagged)[0] == "cannot_answer"
@@ -166,3 +166,61 @@ def test_an_offline_source_without_a_message_is_a_failure(monkeypatch):
     monkeypatch.setattr(bridge, "get_registry", lambda deployment=None: type("R", (), {"get": lambda self, i: Offline()})())
     value, _, err = bridge.fetch_pebble("x", 40.7, -73.9)
     assert value is None and err
+
+
+@pytest.mark.parametrize("text,sentences", [
+    ("This address sits in FEMA flood zone X. 3 FloodNet sensors logged events.", 2),   # once joined into one
+    ("The mark is on Water St. It may flood.", 2),
+    ("Nearest school: P.S. 90 Horace Mann. It is outside.", 2),
+    ("Intersection of 182nd St. and 90th Ave., Jamaica. Next.", 2),
+    ("It covers Jamaica, St. Albans and Hollis. 2 marks.", 2),
+])
+def test_a_hedge_in_one_sentence_cannot_excuse_the_next(text, sentences):
+    from riprap.core.compliance.predicates import _sentences
+
+    assert len(_sentences(text)) == sentences
+
+
+def test_the_same_incident_rule_is_not_quadratic():
+    import time
+
+    from app.context.nyc311 import Complaint, one_per_incident
+
+    coded = [Complaint(str(i), "Sewer Backup (Use Comments) (SA)", f"2025-01-01T{i % 24:02d}:{i % 60:02d}:00", f"{i} A St",
+                       "Closed", 40.7, -73.9) for i in range(4000)]
+    plain = [Complaint(f"p{i}", "Backup", f"2025-01-01T{i % 24:02d}:{i % 60:02d}:30", f"{i} A St", "Closed", 40.7, -73.9)
+             for i in range(4000)]
+    t = time.time()
+    kept = one_per_incident(coded + plain)
+    assert len(kept) == 4000 and time.time() - t < 1.5  # every plain row has its coded twin; this took 3.4 s
+
+
+def test_a_district_reads_the_sensors_inside_it(monkeypatch):
+    from shapely.geometry import box
+
+    rows = [{"deployment_id": "in", "name": "a", "sensor_address_street": "Dover Street", "sensor_address_borough": "BK",
+             "sensor_status": "good", "date_deployed": None, "location": {"coordinates": [-73.95, 40.60]}},
+            {"deployment_id": "out", "name": "b", "sensor_address_street": "Far Street", "sensor_address_borough": "BK",
+             "sensor_status": "good", "date_deployed": None, "location": {"coordinates": [-73.80, 40.60]}}]
+    monkeypatch.setattr(floodnet, "_gql", lambda q, v: {"deployments": rows})
+    monkeypatch.setattr(floodnet, "flood_events_for", lambda ids: [
+        floodnet.FloodEvent(i, "2026-05-01T00:00:00", "2026-05-01T01:00:00", 120, "flood") for i in ids])
+    v = floodnet.summary_for_polygon(box(-74.0, 40.55, -73.9, 40.65))
+    assert v["n_sensors"] == 1 and v["n_flood_events_3y"] == 1
+    assert v["narrative"].startswith("1 FloodNet community sensor inside this area has logged 1 above-curb flood event")
+    assert v["narrative"].endswith("Most events: Dover Street (1).")
+    empty = floodnet.summary_for_polygon(box(0, 0, 1, 1))
+    assert empty["n_sensors"] == 0 and empty["narrative"] == "No FloodNet sensors are deployed inside this area."
+
+
+@pytest.mark.parametrize("query,hazard", [
+    # From the fourth unseen set: advice and another hazard, phrased as no rule expected.
+    ("Thinking about renting a ground floor apt at 2636 East 14th St, Brooklyn 11235. should I take it or is the "
+     "flood risk too high?", "flood"),
+    ("which blocks around 104 W 136th St in Harlem get the hottest in summer?", "heat"),
+])
+def test_advice_and_other_hazards_are_declined_however_they_are_phrased(query, hazard):
+    plan = heuristic_plan(query)
+    assert plan["intent"] == "out_of_scope" and plan["focus"]["hazard"] == hazard
+    # A question about the flood record that mentions summer is still answered.
+    assert heuristic_plan("Did 80 Pioneer Street, Brooklyn flood last summer?")["intent"] == "single_address"

@@ -180,6 +180,10 @@ def place_phrase(text: str) -> str | None:
         words = run.split()
         while words and words[0].lower().strip(".,") in _NOT_PLACE:
             words = words[1:]
+        whole = " ".join(words).strip(" ,.?")
+        if whole.lower() in _known_neighbourhoods():
+            found.append(whole)  # "East New York" whole: stripping "New York" left "East", the East Village
+            continue
         while words and words[-1].lower().strip(".,") in _NOT_PLACE:
             words = words[:-1]
         phrase = " ".join(words).strip(" ,")
@@ -208,6 +212,14 @@ def place_phrase(text: str) -> str | None:
     return found[0] if found else None
 
 
+def landmark_phrase(text: str) -> str | None:
+    """A landmark or a street named after a neighbourhood, typed in lower
+    case ("red hook ferry terminal"): the whole name, for the geocoder."""
+    named = [m.group(0) for n in _known_neighbourhoods()
+             if (m := re.search(rf"\b{re.escape(n)}(?:\s+(?:{_SUFFIX}|{_LANDMARK}))+\b", (text or "").lower()))]
+    return max(named, key=len).title() if named else None
+
+
 # After a neighbourhood's name these make it a building or a station, not the area.
 _LANDMARK = (r"(?:hospital|houses|station|terminal|cent(?:er|re)|college|university|library|school|mall|airport"
              r"|stadium|bridge|tunnel|cemetery|medical|market|pier|ferry|yards?|depot)")
@@ -218,7 +230,8 @@ ELSEWHERE_RE = re.compile(
     r"|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan"
     r"|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|north carolina"
     r"|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah"
-    r"|vermont|virginia|washington state|west virginia|wisconsin|wyoming)\b", re.IGNORECASE)
+    r"|vermont|virginia|washington state|west virginia|wisconsin|wyoming)\b"
+    r"(?!\s+" + _SUFFIX + r"\b)", re.IGNORECASE)  # "Pennsylvania Avenue" is a street in East New York
 
 
 _NEIGHBOURHOODS: list[str] = []

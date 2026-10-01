@@ -1,6 +1,6 @@
 [project]
 name = "riprap"
-version = "0.7.0"
+version = "0.8.0"
 description = "Cited flood-evidence briefings for New York City places, from public records."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -60,6 +60,27 @@ riprap-register = "riprap.cli.register:main"
 riprap-mcp = "riprap.mcp.server:main"
 
 [project.optional-dependencies]
+# Experimental: the Battery surge forecast model, run per request on CPU
+# (app/live/ttm_battery_surge.py). The app works without it and says so.
+ml = [
+    "torch>=2.5,<3",
+    "transformers>=4.55,<5",
+    "huggingface_hub>=0.34,<1",
+    "granite-tsfm>=0.3.0,<0.4",
+]
+# Experimental: batch earth-observation jobs (scripts/run_eo_batch.py,
+# scripts/run_landcover_batch.py), never per request. The app reads their
+# saved outputs without this extra.
+eo = [
+    "terratorch>=1.1,<2",
+    "peft>=0.13,<1",
+    "safetensors>=0.4,<1",
+    "huggingface_hub>=0.34,<1",
+    "planetary-computer>=1.0,<2",
+    "pystac-client>=0.7,<1",
+    "rioxarray>=0.15,<1",
+    "xarray>=2024.1",
+]
 # Measured energy on Apple Silicon (IOReport, no sudo).
 energy = ["zeus-apple-silicon>=1.0,<2; sys_platform == 'darwin'"]
 
@@ -76,10 +97,6 @@ dev = [
     "ruff>=0.6",
     "pytest>=9.0",
     "vulture>=2.13",
-    "radon>=6.0",
-    "pyupgrade>=3.20",
-    "refurb>=2.1",
-    "mypy>=1.13",
     "pre-commit>=4.0",
 ]
 

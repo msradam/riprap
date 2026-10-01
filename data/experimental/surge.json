@@ -1,0 +1,52 @@
+{
+ "model": "msradam/Granite-TTM-r2-Battery-Surge",
+ "revision": "181b892bf4c4693018a834d359427c279b315213",
+ "station": "8518750",
+ "run_date": "2026-10-01",
+ "first": "2025-01-01",
+ "last": "2026-09-27",
+ "step_hours": 24,
+ "context_hours": 1024,
+ "horizon_hours": 96,
+ "n_windows": 635,
+ "mae_m": 0.115,
+ "baseline_mae_m": 0.133,
+ "mae_cm": 11.5,
+ "baseline_mae_cm": 13.3,
+ "n_flood_windows": 23,
+ "n_flood_foreseen": 1,
+ "all": {
+  "n_windows": 635,
+  "mae_model_m": 0.115,
+  "mae_zero_m": 0.167,
+  "mae_last_value_m": 0.133,
+  "mae_mean_24h_m": 0.133,
+  "peak_error_model_m": 0.157,
+  "peak_error_zero_m": 0.36,
+  "peak_error_last_value_m": 0.237,
+  "peak_error_mean_24h_m": 0.24
+ },
+ "residual_peak_at_least_0.5_m": {
+  "n_windows": 109,
+  "mae_model_m": 0.209,
+  "mae_zero_m": 0.281,
+  "mae_last_value_m": 0.246,
+  "mae_mean_24h_m": 0.241,
+  "peak_error_model_m": 0.357,
+  "peak_error_zero_m": 0.617,
+  "peak_error_last_value_m": 0.446,
+  "peak_error_mean_24h_m": 0.463
+ },
+ "minor_flood_stage": {
+  "stage_m_mllw": 2.134,
+  "windows_that_reached_it": 23,
+  "model_said_so": 1,
+  "zero_said_so": 0,
+  "last_value_said_so": 5,
+  "mean_24h_said_so": 6,
+  "model_false_alarms": 1,
+  "zero_false_alarms": 0,
+  "last_value_false_alarms": 4,
+  "mean_24h_false_alarms": 5
+ }
+}

@@ -44,7 +44,8 @@ WORKDIR /app
 
 # Dependencies first so a code-only edit doesn't bust the layer cache.
 COPY pyproject.toml uv.lock ./
-# Core dependencies only: no model runs in the app process.
+# Core dependencies only: no torch. The experimental surge model (the ml
+# extra) is left out and its source says so; the satellite layers are data.
 # The cache mount keeps uv's download cache out of the image.
 RUN --mount=type=cache,target=/root/.cache/uv \
     UV_LINK_MODE=copy uv sync --frozen --no-dev --no-install-project

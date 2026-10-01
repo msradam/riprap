@@ -25,7 +25,11 @@ def test_forecast_questions_are_detected_and_named_days_are_not():
 def test_forecast_question_plans_as_a_point_question_with_future_focus():
     p = heuristic_plan(Q)
     assert p["intent"] == "single_address" and p["focus"]["time_frame"] == "future"
-    assert heuristic_plan("Will 200 Water Street, Manhattan flood next Tuesday?")["intent"] == "out_of_scope"
+    # A named day at a named place is no longer refused outright: the plan runs
+    # the forecasts and the rules decline the prediction (test_experimental.py).
+    day = heuristic_plan("Will 200 Water Street, Manhattan flood next Tuesday?")
+    assert day["intent"] == "single_address" and day["focus"]["time_frame"] == "future"
+    assert heuristic_plan("Will it flood next Tuesday?")["intent"] == "out_of_scope"  # no place, nothing to quote
 
 
 def test_llm_plan_saying_live_now_is_corrected(monkeypatch):

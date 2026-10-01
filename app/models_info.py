@@ -1,21 +1,43 @@
-"""Which model took part in a briefing.
+"""Which models took part in a briefing.
 
-`for_briefing(final)` reads the LLM call records of one result and lists
-each model that ran: the endpoint's model id, where it ran and its latency
-for this briefing. A briefing made without a language model lists nothing:
-no other model runs. `loaded()` backs /api/models; `warm()` pings the LLM
-at startup when RIPRAP_WARM=1.
+`for_briefing(final)` lists each model behind one result: the experimental
+models whose sources returned a value (the surge forecast runs in this
+process; the satellite models ran earlier, in a batch, and their saved
+output is read), then the LLM endpoint with its calls and latency. A
+briefing made with none of them lists nothing. `loaded()` backs
+/api/models; `warm()` pings the LLM at startup when RIPRAP_WARM=1.
 """
 
 from __future__ import annotations
 
 import logging
 
+from app import experimental
+
 log = logging.getLogger("riprap.models")
+
+# source id -> (the experimental model behind it, where it ran, how).
+SOURCES = {
+    "ttm_battery_surge": ("surge", "CPU, in this server", "loaded"),
+    **{s: ("water", "an earlier batch run; its saved output is read", "precomputed")
+       for s in ("prithvi_water", "prithvi_water_nta")},
+    **{s: ("landcover", "an earlier batch run; its saved output is read", "precomputed")
+       for s in ("landcover", "landcover_nta")},
+}
 
 
 def for_briefing(final: dict) -> list[dict]:
-    """The LLM endpoints that answered for one result, with calls and time."""
+    """The models behind one result: experimental models in trace order,
+    each once, then the LLM endpoints that answered."""
+    out: dict[str, dict] = {}
+    for t in final.get("trace") or []:
+        step, value = t.get("step"), final.get(t.get("step"))
+        if step not in SOURCES or not isinstance(value, dict) or value.get("available") is False:
+            continue
+        key, where, how = SOURCES[step]
+        m = experimental.MODELS[key]
+        out.setdefault(m.repo, {"name": f"{m.name} (experimental)", "repo": m.repo, "where": where, "how": how,
+                                "latency_s": t.get("elapsed_s") if how == "loaded" else None})
     calls = [*((final.get("plan") or {}).get("llm_calls") or []),
              *((final.get("grounding") or {}).get("llm_calls") or [])]
     by_model: dict[str, dict] = {}
@@ -26,7 +48,7 @@ def for_briefing(final: dict) -> list[dict]:
                                         "latency_s": 0.0, "calls": 0})
         row["latency_s"] = round(row["latency_s"] + float(c.get("duration_s") or 0), 2)
         row["calls"] += 1
-    return list(by_model.values())
+    return [*out.values(), *by_model.values()]
 
 
 def _where(endpoint: str) -> str:
@@ -37,10 +59,27 @@ def _where(endpoint: str) -> str:
 
 
 def loaded() -> dict:
-    """The LLM endpoint configured, if any. No model runs in this process."""
+    """The experimental models this server can use, and the LLM endpoint
+    configured. `in_process`: the surge model, true once loaded.
+    `precomputed`: whether each batch model's saved output is on disk.
+    `installed`: whether the optional extras are."""
+    import importlib.util
+    import sys
+
+    from app.eo import landcover
+    from app.flood_layers import prithvi_water
     from riprap.core import llm
 
-    return {"in_process": {}, "llm_endpoints": [{"model": e.model, "base_url": e.base_url} for e in llm.endpoints()]}
+    surge = sys.modules.get("app.live.ttm_battery_surge")
+    m = experimental.MODELS
+    return {
+        "in_process": {m["surge"].repo: bool(surge and surge._MODEL is not None)},
+        "precomputed": {m["water"].repo: bool(prithvi_water.events()),
+                        m["landcover"].repo: bool(landcover.years())},
+        "installed": {"ml": bool(importlib.util.find_spec("tsfm_public")),
+                      "eo": bool(importlib.util.find_spec("terratorch"))},
+        "llm_endpoints": [{"model": e.model, "base_url": e.base_url} for e in llm.endpoints()],
+    }
 
 
 def warm() -> dict:

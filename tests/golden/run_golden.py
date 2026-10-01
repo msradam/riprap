@@ -2,6 +2,7 @@
 
     uv run python tests/golden/run_golden.py tests/golden/seen.json
     uv run python tests/golden/run_golden.py tests/golden/unseen.json --kinds question
+    uv run python tests/golden/run_golden.py tests/golden/unseen3.json --kinds predictive,refuse
 
 Reads each entry, asks the app at --base for its briefing, computes the
 keys at the point the app resolved, and writes one JSON result per entry
@@ -122,6 +123,11 @@ def score_district(base: str, code: str) -> dict:
           ok="community board field" in (out.get("paragraph") or ""))
     check(res["facts"], "311 count in text", got, want,
           ok=bool(re.search(rf"\b{got} NYC 311", out.get("paragraph") or "")))
+    v, kf = out.get("floodnet_nta") or {}, keys.floodnet_district(code)
+    check(res["facts"], "FloodNet sensors in the district", v.get("n_sensors"), kf["n_sensors"])
+    check(res["facts"], "FloodNet events in the district (3 y)", v.get("n_flood_events_3y"), kf["n_events"])
+    check(res["facts"], "FloodNet peak mm in the district (good sensors)", (v.get("peak_event") or {}).get("max_depth_mm"),
+          kf["peak_mm_good"])
     return res
 
 
@@ -184,6 +190,9 @@ def score_question(base: str, question: str) -> dict:
             want = keys.nyc311_district(board, years=int(v.get("years") or 3))
             got = re.search(r"\b(\d+) NYC 311", ans)
             check(res["facts"], f"311 count in {board} answered", int(got.group(1)) if got else None, want)
+        else:  # no independent key for the other district questions: that it answered, about that district
+            check(res["facts"], f"answered for {board}", out.get("intent"), None,
+                  ok=bool(ans) and bool((out.get("grounding") or {}).get("answered")))
         return res
     k = keys.all_keys(lat, lon)
     res["keys"] = k
@@ -203,11 +212,52 @@ def score_question(base: str, question: str) -> dict:
     return res
 
 
+def score_predictive(base: str, question: str) -> dict:
+    """A question about the future. No key can say what will happen, so
+    the checks are on the form of the answer: something is quoted, the lead
+    is no yes or no, and every sentence from an experimental model says it
+    is experimental."""
+    out = app_json(base, "/api/agent", question)
+    ans = answer_text(out)
+    g = out.get("grounding") or {}
+    res: dict = {"query": question, "intent": out.get("intent"), "answer": ans, "lead": g.get("answer_lead"), "facts": []}
+    check(res["facts"], "answered, not refused", out.get("intent"), None,
+          ok=out.get("intent") not in ("out_of_scope", "not_implemented") and bool(g.get("answered")))
+    first = ans.split(".")[0].strip().lower() if ans else ""
+    check(res["facts"], "no yes or no about the future", first, None, ok=first not in ("yes", "no", "in part"))
+    cites = out.get("citations") or {}
+    experimental = {d for d, c in cites.items() if (c or {}).get("maturity") == "experimental"}
+    # Sentences are the source's own, each closed by its [doc_id]: one from an
+    # experimental source must open with the label.
+    bad = [d for d in experimental
+           for m in re.finditer(r"(?:^|\]\.?\s+)([^\[\]]+)\[" + re.escape(d) + r"\]", ans)
+           # (An answer formed by a model alone opens with the lead "From an experimental model, not a measurement:".)
+           if m.group(1).strip() and not re.match(r"(Experimental|Limits:|Rely on|From an experimental model, not a measurement: Experimental)",
+                                                  m.group(1).strip())]
+    check(res["facts"], "experimental output is labelled", bad, [], ok=not bad)
+    check(res["facts"], "never a certainty", None, None, ok=not re.search(r"\bwill (flood|reach|rise|exceed)\b", ans))
+    return res
+
+
+def score_refusal(base: str, query: str) -> dict:
+    """A query the app should decline or cannot place: it must not come
+    back as an ordinary New York City briefing."""
+    out = app_json(base, "/api/agent", query)
+    declined = out.get("intent") in ("out_of_scope", "not_implemented")
+    outside = out.get("deployment") in (None, "__none__") and out.get("lat") is not None
+    unplaced = out.get("lat") is None
+    res = {"query": query, "intent": out.get("intent"), "deployment": out.get("deployment"),
+           "answer": (out.get("paragraph") or "")[:400], "facts": []}
+    check(res["facts"], "declined, unplaced or outside the city", [declined, unplaced, outside], None,
+          ok=declined or unplaced or outside)
+    return res
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("set_file")
     ap.add_argument("--base", default="http://127.0.0.1:7860")
-    ap.add_argument("--kinds", default="address,district,question")
+    ap.add_argument("--kinds", default="address,district,question,predictive,refuse")
     ap.add_argument("--ids", default=None, help="comma-separated entry ids to run")
     ap.add_argument("--out", default=None)
     ap.add_argument("--pause", type=float, default=0, help="seconds between entries (the public APIs have quotas)")
@@ -219,7 +269,8 @@ def main() -> int:
         if e["kind"] not in kinds or (a.ids and e["id"] not in a.ids.split(",")):
             continue
         try:
-            fn = {"address": score_address, "district": score_district, "question": score_question}[e["kind"]]
+            fn = {"address": score_address, "district": score_district, "question": score_question,
+                  "predictive": score_predictive, "refuse": score_refusal}[e["kind"]]
             r = fn(a.base, e["query"])
         except Exception as ex:  # noqa: BLE001
             r = {"query": e["query"], "error": repr(ex), "facts": []}

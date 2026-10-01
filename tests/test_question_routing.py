@@ -10,7 +10,13 @@ from riprap.core.burr.templated_reconciler import SCOPE_REFUSAL, refusal
 from riprap.core.pebbles.bridge import get_registry
 
 NYC = get_registry("nyc")
-POINT = [p.id for p in NYC.all() if p.manifest.spatial.scope == "point"]
+POINT = [p.id for p in NYC.all() if p.manifest.spatial.scope in ("point", "any")]  # "any": the harbour gauges
+AREA = [p.id for p in NYC.all() if p.manifest.spatial.scope in ("polygon", "any")]
+
+
+def test_a_district_runs_the_area_sources_and_the_harbour_gauges():
+    got = set(select_pebbles({"intent": "neighborhood", "question": ""}, NYC))
+    assert got == set(AREA) and {"noaa_tides", "nws_water_forecast", "ttm_battery_surge"} <= got
 
 
 def test_bare_address_runs_every_point_pebble():
@@ -131,7 +137,9 @@ def test_focus_floor_adds_what_an_analyst_checks():
     now = {**past, "intent": "live_now", "focus": {"time_frame": "now", "assets": []}}
     assert set(select_pebbles(now, NYC)) == {"nws_alerts", "nws_obs", "floodnet", "noaa_tides", "nws_water_forecast"}
     area = {**past, "intent": "neighborhood", "focus": {"time_frame": "past", "assets": []}}
-    assert set(select_pebbles(area, NYC)) == {"area_boundary", "sandy_nta", "dep_moderate_2050_nta", "nyc311_nta"}
+    # (the sensors inside the area joined the past floor with the district FloodNet source)
+    assert set(select_pebbles(area, NYC)) == {"area_boundary", "sandy_nta", "dep_moderate_2050_nta", "nyc311_nta",
+                                              "floodnet_nta"}
 
 
 def test_empty_section_is_hidden_when_the_answer_covers_its_stone():
@@ -170,9 +178,17 @@ def test_a_later_claim_that_restates_the_answer_is_left_out():
     assert text.count("568") == 1 and "**Live Observer.**" not in text
 
 
-def test_a_named_future_day_is_refused_but_a_past_day_is_not():
-    assert heuristic_plan("Will 200 Water Street, Manhattan flood next Tuesday?")["intent"] == "out_of_scope"
-    assert heuristic_plan("Is 80 Pioneer Street going to flood tomorrow?")["intent"] == "out_of_scope"
+def test_a_named_future_day_gets_no_prediction_and_a_past_day_is_a_history_question():
+    from riprap.core.burr import rule_answer
+
+    # The prediction is declined in the answer's lead, and what is forecast
+    # and mapped at the place follows it; with no place it is still refused.
+    for q in ("Will 200 Water Street, Manhattan flood next Tuesday?", "Is 80 Pioneer Street going to flood tomorrow?"):
+        plan = heuristic_plan(q)
+        assert plan["intent"] == "single_address" and plan["focus"]["time_frame"] == "future"
+        texts = {"nws_water_forecast": "The National Weather Service forecasts a peak water level of 6.0 ft."}
+        assert rule_answer.answer(q, texts, {})[0] == "no_prediction"
+    assert heuristic_plan("Will the city flood next Tuesday?")["intent"] == "out_of_scope"
     assert heuristic_plan("Did 80 Pioneer Street, Brooklyn flood on Monday?")["intent"] != "out_of_scope"
     assert heuristic_plan("Is there flooding near 80 Pioneer Street right now?")["intent"] == "live_now"
 

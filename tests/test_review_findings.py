@@ -298,7 +298,9 @@ def test_311_complaints_alone_do_not_make_has_it_flooded_a_yes():
 
 
 @pytest.mark.parametrize("query,intent", [
-    ("Will 90-01 183rd Street, Queens flood on October 15?", "out_of_scope"),      # a prediction, not a past date
+    # A prediction, not a past date: declined in the answer, with what is forecast there (test_experimental.py).
+    ("Will 90-01 183rd Street, Queens flood on October 15?", "single_address"),
+    ("Will it flood on October 15?", "out_of_scope"),
     ("Is it safe to rent a basement apartment at 153-10 Peck Avenue, Queens?", "out_of_scope"),
     ("what is flooding right now", "not_implemented"),                              # no place: point to the live tools
 ])

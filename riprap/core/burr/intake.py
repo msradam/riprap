@@ -28,8 +28,14 @@ from typing import Any
 from burr.core import State, action
 
 from riprap.core.burr.pebble import trace_rec_for
-from riprap.core.burr.place import ELSEWHERE_RE, extract_address, geocode_matches, resolve_query
-from riprap.core.burr.rule_answer import asks_now  # one definition of "now"
+from riprap.core.burr.place import (
+    ELSEWHERE_RE,
+    extract_address,
+    geocode_matches,
+    landmark_phrase,
+    resolve_query,
+)
+from riprap.core.burr.rule_answer import _clauses, asks_now, recognised  # one definition of "now"
 
 # Trailing risk phrases ("... at risk of flooding?", "... flood risk").
 _TRAILING_RE = re.compile(
@@ -81,16 +87,17 @@ _COMPARE_RE = re.compile(r"^\s*compare\s+(.+?)\s+(?:to|with|and|vs\.?|versus)\s+
 # those once got building permits for an answer.
 _DEVELOPMENT_RE = re.compile(r"\b(construction|permits?|being built|new (buildings?|developments?)|projects? underway)\b",
                              re.IGNORECASE)
-_HOUSE_NUMBER_RE = re.compile(r"^\s*\d+(-\d+)?\s+\S")
 # An address that ends in another state's code ("..., San Francisco, CA"): the
 # NYC address span would drop the city ("1 Dr", "1 Civic Plaza"), so the whole
 # address is geocoded and routed to its deployment, or to none.
 _OTHER_STATE_RE = re.compile(
     r",\s*(?!NY\b)(A[KLRZ]|C[AOT]|D[CE]|FL|GA|HI|I[ADLN]|K[SY]|LA|M[ADEINOST]|N[CDEHJMV]|O[HKR]|PA|RI|S[CD]"
     r"|T[NX]|UT|V[AT]|W[AIVY])\.?(?:\s+\d{5})?\s*\??\s*$")
-_OUT_OF_SCOPE_RE = re.compile(r"\b(should (i|we) (buy|rent|sell|move|live|stay|evacuate|leave)"
+_OUT_OF_SCOPE_RE = re.compile(r"\b(should (i|we) (buy|rent|sell|move|live|stay|evacuate|leave|take|sign|lease|avoid|pass)"
                               r"|(is|would) it (be )?safe\b|safe to (buy|rent|live|stay|move|park)|worth (buying|renting)"
-                              r"|insurance (cost|premium|price|rate)|cost me|sue|lawsuit|lawyer|mortgage)\b", re.IGNORECASE)
+                              r"|risk (is )?too (high|great|much)|too (risky|dangerous) to"
+                              r"|good idea to (rent|buy|live|move|sign)"
+                              r"|insurance (cost|premium|price|rate)(?! map)|cost me|sue (the|my|our|a|an|him|her|them)|lawsuit|lawyer|mortgage)\b", re.IGNORECASE)
 NO_PLACE_NOW = ("Riprap reads the records for one place at a time, and this question names none. For what is "
                 "flooding across the city right now, use the FloodNet sensor dashboard (dataviz.floodnet.nyc); "
                 "official warnings come from the National Weather Service (weather.gov/okx) and Notify NYC. "
@@ -122,8 +129,9 @@ def forecast_question(query: str) -> bool:
     return bool(_FORECAST_Q_RE.search(query or "")) and not _FUTURE_DAY_RE.search(query or "")
 
 
-_OTHER_HAZARD_RE = {"heat": re.compile(r"\b(heat island|heat wave|heat vulnerab|hot in the summer)", re.I),
-                    "air": re.compile(r"\b(air quality|aqi|air pollution|smog)\b", re.I)}
+_OTHER_HAZARD_RE = {"heat": re.compile(r"\b(heat island|heat ?waves?|heat vulnerab|extreme heat|hot(ter|test)?\b[^.?!]{0,30}\bsummer"
+                                       r"|(surface|air) temperatures?|cooling cent(er|re)s?)", re.I),
+                    "air": re.compile(r"\b(air quality|aqi|air pollution|smog|pm ?2\.5|ozone(?! park))\b", re.I)}
 
 
 _BOROUGH_WORDS = {"manhattan": "Manhattan", "brooklyn": "Brooklyn", "queens": "Queens", "bronx": "Bronx",
@@ -154,6 +162,15 @@ def _with_borough(span: str, query: str) -> str:
     return f"{span}, Queens" if re.match(r"\s*\d+-\d+\s", span) else span
 
 
+def _names_a_place(query: str) -> bool:
+    """A street address, a district, or a neighbourhood the city knows
+    (a capitalised "Tuesday" is not one)."""
+    from app.areas import nta  # noqa: PLC0415
+
+    place = resolve_query(query)
+    return place["kind"] in ("address", "district") or (place["kind"] == "neighborhood" and bool(nta.resolve(place["text"])))
+
+
 def heuristic_plan(query: str) -> dict:
     """LLM-free intent routing, so no-LLM mode needs no model at all.
 
@@ -173,11 +190,17 @@ def heuristic_plan(query: str) -> dict:
     if msg:
         return {"intent": "not_implemented", "rationale": msg, "targets": []}
     for hazard, pattern in _OTHER_HAZARD_RE.items():
-        if pattern.search(q):
+        # ("It gets hot here in the summer and the basement floods" is still a flood question, and so
+        # is "It was hot last summer. Was it inside the Sandy zone?": another sentence asks about flooding.)
+        if pattern.search(q) and not re.search(r"\bflood", q, re.IGNORECASE) and not any(
+                recognised(c) for c in _clauses(q) if not pattern.search(c)):
             return {"intent": "out_of_scope", "rationale": f"Heuristic match: {hazard} question.",
                     "focus": {"hazard": hazard, "time_frame": "any", "assets": []},
                     "targets": [{"type": "address", "text": _address_from_query(q)}]}
-    if _OUT_OF_SCOPE_RE.search(q) or _FUTURE_DAY_RE.search(q):
+    # A prediction for a named day with no place has nothing to answer with;
+    # with a place, the rules decline the prediction and quote what is
+    # forecast and mapped there (rule_answer: no_prediction).
+    if _OUT_OF_SCOPE_RE.search(q) or (_FUTURE_DAY_RE.search(q) and not _names_a_place(q)):
         return {"intent": "out_of_scope", "rationale": "Heuristic match: out of scope.",
                 "focus": {"hazard": "flood", "time_frame": "any", "assets": []},
                 "targets": [{"type": "address", "text": _address_from_query(q)}]}
@@ -201,7 +224,7 @@ def heuristic_plan(query: str) -> dict:
     if place["kind"] == "district":
         return {"intent": area_intent, "rationale": f"Heuristic match: community district {place['text']}.",
                 "targets": [{"type": "district", "text": place["text"]}], "place": place}
-    live = asks_now(q) and not forecast_question(q)
+    live = asks_now(q) and not forecast_question(q) and not _FUTURE_DAY_RE.search(q)
     # Another city or state named in the question ("Pike Place Market in Seattle").
     elsewhere = ELSEWHERE_RE.search(q) if place["text"] and not ELSEWHERE_RE.search(place["text"]) else None
     if place["kind"] == "address":
@@ -211,6 +234,8 @@ def heuristic_plan(query: str) -> dict:
         # "Broad Channel high tide tonight": the live sources read at a point,
         # so the neighbourhood by name, for the geocoder (it was City Hall).
         intent, target = "live_now", f"{place['text']}, {hits[0]['borough']}, NY"
+    elif live and place["kind"] is None and not ELSEWHERE_RE.search(q) and (mark := landmark_phrase(q)):
+        intent, target = "live_now", f"{mark}, New York, NY"  # the geocoder decides
     elif live and place["kind"] is None:
         # "What is flooding right now" names no place, and Riprap reads one
         # place at a time: say where the citywide picture is (it was once
@@ -242,7 +267,7 @@ def heuristic_plan(query: str) -> dict:
     kind = "nta" if intent in ("neighborhood", "development_check") else "address"
     out = {"intent": intent, "rationale": f"Heuristic match: {intent}.",
            "targets": [{"type": kind, "text": target}], "place": place}
-    if forecast_question(q):
+    if forecast_question(q) or _FUTURE_DAY_RE.search(q):
         out["focus"] = {"hazard": "flood", "time_frame": "future", "assets": []}
     return out
 

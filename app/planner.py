@@ -200,7 +200,7 @@ def catalog(registry) -> list[dict]:
     """The sources the planner may choose from: id, stone, scope and the
     manifest's one-line `answers`. No evidence, so the prompt stays short."""
     return [{"id": p.id, "stone": p.stone,
-             "scope": "area" if p.manifest.spatial.scope == "polygon" else "point",
+             "scope": {"polygon": "area", "any": "point or area"}.get(p.manifest.spatial.scope, "point"),
              "answers": p.manifest.answers or p.manifest.title}
             for p in sorted(registry.all(), key=lambda p: (p.stone, p.id)) if p.stone != "capstone"]
 

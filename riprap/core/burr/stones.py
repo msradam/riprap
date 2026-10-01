@@ -44,10 +44,11 @@ FLOOR = {
 # chose: the record of past floods, the live signals, the asset register.
 # Ids outside the intent's scope (point vs area) are ignored.
 FOCUS_FLOOR = {
-    ("time_frame", "past"): ("nyc311", "floodnet", "ida_hwm", "sandy", "nyc311_nta", "sandy_nta"),
-    ("time_frame", "now"): ("nws_alerts", "nws_obs", "floodnet", "noaa_tides", "nws_water_forecast", "nws_alerts_nta"),
+    ("time_frame", "past"): ("nyc311", "floodnet", "ida_hwm", "sandy", "nyc311_nta", "floodnet_nta", "sandy_nta"),
+    ("time_frame", "now"): ("nws_alerts", "nws_obs", "floodnet", "noaa_tides", "nws_water_forecast", "nws_alerts_nta",
+                            "floodnet_nta"),
     # A forecast question runs the forecast and every projection.
-    ("time_frame", "future"): ("nws_water_forecast", "npcc4_slr", "dep_moderate_2050", "dep_extreme_2080",
+    ("time_frame", "future"): ("nws_water_forecast", "ttm_battery_surge", "npcc4_slr", "dep_moderate_2050", "dep_extreme_2080",
                                "dep_moderate_2050_nta", "dep_extreme_2080_nta", "npcc4_slr_nta"),
     ("assets", "subway"): ("mta_entrances", "mta_entrances_nta"),
     ("assets", "schools"): ("doe_schools", "doe_schools_nta"),
@@ -95,7 +96,7 @@ def select_pebbles(plan: dict | None, registry) -> list[str]:
 
 def _wants(manifest, intent: str | None) -> bool:
     scope = "polygon" if intent in POLYGON_INTENTS else "point"
-    if manifest.spatial.scope != scope:
+    if manifest.spatial.scope not in (scope, "any"):
         return False
     return intent != "live_now" or manifest.type == "live"
 
