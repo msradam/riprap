@@ -59,7 +59,7 @@ TOPICS = (
     (re.compile(r"\bsandy\b", re.I), ("sandy_inundation", "sandy_nta")),
     (re.compile(r"stormwater|storm water|\bdep\b|scenarios?\b|(extreme|moderate) (rain|flood)|rain(fall)? (flood )?maps?"
                 r"|flood maps?", re.I), DEP),
-    (re.compile(r"elevation|low spot|low.lying|terrain|topograph|how high (is|above)(?![^?]*\b(surge|tides?|water)\b)"
+    (re.compile(r"elevation|low spot|low.lying|terrain|topograph|how high (is|above)(?! (the |tomorrow's |tonight's |today's )?((predicted|storm|high|next) )*(surge|tides?|water)\b)"
                 r"|above sea level", re.I),
      ("microtopo", "microtopo_nta")),
     (re.compile(r"\bpermits?\b|construction|being built", re.I), ("dob_permits_nta",)),
@@ -91,7 +91,8 @@ EXPERIMENTAL = (
 # ("Will this be in a flood zone" and "will flood insurance ..." ask about a map and a price.)
 _WILL_FLOOD_RE = re.compile(r"\b(will|going to|gonna|likely to|expected to|about to)\b[^.?!]*"
                             r"\bflood(?!net|[- ]?(zone|plain|insurance|map))"
-                            r"|\bflood\w*\s+(?:is\s+|are\s+)?(?:expected|likely|forecast|predicted)\b", re.I)
+                            r"|\bflood\w*\s+(?:(?:is|are)\s+(?:expected|likely|forecast|predicted)|expected|likely|predicted)\b",
+                            re.I)  # ("the flood forecast" is a noun, and the forecast answers it)
 NO_PREDICTION_FACTS = ("nws_alerts", "nws_water_forecast", "fema_nfhl", "dcp_floodplain_nta",
                        "dep_moderate_current", "dep_moderate_current_nta", "sandy_inundation", "sandy_nta")
 
@@ -121,13 +122,13 @@ _NOW_RE = re.compile(r"\b(right now|rite now|rn|currently|tonight|at the moment|
                      r"|happening now|going on now|as we speak)\b|" + _FLOODING_NOW_RE.pattern, re.I)
 _FUTURE_RE = re.compile(r"\b(forecasts?|forecasting|projections?|projected|outlook|predictions?|what is coming|what's coming"
                         r"|in the (coming|next) (years|decades)|in the future|by (the )?20\d\ds?|20[5-9]0s?|2100"
-                        r"|(next|coming) (few |couple of |\w+ )?(hours|days)|tomorrow|next week|this (coming )?week(end)?)\b", re.I)
+                        r"|(next|coming) (few |couple of |\w+ )?(hours|days)|tomorrow|next week|this (coming )?weekend)\b", re.I)
 _FLOOD_RE = re.compile(r"\bflood", re.I)
 _DURING_RE = re.compile(r"\b(during|in|after|by)\s+(?:tropical storm\s+|[a-z]+\s+)?(ida|sandy)\b", re.I)
 
 
 _CLAUSE_SPLIT_RE = re.compile(r"(?<=[.!?;:])\s+|,\s+(?:and|but)\s+"
-                              r"|\s+and\s+(?=(?:has|have|had|did|does|do|was|were|is|are|will|would|could|how|which|what)\b)", re.I)
+                              r"|\s+and\s+(?=(?:has|have|had|did|does|do|was|were|is|are|how|which|what)\b)", re.I)
 
 
 # The period of an abbreviation ends no clause: "100 Main St. since Sandy" was
@@ -164,8 +165,12 @@ def _clauses(question: str) -> list[str]:
     q = _INITIALS_RE.sub(lambda m: m.group(0).replace(".", ""), _ABBREV_RE.sub(_abbreviation, question or ""))
     parts = (re.sub(r"^\W*(and|but|so|also)\s+", "", c, flags=re.I).strip() for c in _CLAUSE_SPLIT_RE.split(q))
     # "Since Ida, has it flooded?" reads as "has it flooded since Ida?": the rules look at how a clause opens.
-    parts = (re.sub(r"^((?:since|during|after|before)\b[^,?]*?)(?:,\s*|\s+(?=(?:has|have|had|did|was|were|is|are)\b))"
-                    r"(.+?)([?.!]*)$", r"\2 \1\3", c, flags=re.I) for c in parts)
+    # Without a comma only a storm or a year is moved ("since ida has it flooded"): "During which storms
+    # was this flooded?" and "Since my office is at ..., has it flooded?" are left as written.
+    parts = (re.sub(r"^((?:since|during|after|before)\b[^,?]*),\s*(.+?)([?.!]*)$", r"\2 \1\3", c, flags=re.I) for c in parts)
+    parts = (re.sub(r"^((?:since|during|after|before)\s+(?:hurricane\s+|tropical storm\s+|superstorm\s+)?"
+                    r"(?:ida|sandy|(?:19|20)\d\d))\s+(?=(?:has|have|had|did|was|were|is|are)\b)(.+?)([?.!]*)$",
+                    r"\2 \1\3", c, flags=re.I) for c in parts)
     return [c for c in parts if c]
 
 
@@ -189,7 +194,9 @@ def asks_now(question: str) -> bool:
 
 
 # A house number that reads as a year ("2100 Bartow Avenue", "2050 Grand Concourse") is not one.
-_HOUSE_YEAR_RE = re.compile(r"\b(20[3-9]\d|2100)(?=\s+(?:(?:[nsew]\.?|east|west|north|south)\s+)?(?:[\w']+\s+){0,2}"
+# Only capitalised words may stand between the number and the street word, and "in", "by" or "the"
+# before it make it a year ("In 2050 will Ocean Parkway flood?", "by 2050 put Hamilton Avenue ...").
+_HOUSE_YEAR_RE = re.compile(r"(?<!\bin )(?<!\bby )(?<!\bthe )\b(20[3-9]\d|2100)(?=\s+(?:(?-i:[A-Z])[\w'.]*\s+){0,3}?"
                             r"(?:street|st|avenue|ave|av|boulevard|blvd|road|rd|place|pl|drive|dr|lane|ln|parkway"
                             r"|pkwy|terrace|court|ct|way|plaza|highway|expressway|turnpike|broadway|concourse)\b)", re.I)
 
@@ -199,8 +206,7 @@ def _asks_future(q: str) -> bool:
     whether it flooded ("Did it flood this weekend?" is about the past)."""
     q = _HOUSE_YEAR_RE.sub("", q)
     words = [m.group(0).lower() for m in _FUTURE_RE.finditer(q)]
-    this = ("week", "weekend")  # "this week" and "this weekend" are the past in "did it flood this week"
-    return any(not w.endswith(this) for w in words) or bool(words and not _happened_clause(q))
+    return any(not w.endswith("weekend") for w in words) or bool(words and not _happened_clause(q))
 
 
 def time_frame(question: str) -> str:

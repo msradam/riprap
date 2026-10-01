@@ -209,7 +209,7 @@ def test_no_event_under_way_is_said_only_when_the_record_supports_it(monkeypatch
         monkeypatch.setattr(floodnet, "flood_events_for", lambda ids: [FloodEvent("a", "2026-05-20T23:21:49", end, 300, "flood")])
         return floodnet.summary_for_point(40.71, -73.78)["narrative"]
 
-    said = "FloodNet's record showed no flood event under way at it when this was read."
+    said = "FloodNet's record showed no flood event under way at it when this was read ("
     assert said in narrative("good", "2026-05-21T01:00:00")
     assert said not in narrative("dead", "2026-05-21T01:00:00")  # a sensor out of order cannot say
     assert said not in narrative("good", None)                   # an event with no end is still open in the record
@@ -343,7 +343,6 @@ def test_no_yes_or_no_about_a_day_a_month_or_the_time_before_a_storm(question):
     "Has 80 Pioneer Street, Brooklyn flooded in the last few years?", "Has it flooded here in the last 3 years?",
     "After Ida, has 80 Pioneer Street, Brooklyn flooded?", "Has it flooded here after Ida?",
     "since ida has 80 pioneer street brooklyn flooded",
-    "Has 80 Pioneer Street, Brooklyn flooded before and will it flood again?",
     "Has 2050 Grand Concourse flooded since Ida?",
 ])
 def test_the_sensors_still_say_yes(question):
@@ -392,8 +391,11 @@ def test_the_question_asked_is_the_one_answered(question):
 def test_will_it_flood_is_declined_with_or_without_a_question_mark():
     assert ra.answer("Will 80 Pioneer Street, Brooklyn flood.", T, {})[0] == "no_prediction"
     assert ra.answer("Is flooding expected at 80 Pioneer Street, Brooklyn this week?", T, {})[0] == "no_prediction"
-    assert ra.time_frame("Is flooding expected at 80 Pioneer Street, Brooklyn this week?") == "future"
     assert ra.time_frame("Did it flood here this week?") == "past"
+    # A question that asks about the past and the future together is declined as a prediction;
+    # a "Yes." about the past would sit beside "will it flood again". (Known limit: the record is not quoted.)
+    assert ra.answer("Has 80 Pioneer Street, Brooklyn flooded before and will it flood again?", T, SENSORS)[0] == "no_prediction"
+    assert ra.answer("Is 80 Pioneer Street in a flood zone and will it flood this week?", T, {})[0] == "no_prediction"
 
 
 def test_a_question_about_imagery_takes_no_yes_from_the_record():
@@ -437,3 +439,80 @@ def test_a_citation_mark_does_not_land_inside_a_school_name():
     assert cite(text, "doe_school_exposure") == text.replace("(120 m).", "(120 m) [doe_school_exposure].").replace(
         "It is flagged.", "It is flagged.")
     assert predicates._sentences("in flood zone X. 3 sensors logged events.") == ["in flood zone X.", "3 sensors logged events."]
+
+
+# ---- Regressions the check of the fourth round's fixes found: its inputs. ----
+
+def test_the_real_sensor_sentence_still_reports_a_result(monkeypatch):
+    # "no flood event under way" in the first sentence read as an absence and cost every sensor-only "Yes.".
+    from app.context import floodnet
+    from app.context.floodnet import FloodEvent, Sensor
+    from riprap.core.burr.answer_checks import check_lead, reports_result
+
+    monkeypatch.setattr(floodnet, "sensors_near", lambda *a, **k: [Sensor("a", "Q - 183rd St", "183rd St", "Queens", "good", None)])
+    monkeypatch.setattr(floodnet, "flood_events_for", lambda ids: [
+        FloodEvent("a", f"2026-05-{d:02d}T10:00:00", f"2026-05-{d:02d}T11:00:00", 300, "flood") for d in range(1, 9)])
+    v = floodnet.summary_for_point(40.71, -73.78)
+    assert "no flood event under way" in v["narrative"] and reports_result(v["narrative"])
+    q = "Have the FloodNet sensors near 80 Pioneer Street, Brooklyn recorded any flooding?"
+    lead, facts = ra.answer(q, {"floodnet": v["narrative"]}, {"floodnet": v})
+    assert lead == "yes" and not check_lead(lead, facts, q, {"floodnet": v["narrative"]}, {"floodnet": v})
+
+
+def test_a_year_beside_a_street_is_still_a_year():
+    for q in ("In 2050 will Ocean Parkway flood?", "By 2080 will this street flood?",
+              "What does flooding look like in 2050 on Broadway?", "Will sea level rise by 2050 put Hamilton Avenue under water?"):
+        assert ra.time_frame(q) == "future", q
+
+
+def test_only_a_storm_or_a_year_is_moved_to_the_end_of_its_clause():
+    assert ra.answer("Since my office is at 100 Gold Street, has it flooded?", T, SENSORS)[0] == "yes"
+    for q in ("During which storms was this flooded?", "Since when has it flooded here?"):
+        assert ra._clauses(q) == [q]
+
+
+def test_this_week_in_a_question_about_the_record_brings_no_forecast():
+    assert ra.answer("What were the 311 complaints here this week?", T, SENSORS)[1] == ["nyc311"]
+    assert ra.answer("What did the FloodNet sensors record this week?", T, SENSORS)[1] == ["floodnet"]
+
+
+def test_elevation_questions_that_mention_water_keep_the_elevation():
+    texts = {**T, "microtopo": "Elevation 1.37 m."}
+    assert ra.answer("How high is 80 Pioneer Street above the water?", texts, {})[1] == ["microtopo"]
+    assert "microtopo" in ra.answer("How high is the ground here above high tide?", texts, {})[1]
+
+
+def test_the_flood_forecast_is_a_noun_and_the_forecast_answers_it():
+    for q in ("What is the flood forecast for this weekend?", "Is there a flood forecast for tomorrow?"):
+        lead, facts = ra.answer(q, T, {})
+        assert lead == "facts" and facts[0] == "nws_water_forecast", q
+
+
+def test_a_count_for_last_night_is_not_the_five_year_total():
+    from riprap.core.burr.answer_checks import count_lead
+
+    values = {"nyc311": {"n": 7, "years": 5, "by_year": {"2024": 7}, "by_kind": {}}}
+    assert count_lead("How many 311 complaints were filed last night?", T, values) == (None, True)
+
+
+def test_flooded_before_during_sandy_is_about_sandy():
+    assert ra.answer("Has 80 Pioneer Street flooded before during Sandy?", T, SENSORS) == ("yes", ["sandy_inundation"])
+
+
+def test_a_borough_after_a_neighbourhood_keeps_the_match_exact():
+    from burr.core import State
+
+    from riprap.core.burr import intake
+
+    plan = heuristic_plan("Is Greenpoint, Brooklyn in a flood zone?")
+    out = intake.resolve_area(State({"first_target": plan["targets"][0]["text"], "trace": []}))
+    assert out["geocode"]["match"] == "exact" and out["geocode"]["borough"] == "Brooklyn"
+    queens = intake.resolve_area(State({"first_target": "Murray Hill, Queens", "trace": []}))
+    assert queens["geocode"]["borough"] == "Queens"
+
+
+def test_imagery_after_ida_is_about_the_storm_not_the_time_since():
+    texts = {**T, "ida_hwm": "USGS surveyed 1 Hurricane Ida high-water mark within 800 m of this address.",
+             "prithvi_water": "Experimental: a satellite model showed 0 m² of new surface water within 500 m."}
+    lead, facts = ra.answer("Did satellite imagery show flooding here after Ida?", texts, SENSORS)
+    assert lead == "facts" and facts == ["ida_hwm", "prithvi_water"]

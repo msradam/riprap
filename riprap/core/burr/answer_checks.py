@@ -182,7 +182,7 @@ def kind_asked(rel: str, question: str, value: dict | None) -> str | None:
 
 _ASKS_REPORTS_RE = re.compile(r"\b311\b|complain|report", re.I)
 _YEAR_RE = re.compile(r"\b(?:in|during|for|of)\s+(20[12]\d)\b", re.I)
-_OTHER_PERIOD_RE = re.compile(r"\b(last|this|past) (month|week|few|couple|\d+)|yesterday|today|this (spring|summer|fall|"
+_OTHER_PERIOD_RE = re.compile(r"\b(last|this|past) (month|week|weekend|night|morning|few|couple|\d+)|yesterday|today|this (spring|summer|fall|"
                               r"autumn|winter)|last (spring|summer|fall|autumn|winter)\b", re.I)
 
 
@@ -349,10 +349,12 @@ _HAPPENED_RE = re.compile(r"^\W*(has|have|had|did|was|were|is there|are there)\b
 # One word may stand before the storm's name ("hurricane", "superstorm", or a misspelling of either).
 # "Has it flooded after Ida?" asks about the time since, like "since Ida" (it was once answered
 # "Yes." from Ida's own marks). "Marks surveyed after Ida" and "imagery after Ida" are about the storm.
-_SINCE_RE = re.compile(r"\b(?:since|flood(?:ed|ing|s)?(?: here| there)?\s+after)\s+(?:[a-z]+\s+)?(ida|sandy|(?:19|20)\d\d)\b",
+_SINCE_RE = re.compile(r"\b(?:since|flood(?:ed)?(?: here| there)?\s+after)\s+(?:[a-z]+\s+)?(ida|sandy|(?:19|20)\d\d)\b",
                        re.IGNORECASE)
 # "Before Sandy, had it flooded?": no source here says what happened before a storm or a year.
-_BEFORE_RE = re.compile(r"\bbefore\s+(?:[a-z]+\s+)?(ida|sandy|(?:19|20)\d\d)\b", re.IGNORECASE)
+# ("Has it flooded before during Sandy" is not "before Sandy": only a storm's title may stand between.)
+_BEFORE_RE = re.compile(r"\bbefore\s+(?:hurricane\s+|tropical storm\s+|superstorm\s+)?(ida|sandy|(?:19|20)\d\d)\b",
+                        re.IGNORECASE)
 # A few days, a named day or a month: the sources count over years, so their
 # totals say neither yes nor no about it. ("The last few years" is not short.)
 _SHORT_PERIOD_RE = re.compile(

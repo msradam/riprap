@@ -454,7 +454,7 @@ def resolve_area(state: State) -> State:
                 "bbox": list(t["geometry"].bounds), "n_matches": len(matches)}
         rec["ok"], rec["result"] = True, info
         trace.append(rec)
-        exact = bool(district) or nta._normalize(target) == nta._normalize(t["nta_name"])
+        exact = bool(district) or nta._normalize(name) == nta._normalize(t["nta_name"])
         geocode = {"address": f"{t['nta_name']}, {t['borough']}", "borough": t["borough"],
                    "lat": c.y, "lon": c.x, "bbl": None, "bin": None,
                    "match": "exact" if exact else "closest"}
