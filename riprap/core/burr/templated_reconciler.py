@@ -256,17 +256,27 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
 
 
 @action(
-    reads=["geocode", "intent", "deployment", *evidence.all_pebble_ids()],
+    reads=["geocode", "intent", "deployment", "plan", "consulted", *evidence.all_pebble_ids()],
     writes=["paragraph", "audit", "grounding", "citations", "trace"],
 )
 def reconcile_templated(state: State) -> State:
     """Burr action: the no-LLM briefing. No model call; every sentence is
-    a manifest template filled from a pebble value."""
+    a manifest template filled from a pebble value, and a question's answer
+    is chosen by rules."""
     trace = list(state.get("trace", []))
     rec = {"step": "reconcile_templated", "started_at": time.time(), "ok": True,
            "result": None, "err": None, "elapsed_s": 0.0}
+    grounding = {"tier": "no_llm", "claims": [], "dropped_claims": []}
     try:
-        paragraph, cites = compose_briefing(state)
+        if (state.get("plan") or {}).get("question") and state.get("intent") not in ("not_implemented", "out_of_scope"):
+            # A question: the rules pick the lead and the facts (rule_answer),
+            # or the evidence briefing stands and says it was not answered.
+            from riprap.core.burr.synthesis import synthesize
+
+            out = synthesize(state, use_llm=False)
+            paragraph, cites, grounding = out["paragraph"], out["citations"], out["grounding"]
+        else:
+            paragraph, cites = compose_briefing(state)
         rec["result"] = {"n_chars": len(paragraph), "n_citations": len(cites), "tier": "no_llm"}
     except Exception as e:  # noqa: BLE001 - surfaced via trace
         rec["ok"], rec["err"] = False, str(e)
@@ -275,8 +285,8 @@ def reconcile_templated(state: State) -> State:
     trace.append(rec)
     return state.update(
         paragraph=paragraph,
-        audit={"raw": paragraph, "dropped": [], "tier": "no_llm"},
-        grounding={"tier": "no_llm", "claims": [], "dropped_claims": []},
+        audit={"raw": paragraph, "dropped": grounding.get("dropped_claims") or [], "tier": "no_llm"},
+        grounding=grounding,
         citations=cites,
         trace=trace,
     )

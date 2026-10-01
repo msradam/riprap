@@ -83,6 +83,7 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
         try:
             from app.planner import is_bare_place
             from app.planner import plan as run_planner
+            from riprap.core.burr import synthesis
             from riprap.core.burr.synthesis import llm_bare
 
             guard = heuristic_plan(query)
@@ -90,6 +91,8 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
                 return guard
             if not llm_bare() and is_bare_place(query, guard["targets"]):
                 return guard  # a bare place: the resolver finds it, and there is no question to plan
+            if synthesis.RULES_FIRST and _rules_can_plan(query, guard):
+                return _with_question(guard, query)  # no model call: the rules route and answer it
             p = run_planner(query, ledger=calls)
             intent, targets, focus = p.intent, p.targets, p.focus
             place_kind = (guard.get("place") or {}).get("kind")
@@ -97,6 +100,10 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
                 # The query names a street address; the model's "Hollis, Queens"
                 # resolved to no area and the reporter's question went unanswered.
                 intent, targets = "single_address", guard["targets"]
+            elif place_kind == "address" and intent in ("single_address", "live_now") and guard["intent"] != "compare":
+                # The parser's span carries the borough the query implies; the
+                # model's "90-01 183rd St in Hollis" matched no place.
+                targets = guard["targets"]
             elif place_kind == "district":
                 # The code parser read the district code; the model's own words
                 # ("Queens Community Board 12") match no tabulation area.
@@ -120,7 +127,28 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
             if "question" not in guard and not is_bare_place(query, guard.get("targets") or []):
                 guard["question"] = query.strip()
             return guard
-    return heuristic_plan(query)
+    return _with_question(heuristic_plan(query), query)
+
+
+def _rules_can_plan(query: str, guard: dict) -> bool:
+    """The rules recognise the question and the place parser found a
+    street address, a district or a neighbourhood: no planner call needed."""
+    from riprap.core.burr import rule_answer
+
+    kind = (guard.get("place") or {}).get("kind")
+    placed = kind in ("address", "district") or (kind == "neighborhood" and guard["intent"] in POLYGON_INTENTS)
+    return placed and guard["intent"] != "compare" and rule_answer.recognised(query)
+
+
+def _with_question(plan: dict, query: str) -> dict:
+    """The regex plan with the question it was asked, so the rules can
+    answer it (a bare place has no question)."""
+    from app.planner import is_bare_place
+
+    if plan["intent"] not in ("not_implemented", "out_of_scope", "compare") and not is_bare_place(
+            query, plan.get("targets") or []):
+        plan["question"] = query.strip()
+    return plan
 
 
 def build_app(query: str, plan: dict | None = None, *, step_queue=None, no_llm: bool = False):

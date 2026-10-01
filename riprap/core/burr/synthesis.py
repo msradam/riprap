@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from burr.core import State, action
 
 from riprap.core import llm
-from riprap.core.burr import answer_checks, evidence
+from riprap.core.burr import answer_checks, evidence, rule_answer
 from riprap.core.burr.templated_reconciler import NON_SCOPE_FOOTER, _scope_header, compose_briefing
 
 log = logging.getLogger("riprap.synthesis")
@@ -171,13 +171,14 @@ EXTRACTIVE_SYSTEM = """You answer a question about flood exposure at one place b
 
 Return JSON with "answer": "lead" is one of yes, no, partly, count, cannot_answer, and "facts" lists the ids of one to four documents that support the lead, most relevant first. The reader sees a fixed phrase for the lead followed by those documents' text, word for word. Use "no" only when the facts report an absence (outside, none, zero). Use "partly" when some but not all of what was asked about is affected. Use "count" when the question asks how many or how much. Use "cannot_answer" with no facts when the documents do not answer the question. Use only ids from the list."""
 LEADS = ("yes", "no", "partly", "count", "cannot_answer")
-# The facts a forecast question is answered with, in order: the Weather
-# Service's water-level forecast, then the published projections.
-# What reports the present: a question about now quotes these, chosen in
-# code (the model left out the sensors and the tide gauge).
-LIVE_FACTS = ("nws_alerts", "floodnet", "noaa_tides", "nws_water_forecast", "usgs_gauges", "nws_obs")
-FORECAST_FACTS = ("nws_water_forecast", "npcc4_slr",
-                  "dep_moderate_2050", "dep_extreme_2080", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
+# What reports the present, and what a forecast question is answered with:
+# chosen in code in both paths (the model left out the sensors and the tide
+# gauge, and picked the flood zone for a forecast question).
+LIVE_FACTS, FORECAST_FACTS = rule_answer.LIVE_FACTS, rule_answer.FORECAST_FACTS
+# When True, a question the rules recognise is answered by the rules even
+# with a model configured, and the model is asked only for the rest
+# (riprap/core/burr/rule_answer.py). Without a model the rules always answer.
+RULES_FIRST = False
 # The owner's decision after refactor 3: extractive cannot paraphrase, and
 # it declines honestly when the evidence does not answer. The guarded mode
 # it replaced (model-written answer claims, five answer rules and an
@@ -294,8 +295,16 @@ def _and(items: list[str]) -> str:
     return items[0] if len(items) == 1 else f"{', '.join(items[:-1])} and {items[-1]}"
 
 
+# A "right now" answer says where the live picture is: the public tools are
+# better at that job than a briefing built from records.
+LIVE_POINTER = ("Riprap reads records, not the street. For a live depth reading use the FloodNet dashboard "
+                "(dataviz.floodnet.nyc); official warnings come from the National Weather Service "
+                "(weather.gov) and Notify NYC.")
+
+
 def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: str = "",
-            lead: str = "", empty: dict[str, list[str]] | None = None, brief: str | None = None) -> str:
+            lead: str = "", empty: dict[str, list[str]] | None = None, brief: str | None = None,
+            now: bool = False) -> str:
     """Scope header, then the answer (when a question was asked), then one
     section per Stone that ran, then the footer. Only verified claims.
 
@@ -349,14 +358,19 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
                                           not in d.text.lower() else d.text, d.doc_id)
                             for d in docs if d.section == sec)
         parts.append(f"**{sec}.**\n" + (body or NO_EVIDENCE_LINE))
-    parts.append(NON_SCOPE_FOOTER)
+    parts.append(NON_SCOPE_FOOTER.replace("**Out of scope.** ", f"**Out of scope.** {LIVE_POINTER} ", 1)
+                 if now else NON_SCOPE_FOOTER)
     return "\n\n".join(parts)
 
 
-def synthesize(state) -> dict:
-    """Run the claim loop. Returns paragraph, citations and a `grounding`
-    record (kept claims, dropped claims with reasons, attempts, model).
-    Falls back to the no-LLM briefing when no endpoint answers."""
+def synthesize(state, use_llm: bool = True) -> dict:
+    """The briefing for a state. A question is answered by the rules of
+    rule_answer (always when `use_llm` is False; first when RULES_FIRST) or
+    by the model's choice of lead and facts, checked by the lead rules.
+    Returns paragraph, citations and a `grounding` record (the answer's
+    facts as claims, dropped claims with reasons, attempts, model). Falls
+    back to the rules, then to the evidence briefing, when no endpoint
+    answers."""
     if state.get("intent") in ("not_implemented", "out_of_scope"):
         paragraph, _ = compose_briefing(state)
         return {"paragraph": paragraph, "citations": {},
@@ -369,7 +383,7 @@ def synthesize(state) -> dict:
                 "grounding": {"tier": "llm", "claims": [], "dropped_claims": [], "attempts": 0}}
     plan = state.get("plan") or {}
     question, focus = plan.get("question") or "", plan.get("focus")
-    if not question and not llm_bare():
+    if not question and not (use_llm and llm_bare()):
         paragraph, cites = compose_briefing(state)
         return {"paragraph": paragraph, "citations": cites,
                 "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": 0,
@@ -419,31 +433,59 @@ def synthesize(state) -> dict:
             notes = [f"answer lead {lead!r}: {r}" for _, r in lead_hits]
         return kept, dropped, notes, (lead, facts, lead_hits)
 
-    attempts, model, first_dropped, calls = 0, None, [], []
-    try:
-        out, model = llm.chat_json(messages, schema, name="claims", ledger=calls)
-        attempts = 1
-        kept, dropped, notes, answer = check(out)
-        first_dropped = dropped
-        if dropped or notes:
-            failures = "\n".join([f'- "{d["text"]}": {d["reason"]}' for d in dropped] + [f"- {n}" for n in notes])
-            messages += [
-                {"role": "assistant", "content": json.dumps(out)},
-                {"role": "user", "content": "These failed verification:\n" + failures +
-                 "\nReturn the full output again. Fix these using only what their cited documents "
-                 "say, or leave them out."},
-            ]
+    attempts, model, first_dropped, calls, fallback_reason = 0, None, [], [], None
+    kept, dropped, notes, answer = [], [], [], ("", [], [])
+    ruled = rule_answer.answer(question, texts, values) if question and (RULES_FIRST or not use_llm) else None
+    if ruled is None and use_llm:
+        try:
             out, model = llm.chat_json(messages, schema, name="claims", ledger=calls)
-            attempts = 2
+            attempts = 1
             kept, dropped, notes, answer = check(out)
-    except llm.LLMUnavailable as e:
+            first_dropped = dropped
+            if dropped or notes:
+                failures = "\n".join([f'- "{d["text"]}": {d["reason"]}' for d in dropped] + [f"- {n}" for n in notes])
+                messages += [
+                    {"role": "assistant", "content": json.dumps(out)},
+                    {"role": "user", "content": "These failed verification:\n" + failures +
+                     "\nReturn the full output again. Fix these using only what their cited documents "
+                     "say, or leave them out."},
+                ]
+                out, model = llm.chat_json(messages, schema, name="claims", ledger=calls)
+                attempts = 2
+                kept, dropped, notes, answer = check(out)
+        except llm.LLMUnavailable as e:
+            # The question stays a question: the rules answer it if they can.
+            fallback_reason = f"LLM unavailable: {e}"
+            ruled = rule_answer.answer(question, texts, values) if question else None
+            kept, dropped, notes = [], [], []
+    if ruled is None and (fallback_reason or not use_llm):
+        # No rule names what the question asks and no model answered: the
+        # evidence for the place, and the page says it was not answered.
         paragraph, cites = compose_briefing(state)
         return {"paragraph": paragraph, "citations": cites,
-                "grounding": {"tier": "no_llm", "fallback_reason": f"LLM unavailable: {e}",
-                              "claims": [], "dropped_claims": [], "attempts": attempts,
-                              "llm_calls": calls, "answer_mode": "extractive"}}
+                "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": attempts,
+                              "llm_calls": calls, "question": question, "answered": False if question else None,
+                              "answer_mode": "extractive" if fallback_reason else "rules",
+                              **({"fallback_reason": fallback_reason} if fallback_reason else {})}}
+    if ruled is not None:
+        focus = {"time_frame": rule_answer.time_frame(question)}
+        lead, facts = ruled
+        if any(k != "dropped_count" for k, _ in answer_checks.check_lead(lead, facts, question, texts, values)):
+            lead = "facts"  # the facts stand; a lead that fails the lead rules does not
+        answer = (lead, facts, [])
     lead_phrase, answer_flags, lead, lead_fact = "", notes, None, None
-    if question:
+    if question and ruled is not None:
+        lead, facts, _ = answer
+        rel = answer_checks.relevant_doc(question, texts)
+        experimental = frozenset(d.doc_id for d in docs if d.experimental)
+        facts = sorted(facts, key=lambda f: f in experimental)  # the rule's order, experimental sources last
+        kept = [{"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts]
+        lead_phrase = CANNOT_ANSWER if lead == "cannot_answer" and facts else LEAD_PHRASES.get(lead, "")
+        if lead == "count" and rel in facts and (kl := answer_checks.kind_lead(question, texts, values)):
+            lead_phrase = f"{kl} {lead_phrase}"
+        lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
+                               focus, texts, values, experimental)
+    elif question:
         lead, facts, lead_hits = answer
         rel = answer_checks.relevant_doc(question, texts)
         appended = bool(rel and rel not in facts and lead != "cannot_answer"
@@ -491,7 +533,8 @@ def synthesize(state) -> dict:
     from riprap.core.burr.templated_reconciler import _lead
 
     brief = _lead(state, items) if not question and state.get("intent") == "single_address" else None
-    paragraph = _render(kept, docs, sections, question, lead_phrase, empty, brief)
+    paragraph = _render(kept, docs, sections, question, lead_phrase, empty, brief,
+                        now=bool(question) and (focus or {}).get("time_frame") == "now")
     # Every consulted source with a value is citable (its evidence row gets a
     # number), the ones the text cites first, in order of appearance, so the
     # numbering still starts with the answer.
@@ -502,11 +545,14 @@ def synthesize(state) -> dict:
     return {
         "paragraph": paragraph + f"\n\nChecks run: {'; '.join(checks)}.",
         "citations": citations,
-        "grounding": {"tier": "llm", "model": model, "attempts": attempts,
+        "grounding": {"tier": "llm" if attempts else "no_llm", "model": model, "attempts": attempts,
                       "claims": kept, "dropped_claims": dropped,
                       "retried_claims": first_dropped if attempts == 2 else [],
                       "n_kept": len(kept), "n_dropped": len(dropped), "llm_calls": calls,
-                      "question": question, "n_documents": len(docs), "answer_mode": "extractive",
+                      "question": question, "n_documents": len(docs),
+                      # "rules": lead and facts chosen by rule_answer; "extractive": by the model.
+                      "answer_mode": "rules" if ruled is not None else "extractive",
+                      **({"fallback_reason": fallback_reason} if fallback_reason else {}),
                       "answer_lead": lead, "lead_fact": lead_fact,
                       "answer_flags": answer_flags, "checks": checks,
                       "answered": (lead != "cannot_answer" and any(c["section"] == ANSWER_SECTION for c in kept))

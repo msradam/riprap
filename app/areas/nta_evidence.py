@@ -134,3 +134,21 @@ def floodplain(polygon, query=None) -> dict | None:  # noqa: ARG001 - polygon ke
                           f"resident{'s' if pop != 1 else ''} in the 1% annual chance floodplain of this district "
                           "(the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, "
                           "by census block).")}
+
+
+def alerts(polygon) -> dict:
+    """Active Weather Service alerts for the area, read at its centre
+    (alerts are issued by forecast zone, far larger than a district)."""
+    from app.context import nws_alerts
+
+    c = polygon.centroid
+    v = nws_alerts.summary_for_point(c.y, c.x)
+    if v.get("narrative"):
+        v["narrative"] = v["narrative"].replace(" at this point", " for this area (read at its centre)")
+    return v
+
+
+def sea_level(polygon) -> dict:  # noqa: ARG001 - one projection for the whole city
+    from app.context import npcc4_slr
+
+    return npcc4_slr.get_projections()

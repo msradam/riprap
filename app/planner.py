@@ -251,16 +251,25 @@ _QUESTION_WORDS = frozenset(
 
 def is_bare_place(raw_query: str, targets: list[dict[str, str]]) -> bool:
     """True when the input is only a place: no '?' and no question word
-    once the target text is removed.
+    once the target text is removed, and no word that names a source or a
+    time frame.
 
     ponytail: word list, so "flooding at 80 Pioneer Street" reads as bare
     and gets the full briefing (the safe side); a classifier if that bites."""
     if "?" in raw_query:
         return False
-    rest = raw_query.lower()
+    from riprap.core.burr import rule_answer  # noqa: PLC0415
+    from riprap.core.burr.place import _ADDRESS_RE  # noqa: PLC0415
+
+    rest = raw_query
     for t in targets:
-        rest = rest.replace(t.get("text", "").lower(), " ")
-    return not any(w in _QUESTION_WORDS for w in re.findall(r"[a-z]+", rest))
+        rest = re.sub(re.escape(t.get("text", "")), " ", rest, flags=re.IGNORECASE) if t.get("text") else rest
+    rest = _ADDRESS_RE.sub(" ", rest)  # "12 School Street" names a place, not the schools
+    if any(w in _QUESTION_WORDS for w in re.findall(r"[a-z]+", rest.lower())):
+        return False
+    # A search phrase beside the place asks something too: "200 Water Street
+    # Manhattan FEMA flood zone", "QN12 311 complaints".
+    return not rule_answer.asks_something(rest)
 
 
 def _validate(d: dict[str, Any], raw_query: str, catalog_ids: list[str] | None = None) -> Plan:  # TODO(cleanup): cc-grade-D (23)

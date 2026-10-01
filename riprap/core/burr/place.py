@@ -46,6 +46,15 @@ _ADDRESS_RE = re.compile(rf"\b(\d{{1,6}}(?:-\d{{1,4}})?[A-Za-z]?)\s+((?:{_STREET
                          r"(?:\s+(?:NW|NE|SW|SE)\b)?", re.IGNORECASE)
 # After the street: ", Queens", " in the Bronx", ", Red Hook, Brooklyn", ", NY", " 11423".
 _TAIL_AREA_RE = re.compile(r"^\s*(?:,\s*|\s+in\s+(?:the\s+)?)([A-Z][\w.'-]*(?:\s+[A-Z][\w.'-]*){0,2})")
+# A borough right after the street, with or without a comma, in any case or
+# common abbreviation: "200 Water Street Manhattan", "1310 Surf Ave, Bklyn".
+# Without it the geocoder picks a borough itself (Water Street in Dumbo).
+_TAIL_BORO_RE = re.compile(r"^\s*,?\s*(?:in\s+)?(?:the\s+)?(manhattan|brooklyn|bklyn|bkln|queens|qns|bronx|bx"
+                           r"|staten island)\b\.?", re.IGNORECASE)
+_BORO_FULL = {"manhattan": "Manhattan", "brooklyn": "Brooklyn", "bklyn": "Brooklyn", "bkln": "Brooklyn",
+              "queens": "Queens", "qns": "Queens", "bronx": "Bronx", "bx": "Bronx", "staten island": "Staten Island"}
+# A street that is its own name; any other suffix needs a street word before it.
+_STANDALONE_STREETS = {"broadway", "bowery"}
 _TAIL_STATE_RE = re.compile(r"^\s*,?\s*(?:NY|New York)\b(?!\s+(?:City|County))")
 _TAIL_ZIP_RE = re.compile(r"^\s*,?\s*(\d{5})\b")
 _CAPS_RUN_RE = re.compile(r"\b[A-Z][\w.'-]*(?:\s+[A-Z][\w.'-]*)*")
@@ -98,11 +107,18 @@ def extract_address(text: str) -> str | None:
     """The street-address span in free text, with its borough,
     neighbourhood, state and ZIP when they follow it; None when there is no
     house number plus street."""
-    m = _ADDRESS_RE.search(text or "")
+    # "311 street flooding complaints near 80 Pioneer St": a number and a
+    # bare street word are not an address; the next match is.
+    m = next((m for m in _ADDRESS_RE.finditer(text or "")
+              if len(m.group(2).split()) > 1 or m.group(2).lower().rstrip(".") in _STANDALONE_STREETS), None)
     if not m:
         return None
     span, rest = m.group(0).rstrip("."), (text or "")[m.end():]
-    for _ in range(2):  # up to two area names: ", Red Hook, Brooklyn"
+    for _ in range(3):  # up to two area names and a borough: ", Red Hook, Brooklyn"
+        if b := _TAIL_BORO_RE.match(rest):
+            span += f", {_BORO_FULL[b.group(1).lower()]}"
+            rest = rest[b.end():]
+            break
         a = _TAIL_AREA_RE.match(rest)
         if not a:
             break

@@ -1,0 +1,48 @@
+id: nws_alerts_nta
+type: live
+title: NWS active alerts for the area (flood/coastal/wind)
+answers: "active National Weather Service flood, coastal and wind alerts for the area, right now"
+stone: lodestone
+tier: modeled
+adapter: python_call
+
+# The area version: runs for a neighbourhood or community district, read at
+# the area's centre (alerts are issued by forecast zone, far larger than a
+# district).
+spatial:
+  scope: polygon
+  crs: EPSG:4326
+
+config:
+  module: app.areas.nta_evidence
+  function: alerts
+  args:
+    - {source: polygon_4326}
+  on_none: passthrough
+
+trace_summary:
+  n_active: n_active
+
+provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
+  source_name: National Weather Service (NOAA), active alerts at point
+  source_url: https://api.weather.gov/
+  license: U.S. Public Domain
+  doc_id: nws_alerts
+  citation: NWS active alerts for the area (flood / coastal / wind).
+
+narration:
+  short: Currently active NWS alerts for this area.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: NWS alerts endpoint unreachable.
+
+display:
+  variant: tabular
+  order: 10
+  kind: list
+  map_layer: false
+  icon: "⚠️"

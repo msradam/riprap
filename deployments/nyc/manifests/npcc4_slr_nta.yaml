@@ -1,0 +1,48 @@
+id: npcc4_slr_nta
+type: baked
+title: NPCC4 (2024) sea-level rise projections
+answers: "projected sea level rise at the Battery for the 2050s and 2100 (NPCC4)"
+stone: lodestone
+tier: modeled
+adapter: python_call
+
+# The area version: the same citywide projection, for a neighbourhood or
+# community district question about sea level.
+spatial:
+  scope: polygon
+  crs: EPSG:4326
+
+config:
+  module: app.areas.nta_evidence
+  function: sea_level
+  args:
+    - {source: polygon_4326}
+  on_none: passthrough
+
+provenance:
+  date_modified: 2024
+  retrieved_at: 2026-07-11
+  source_name: NPCC4, New York City Panel on Climate Change (2024)
+  source_url: https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15116
+  license: CC-BY-NC 4.0 (Annals of the New York Academy of Sciences)
+  doc_id: npcc4_slr
+  citation: >-
+    Rosenzweig, C. et al. (eds.). New York City Panel on Climate Change 2024
+    Report (NPCC4). Annals of the New York Academy of Sciences, Vol. 1539
+    (parent doi:10.1111/nyas.15116). Sea-level rise projections from the
+    NPCC4 climate-science chapter, Battery (NOAA station 8518750) reference.
+
+narration:
+  template: "{narrative}"
+  short: NYC Panel on Climate Change (2024) sea-level rise projections, Battery, NY.
+
+display:
+  variant: tabular
+  order: 50
+  kind: stat
+  map_layer: false
+  icon: "🌊"
+
+fallback:
+  on_offline: error
+  message: The NPCC4 sea-level rise table was not available when this briefing ran.
