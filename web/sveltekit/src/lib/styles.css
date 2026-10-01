@@ -1,22 +1,4 @@
-/* Global styles for the citation mark and the map frame. */
-
-/* The citation mark (docs/design/handoff/css/components.css
-   .riprap-citation-link): Overpass Mono, inline, so exempt from the
-   2.5.8 target-size minimum (do not enlarge), with its own focus ring. */
-.inline-cite {
-  color: var(--riprap-text-link);
-  font-family: var(--riprap-font-mono);
-  font-weight: 500;
-  text-decoration: none;
-  font-size: 14px;
-  transition: color 120ms ease;
-}
-.inline-cite sup { font-size: 12px; }
-.inline-cite:hover { color: var(--riprap-tier-modeled); }
-.inline-cite:focus-visible {
-  outline: 3px solid var(--riprap-focus);
-  outline-offset: 2px;
-}
+/* Global styles for the map frame. The citation mark is in tokens.css. */
 
 /* ── Map ─────────────────────────────────────────────────── */
 .map-frame {
