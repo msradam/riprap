@@ -176,11 +176,14 @@ LEADS = ("yes", "no", "partly", "count", "cannot_answer")
 # chosen in code in both paths (the model left out the sensors and the tide
 # gauge, and picked the flood zone for a forecast question).
 LIVE_FACTS, FORECAST_FACTS = rule_answer.LIVE_FACTS, rule_answer.FORECAST_FACTS
-# When True, a question the rules recognise is answered by the rules even
-# with a model configured, and the model is asked only for the rest
-# (riprap/core/burr/rule_answer.py). Without a model the rules always answer.
-# RIPRAP_RULES_FIRST=1 or 0 sets it for a server.
-RULES_FIRST = os.environ.get("RIPRAP_RULES_FIRST", "0") == "1"
+# When True (the default), a question the rules recognise is answered by the
+# rules even with a model configured, and the model is asked only for the
+# rest (riprap/core/burr/rule_answer.py). Without a model the rules always
+# answer. On 130 questions nobody on the project had seen, judged blind, the
+# rule answers were preferred to the model's on 54 and the model's on 21, at
+# about 2 s against 10 s (docs/GROUNDING.md). RIPRAP_RULES_FIRST=0 puts the
+# model first again.
+RULES_FIRST = os.environ.get("RIPRAP_RULES_FIRST", "1") != "0"
 # The owner's decision after refactor 3: extractive cannot paraphrase, and
 # it declines honestly when the evidence does not answer. The guarded mode
 # it replaced (model-written answer claims, five answer rules and an

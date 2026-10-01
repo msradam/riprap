@@ -7,12 +7,14 @@ configured, a briefing is built from the data, and a question is answered
 by rules over its words (`riprap/core/burr/rule_answer.py`).
 
 The one model Riprap can use is an optional LLM behind any
-OpenAI-compatible endpoint (`RIPRAP_LLM_BASE_URL`, `RIPRAP_LLM_MODEL`). The
-gallery's question entries use Granite 4.1 8B
-(`hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M` over Ollama). For a
-question the model chooses a lead and up to four cited facts, and code
-checks that choice; the answer text is the sources' own sentences
-([`docs/GROUNDING.md`](GROUNDING.md)). `app/models_info.py` lists the
+OpenAI-compatible endpoint (`RIPRAP_LLM_BASE_URL`, `RIPRAP_LLM_MODEL`); it
+was tested with Granite 4.1 8B
+(`hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M` over Ollama). The rules
+answer first even then. The model is asked only when the rules do not
+recognise a question or cannot read its place: it plans the query, chooses
+a lead and up to four cited facts, and code checks that choice; the answer
+text is the sources' own sentences ([`docs/GROUNDING.md`](GROUNDING.md)).
+The gallery is built with no model. `app/models_info.py` lists the
 endpoint that answered in each result's `models` field and at
 `/api/models`.
 

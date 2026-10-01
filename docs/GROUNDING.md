@@ -110,10 +110,23 @@ is used only where there is a question (refactor 8):
    "Experimental:" if the model left that out.
 
 If no endpoint answers, a question falls back to the rules above, then to the
-no-LLM evidence, and `grounding.fallback_reason` says why. With a model
-configured the model path is the default (`synthesis.RULES_FIRST = False`);
-`grounding.answer_mode` is `rules` or `extractive` and records which one
-answered.
+no-LLM evidence, and `grounding.fallback_reason` says why.
+
+With a model configured, the rules still go first: a question the rules
+recognise, at a place the parser can read, is planned and answered with no
+model call, and the model is asked only for the rest. `grounding.answer_mode`
+is `rules` or `extractive` and records which one answered.
+`RIPRAP_RULES_FIRST=0` puts the model first.
+
+The order was set by measurement. An agent that could not read the repository
+wrote questions the way users type them; both paths answered each one in the
+same process; a second agent judged the pairs blind. Over 130 judged pairs
+(four sets, 2026-10-01) the rule answers were preferred on 54, the model's on
+21, and 55 were ties; wrong openings 7 against 8, wrong places 13 against 12,
+sentences beside the point 70 against 145, and a median of about 2 s against
+9 to 13 s. One of the three sets that were clean (never seen while the rules
+were written) went against the rules on wrong openings and places, 3 and 5
+against 1 and 4; the defects behind it were fixed before the last set.
 
 ### Questions
 
