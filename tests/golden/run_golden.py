@@ -113,8 +113,8 @@ def score_district(base: str, code: str) -> dict:
     v = out.get("nyc311_nta") or {}
     want = keys.nyc311_district(board, years=int(v.get("years") or 3))
     res = {"query": code, "intent": out.get("intent"), "facts": []}
-    # Both count by the record's own community_board field (the app fetches
-    # the rows and counts them; the key counts on the server), so exact.
+    # Both count by the record's own community_board field, each with its own
+    # definition of a flood descriptor and its own one-row-per-incident rule.
     got = v.get("n")
     check(res["facts"], f"311 count in {board} ({v.get('years')} y)", got, want)
     check(res["facts"], "311 sentence names the community board field", None, None,

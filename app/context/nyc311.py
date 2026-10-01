@@ -14,31 +14,32 @@ from riprap.core import http
 
 URL = "https://data.cityofnewyork.us/resource/erm2-nwe9.json"
 DOC_ID = "nyc311"
-CITATION = "NYC 311 service requests (Socrata erm2-nwe9, 2010-present)"
-
-FLOOD_DESCRIPTORS = [
-    "Street Flooding (SJ)",
-    "Sewer Backup (Use Comments) (SA)",
-    "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-    "Highway Flooding (SH)",
-    "Manhole Overflow (Use Comments) (SA1)",
-    "Flooding on Street",
-    "RAIN GARDEN FLOODING (SRGFLD)",
-]
-
-_DESC_CLAUSE = "(" + " OR ".join(f"descriptor='{d}'" for d in FLOOD_DESCRIPTORS) + ")"
+CITATION = "NYC 311 service requests (Socrata erm2-nwe9, 2020 to present)"
 
 # The kind of complaint each descriptor records, in the words a question
-# uses ("street flooding"). Two descriptors record street flooding.
+# uses ("street flooding"). NYC renamed the descriptors: complaint type
+# "Sewer" (coded names) ends on 2026-07-29 and "Sewer Maintenance" (plain
+# names) carries the same kinds from then on, so each kind has two names.
+# tests/test_311_vocabulary_live.py fails when the dataset grows a third.
 KIND = {
     "Street Flooding (SJ)": "street flooding",
     "Flooding on Street": "street flooding",
     "Sewer Backup (Use Comments) (SA)": "sewer backup",
+    "Backup": "sewer backup",
     "Catch Basin Clogged/Flooding (Use Comments) (SC)": "catch basin",
+    "Catch Basin Clogged": "catch basin",
     "Highway Flooding (SH)": "highway flooding",
+    "Flooding on Highway": "highway flooding",
     "Manhole Overflow (Use Comments) (SA1)": "manhole overflow",
+    "Manhole Overflow": "manhole overflow",
     "RAIN GARDEN FLOODING (SRGFLD)": "rain garden flooding",
 }
+FLOOD_DESCRIPTORS = list(KIND)
+COMPLAINT_TYPES = ("Sewer", "Sewer Maintenance")
+# The plain names are common words ("Backup"), so the complaint type is part of the filter.
+_DESC_CLAUSE = ("(" + " OR ".join(f"descriptor='{d}'" for d in FLOOD_DESCRIPTORS) + ") AND ("
+                + " OR ".join(f"complaint_type='{t}'" for t in COMPLAINT_TYPES) + ")")
+_NEW_NAMES = frozenset(d for d in KIND if "(" not in d)
 
 
 @dataclass
@@ -167,13 +168,37 @@ def summary_for_district(code: str, years: int = 3) -> dict:
     board = community_board(code)
     if board is None:
         raise ValueError(f"not a community district code like QN12: {code!r}")
-    cs = complaints_in_board(board, since=_since(years), limit=5000)
+    # QN12 holds about 4,500 rows in three years; the limit leaves room.
+    cs = complaints_in_board(board, since=_since(years), limit=20000)
     where = f"in Community District {code.upper().replace(' ', '')} (by the record's community board field)"
-    return _summarize(cs, years=years, radius_m=None, limit=5000, where=where)
+    return _summarize(cs, years=years, radius_m=None, limit=20000, where=where)
+
+
+def one_per_incident(cs: list[Complaint]) -> list[Complaint]:
+    """Drop a request filed under both names. During the storm of 29
+    September 2023 and the days after, 311 logged many requests twice, once
+    under each descriptor name, a minute or two apart at the same address.
+    The plain-name row goes when a coded-name row of the same kind at the
+    same address was created within ten minutes of it."""
+    coded: dict[tuple, list[datetime]] = {}
+    for c in cs:
+        if c.descriptor not in _NEW_NAMES and c.address and c.created_date:
+            coded.setdefault((c.address, KIND.get(c.descriptor)), []).append(datetime.fromisoformat(c.created_date))
+
+    def twin(c: Complaint) -> bool:
+        if c.descriptor not in _NEW_NAMES or not c.address or not c.created_date:
+            return False
+        t = datetime.fromisoformat(c.created_date)
+        return any(abs(t - u) <= timedelta(minutes=10) for u in coded.get((c.address, KIND.get(c.descriptor)), ()))
+
+    return [c for c in cs if not twin(c)]
 
 
 def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: int | None = None,
                where: str | None = None) -> dict:
+    # At the fetch limit the count is a floor; decide that before twins are dropped.
+    capped = limit is not None and len(cs) >= limit
+    cs = one_per_incident(cs)
     by_year: Counter = Counter(c.created_date[:4] for c in cs if c.created_date)
     by_descriptor: Counter = Counter(c.descriptor for c in cs)
     by_kind: Counter = Counter(KIND.get(c.descriptor, c.descriptor) for c in cs)
@@ -192,8 +217,6 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: i
     kinds = dict(by_kind.most_common())
     where = where or (f"within {radius_m:.0f} m of this location" if radius_m else "inside this area")
     # The source answered: 0 here is a true zero, and the sentence says so.
-    # At the fetch limit the count is a floor, not the total.
-    capped = limit is not None and n >= limit
     narrative = (f"{'At least ' if capped else ''}{n} NYC 311 flood-related complaint{'s' if n != 1 else ''} filed {where} "
                  f"in the last {years} years")
     narrative += (": " + ", ".join(f"{k} {kind}" for kind, k in kinds.items()) + "." if n
@@ -248,48 +271,37 @@ def flood_requests(*, lat: float | None = None, lon: float | None = None,
                    radius_m: float = 200, community_district: str | None = None,
                    days: int = 365) -> dict:
     """Flood-related 311 requests near a point or inside a community
-    district over the last `days`: exact counts by descriptor and by month
-    (grouped server-side, so no row cap) and the ten most recent."""
-    since = (datetime.now(UTC) - timedelta(days=days)).replace(tzinfo=None)
-    where = f"{_DESC_CLAUSE} AND created_date >= '{since.isoformat(timespec='seconds')}'"
+    district over the last `days`: counts by descriptor, kind and month and
+    the ten most recent, by the same rule as a briefing (a request filed
+    under both descriptor names counts once)."""
+    since = datetime.now(UTC) - timedelta(days=days)
     if community_district:
         board = community_board(community_district)
         if board is None:
             return {"error": f"not a community district code like QN12: {community_district!r}"}
-        where += f" AND community_board = '{board}'"
+        where_place = f"community_board='{board}'"
         area = {"community_district": community_district.upper().replace(" ", ""),
                 "community_board": board,
                 "definition": f"requests whose community_board field is '{board}', the same field a "
                               "district briefing counts by"}
     elif lat is not None and lon is not None:
-        where += f" AND within_circle(location, {lat}, {lon}, {radius_m})"
+        where_place = f"within_circle(location, {lat}, {lon}, {radius_m})"
         area = {"lat": lat, "lon": lon, "radius_m": radius_m,
                 "definition": f"requests geocoded within {radius_m:g} m of the point"}
     else:
         return {"error": "give lat and lon, or a community district"}
-    def query(**params) -> list:
-        r = http.get(URL, params={"$where": where, **params}, timeout=60)
-        r.raise_for_status()
-        return r.json()
-
-    by_desc = query(**{"$select": "descriptor, count(*) AS n", "$group": "descriptor",
-                       "$order": "n DESC"})
-    by_month = query(**{"$select": "date_trunc_ym(created_date) AS month, count(*) AS n",
-                        "$group": "month", "$order": "month"})
-    recent = query(**{"$select": "descriptor, created_date, incident_address, status",
-                      "$order": "created_date DESC", "$limit": "10"})
+    cs = one_per_incident(_complaints_where(where_place, since, limit=50000))
+    by_desc = Counter(c.descriptor for c in cs)
+    by_month = Counter(c.created_date[:7] for c in cs)
     return {
         **area,
         "days": days,
-        "n": sum(int(row["n"]) for row in by_desc),
-        "by_descriptor": {row.get("descriptor"): int(row["n"]) for row in by_desc},
-        "by_kind": dict(sum((Counter({KIND.get(row.get("descriptor"), row.get("descriptor")): int(row["n"])})
-                             for row in by_desc), Counter()).most_common()),
-        "by_month": {row["month"][:7]: int(row["n"]) for row in by_month},
-        "most_recent": [{"date": (row.get("created_date") or "")[:10],
-                         "descriptor": row.get("descriptor"),
-                         "address": row.get("incident_address"),
-                         "status": row.get("status")} for row in recent],
+        "n": len(cs),
+        "by_descriptor": dict(by_desc.most_common()),
+        "by_kind": dict(Counter(KIND.get(c.descriptor, c.descriptor) for c in cs).most_common()),
+        "by_month": dict(sorted(by_month.items())),
+        "most_recent": [{"date": c.created_date[:10], "descriptor": c.descriptor,
+                         "address": c.address, "status": c.status} for c in cs[:10]],
         "source": CITATION,
-        "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9",
+        "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
     }

@@ -22,19 +22,47 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 UA = "Mozilla/5.0 (compatible; Riprap golden keys; +https://github.com/msradam/riprap)"
 
-# The 311 descriptors that record flooding. This is the one definition the
-# keys share with Riprap (app/context/nyc311.py); everything else is
-# computed differently (server-side counts here, client-side rows there).
-FLOOD_DESCRIPTORS = [
-    "Street Flooding (SJ)",
-    "Sewer Backup (Use Comments) (SA)",
-    "Catch Basin Clogged/Flooding (Use Comments) (SC)",
-    "Highway Flooding (SH)",
-    "Manhole Overflow (Use Comments) (SA1)",
-    "Flooding on Street",
-    "RAIN GARDEN FLOODING (SRGFLD)",
-]
-_DESC = "(" + " OR ".join(f"descriptor='{d}'" for d in FLOOD_DESCRIPTORS) + ")"
+# Which 311 requests record flooding: a pattern over the two sewer complaint
+# types, read from the live descriptor column, not a list. Until 2026-10-01
+# this was a list shared with app/context/nyc311.py; NYC renamed the
+# descriptors that July and the shared list hid the app's undercount.
+_FLOOD = ("(complaint_type='Sewer' OR complaint_type='Sewer Maintenance') AND ("
+          "upper(descriptor) like '%FLOOD%' OR upper(descriptor) like '%BACKUP%' OR "
+          "upper(descriptor) like '%CATCH BASIN CLOGGED%' OR upper(descriptor) like '%MANHOLE OVERFLOW%')")
+_KIND_WORDS = ("HIGHWAY", "RAIN GARDEN", "FLOOD", "BACKUP", "CATCH BASIN", "MANHOLE")
+
+
+def _kind(descriptor: str) -> str:
+    d = descriptor.upper()
+    return next(w for w in _KIND_WORDS if w in d)
+
+
+def _once(rows: list[dict]) -> list[dict]:
+    """A request logged under both descriptor names counts once: the
+    plain-name row ("Backup") is dropped when a coded-name row ("Sewer
+    Backup (Use Comments) (SA)") of the same kind at the same address was
+    created within ten minutes of it. Written apart from the app's rule."""
+    def secs(r):
+        return datetime.fromisoformat(r["created_date"]).timestamp()
+
+    coded = [r for r in rows if "(" in r["descriptor"] and r.get("incident_address")]
+    keep = []
+    for r in rows:
+        plain = "(" not in r["descriptor"] and r.get("incident_address")
+        if plain and any(c["incident_address"] == r["incident_address"] and _kind(c["descriptor"]) == _kind(r["descriptor"])
+                         and abs(secs(c) - secs(r)) <= 600 for c in coded):
+            continue
+        keep.append(r)
+    return keep
+
+
+def _flood_rows(where: str, years: int) -> list[dict]:
+    since = (datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+             - timedelta(days=365 * years)).replace(tzinfo=None).isoformat(timespec="seconds")
+    rows = _get("https://data.cityofnewyork.us/resource/erm2-nwe9.json",
+                {"$select": "descriptor, created_date, incident_address",
+                 "$where": f"{_FLOOD} AND {where} AND created_date >= '{since}'", "$limit": 50000})
+    return _once(rows)
 
 
 def _get(url: str, params: dict | None = None, timeout: int = 60):
@@ -79,28 +107,20 @@ def geocode(address: str) -> dict | None:
             "accuracy": f["properties"].get("accuracy")}
 
 
-# NYC 311 (Socrata erm2-nwe9): counts grouped on the server, no row cap.
+# NYC 311 (Socrata erm2-nwe9): every matching row, no cap in practice.
 def nyc311(lat: float, lon: float, radius_m: int = 200, years: int = 5) -> dict:
-    since = (datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
-             - timedelta(days=365 * years)).replace(tzinfo=None).isoformat(timespec="seconds")
-    where = f"{_DESC} AND within_circle(location, {lat}, {lon}, {radius_m}) AND created_date >= '{since}'"
-    url = "https://data.cityofnewyork.us/resource/erm2-nwe9.json"
-    by_desc = _get(url, {"$select": "descriptor, count(*) AS n", "$where": where, "$group": "descriptor"})
-    by_year = _get(url, {"$select": "date_extract_y(created_date) AS y, count(*) AS n",
-                         "$where": where, "$group": "y"})
-    return {"n": sum(int(r["n"]) for r in by_desc),
-            "by_descriptor": {r["descriptor"]: int(r["n"]) for r in by_desc},
-            "by_year": {str(r["y"]): int(r["n"]) for r in by_year}}
+    rows = _flood_rows(f"within_circle(location, {lat}, {lon}, {radius_m})", years)
+    by_desc: dict[str, int] = {}
+    by_year: dict[str, int] = {}
+    for r in rows:
+        by_desc[r["descriptor"]] = by_desc.get(r["descriptor"], 0) + 1
+        by_year[r["created_date"][:4]] = by_year.get(r["created_date"][:4], 0) + 1
+    return {"n": len(rows), "by_descriptor": by_desc, "by_year": by_year}
 
 
 def nyc311_district(community_board: str, years: int = 3) -> int:
     """Flood-related 311 requests filed in one community board ('12 QUEENS')."""
-    since = (datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
-             - timedelta(days=365 * years)).replace(tzinfo=None).isoformat(timespec="seconds")
-    where = f"{_DESC} AND community_board='{community_board}' AND created_date >= '{since}'"
-    rows = _get("https://data.cityofnewyork.us/resource/erm2-nwe9.json",
-                {"$select": "count(*) AS n", "$where": where})
-    return int(rows[0]["n"])
+    return len(_flood_rows(f"community_board='{community_board}'", years))
 
 
 # FloodNet (Hasura GraphQL): every deployment, filtered here by distance.
@@ -129,11 +149,17 @@ def floodnet(lat: float, lon: float, radius_m: int = 600, years: int = 3) -> dic
              "start_time:{_gte:$since},label:{_eq:\"flood\"}}, limit: 10000)"
              "{ deployment_id start_time max_depth_proc_mm } }")
         events = _post_json(_FLOODNET, {"query": q, "variables": {"ids": ids, "since": since}})["data"]["sensor_events"]
+        # The table holds events stamped 2080 (a sensor clock fault): none of those is in "the last 3 years".
+        now = datetime.now(UTC).replace(tzinfo=None).isoformat()
+        events = [e for e in events if e["start_time"] <= now]
     good = {d["deployment_id"] for d in near if (d.get("sensor_status") or "").lower().startswith("good")}
     good_depths = [e["max_depth_proc_mm"] for e in events
                    if e["deployment_id"] in good and e.get("max_depth_proc_mm") is not None]
+    flagged_depths = [e["max_depth_proc_mm"] for e in events
+                      if e["deployment_id"] not in good and e.get("max_depth_proc_mm") is not None]
     return {"n_sensors": len(near), "n_events": len(events),
             "peak_mm_good": max(good_depths) if good_depths else None,
+            "peak_mm_flagged": max(flagged_depths) if flagged_depths else None,
             "statuses": sorted(d.get("sensor_status") or "" for d in near)}
 
 

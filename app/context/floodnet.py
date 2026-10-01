@@ -92,10 +92,10 @@ def sensors_near(lat: float, lon: float, radius_m: float = 1000) -> list[Sensor]
 
 
 _EVENTS_Q = """
-query Events($ids: [String!], $since: timestamp!) {
+query Events($ids: [String!], $since: timestamp!, $until: timestamp!) {
   sensor_events(where:{
       deployment_id:{_in:$ids},
-      start_time:{_gte:$since},
+      start_time:{_gte:$since, _lte:$until},
       label:{_eq:"flood"}
   }, order_by:{start_time: desc}, limit: 200) {
     deployment_id
@@ -113,9 +113,12 @@ def flood_events_for(deployment_ids: list[str],
         return []
     if since is None:
         since = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=365 * 3)
+    # The table holds events stamped 2080 (a sensor clock fault), so the
+    # window is closed at now: "the last 3 years" must not reach forward.
     d = _gql(_EVENTS_Q, {
         "ids": deployment_ids,
         "since": since.isoformat(timespec="seconds").replace("+00:00", ""),
+        "until": datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", ""),
     })
     return [
         FloodEvent(
@@ -141,6 +144,11 @@ def status_words(status: str) -> str:
     return "in good working order" if is_good(status) else "flagged by FloodNet for maintenance"
 
 
+def _depth(mm: int) -> str:
+    """'815 mm (32.1 in)': the record is in millimetres, the press prints inches."""
+    return f"{mm} mm ({mm / 25.4:.1f} in)"
+
+
 def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
     """One-shot summary used by the FSM node and the cited paragraph."""
     sensors = sensors_near(lat, lon, radius_m)
@@ -155,6 +163,8 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
     peak = max((e for e in events if e.max_depth_mm is not None and e.deployment_id in good),
                key=lambda e: e.max_depth_mm or 0, default=None)
     flagged = {s.deployment_id for s in sensors if not is_good(s.status)} & set(by_dep)
+    flagged_peak = max((e for e in events if e.max_depth_mm is not None and e.deployment_id in flagged),
+                       key=lambda e: e.max_depth_mm or 0, default=None)
     n_sensors = len(sensors)
     n_events = len(events)
     # Templatable narrative for the manifest's narration.template.
@@ -174,7 +184,7 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
         if peak is not None and peak.max_depth_mm is not None:
             narrative += (
                 f" Peak depth recorded by the sensors in good working order: "
-                f"{peak.max_depth_mm} mm on {peak.start_time[:10]}."
+                f"{_depth(peak.max_depth_mm)} on {peak.start_time[:10]}."
             )
         if flagged:
             k = len(flagged)
@@ -182,11 +192,17 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 600) -> dict:
             narrative += (f" {k} sensor{'' if k == 1 else 's'} that logged events {'is' if k == 1 else 'are'} "
                           f"flagged by FloodNet for maintenance, so {'its' if k == 1 else 'their'} depths are not "
                           f"used for the peak.")
+            # The flagged reading is still in FloodNet's published record, and
+            # others print it (46.1 in at Hollis on 2026-05-20), so it is stated with its flag.
+            if flagged_peak is not None:
+                narrative += (f" The highest depth a flagged sensor recorded was {_depth(flagged_peak.max_depth_mm)} "
+                              f"on {flagged_peak.start_time[:10]}.")
     return {
         "n_sensors": n_sensors,
         "sensors": [{**vars(s), "status_words": status_words(s.status)} for s in sensors],
         "n_flood_events_3y": n_events,
         "n_sensors_with_events": len(by_dep),
         "peak_event": vars(peak) if peak else None,
+        "flagged_peak_event": vars(flagged_peak) if flagged_peak else None,
         "narrative": narrative,
     }

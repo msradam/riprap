@@ -25,7 +25,7 @@ provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
   source_name: NYC 311 Service Requests (NYC Open Data)
-  source_url: https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9
+  source_url: https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9
   license: NYC Open Data Terms of Use
   doc_id: nyc311_nta
   citation: NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).

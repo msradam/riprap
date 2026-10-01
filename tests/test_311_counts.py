@@ -80,3 +80,25 @@ def test_district_counts_by_community_board_and_says_so(monkeypatch):
     monkeypatch.setattr(nyc311, "summary_for_polygon", lambda polygon, years: called.setdefault("polygon", years))
     nta_evidence.complaints("poly", query=SimpleNamespace(extras={"area_code": "QN0201"}), years=3)
     assert called == {"polygon": 3}
+
+
+def test_renamed_descriptors_count_as_the_same_kinds():
+    """NYC renamed the descriptors in 2026 ("Backup" for "Sewer Backup (Use
+    Comments) (SA)"); both names count, as one kind."""
+    v = _summarize([_c("Sewer Backup (Use Comments) (SA)"), _c("Backup"), _c("Catch Basin Clogged"),
+                    _c("Manhole Overflow"), _c("Flooding on Highway")], years=5, radius_m=200)
+    assert v["n"] == 5
+    assert v["by_kind"] == {"sewer backup": 2, "catch basin": 1, "manhole overflow": 1, "highway flooding": 1}
+
+
+def test_a_request_logged_under_both_names_counts_once():
+    def at(desc, minute, address="90-01 183 STREET"):
+        return Complaint(unique_key=desc + str(minute), descriptor=desc, address=address, status=None,
+                         created_date=f"2023-09-29T10:{minute:02d}:00.000")
+
+    cs = [at("Street Flooding (SJ)", 0), at("Flooding on Street", 2),            # the same request twice
+          at("Flooding on Street", 40),                                          # a later one, same address
+          at("Flooding on Street", 2, address="1 OTHER STREET"),                 # another address
+          at("Backup", 1)]                                                       # another kind
+    v = _summarize(cs, years=5, radius_m=200)
+    assert v["n"] == 4 and v["by_kind"] == {"street flooding": 3, "sewer backup": 1}
