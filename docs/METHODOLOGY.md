@@ -1,5 +1,10 @@
 # Riprap methodology
 
+Every claim cites its source: a public record from FEMA, NOAA, USGS or city
+open data, or, where it is labelled experimental, one of three models.
+Riprap reads 23 public data sources for New York City. This methodology was
+last updated 2026-10-01.
+
 > Riprap reports evidence. It computes no score, tier or ranking, and no
 > language model scores anything. Each source's finding is one cited
 > sentence, and the reader weighs them.
@@ -33,6 +38,8 @@ nothing is weighted.
 
 ## 3. Asset registers
 
+For a community district a briefing names the schools, subway entrances,
+public housing developments and hospitals inside the mapped flood extents.
 An asset is in a register when its point is inside the 2012 Sandy
 inundation zone or inside any of the three DEP stormwater scenarios. There
 is no other rule.
@@ -97,6 +104,20 @@ Caveats that travel with the evidence:
   separately by any source Riprap reads (NPCC4).
 - A source that did not answer is named as unavailable. It supports
   neither a "no" nor a zero.
+
+## 8. The five Stones
+
+A briefing sorts its sources into five Stones. Each Stone is a class of
+evidence. Together they form the briefing, and every claim in the output
+traces back to the Stone that produced it.
+
+| Stone | Role | Sources |
+|---|---|---|
+| Cornerstone | The hazard reader | FEMA flood maps, DEP stormwater scenarios, the Sandy extent, Ida high-water marks, terrain |
+| Keystone | The asset register | Schools, subway entrances, public housing, hospitals, construction permits, floodplain counts |
+| Touchstone | The live observer | FloodNet sensors, 311 flood complaints, tide and stream gauges, weather observations |
+| Lodestone | The projector | NWS alerts and water-level forecasts, NPCC4 sea-level projections |
+| Capstone | The synthesizer | Writes one cited sentence per record, and answers a question by rules over its words |
 
 ## References
 

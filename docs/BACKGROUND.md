@@ -17,6 +17,13 @@ briefing that should be a tool call ends up as a half-day of manual joins.
 Existing tools either return opaque vendor risk scores or skip the audit
 trail a stamped engineering memo actually requires.
 
+The flood records for a New York City block are public, and they sit in
+separate places: FEMA's flood maps, the city's stormwater scenarios, the
+Sandy inundation extent, Ida high-water marks, 311 requests, street sensors.
+Riprap reads them for one address or one community district and quotes each
+with its source and date, so a sentence can go into a story or a board memo
+with its citation.
+
 Riprap composes it. Type an address in any deployed city and get a
 citation-grounded briefing with one section per Stone that has evidence,
 every claim pointing back to a `[doc_id]` in public-record data.
@@ -61,6 +68,11 @@ substitute for a licensed professional.
   Riprap citation as evidence in a transaction is outside the design
   scope of this tool and outside the support scope of its
   contributors.
+
+**Scope.** Riprap composes public-record data into a written briefing. It
+does not predict damage to specific properties or substitute for
+professional engineering judgment. For personal property decisions, contact
+your local resilience office or hazard-mitigation program.
 
 **On FEMA determinations specifically:** when FEMA proposes a change to
 a flood hazard determination, a Base Flood Elevation, an SFHA

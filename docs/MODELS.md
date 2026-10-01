@@ -34,6 +34,11 @@ as claims (the mode now behind `RIPRAP_LLM_BARE=1`). `granite4:micro` kept
 
 ## Experimental models
 
+The gallery answers three questions with these models:
+[the Battery surge](https://msradam.github.io/riprap/gallery/battery-surge/),
+[surface water in BK18 after Ida](https://msradam.github.io/riprap/gallery/bk18-satellite/)
+and [paved and green land in QN12](https://msradam.github.io/riprap/gallery/qn12-paved/).
+
 Riprap is an app in development, and these three models are part of it.
 None has been shown to beat an official product. So their output is never
 shown as a measurement:

@@ -2,7 +2,8 @@
 
 The public sources behind the NYC deployment. Each manifest's `provenance`
 block is the authority for its URL, licence and vintage; `list_sources` on
-the MCP server prints them.
+the MCP server prints them. Data is used under each source's open-data
+terms.
 
 Riprap contacts only public-record federal, state and city sources at
 runtime, plus NOAA's gauge and Hugging Face when the experimental surge
