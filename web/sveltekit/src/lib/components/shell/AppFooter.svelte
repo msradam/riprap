@@ -30,13 +30,13 @@
       </p>
     {/if}
     <p class="app-footer-beta">
-      This is open beta. Methodology and source attribution are stable. Per-city coverage is
-      expanding. <a href={FEEDBACK} target="_blank" rel="noopener">Send feedback</a>.
+      This is open beta. Methodology and source attribution are stable. New York City is the
+      production city; Chicago, Seattle and Albany are experimental. <a href={FEEDBACK} target="_blank" rel="noopener">Send feedback</a>.
     </p>
     <p class="app-footer-build">
       Built to USWDS, WCAG 2.2 AA, Section 508 and the Plain Writing Act. Riprap is open source
-      under Apache-2.0. All data comes from public-record federal, state
-      and city sources. No commercial data APIs are used; the map's background tiles come from CARTO. Riprap <span class="data">v{APP_VERSION}</span>.
+      under Apache-2.0. The records come from public federal, state and city sources; the
+      experimental layers also read Copernicus Sentinel satellite imagery. No commercial data APIs are used; the map's background tiles come from CARTO. Riprap <span class="data">v{APP_VERSION}</span>.
     </p>
     <p class="app-footer-credits">
       Dam mark: <a href="https://thenounproject.com/icon/dam-4516918/">"Dam" by Chintuza</a> via the Noun Project, CC-BY 3.0.

@@ -18,6 +18,12 @@
     inside the mapped flood extents. The same evidence is available as JSON over HTTP and MCP, for
     code and AI agents.
   </p>
+  <p>
+    Three experimental models, fine-tuned by Riprap's author, answer a few questions about the days
+    and years ahead: a surge forecast for the Battery, new surface water in satellite scenes after
+    storms, and land cover by year. Whatever they say is labelled experimental, with its limits and
+    tested accuracy beside it, and it never sets a yes or no about past flooding.
+  </p>
   <p>Other tools do these jobs better, and Riprap points to them:</p>
   <ul>
     <li>

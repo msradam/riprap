@@ -113,6 +113,40 @@ describe('a rules-mode question entry', () => {
     expect(c.textContent).not.toContain('Evidence briefing (no LLM)');
   });
 
+  // A rules answer that says no source answers, or that quotes an
+  // experimental model, has its own note; the rest share the plain one.
+  const claim = (section: string, id: string) => ({ section, text: 't', doc_ids: [id], numbers: [] });
+  const g = { tier: 'no_llm', answer_mode: 'rules', question: 'q', answered: true } as const;
+  const cites = { nyc311: { doc_id: 'nyc311' }, landcover: { doc_id: 'landcover', maturity: 'experimental' } } as const;
+  const none = withGrounding({ ...index, slug: 'n' }, { ...g, answered: false, answer_lead: 'cannot_answer', claims: [claim('answer', 'nyc311')] }, undefined, cites);
+  const quoting = withGrounding({ ...index, slug: 'e' }, { ...g, answer_lead: 'facts', claims: [claim('answer', 'landcover')] }, undefined, cites);
+
+  it('says whether the answer quotes an experimental model, from its lead or its cited sources', () => {
+    const plain = withGrounding(index, { ...g, answer_lead: 'yes', claims: [claim('answer', 'nyc311'), claim('evidence', 'landcover')] }, undefined, cites);
+    expect(plain).toMatchObject({ answerLead: 'yes', quotesExperimental: false });
+    expect(none).toMatchObject({ answerLead: 'cannot_answer', quotesExperimental: false });
+    expect(quoting.quotesExperimental).toBe(true);
+    expect(withGrounding(index, { ...g, answer_lead: 'experimental' }).quotesExperimental).toBe(true);
+    expect(withGrounding(index, { ...g, answer_lead: 'no_prediction' }).quotesExperimental).toBe(true);
+    expect(rules).toMatchObject({ answerLead: null, quotesExperimental: false });
+  });
+
+  it('gives those two their own note on the row and keeps the shared note for the rest', () => {
+    const c = page([rules, none, quoting]);
+    const shared = [...c.querySelectorAll('.gallery-note')].filter((p) => p.textContent?.includes('with no language model') && p.textContent.includes('Answered by rules'));
+    expect(shared).toHaveLength(1);
+    const items = [...c.querySelectorAll('.gallery-item')].map((li) => li.querySelector('.gallery-meta')?.textContent?.trim() ?? null);
+    expect(items).toEqual([
+      null,
+      'The rules found no source that answers this question, and the answer says so.',
+      'Answered by rules in code. The answer quotes an experimental model, labelled where it appears.'
+    ]);
+  });
+
+  it('reads the shipped entry whose answer says no source answers', async () => {
+    expect((await galleryStories()).find((s) => s.slug === 'brooklyn-heights-sensors')).toMatchObject({ answerLead: 'cannot_answer', quotesExperimental: false });
+  });
+
   it('reads the refusal in the shipped gallery as refused', async () => {
     const stories = await galleryStories();
     const refused = (slug: string) => stories.find((s) => s.slug === slug)?.refused;

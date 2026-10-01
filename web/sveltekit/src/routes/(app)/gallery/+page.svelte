@@ -18,14 +18,23 @@
   const NOTE_RULES = "Answered by rules in code over the question's words, with no language model.";
   const NOTE_RULES_PLANNED =
     "The answer was chosen by rules in code over the question's words; a language model was used only to read the place and choose the sources.";
+  const NOTE_NO_SOURCE = 'The rules found no source that answers this question, and the answer says so.';
+  const NOTE_EXPERIMENTAL = 'Answered by rules in code. The answer quotes an experimental model, labelled where it appears.';
   type Entry = (typeof data.entries)[number];
+  // A rules answer that quotes an experimental model, or that says no
+  // source answers, has its own note. It is shown on its row and stays out
+  // of the shared note, so that note is true of every entry it covers.
+  const ownNote = (e: Entry) =>
+    e.refused || e.modelName || e.answerMode !== 'rules' ? null
+      : e.quotesExperimental ? NOTE_EXPERIMENTAL
+      : e.answerLead === 'cannot_answer' ? NOTE_NO_SOURCE : null;
   const note = (e: Entry) =>
     e.refused ? null
-      : e.modelName
+      : ownNote(e) ?? (e.modelName
       ? e.answerMode === 'extractive' ? NOTE_EXTRACTIVE : NOTE_WRITTEN
       : e.answerMode === 'rules' ? (e.planned ? NOTE_RULES_PLANNED : NOTE_RULES)
-      : e.mode !== 'llm' ? `${modeLabel(e.mode)}.` : null;
-  let notes = $derived([...new Set(questions.map(note).filter((n) => n !== null))]);
+      : e.mode !== 'llm' ? `${modeLabel(e.mode)}.` : null);
+  let notes = $derived([...new Set(questions.filter((e) => !ownNote(e)).map(note).filter((n) => n !== null))]);
   let sharedNote = $derived(notes.length === 1 ? notes[0] : null);
 
   // The model is named once when every answered question used the same
@@ -72,10 +81,10 @@
             e.lead,
             e.reason
           )}
-          {#if (!sharedModel && e.modelName) || (!sharedNote && note(e))}
+          {#if (!sharedModel && e.modelName) || ((!sharedNote || ownNote(e)) && note(e))}
             <p class="gallery-meta">
               {#if !sharedModel && e.modelName}Language model <span class="gallery-model">{e.modelName}</span>.{/if}
-              {#if !sharedNote}{note(e)}{/if}
+              {#if !sharedNote || ownNote(e)}{note(e)}{/if}
             </p>
           {/if}
         </li>

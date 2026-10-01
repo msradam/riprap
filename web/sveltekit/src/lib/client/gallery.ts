@@ -3,7 +3,7 @@
  * into src/lib/gallery/*.json. Pages built from these make no backend
  * requests; everything they show comes from the JSON.
  */
-import { planned, refusedIntent, type FinalResult } from './agentStream';
+import { citationList, planned, refusedIntent, type FinalResult } from './agentStream';
 import type { PebbleManifestResponse } from '$lib/stores/pebbleManifest.svelte';
 import type { Deployment } from '$lib/stores/deployment.svelte';
 import index from '$lib/gallery/index.json';
@@ -36,12 +36,19 @@ export const galleryIndex = index as GalleryIndexEntry[];
  *  `final.grounding`, so every label says how that entry was made. The
  *  index fields stand for an entry saved without a grounding. `planned`
  *  says whether a language model planned the query (`final.plan`), and
- *  `refused` whether the plan refused it. */
+ *  `refused` whether the plan refused it. `answerLead` is the grounding's
+ *  lead, and `quotesExperimental` says the answer quotes an experimental
+ *  model: its lead is one only such an answer takes, or a claim in its
+ *  answer cites a source whose citation is experimental. */
 export function withGrounding<T extends GalleryIndexEntry>(
-  e: T, g: FinalResult['grounding'], plan?: FinalResult['plan']
-): T & { answerMode: string | null; planned: boolean; refused: boolean } {
+  e: T, g: FinalResult['grounding'], plan?: FinalResult['plan'], citations?: FinalResult['citations']
+): T & { answerMode: string | null; answerLead: string | null; quotesExperimental: boolean; planned: boolean; refused: boolean } {
+  const exp = new Set(citationList(citations).filter((c) => c.maturity === 'experimental').map((c) => c.doc_id));
   return {
     ...e, mode: g?.tier ?? e.mode, model: g ? g.model ?? null : e.model, answerMode: g?.answer_mode ?? null,
+    answerLead: g?.answer_lead ?? null,
+    quotesExperimental: g?.answer_lead === 'experimental' || g?.answer_lead === 'no_prediction' ||
+      !!g?.claims?.some((c) => c.section === 'answer' && c.doc_ids.some((id) => exp.has(id))),
     planned: planned(plan), refused: refusedIntent(plan?.intent)
   };
 }

@@ -2,9 +2,7 @@
   import { resolve } from '$app/paths';
 
   /** One sample address per shipped city, as plain links. New York City
-   *  is the production deployment; the other three are experimental.
-   *  Anchors match probe_cities.py's smoke-test addresses so what loads
-   *  here is identical to what `scripts/probe_cities.py` exercises in CI. */
+   *  is the production deployment; the other three are experimental. */
 
   const CITIES = [
     { city: 'NYC', address: '189 Atlantic Avenue, Brooklyn, NY', experimental: false },

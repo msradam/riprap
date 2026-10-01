@@ -59,6 +59,12 @@ describe('Landing smoke', () => {
     expect(container.textContent).not.toContain('This public copy shows saved briefings only');
   });
 
+  it('says the three experimental models are there, and that a claim may cite one', () => {
+    const text = (c: typeof LandFor) => (render(c).container.textContent ?? '').replace(/\s+/g, ' ');
+    expect(text(LandFor)).toContain('Whatever they say is labelled experimental');
+    expect(text(LandStones)).toContain('or, where it is labelled experimental, one of three models.');
+  });
+
   it('LandStones names all five Stones', () => {
     const { container } = render(LandStones);
     const text = container.textContent ?? '';

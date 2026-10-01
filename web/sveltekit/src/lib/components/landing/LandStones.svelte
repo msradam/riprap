@@ -9,8 +9,9 @@
 <section class="land-section" id="methodology" aria-labelledby="stones-h">
   <h2 id="stones-h">What a briefing contains</h2>
   <p>
-    Every claim cites a public record from FEMA, NOAA, USGS, or city open data. Riprap reads 23
-    public data sources for New York City; the methodology was last updated
+    Every claim cites its source: a public record from FEMA, NOAA, USGS or city open data, or, where
+    it is labelled experimental, one of three models. Riprap reads 23 public data sources for New
+    York City; the methodology was last updated
     <time datetime="2026-10-01">2026-10-01</time>.
   </p>
   <p>

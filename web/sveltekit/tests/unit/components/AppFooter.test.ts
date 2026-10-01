@@ -61,6 +61,13 @@ describe('AppFooter site lines (the landing uses this footer too)', () => {
     expect(getByRole('link', { name: 'Send feedback' })).toHaveAttribute('href', expect.stringContaining('/issues/new'));
   });
 
+  it('says which cities are experimental and that the experimental layers read satellite imagery', () => {
+    const text = (render(AppFooter).container.textContent ?? '').replace(/\s+/g, ' ');
+    expect(text).toContain('New York City is the production city; Chicago, Seattle and Albany are experimental.');
+    expect(text).toContain('the experimental layers also read Copernicus Sentinel satellite imagery.');
+    expect(text).not.toMatch(/coverage is expanding|All data comes from/);
+  });
+
   it('drops the disclaimer when the page already carries it', () => {
     const { container } = render(AppFooter, { props: { disclaimer: false } });
     expect(container.textContent).not.toContain('Riprap is a reference dossier');
