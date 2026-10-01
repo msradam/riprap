@@ -33,15 +33,15 @@ describe('Landing smoke', () => {
     ]);
   });
 
-  it('LandHero has one h1, and sets the specimen as a figure after the form: a briefing window and its question as text', () => {
-    const { container } = render(LandHero, heroProps);
+  it('LandHero has one h1, and sets the specimen as a figure after the form: one link to the briefing, its question as text', () => {
+    const { container, getByRole } = render(LandHero, heroProps);
     expect([...container.querySelectorAll('h1')].map((h) => h.textContent)).toEqual([
       'The flood record for any New York City block, cited line by line.'
     ]);
     const form = container.querySelector('form[role=search]')!;
     const figure = container.querySelector('figure')!;
     expect(form.compareDocumentPosition(figure) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    // The question is a paragraph, not a heading.
+    // The question is text, not a heading.
     expect(figure.querySelector('h1, h2, h3')).toBeNull();
     // The window is one link to the briefing; its image has a fixed size and no fetch priority,
     // so on phones, where it sits below the actions, it does not jump ahead of the fonts.
@@ -54,12 +54,20 @@ describe('Landing smoke', () => {
     expect([img.getAttribute('width'), img.getAttribute('height')]).toEqual(['712', '1400']);
     expect(img.hasAttribute('fetchpriority')).toBe(false);
     expect(img.getAttribute('decoding')).toBe('async');
-    expect(text(win.querySelector('.window-bar')!)).toBe('riprap / gallery / hollis-since-ida');
-    // The caption is real text: the question, the lead word and the link.
+    // The first frame, as prerendered: the bar reads riprap and the box is empty.
+    expect(text(win.querySelector('.window-bar')!)).toBe('riprap');
+    // The typed question is a picture; the link's name carries the question and the image alt.
+    const search = win.querySelector('.search')!;
+    expect(search).toHaveAttribute('aria-hidden', 'true');
+    expect(text(search.querySelector('.typed')!)).toBe('');
+    expect(search.querySelector('a, button, input, [tabindex]')).toBeNull();
+    const link = getByRole('link', { name: new RegExp(`^${data.specimen.question.replace(/[?.]/g, '\\$&')} The Riprap briefing for this question`) });
+    expect(link).toBe(win);
+    // The caption is the link alone.
     const caption = figure.querySelector('figcaption')!;
-    expect(text(caption.querySelector('.specimen-q')!).trim()).toBe(data.specimen.question);
-    expect(caption.querySelector('.specimen-lead')?.textContent).toBe('Yes.');
-    expect(caption.querySelector('a[href="/gallery/hollis-since-ida/"]')?.textContent).toBe('Read the full briefing');
+    expect([...caption.children].map((c) => [c.tagName, c.classList.contains('land-link'), c.getAttribute('href'), c.textContent])).toEqual([
+      ['A', true, '/gallery/hollis-since-ida/', 'Read the full briefing']
+    ]);
   });
 
   it('LandProof sets the district card first, then each question as a linked h3 with its quote and date', () => {

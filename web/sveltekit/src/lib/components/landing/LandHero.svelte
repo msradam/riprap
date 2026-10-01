@@ -275,8 +275,10 @@
     .hero-chips {
       order: 2;
     }
+    /* Stretch, or the window would be only as wide as its content. */
     .hero-specimen {
       order: 1;
+      align-self: stretch;
       margin-top: 32px;
     }
   }

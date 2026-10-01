@@ -55,13 +55,12 @@ describe('landing load', () => {
     expect(data.count).toBe(galleryIndex.length);
   });
 
-  it("sets the specimen from the snapshot: the entry's own question and the briefing's lead word", async () => {
+  it("sets the specimen from the snapshot: the entry's own question, whose briefing answers Yes as the image alt says", async () => {
     const { specimen } = await load();
     const entry = await loadGalleryEntry(SPECIMEN_SLUG);
     expect(specimen.slug).toBe(SPECIMEN_SLUG);
     expect(specimen.question).toBe(entry!.question);
     expect(specimen.question).toBe('Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?');
-    expect(specimen.lead).toBe('Yes.');
     // The briefing's answer opens with the lead word, then its key sentence.
     expect(await plainBriefing(SPECIMEN_SLUG)).toMatch(/\*\*Answer\.\*\* Yes\. \d+ FloodNet community sensors? /);
   });
