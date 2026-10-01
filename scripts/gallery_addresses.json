@@ -84,6 +84,24 @@
   "feature_doc": "ida_hwm"
  },
  {
+  "slug": "qn12",
+  "neighborhood": "Community district QN12, Queens",
+  "address": "QN12",
+  "reason": "A district on one page: 311 flood requests by type, the share inside the Sandy extent and the city's stormwater scenarios, and the exposed schools, subway entrances and public housing by name."
+ },
+ {
+  "slug": "bk06",
+  "neighborhood": "Community district BK06, Brooklyn",
+  "address": "BK06",
+  "reason": "Red Hook, Gowanus, Carroll Gardens and Park Slope: a coastal and a rain-flooded part in one district."
+ },
+ {
+  "slug": "bx01",
+  "neighborhood": "Community district BX01, Bronx",
+  "address": "BX01",
+  "reason": "Mott Haven, Melrose and Port Morris: a seventh of the district was inside the Sandy extent."
+ },
+ {
   "slug": "hollis-since-ida",
   "neighborhood": "Hollis, Queens",
   "address": "90-01 183rd Street, Queens, NY 11423",
@@ -131,5 +149,12 @@
   "address": "80 Pioneer Street, Brooklyn, NY",
   "question": "Should I buy the house at 80 Pioneer Street, Brooklyn?",
   "reason": "A refusal: Riprap does not give property advice."
+ },
+ {
+  "slug": "bk06-nycha",
+  "neighborhood": "Community district BK06, Brooklyn",
+  "address": "BK06",
+  "question": "Which NYCHA developments in Brooklyn Community District 6 lie inside the 2012 Sandy inundation area?",
+  "reason": "Exposed assets by name: the public housing developments of a district inside the Sandy extent."
  }
 ]

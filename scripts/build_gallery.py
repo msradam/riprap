@@ -3,15 +3,15 @@ scripts/gallery_addresses.json, written to web/sveltekit/src/lib/gallery/.
 The SvelteKit app prerenders /gallery and /gallery/<slug> from these
 files, so the gallery needs no backend (GitHub Pages).
 
-    uv run python scripts/build_gallery.py          # no-LLM briefings
+    uv run python scripts/build_gallery.py          # no model: rule answers
     GALLERY_ONLY=hollis-since-ida,homecrest-311 \\
     RIPRAP_LLM_BASE_URL=http://localhost:11434/v1 \\
     RIPRAP_LLM_MODEL=hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M \\
-        uv run python scripts/build_gallery.py      # question entries, LLM claims
+        uv run python scripts/build_gallery.py      # those entries with a model configured
 
-Entries with a `question` run the question (LLM mode answers it); the
-rest run the bare address. Without an LLM configured, question entries
-are kept as they are. GALLERY_ONLY rebuilds just those slugs and keeps
+Entries with a `question` run the question; the rest run the bare place
+(an address or a community district). Without a model a question is
+answered by the rules. GALLERY_ONLY rebuilds just those slugs and keeps
 every other file and index entry as it is.
 
 Each file carries the full result (the same shape as the SSE `final`
@@ -55,18 +55,11 @@ def main() -> int:
     only = set(filter(None, os.environ.get("GALLERY_ONLY", "").split(",")))
     old_index = {e["slug"]: e for e in json.loads((OUT / "index.json").read_text())} \
         if (OUT / "index.json").exists() else {}
-    has_llm = bool(llm.endpoints())
     index = []
     for a in addresses:
         if only and a["slug"] not in only:
             if a["slug"] in old_index:
                 index.append(old_index[a["slug"]])
-            continue
-        if a.get("question") and not has_llm:
-            # A question entry shows an LLM answer: without an endpoint, keep it as it is.
-            if a["slug"] in old_index:
-                index.append(old_index[a["slug"]])
-            print(f"{a['slug']:18s} kept as is (question entries need RIPRAP_LLM_BASE_URL and RIPRAP_LLM_MODEL)")
             continue
         t0 = time.time()
         final = run(a.get("question") or a["address"])
@@ -92,6 +85,7 @@ def main() -> int:
                                             "generated_at", "mode", "model", "quantization")})
         print(f"{a['slug']:18s} {entry['mode']:7s} kept={len(g.get('claims') or [])} "
               f"dropped={len(g.get('dropped_claims') or [])} {time.time() - t0:.1f}s", flush=True)
+        time.sleep(float(os.environ.get("GALLERY_PAUSE_S", "3")))  # the public APIs have quotas
     # Editorial fields come from the address list every run, so a kept entry
     # picks up a new reason or featured source without being regenerated.
     by_slug = {a["slug"]: a for a in addresses}
