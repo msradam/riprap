@@ -10,9 +10,9 @@ rubric and its weights are in git history at `8b87165` (`app/score.py`).
 
 ## 1. Why no score
 
-Closed-methodology scores (First Street, Jupiter, Fathom) are useful
-products but uncitable in civic work. A NYCEM grant writer can't quote
-"0.73" in a FEMA BRIC sub-application without a defensible audit trail. A
+A score without a published method is hard to cite in civic work. A grant
+writer can't quote "0.73" in a FEMA BRIC sub-application without an audit
+trail behind it. A
 score emitted by an LLM would be non-reproducible and uncalibrated. A
 composite of weighted layers hides which layer put a place on the list.
 Riprap states each layer's finding separately, with its source and vintage.
@@ -64,7 +64,11 @@ TWI are in the evidence table.
 
 The Sandy zone is a mapped outline, not exact to a building. A point within
 50 m of the mapped edge, inside or outside, gets its distance to the edge
-in the sentence (`app/flood_layers/sandy_inundation.py`).
+in the sentence (`app/flood_layers/sandy_inundation.py`), and a question
+about that point gets no flat yes or no. A hospital or subway entrance whose
+mapped point is outside the outline but within 50 m of it is named in its
+register sentence: two hospitals that Sandy closed have points 3 m and 46 m
+outside the mapped edge.
 
 ## 6. Live signals
 
