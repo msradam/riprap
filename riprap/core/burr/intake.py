@@ -29,7 +29,7 @@ from burr.core import State, action
 
 from riprap.core.burr.pebble import trace_rec_for
 from riprap.core.burr.place import extract_address, geocode_matches, resolve_query
-from riprap.core.burr.rule_answer import _NOW_RE as _LIVE_RE  # one definition of "now"
+from riprap.core.burr.rule_answer import asks_now  # one definition of "now"
 
 # Trailing risk phrases ("... at risk of flooding?", "... flood risk").
 _TRAILING_RE = re.compile(
@@ -124,21 +124,24 @@ def _with_borough(span: str, query: str) -> str:
     """The address span with its borough, when the span lacks one and the
     query says or implies it: the geocoder cannot place "90-01 183rd St,
     Hollis" and puts a bare "200 Water Street" in Brooklyn. In order: a
-    neighbourhood named with the address, a Queens-style hyphenated house
-    number, a borough named elsewhere in the query."""
+    neighbourhood named with the address, "in <borough>" elsewhere in the
+    query, a Queens-style hyphenated house number. A span that already
+    carries a borough, a ZIP or "New York" is left as written."""
     from app.areas import nta  # noqa: PLC0415
 
     low = span.lower()
-    if any(b in low for b in _BOROUGH_WORDS) or re.search(r"\b\d{5}\b", span):
+    if any(b in low for b in _BOROUGH_WORDS) or re.search(r"\b\d{5}\b|\b(new york|ny|nyc)\b", low):
         return span
     for area in [p.strip() for p in span.split(",")[1:] if p.strip()]:
         hits = nta.resolve(area)
-        if hits:
+        # The resolver matches substrings ("NY" finds Sunnyside): the part must be a whole word of the name.
+        if hits and re.search(rf"\b{re.escape(area)}\b", hits[0]["nta_name"], re.IGNORECASE):
             return f"{span}, {hits[0]['borough']}"
-    if re.match(r"\s*\d+-\d+\s", span):
-        return f"{span}, Queens"
-    named = [full for word, full in _BOROUGH_WORDS.items() if re.search(rf"\b{word}\b", query, re.IGNORECASE)]
-    return f"{span}, {named[0]}" if len(named) == 1 else span
+    named = [full for word, full in _BOROUGH_WORDS.items()
+             if re.search(rf"\bin (?:the )?{word}\b", query, re.IGNORECASE)]
+    if len(named) == 1:
+        return f"{span}, {named[0]}"
+    return f"{span}, Queens" if re.match(r"\s*\d+-\d+\s", span) else span
 
 
 def heuristic_plan(query: str) -> dict:
@@ -170,7 +173,7 @@ def heuristic_plan(query: str) -> dict:
     # A comparison of two addresses. "Compare the current and 2080 flood maps
     # at 89-11 Merrick Boulevard" names one place and was once briefed as a
     # building called The Current in New Jersey.
-    if m and all(extract_address(g) for g in m.groups() if g):
+    if m and all(extract_address(g) or nta.resolve(g.strip(" ?.")) for g in m.groups() if g):
         a, b = (g for g in m.groups() if g)
         return {"intent": "compare", "rationale": "Heuristic match: compare.",
                 "targets": [{"type": "address", "text": _address_from_query(a)},
@@ -186,10 +189,14 @@ def heuristic_plan(query: str) -> dict:
     if place["kind"] == "district":
         return {"intent": area_intent, "rationale": f"Heuristic match: community district {place['text']}.",
                 "targets": [{"type": "district", "text": place["text"]}], "place": place}
-    live = _LIVE_RE.search(q) and not forecast_question(q)
+    live = asks_now(q) and not forecast_question(q)
     if place["kind"] == "address":
         target = _address_from_query(q) if _OTHER_STATE_RE.search(q) else _with_borough(place["text"], q)
         intent = "live_now" if live else "single_address"
+    elif live and place["kind"] == "neighborhood" and (hits := nta.resolve(place["text"])):
+        # "Broad Channel high tide tonight": the live sources read at a point,
+        # so the neighbourhood by name, for the geocoder (it was City Hall).
+        intent, target = "live_now", f"{place['text']}, {hits[0]['borough']}, NY"
     elif live:
         intent, target = "live_now", "New York City Hall, New York, NY"
     elif place["kind"] == "neighborhood" and nta.resolve(place["text"]):
@@ -198,7 +205,10 @@ def heuristic_plan(query: str) -> dict:
         # A landmark or anything else: the whole place text, so "Ferry
         # Building, San Francisco" keeps its city; the geocoder decides, and
         # fails honestly.
-        intent, target = "single_address", _address_from_query(q)
+        named = place["kind"] == "neighborhood" and re.search(
+            re.escape(place["text"]) + r"\s*,?\s*(?:in\s+)?(?:the\s+)?(Manhattan|Brooklyn|Queens|Bronx|Staten Island)\b", q)
+        # "Hamilton Beach, Queens. Two things: ...": the place and its borough, not the whole question.
+        intent, target = "single_address", (f"{place['text']}, {named.group(1)}, NY" if named else _address_from_query(q))
     kind = "nta" if intent in ("neighborhood", "development_check") else "address"
     out = {"intent": intent, "rationale": f"Heuristic match: {intent}.",
            "targets": [{"type": kind, "text": target}], "place": place}

@@ -33,6 +33,7 @@ _NUM = r"(?:no\.?\s*|number\s+|#\s*)?(\d{1,3})(?![\d-])(?!\s*(?:st|nd|rd|th)\b)"
 _CODE_RE = re.compile(r"\b(MN|BX|BK|QN|SI)\s*-?\s*(\d{1,3})\b(?![\d-])", re.IGNORECASE)
 _BORO_KIND_NUM_RE = re.compile(rf"\b{_BORO_WORDS}\s*,?\s*{_KIND}\s*{_NUM}", re.IGNORECASE)
 _KIND_NUM_BORO_RE = re.compile(rf"\b{_KIND}\s*{_NUM}(?:\s*(?:,|in|of)?\s*{_BORO_WORDS})?", re.IGNORECASE)
+_CODE_KIND_NUM_RE = re.compile(rf"\b(MN|BX|BK|QN|SI)\s+{_KIND}\s*{_NUM}", re.IGNORECASE)  # "SI CD 2"
 _BORO_NUM_RE = re.compile(rf"^\s*{_BORO_WORDS}\s+(\d{{1,2}})\s*[?.!]?\s*$", re.IGNORECASE)
 
 _SUFFIX = (r"(?:street|st|avenue|ave|av|boulevard|blvd|road|rd|place|pl|drive|dr|lane|ln|parkway|pkwy|terrace|ter"
@@ -50,7 +51,9 @@ _TAIL_AREA_RE = re.compile(r"^\s*(?:,\s*|\s+in\s+(?:the\s+)?)([A-Z][\w.'-]*(?:\s
 # common abbreviation: "200 Water Street Manhattan", "1310 Surf Ave, Bklyn".
 # Without it the geocoder picks a borough itself (Water Street in Dumbo).
 _TAIL_BORO_RE = re.compile(r"^\s*,?\s*(?:in\s+)?(?:the\s+)?(manhattan|brooklyn|bklyn|bkln|queens|qns|bronx|bx"
-                           r"|staten island)\b\.?", re.IGNORECASE)
+                           r"|staten island)\b\.?"
+                           # "Manhattan Beach" and "Brooklyn Heights" are neighbourhoods, not the borough
+                           r"(?!\s+(?:Beach|Heights|Village|Valley|Bridge|Terrace|Park|Hills?|Navy|Gardens)\b)", re.IGNORECASE)
 _BORO_FULL = {"manhattan": "Manhattan", "brooklyn": "Brooklyn", "bklyn": "Brooklyn", "bkln": "Brooklyn",
               "queens": "Queens", "qns": "Queens", "bronx": "Bronx", "bx": "Bronx", "staten island": "Staten Island"}
 # A street that is its own name; any other suffix needs a street word before it.
@@ -69,7 +72,7 @@ _ZIP_ONLY_RE = re.compile(r"^\s*(\d{5})(?:-\d{4})?\s*[?.!]?\s*$")
 _NOT_PLACE = {"is", "are", "was", "were", "what", "how", "has", "have", "does", "did", "do", "tell", "show",
               "can", "could", "will", "would", "which", "where", "when", "why", "who", "the", "a", "an", "i",
               "nyc", "new", "york", "city", "fema", "dep", "nws", "noaa", "usgs", "mta", "nycha", "doe", "sandy",
-              "ida", "hurricane", "floodnet", "npcc4", "ny"}
+              "ida", "hurricane", "floodnet", "npcc4", "ny", "in", "we're", "i'm", "it's", "its"}
 
 
 def _district(prefix: str, n: int) -> tuple[str | None, str | None]:
@@ -86,6 +89,9 @@ def parse_district(text: str) -> tuple[str | None, str | None]:
     """(district code, refusal). Both None when the text names no district."""
     t = text or ""
     m = _CODE_RE.search(t)
+    if m:
+        return _district(m.group(1), int(m.group(2)))
+    m = _CODE_KIND_NUM_RE.search(t)
     if m:
         return _district(m.group(1), int(m.group(2)))
     m = _BORO_KIND_NUM_RE.search(t)
@@ -134,8 +140,13 @@ def extract_address(text: str) -> str | None:
 
 def place_phrase(text: str) -> str | None:
     """A short place name for a neighbourhood lookup ("Red Hook",
-    "Jamaica"), never a whole question: the first run of capitalised words
-    that is not a question word, an agency, a storm or a borough alone."""
+    "Jamaica"), never a whole question: a run of capitalised words that is
+    not a question word, an agency, a storm or a borough alone. A run that
+    names a known neighbourhood wins ("We're drafting ... In Hollis, how
+    many" is about Hollis); otherwise the first run."""
+    from app.areas import nta  # noqa: PLC0415
+
+    found: list[str] = []
     for run in _CAPS_RUN_RE.findall(text or ""):
         words = run.split()
         while words and words[0].lower().strip(".,") in _NOT_PLACE:
@@ -144,8 +155,14 @@ def place_phrase(text: str) -> str | None:
             words = words[:-1]
         phrase = " ".join(words).strip(" ,")
         if phrase and len(words) <= 4 and phrase.lower() not in _BOROUGH:
+            found.append(phrase)
+    for phrase in found:
+        hits = nta.resolve(phrase)
+        # The resolver matches substrings: the phrase must be whole words of the name, or an alias.
+        if phrase.lower() in nta.ALIASES or (hits and re.search(rf"\b{re.escape(phrase)}\b", hits[0]["nta_name"],
+                                                                 re.IGNORECASE)):
             return phrase
-    return None
+    return found[0] if found else None
 
 
 def resolve_query(text: str) -> dict:

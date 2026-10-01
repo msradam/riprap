@@ -262,6 +262,7 @@ def _extract(out: dict, question: str, texts: dict[str, str],
         asked = answer_checks.dep_scenario_asked(question)
         if lead == "facts" and asked and any(f.startswith(asked) for f in facts):
             facts = [f for f in facts if not f.startswith("dep_") or f.startswith(asked)]
+    lead = rule_answer.soften(lead, facts, values)
     return lead, facts, answer_checks.check_lead(lead, facts, question, texts, values)
 # "facts" is set only by code: the facts with no yes or no in front of them.
 LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:",
@@ -472,7 +473,7 @@ def synthesize(state, use_llm: bool = True) -> dict:
         lead, facts = ruled
         if any(k != "dropped_count" for k, _ in answer_checks.check_lead(lead, facts, question, texts, values)):
             lead = "facts"  # the facts stand; a lead that fails the lead rules does not
-        answer = (lead, facts, [])
+        answer = (rule_answer.soften(lead, facts, values), facts, [])
     lead_phrase, answer_flags, lead, lead_fact = "", notes, None, None
     if question and ruled is not None:
         lead, facts, _ = answer

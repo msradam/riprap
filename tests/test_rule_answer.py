@@ -57,7 +57,10 @@ def test_a_now_question_reads_the_live_sources_and_never_says_yes_or_no():
 
 
 def test_a_named_asset_is_answered_from_its_register_alone():
-    assert ra.answer("Are any subway entrances near here exposed to flooding?", T) == ("yes", ["mta_entrance_exposure"])
+    counts = {"mta_entrance_exposure": {"n_entrances": 5, "n_inside_sandy_2012": 3, "n_in_dep_extreme_2080": 0}}
+    q = "Are any subway entrances near here exposed to flooding?"
+    assert ra.answer(q, T, counts) == ("yes", ["mta_entrance_exposure"])
+    assert ra.answer(q, T) == ("facts", ["mta_entrance_exposure"])  # no counts, no yes
 
 
 def test_a_count_question_keeps_the_second_subject():

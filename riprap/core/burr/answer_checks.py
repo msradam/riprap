@@ -149,6 +149,9 @@ def relevant_doc(question: str, docs: dict[str, str]) -> str | None:
     return None
 
 
+# How near an Ida high-water mark must be to say "yes, this block flooded".
+# ponytail: one fixed distance (a long Queens block); use the block's own geometry if the yes ever needs to be finer.
+IDA_BLOCK_M = 250
 # The structured field that holds each source's headline figure.
 COUNT_FIELD = {
     "ida_hwm": "n_within_radius", "mta_entrance_exposure": "n_entrances", "doe_school_exposure": "n_schools",
@@ -355,8 +358,10 @@ def _event(doc_id: str, v: dict, start: int | None, this_year: int, start_date=N
         return False if start is None or window_start <= start else None
     if doc_id == "ida_hwm" and "n_within_radius" in v:
         # USGS surveyed marks at selected sites only: none nearby does not
-        # show the area stayed dry.
-        return True if v["n_within_radius"] > 0 else None
+        # show the area stayed dry. A mark says the block flooded only when it
+        # is on or beside the block; one 700 m away says the neighbourhood did.
+        near = v.get("nearest_dist_m")
+        return True if v["n_within_radius"] > 0 and (near is None or near <= IDA_BLOCK_M) else None
     if doc_id == "sandy_inundation" and "inside" in v:
         return bool(v["inside"])
     return None

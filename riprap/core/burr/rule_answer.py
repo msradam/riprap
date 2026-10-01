@@ -48,15 +48,19 @@ TOPICS = (
     (re.compile(r"\bsandy\b", re.I), ("sandy_inundation", "sandy_nta")),
     (re.compile(r"stormwater|storm water|\bdep\b|scenarios?\b|(extreme|moderate) (rain|flood)|rain(fall)? (flood )?maps?"
                 r"|flood maps?", re.I), DEP),
-    (re.compile(r"elevation|low spot|low.lying|terrain|topograph|how high", re.I), ("microtopo", "microtopo_nta")),
+    (re.compile(r"elevation|low spot|low.lying|terrain|topograph|how high (is|above)|above sea level", re.I),
+     ("microtopo", "microtopo_nta")),
     (re.compile(r"\bpermits?\b|construction|being built", re.I), ("dob_permits_nta",)),
     (re.compile(r"\bstream|river level|\bgauges?\b", re.I), ("usgs_gauges",)),
 )
 # Words for the present. Weather words alone ("it's pouring") are not
 # enough: people say them before asking about the past.
+# "Is there flooding risk" and "is it flooding often" are not about now.
+_FLOODING_NOW_RE = re.compile(r"\bis (it|anything|the street|the block|there|this) (now )?flooding\b"
+                              r"(?!\s+(risk|history|often|usually|regularly|a lot|problems?|issues?|records?|complaints?"
+                              r"|common|frequent))", re.I)
 _NOW_RE = re.compile(r"\b(right now|currently|tonight|at the moment|current conditions|live conditions|happening now"
-                     r"|as we speak"
-                     r"|is (it|anything|the street|the block|there|this) (now )?flooding)\b", re.I)
+                     r"|as we speak)\b|" + _FLOODING_NOW_RE.pattern, re.I)
 _FUTURE_RE = re.compile(r"\b(forecasts?|forecasting|projections?|projected|outlook|predictions?|what is coming|what's coming"
                         r"|in the (coming|next) (years|decades)|in the future|by (the )?20\d\ds?|20[5-9]0s?|2100)\b", re.I)
 _FLOOD_RE = re.compile(r"\bflood", re.I)
@@ -78,12 +82,25 @@ def _clauses(question: str) -> list[str]:
 def _happened_clause(question: str) -> str | None:
     """The clause that asks whether it flooded ("Has the block flooded
     since Ida"), wherever it sits."""
-    return next((c for c in _clauses(question) if ac._HAPPENED_RE.search(c)), None)
+    # ("FloodNet" is a name, not a flood: "is there a FloodNet sensor near here" asks about the sensor.)
+    return next((c for c in _clauses(question) if ac._HAPPENED_RE.search(re.sub(r"floodnet", "", c, flags=re.I))), None)
+
+
+def asks_now(question: str) -> bool:
+    """A question about the present. "Is it currently in a FEMA flood zone"
+    is not one: a word for now beside a mapped or recorded subject asks
+    about that subject, unless it also asks whether it is flooding."""
+    q = question or ""
+    if not _NOW_RE.search(q):
+        return False
+    mapped = (any(pattern.search(q) for pattern, ids in TOPICS if "usgs_gauges" not in ids)
+              or any(i in ASSET_DOCS for i in _named_ids(q)))  # "which schools ... for a meeting tonight"
+    return not mapped or bool(_FLOODING_NOW_RE.search(q))
 
 
 def time_frame(question: str) -> str:
     q = question or ""
-    if _NOW_RE.search(q) and not _FUTURE_RE.search(q):
+    if asks_now(q) and not _FUTURE_RE.search(q):
         return "now"
     if _FUTURE_RE.search(q) or ac.dep_scenario_asked(q):
         return "future"
@@ -110,7 +127,7 @@ def named(question: str, texts: dict[str, str]) -> list[str]:
     asked = ac.dep_scenario_asked(question)
     if asked:  # one DEP scenario named: the others were not asked about
         out = [i for i in out if not i.startswith("dep_") or i.startswith(asked)]
-    if "nws_obs" in out and not (_NOW_RE.search(question or "") or _RAIN_NOW_RE.search(question or "")):
+    if "nws_obs" in out and not (asks_now(question) or _RAIN_NOW_RE.search(question or "")):
         # "does it flood when it rains this hard": rain is the setting, not the subject
         out.remove("nws_obs")
     if ac._SINCE_RE.search(question or ""):
@@ -137,27 +154,68 @@ def asks_something(text: str) -> bool:
     """True when words beside a place name a source or a time frame
     ("200 Water Street Manhattan FEMA flood zone"): a question typed as a
     search phrase. The word "flood" alone does not count."""
-    return bool(_NOW_RE.search(text or "") or _FUTURE_RE.search(text or "") or _named_ids(text or "")
+    return bool(asks_now(text) or _FUTURE_RE.search(text or "") or _named_ids(text or "")
                 or _HISTORY_RE.search(text or ""))
 
 
 def recognised(question: str) -> bool:
     """True when a rule knows what kind of question this is, from its words alone."""
     q = question or ""
-    return bool(_NOW_RE.search(q) or _FUTURE_RE.search(q) or _named_ids(q) or _FLOOD_RE.search(q))
+    return bool(asks_now(q) or _FUTURE_RE.search(q) or _named_ids(q) or _FLOOD_RE.search(q))
 
 
-def _asset_lead(question: str, docs: list[str], texts: dict[str, str]) -> str:
-    """Yes when a register names an exposed asset, no when none is, in part
-    when a full layer has some inside and some outside. A question that is
-    not yes or no ("which schools") keeps the neutral lead."""
-    if not ac.is_yes_no_question(question):
+_SAFE_RE = re.compile(r"\b(safe|dry|high(er)? ground|spared|protected|outside|not (in|inside|exposed|at risk))\b", re.I)
+_SCENARIO_RE = re.compile(r"stormwater|\bdep\b|scenarios?\b|\b2080\b|extreme rain", re.I)
+_EXPOSED_RE = re.compile(r"exposed|exposure|at risk|vulnerab|flood[- ]?(zone|prone|plain|area|risk)", re.I)
+_TOTALS = {"mta_entrance_exposure": "n_entrances", "doh_hospital_exposure": "n_hospitals"}  # full layers
+
+
+def _asset_lead(question: str, docs: list[str], values: dict | None) -> str:
+    """Yes, no or in part from the register's own counts, and only for
+    what a register records: assets inside the 2012 Sandy extent, assets
+    inside the DEP extreme scenario. The question's words say which count.
+    It records no flooding since a date, and "is the school safe" asks the
+    opposite, so those keep the neutral lead, as does "which schools"."""
+    q = question or ""
+    if not ac.is_yes_no_question(q) or _SAFE_RE.search(q) or ac._SINCE_RE.search(q) or re.search(r"\bida\b", q, re.I):
         return "facts"
-    if not any(ac.reports_result(texts[d]) for d in docs):
-        return "no"
-    # An exposed-only register counts exposed assets only, so "some" is "yes".
-    full_layer = [d for d in docs if "register lists only" not in texts[d]]
-    return "partly" if any(ac._partial(texts[d]) for d in full_layer) else "yes"
+    sandy, scenario = re.search(r"\bsandy\b", q, re.I), _SCENARIO_RE.search(q)
+    keys = (["n_inside_sandy_2012"] if sandy and not scenario else ["n_in_dep_extreme_2080"] if scenario and not sandy
+            else ["n_inside_sandy_2012", "n_in_dep_extreme_2080"] if sandy or scenario or _EXPOSED_RE.search(q) else [])
+    vals = [(values or {}).get(d) for d in docs]
+    if not keys or not all(isinstance(v, dict) and all(isinstance(v.get(k), int) for k in keys) for v in vals):
+        return "facts"
+    hit = max(sum(v[k] for v in vals) for k in keys)
+    if not hit:
+        # An asset just outside the mapped Sandy edge is not a plain no.
+        return "facts" if "n_inside_sandy_2012" in keys and any(v.get("n_near_sandy_edge") for v in vals) else "no"
+    # A full layer (every entrance, every hospital) with some inside and some
+    # outside is "in part", unless the question asks whether any is.
+    total = sum(v.get("n_checked") or v.get(_TOTALS[d]) or 0 for d, v in zip(docs, vals, strict=True) if d in _TOTALS)
+    return "partly" if total > hit and not _ANY_RE.search(q) else "yes"
+
+
+def _count_of(doc: str, question: str, value) -> int | None:
+    """The count "are there any ..." asks about: the named 311 kind and not
+    every complaint, sensor events and not sensors when the question asks
+    about flooding."""
+    if not isinstance(value, dict):
+        return None
+    if doc in ("nyc311", "nyc311_nta"):
+        kind = ac.kind_asked(doc, question, value)
+        return value["by_kind"].get(kind, 0) if kind else value.get("n")
+    if doc == "floodnet" and re.search(r"\b(flood(ed|ing|s)?|events?|logged|recorded|water|depth)\b", question, re.I):
+        return value.get("n_flood_events_3y") if value.get("n_sensors") else None  # no sensor: cannot say
+    return value.get(_COUNT_KEYS.get(doc, ""))
+
+
+def soften(lead: str, facts: list[str], values: dict | None) -> str:
+    """Within 50 m of the mapped Sandy edge, on either side, the outline
+    does not settle yes or no for one building: the sentence says how near
+    the edge is, and the lead stays neutral."""
+    v = (values or {}).get("sandy_inundation")
+    near = isinstance(v, dict) and v.get("edge_m") is not None
+    return "facts" if near and lead in ("yes", "no") and facts[:1] == ["sandy_inundation"] else lead
 
 
 def answer(question: str, texts: dict[str, str], values: dict | None = None) -> tuple[str, list[str]] | None:
@@ -213,9 +271,9 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
         # The register sentence already says which assets are in the Sandy
         # extent and the DEP scenario, so those layers are the criteria of an
         # asset question, not further subjects.
-        lead = _asset_lead(question, assets, texts)
-        if lead != "facts" and tf == "future":
-            lead = "facts"  # "in a flood scenario": a scenario is not an observation
+        lead = _asset_lead(question, assets, values)
+        if lead != "facts" and tf == "future" and not _MAP_SHOWS_RE.search(question):
+            lead = "facts"  # "will the schools flood by 2080": a scenario is not an observation
         return lead, assets
     happened = _happened_clause(question) if tf == "past" else None
     past = ac.past_event_lead(happened, {"time_frame": "past"}, list(texts), texts, values) if happened else None
@@ -257,7 +315,7 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
                 or [d for d in subjects if d in DEP]
                 or [i for i in FORECAST_FACTS if texts.get(i) and not (far and i == "nws_water_forecast")][:4])
         return with_named("facts", docs) if docs else None
-    n = (values or {}).get(subjects[0], {}).get(_COUNT_KEYS.get(subjects[0], "")) if subjects else None
+    n = _count_of(subjects[0], question, (values or {}).get(subjects[0])) if subjects else None
     if isinstance(n, int) and ac.is_yes_no_question(question) and _ANY_RE.search(question):
         # "Were any high-water marks surveyed near here": the source's own count says yes or no.
         return with_named("yes" if n else "no", [subjects[0]])

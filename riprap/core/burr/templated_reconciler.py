@@ -105,7 +105,9 @@ def _lead(state, items) -> str | None:
         claims.append({"section": "lead", "text": text, "doc_ids": ids or [by_pebble[pid].doc_id]})
 
     if "sandy" in by_pebble and isinstance(state.get("sandy"), dict):
-        add("sandy", f"{'inside' if state['sandy'].get('inside') else 'outside'} the 2012 Sandy inundation footprint")
+        edge = state["sandy"].get("edge_m")
+        add("sandy", f"{'inside' if state['sandy'].get('inside') else 'outside'} the 2012 Sandy inundation footprint"
+            + (f" (about {max(edge, 1)} m from its mapped edge)" if edge is not None else ""))
     fema = state.get("fema_nfhl")
     if "fema_nfhl" in by_pebble and isinstance(fema, dict) and fema.get("fld_zone"):
         from app.context.fema_nfhl import zone_reading
