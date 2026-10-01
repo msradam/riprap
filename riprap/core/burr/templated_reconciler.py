@@ -215,6 +215,25 @@ def nothing_built(state) -> str:
     return " ".join(out)
 
 
+# A plain place briefing quotes a live reading only when it is notable; a
+# "right now" question quotes them all (rule_answer). The readings stay in
+# the evidence table either way.
+# ponytail: a fixed 1 ft above the predicted tide; use the gauge's own action
+# stage if the tide source ever carries one.
+_QUIET_UNLESS = {
+    "nws_obs": lambda v: v.get("raining"),
+    "usgs_gauges": lambda v: v.get("n_gauges_in_area"),
+    "noaa_tides": lambda v: (v.get("residual_ft") or 0) >= 1.0,
+    "nws_water_forecast": lambda v: v.get("flood_category"),
+}
+
+
+def _quiet(state, e) -> bool:
+    notable = _QUIET_UNLESS.get(e.pebble_id)
+    value = state.get(e.pebble_id)
+    return bool(notable) and isinstance(value, dict) and not notable(value)
+
+
 def compose_briefing(state) -> tuple[str, dict[str, dict]]:
     """One section per Stone (stones.yaml order), one cited sentence per
     pebble with a value, the DEP scenarios merged into one sentence.
@@ -238,7 +257,7 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
             continue  # Capstone is the synthesis output, not a data stone
         out = []
         for e in items:
-            if e.stone_id != stone.id:
+            if e.stone_id != stone.id or (not question and _quiet(state, e)):
                 continue
             if dep and e.pebble_id in _DEP_POINT:
                 if not dep_done:  # the merged sentence goes where the first scenario was

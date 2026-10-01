@@ -109,6 +109,8 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
                 # ("Queens Community Board 12") match no tabulation area.
                 intent = intent if intent in ("neighborhood", "development_check") else "neighborhood"
                 targets = guard["targets"]
+            if intent == "development_check" and guard["intent"] != "development_check":
+                intent = "neighborhood"  # the words name no construction (intake._DEVELOPMENT_RE)
             if forecast_question(query):
                 # Decided in code: a forecast question is about what is coming,
                 # so it runs the Lodestone's forecast pebbles, never live_now.

@@ -77,7 +77,9 @@ def _address_from_query(query: str) -> str:
 
 _COMPARE_RE = re.compile(r"^\s*compare\s+(.+?)\s+(?:to|with|and|vs\.?|versus)\s+(.+?)\s*\??$"
                          r"|^(.+?)\s+(?:vs\.?|versus)\s+(.+?)\s*\??$", re.IGNORECASE)
-_DEVELOPMENT_RE = re.compile(r"\b(building|construction|permits?|development|projects? underway)\b",
+# Construction, not "NYCHA developments" or "buildings in the floodplain":
+# those once got building permits for an answer.
+_DEVELOPMENT_RE = re.compile(r"\b(construction|permits?|being built|new (buildings?|developments?)|projects? underway)\b",
                              re.IGNORECASE)
 _HOUSE_NUMBER_RE = re.compile(r"^\s*\d+(-\d+)?\s+\S")
 # An address that ends in another state's code ("..., San Francisco, CA"): the
@@ -255,16 +257,14 @@ def plan_intent(state: State) -> State:
 def select_deployment(state: State) -> State:
     """Pick the deployment whose coverage bbox contains the geocoded point.
 
-    The chosen deployment name (e.g. `nyc`, `boston`) is written to
-    state and read by every Stone's MapActions fan-out. When no
-    deployment covers the point, `deployment` is set to None and the
-    Stones fan out to zero pebbles — the reconciler then produces a
-    "Riprap doesn't cover this place yet" briefing.
+    The chosen deployment name (e.g. `nyc`, `chicago`) is written to
+    state and read by the Stones fan-out. When no deployment covers the
+    point, `deployment` is set to the sentinel `__none__` and only the
+    federal pebbles run.
 
-    This is what stops a Boston query from firing NYC's `ida_hwm` or
-    `sandy` pebble: per-query routing replaces the previous behaviour
-    where the server's boot-time `RIPRAP_DEPLOYMENT` env var dictated
-    which pebbles ran for every query.
+    This is what stops a Chicago query from firing NYC's `ida_hwm` or
+    `sandy` pebble: the server's boot-time `RIPRAP_DEPLOYMENT` env var
+    does not decide which pebbles run for a query.
     """
     from riprap.core.pebbles.deployments import pick_deployment  # noqa: PLC0415
 
@@ -280,9 +280,9 @@ def select_deployment(state: State) -> State:
                          "reason": "no deployment covers this point"}
         rec["elapsed_s"] = round(time.time() - rec["started_at"], 4)
         trace.append(rec)
-        # Sentinel `__none__` (not None) so Stones can distinguish
-        # "explicitly out of coverage → fan out zero pebbles" from
-        # "no deployment resolved yet → fall back to env var".
+        # Sentinel `__none__` (not None) so Stones can tell "out of
+        # coverage: run the federal pebbles only" from "no deployment
+        # resolved yet: fall back to the env var".
         return state.update(deployment="__none__", trace=trace)
     rec["ok"] = True
     rec["result"] = {"deployment": dep.name, "city": dep.city,
@@ -297,7 +297,7 @@ def geocode_target(state: State) -> State:
     """Resolve the first target (or the raw query if empty) to lat/lon
     via `app.geocode.geocode_one` — NYC Geosearch first, OSM Nominatim
     fallback for any US address. This is what makes non-NYC deployments
-    (Chicago, Boston, etc.) work without code changes."""
+    (Chicago, Seattle, Albany) work without code changes."""
     from app.geocode import geocode_one  # noqa: PLC0415
 
     trace = list(state.get("trace", []))

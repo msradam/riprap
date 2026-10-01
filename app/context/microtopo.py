@@ -200,13 +200,9 @@ def microtopo_at(lat: float, lon: float, radius_m: int = 750) -> Microtopo | Non
     pct = round(pct_200)
     bits.append(f"; this point is higher than {pct}% of the ground within 200 m (the {_ordinal(pct)} "
                 f"percentile; a low percentile means a local low spot where water collects)")
-    if hand_v is not None:
-        bits.append(f"; HAND (height above the nearest drainage channel) {hand_v} m")
-    if twi_v is not None:
-        bits.append(f"; TWI (topographic wetness index; higher means water tends to collect) {twi_v}")
-    bits.append(f". Local basin relief (the rise from this point to the highest ground within "
-                f"{radius_m} m): {relief} m.")
-    narrative = "".join(bits)
+    # HAND, TWI and basin relief stay in the value (the evidence table):
+    # two decimals from a 30 m raster read as precision the data lacks.
+    narrative = "".join(bits) + "."
     return Microtopo(
         point_elev_m=elev,
         rel_elev_pct_750m=round(pct_750, 1),
