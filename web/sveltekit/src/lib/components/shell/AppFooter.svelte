@@ -35,7 +35,7 @@
     </p>
     <p class="app-footer-build">
       Built to USWDS, WCAG 2.2 AA, Section 508 and the Plain Writing Act. Riprap is open source
-      under Apache-2.0. All foundation models are Apache-2.0. All data comes from public-record federal, state
+      under Apache-2.0. All data comes from public-record federal, state
       and city sources. No commercial APIs are contacted at runtime. Riprap <span class="data">v{APP_VERSION}</span>.
     </p>
     <p class="app-footer-credits">
