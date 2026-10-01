@@ -17,8 +17,8 @@ one page, with the source and its date beside every sentence.
 
 ## What it does
 
-Type an NYC address, a community district such as QN12, or a question about
-either. Riprap reads the public flood records for that place: FEMA's effective
+Type an NYC address, a neighbourhood, a community district such as QN12, or a
+question about one. Riprap reads the public flood records for that place: FEMA's effective
 and preliminary flood maps, the 2012 Sandy inundation extent, Hurricane Ida
 high-water marks, the city's three stormwater scenarios, 311 flood requests,
 FloodNet street sensors, and the subway entrances, schools, public housing and
@@ -66,14 +66,16 @@ City:
 
 - reads the observed record (311, FloodNet events, Ida high-water marks) and
   the mapped one (two FEMA maps, three city stormwater scenarios, the Sandy
-  extent) for the same address or district in one step;
+  extent) for the same address in one step, and for a district its 311
+  requests, its Sandy and stormwater shares and the city's floodplain counts;
 - puts a source and a data date on every sentence, so a figure can be quoted
   with its citation;
 - names the exposed assets of a district (which schools, which public housing
   developments, which subway entrances), by one method for all 59 districts;
-- returns the same evidence to a program: JSON over HTTP and
-  [MCP](#quickstart), each item with its figures, source URL and vintage, a
-  digest of the result and the list of sources that failed to answer.
+- returns the same evidence to a program: over [MCP](#quickstart), each item
+  with its figures, source URL and vintage, a digest of the result and the
+  list of sources that failed to answer; over HTTP, the full result as JSON
+  with its trace.
 
 It also carries rules for the traps in these sources: which 311 descriptors
 record flooding (the city renamed them in 2026), which sensor readings FloodNet
@@ -102,7 +104,7 @@ insurance or hydraulic design. More in [docs/BACKGROUND.md](docs/BACKGROUND.md).
 
 | Area | Status |
 |---|---|
-| New York City flood | Production: 23 public sources, for addresses, questions and all 59 community districts |
+| New York City flood | Production: 23 public sources for an address (15 of them for a neighbourhood or district), questions, and all 59 community districts |
 | Chicago, Seattle, Albany | Experimental: federal sources plus a reviewed 311 flood filter and a water-level gauge ([docs/multi-city.md](docs/multi-city.md)) |
 | Models | None required. No model writes, scores or forecasts anything. An optional LLM routes questions the rules do not recognise |
 | Checks | Citations and numbers on every claim, rules on answer leads, 13 disclosure checks. They are patterns and rules: they do not read meaning and can miss a wrong inference ([docs/GROUNDING.md](docs/GROUNDING.md)) |
@@ -195,8 +197,8 @@ No accounts, no cookies and no analytics. The server keeps a short-lived local
 cache of public-data responses and no database of queries (a web server's access
 log, if you keep one, holds the URLs asked). 311 free text is
 redacted of email addresses and phone numbers when it is fetched; names are not
-redacted. Addresses are sent to geocoders, and a configured LLM receives the
-question and evidence. Details and a do-no-harm note:
+redacted. Addresses are sent to geocoders, the map loads its background tiles
+from CARTO, and a configured LLM receives the question and evidence. Details and a do-no-harm note:
 [docs/PRIVACY.md](docs/PRIVACY.md).
 
 ## Get involved
