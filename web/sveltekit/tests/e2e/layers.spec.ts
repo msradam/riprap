@@ -1,10 +1,7 @@
 /**
- * Backend-data smoke for the four MapLibre tier sources. Verifies that
- * the FastAPI /api/layers/* endpoints respond, and prints feature counts
- * so we can tell if "synthetic-prior not rendering" is a registration
- * bug (the syn-stripe-45 image fails to load) or a data-coverage gap
- * (Prithvi water polygons only cover Hurricane Ida flooded areas, so
- * most NYC points return an empty FeatureCollection).
+ * Backend-data smoke for the map's tier sources. Verifies that the
+ * FastAPI /api/layers/* endpoints respond, and prints feature counts so
+ * an empty layer can be told apart from an endpoint that failed.
  *
  * Skipped automatically if the backend isn't reachable.
  */
@@ -26,19 +23,18 @@ test.describe('@layers backend data coverage', () => {
         return { features: (j?.features?.length ?? 0) as number, status: r.status() };
       };
 
-      const [sandy, dep, prithvi, floodnet] = await Promise.all([
+      const [sandy, dep, floodnet] = await Promise.all([
         fetchFc(`/api/layers/sandy?lat=${p.lat}&lon=${p.lon}&r=1500`),
         fetchFc(`/api/layers/dep_extreme_2080?lat=${p.lat}&lon=${p.lon}&r=1500`),
-        fetchFc(`/api/layers/prithvi_water?lat=${p.lat}&lon=${p.lon}&r=1500`),
         fetchFc(`/api/floodnet_near?lat=${p.lat}&lon=${p.lon}&r=1500`)
       ]);
 
-      console.log(`[${p.name}] sandy=${sandy.features} dep=${dep.features} prithvi=${prithvi.features} floodnet=${floodnet.features}`);
+      console.log(`[${p.name}] sandy=${sandy.features} dep=${dep.features} floodnet=${floodnet.features}`);
 
       // Each endpoint should respond 200 (or be cleanly skipped on a
       // non-running backend). Coverage at any specific point is the
-      // diagnostic — empty Prithvi at Red Hook is expected, not a bug.
-      for (const fc of [sandy, dep, prithvi, floodnet]) {
+      // diagnostic: an empty layer is not a bug.
+      for (const fc of [sandy, dep, floodnet]) {
         expect([200, -1]).toContain(fc.status);
       }
     });

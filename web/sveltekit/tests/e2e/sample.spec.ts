@@ -75,7 +75,7 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
     await expect(page.getByText(/\b(EMP|MOD|PRX|SYN) ON\b/)).toHaveCount(0);
   });
 
-  test('MapLibre map mounts and registers syn-stripe-45 pattern', async ({ page }) => {
+  test('MapLibre map mounts with its sources and layers', async ({ page }) => {
     const consoleErrors: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
@@ -90,25 +90,15 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
       undefined,
       { timeout: 15_000 }
     );
-    await page.waitForFunction(
-      () => {
-        const m = (window as unknown as { __riprapMap?: { hasImage: (s: string) => boolean } }).__riprapMap;
-        return Boolean(m && m.hasImage('syn-stripe-45'));
-      },
-      undefined,
-      { timeout: 5_000 }
-    );
 
     const mapState = await page.evaluate(() => {
       type MlMap = {
-        hasImage: (id: string) => boolean;
         getStyle: () => { sources: Record<string, unknown>; layers: Array<{ id: string }> };
       };
       const map = (window as unknown as { __riprapMap?: MlMap }).__riprapMap;
       if (!map) return null;
       const style = map.getStyle();
       return {
-        hasStripe: map.hasImage('syn-stripe-45'),
         sources: Object.keys(style.sources),
         layers: style.layers.map((l) => l.id)
       };
@@ -116,10 +106,8 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
     expect(mapState, 'map instance should be reachable from the DOM').not.toBeNull();
     if (!mapState) return;
 
-    expect(mapState.sources).toEqual(expect.arrayContaining(['syn-prior', 'register-points', 'queried-address']));
-    expect(mapState.layers).toEqual(expect.arrayContaining([
-      'tier-synthetic-fill', 'tier-synthetic-line', 'register-points-circle', 'queried-pin'
-    ]));
+    expect(mapState.sources).toEqual(expect.arrayContaining(['register-points', 'queried-address']));
+    expect(mapState.layers).toEqual(expect.arrayContaining(['register-points-circle', 'queried-pin']));
     // The register points behind the map point list are on the map.
     const points = await page.evaluate(() => {
       type Src = { _data?: { features?: unknown[] } } | undefined;
@@ -127,8 +115,6 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
       return map?.getSource('register-points')?._data?.features?.length ?? 0;
     });
     expect(points).toBeGreaterThan(0);
-
-    expect(mapState.hasStripe, 'syn-stripe-45 image should be registered').toBe(true);
 
     expect(consoleErrors.filter((e) => !e.includes('favicon'))).toEqual([]);
   });

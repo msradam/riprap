@@ -70,8 +70,8 @@ const DEMO_QUERIES: DemoQuery[] = [
     query: 'current conditions at the Battery, Manhattan',
     minCitations: 1,
     expectLiveNow: true,
-    notes: 'live_now intent: NOAA Battery gauge + NWS active alerts + TTM '
-         + 'surge nowcast. Streams in seconds, not minutes.' },
+    notes: 'live_now intent: NOAA Battery gauge + NWS active alerts + the '
+         + 'Weather Service water-level forecast. Streams in seconds, not minutes.' },
   { name: 'gowanus-superfund',
     query: 'Gowanus Canal Superfund flood exposure briefing',
     minCitations: 2,

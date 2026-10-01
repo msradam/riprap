@@ -11,7 +11,7 @@ ordering for the 5-min pitch slot.
 | 1 | `red-hook.png` | Visual language: claim glyphs in the gutter, 4 sections, citations 1-4 in the drawer, MapLibre with Sandy + DEP layers, trace UI ticking through 9 specialists. The "this is what Riprap *is*" frame. | Everyone |
 | 2 | `red-hook-houses-nycha.png` | Specific damning number: ~85% of the 2,878-unit Red Hook Houses footprint inside the 2012 Sandy Inundation Zone. NYCHA register card with per-row provenance grid. | Journalists, agency analysts |
 | 3 | `hollis.png` | The Mellea reroll demo — Riprap catches itself getting an order of magnitude wrong (0.19% → 19%) and corrects in front of the audience. The system showing its work. | Researchers, methodology audience |
-| 4 | `battery-live-now.png` | Shifts gears from archival to real-time: NOAA Battery gauge + NWS active alerts + TTM r2 surge nowcast. Streams in seconds, not minutes. | Agency analysts (OEM), planners |
+| 4 | `battery-live-now.png` | Shifts gears from archival to real-time: NOAA Battery gauge + NWS active alerts + the Weather Service water-level forecast. Streams in seconds, not minutes. | Agency analysts (OEM), planners |
 | 5 | `downing-street-london.png` | Silence-over-confabulation. The briefing politely refuses to invent NYC content for an out-of-scope address. Closes the philosophical loop. | Researchers, anyone evaluating epistemic discipline |
 
 ## Full screenshot index
