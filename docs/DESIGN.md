@@ -158,7 +158,8 @@ blues carry evidence and links, amber and red are reserved for signal.
 - **Soft Rule** (slate-300) and **Hairline** (slate-250): row separators
   and the one input border.
 - **Paper**, **Sunken Paper**, **Inset Paper**, **Card White**: the
-  surfaces. **Mist**: the app desk backdrop. **Sky**: basemap water.
+  surfaces. **Mist**: the app desk backdrop. **Sky**: basemap water, and
+  the landing's question chips.
 
 ### Named Rules
 **The Checkable Blue Rule.** Federal Blue means a source or a control you
@@ -196,8 +197,8 @@ Third-party map controls are restyled to meet it.
 
 **The Measure Rule.** Prose lines stay at 75 characters or fewer.
 
-**The One Heading Style Rule.** Every h2 on a page uses Headline; sections
-are numbered in one sequence or not at all.
+**The One Heading Style Rule.** Every h2 on a page uses one style: Headline,
+or Title on the landing; sections are numbered in one sequence or not at all.
 
 ## Layout
 
@@ -344,17 +345,21 @@ A small square whose fill encodes the tier; used in the evidence table, the
 map legend and the tier key only.
 
 ### Landing
-A front page at report restraint: the kind line, an h1 "Flood-exposure
-briefings for New York City" (Title scale raised to 56px on desktop, no
-accented word), one deck sentence, the query input (56px, labelled, a
-plain "Brief this place" button), the example queries as plain links, then
-the gallery's question briefings as stories: the question as a 22 to 28px
-headline link, the answer's first sentence as the standfirst, the place and
-snapshot date as a byline. The address briefings follow as one compact
-list under "Address briefings": the place as the link, its address and the
-snapshot date, one row each. No stat row, no badge row, no numbered cards.
-Community districts are written QN12, with no space, in copy, examples and
-placeholders.
+A Persuade page inside the report system. The hero pairs the h1 (52px, 34px
+on phones), one subhead and the query box (or, on the static site, "Browse
+briefings" and "Run it yourself") with a real gallery answer set as a
+specimen: the question, the lead word at Lead size, the key sentence and
+its source notes. Real questions follow as chips. Proof comes next, as
+gallery answers on Card White cards with no border: one wide district card
+with its figure, then question cards with a verbatim quote. Then the
+sources by Stone (`#methodology`), who it is for, developers and MCP, the
+experimental models, how to collaborate, and one "evidence, not advice"
+line with the official sources. Section headings use the Title scale. Tonal
+bands of Sunken Paper and one Ink code block give rhythm. There are no
+shadows, borders, stat rows or numbered cards. Cards and Title-scale
+section headings are for the landing only; briefing, gallery and print
+pages keep the report style. Community districts are written QN12, with no
+space, in copy, examples and placeholders.
 
 ### Gallery index
 The typographic list stays: place over question, snapshot date in Data,
