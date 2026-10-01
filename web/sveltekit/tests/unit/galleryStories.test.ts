@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { featureSentence, leadSentence, modelName, standfirst, storyLead } from '$lib/server/galleryStories';
+import { llmStamp, withGrounding, type GalleryIndexEntry } from '$lib/client/gallery';
+import { render } from '@testing-library/svelte';
+import GalleryPage from '../../src/routes/(app)/gallery/+page.svelte';
 
 describe('leadSentence', () => {
   it('keeps the sentence after a bare lead word and drops citation markers', () => {
@@ -63,5 +66,37 @@ describe('featureSentence', () => {
   it('matches whole ids only and is empty when nothing cites the id', () => {
     expect(featureSentence(p, 'nyc311_nta')).toBe('Peak depth: 1172 mm.');
     expect(featureSentence(p, 'ida_hwm')).toBe('');
+  });
+});
+
+/** A question entry answered by rules: the index says `no_llm` with no
+ *  model, and only its grounding says how it was answered. */
+describe('a rules-mode question entry', () => {
+  const index: GalleryIndexEntry = { slug: 'r', neighborhood: 'Hollis, Queens', address: 'a', question: 'Did it flood?', generated_at: '2026-10-01T12:00Z', mode: 'no_llm', model: null };
+  const rules = withGrounding(index, { tier: 'no_llm', answer_mode: 'rules', question: 'Did it flood?', answered: true });
+  const llm = withGrounding({ ...index, slug: 'l', mode: 'llm', model: 'stale' }, { tier: 'llm', answer_mode: 'extractive', model: 'hf.co/x-GGUF:Q4_K_M' });
+  const page = (entries: (typeof rules)[]) =>
+    render(GalleryPage, { data: { entries: entries.map((e) => ({ ...e, lead: '', modelName: modelName(e) })) } } as never).container;
+
+  it('reads mode, model and answer mode from the grounding, and has no model name or stamp', () => {
+    expect(rules).toMatchObject({ mode: 'no_llm', model: null, answerMode: 'rules' });
+    expect(modelName(rules)).toBeNull();
+    expect(llmStamp(rules)).toBeNull();
+    expect(llm).toMatchObject({ mode: 'llm', model: 'hf.co/x-GGUF:Q4_K_M', answerMode: 'extractive' });
+  });
+
+  it('says it was answered by rules with no language model, and shows no model line', () => {
+    const text = page([rules]).textContent ?? '';
+    expect(text).toContain("Answered by rules in code over the question's words, with no language model.");
+    expect(text).not.toMatch(/Language model|answered with the language model|LLM/);
+    expect(page([rules]).querySelector('.gallery-model')).toBeNull();
+    expect(page([rules]).querySelector('.gallery-meta')).toBeNull();
+  });
+
+  it('beside an entry a model answered, each says how it was made and the model entry names its model', () => {
+    const metas = [...page([rules, llm]).querySelectorAll('.gallery-meta')].map((p) => p.textContent?.replace(/\s+/g, ' ').trim());
+    expect(metas[0]).toBe("Answered by rules in code over the question's words, with no language model.");
+    expect(metas[1]).toMatch(/^Language model hf\.co\/x-GGUF:Q4_K_M\. The lead \(Yes, No or a count\) is set by rules in code/);
+    expect(page([rules, llm]).querySelector('.gallery-colophon')).toBeNull();
   });
 });

@@ -3,7 +3,7 @@
   import { resolve } from '$app/paths';
   import ResultsView from '$lib/components/results/ResultsView.svelte';
   import { RunState } from '$lib/client/runState.svelte';
-  import { galleryIndex, llmStamp } from '$lib/client/gallery';
+  import { galleryIndex, llmStamp, withGrounding } from '$lib/client/gallery';
   import { persistSnapshot } from '$lib/stores/briefingState.svelte';
   import { snapshotFromRun } from '$lib/client/briefingModel';
   import type { PageProps } from './$types';
@@ -20,7 +20,7 @@
   let sibling = $derived(run.refused
     ? galleryIndex.find((e) => e.slug !== entry.slug && !e.question && e.address === entry.address) ?? null
     : null);
-  let meta = $derived({ generatedAt: entry.generated_at, commit: entry.riprap_commit, stamp: llmStamp(entry) });
+  let meta = $derived({ generatedAt: entry.generated_at, commit: entry.riprap_commit, stamp: llmStamp(withGrounding(entry, entry.final.grounding)) });
 
   /** Save this entry as a print snapshot and open the print route. The
    *  id is what a reader would type to run the same briefing live, so the

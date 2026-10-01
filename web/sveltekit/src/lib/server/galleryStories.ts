@@ -3,7 +3,7 @@
  * gallery index: each entry's index fields plus its standfirst and
  * answer mode, so neither page ships the full snapshots.
  */
-import { galleryIndex, loadGalleryEntry, type GalleryIndexEntry } from '$lib/client/gallery';
+import { galleryIndex, loadGalleryEntry, withGrounding, type GalleryIndexEntry } from '$lib/client/gallery';
 import { citationList, type FinalResult } from '$lib/client/agentStream';
 import { parseBriefing } from '$lib/client/parseBriefing';
 import { keyedAnswer, leadAnswer } from '$lib/client/briefingModel';
@@ -73,11 +73,7 @@ export async function galleryStories(): Promise<GalleryStory[]> {
   const out: GalleryStory[] = [];
   for (const e of galleryIndex) {
     const entry = await loadGalleryEntry(e.slug);
-    out.push({
-      ...e,
-      lead: entry ? storyLead(e, entry.final) : '',
-      answerMode: entry?.final.grounding?.answer_mode ?? null
-    });
+    out.push({ ...withGrounding(e, entry?.final.grounding), lead: entry ? storyLead(e, entry.final) : '' });
   }
   return out;
 }

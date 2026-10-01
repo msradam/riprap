@@ -8,20 +8,27 @@
   let questions = $derived(data.entries.filter((e) => e.question));
   let addresses = $derived(data.entries.filter((e) => !e.question));
 
-  // The model is named once when every question briefing used the same one;
-  // otherwise each entry says how it was made. A refusal ran no model and
-  // does not count.
-  let models = $derived([...new Set(questions.flatMap((e) => (e.modelName ? [e.modelName] : [])))]);
-  let sharedModel = $derived(models.length === 1 ? models[0] : null);
-
-  // The note depends on how each answer was made. In extractive mode code
-  // sets the lead (and any refusal); the model only picks the quoted sentences.
+  // The note depends on how each answer was made, read from the entry's own
+  // grounding. In extractive mode code sets the lead (and any refusal); the
+  // model only picks the quoted sentences. A refusal ran no model and no
+  // rule, and has no note.
   const NOTE_EXTRACTIVE =
     'The lead (Yes, No or a count) is set by rules in code, and so is a refusal or a note that the sources do not answer. The model chose which source sentences answer the question, and they are quoted word for word.';
   const NOTE_WRITTEN = 'Written by a language model, with each claim checked against its cited sources.';
-  const note = (mode: string | null) => (mode === 'extractive' ? NOTE_EXTRACTIVE : NOTE_WRITTEN);
-  let modes = $derived([...new Set(questions.filter((e) => e.modelName).map((e) => e.answerMode === 'extractive'))]);
-  let sharedNote = $derived(modes.length === 1 ? (modes[0] ? NOTE_EXTRACTIVE : NOTE_WRITTEN) : null);
+  const NOTE_RULES = "Answered by rules in code over the question's words, with no language model.";
+  type Entry = (typeof data.entries)[number];
+  const note = (e: Entry) =>
+    e.modelName
+      ? e.answerMode === 'extractive' ? NOTE_EXTRACTIVE : NOTE_WRITTEN
+      : e.answerMode === 'rules' ? NOTE_RULES
+      : e.mode !== 'llm' ? `${modeLabel(e.mode)}.` : null;
+  let notes = $derived([...new Set(questions.map(note).filter((n) => n !== null))]);
+  let sharedNote = $derived(notes.length === 1 ? notes[0] : null);
+
+  // The model is named once when every answered question used the same
+  // one; otherwise each entry that used a model names its own.
+  let models = $derived([...new Set(questions.filter(note).map((e) => e.modelName))]);
+  let sharedModel = $derived(models.length === 1 ? models[0] : null);
   // One generation date for the whole gallery is said once, not per row.
   let dates = $derived([...new Set(data.entries.map((e) => e.generated_at.slice(0, 10)))]);
   let sharedDate = $derived(dates.length === 1 ? dates[0] : null);
@@ -62,12 +69,10 @@
             e.lead,
             e.reason
           )}
-          {#if !sharedModel || !sharedNote}
+          {#if (!sharedModel && e.modelName) || (!sharedNote && note(e))}
             <p class="gallery-meta">
-              {#if !sharedModel}
-                {#if e.modelName}Language model <span class="gallery-model">{e.modelName}</span>.{:else if e.mode !== 'llm'}{modeLabel(e.mode)}.{/if}
-              {/if}
-              {#if !sharedNote && e.modelName}{note(e.answerMode)}{/if}
+              {#if !sharedModel && e.modelName}Language model <span class="gallery-model">{e.modelName}</span>.{/if}
+              {#if !sharedNote}{note(e)}{/if}
             </p>
           {/if}
         </li>

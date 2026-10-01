@@ -32,6 +32,13 @@ export interface GalleryEntry extends GalleryIndexEntry {
 
 export const galleryIndex = index as GalleryIndexEntry[];
 
+/** An entry with `mode`, `model` and `answerMode` read from its own
+ *  `final.grounding`, so every label says how that entry was made. The
+ *  index fields stand for an entry saved without a grounding. */
+export function withGrounding<T extends GalleryIndexEntry>(e: T, g: FinalResult['grounding']): T & { answerMode: string | null } {
+  return { ...e, mode: g?.tier ?? e.mode, model: g ? g.model ?? null : e.model, answerMode: g?.answer_mode ?? null };
+}
+
 const files = import.meta.glob<GalleryEntry>(
   ['/src/lib/gallery/*.json', '!/src/lib/gallery/index.json'],
   { import: 'default' }
