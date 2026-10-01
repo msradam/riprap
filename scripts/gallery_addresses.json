@@ -156,5 +156,36 @@
   "address": "BK06",
   "question": "Which NYCHA developments in Brooklyn Community District 6 lie inside the 2012 Sandy inundation area?",
   "reason": "Exposed assets by name: the public housing developments of a district inside the Sandy extent."
+ },
+ {
+  "slug": "battery-surge",
+  "neighborhood": "The Battery, Manhattan",
+  "address": "The Battery, Manhattan, NY",
+  "question": "Will the water at the Battery run above the predicted tide in the next four days, and by how much?",
+  "reason": "A forecast question: the Weather Service's forecast for the gauge first, then an experimental model's, hedged, with its tested accuracy.",
+  "feature_doc": "ttm_battery_surge"
+ },
+ {
+  "slug": "waterside-next-week",
+  "neighborhood": "Kips Bay, Manhattan",
+  "address": "30 Waterside Plaza, Manhattan, NY",
+  "question": "I live at 30 Waterside Plaza, Manhattan. Will my building flood next week?",
+  "reason": "A prediction nobody can make: no yes or no, and no refusal either. The answer says so and quotes what is forecast and mapped."
+ },
+ {
+  "slug": "qn12-paved",
+  "neighborhood": "Community district QN12, Queens",
+  "address": "QN12",
+  "question": "How much of QN12 is paved and how much is green?",
+  "reason": "An experimental satellite land-cover model answers, labelled as a proxy, with its agreement against ESA WorldCover and its own noise.",
+  "feature_doc": "landcover_nta"
+ },
+ {
+  "slug": "bk18-satellite",
+  "neighborhood": "Community district BK18, Brooklyn",
+  "address": "BK18",
+  "question": "What did satellite imagery show in BK18 after Ida?",
+  "reason": "What an experimental satellite model showed after Hurricane Ida, with the plain statement that it did no better than chance against surveyed flood marks.",
+  "feature_doc": "prithvi_water_nta"
  }
 ]

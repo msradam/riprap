@@ -3,8 +3,8 @@
  "neighborhood": "Red Hook, Brooklyn",
  "address": "80 Pioneer Street, Brooklyn, NY",
  "question": "Should I buy the house at 80 Pioneer Street, Brooklyn?",
- "generated_at": "2026-10-01T08:14Z",
- "riprap_commit": "3b15b18",
+ "generated_at": "2026-10-01T16:41Z",
+ "riprap_commit": "45272b1",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -449,6 +449,72 @@
     }
    },
    {
+    "id": "prithvi_water",
+    "type": "baked",
+    "title": "New surface water after Hurricane Ida and other storms, Prithvi-EO (experimental)",
+    "stone": "cornerstone",
+    "tier": "modeled",
+    "maturity": "experimental",
+    "scope": "point",
+    "display": {
+     "order": 40,
+     "kind": "text",
+     "variant": "raster",
+     "map_layer": false,
+     "icon": null
+    },
+    "narration": {
+     "short": "New surface water after Hurricane Ida near this address, from a satellite model (experimental).",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "Prithvi-EO 2.0 NYC Pluvial (msradam, experimental) on Copernicus Sentinel-2 L2A",
+     "source_url": "https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial",
+     "license": "Apache-2.0 (model); Copernicus Sentinel data terms (imagery)",
+     "citation": "msradam/Prithvi-EO-2.0-NYC-Pluvial (Apache-2.0), the owner's fine-tune of NASA and IBM's Prithvi-EO 2.0, run by scripts/run_eo_batch.py on Sentinel-2 L2A scenes from the day or two after heavy rain, with a same-tile scene from the month before masking permanent water. Contains modified Copernicus Sentinel data, via Microsoft Planetary Computer. Experimental: its labels were the base model's own output for Hurricane Ida, and street and basement flooding is not visible at 10 to 20 m.",
+     "doc_id": "prithvi_water",
+     "date_modified": "2021-09-02",
+     "retrieved_at": "2026-10-01"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "The saved Prithvi-EO satellite output was not found on this server."
+    }
+   },
+   {
+    "id": "prithvi_water_nta",
+    "type": "baked",
+    "title": "New surface water after Hurricane Ida and other storms in the area, Prithvi-EO (experimental)",
+    "stone": "cornerstone",
+    "tier": "modeled",
+    "maturity": "experimental",
+    "scope": "polygon",
+    "display": {
+     "order": 45,
+     "kind": "text",
+     "variant": "raster",
+     "map_layer": false,
+     "icon": null
+    },
+    "narration": {
+     "short": "New surface water after Hurricane Ida in this area, from a satellite model (experimental).",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "Prithvi-EO 2.0 NYC Pluvial (msradam, experimental) on Copernicus Sentinel-2 L2A",
+     "source_url": "https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial",
+     "license": "Apache-2.0 (model); Copernicus Sentinel data terms (imagery)",
+     "citation": "msradam/Prithvi-EO-2.0-NYC-Pluvial (Apache-2.0), the owner's fine-tune of NASA and IBM's Prithvi-EO 2.0, run by scripts/run_eo_batch.py on Sentinel-2 L2A scenes from the day or two after heavy rain, with a same-tile scene from the month before masking permanent water. Contains modified Copernicus Sentinel data, via Microsoft Planetary Computer. Experimental: its labels were the base model's own output for Hurricane Ida, and street and basement flooding is not visible at 10 to 20 m.",
+     "doc_id": "prithvi_water_nta",
+     "date_modified": "2021-09-02",
+     "retrieved_at": "2026-10-01"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "The saved Prithvi-EO satellite output was not found on this server."
+    }
+   },
+   {
     "id": "microtopo",
     "type": "baked",
     "title": "LiDAR / DEM-derived micro-topography",
@@ -515,6 +581,72 @@
     }
    },
    {
+    "id": "landcover",
+    "type": "baked",
+    "title": "Land cover from satellite, TerraMind NYC adapter (experimental)",
+    "stone": "cornerstone",
+    "tier": "modeled",
+    "maturity": "experimental",
+    "scope": "point",
+    "display": {
+     "order": 60,
+     "kind": "text",
+     "variant": "raster",
+     "map_layer": false,
+     "icon": null
+    },
+    "narration": {
+     "short": "Paved and green shares near this address, from a satellite land-cover model (experimental).",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "TerraMind NYC land-cover adapter (msradam, experimental) on Copernicus Sentinel-2",
+     "source_url": "https://huggingface.co/msradam/TerraMind-NYC-Adapters",
+     "license": "Apache-2.0 (model); Copernicus Sentinel data terms (imagery)",
+     "citation": "msradam/TerraMind-NYC-Adapters, adapter lulc_nyc (Apache-2.0), the owner's LoRA adapter on IBM and ESA's TerraMind 1.0, run by scripts/run_landcover_batch.py on Sentinel-2 L2A scenes (the adapter's radar and elevation inputs are left empty). Contains modified Copernicus Sentinel data, via Microsoft Planetary Computer. Experimental: a proxy from 10 m pixels trained on ESA WorldCover 2021 labels, not a survey.",
+     "doc_id": "landcover",
+     "date_modified": "2026",
+     "retrieved_at": "2026-10-01"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "The saved land-cover output was not found on this server."
+    }
+   },
+   {
+    "id": "landcover_nta",
+    "type": "baked",
+    "title": "Land cover from satellite, TerraMind NYC adapter (experimental)",
+    "stone": "cornerstone",
+    "tier": "modeled",
+    "maturity": "experimental",
+    "scope": "polygon",
+    "display": {
+     "order": 61,
+     "kind": "text",
+     "variant": "raster",
+     "map_layer": false,
+     "icon": null
+    },
+    "narration": {
+     "short": "Paved and green shares of this area, from a satellite land-cover model (experimental).",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "TerraMind NYC land-cover adapter (msradam, experimental) on Copernicus Sentinel-2",
+     "source_url": "https://huggingface.co/msradam/TerraMind-NYC-Adapters",
+     "license": "Apache-2.0 (model); Copernicus Sentinel data terms (imagery)",
+     "citation": "msradam/TerraMind-NYC-Adapters, adapter lulc_nyc (Apache-2.0), the owner's LoRA adapter on IBM and ESA's TerraMind 1.0, run by scripts/run_landcover_batch.py on Sentinel-2 L2A scenes (the adapter's radar and elevation inputs are left empty). Contains modified Copernicus Sentinel data, via Microsoft Planetary Computer. Experimental: a proxy from 10 m pixels trained on ESA WorldCover 2021 labels, not a survey.",
+     "doc_id": "landcover_nta",
+     "date_modified": "2026",
+     "retrieved_at": "2026-10-01"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "The saved land-cover output was not found on this server."
+    }
+   },
+   {
     "id": "floodnet",
     "type": "live",
     "title": "FloodNet ultrasonic depth sensors (NYC)",
@@ -531,6 +663,39 @@
     },
     "narration": {
      "short": "FloodNet sensors and historical flood events near this address.",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "FloodNet NYC, ultrasonic depth sensor network (CUNY/NYU/Brooklyn College)",
+     "source_url": "https://www.floodnet.nyc/data-downloads",
+     "license": "CC-BY-NC-SA 4.0",
+     "citation": "FloodNet NYC, community-led real-time street-flood sensor network. Data CC-BY-NC-SA 4.0; derivatives must carry the same license. Readings come from the FloodNet API (api.floodnet.nyc), which has no stable page per sensor or event, so the link is the project's data download page. https://www.floodnet.nyc/data-downloads",
+     "doc_id": "floodnet",
+     "date_modified": "live",
+     "retrieved_at": "live"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "FloodNet did not respond when this briefing ran."
+    }
+   },
+   {
+    "id": "floodnet_nta",
+    "type": "live",
+    "title": "FloodNet ultrasonic depth sensors (NYC)",
+    "stone": "touchstone",
+    "tier": "empirical",
+    "maturity": "production",
+    "scope": "polygon",
+    "display": {
+     "order": 10,
+     "kind": "stat",
+     "variant": "scalars",
+     "map_layer": true,
+     "icon": "\ud83d\udce1"
+    },
+    "narration": {
+     "short": "FloodNet sensors and historical flood events inside this area.",
      "template": "{narrative}"
     },
     "provenance": {
@@ -653,7 +818,7 @@
     "stone": "touchstone",
     "tier": "empirical",
     "maturity": "production",
-    "scope": "point",
+    "scope": "any",
     "display": {
      "order": 40,
      "kind": "stat",
@@ -1115,7 +1280,7 @@
     "stone": "lodestone",
     "tier": "modeled",
     "maturity": "production",
-    "scope": "point",
+    "scope": "any",
     "display": {
      "order": 15,
      "kind": "stat",
@@ -1139,6 +1304,39 @@
     "fallback": {
      "on_offline": "skip",
      "message": "The National Water Prediction Service had no current forecast for the nearest gauge when this briefing ran."
+    }
+   },
+   {
+    "id": "ttm_battery_surge",
+    "type": "live",
+    "title": "Battery surge forecast, 96 hours, Granite TTM r2 fine-tune (experimental)",
+    "stone": "lodestone",
+    "tier": "modeled",
+    "maturity": "experimental",
+    "scope": "any",
+    "display": {
+     "order": 21,
+     "kind": "stat",
+     "variant": "scalars",
+     "map_layer": false,
+     "icon": null
+    },
+    "narration": {
+     "short": "An experimental 96-hour forecast of the surge at The Battery.",
+     "template": "{narrative}"
+    },
+    "provenance": {
+     "source_name": "Granite TTM r2 Battery Surge (msradam, experimental) on NOAA CO-OPS station 8518750",
+     "source_url": "https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge",
+     "license": "Apache-2.0 (model); U.S. Public Domain (gauge data)",
+     "citation": "msradam/Granite-TTM-r2-Battery-Surge (Apache-2.0), the owner's fine-tune of IBM's Granite TTM r2, run on the last 1,024 hourly surge residuals at NOAA station 8518750 (The Battery). Experimental: no wind or pressure input; backtest in data/experimental/surge.json.",
+     "doc_id": "ttm_battery_surge",
+     "date_modified": "live",
+     "retrieved_at": "live"
+    },
+    "fallback": {
+     "on_offline": "skip",
+     "message": "The experimental Battery surge forecast did not run."
     }
    },
    {
@@ -1250,7 +1448,7 @@
   "trace": [
    {
     "step": "reconcile_templated",
-    "started_at": 1790842449.382145,
+    "started_at": 1790872906.688786,
     "ok": true,
     "result": {
      "n_chars": 526,
