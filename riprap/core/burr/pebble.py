@@ -81,9 +81,14 @@ def pebble_action(pebble_id: str):
                 value, trace_summary, err = fetch.result(timeout=SOURCE_BUDGET_S)
             except FutureTimeout:
                 value, trace_summary, err = None, None, f"no answer within {SOURCE_BUDGET_S:.0f} s"
-            if value is None:
+            if value is None and err is None:
+                # The source answered that it has nothing to say about this
+                # kind of place (district counts for a neighbourhood): not a failure.
+                rec["ok"] = True
+                rec["result"] = {"skipped": "does not apply to this place"}
+            elif value is None:
                 rec["ok"] = False
-                rec["err"] = err or "no value"
+                rec["err"] = err
             else:
                 rec["ok"] = True
                 rec["result"] = trace_summary

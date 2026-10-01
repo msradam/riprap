@@ -101,3 +101,36 @@ def assets(polygon, asset_class: str) -> dict:
     from app.registers import exposure
 
     return exposure.summary_for_polygon(polygon, asset_class)
+
+
+_PROFILES_URL = "https://planninglabs.carto.com/api/v2/sql"
+_PROFILES_TABLE = "community_district_profiles_v202402"  # the table the profiles site itself reads
+_BORO_DIGIT = {"MN": 1, "BX": 2, "BK": 3, "QN": 4, "SI": 5}
+
+
+def floodplain(polygon, query=None) -> dict | None:  # noqa: ARG001 - polygon keeps the area-pebble signature
+    """Buildings, residential units and residents in the 1% annual chance
+    floodplain of a community district, as NYC Planning's Community
+    District Profiles count them. None for an area that is not a district:
+    the profiles exist per district only."""
+    from riprap.core import http
+
+    code = ((query.extras.get("area_code") if query else None) or "").upper().replace(" ", "")
+    if not nyc311.community_board(code):
+        return None
+    borocd = _BORO_DIGIT[code[:2]] * 100 + int(code[2:])
+    r = http.get(_PROFILES_URL, timeout=20, params={
+        "q": f"SELECT fp_100_bldg, fp_100_resunits, fp_100_pop, fp_100_area FROM {_PROFILES_TABLE} WHERE borocd = {borocd}"})
+    r.raise_for_status()
+    rows = r.json().get("rows") or []
+    if not rows:
+        raise ValueError(f"the district profiles table has no row for {borocd}")
+    v = {k: rows[0].get(k) for k in ("fp_100_bldg", "fp_100_resunits", "fp_100_pop", "fp_100_area")}
+    bldg, units, pop = (int(v[k] or 0) for k in ("fp_100_bldg", "fp_100_resunits", "fp_100_pop"))
+    return {"community_district": code, "n_buildings": bldg, "n_residential_units": units, "n_residents_2010": pop,
+            "floodplain_sq_mi": v["fp_100_area"],
+            "narrative": (f"NYC Planning's Community District Profile counts {bldg:,} building{'s' if bldg != 1 else ''}, "
+                          f"{units:,} residential unit{'s' if units != 1 else ''} and {pop:,} "
+                          f"resident{'s' if pop != 1 else ''} in the 1% annual chance floodplain of this district "
+                          "(the floodplain of FEMA's 2015 preliminary and 2007 maps; residents from the 2010 census, "
+                          "by census block).")}

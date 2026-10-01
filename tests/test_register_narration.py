@@ -88,3 +88,31 @@ def test_district_register_names_the_exposed_assets():
     assert _register_counts(n["narrative"] + ".") == (2, 2, 0)
     m = exposure.summary_for_polygon(bk06, "mta_entrances")  # every entrance in the outline, each checked
     assert m["n_entrances"] > 20 and "(the register lists only" not in m["narrative"]
+
+
+def test_district_floodplain_counts_come_from_the_planning_profile(monkeypatch):
+    """A district briefing quotes NYC Planning's own counts of buildings,
+    units and residents in the 1% floodplain, with their basis; a
+    neighbourhood has no such profile and the source says nothing."""
+    from types import SimpleNamespace
+
+    from app.areas import nta_evidence
+    from riprap.core import http
+
+    seen = {}
+
+    class R:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"rows": [{"fp_100_bldg": 327, "fp_100_resunits": 1972, "fp_100_pop": 580.0, "fp_100_area": 0.28}]}
+
+    monkeypatch.setattr(http, "get", lambda url, **k: seen.update(k["params"]) or R())
+    v = nta_evidence.floodplain(None, SimpleNamespace(extras={"area_code": "BX01"}))
+    assert "borocd = 201" in seen["q"]
+    assert (v["n_buildings"], v["n_residential_units"], v["n_residents_2010"]) == (327, 1972, 580)
+    assert v["narrative"].startswith("NYC Planning's Community District Profile counts 327 buildings, 1,972 "
+                                     "residential units and 580 residents in the 1% annual chance floodplain")
+    assert "2010 census" in v["narrative"] and "2015 preliminary" in v["narrative"]
+    assert nta_evidence.floodplain(None, SimpleNamespace(extras={"area_code": "BK0603"})) is None  # a neighbourhood

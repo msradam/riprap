@@ -55,8 +55,10 @@ def fetch_pebble(pebble_id: str, lat: float, lon: float,
     result = pebble.fetch(SpatialQuery(lat=lat, lon=lon, geometry_wkt=geometry_wkt,
                                        extras=extras or {}))
 
-    if result.error is not None or result.value is None:
-        return None, {}, result.error or "no value"
+    if result.error is not None:
+        return None, {}, result.error
+    if result.value is None:
+        return None, {}, None  # the source ran and has nothing to say about this kind of place
 
     value = result.value
     # Some helpers catch their own fetch error and return it in the value

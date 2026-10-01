@@ -1,0 +1,48 @@
+id: dcp_floodplain_nta
+type: live
+title: People and buildings in the floodplain (NYC Planning district profile)
+answers: "how many buildings, residential units and residents of a community district are in the 1% annual chance floodplain, by NYC Planning's count"
+stone: keystone
+tier: empirical
+adapter: python_call
+
+# A community district only: NYC Planning publishes these counts per
+# district, so a neighbourhood gets no value from this source.
+spatial:
+  scope: polygon
+  crs: EPSG:4326
+
+config:
+  module: app.areas.nta_evidence
+  function: floodplain
+  args:
+    - {source: polygon_4326}
+  kwargs:
+    query: {source: query}   # extras.area_code: the district code
+  on_none: passthrough
+
+trace_summary:
+  n_buildings: n_buildings
+  n_residents_2010: n_residents_2010
+
+provenance:
+  date_modified: 2024-02-01
+  retrieved_at: at_fetch
+  source_name: NYC Department of City Planning, Community District Profiles (floodplain indicators)
+  source_url: https://communityprofiles.planning.nyc.gov/
+  license: NYC Open Data Terms of Use
+  doc_id: dcp_floodplain_nta
+  citation: NYC Department of City Planning, Community District Profiles, floodplain indicators (data version 2024-02). The 1% annual chance floodplain is from FEMA's 2015 preliminary and 2007 flood insurance rate maps; population is the 2010 census by census block.
+
+narration:
+  template: "{narrative}"
+  short: Buildings, residential units and residents in the district's 1% annual chance floodplain, by NYC Planning's count.
+
+display:
+  variant: scalars
+  order: 5
+  kind: stat
+
+fallback:
+  on_offline: skip
+  message: NYC Planning's district profile data did not respond when this briefing ran.
