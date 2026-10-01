@@ -82,6 +82,39 @@ def inside_raster(pt_geom_2263) -> bool:
     return bool(int(v[0]))
 
 
+EDGE_M = 50  # how near the mapped edge a point must be for the sentence to say so
+
+
+def at_point(pt_geom_2263) -> dict:
+    """Inside or outside the 2012 extent, and how near the mapped edge.
+
+    The outline was drawn in 2013 from high-water marks and surge sensors;
+    it is not exact to a building. A point within EDGE_M of the edge gets
+    its distance stated, so "outside" 3 m from mapped flooding does not
+    read like "outside" a mile inland."""
+    import math
+
+    inside = inside_raster(pt_geom_2263)
+    out = {"inside": inside, "edge_m": None, "edge_note": ""}
+    h = _raster_handle()
+    if h is None:
+        return out
+    import numpy as np
+    from rasterio.windows import Window
+
+    px = h.res[0]  # feet: the raster is in EPSG:2263
+    n = math.ceil(EDGE_M / 0.3048 / px)
+    row, col = h.index(pt_geom_2263.x, pt_geom_2263.y)
+    a = h.read(1, window=Window(col - n, row - n, 2 * n + 1, 2 * n + 1), boundless=True, fill_value=0).astype(bool)
+    other = np.argwhere(a != inside)
+    if len(other):
+        d = float(np.hypot(other[:, 0] - n, other[:, 1] - n).min() * px * 0.3048)
+        if d <= EDGE_M:
+            out["edge_m"] = round(d)
+            out["edge_note"] = f", about {max(round(d), 1)} m from the mapped edge (the outline is not exact to a building)"
+    return out
+
+
 def coverage_for_polygon(polygon, polygon_crs: str = "EPSG:4326") -> dict:
     """Polygon-level summary: what fraction of the input polygon overlaps
     the 2012 Sandy inundation extent? Used in neighborhood-mode queries.

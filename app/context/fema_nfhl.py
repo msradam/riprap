@@ -117,7 +117,7 @@ def preliminary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> d
     layer (the panel records carry no date until the map goes to print).
     None when no preliminary study covers the point."""
     try:
-        zones = _point_query(_ZONE_LAYER, lat, lon, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,STATIC_BFE",
+        zones = _point_query(_ZONE_LAYER, lat, lon, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,STATIC_BFE,V_DATUM",
                              cache_ttl_s, PRELIM_URL)
         studies = _point_query(_PRELIM_AVAILABILITY_LAYER, lat, lon, "DFIRM_ID,PRELM_ISSUE_DATE",
                                cache_ttl_s, PRELIM_URL)
@@ -132,12 +132,15 @@ def preliminary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> d
     sfha = zone.get("SFHA_TF") == "T"
     bfe = zone.get("STATIC_BFE")
     bfe = float(bfe) if bfe is not None and bfe > -9000 else None
+    # The effective and preliminary maps use different vertical datums in NYC
+    # (NGVD29 and NAVD88), so an elevation is printed with its own.
+    datum = (zone.get("V_DATUM") or "").strip()
     reading = " (a Special Flood Hazard Area)" if sfha else (
         f" ({r})" if (r := zone_reading(zone.get("ZONE_SUBTY"))) else "")
     when = f" issued {issue_date}" if issue_date else ""
     narrative = (f"FEMA's preliminary flood map (PFIRM{when}, community {study.get('DFIRM_ID')}) places "
                  f"this address in zone {fld_zone}{reading}"
-                 + (f", static base flood elevation {bfe:g} ft" if bfe is not None else "")
+                 + (f", static base flood elevation {bfe:g} ft{f' {datum}' if datum else ''}" if bfe is not None else "")
                  # Its own sentence: the lead rules read a source's first
                  # sentence for a result, and "not" there reads as an absence.
                  + ". A preliminary map is not the effective map and does not set flood insurance.")
@@ -146,6 +149,7 @@ def preliminary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> d
         "zone_subty": zone.get("ZONE_SUBTY"),
         "sfha": sfha,
         "static_bfe_ft": bfe,
+        "vertical_datum": datum or None,
         "community": study.get("DFIRM_ID"),
         "issue_date": issue_date,  # the citation's vintage
         "narrative": narrative,

@@ -18,16 +18,16 @@ spatial:
 
 config:
   module: app.flood_layers.sandy_inundation
-  function: inside_raster
+  function: at_point
   args:
     - {source: pt_2263}
-  # inside_raster returns False if outside, True if inside — both valid.
-  # Only None would indicate failure, but the function never returns None;
-  # passthrough is the safe mode so booleans aren't reinterpreted as offline.
+  # at_point always returns a dict (inside, and the distance to the mapped
+  # edge when it is near); passthrough keeps a False from reading as offline.
   on_none: passthrough
 
 trace_summary:
-  inside: __value__   # special: the whole pebble value (not a dict key)
+  inside: inside
+  edge_m: edge_m
 
 provenance:
   date_modified: 2015-11-09
@@ -39,8 +39,8 @@ provenance:
   citation: NYC Sandy Inundation Zone (NYC OpenData uyj8-7rv5, empirical 2012 extent)
 
 narration:
-  short: The 2012 Hurricane Sandy inundation extent (NYC OEM) at this address.
-  template: This address {inside_phrasing} the empirical 2012 Hurricane Sandy inundation footprint (NYC OEM).
+  short: The 2012 Hurricane Sandy inundation extent (NYC Open Data) at this address.
+  template: This address {inside_phrasing} the empirical 2012 Hurricane Sandy inundation footprint (NYC Open Data){edge_note}.
 
 fallback:
   on_offline: skip

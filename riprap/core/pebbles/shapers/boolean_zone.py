@@ -46,10 +46,12 @@ def shape(value: Any, _manifest: PebbleManifest) -> dict[str, Any]:
         out = dict(value)
         out.setdefault("inside_phrasing", "sits within" if inside else "sits outside")
         out.setdefault("inside_or_outside", "inside" if inside else "outside")
+        out.setdefault("edge_note", "")  # ", about 40 m from the mapped edge ..." when the source measures it
         return out
     inside = bool(value)
     return {
         "inside": inside,
         "inside_phrasing": "sits within" if inside else "sits outside",
         "inside_or_outside": "inside" if inside else "outside",
+        "edge_note": "",
     }

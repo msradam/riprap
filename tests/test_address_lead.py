@@ -16,7 +16,7 @@ def _dep(cls, label, scenario):
 
 STATE = {
     "intent": "single_address", "deployment": "nyc", "plan": {"question": ""},
-    "sandy": {"inside": False, "inside_phrasing": "sits outside", "inside_or_outside": "outside"},
+    "sandy": {"inside": False, "inside_phrasing": "sits outside", "inside_or_outside": "outside", "edge_note": ""},
     "fema_nfhl": {"fld_zone": "X", "firm_panel": "3604970234F", "effective_year": 2007,
                   "narrative": "This address sits in FEMA flood zone X, per NFHL FIRM panel 3604970234F, effective 2007."},
     "dep_moderate_current": _dep(0, "outside", "the NYC DEP stormwater scenario (2.13 in/hr, current SLR)"),

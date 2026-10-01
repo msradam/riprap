@@ -1,7 +1,7 @@
 {
 "40.5757,-73.986": {
 "available": true,
-"citation": "MTA Open Data subway entrances + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
+"citation": "MTA Open Data subway entrances + NYC Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
 "entrances": [
 {
 "ada_accessible": false,
@@ -123,7 +123,7 @@
 },
 "40.6436,-74.0781": {
 "available": true,
-"citation": "MTA Open Data subway entrances + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
+"citation": "MTA Open Data subway entrances + NYC Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
 "entrances": [
 {
 "ada_accessible": false,
@@ -191,7 +191,7 @@
 },
 "40.677,-74.0105": {
 "available": true,
-"citation": "MTA Open Data subway entrances + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
+"citation": "MTA Open Data subway entrances + NYC Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
 "entrances": [],
 "footprint_buffer_m": 8,
 "n_ada_accessible": 0,
@@ -204,7 +204,7 @@
 },
 "40.707431,-74.00476": {
 "available": true,
-"citation": "MTA Open Data subway entrances + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
+"citation": "MTA Open Data subway entrances + NYC Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
 "entrances": [
 {
 "ada_accessible": false,
@@ -362,7 +362,7 @@
 },
 "40.711001,-73.777712": {
 "available": true,
-"citation": "MTA Open Data subway entrances + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
+"citation": "MTA Open Data subway entrances + NYC Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
 "entrances": [
 {
 "ada_accessible": false,
@@ -520,7 +520,7 @@
 },
 "40.8296,-73.9262": {
 "available": true,
-"citation": "MTA Open Data subway entrances + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
+"citation": "MTA Open Data subway entrances + NYC Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
 "entrances": [
 {
 "ada_accessible": false,

@@ -112,7 +112,7 @@ CLASSES: dict[str, Spec] = {
     "mta_entrances": Spec(
         singular="MTA subway entrance", plural="MTA subway entrances", radius_m=800, max_n=8,
         count_key="n_entrances", list_key="entrances",
-        citation="MTA Open Data subway entrances + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + "
+        citation="MTA Open Data subway entrances + NYC Sandy 2012 Inundation Zone (5xsi-dfpx) + "
                  "NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
         head=_entrance, name=lambda f: f"{f['station_name']} ({f['daytime_routes']})",
         geojson=DATA / "mta_entrances.geojson", lat_lon=_mta_lat_lon,
@@ -120,7 +120,7 @@ CLASSES: dict[str, Spec] = {
     "doh_hospitals": Spec(
         singular="hospital", plural="hospitals", radius_m=3000, max_n=5,
         count_key="n_hospitals", list_key="hospitals",
-        citation="NYS DOH Health Facility Certification (vn5v-hh5r) + NYC OEM Sandy 2012 Inundation "
+        citation="NYS DOH Health Facility Certification (vn5v-hh5r) + NYC Sandy 2012 Inundation "
                  "Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
         head=_hospital, name=lambda f: f["facility_name"],
         geojson=DATA / "hospitals.geojson", buffer_m=BUFFER_DOH_HOSPITAL_M, raster=True),
