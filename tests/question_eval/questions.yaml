@@ -174,7 +174,7 @@
   expected_intent: single_address
   must_run: [npcc4_slr]
   irrelevant: [nws_obs, usgs_gauges, doe_schools, doh_hospitals, mta_entrances, nyc311]
-  answer_should_mention: [["0.38"], ["2050"]]
+  answer_should_mention: [["14 to 19"], ["2050"]]
 
 - id: q17
   kind: future

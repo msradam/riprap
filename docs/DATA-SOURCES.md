@@ -35,7 +35,7 @@ after the table.
 | DOB permits | NYC Department of Buildings (`ipu4-2q9a`) | `development_check` intent |
 | Community District Profiles | NYC Department of City Planning | Buildings, residential units and residents in a district's 1% annual chance floodplain |
 | 2020 Neighborhood Tabulation Areas | NYC Department of City Planning (`9nt8-h7nd`) | Area outlines |
-| NPCC4 sea-level projections | NYC Panel on Climate Change | Projected sea level at The Battery |
+| NPCC4 sea-level projections | NYC Panel on Climate Change | Projected sea-level rise for New York City (the report's Table 1, relative to 1995-2014) |
 
 ## Experimental model layers
 

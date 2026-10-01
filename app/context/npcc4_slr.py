@@ -1,29 +1,34 @@
-"""NPCC4 sea-level rise projections for NYC (static lookup).
+"""NPCC4 sea-level rise projections for New York City (static lookup).
 
-Source: New York City Panel on Climate Change 4th Assessment (2024),
-Chapter 3, Table 3.2 — sea-level rise relative to 2000–2004 baseline,
-Battery Tide Gauge (NOAA 8518750), primary NYC harbor reference.
+Source: Braneon, C. et al. (2024). NPCC4: New York City climate risk
+information 2022, observations and projections. Annals of the New York
+Academy of Sciences 1539 (doi:10.1111/nyas.15116), Table 1, "Projections
+for sea level rise in New York City for 2030-2150", relative to a
+1995-2014 baseline.
 
-Values are in inches above the 2000–2004 mean. The NPCC4 uses a
-probabilistic framework across RCP/SSP scenarios; the table excerpted
-here represents the "likely range" (10th–90th) plus the high-end
-"extreme" scenario (99th).
+The table gives the 10th, 25th, 75th and 90th percentiles and no median.
+The middle range (25th to 75th) is what the report itself quotes in its
+text, so the sentence quotes it, with the 90th percentile as the high end.
+
+An earlier version of this table (15 in at the median and 29 in at the
+90th percentile for the 2050s, on a 2000-2004 baseline, cited to a "Table
+3.2") matched no table in the report. It was replaced on 2026-10-01 after
+a check against the published paper.
 """
 
 DOC_ID = "npcc4_slr"
 CITATION = (
-    "New York City Panel on Climate Change 4th Assessment (NPCC4 2024), "
-    "Chapter 3, Sea Level Rise, Table 3.2. "
-    "Published by the New York Academy of Sciences. "
-    "Reference gauge: NOAA Battery (8518750), baseline 2000–2004."
+    "Braneon, C. et al. (2024). NPCC4: New York City climate risk information 2022, "
+    "observations and projections. Annals of the New York Academy of Sciences 1539, "
+    "doi:10.1111/nyas.15116, Table 1. Baseline 1995-2014."
 )
 
-# Sea-level rise projections in INCHES above the 2000–2004 baseline,
-# Battery Tide Gauge. Percentiles: 10th (low), 50th (mid), 90th (high),
-# 99th (extreme). All values from NPCC4 (2024) Ch. 3 Table 3.2.
+# Inches above the 1995-2014 baseline, by percentile, as printed in Table 1.
 _TABLE_IN = {
-    2050: {10: 8,  50: 15, 90: 29, 99: 40},
-    2100: {10: 13, 50: 31, 90: 65, 99: 96},
+    "2030s": {10: 6, 25: 7, 75: 11, 90: 13},
+    "2050s": {10: 12, 25: 14, 75: 19, 90: 23},
+    "2080s": {10: 21, 25: 25, 75: 39, 90: 45},
+    "2100": {10: 25, 25: 30, 75: 50, 90: 65},
 }
 
 
@@ -32,19 +37,16 @@ def _in_to_m(inches: float) -> float:
 
 
 def get_projections() -> dict:
-    """Return NPCC4 SLR projection dict, always available (static table)."""
-    result: dict = {"available": True, "baseline": "2000–2004", "gauge": "NOAA Battery (8518750)"}
-    for year, pcts in _TABLE_IN.items():
-        result[str(year)] = {
-            str(pct): {"in": v, "m": _in_to_m(v)}
-            for pct, v in pcts.items()
-        }
-    p50, p90 = result["2050"]["50"], result["2050"]["90"]
-    q50, q90 = result["2100"]["50"], result["2100"]["90"]
+    """The NPCC4 table as a value, always available (static)."""
+    result: dict = {"available": True, "baseline": "1995-2014", "place": "New York City"}
+    for period, pcts in _TABLE_IN.items():
+        result[period] = {str(pct): {"in": v, "m": _in_to_m(v)} for pct, v in pcts.items()}
+    a, b = result["2050s"], result["2100"]
     result["narrative"] = (
-        f"NPCC4 (2024) projects sea-level rise at the Battery of {p50['m']} m "
-        f"({p50['in']} in) by the 2050s and {q50['m']} m ({q50['in']} in) by 2100 "
-        f"at the median, relative to 2000-2004; 90th percentile {p90['m']} m and "
-        f"{q90['m']} m."
+        f"NPCC4 (2024) projects sea-level rise in New York City of {a['25']['in']} to {a['75']['in']} in "
+        f"({a['25']['m']} to {a['75']['m']} m) by the 2050s and {b['25']['in']} to {b['75']['in']} in "
+        f"({b['25']['m']} to {b['75']['m']} m) by 2100, relative to 1995-2014, as its middle range (25th to "
+        f"75th percentile); the 90th percentile is {a['90']['in']} in ({a['90']['m']} m) by the 2050s and "
+        f"{b['90']['in']} in ({b['90']['m']} m) by 2100."
     )
     return result

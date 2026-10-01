@@ -94,6 +94,13 @@ Added:
 
 Fixed, each reproduced first:
 
+- The NPCC4 sea-level sentence quoted figures that are in no table of the
+  report: 15 in at the median and 29 in at the 90th percentile for the 2050s,
+  on a 2000 to 2004 baseline. The published table (Braneon et al. 2024,
+  Table 1) gives 14 to 19 in as the middle range and 23 in at the 90th
+  percentile, relative to 1995 to 2014, and no median. The sentence now
+  quotes the table. A blind judge found it by checking the paper.
+
 - "Has it flooded at 100 Main St. since Sandy?" was cut at the abbreviation
   and answered "No." from sources that do not reach 2012.
 - "Did any water reach it during Ida" said "Yes." from marks up to 800 m

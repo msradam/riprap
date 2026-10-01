@@ -299,3 +299,18 @@ def test_every_shipped_evaluation_file_fills_its_sentence():
     # A result file that lacks a field the sentence quotes falls back to "out of date": never ship one.
     for key in experimental.MODELS:
         assert "out of date" not in experimental.hedge(key, "x") and "no saved evaluation" not in experimental.hedge(key, "x"), key
+
+
+def test_the_sea_level_sentence_quotes_the_published_table():
+    # Braneon et al. 2024 (doi:10.1111/nyas.15116), Table 1, relative to 1995-2014. An earlier table here
+    # (15 in and 29 in for the 2050s on a 2000-2004 baseline) matched no table in the report.
+    from app.context import npcc4_slr
+
+    v = npcc4_slr.get_projections()
+    assert {p: v["2050s"][p]["in"] for p in ("10", "25", "75", "90")} == {"10": 12, "25": 14, "75": 19, "90": 23}
+    assert {p: v["2100"][p]["in"] for p in ("10", "25", "75", "90")} == {"10": 25, "25": 30, "75": 50, "90": 65}
+    assert v["narrative"] == (
+        "NPCC4 (2024) projects sea-level rise in New York City of 14 to 19 in (0.36 to 0.48 m) by the 2050s and "
+        "30 to 50 in (0.76 to 1.27 m) by 2100, relative to 1995-2014, as its middle range (25th to 75th "
+        "percentile); the 90th percentile is 23 in (0.58 m) by the 2050s and 65 in (1.65 m) by 2100.")
+    assert predicates.projection_has_horizon(v["narrative"] + " [npcc4_slr]").passed

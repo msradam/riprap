@@ -221,7 +221,7 @@ Point pebbles:
 | **nyc311** *(live)* | NYC 311 flood-related complaints near this address over the past 5 years, counted under both the old and the new descriptor names. | proxy |
 | **noaa_tides** *(live)* | Latest NOAA water level, predicted tide and the residual (roughly the surge) at the nearest station. | empirical |
 | **nws_water_forecast** *(live)* | The National Weather Service's forecast peak water level at the nearest of The Battery, Kings Point and Bergen Point, and the flood stage it reaches. | modeled |
-| **npcc4_slr** | NPCC4 (2024) sea-level rise projections at the Battery. | modeled |
+| **npcc4_slr** | NPCC4 (2024) sea-level rise projections for New York City. | modeled |
 | **nws_alerts** *(live, federal)* | Active NWS alerts intersecting this address. | modeled |
 | **nws_obs** *(live, federal)* | Latest NWS hourly observation at the nearest station. | empirical |
 | **usgs_gauges** *(live, federal)* | Live stage at the nearest USGS stream gauge (OGC API). | empirical |
