@@ -54,10 +54,10 @@ FOCUS_FLOOR = {
     ("time_frame", "future"): ("npcc4_slr", "ttm_battery_surge", "floodnet_forecast", "ttm_311_forecast",
                                "dep_moderate_2050", "dep_extreme_2080",
                                "dep_moderate_2050_nta", "dep_extreme_2080_nta"),
-    ("assets", "subway"): ("mta_entrances",),
-    ("assets", "schools"): ("doe_schools",),
-    ("assets", "public_housing"): ("nycha_developments",),
-    ("assets", "hospitals"): ("doh_hospitals",),
+    ("assets", "subway"): ("mta_entrances", "mta_entrances_nta"),
+    ("assets", "schools"): ("doe_schools", "doe_schools_nta"),
+    ("assets", "public_housing"): ("nycha_developments", "nycha_developments_nta"),
+    ("assets", "hospitals"): ("doh_hospitals", "doh_hospitals_nta"),
     ("assets", "construction"): ("dob_permits_nta",),
 }
 

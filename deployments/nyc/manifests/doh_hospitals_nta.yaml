@@ -1,0 +1,49 @@
+id: doh_hospitals_nta
+type: baked
+title: NYC DOH hospitals exposed in the area
+answers: "hospitals in the area and how many sit in the Sandy extent or the DEP 2080 scenario"
+stone: keystone
+tier: empirical
+adapter: python_call
+
+# The area version of the register: every listed asset inside the
+# neighbourhood or the outline drawn for a community district.
+spatial:
+  scope: polygon
+  crs: EPSG:4326
+
+config:
+  module: app.areas.nta_evidence
+  function: assets
+  args:
+    - {source: polygon_4326}
+    - {const: doh_hospitals}
+  on_none: offline
+
+trace_summary:
+  n_hospitals: n_hospitals
+  n_inside_sandy_2012: n_inside_sandy_2012
+  n_in_dep_extreme_2080: n_in_dep_extreme_2080
+
+provenance:
+  date_modified: null
+  retrieved_at: 2026-07-11
+  source_name: NYS DOH hospitals register
+  source_url: https://health.data.ny.gov/Health/Health-Facility-General-Information/vn5v-hh5r
+  license: NYC Open Data Terms of Use
+  doc_id: doh_hospital_exposure
+  citation: NYS DOH Health Facility General Information (vn5v-hh5r) hospitals in NYC, cross-referenced with Sandy 2012 + DEP extreme 2080.
+
+narration:
+  template: "{narrative}"
+  short: NYC DOH-licensed hospitals inside this area and their flood exposure.
+
+display:
+  variant: register
+  order: 40
+  kind: list
+  icon: "🏥"
+
+fallback:
+  on_offline: skip
+  message: The DOH hospitals list was not available when this briefing ran.

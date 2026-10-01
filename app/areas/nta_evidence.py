@@ -94,3 +94,10 @@ def boundary(polygon) -> dict:
                       "Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as "
                       "the union of its tabulation areas, which approximates the district."),
     }
+
+
+def assets(polygon, asset_class: str) -> dict:
+    """The exposed assets of one class inside the area, by name."""
+    from app.registers import exposure
+
+    return exposure.summary_for_polygon(polygon, asset_class)

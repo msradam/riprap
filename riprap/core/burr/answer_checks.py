@@ -29,8 +29,9 @@ _DOC_ABSENCE_RE = re.compile(r"\b(no|none|not|zero|without|outside|never)\b|(?<!
 # A document or value that says its source could not answer.
 _UNAVAILABLE_RE = re.compile(r"\bunavailable\b|\bnot available\b|could not be (read|reached)|failed to respond"
                              r"|\bunreachable\b", re.IGNORECASE)
-# "{n} <assets> within {r} m of this address: {a} inside the 2012 Sandy ... and {b} inside the DEP ..."
-_REGISTER_RE = re.compile(r"(\d[\d,]*)\s[^:]*?within\s[\d,.]+\s?m\b[^:]*:\s*(\d+) inside the 2012 Sandy"
+# "{n} <assets> within {r} m of this address: {a} inside the 2012 Sandy ... and {b} inside the DEP ...",
+# or "{n} <assets> in this area: ..." for a neighbourhood or district.
+_REGISTER_RE = re.compile(r"(\d[\d,]*)\s[^:]*?(?:within\s[\d,.]+\s?m\b|in this area)[^:]*:\s*(\d+) inside the 2012 Sandy"
                           r"[^.]*?(\d+) inside the DEP", re.IGNORECASE)
 _DISTANCE_OR_YEAR_RE = re.compile(r"^\s?(m|km|meters?|metres?|mi|miles?)\b", re.IGNORECASE)
 

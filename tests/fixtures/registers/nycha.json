@@ -92,7 +92,7 @@
 "n_developments": 10,
 "n_in_dep_extreme_2080": 3,
 "n_inside_sandy_2012": 10,
-"narrative": "10 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 10 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+"narrative": "10 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 10 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: CONEY ISLAND I (SITE 1B) (111 m), CAREY GARDENS (352 m), HABER (544 m), CONEY ISLAND I (SITES 4 & 5) (613 m), CONEY ISLAND (956 m), SURFSIDE GARDENS (1062 m), and 4 more. Inside the DEP extreme scenario: CAREY GARDENS (352 m), SURFSIDE GARDENS (1062 m), O'DWYER GARDENS (1148 m)",
 "radius_m": 2000
 },
 "40.6436,-74.0781": {
@@ -120,7 +120,7 @@
 "n_developments": 1,
 "n_in_dep_extreme_2080": 1,
 "n_inside_sandy_2012": 0,
-"narrative": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+"narrative": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: RICHMOND TERRACE (788 m)",
 "radius_m": 2000
 },
 "40.677,-74.0105": {
@@ -165,7 +165,7 @@
 "n_developments": 2,
 "n_in_dep_extreme_2080": 0,
 "n_inside_sandy_2012": 2,
-"narrative": "2 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 2 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+"narrative": "2 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 2 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: RED HOOK WEST (228 m), RED HOOK EAST (561 m)",
 "radius_m": 2000
 },
 "40.707431,-74.00476": {
@@ -193,7 +193,7 @@
 "n_developments": 1,
 "n_in_dep_extreme_2080": 1,
 "n_inside_sandy_2012": 0,
-"narrative": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+"narrative": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: SEWARD PARK EXTENSION (1842 m)",
 "radius_m": 2000
 },
 "40.711001,-73.777712": {
@@ -221,7 +221,7 @@
 "n_developments": 1,
 "n_in_dep_extreme_2080": 1,
 "n_inside_sandy_2012": 0,
-"narrative": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+"narrative": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario: CONLON LIHFE TOWER (1048 m)",
 "radius_m": 2000
 },
 "40.8296,-73.9262": {

@@ -47,3 +47,44 @@ def test_full_layer_count_is_every_entrance_in_range():
     s = exposure.summary_for_point(*BROOKLYN_HEIGHTS, "mta_entrances")
     assert s["n_entrances"] > s["n_checked"] == len(s["entrances"]) == 8
     assert f"; of the nearest {s['n_checked']}:" in s["narrative"]
+
+
+def test_exposed_assets_are_named_nearest_first():
+    """A question that asks which schools gets the schools, not only a count."""
+    from app.registers import exposure
+
+    s = exposure.summary_for_point(40.677, -74.0105, "doe_schools")  # Red Hook
+    assert s["narrative"].endswith("Inside the 2012 Sandy extent: P.S. 015 Patrick F. Daly (116 m), "
+                                   "South Brooklyn Community High School (328 m)")
+    assert _register_counts(s["narrative"] + ".") == (2, 2, 0)  # the counts still parse
+
+
+def test_a_station_with_several_entrances_is_named_once():
+    from app.registers import exposure
+
+    s = exposure.summary_for_point(40.711001, -73.777712, "mta_entrances")  # Hollis
+    assert s["n_in_dep_extreme_2080"] > 1 and s["narrative"].count("Jamaica-179 St (F)") == 1
+
+
+def test_no_exposed_asset_names_nothing():
+    from app.registers import exposure
+
+    s = exposure.summary_for_point(*BROOKLYN_HEIGHTS, "doe_schools")
+    assert "Inside the" not in s["narrative"]
+
+
+def test_district_register_names_the_exposed_assets():
+    """Brooklyn Community District 6: the two Red Hook developments were
+    inside the Sandy extent (an independent overlay of phvi-damg on the
+    Sandy polygons gives 60% and 85% of their sites; Gowanus 0.7%)."""
+    from app.areas import nta
+    from app.registers import exposure
+
+    bk06 = nta.by_district("BK06")["geometry"]
+    n = exposure.summary_for_polygon(bk06, "nycha")
+    assert n["n_inside_sandy_2012"] == 2
+    assert n["narrative"].startswith("2 flood-exposed NYCHA developments in this area (the register lists only")
+    assert n["narrative"].endswith("Inside the 2012 Sandy extent: RED HOOK EAST, RED HOOK WEST")
+    assert _register_counts(n["narrative"] + ".") == (2, 2, 0)
+    m = exposure.summary_for_polygon(bk06, "mta_entrances")  # every entrance in the outline, each checked
+    assert m["n_entrances"] > 20 and "(the register lists only" not in m["narrative"]

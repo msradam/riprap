@@ -1,0 +1,49 @@
+id: mta_entrances_nta
+type: baked
+title: MTA subway/rail entrances exposed in the area
+answers: "subway entrances in the area and how many sit in the Sandy extent or the DEP 2080 scenario"
+stone: keystone
+tier: empirical
+adapter: python_call
+
+# The area version of the register: every listed asset inside the
+# neighbourhood or the outline drawn for a community district.
+spatial:
+  scope: polygon
+  crs: EPSG:4326
+
+config:
+  module: app.areas.nta_evidence
+  function: assets
+  args:
+    - {source: polygon_4326}
+    - {const: mta_entrances}
+  on_none: offline
+
+trace_summary:
+  n_entrances: n_entrances
+  n_inside_sandy_2012: n_inside_sandy_2012
+  n_in_dep_extreme_2080: n_in_dep_extreme_2080
+
+provenance:
+  date_modified: 2025-12-05
+  retrieved_at: 2026-05-07
+  source_name: MTA, subway/rail entrances register
+  source_url: https://data.ny.gov/Transportation/MTA-Subway-Entrances-and-Exits/i9wp-a4ja
+  license: MTA Open Data Terms
+  doc_id: mta_entrance_exposure
+  citation: MTA subway/rail entrances, cross-referenced with Sandy 2012 + DEP extreme 2080.
+
+narration:
+  template: "{narrative}"
+  short: MTA subway / rail entrances inside this area and their flood exposure.
+
+display:
+  variant: register
+  order: 10
+  kind: list
+  icon: "🚇"
+
+fallback:
+  on_offline: skip
+  message: The MTA subway entrances list was not available when this briefing ran.

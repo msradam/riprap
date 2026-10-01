@@ -59,6 +59,7 @@ class Spec:
     citation: str
     # The row's identity fields, coordinates and distance, in output order.
     head: Callable[[dict, float, float, float], dict]
+    name: Callable[[dict], str] = lambda f: ""  # what the sentence calls one asset
     register: str | None = None   # baked register name under data/registers/
     geojson: Path | None = None   # live layer; exposure is looked up per hit
     lat_lon: Callable[[dict], tuple[float, float]] = (
@@ -113,20 +114,22 @@ CLASSES: dict[str, Spec] = {
         count_key="n_entrances", list_key="entrances",
         citation="MTA Open Data subway entrances + NYC OEM Sandy 2012 Inundation Zone (5xsi-dfpx) + "
                  "NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
-        head=_entrance, geojson=DATA / "mta_entrances.geojson", lat_lon=_mta_lat_lon,
+        head=_entrance, name=lambda f: f"{f['station_name']} ({f['daytime_routes']})",
+        geojson=DATA / "mta_entrances.geojson", lat_lon=_mta_lat_lon,
         buffer_m=BUFFER_MTA_ENTRANCE_M, rollups={"n_ada_accessible": "ada_accessible"}),
     "doh_hospitals": Spec(
         singular="hospital", plural="hospitals", radius_m=3000, max_n=5,
         count_key="n_hospitals", list_key="hospitals",
         citation="NYS DOH Health Facility Certification (vn5v-hh5r) + NYC OEM Sandy 2012 Inundation "
                  "Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
-        head=_hospital, geojson=DATA / "hospitals.geojson", buffer_m=BUFFER_DOH_HOSPITAL_M, raster=True),
+        head=_hospital, name=lambda f: f["facility_name"],
+        geojson=DATA / "hospitals.geojson", buffer_m=BUFFER_DOH_HOSPITAL_M, raster=True),
     "doe_schools": Spec(
         singular="flood-exposed NYC DOE school", plural="flood-exposed NYC DOE schools", radius_m=1500, max_n=6,
         count_key="n_schools", list_key="schools",
         citation="Pre-computed from NYC DOE Locations Points joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + "
                  "NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. See data/registers/schools.json.",
-        head=_school, register="schools", buffer_m=BUFFER_DOE_SCHOOL_M,
+        head=_school, name=lambda f: f["loc_name"], register="schools", buffer_m=BUFFER_DOE_SCHOOL_M,
         scope=" (the register lists only schools found inside the 2012 Sandy extent or a DEP "
               "stormwater scenario, not every school)"),
     "nycha": Spec(
@@ -135,7 +138,7 @@ CLASSES: dict[str, Spec] = {
         citation="Pre-computed from NYC Open Data NYCHA Developments (phvi-damg) joined to Sandy 2012 "
                  "Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. "
                  "See data/registers/nycha.json.",
-        head=_development, register="nycha", missing_class=0,
+        head=_development, name=lambda f: f["development"], register="nycha", missing_class=0,
         scenarios=SCENARIOS + ("dep_moderate_current",),
         elev_key="rep_elevation_m", hand_key="rep_hand_m",
         scope=" (the register lists only developments found inside the 2012 Sandy extent or a DEP "
@@ -194,9 +197,9 @@ def _exposure(spec: Spec, lat: float, lon: float) -> tuple[bool, dict[str, int]]
             {s: dep_class_buffered(lat, lon, spec.buffer_m, s)[0] for s in spec.scenarios})
 
 
-def _finding(spec: Spec, distance_m: float, row: dict) -> dict:
+def _finding(spec: Spec, distance_m: float | None, row: dict) -> dict:
     lat, lon = float(row["lat"]), float(row["lon"])
-    f = spec.head(row, lat, lon, round(distance_m, 1))
+    f = spec.head(row, lat, lon, None if distance_m is None else round(distance_m, 1))
     if spec.register:
         snap = row.get("snap") or {}
         dep = snap.get("dep") or {}
@@ -221,6 +224,50 @@ def _finding(spec: Spec, distance_m: float, row: dict) -> dict:
     return f
 
 
+def _named(spec: Spec, findings: list[dict], limit: int = 6) -> str:
+    """The exposed assets by name, nearest first: a question that asks
+    which schools gets the schools, not only how many."""
+    out = ""
+    for label, hit in (("Inside the 2012 Sandy extent", lambda f: f["inside_sandy_2012"]),
+                       ("Inside the DEP extreme scenario", lambda f: (f["dep_extreme_2080_class"] or 0) > 0)):
+        nearest: dict[str, float | None] = {}  # one station has several entrances: its nearest one
+        for f in findings:
+            if hit(f) and spec.name(f) not in nearest:
+                nearest[spec.name(f)] = f.get("distance_m")
+        names = [n if d is None else f"{n} ({d:.0f} m)" for n, d in nearest.items()]
+        if names:
+            more = f", and {len(names) - limit} more" if len(names) > limit else ""
+            out += f". {label}: {', '.join(names[:limit])}{more}"
+    return out
+
+
+def summary_for_polygon(polygon, asset_class: str) -> dict:
+    """The assets of `asset_class` inside a WGS84 polygon (a neighbourhood,
+    or the outline drawn for a community district), with their exposure.
+    Schools and NYCHA come from the baked registers, which list exposed
+    assets only; subway entrances and hospitals are every asset in the
+    polygon, each checked against the baked rasters at its own point."""
+    from dataclasses import replace
+
+    from shapely.geometry import Point
+    from shapely.prepared import prep
+
+    spec = CLASSES[asset_class]
+    inside = prep(polygon)
+    rows = [r for r in _rows(asset_class, spec)
+            if r.get("lat") is not None and inside.contains(Point(float(r["lon"]), float(r["lat"])))]
+    at_point = spec if spec.register else replace(spec, raster=True)
+    findings = sorted((_finding(at_point, None, r) for r in rows), key=spec.name)
+    n_sandy = sum(1 for f in findings if f["inside_sandy_2012"])
+    n_dep = sum(1 for f in findings if (f["dep_extreme_2080_class"] or 0) > 0)
+    n = len(findings)
+    return {"available": True, spec.count_key: n, "n_inside_sandy_2012": n_sandy, "n_in_dep_extreme_2080": n_dep,
+            "narrative": (f"{n} {spec.singular if n == 1 else spec.plural} in this area{spec.scope}: {n_sandy} inside "
+                          f"the 2012 Sandy inundation extent and {n_dep} inside the DEP extreme stormwater "
+                          f"scenario (2080 sea-level rise)" + _named(spec, findings)),
+            spec.list_key: findings, "citation": spec.citation}
+
+
 def summary_for_point(lat: float, lon: float, asset_class: str,
                       radius_m: float | None = None, max_n: int | None = None) -> dict:
     """The assets of `asset_class` within radius_m of (lat, lon), nearest
@@ -242,7 +289,7 @@ def summary_for_point(lat: float, lon: float, asset_class: str,
     out["n_inside_sandy_2012"] = n_sandy
     out["n_in_dep_extreme_2080"] = n_dep
     out["narrative"] = narrative(spec.singular, spec.plural, len(hits), radius_m, n_sandy, n_dep,
-                                 scope=spec.scope, n_checked=len(findings) if live else None)
+                                 scope=spec.scope, n_checked=len(findings) if live else None) + _named(spec, findings)
     for key, flag in spec.rollups.items():
         out[key] = sum(1 for f in findings if f[flag])
     out[spec.list_key] = findings[:max_n]
