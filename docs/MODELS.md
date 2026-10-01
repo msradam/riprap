@@ -1,29 +1,29 @@
 # Models and inference energy
 
-Every model Riprap can run, what each evaluation supports, and how LLM energy is recorded. Moved from the README in refactor 7.
-
 ## Models
 
-Every model is optional. Without the `ml` extra the model pebbles skip
-themselves and the briefing is built from the data pebbles alone. The
-table lists what the app runs today and what each evaluation supports.
+Riprap runs no model in its own process and ships no weights. With nothing
+configured, a briefing is built from the data, and a question is answered
+by rules over its words (`riprap/core/burr/rule_answer.py`).
 
-| Model | Where it runs | Maturity | What the evidence supports |
-|---|---|---|---|
-| [`msradam/Granite-TTM-r2-Battery-Surge`](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge) | `ttm_battery_surge` pebble, in process on CPU | Experimental | Test MAE 0.1091 m on held-out Battery gauge data, 41% better than persistence and 25% better than zero-shot TTM. It forecasts the surge residual only, has no wind or pressure input, and its briefing sentence points readers to NOAA ETSS or the Stevens Flood Advisory System for storm decisions. |
-| Granite TimeSeries TTM r2 (base) | `ttm_311_forecast` and `floodnet_forecast` pebbles, in process on CPU | Experimental | Indicative forecasts of 311 complaint volume and FloodNet event recurrence. No held-out evaluation is published. |
-| Granite Embedding 278M | `policy_corpus` pebble, query embedding only (the corpus index is built offline by `scripts/build_rag_index.py`) | Experimental | Retrieves passages from five NYC agency PDFs. Retrieval quality is not scored. |
-| Flair NER (`flair/ner-english-ontonotes-fast`) | `policy_corpus` pebble, in process on CPU | Experimental | Coarse entity tags (agency, date, amount, place) on the retrieved passages. |
-| Prithvi-EO 2.0 | Offline only: the baked Ida layer behind `prithvi_water`, and `scripts/run_eo_batch.py` | Experimental | Satellite-detected surface water after Ida. It mostly shows marsh, shoreline and park water, gives no inside or outside verdict for an address, and says nothing about street or basement flooding. |
-| [`msradam/Prithvi-EO-2.0-NYC-Pluvial`](https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial) | Default checkpoint for `scripts/run_eo_batch.py`; not used by the app at runtime | Experimental | Test IoU 0.598, but the labels are the base model's own Ida polygons (self-distillation) and the random split shares parent scenes, so this measures agreement with pseudo-labels, not flood detection. |
-| [`msradam/TerraMind-NYC-Adapters`](https://huggingface.co/msradam/TerraMind-NYC-Adapters) | Not used by the app | Research artifact | LoRA family on TerraMind 1.0. Reported mIoU: LULC 0.5866, TiM 0.6023, Buildings 0.5511. |
-| Any OpenAI-compatible LLM | Optional, external endpoint | Production path, with claims checked in code | On ten gallery addresses, `granite4:micro` kept 122 claims and dropped 0; `llama3.1:8b` kept 191 and dropped 0 (`tests/probe_grounding_results*.json`). Every claim gets citation and number checks. Question answers also get the lead rules ([`docs/GROUNDING.md`](GROUNDING.md)). |
-| GLiClass modern-base 311 filter | Non-NYC free-text 311 feeds (SF, Boston, Albany), in process on CPU; weights built locally and found through `RIPRAP_311_FILTER_PATH` | Experimental | Distilled from silver labels. Unreliable on live feeds: it kept street-cleaning and sidewalk reports as flooding (`tests/flood311_live_counts_2026-09-27.txt`). Without the weights, records pass unfiltered and the briefing says so. |
+The one model Riprap can use is an optional LLM behind any
+OpenAI-compatible endpoint (`RIPRAP_LLM_BASE_URL`, `RIPRAP_LLM_MODEL`). The
+gallery's question entries use Granite 4.1 8B
+(`hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M` over Ollama). For a
+question the model chooses a lead and up to four cited facts, and code
+checks that choice; the answer text is the sources' own sentences
+([`docs/GROUNDING.md`](GROUNDING.md)). `app/models_info.py` lists the
+endpoint that answered in each result's `models` field and at
+`/api/models`.
 
-The three `msradam/*` fine-tunes were trained on AMD Instinct MI300X via
-AMD Developer Cloud and are published under Apache 2.0. Reproduction
-recipes live under `experiments/`.
+An earlier probe had the model rewrite the evidence for ten gallery
+addresses as claims (the mode now behind `RIPRAP_LLM_BARE=1`).
+`granite4:micro` kept 122 claims and dropped 0, and `llama3.1:8b` kept 191
+and dropped 0 (`tests/probe_grounding_results*.json`).
 
+Earlier versions ran a satellite water model, three time-series forecasts,
+an embedding model and an entity tagger. None of them is used now; the
+code is in git history at `8b87165`.
 
 ## Inference energy
 
@@ -38,8 +38,7 @@ duration and an energy status:
 
 zeus-apple-silicon 1.1.0 reads 0 mJ of CPU energy on an Apple M5; those
 readings are rejected and the call is marked unknown. The ledger is the
-`emissions` block of every result. In-process CPU models are not in it.
+`emissions` block of every result.
 The numbers in [`docs/history/BENCHMARKS.md`](history/BENCHMARKS.md) come from the
 retired GPU stack and are historical. Details in
 [`docs/EMISSIONS.md`](EMISSIONS.md).
-

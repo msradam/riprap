@@ -1,32 +1,35 @@
 # Data sources
 
-The public sources behind the NYC deployment. Each manifest's `provenance` block is the authority for its URL, licence and vintage. Moved from the README in refactor 7.
-
-## Data sources
+The public sources behind the NYC deployment. Each manifest's `provenance`
+block is the authority for its URL, licence and vintage; `list_sources` on
+the MCP server prints them.
 
 Riprap contacts only public-record federal, state and city sources at
-runtime. No commercial APIs, no proprietary scores. Source URLs, licences,
-`date_modified` and `retrieved_at` for each come from the pebble's manifest
-`provenance` block; `list_sources` on the MCP server prints them.
+runtime. No commercial APIs, no proprietary scores. The NYC deployment has
+35 manifests: 31 in `deployments/nyc/manifests/` (16 for a point, 15 for a
+neighbourhood or district) and 4 in `deployments/federal/manifests/`. A
+point manifest and its area version read the same source, so the table has
+fewer rows than that.
 
-| Source | Hosting agency | Used for |
+| Source | Publisher | Used for |
 |---|---|---|
-| Hurricane Sandy 2012 inundation zone | NYC OTI / NOAA Office for Coastal Management | Hazard memory |
-| NYC DEP Stormwater Flood Maps | NYC Department of Environmental Protection | Modeled scenarios |
-| FEMA National Flood Hazard Layer | FEMA | Regulatory flood zone (2007 effective FIRM) |
-| FEMA preliminary NFHL (2015 PFIRM) | FEMA | Preliminary flood zone and base flood elevation, adopted by NYC Building Code Appendix G for flood-resistant construction |
-| Hurricane Ida 2021 USGS high-water marks | USGS Short-Term Network | Empirical points |
-| FloodNet ultrasonic sensor network | NYU CUSP / FloodNet | Flood-event log |
-| NYC 311 flood complaints | NYC Open Data | Complaint history |
-| NOAA tide gauge, The Battery | NOAA CO-OPS | Tide and surge level |
-| USGS stream gauges | USGS Water Data (OGC API) | Live stage |
-| NWS observations and alerts | National Weather Service | Precipitation, active warnings |
-| MTA subway entrances | MTA / NYC Open Data | Transit assets |
+| Sandy Inundation Zone, 2012 | NYC Open Data (`uyj8-7rv5`) | Whether Sandy flooded the place, and the distance to the mapped edge when within 50 m |
+| NYC Stormwater Flood Maps | NYC Department of Environmental Protection | Three modeled rainfall scenarios |
+| National Flood Hazard Layer | FEMA | Effective flood zone (2007 FIRM) |
+| Preliminary NFHL (2015 PFIRM) | FEMA | Preliminary flood zone and base flood elevation with its datum, adopted by NYC Building Code Appendix G for flood-resistant construction |
+| Hurricane Ida 2021 high-water marks | USGS Short-Term Network | Surveyed flood marks |
+| FloodNet sensor network | FloodNet NYC | Flood-event log |
+| 311 service requests | NYC Open Data (`erm2-nwe9`) | Flood requests, counted under both the coded descriptor names and the plain names the city introduced in 2026 |
+| Tide gauges | NOAA CO-OPS | Water level, predicted tide and residual at the nearest of The Battery, Kings Point and Sandy Hook |
+| Water-level forecast | National Weather Service, National Water Prediction Service | Forecast peak and the flood stage it reaches at the nearest of The Battery, Kings Point and Bergen Point |
+| Stream gauges | USGS Water Data (OGC API) | Live stage |
+| Observations and alerts | National Weather Service | Precipitation, active warnings |
+| Subway entrances | MTA (`i9wp-a4ja`) | Transit assets |
 | NYCHA developments | NYC Housing Authority (`phvi-damg`) | Public housing |
-| NYC DOE schools | NYC Department of Education | Schools |
-| NYS DOH hospitals | New York State Department of Health (`vn5v-hh5r`) | Hospitals |
-| USGS 3DEP 1 m DEM | USGS National Map | HAND and TWI |
-| NYC DOB permits | NYC Department of Buildings | `development_check` intent |
-| NPCC4 sea-level projections and agency PDFs | NYC Panel on Climate Change, NYC agencies | Policy context |
-| Sentinel-2 MSI imagery | ESA / Copernicus | Offline Prithvi layers |
-
+| School locations | NYC Department of Education (`wg9x-4ke6`) | Schools |
+| Health facilities | New York State Department of Health (`vn5v-hh5r`) | Hospitals |
+| 3DEP elevation model | USGS | Elevation, HAND and TWI |
+| DOB permits | NYC Department of Buildings (`ipu4-2q9a`) | `development_check` intent |
+| Community District Profiles | NYC Department of City Planning | Buildings, residential units and residents in a district's 1% annual chance floodplain |
+| 2020 Neighborhood Tabulation Areas | NYC Department of City Planning (`9nt8-h7nd`) | Area outlines |
+| NPCC4 sea-level projections | NYC Panel on Climate Change | Projected sea level at The Battery |

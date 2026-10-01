@@ -5,7 +5,8 @@ type: reference
 # Privacy and do-no-harm
 
 What Riprap stores, what it sends to other services, and what it is not
-for. Each statement below was checked against the code on 2026-09-28.
+for. Each statement below was checked against the code on 2026-09-28,
+and the storage table and the 311 section again on 2026-10-01.
 
 ## What Riprap does not do
 
@@ -22,7 +23,6 @@ for. Each statement below was checked against the code on 2026-09-28.
 | What | Where | Holds |
 |---|---|---|
 | HTTP cache | `~/.cache/riprap/http.sqlite` on the machine running the server (`riprap/core/http.py`; `RIPRAP_HTTP_CACHE=off` disables it) | Responses from public data APIs, kept for 10 minutes by default (`RIPRAP_HTTP_CACHE_TTL_S`). 311 records are never written to it (see below). |
-| 311 filter cache | `~/.cache/riprap/flood311.sqlite` (`riprap/core/pebbles/record_filter.py`), only when the optional 311 classifier is installed | A record id (or the redacted record text when there is no id) and the classifier's probability. |
 | Run logs | `.burr/`, only when `RIPRAP_BURR_TRACKING=1` | Each pipeline run, including the query, for the Burr tracking UI. Off by default. |
 | Server output | Standard output of the process | Startup messages; the web server's access log includes request URLs, which carry the address or question typed. Where these go depends on how you run the server. |
 | Print snapshot | The visitor's own browser (`localStorage`, `web/sveltekit/src/lib/stores/briefingState.svelte.ts`) | The briefing last viewed, so the print page can render it. It never leaves the browser. |
@@ -46,17 +46,13 @@ its own, and GitHub's own privacy terms apply to its hosting.
 
 ## Personal data in 311 records
 
-311 free text (Boston `closure_reason`, San Francisco `status_notes` and
-`service_details`, Albany SeeClickFix summaries and descriptions) can
-hold a resident's email address, phone number or name. The Socrata, CKAN
-and SeeClickFix adapters fetch these records with the HTTP cache turned
-off and remove email addresses and phone numbers from every string before
-anything else reads them (`riprap/core/redact.py`). **Names are not
-removed**: telling a name from a street or an agency takes more than a
-pattern. NYC's 311 query does not fetch free text at all.
-
-The training pool for the optional 311 classifier is not in the
-repository and is git-ignored; see `data/calibration/README.md`.
+311 free text (Albany SeeClickFix summaries and descriptions, a Socrata
+feed's notes fields) can hold a resident's email address, phone number or
+name. The Socrata and SeeClickFix adapters fetch these records with the
+HTTP cache turned off and remove email addresses and phone numbers from
+every string before anything else reads them (`riprap/core/redact.py`).
+**Names are not removed**: telling a name from a street or an agency takes
+more than a pattern. NYC's 311 query does not fetch free text at all.
 
 ## Do no harm
 

@@ -12,13 +12,13 @@ is always a separate OpenAI-compatible endpoint you point it at.
 ## 1. Local, no LLM (default)
 
 ```bash
-git lfs install && git lfs pull      # data/ and the policy PDFs are Git LFS files
+git lfs install && git lfs pull      # the flood layers under data/ are Git LFS files
 uv sync
 uv run uvicorn web.main:app --port 7860
 ```
 
-Open `http://localhost:7860`. Every briefing is the no-LLM evidence briefing
-(docs/GROUNDING.md).
+Open `http://localhost:7860`. Every briefing is the no-LLM evidence briefing,
+and a question is answered by rules over its words (docs/GROUNDING.md).
 
 ## 2. Local, with an LLM
 
@@ -78,5 +78,4 @@ traffic. `deploy/modal_app.py` can also host the app itself on Modal as a
 CPU-only function.
 
 The per-request ML specialist server in riprap-inference (`modal_app.py`,
-LitServe) is not used: TTM, embeddings and NER run in the app process on CPU,
-and the earth-observation models run as batch jobs (`scripts/run_eo_batch.py`).
+LitServe) is not used: the LLM is the only model Riprap calls.

@@ -7,9 +7,8 @@ Why Riprap exists, who it is for, and how the Five Stones generalise beyond NYC.
 Cities publish the hazard-exposure inputs an engineer needs. NYC alone has
 decades of it: Sandy 2012 inundation, NYC DEP stormwater scenarios,
 FloodNet sensors, NOAA tide gauges, USGS 3DEP LiDAR, 311 complaints, MTA,
-NYCHA, schools, hospitals, and Chicago, Seattle, San Francisco, Boston,
-and Albany each publish their own equivalents. The data is public. None of
-it composes itself.
+NYCHA, schools, hospitals. Other cities publish their own equivalents. The
+data is public. None of it composes itself.
 
 Every engineer doing a drainage review, every resilience office siting a
 capital project, every climate-adaptation team prioritising blocks
@@ -77,7 +76,7 @@ citation.
 
 ## How Riprap works: the Five Stones
 
-Behind every briefing, a couple dozen atomic data probes (**pebbles**)
+Behind every briefing, up to twenty atomic data probes (**pebbles**)
 fan out across public datasets, sensors and forecasts. Each pebble is one
 YAML manifest plus a small adapter; the framework loads them from a
 deployment directory and groups them into five roles, the **Five Stones**:
@@ -88,11 +87,11 @@ deployment directory and groups them into five roles, the **Five Stones**:
 
 | Stone | Role | NYC pebbles |
 |---|---|---|
-| **Cornerstone** | What the ground remembers | Sandy 2012 inundation extent, NYC DEP stormwater scenarios, FEMA NFHL zone, 2021 Ida USGS high-water marks, satellite-detected surface water after Ida (experimental), USGS 3DEP DEM with HAND and TWI |
-| **Keystone** | What is exposed | MTA subway entrances, NYCHA developments, NYC DOE schools, NYS DOH hospitals |
+| **Cornerstone** | What the ground remembers | Sandy 2012 inundation extent, NYC DEP stormwater scenarios, FEMA effective and preliminary flood zones, 2021 Ida USGS high-water marks, USGS 3DEP DEM with HAND and TWI |
+| **Keystone** | What is exposed | MTA subway entrances, NYCHA developments, NYC DOE schools, NYS DOH hospitals, named when exposed; for a district, NYC Planning's floodplain counts and DOB permits |
 | **Touchstone** | Current state of the city | FloodNet depth sensors, NYC 311 flood complaints, NWS hourly observations, NOAA tide-gauge water levels, USGS stream gauges |
-| **Lodestone** | What is coming | NWS flood alerts, NPCC4 sea-level projections, 311 weekly forecast (experimental), FloodNet recurrence forecast (experimental), Battery surge forecast (experimental) |
-| **Capstone** | The briefing | An "In brief" lead and the evidence sentences as written, with the point DEP scenarios merged into one sentence (no-LLM mode), or JSON claims from any OpenAI-compatible model with citations and numbers checked in code |
+| **Lodestone** | What is coming | NWS flood alerts, the NWS water-level forecast at the nearest harbor gauge, NPCC4 sea-level projections |
+| **Capstone** | The briefing | An "In brief" lead and the evidence sentences as written, with the point DEP scenarios merged into one sentence. A question is answered from those sentences, by rules or by any OpenAI-compatible model whose choice of lead and facts is checked in code |
 
 One Burr application runs every intent. All pebbles for the intent fan out
 in one parallel `MapActions` group; the Capstone then turns their evidence
@@ -109,14 +108,13 @@ same; only the pebbles plugged into each Stone change.
 |---|---|---|
 | **Cornerstone** | Hazard memory | Local historical inundation extents, regional DEM, regulatory floodplain maps |
 | **Keystone** | Asset registers | The transit, housing, education and healthcare layers your jurisdiction publishes |
-| **Touchstone** | Live observation | Whatever live sensors and complaint streams the city or region exposes (FloodNet has analogues in Houston, Boston, Miami) |
+| **Touchstone** | Live observation | Whatever live sensors and complaint streams the city or region exposes |
 | **Lodestone** | Forecasts | Local NWS forecast office output, regional surge or hydrologic models |
 | **Capstone** | Citation-grounded synthesis | Same |
 
 What transfers unchanged: one Burr graph that fans pebble manifests out in
-parallel, evidence rendered from manifest templates, claims checked in
-code for citations and numbers when an LLM is configured, and every
-sentence cited to its source.
+parallel, evidence rendered from manifest templates, answers checked in
+code when an LLM is configured, and every sentence cited to its source.
 To port Riprap to a new city you write a deployment directory of manifests
 against local data. See [`docs/PORT-YOUR-CITY.md`](PORT-YOUR-CITY.md).
 

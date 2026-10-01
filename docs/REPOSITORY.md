@@ -21,10 +21,10 @@ query ──► plan (LLM planner: intent, question, pebbles needed; regex heuri
    (Cornerstone, Keystone, Touchstone, Lodestone)
              │
              ▼
-   assemble_legacy_state ──► policy_corpus ──► reconcile
+   assemble_legacy_state ──► reconcile
              │
              ▼
-   evidence from manifest templates ──► no-LLM briefing, or JSON claims checked in code for citations and numbers
+   evidence from manifest templates ──► no-LLM briefing (a question answered by rules), or an LLM answer checked in code
              │
              ▼
    cited briefing + disclosure checks + energy ledger ──► JSON, SSE, MCP
@@ -52,15 +52,15 @@ Source-of-truth pointers:
 | `riprap/core/burr/` | The Burr app, evidence rendering (`evidence.py`) and claim verification (`synthesis.py`) |
 | `riprap/core/http.py` | Shared cached HTTP client with retries |
 | `riprap/core/compliance/` | Disclosure checks: substring tests for required caveat phrases. They do not measure quality. |
-| `deployments/<city>/` | Manifests, `stones.yaml`, data and corpus for one deployment |
-| `app/` | Pebble implementations (`context/`, `flood_layers/`, `live/`, `assets/`, `areas/`), planner, geocoder, energy ledger |
-| `web/main.py` | FastAPI: `/api/agent`, `/api/agent/stream` (SSE), `/api/district/{code}`, `/api/nyc311/flood_requests`, layer endpoints |
+| `deployments/<city>/` | Manifests and `stones.yaml` for one deployment |
+| `app/` | Pebble implementations (`context/`, `flood_layers/`, `assets/`, `registers/`, `areas/`), planner, geocoder, energy ledger |
+| `web/main.py` | FastAPI: `/api/agent`, `/api/agent/stream` (SSE), `/api/agent/batch`, `/api/district/{code}`, `/api/nyc311/flood_requests`, `/api/register/{asset_class}`, layer endpoints |
 | `riprap/mcp/server.py` | MCP server (stdio or `--http`) |
 | `web/sveltekit/` | UI and static gallery (adapter-static, build committed) |
 
 Long form in [`docs/ARCHITECTURE.md`](ARCHITECTURE.md). Grounding in
-[`docs/GROUNDING.md`](GROUNDING.md). Methodology and civil-engineering
-framing in [`docs/METHODOLOGY.md`](METHODOLOGY.md). Literature review
+[`docs/GROUNDING.md`](GROUNDING.md). Methodology in
+[`docs/METHODOLOGY.md`](METHODOLOGY.md). Literature review
 in [`docs/history/RESEARCH.md`](history/RESEARCH.md). Deployment in
 [`docs/DEPLOY.md`](DEPLOY.md).
 
@@ -75,22 +75,24 @@ riprap/core/               The framework
 └── http.py                Shared cached HTTP client
 
 riprap/mcp/                MCP server
+riprap/cli/                riprap-register: flood flags per asset, as CSV
 
 deployments/               One directory per deployment
-├── nyc/                   Reference: manifests, stones.yaml, data, corpus
+├── nyc/                   Reference: manifests, stones.yaml
 ├── federal/               Pebbles every US deployment shares
-└── chicago, seattle, sf, boston, albany, heat, air
+└── chicago, seattle, albany
+
+data/                      NYC flood layers, rasters and baked registers (Git LFS)
 
 app/                       Pebble implementations, planner, geocoder,
-                           energy ledger, PDF export, register builder
+                           energy ledger, register builder
 
 web/                       FastAPI + SvelteKit
 ├── main.py                FastAPI app, SSE stream, layer endpoints
 └── sveltekit/             UI and static gallery (build committed)
 
 deploy/                    Dockerfile and the optional Modal host (modal_app.py)
-scripts/                   Gallery, RAG index, EO batch, probes, register builders
-experiments/               Reproduction recipes for the NYC fine-tunes
+scripts/                   Gallery, probes, evaluations, register and raster builders
 docs/                      See docs/INDEX.md
 tests/                     pytest + vitest
 ```

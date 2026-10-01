@@ -2,20 +2,20 @@
 
 Riprap's deployments are directories of YAML. **BYOD** lets you layer
 your own pebbles on top of any base deployment without forking the repo,
-without editing any code, and without recompiling the registry — drop a
+without editing any code, and without recompiling the registry. Drop a
 manifest into one of two known locations and the next briefing includes
 your data alongside the city defaults.
 
 ## TL;DR
 
 ```bash
-# Option 1 — drop into ./.riprap/ in your CWD
+# Option 1: drop into ./.riprap/ in your CWD
 mkdir -p .riprap && cp examples/byod/fdny_firehouses.{yaml,csv} .riprap/
 RIPRAP_DEPLOYMENT=deployments/nyc RIPRAP_RECONCILER_TIER=no_llm \
   uv run python -c "import riprap.core.burr.app as a; \
     print(a.run('189 Atlantic Ave, Brooklyn, NY')['fdny_firehouses'])"
 
-# Option 2 — point an env var at a directory (or single YAML)
+# Option 2: point an env var at a directory (or single YAML)
 RIPRAP_DEPLOYMENT=deployments/nyc \
 RIPRAP_EXTRA_MANIFESTS=examples/byod \
 RIPRAP_RECONCILER_TIER=no_llm \
@@ -23,16 +23,16 @@ RIPRAP_RECONCILER_TIER=no_llm \
     print(a.run('189 Atlantic Ave, Brooklyn, NY')['fdny_firehouses'])"
 ```
 
-Both verified working — see "Verified output" below.
+Both were verified; see "Verified output" below.
 
 ## The two load paths
 
 `riprap/core/pebbles/registry.py:load_registry` merges manifests in this
 order (later writers win on id collisions):
 
-1. **Base deployment** — `deployments/<name>/manifests/*.yaml`
-2. **`.riprap/` auto-discovery** — `${CWD}/.riprap/**/*.yaml`
-3. **`RIPRAP_EXTRA_MANIFESTS` env var** — colon-separated list of paths;
+1. **Base deployment**: `deployments/<name>/manifests/*.yaml`
+2. **`.riprap/` auto-discovery**: `${CWD}/.riprap/**/*.yaml`
+3. **`RIPRAP_EXTRA_MANIFESTS` env var**: colon-separated list of paths;
    each entry is a directory (loaded recursively, sorted) or a single
    `.yaml` file.
 
@@ -57,11 +57,11 @@ This is enforced by `BasePebble.manifest_dir`, which `load_registry`
 sets to `yaml_path.parent` for BYOD pebbles and leaves `None` for base
 ones (preserving the existing deployment layout).
 
-## Worked example — FDNY firehouses as a BYOD portfolio
+## Worked example: FDNY firehouses as a BYOD portfolio
 
-`examples/byod/` ships a real NYC Open Data CSV — 219 FDNY firehouses
+`examples/byod/` ships a real NYC Open Data CSV, 219 FDNY firehouses
 across the five boroughs (real addresses, real lat/lon, pulled from
-`hc8x-tcnd` on data.cityofnewyork.us) — treated as if it were a
+`hc8x-tcnd` on data.cityofnewyork.us), treated as if it were a
 user-supplied facility portfolio.
 
 The manifest is a thin `csv_points` adapter config:
@@ -92,7 +92,7 @@ changes.
 
 ## Verified output
 
-**1. NYC deployment, 189 Atlantic Ave, Brooklyn — via `RIPRAP_EXTRA_MANIFESTS`**
+**1. NYC deployment, 189 Atlantic Ave, Brooklyn, via `RIPRAP_EXTRA_MANIFESTS`**
 
 ```
 fdny_firehouses populated: True
@@ -103,7 +103,7 @@ fdny_firehouses populated: True
 Disclosure checks: 13 / 13
 ```
 
-**2. NYC deployment, 80 Pioneer Street, Red Hook — via `.riprap/`**
+**2. NYC deployment, 80 Pioneer Street, Red Hook, via `.riprap/`**
 
 ```
 fdny_firehouses populated: True
@@ -111,19 +111,6 @@ fdny_firehouses populated: True
   nearest: Battalion 32 / Engine 202 / Ladder 101
 Disclosure checks: 13 / 13
 ```
-
-**3. Boston deployment, 1 City Hall Square — same BYOD pebble, cross-deployment**
-
-```
-fdny_firehouses populated: True
-  n_within_radius (FDNY in Boston area): 0    # correct — NYC-only CSV
-  nearest distance: 282.4 km                  # correct — Manhattan from Boston
-boston_311 n_records: 396                     # Boston-native pebble still flows
-Disclosure checks: 13 / 13
-```
-
-The same BYOD pebble layers cleanly on every base deployment. Spatial
-mismatches degrade silently (zero records, no errors).
 
 ## What adapters are available for BYOD?
 
@@ -134,11 +121,10 @@ Every adapter the base deployments use, registered in
 |---|---|
 | `csv_points` | Tabular point data with lat/lon columns (local file or URL) |
 | `baked_vector` | GeoJSON / Shapefile / Parquet of points or polygons |
-| `socrata_records` | Any Socrata SODA endpoint (NYC, Chicago, Seattle, SF, DC, ...) |
-| `ckan_records` | Any CKAN datastore_search_sql endpoint (Boston, Philly, EU portals, ...) |
-| `rest_json` | Generic REST JSON endpoint with a JMESPath shape extraction |
-| `python_call` | Call a Python function in your env — escape hatch for anything custom |
-| `local_corpus_with_ner` | Local PDF corpus + entity extraction (used by `policy_corpus`) |
+| `socrata_records` | Any Socrata SODA endpoint (NYC, Chicago, Seattle, DC, ...) |
+| `rest_json` | Generic REST JSON endpoint, with a dotted `response_path` into the response |
+| `python_call` | Call a Python function in your environment, for anything custom |
+| `model_call` | POST to an inference backend you run; no shipped manifest uses it |
 
 ## Override semantics
 
@@ -152,7 +138,7 @@ type: live
 adapter: rest_json
 config:
   url: https://my-private-weather-api.example.com/obs?lat={lat}&lon={lon}
-  shape: {path: data}
+  response_path: data
 ...
 EOF
 
@@ -166,6 +152,6 @@ pebble's, so citations then point at your source.
 
 ## See also
 
-- [`docs/multi-city.md`](multi-city.md) — generalising across cities
-- [`examples/byod/`](../examples/byod/) — the worked FDNY example
-- [`riprap/core/pebbles/registry.py`](../riprap/core/pebbles/registry.py) — the load merge logic
+- [`docs/multi-city.md`](multi-city.md): the city deployments
+- [`examples/byod/`](../examples/byod/): the worked FDNY example
+- [`riprap/core/pebbles/registry.py`](../riprap/core/pebbles/registry.py): the load merge logic

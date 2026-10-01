@@ -25,10 +25,33 @@ brief" lead: the Sandy footprint, the FEMA zone, the DEP scenarios and the 311
 count, each cited and each passed through the claim verifier below (a part
 that fails is left out). Then comes one section per Stone with evidence, one
 cited sentence per pebble, with the three point DEP scenarios merged into one
-sentence. When no source produces evidence, the briefing says Riprap could not
+sentence. A plain place briefing leaves out a live reading that is not notable
+(an observation with no rain, a tide less than a foot above prediction, a
+water-level forecast below flood stage); a right-now question quotes them all. When no source produces evidence, the briefing says Riprap could not
 build it and names the sources that failed to respond. There is no model. This
-is the mode the MCP evidence tools use. The static gallery has 10 address
-entries in this mode and 4 question entries in LLM mode.
+is the mode the MCP evidence tools use. The static gallery has 12 address
+entries in this mode and 7 question entries in LLM mode.
+
+A question is answered in this mode too, by rules over its words
+(`riprap/core/burr/rule_answer.py`). The rules pick the lead and the facts
+from the question and from the values the sources returned; the facts are the
+sources' sentences word for word. They are tried in a fixed order:
+
+1. "right now": the live readings, with no yes or no (no alert is not an
+   observation that nothing is flooding);
+2. a named asset class (subway, schools, public housing, hospitals): its
+   register;
+3. "has it flooded": the past-event rule described below sets yes, no or
+   cannot say;
+4. "how many": the counted source;
+5. forecasts, projections and scenarios: those sources, with no yes or no;
+6. any other source the question names (FEMA zone, terrain, permits);
+7. any other question about flooding: the observed record.
+
+A lead the rules chose still goes through the lead checks below; one that
+fails is dropped and the facts stand. When no rule recognises the question,
+the page shows the evidence for the place and says the question was not
+answered.
 
 ## LLM mode
 
@@ -49,7 +72,7 @@ is used only where there is a question (refactor 8):
   claims, as described in the steps below. It never writes free prose.
 
 1. The model receives the evidence sentences, grouped by section, each labelled
-   with its `doc_id`. Retrieved policy passages are added as `rag_*` documents.
+   with its `doc_id`.
 2. It must answer with JSON that matches a schema built for this request:
    `claims: [{section, text, doc_ids, numbers}]`. `doc_ids` is an enum of the
    ids actually passed in, and `section` is an enum of the sections that have
@@ -71,8 +94,11 @@ is used only where there is a question (refactor 8):
    section." A claim that cites an experimental source is prefixed
    "Experimental:" if the model left that out.
 
-If no endpoint answers, the briefing falls back to the no-LLM evidence and says
-why in `grounding.fallback_reason`.
+If no endpoint answers, a question falls back to the rules above, then to the
+no-LLM evidence, and `grounding.fallback_reason` says why. With a model
+configured the model path is the default (`synthesis.RULES_FIRST = False`);
+`grounding.answer_mode` is `rules` or `extractive` and records which one
+answered.
 
 ### Questions
 
@@ -83,8 +109,10 @@ When the input is a question, not just a place, three more rules apply.
   zone, Sandy extent and the DEP 2050 scenario for an address; NWS alerts for
   a "right now" question) and a floor for the question's focus (for a past
   question 311, FloodNet, Ida high-water marks and Sandy; for a right-now
-  question alerts, observations, FloodNet and the tide gauge; for an asset
-  question that asset's register). Only those pebbles run, and every briefing lists the
+  question alerts, observations, FloodNet, the tide gauge and the NWS
+  water-level forecast; for a forecast question that forecast, the NPCC4
+  projections and the DEP 2050 and 2080 scenarios; for an asset question that
+  asset's register). Only those pebbles run, and every briefing lists the
   sources consulted and the ones not checked. A bare address runs every source.
 - The briefing opens with an answer (described below). If no answer
   survives the checks,
@@ -139,9 +167,10 @@ the facts after the retry, it is appended; if the lead no longer fits the
 appended fact, the lead is dropped and the answer opens "From the sources
 consulted:".
 
-Every LLM briefing ends with a line naming the checks that ran: "Checks
+Every briefing with an answer ends with a line naming the checks that ran: "Checks
 run: citations and numbers on every claim; lead rules on the answer, which
-is the cited text word for word."
+is the cited text word for word." An answer about right now also points to
+the FloodNet dashboard, the National Weather Service and Notify NYC.
 
 **The retired guarded mode.** Until 2026-09-30 `RIPRAP_ANSWER_MODE=guarded`
 let the model write one to three answer claims of its own, checked by five
@@ -187,46 +216,29 @@ the answer the text is the evidence text, so it cannot paraphrase; what can
 still be wrong is the lead and the choice of facts, and only the lead rules
 above are checked.
 
-## 311 feeds outside NYC
+## 311 counts
 
-NYC 311 pebbles keep their descriptor filter. Elsewhere
-(`riprap/core/pebbles/record_filter.py`, set per manifest under
-`config.record_filter`):
+NYC 311 flood requests are filtered by descriptor
+(`app/context/nyc311.py`). The city renamed the descriptors in 2026:
+complaint type "Sewer" with coded names ("Sewer Backup (Use Comments) (SA)")
+gave way to "Sewer Maintenance" with plain names ("Backup"). Riprap counts
+both names as one kind, with the complaint type in the filter, and counts
+an incident logged under both names once. `tests/test_311_vocabulary_live.py`
+fails when the dataset grows a flood-like descriptor the app does not count.
 
-- **San Francisco, Boston, Albany** give free text, so a text classifier
-  decides: GLiClass modern-base distilled from Granite 4.1 8B's option
-  probabilities in an unpublished experiment (its calibration data is in
-  `data/calibration/`), rebuilt by `scripts/train_311_filter.py` because
-  the experiment did not save it. The script needs `--pool` (a pool of
-  records you supply, kept outside the repo) and new teacher probabilities
-  for a new pool; see `data/calibration/README.md`. A
-  record is kept when P(any flood class) is at or above the threshold
-  chosen on the experiment's calibration split, and cached by record id.
-  The classifier reads the same text the experiment trained on (SF
-  `service_details | status_notes`, Boston's closure note after "Case
-  Resolved", Albany `summary: description`); a record with no text (an
-  open Boston case) is not counted and is reported as `n_no_text`. Its
-  labels are silver, so these pebbles are experimental. The weights are not
-  in the repo: set `RIPRAP_311_FILTER_PATH`; without them the records pass
-  unfiltered and the sentence says so.
-- **Chicago and Seattle** give only a category name, so a reviewed table in
-  the manifest decides; the reviewed categories are listed in each
-  manifest's comment.
+Outside NYC a 311 feed is counted only through a reviewed filter:
 
-Each sentence says how many of how many records were kept, and "the
-latest N" when the feed hit its fetch limit.
+- Chicago and Seattle give a category name, so a reviewed table in the
+  manifest decides (`config.record_filter`, `kind: category_table`,
+  `riprap/core/pebbles/record_filter.py`). The reviewed categories are
+  listed in each manifest's comment. Each sentence says how many of how
+  many records were kept, and "the latest N" when the feed hit its fetch
+  limit.
+- Albany's SeeClickFix feed is queried for its own flooding,
+  sewers/drainage and sinkhole request types.
 
-What this misses. The classifier matches its teacher on the experiment's
-silver test set (0.618 accuracy; at the 0.0043 threshold it keeps 55% of
-silver flood records and drops 90% of the rest), but it does not hold up on
-live feeds: on 2026-09-27 it kept 89 of the latest 200 San Francisco
-requests near City Hall, led by street-cleaning reports of human waste,
-and 62 of 68 Albany requests near 24 Eagle Street, including sidewalk
-repairs (`tests/flood311_live_counts_2026-09-27.txt`). Albany had no silver
-labels, so the test set never measured it. Leave `RIPRAP_311_FILTER_PATH`
-unset until it is checked against hand labels. The category tables cannot
-see a flood report filed under another category, and Seattle's feed has no
-street-flooding category at all.
+A category table cannot see a flood report filed under another category,
+and Seattle's feed has no street-flooding category at all.
 
 ## Measuring it
 

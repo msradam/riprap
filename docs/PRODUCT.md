@@ -61,8 +61,8 @@ answer, it says so instead of guessing.
   pages. (Owner, 2026-09-29.)
 - A static gallery of precomputed briefings runs with no backend (GitHub
   Pages style).
-- Six city deployments exist (NYC production; Chicago, Seattle, San
-  Francisco, Boston and Albany experimental).
+- Four city deployments exist (NYC production; Chicago, Seattle and
+  Albany experimental).
 
 ## Capabilities and Constraints
 

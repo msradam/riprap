@@ -6,20 +6,17 @@ body:
   - type: markdown
     attributes:
       value: |
-        Five deployments already ship in the repo — **NYC, Chicago, Seattle,
-        San Francisco, Boston** — and every one of them is a directory of
-        YAML pebble manifests + a `stones.yaml`. Adding your city is a
-        manifest, not a fork. Start with [`docs/PORT-YOUR-CITY.md`](https://github.com/msradam/riprap/blob/main/docs/PORT-YOUR-CITY.md).
+        Four city deployments ship in the repo: NYC, and experimental
+        Chicago, Seattle and Albany. Each is a directory of YAML pebble
+        manifests and a `stones.yaml`. Adding your city is a manifest
+        directory, not a fork. Start with [`docs/PORT-YOUR-CITY.md`](https://github.com/msradam/riprap/blob/main/docs/PORT-YOUR-CITY.md).
 
-        Generic adapters that probably already cover your data:
-        - `socrata_records` — any Socrata SODA portal (NYC, Chicago, SF, Seattle, DC, LA, Austin, Houston, ...)
-        - `ckan_records` — any CKAN datastore (Boston, Philadelphia, Toronto, most EU portals)
-        - `csv_points`, `baked_vector`, `rest_json`, `python_call` — escape hatches
+        Adapters that probably already cover your data:
+        - `socrata_records`: any Socrata SODA portal (NYC, Chicago, Seattle, DC, LA, Austin, Houston, ...)
+        - `csv_points`, `baked_vector`, `rest_json`, `python_call`: everything else
 
-        This issue helps you (and reviewers) scope the work before you
-        open a PR. Riprap is hazard-agnostic too (`deployments/heat/`,
-        `deployments/air/`) — if you're porting for a non-flood hazard,
-        mention which one.
+        This issue helps you and reviewers scope the work before you
+        open a PR. Riprap briefs on flooding only.
   - type: input
     id: city
     attributes:
@@ -27,81 +24,60 @@ body:
       placeholder: e.g. Houston, TX
     validations:
       required: true
-  - type: dropdown
-    id: hazard
-    attributes:
-      label: Hazard scope
-      options:
-        - Flood (default — most NYC pebbles port directly)
-        - Heat
-        - Air quality
-        - Wildfire
-        - Other (describe below)
-    validations:
-      required: true
   - type: textarea
     id: data_portal
     attributes:
       label: Open-data portal
       description: |
-        URL of your jurisdiction's open-data portal + the platform it
-        runs (Socrata? CKAN? Other?). If Socrata or CKAN, the existing
-        adapter probably already works — list the resource IDs and the
-        spatial field name (`location` / `point` / lat-lon columns) for
-        the datasets you want to surface.
+        URL of your jurisdiction's open-data portal and the platform it
+        runs (Socrata, CKAN, other). If Socrata, the existing adapter
+        probably already works: list the resource IDs and the spatial
+        field name (`location`, `point` or lat-lon columns) for the
+        datasets you want to use.
       placeholder: |
-        https://data.cityofchicago.org — Socrata. 311: v6vf-nfxy, spatial field `location`.
+        https://data.cityofchicago.org (Socrata). 311: v6vf-nfxy, spatial field `location`.
     validations:
       required: true
   - type: textarea
     id: cornerstone
     attributes:
-      label: Cornerstone — hazard memory
+      label: "Cornerstone: hazard memory"
       description: |
         Local historical inundation extents, regional DEM, regulatory
-        floodplain maps. Include dataset URLs and licences. NWS alerts
-        and NOAA tide gauges port for free (federal pebbles).
+        floodplain maps. Include dataset URLs and licences. The FEMA
+        flood zone is a federal pebble and comes for free.
     validations:
       required: true
   - type: textarea
     id: keystone
     attributes:
-      label: Keystone — asset registers
+      label: "Keystone: asset registers"
       description: |
-        Transit, housing, education, healthcare polygons your jurisdiction
-        publishes. Often the same kind of Socrata table as the NYC ones —
-        same `socrata_records` adapter, different resource id.
+        Transit, housing, education and healthcare layers your
+        jurisdiction publishes, as points or polygons.
     validations:
       required: true
   - type: textarea
     id: touchstone
     attributes:
-      label: Touchstone — live observation
+      label: "Touchstone: live observation"
       description: |
-        Live sensors, complaint streams (most US cities publish 311 or
-        an equivalent via Socrata or CKAN — both adapters supported).
+        Live sensors and complaint streams. Most US cities publish 311
+        or an equivalent. A 311 feed needs a reviewed list of its
+        flood-related categories. NWS observations and USGS stream
+        gauges are federal pebbles. Name the nearest NOAA water-level
+        station and NWS observation station, since both are picked from
+        fixed lists in `app/context/`.
     validations:
       required: true
   - type: textarea
     id: lodestone
     attributes:
-      label: Lodestone — forecast
+      label: "Lodestone: forecast"
       description: |
-        Local NWS / hydrologic / surge models, tide gauges, time-series
-        fine-tunes you'd retrain. NWS alerts are a federal pebble; works
-        for any US address.
-    validations:
-      required: true
-  - type: dropdown
-    id: hardware
-    attributes:
-      label: Target inference hardware
-      options:
-        - AMD MI300X (or other ROCm)
-        - NVIDIA L4 / A10
-        - NVIDIA H100 / A100
-        - CPU-only (Ollama)
-        - Not decided
+        Local NWS water-level forecast gauges, regional surge or
+        hydrologic forecasts, sea-level projections. NWS alerts are a
+        federal pebble and work for any US address.
     validations:
       required: true
   - type: textarea
