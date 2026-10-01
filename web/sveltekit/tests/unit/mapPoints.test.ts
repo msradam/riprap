@@ -3,7 +3,7 @@
  * FeatureCollection, and the area outline is read from `final.area_boundary`.
  */
 import { describe, it, expect } from 'vitest';
-import { areaBoundaryGeometry, buildRegisterPointsFc, mapPointRows } from '$lib/client/runState.svelte';
+import { areaBoundaryGeometry, buildRegisterPointsFc, mapPointRows, RunState } from '$lib/client/runState.svelte';
 import type { FinalResult } from '$lib/client/agentStream';
 
 describe('mapPointRows', () => {
@@ -30,6 +30,24 @@ describe('mapPointRows', () => {
 
   it('is empty when there are no points', () => {
     expect(mapPointRows(undefined)).toEqual([]);
+  });
+
+  it('maps the schools of an area briefing, which have no distance', () => {
+    const final = {
+      paragraph: '',
+      doe_schools_nta: {
+        schools: [{ loc_name: 'P.S. 15', loc_code: 'K015', school_lat: 40.676, school_lon: -74.01,
+          distance_m: null, inside_sandy_2012: true, dep_extreme_2080_class: 0 }]
+      }
+    };
+    const areaFc = buildRegisterPointsFc(final);
+    expect(areaFc.features).toHaveLength(1);
+    expect(mapPointRows(areaFc)).toEqual([
+      { id: 'school-0', name: 'P.S. 15', distance: '', scenarios: 'Sandy 2012 extent' }
+    ]);
+    const run = new RunState();
+    run.applyFinal(final as FinalResult);
+    expect(run.mapPoints).toEqual([{ id: 'school-0', name: 'P.S. 15', meta: 'scenarios: Sandy 2012 extent' }]);
   });
 });
 

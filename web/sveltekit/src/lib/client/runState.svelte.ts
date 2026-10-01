@@ -127,9 +127,9 @@ export function buildRegisterPointsFc(fr: Rec): FeatureCollection {
     key: string, listKey: string, kind: string,
     lat: string, lon: string, name: (e: Rec) => string, docId: (e: Rec) => string
   ) => {
-    const block = fr[key] as Rec | null | undefined;
-    if (!block || !Array.isArray(block[listKey])) return;
-    (block[listKey] as Rec[]).forEach((e, i) => {
+    const list = block(fr, key)?.[listKey];
+    if (!Array.isArray(list)) return;
+    (list as Rec[]).forEach((e, i) => {
       const la = Number(e[lat]); const lo = Number(e[lon]);
       if (!Number.isFinite(la) || !Number.isFinite(lo)) return;
       features.push({
@@ -286,7 +286,8 @@ export function mapPointRows(fc: FeatureCollection | undefined): MapPointRow[] {
     return {
       id: String(p.pid),
       name: String(p.name ?? '?'),
-      distance: typeof p.distance_m === 'number' ? `${Math.round(p.distance_m)} m` : 'distance not given',
+      // An area briefing's points have no distance: the row shows none.
+      distance: typeof p.distance_m === 'number' ? `${Math.round(p.distance_m)} m` : '',
       scenarios: inside.join(', ') || 'none'
     };
   });
@@ -372,7 +373,7 @@ export class RunState {
   mapPoints = $derived<EvidencePointRow[]>([
     ...evidencePointRows(this.idaHwmFc, this.floodnetFc),
     ...mapPointRows(this.registerPointsFc).map((r) => ({
-      id: r.id, name: r.name, meta: `${r.distance}; scenarios: ${r.scenarios}`
+      id: r.id, name: r.name, meta: [r.distance, `scenarios: ${r.scenarios}`].filter(Boolean).join('; ')
     })),
     ...evidencePointRows(this.proxyFc)
   ]);
