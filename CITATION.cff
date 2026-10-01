@@ -17,8 +17,9 @@ url: "https://msradam.github.io/riprap/"
 abstract: >-
   Riprap gathers public flood evidence for a New York City address, a
   question about one, or a community district, and cites every sentence
-  to its source. NYC is the production deployment, with 35 public-record
-  city, state and federal sources; Chicago, Seattle and Albany are
+  to its source. NYC is the production deployment, with 23 public-record
+  city, state and federal sources (35 manifests: a source read for a point
+  and for an area has two); Chicago, Seattle and Albany are
   experimental deployments on the same code. With no model configured,
   the briefing is built directly from the data and a question is
   answered by rules over its words; an optional LLM can choose the
