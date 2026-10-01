@@ -21,6 +21,7 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { adaptFinalToFindings, dropUnfilled } from '$lib/client/cardAdapter';
+import { findingOf } from '$lib/client/briefingText';
 import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 import type { PebbleManifest, PebbleStone } from '$lib/stores/pebbleManifest.svelte';
 
@@ -159,6 +160,42 @@ describe('cardAdapter: an optional template clause', () => {
   });
 });
 
+/** A city 311 value (deployments/chicago/manifests/chicago_311.yaml):
+ *  `n_records` is the count after the flood filter, and `n_truncated`
+ *  says the fetch hit its limit before the filter. */
+describe('cardAdapter: a city 311 card states the backend sentence', () => {
+  const LIST_MANIFEST: PebbleManifest = {
+    ...SANDY_MANIFEST,
+    id: 'chicago_311',
+    display: { ...SANDY_MANIFEST.display, kind: 'list', variant: null },
+    narration: {
+      short: 'Flood-related Chicago 311 service requests within 200 m of this address.',
+      template: '{n_kept} of {n_before_phrase} Chicago 311 service requests within {radius_m} m of this address {filter_note}.',
+    },
+  };
+  const finding = (manifest: PebbleManifest, value: Record<string, unknown>) => {
+    seedManifest([manifest]);
+    const card = adaptFinalToFindings({ chicago_311: value, trace: [] } as never, null, 1.0)
+      .cards.find((c) => c.id === 'pebble-chicago_311');
+    return card && findingOf(card, manifest.narration.short)?.first;
+  };
+
+  it('says how many of the fetched requests are flood-related, with no "+" on the filtered count', () => {
+    expect(finding(LIST_MANIFEST, {
+      n_records: 3, n_truncated: true, radius_m: 200, sample: [{ sr_type: 'Water On Street Complaint' }],
+      n_before: 200, n_kept: 3, n_before_phrase: 'the latest 200', filter_note: 'are in categories reviewed as flood-related',
+    })).toBe('3 of the latest 200 Chicago 311 service requests within 200 m of this address are in categories reviewed as flood-related.');
+  });
+
+  it('marks a capped count where the sentence prints the count itself', () => {
+    const albany = { ...LIST_MANIFEST, narration: { ...LIST_MANIFEST.narration, template: 'Reports within {radius_m} m of this address: {n_records}.' } };
+    expect(finding(albany, { n_records: 100, n_truncated: true, radius_m: 800, sample: [{}] }))
+      .toBe('Reports within 800 m of this address: 100+.');
+    expect(finding(albany, { n_records: 12, n_truncated: false, radius_m: 800, sample: [{}] }))
+      .toBe('Reports within 800 m of this address: 12.');
+  });
+});
+
 describe('cardAdapter: absent sources and unfilled templates', () => {
   it('marks a pebble that never ran as Not run', () => {
     seedManifest([SANDY_MANIFEST]);
@@ -170,13 +207,11 @@ describe('cardAdapter: absent sources and unfilled templates', () => {
   it('never renders a line that still holds a {field} placeholder', () => {
     const card = dropUnfilled({
       id: 'x', stone: 'lodestone', tier: 'modeled', variant: 'scalars',
-      source: 'S', agency: 'A', vintage: 'v', title: 'T', docId: 'd',
+      source: 'S', vintage: 'v', title: 'T', docId: 'd',
       headline: '5.9 ft',
       sub: 'forecasts a peak water level of {forecast_peak_ft_mllw} ft',
-      metaRows: [{ k: 'a', v: '{narrative}' }, { k: 'b', v: '3' }],
     });
     expect(card.headline).toBe('5.9 ft');
     expect(card.sub).toBeUndefined();
-    expect(card.metaRows).toEqual([{ k: 'b', v: '3' }]);
   });
 });

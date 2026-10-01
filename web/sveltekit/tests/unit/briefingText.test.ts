@@ -4,7 +4,7 @@ import type { Card } from '$lib/types/card';
 
 const card = (over: Partial<Card>): Card => ({
   id: 'pebble-x', stone: 'cornerstone', tier: 'empirical', variant: 'headline',
-  source: 'Open Data', agency: 'Open Data', vintage: '2024-07-03', title: 'Dataset title', docId: 'x',
+  source: 'Open Data', vintage: '2024-07-03', title: 'Dataset title', docId: 'x',
   ...over
 });
 

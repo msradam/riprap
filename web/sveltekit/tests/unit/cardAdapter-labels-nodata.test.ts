@@ -16,11 +16,8 @@ describe('card labels and no-data sources', () => {
   // The gallery route's path: rebuild the run from the saved payload.
   const data = RunState.fromFinal(final, redHook.address).findingsData;
 
-  it('shows no raw field keys on scalar or meta cards', () => {
-    const labels = data.cards.flatMap((c) => [
-      ...(c.scalars ?? []).map((s) => s.label),
-      ...(c.metaRows ?? []).map((r) => r.k),
-    ]);
+  it('shows no raw field keys on scalar cards', () => {
+    const labels = data.cards.flatMap((c) => (c.scalars ?? []).map((s) => s.label));
     expect(labels.length).toBeGreaterThan(0);
     expect(labels.filter((l) => /_/.test(l))).toEqual([]);
   });
@@ -53,20 +50,21 @@ describe('card labels and no-data sources', () => {
   // range is a true zero, stays out of "no data" and says 0.
   const withMta = (mta: Record<string, unknown>) =>
     RunState.fromFinal({ ...final, mta_entrances: mta } as unknown as FinalResult, redHook.address).findingsData;
-  // Each register is its own card now; find the MTA register's row.
-  const mtaRow = (d: typeof data) =>
-    d.cards.filter((c) => c.variant === 'register').flatMap((c) => c.registers ?? []).find((r) => r.reg === 'MTA');
+  // Each register is its own card; `sub` is the line the page prints.
+  const mtaCard = (d: typeof data) => d.cards.find((c) => c.id === 'fsm-mta-entrances');
 
   it('an unreadable register is no data and says unavailable', () => {
     const d = withMta({ available: false });
     expect((d.noData ?? []).map((s) => s.id)).toContain('mta_entrances');
-    expect(mtaRow(d)?.note).toMatch(/was not available/);
+    expect(mtaCard(d)?.absent).toBe('Not available');
+    expect(mtaCard(d)?.sub).toMatch(/was not available/);
   });
 
   it('a register read with nothing in range says 0 and is not no data', () => {
     const d = withMta({ available: true, n_entrances: 0, n_inside_sandy_2012: 0, n_in_dep_extreme_2080: 0,
                         radius_m: 800, entrances: [] });
     expect((d.noData ?? []).map((s) => s.id)).not.toContain('mta_entrances');
-    expect(mtaRow(d)?.note).toBe('0 within 800 m');
+    expect(mtaCard(d)?.absent).toBeUndefined();
+    expect(mtaCard(d)?.sub).toMatch(/^No .+ within 800 m\.$/);
   });
 });

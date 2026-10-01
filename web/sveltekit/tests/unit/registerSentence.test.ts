@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { registerSentence } from '$lib/client/cardAdapter';
 
-const row = (label: string, detail: string | null) => ({ reg: 'NYCHA', tier: 'empirical' as const, label, detail, sourceId: null, note: null });
+const row = (label: string, detail: string | null) => ({ label, detail });
 
 describe('registerSentence', () => {
   it('states the count, the flags and the listed assets from the values returned', () => {

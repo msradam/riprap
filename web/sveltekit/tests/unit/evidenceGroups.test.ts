@@ -3,7 +3,7 @@ import { evidenceGroups, mergeDepScenarios, splitLead } from '$lib/client/briefi
 import type { Card, StoneKey } from '$lib/types/card';
 
 const card = (id: string, stone: StoneKey, citeId?: string): Card => ({
-  id, stone, tier: 'empirical', variant: 'headline', source: id, agency: id,
+  id, stone, tier: 'empirical', variant: 'headline', source: id,
   vintage: '2024', title: id, docId: id, citeId
 });
 

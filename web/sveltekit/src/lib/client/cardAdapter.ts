@@ -13,14 +13,13 @@
  * the TraceNode tree.
  *
  * Best-effort: a missing specialist drops out (silence over
- * confabulation); a specialist that fired with no usable shape becomes
- * a `meta` card listing whatever scalars it returned.
+ * confabulation).
  */
 import type {
   Card, CardVariant, FindingsData, ModelLine, StoneKey, StoneMember, StoneTrace
 } from '$lib/types/card';
 import type { TraceNode, TraceStatus } from '$lib/types/trace';
-import { citationList, type FinalResult, type ModelRow } from '$lib/client/agentStream';
+import type { FinalResult, ModelRow } from '$lib/client/agentStream';
 import { pebbleManifest, type PebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 
 /** Reasonable defaults — when the FSM doesn't supply a vintage, fall
@@ -42,8 +41,8 @@ export function shortSource(name: string): string {
   return head.trim();
 }
 
-/** Reader-facing labels for the value fields that scalar and meta cards
- *  show. Each label restates the field as the pebble's own narrative
+/** Reader-facing labels for the value fields that scalar cards show.
+ *  Each label restates the field as the pebble's own narrative
  *  describes it. A field with no label here is not shown: a snake_case
  *  key tells a reader nothing. */
 const FIELD_LABELS: Record<string, string> = {
@@ -104,7 +103,9 @@ const OPTIONAL_FIELDS = new Set(['edge_note']);
 
 function formatTemplate(template: string, value: unknown): string | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
-  const v = value as Record<string, unknown>;
+  const v = { ...(value as Record<string, unknown>) };
+  // As the backend sentence does: a count that hit the fetch limit reads "200+".
+  if (v.n_truncated === true && typeof v.n_records === 'number') v.n_records = `${v.n_records}+`;
   let missing = false;
   const out = template.replace(/\{(\w+)\}/g, (_, key: string) => {
     const x = v[key];
@@ -118,7 +119,7 @@ function formatTemplate(template: string, value: unknown): string | null {
 }
 
 const UNFILLED = /\{\w+\}/;
-const TEXT_FIELDS = ['headline', 'subhead', 'body', 'sub', 'sparkSub'] as const;
+const TEXT_FIELDS = ['headline', 'body', 'sub'] as const;
 
 /** Drop any card text line that still holds a `{field}` placeholder: an
  *  unfilled template is worse than no line. Every card passes through
@@ -132,8 +133,6 @@ export function dropUnfilled(card: Card): Card {
       out[k] = undefined;
     }
   }
-  const rows = card.metaRows?.filter((r) => !UNFILLED.test(r.v));
-  if (rows && rows.length !== card.metaRows?.length) out = { ...out, metaRows: rows };
   return out;
 }
 
@@ -276,9 +275,6 @@ function obj(v: unknown): Record<string, unknown> | null {
 // developments / schools / hospitals / items / features). The
 // renderer scans known field names; an explicit `items` array
 // always wins so future BYOD registers don't need a heuristic.
-//
-// `reg` label comes from the manifest icon or the first capitalized
-// token of the title — no per-id hardcoding.
 type RegisterItem = Record<string, unknown>;
 type RegisterValue = {
   available?: boolean;
@@ -300,22 +296,8 @@ function _itemsFromRegisterValue(v: RegisterValue): RegisterItem[] {
   return [];
 }
 
-function _regLabelFromManifest(m: PebbleManifest): string {
-  // Prefer a short SOURCE acronym from the manifest's source_name
-  // ("MTA — subway/rail entrances register" → "MTA"); else fall back
-  // to first capitalized token of the title.
-  const src = m.provenance.source_name;
-  const dashIdx = Math.min(...['—', '-', ':', ','].map(c => {
-    const i = src.indexOf(c);
-    return i < 0 ? Number.MAX_SAFE_INTEGER : i;
-  }));
-  const head = (dashIdx < Number.MAX_SAFE_INTEGER ? src.slice(0, dashIdx) : src).trim();
-  // If the head is short enough (≤6 chars) use it; else first word.
-  if (head.length > 0 && head.length <= 6) return head.toUpperCase();
-  return (head.split(/\s+/)[0] || m.id).toUpperCase().slice(0, 6);
-}
-
-function _itemRow(reg: string, item: RegisterItem): NonNullable<Card['registers']>[number] {
+/** An asset's name and what places it: its distance and subway routes. */
+function _itemRow(item: RegisterItem): { label: string; detail: string | null } {
   const label = (str(item.station_name) ?? str(item.development)
                 ?? str(item.loc_name) ?? str(item.facility_name)
                 ?? str(item.label) ?? str(item.name) ?? 'item');
@@ -324,14 +306,7 @@ function _itemRow(reg: string, item: RegisterItem): NonNullable<Card['registers'
   if (distance != null) detail_bits.push(`${Math.round(distance)} m`);
   const routes = str(item.daytime_routes);
   if (routes) detail_bits.push(routes);
-  const sourceId = (str(item.station_id) ?? str(item.tds_num)
-                    ?? str(item.loc_code) ?? str(item.fac_id)
-                    ?? str(item.source_id) ?? null);
-  return {
-    reg, tier: 'empirical',
-    label, detail: detail_bits.join(', ') || null,
-    sourceId, note: null,
-  };
+  return { label, detail: detail_bits.join(', ') || null };
 }
 
 /** "2 NYCHA developments", "1 NYCHA development". */
@@ -346,7 +321,7 @@ export function registerSentence(
   noun: string,
   v: Record<string, unknown>,
   items: RegisterItem[],
-  listed: NonNullable<Card['registers']>,
+  listed: { label: string; detail: string | null }[],
 ): string {
   const radius = num(v.radius_m);
   const within = radius != null ? `within ${radius} m` : 'within range';
@@ -362,93 +337,62 @@ export function registerSentence(
   return `${countOf(items.length, noun)} listed ${within}${flags ? `, ${flags}` : ''}${names ? nearest : ''}.`;
 }
 
-/** One register's card: its listed assets (up to four), its finding (the
- *  pebble's own narrative, which says whether it counts every asset in
- *  range or only flood-exposed ones) and its own citation and date. A
- *  register that could not be read is a muted absence, not a finding; one
- *  read with nothing in range reports 0. */
+/** One register's card: its finding (the pebble's own narrative, which
+ *  says whether it counts every asset in range or only flood-exposed
+ *  ones) and its own citation and date. A register that could not be read
+ *  is a muted absence, not a finding; one read with nothing in range
+ *  reports 0. */
 function buildRegisterCard(m: PebbleManifest, value: unknown): Card | null {
   const v = obj(value) as (RegisterValue & Record<string, unknown>) | null;
   if (!v) return null;
-  const reg = _regLabelFromManifest(m);
   const items = _itemsFromRegisterValue(v);
   const noun = m.title.replace(/\s+exposed nearby$/i, '');
-  const unavailable = v.available === false;
-  const radius = num(v.radius_m);
-  const listed = items.slice(0, 4).map((it) => _itemRow(reg, it));
-  const registers: NonNullable<Card['registers']> = items.length && !unavailable ? listed : [{
-    reg, tier: 'empirical', label: null, detail: null, sourceId: null,
-    note: unavailable
-      ? m.fallback.message ?? `The ${reg} list was not available when this briefing ran.`
-      : `0 within ${radius != null ? `${radius} m` : 'range'}`,
-  }];
   const said = str(v.narrative)?.replace(/\s*\[[a-z0-9_]+\]/g, '').trim();
-  const sentence = said || registerSentence(noun, v, items, listed);
+  const sentence = said || registerSentence(noun, v, items, items.slice(0, 4).map(_itemRow));
   const doc = m.provenance.doc_id ?? m.id;
   const card: Card = {
     id: `fsm-${m.id.replace(/_/g, '-')}`,
     stone: m.stone, tier: (m.tier ?? 'empirical') as Card['tier'], variant: 'register',
-    source: shortSource(m.provenance.source_name), agency: m.provenance.source_name,
+    source: shortSource(m.provenance.source_name),
     vintage: m.provenance.date_modified
       ?? (m.provenance.retrieved_at ? `retrieved ${m.provenance.retrieved_at}` : RIPRAP_VINTAGE),
     title: m.title,
-    registers,
     // Pebble narratives carry no closing stop.
     sub: /[.!?]$/.test(sentence) ? sentence : `${sentence}.`,
     docId: doc,
     citeId: doc,
-    mapLayer: 'registers',
   };
-  return unavailable ? { ...card, absent: 'Not available', sub: registers[0].note ?? undefined } : card;
+  return v.available === false
+    ? { ...card, absent: 'Not available',
+        sub: m.fallback.message ?? `The ${noun} list was not available when this briefing ran.` }
+    : card;
 }
 
 // ── Type-keyed histogram card renderer ──────────────────────────
 //
-// Pebbles that declare `display.variant: histogram` and emit a
-// normalized value shape:
-//   { n, histogram: number[], headline_value, subhead_text, narrative,
-//     radius_m?, years? }
-// nyc311 is the canonical case; future "count me over time" pebbles
-// get the same bespoke chrome by declaring the variant + emitting the shape.
+// Pebbles that declare `display.variant: histogram` and emit
+// `{ n, headline_value, narrative }`. nyc311 is the canonical case.
 type HistogramValue = {
   n?: number;
-  histogram?: number[];
   headline_value?: string;
-  subhead_text?: string;
   narrative?: string;
-  radius_m?: number;
-  years?: number;
 };
 
 function buildHistogramCard(m: PebbleManifest, value: unknown): Card | null {
   const t = value as HistogramValue | null;
   if (!t) return null;
+  // An honest negative ("0 complaints") still shows; the narrative explains the zero.
   const n = num(t.n) ?? 0;
-  // Honest negative ("0 complaints") still surfaces — same all-clear contract
-  // as the NWS / ida_hwm cards. The narrative explains the zero.
-  const hist = Array.isArray(t.histogram) ? t.histogram : [];
-  const headline = t.headline_value ?? `${n} complaint${n === 1 ? '' : 's'}`;
-  const radius = num(t.radius_m);
-  const years = num(t.years);
-  const sparkSub = (radius != null && years != null)
-    ? `Within ${radius} m, ${years} y window. Filtered to flood-relevant descriptors.`
-    : undefined;
-  const tier = (m.tier ?? 'proxy') as Card['tier'];
-  const source = shortSource(m.provenance.source_name);
   return {
     id: `fsm-${m.id.replace(/_/g, '-')}`,
-    stone: m.stone, tier, variant: 'histogram',
-    source, agency: m.provenance.source_name,
+    stone: m.stone, tier: (m.tier ?? 'proxy') as Card['tier'], variant: 'histogram',
+    source: shortSource(m.provenance.source_name),
     vintage: m.provenance.date_modified?.toString() ?? RIPRAP_VINTAGE,
     title: m.title,
-    headline,
-    subhead: t.subhead_text,
-    histogram: hist.length ? hist : Array.from({ length: 12 }, () => Math.round(n / 12)),
-    sparkSub,
+    headline: t.headline_value ?? `${n} complaint${n === 1 ? '' : 's'}`,
     sub: t.narrative,
     docId: m.provenance.doc_id ?? m.id,
     citeId: m.provenance.doc_id ?? m.id,
-    mapLayer: m.display.map_layer ? m.id : null,
   };
 }
 
@@ -476,34 +420,16 @@ export function modelLines(rows: ModelRow[] | undefined): ModelLine[] {
   });
 }
 
-function buildCapstoneMeta(final: FinalResult, wallSeconds?: number): Card {
-  // How the briefing was produced, read from final.grounding and
-  // final.compliance. `compliance` is a set of substring checks for
-  // required disclosure phrases, not a quality score.
+/** The capstone card: the models behind the briefing (`final.models`). */
+function buildCapstoneMeta(final: FinalResult): Card {
   const g = final.grounding;
   const isLlm = g?.tier === 'llm';
-  const kept = g?.claims?.length ?? 0;
-  const dropped = g?.dropped_claims?.length ?? 0;
-  const c = final.compliance;
-  const cites = citationList(final.citations).length;
   return {
     id: 'fsm-capstone-meta',
     stone: 'capstone', tier: 'modeled', variant: 'meta',
     source: isLlm ? 'LLM' : 'No LLM',
-    agency: isLlm
-      ? `Capstone synthesis with ${g?.model ?? 'LLM'}: ${g?.answer_mode === 'extractive'
-          ? 'answer quoted word for word, other claims checked against cited sources'
-          : 'claims checked against cited sources'}`
-      : 'Capstone synthesis: evidence briefing built from source values (no LLM)',
     vintage: RIPRAP_VINTAGE,
     title: 'How this briefing was written',
-    metaRows: [
-      { k: 'mode', v: isLlm ? `LLM${g?.model ? `: ${g.model}` : ''}` : 'evidence briefing (no LLM)' },
-      { k: 'claims checked', v: isLlm ? `${kept} kept, ${dropped} dropped` : 'n/a (no LLM)' },
-      { k: 'disclosure checks', v: c ? `${c.n_passed}/${c.n_total} present` : '—' },
-      { k: 'citations resolved', v: `${cites}` },
-      { k: 'wall-clock', v: wallSeconds != null ? `${wallSeconds.toFixed(1)} s` : '—' },
-    ],
     models: modelLines(final.models),
     sub: g?.fallback_reason
       ? `The LLM was unavailable (${g.fallback_reason}), so the evidence briefing is shown.`
@@ -523,11 +449,11 @@ function buildCapstoneMeta(final: FinalResult, wallSeconds?: number): Card {
  * Mapping from `display.kind` → CardVariant:
  *    text     → headline   (narration.short fills `headline`)
  *    stat     → scalars    (every numeric field becomes a scalar cell)
- *    list     → tabular    (features[] becomes rows)
+ *    list     → tabular    (the templated sentence)
  *    chart    → meta       (no canonical chart shape yet; falls back to meta)
  *    map_only → null       (no card body; data only appears on the map)
  *
- * Chrome (source / agency / title / docId / cites) comes from
+ * Chrome (source / title / docId / cites) comes from
  * `manifest.provenance` + `manifest.title`.
  */
 const KIND_TO_VARIANT: Record<PebbleManifest['display']['kind'], CardVariant | null> = {
@@ -593,12 +519,10 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
     tier,
     variant: variant ?? 'meta',
     source,
-    agency: m.provenance.source_name,
     vintage,
     title: m.title,
     docId: m.provenance.doc_id ?? m.id,
     citeId: m.provenance.doc_id ?? m.id,
-    mapLayer: m.display.map_layer ? m.id : null,
   };
   // No value: keep the pebble visible with its provenance, but as a muted
   // absence, not a finding. A step that errored, or ran and returned
@@ -703,68 +627,16 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
     return { ...base, scalars, sub: narrative ?? undefined };
   }
   if (variant === 'tabular') {
-    const v = value as {
-      features?: { properties?: Record<string, unknown>; distance_m?: number }[];
-      // socrata_records adapter and seeclickfix: summary-shape with
-      // n_records + a sample[] of plain row objects + top_by_*.
-      // n_truncated=true means n_records hit the SQL LIMIT cap, so
-      // the real count is >= n_records — render as "N+ records".
-      sample?: Record<string, unknown>[];
-      n_records?: number;
-      n_truncated?: boolean;
-      radius_m?: number;
-    };
-    // Path A — GeoJSON-style features
-    const feats = Array.isArray(v?.features) ? v.features : [];
-    if (feats.length) {
-      const cols = Object.keys(feats[0]?.properties ?? {});
-      const rows: (string | number)[][] = [];
-      for (const f of feats.slice(0, 8)) {
-        const row: (string | number)[] = [];
-        for (const c of cols) {
-          const val = f.properties?.[c];
-          row.push(typeof val === 'number' || typeof val === 'string' ? val : '—');
-        }
-        rows.push(row);
-      }
-      return { ...base, columns: cols.length ? cols : ['feature'], rows,
-               sub: `${feats.length} feature${feats.length === 1 ? '' : 's'} within range` };
+    // GeoJSON-style features: the count.
+    const feats = (value as { features?: unknown[] } | null)?.features;
+    if (Array.isArray(feats) && feats.length) {
+      return { ...base, sub: `${feats.length} feature${feats.length === 1 ? '' : 's'} within range` };
     }
-    // Path B: records summary shape (city 311 pebbles). Chicago,
-    // Seattle and Albany emit { n_records, sample, top_by_* }.
-    const sample = Array.isArray(v?.sample) ? v.sample : [];
-    if (sample.length) {
-      const cols = Object.keys(sample[0]);
-      const rows: (string | number)[][] = sample.slice(0, 8).map((row) =>
-        cols.map((c) => {
-          const val = row[c];
-          return typeof val === 'number' || typeof val === 'string' ? val : '—';
-        }),
-      );
-      // Humanize the column headers so the card reads "Type" instead
-      // of "sr_type". The raw API field names are kept on the
-      // underlying data; only the rendered header swaps.
-      const HEADER_LABELS: Record<string, string> = {
-        // Chicago Socrata 311
-        sr_type: 'Type', sr_short_code: 'Code',
-        status: 'Status', created_date: 'Opened',
-      };
-      const prettyCols = cols.map((c) => HEADER_LABELS[c] ?? c);
-      const n = v?.n_records ?? sample.length;
-      const nLabel = v?.n_truncated ? `${n}+` : String(n);
-      const rad = v?.radius_m;
-      return {
-        ...base, columns: prettyCols, rows,
-        sub: rad
-          ? `${nLabel} record${n === 1 ? '' : 's'} within ${rad} m`
-          : `${nLabel} record${n === 1 ? '' : 's'}`,
-      };
-    }
-    // No features or sample: fall back to the pebble's
-    // narration.template formatted against the value (e.g. nws_alerts
-    // returns {n_active: 0, alerts: [], narrative: "No active NWS..."};
-    // the narrative is the human-readable card body). If the template
-    // also can't format, render the manifest's fallback message.
+    // Otherwise the pebble's narration.template formatted against the
+    // value: a city 311 card states what the backend sentence states
+    // ("3 of 17 ... requests ... are in categories reviewed as
+    // flood-related"), and nws_alerts its own narrative. If the template
+    // cannot be filled, the manifest's fallback message.
     const tabularNarrative = m.narration.template
       ? formatTemplate(m.narration.template, value)
       : null;
@@ -773,17 +645,7 @@ function buildTemplated(m: PebbleManifest, value: unknown, failed = false): Card
              sub: m.fallback.message ?? 'No records within range' };
   }
   // meta fallback (chart pebbles without a special builder)
-  const metaRows: { k: string; v: string }[] = [];
-  if (typeof value === 'object' && value !== null) {
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      const label = FIELD_LABELS[k];
-      if (!label || v === null || typeof v === 'object') continue;
-      metaRows.push({ k: label, v: String(v) });
-      if (metaRows.length >= 6) break;
-    }
-  }
-  return { ...base, variant: 'meta', metaRows,
-           sub: m.narration.short ?? undefined };
+  return { ...base, variant: 'meta', sub: m.narration.short ?? undefined };
 }
 
 /** Public adapter. Combines per-specialist card builders with the trace
@@ -808,7 +670,7 @@ export function adaptFinalToFindings(
   // run summary is the one curated card, and only once there is
   // something to summarise.
   const curatedCards: Card[] = hasFinal
-    ? [buildCapstoneMeta((final ?? { paragraph: '' }) as FinalResult, wallSeconds)]
+    ? [buildCapstoneMeta((final ?? { paragraph: '' }) as FinalResult)]
     : [];
 
   // Phase 2 — templated cards for every manifest pebble that didn't get a

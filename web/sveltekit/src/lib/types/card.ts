@@ -47,21 +47,7 @@ export type CardVariant =
   | 'register'
   | 'meta';
 
-export type RegisterRow = {
-  reg: string;        // "MTA" | "NYCHA" | "DOE" | "DOH" | "PLUTO" | ...
-  tier: Tier;
-  /** When `label` is null the row renders as a silent — register fired but
-      had no hits. The note carries the silent reason. */
-  label: string | null;
-  detail: string | null;
-  sourceId: string | null;
-  vintage?: string | null;
-  note?: string | null;
-};
-
 export type ScalarCell = { value: string; label: string; unit?: string };
-
-export type MetaRow = { k: string; v: string };
 
 /** One line of the capstone "Models in this briefing" list. */
 export type ModelLine = {
@@ -84,7 +70,6 @@ export type Card = {
 
   /** Header chrome — always shown. */
   source: string;       // short label, e.g. "FEMA"
-  agency: string;       // long form, e.g. "Federal Emergency Management Agency"
   vintage: string;      // e.g. "2024-09" or "2024-Q3"
 
   /** Title row. */
@@ -93,10 +78,6 @@ export type Card = {
   /** Footer chrome — always shown. */
   docId: string;
   citeId?: string | null;
-
-  /** Map cross-link key. Hovering this card lights up the matching map
-   *  layer; hovering the layer outlines this card. */
-  mapLayer?: string | null;
 
   /** Set when the source produced nothing: a short label such as "Not
    *  available" or "Not run". The card renders as a muted absence line,
@@ -108,26 +89,13 @@ export type Card = {
 
   /** Variant-specific body fields. Only the relevant ones are populated. */
   headline?: string;
-  subhead?: string;
   body?: string;
   sub?: string;
-  sparkSub?: string;
-
-  // tabular
-  columns?: string[];
-  rows?: (string | number)[][];
 
   // scalars
   scalars?: ScalarCell[];
 
-  // histogram
-  histogram?: number[];
-
-  // register
-  registers?: RegisterRow[];
-
   // meta
-  metaRows?: MetaRow[];
   models?: ModelLine[];
 };
 
