@@ -46,8 +46,9 @@
   <p class="land-kind">Riprap, open beta</p>
   <h1>Flood-exposure briefings for New York City</h1>
   <p class="land-deck">
-    Riprap turns an address, a community district, or a flood question into a written briefing
-    on flood exposure.
+    Type a New York City address or community district. Riprap reads the public flood records
+    for that place and writes them up on one page, with the source and its date beside every
+    sentence.
   </p>
 
   {#if STATIC_SITE}

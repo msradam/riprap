@@ -20,8 +20,8 @@
  * Then:
  *   npx playwright test pages.spec.ts
  *
- * NYC is allotted longer than the rest because its 22 specialists
- * include the TTM and Prithvi cold-load. Other cities settle in ~5s.
+ * NYC is allotted longer than the rest because it reads the most
+ * sources. Other cities settle in ~5s.
  */
 import { test, expect, type Page } from '@playwright/test';
 
@@ -36,17 +36,11 @@ const CITIES: CityCase[] = [
   { key: 'nyc',     city: 'NYC',
     address: '189 Atlantic Avenue, Brooklyn, NY',
     timeoutMs: 120_000 },
-  { key: 'boston',  city: 'Boston',
-    address: '1 City Hall Square, Boston, MA',
-    timeoutMs: 45_000 },
   { key: 'chicago', city: 'Chicago',
     address: '233 S Wacker Drive, Chicago, IL',
     timeoutMs: 45_000 },
   { key: 'seattle', city: 'Seattle',
     address: '600 4th Avenue, Seattle, WA',
-    timeoutMs: 45_000 },
-  { key: 'sf',      city: 'San Francisco',
-    address: '1 Dr Carlton B Goodlett Place, San Francisco, CA',
     timeoutMs: 45_000 },
 ];
 
@@ -133,11 +127,11 @@ test('out-of-coverage (Albuquerque) renders the neutral chip', async ({ page }) 
   }
 });
 
-test('landing page renders all 5 city pills + the standards strip', async ({ page }) => {
+test('landing page names every shipped city + the standards strip', async ({ page }) => {
   await page.goto('/');
 
-  for (const c of CITIES) {
-    await expect(page.locator('body')).toContainText(c.city);
+  for (const city of [...CITIES.map((c) => c.city), 'Albany']) {
+    await expect(page.locator('body')).toContainText(city);
   }
   // Standards strip is a load-bearing trust signal.
   await expect(page.locator('body')).toContainText(/WCAG|USWDS/);

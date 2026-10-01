@@ -16,7 +16,7 @@
 
 <svelte:head>
   <title>Riprap: flood-exposure briefings for New York City</title>
-  <meta name="description" content="Riprap composes federal, state, and city open data into a written flood-exposure briefing in which every claim cites a public record. Open source, Apache-2.0. New York City is in production; Chicago, Seattle, San Francisco, Boston and Albany are experimental." />
+  <meta name="description" content="Riprap reads the public flood records for a New York City address or community district and writes them up on one page, with the source and date beside every sentence. Open source, Apache-2.0. New York City is in production; Chicago, Seattle and Albany are experimental." />
 </svelte:head>
 
 <div class="land">

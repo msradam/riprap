@@ -29,15 +29,30 @@ describe('Landing smoke', () => {
   it('CityPicker links every shipped city', () => {
     const { container } = render(CityPicker);
     const text = container.textContent ?? '';
-    for (const city of ['NYC', 'Boston', 'Chicago', 'Seattle', 'San Francisco', 'Albany']) {
+    for (const city of ['NYC', 'Chicago', 'Seattle', 'Albany']) {
       expect(text, `CityPicker missing ${city}`).toContain(city);
     }
-    expect(container.querySelectorAll('a')).toHaveLength(6);
+    expect(container.querySelectorAll('a')).toHaveLength(4);
   });
 
   it('UseBand says evidence, not advice', () => {
     const { container } = render(UseBand);
     expect(container.textContent).toContain('Riprap returns evidence, not advice.');
+  });
+
+  it('UseBand says what Riprap is for first, and links the tools that do other jobs better', () => {
+    const { container } = render(UseBand);
+    expect([...container.querySelectorAll('h2')].map((h) => h.textContent)).toEqual([
+      'What Riprap is for, and what it is not',
+      'Riprap returns evidence, not advice.'
+    ]);
+    expect([...container.querySelectorAll('li a')].map((a) => a.getAttribute('href'))).toEqual([
+      'https://dataviz.floodnet.nyc/',
+      'https://www.weather.gov/okx/',
+      'https://a858-nycnotify.nyc.gov/',
+      'https://msc.fema.gov/portal/home',
+      'https://www.floodhelpny.org/'
+    ]);
   });
 
   it('LandStones names all five Stones', () => {

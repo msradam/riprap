@@ -2,7 +2,7 @@
   import { resolve } from '$app/paths';
 
   /** One sample address per shipped city, as plain links. New York City
-   *  is the production deployment; the other five are experimental.
+   *  is the production deployment; the other three are experimental.
    *  Anchors match probe_cities.py's smoke-test addresses so what loads
    *  here is identical to what `scripts/probe_cities.py` exercises in CI. */
 
@@ -10,8 +10,6 @@
     { city: 'NYC', address: '189 Atlantic Avenue, Brooklyn, NY', experimental: false },
     { city: 'Chicago', address: '233 S Wacker Dr, Chicago, IL', experimental: true },
     { city: 'Seattle', address: '2100 5th Ave, Seattle, WA', experimental: true },
-    { city: 'San Francisco', address: '1 Dr Carlton B Goodlett Pl, San Francisco, CA', experimental: true },
-    { city: 'Boston', address: '1 City Hall Square, Boston, MA', experimental: true },
     { city: 'Albany', address: '25 Erie Blvd, Albany, NY', experimental: true }
   ];
 
@@ -21,8 +19,8 @@
 <section class="land-section" aria-labelledby="cities-h">
   <h2 id="cities-h">Cities</h2>
   <p>
-    New York City is in production; Chicago, Seattle, San Francisco, Boston and Albany are
-    experimental. Each link briefs one sample address.
+    New York City is in production; Chicago, Seattle and Albany are experimental. Each link
+    briefs one sample address.
   </p>
   <ul>
     {#each CITIES as c (c.city)}
