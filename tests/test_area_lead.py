@@ -17,10 +17,12 @@ STATE = {"sandy_nta": {"fraction": 0.0075},
 
 def test_district_lead_is_cited_and_checked():
     lead = _area_lead(STATE, ITEMS)
-    assert lead == ("0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_nta]. "
+    # The same three sentences, the reported record first: for an inland
+    # district the Sandy share is the smallest number and it used to lead.
+    assert lead == ("4263 flood-related 311 complaints were filed inside this area in the last 3 years [nyc311_nta]. "
                     "16.4% is modeled to flood from rainfall in the DEP extreme scenario for 2080 sea-level rise "
-                    "[dep_extreme_2080_nta]. 4263 flood-related 311 complaints were filed inside this area in the "
-                    "last 3 years [nyc311_nta].")
+                    "[dep_extreme_2080_nta]. 0.8% of this area lies inside the 2012 Sandy inundation extent "
+                    "[sandy_nta].")
 
 
 def test_coastal_district_lead_states_the_rainfall_share_not_the_tide():
