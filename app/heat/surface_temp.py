@@ -96,9 +96,9 @@ def _summary(geom_4326, where: str) -> dict | None:
     last_img, last_d = diffs[-1]
     first, last = diffs[0][0]["time_utc"][:10], last_img["time_utc"][:10]
     latest_f = round(last_img["city_land_mean_f"] + last_d, 1)
-    if lo > 0 or hi < 0:
-        spread = f"image by image it ran from {abs(lo if lo > 0 else hi):.1f} to {abs(hi if lo > 0 else lo):.1f}°F " \
-                 f"{'warmer' if lo > 0 else 'cooler'}"
+    if lo >= 0 or hi <= 0:  # a rounded 0.0 reads "from 0.0 to 4.7°F warmer", not "0.0°F cooler"
+        spread = f"image by image it ran from {abs(lo if hi > 0 else hi):.1f} to {abs(hi if hi > 0 else lo):.1f}°F " \
+                 f"{'warmer' if hi > 0 else 'cooler'}"
     else:
         spread = f"image by image it ran from {abs(lo):.1f}°F cooler to {hi:.1f}°F warmer"
     narrative = (f"Landsat measured the surface of {where} {_diff(mean)} the city's land average, over "

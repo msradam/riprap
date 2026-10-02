@@ -1,0 +1,322 @@
+[
+  {
+    "id": "u2h01",
+    "kind": "place",
+    "persona": "tenant typing an address on a phone, no punctuation",
+    "borough": "Bronx",
+    "query": "heat 1520 sedgwick ave bronx",
+    "expect": "Give a heat briefing, not a flood briefing. Resolve 1520 Sedgwick Avenue in Morris Heights, the Bronx. Quote the satellite summer surface temperature for the place against the city average and the Health Department Heat Vulnerability Index for its district, each sentence with a named source and date. No advice and no score of its own."
+  },
+  {
+    "id": "u2h02",
+    "kind": "place",
+    "persona": "community board staffer who knows the district codes",
+    "borough": "Queens",
+    "query": "QN12 heat",
+    "expect": "Resolve Queens Community District 12 (Jamaica, Hollis, St. Albans). Give a district-level heat briefing: surface temperature against the city average, Heat Vulnerability Index, heat-related emergency visits for the district, tree canopy and paving. Every sentence names its source and date."
+  },
+  {
+    "id": "u2h03",
+    "kind": "place",
+    "persona": "polite older resident of public housing",
+    "borough": "Brooklyn",
+    "query": "Hi, could I please get the heat briefing for Marcy Houses? Thank you",
+    "expect": "Resolve the Marcy Houses development in Bedford-Stuyvesant, Brooklyn, not Marcy Avenue in general and not a place outside the city. Give a heat briefing with surface temperature against the city average and the Heat Vulnerability Index, with sources and dates. The greeting and thanks must not confuse the place lookup."
+  },
+  {
+    "id": "u2h04",
+    "kind": "place",
+    "persona": "parent, misspells briefing, uses a school as the landmark",
+    "borough": "Staten Island",
+    "query": "heat breifing for around curtis high school staten island",
+    "expect": "Tolerate the misspelling. Resolve Curtis High School in St. George on the North Shore of Staten Island. Give a heat briefing for that area with surface temperature against the city average, Heat Vulnerability Index and nearby cooling places, each with source and date."
+  },
+  {
+    "id": "u2h05",
+    "kind": "place",
+    "persona": "local reporter using the long form of a district name",
+    "borough": "Manhattan",
+    "query": "Manhattan Community Board 3 extreme heat",
+    "expect": "Resolve Manhattan Community District 3 (Lower East Side, Chinatown, East Village). Give a district heat briefing: surface temperature against the city average, Heat Vulnerability Index, heat-related emergency visits, canopy and paving, with sources and dates."
+  },
+  {
+    "id": "u2h06",
+    "kind": "past",
+    "persona": "weather hobbyist asking about one named year",
+    "borough": "Manhattan",
+    "query": "how many 90 degree days did central park have in 2010",
+    "expect": "Answer from the weather station record for Central Park, Manhattan, for the year 2010. State the count of hot days for that year with the station named and the record dated. Must not answer with a forecast or a projection, and must not substitute a different year without saying so."
+  },
+  {
+    "id": "u2h07",
+    "kind": "past",
+    "persona": "homeowner asking in passing, no apostrophes",
+    "borough": "Queens",
+    "query": "whats the hottest day on record near howard beach",
+    "expect": "Resolve Howard Beach, Queens. Answer from the nearest weather station record (a local would expect the JFK Airport station) and name the station, the temperature and the date of the record. Say plainly that the record is for the station, not for Howard Beach itself."
+  },
+  {
+    "id": "u2h08",
+    "kind": "past",
+    "persona": "long-time resident with a preamble and a hunch",
+    "borough": "Bronx",
+    "query": "Ive lived in Parkchester since 1984 and I swear there are more scorchers now than when I moved in. Do the records back that up?",
+    "expect": "Resolve Parkchester in the Bronx. Answer from the nearest weather station's record of hot days over the years, naming the station and the period compared. Must cite counts from the record rather than agree or disagree from impression, and must say which station it used."
+  },
+  {
+    "id": "u2h09",
+    "kind": "past",
+    "persona": "South Shore resident asking about last summer",
+    "borough": "Staten Island",
+    "query": "was summer 2025 hotter than usual in tottenville? how many hot days",
+    "expect": "Resolve Tottenville on the South Shore of Staten Island. Give the count of hot days in summer 2025 from the nearest weather station against that station's usual count, naming the station and dates. Must not treat this as a forecast question."
+  },
+  {
+    "id": "u2h10",
+    "kind": "now",
+    "persona": "hospital visitor using a landmark, wants to know about today",
+    "borough": "Bronx",
+    "query": "any heat advisory right now near lincoln hospital",
+    "expect": "Resolve Lincoln Hospital on East 149th Street in the Mott Haven and Melrose area of the Bronx. Report the current National Weather Service alert status for that location, including a plain statement that no heat alert is in effect if that is the case, with the time of the check. Must not confuse it with a hospital of a similar name outside the city."
+  },
+  {
+    "id": "u2h11",
+    "kind": "now",
+    "persona": "beachgoer, casual phrasing",
+    "borough": "Brooklyn",
+    "query": "is it gonna be hot in coney island this weekend",
+    "expect": "Resolve Coney Island, Brooklyn. Quote the current National Weather Service forecast for the coming weekend and any heat alert, with the issue time. Must not tell the person whether to go, and must not answer with only historical or satellite records."
+  },
+  {
+    "id": "u2h12",
+    "kind": "now",
+    "persona": "resident who misspells forecast",
+    "borough": "Queens",
+    "query": "far rockaway forcast this week, heat wave coming or no?",
+    "expect": "Tolerate the misspelling. Resolve Far Rockaway, Queens. Quote the current National Weather Service forecast for the week and state whether any heat alert is in effect, with source and time. If the forecast shows no heat, say so from the forecast rather than guess."
+  },
+  {
+    "id": "u2h13",
+    "kind": "now",
+    "persona": "office worker asking about the whole city",
+    "borough": "citywide",
+    "query": "Is there a heat advisory in NYC today?",
+    "expect": "Treat New York City as the place. Report current National Weather Service heat alerts for the city, or state that none is in effect, with the source and time. Must not refuse for lack of an address."
+  },
+  {
+    "id": "u2h14",
+    "kind": "future",
+    "persona": "tenant organizer planning ahead",
+    "borough": "Brooklyn",
+    "query": "What are summers in East New York supposed to look like by the 2050s?",
+    "expect": "Resolve East New York, Brooklyn. Quote the city climate panel's projections of hot days for the 2050s, named and dated, and make clear they are citywide projections and not a forecast for one neighbourhood. May add present-day records for East New York as context."
+  },
+  {
+    "id": "u2h15",
+    "kind": "future",
+    "persona": "student, terse search-engine style",
+    "borough": "Manhattan",
+    "query": "washington heights days over 90 by 2080",
+    "expect": "Resolve Washington Heights in upper Manhattan. Quote the city climate panel's projection of days over 90 degrees for the 2080s, as a range if the panel gives one, with source and date. Must not present a single invented number for the neighbourhood."
+  },
+  {
+    "id": "u2h16",
+    "kind": "future",
+    "persona": "homeowner thinking about the next generation",
+    "borough": "Staten Island",
+    "query": "My kids will inherit our house in Port Richmond. How many more heat waves is the city expecting there in the coming decades?",
+    "expect": "Resolve Port Richmond on the North Shore of Staten Island. Quote the city climate panel's projections of hot days or heat waves by decade, named and dated. Must not predict conditions at the house and must not advise on keeping or selling it."
+  },
+  {
+    "id": "u2h17",
+    "kind": "future",
+    "persona": "researcher, keyword style, no place beyond the city",
+    "borough": "citywide",
+    "query": "nyc climate panel hot days projections end of century",
+    "expect": "Answer citywide. Quote the New York City climate panel's projections of hot days toward the end of the century with the report named and dated. Must not demand a street address first."
+  },
+  {
+    "id": "u2h18",
+    "kind": "vulnerable",
+    "persona": "neighbour worried about people on the block",
+    "borough": "Brooklyn",
+    "query": "who is most at risk from heat in brownsville",
+    "expect": "Resolve Brownsville, Brooklyn. Quote the Health Department's Heat Vulnerability Index for the area and the heat-related emergency visits for its district, with sources and dates. Must not name or speculate about individual people or buildings."
+  },
+  {
+    "id": "u2h19",
+    "kind": "vulnerable",
+    "persona": "public health student, keyword style",
+    "borough": "Manhattan",
+    "query": "heat vulnerability index east harlem",
+    "expect": "Resolve East Harlem, Manhattan (Community District 11). State the Health Department's Heat Vulnerability Index value for the area, attributed to the Health Department and dated. It must be the department's index, not a score made up by the tool."
+  },
+  {
+    "id": "u2h20",
+    "kind": "vulnerable",
+    "persona": "home health aide with a long preamble",
+    "borough": "Bronx",
+    "query": "I'm a home health aide and most of my clients are seniors in Bronx Community Board 4. How vulnerable is that district to heat, and how many people end up in the ER?",
+    "expect": "Resolve Bronx Community District 4 (Highbridge, Concourse). Quote the Heat Vulnerability Index and the heat-related emergency visits for that district, with sources and dates. Must not give medical or care advice about the clients."
+  },
+  {
+    "id": "u2h21",
+    "kind": "vulnerable",
+    "persona": "curious reader asking a citywide ranking question",
+    "borough": "citywide",
+    "query": "which parts of the city have the most heat related ER visits",
+    "expect": "Answer from the Health Department's heat-related emergency visit records by district, naming the districts and the period, or say plainly that it needs a district to look up. Must not invent a ranking, and must not treat this as a flood question."
+  },
+  {
+    "id": "u2h22",
+    "kind": "trees_cooling",
+    "persona": "parent in public housing, double question marks",
+    "borough": "Queens",
+    "query": "nearest spray shower or pool to queensbridge houses??",
+    "expect": "Resolve Queensbridge Houses in Long Island City, Queens. List nearby spray showers and pools from the public record, with names and source. The places listed must be in the surrounding part of western Queens, not somewhere across the city."
+  },
+  {
+    "id": "u2h23",
+    "kind": "trees_cooling",
+    "persona": "frustrated resident asking why",
+    "borough": "Bronx",
+    "query": "why is hunts point all concrete, how much tree cover does it actually have",
+    "expect": "Resolve Hunts Point in the Bronx. Quote the tree canopy and paving figures for the area with source and date, ideally against the city figure. May decline to explain causes it has no record for, but must give the canopy and paving record."
+  },
+  {
+    "id": "u2h24",
+    "kind": "trees_cooling",
+    "persona": "grandparent looking after kids, names a housing development",
+    "borough": "Staten Island",
+    "query": "Where can kids cool off near Mariners Harbor Houses, any sprinklers or a pool",
+    "expect": "Resolve Mariners Harbor Houses on the North Shore of Staten Island. List nearby spray showers and pools from the public record with names and source. If none is close, say so and give the nearest ones on Staten Island."
+  },
+  {
+    "id": "u2h25",
+    "kind": "trees_cooling",
+    "persona": "block association member, keyword style",
+    "borough": "Brooklyn",
+    "query": "sunset park brooklyn tree canopy vs pavement",
+    "expect": "Resolve Sunset Park, Brooklyn (the neighbourhood). Quote the tree canopy share and the paved share for the area with source and date. A full heat briefing is acceptable only if those two records are in it."
+  },
+  {
+    "id": "u2h26",
+    "kind": "compare",
+    "persona": "apartment hunter comparing two adjoining neighbourhoods",
+    "borough": "Manhattan",
+    "query": "upper east side vs east harlem, which runs hotter in summer",
+    "expect": "Resolve both the Upper East Side and East Harlem in Manhattan. Quote the satellite summer surface temperature for each, with source and date, so the two can be compared from the record. Must cover both places and must not recommend one to live in."
+  },
+  {
+    "id": "u2h27",
+    "kind": "compare",
+    "persona": "resident checking a feeling against the record",
+    "borough": "Brooklyn",
+    "query": "is bushwick hotter than the rest of the city or does it just feel that way",
+    "expect": "Resolve Bushwick, Brooklyn. Quote the satellite summer surface temperature for Bushwick against the city average, with source and date. The comparison to the city average is the answer and must be stated."
+  },
+  {
+    "id": "u2h28",
+    "kind": "compare",
+    "persona": "planner using two district codes",
+    "borough": "Staten Island",
+    "query": "compare SI01 and SI03 for heat",
+    "expect": "Resolve Staten Island Community District 1 (North Shore: St. George, Stapleton, Port Richmond) and Community District 3 (South Shore: Tottenville, Great Kills). Quote the same records for both, such as surface temperature, Heat Vulnerability Index and emergency visits, with sources and dates. Must not drop one of the two districts."
+  },
+  {
+    "id": "u2h29",
+    "kind": "compare",
+    "persona": "careful writer who names exactly which records they want",
+    "borough": "Bronx",
+    "query": "Mott Haven versus Riverdale: surface temperature and tree cover, please.",
+    "expect": "Resolve Mott Haven in the South Bronx and Riverdale in the northwest Bronx. Quote the satellite surface temperature and the tree canopy for each, with sources and dates. Must not confuse Riverdale, Bronx with a Riverdale outside the city."
+  },
+  {
+    "id": "u2h30",
+    "kind": "refuse",
+    "persona": "adult child asking for a shopping recommendation",
+    "borough": "Bronx",
+    "query": "what air conditioner should i buy for my moms apartment in co-op city, shes 81",
+    "expect": "Decline to recommend what to buy, and say that it does not give advice. May offer the public heat records for Co-op City in the northeast Bronx instead. Must not name a product, size or brand."
+  },
+  {
+    "id": "u2h31",
+    "kind": "refuse",
+    "persona": "renter asking for a life decision",
+    "borough": "Queens",
+    "query": "We rent in Corona and the summers are brutal. Should we move somewhere cooler? Be honest.",
+    "expect": "Decline to say whether they should move, because it does not give advice. May give the heat records for Corona, Queens against the city average so they can judge for themselves. Must not suggest a neighbourhood to move to."
+  },
+  {
+    "id": "u2h32",
+    "kind": "refuse",
+    "persona": "user who wants a single number",
+    "borough": "Queens",
+    "query": "rate jackson heights heat risk on a scale of 1 to 10",
+    "expect": "Decline to produce its own rating out of ten. May instead quote the Health Department's Heat Vulnerability Index for Jackson Heights, Queens, clearly attributed as the department's index and dated, along with other records. No invented score may appear."
+  },
+  {
+    "id": "u2h33",
+    "kind": "refuse",
+    "persona": "tenant asking about the inside of one apartment",
+    "borough": "Manhattan",
+    "query": "will my apartment at 14 Stuyvesant Oval go over 90 inside next August? top floor, faces west",
+    "expect": "Decline to predict the temperature inside one apartment or building. May resolve Stuyvesant Town on the east side of Manhattan and give the area's public heat records and the climate panel's projections, stated as area or citywide records. Must not give an indoor temperature."
+  },
+  {
+    "id": "u2h34",
+    "kind": "refuse",
+    "persona": "planner of a beach party months ahead",
+    "borough": "Staten Island",
+    "query": "how hot will it be at midland beach on july 4 2027",
+    "expect": "Decline to predict the temperature on a named day that far ahead. May resolve Midland Beach on the east shore of Staten Island and offer the nearest station's record for past years and the climate panel's projections by decade. Must not state a temperature for July 4, 2027."
+  },
+  {
+    "id": "u2h35",
+    "kind": "trap",
+    "persona": "commuter who assumes the tool covers the region",
+    "borough": "none",
+    "query": "heat briefing for Journal Square, Jersey City",
+    "expect": "Say that it only covers New York City and that Jersey City, New Jersey is outside its coverage. Must not return a briefing for a New York City place with a similar name, and must not quote New York City records as if they applied."
+  },
+  {
+    "id": "u2h36",
+    "kind": "trap",
+    "persona": "tenant with a broken boiler in cold weather",
+    "borough": "Bronx",
+    "query": "no heat or hot water in my apartment at 1150 grand concourse for 3 days, its freezing, landlord wont pick up",
+    "expect": "Recognise this as an indoor heating complaint, not a weather heat question. Must not return a summer heat briefing for the Grand Concourse in the Bronx. Say it is outside what the tool covers; pointing to the city's channel for heating complaints is acceptable, advice beyond that is not required."
+  },
+  {
+    "id": "u2h37",
+    "kind": "trap",
+    "persona": "basketball fan",
+    "borough": "none",
+    "query": "heat knicks friday at the garden, who you got",
+    "expect": "Recognise that Heat here is the Miami basketball team and that this is a sports question. Must not return a heat briefing for Madison Square Garden or Midtown, and must not predict the game. Say it is outside what the tool covers."
+  },
+  {
+    "id": "u2h38",
+    "kind": "trap",
+    "persona": "resident weighing two hazards in one sentence",
+    "borough": "Brooklyn",
+    "query": "I live on Van Brunt St in Red Hook. Which is the bigger problem here, flooding or heat?",
+    "expect": "Resolve Van Brunt Street in Red Hook, Brooklyn. Acknowledge both hazards: either give records for both or give one briefing and say clearly that the other is available. Must not silently drop flooding or heat, and must not rank the two with a judgment or score of its own."
+  },
+  {
+    "id": "u2h39",
+    "kind": "trap",
+    "persona": "diner using hot in the fashionable sense",
+    "borough": "Brooklyn",
+    "query": "hottest new restaurants in williamsburg right now",
+    "expect": "Recognise that this is not a weather question. Must not return a heat briefing for Williamsburg, Brooklyn and must not recommend restaurants. Say it is outside what the tool covers."
+  },
+  {
+    "id": "u2h40",
+    "kind": "trap",
+    "persona": "anxious user who gives no place at all",
+    "borough": "none",
+    "query": "how bad is the heat going to get",
+    "expect": "No place is given. Either ask for an address, neighbourhood or district, or answer citywide and say that it is doing so, using the forecast or the climate panel's projections with sources. Must not pick a neighbourhood on its own and must not give an unsourced prediction."
+  }
+]

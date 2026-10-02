@@ -41,7 +41,7 @@ _BORO_NUM_RE = re.compile(rf"^\s*{_BORO_WORDS}\s+(\d{{1,2}})\s*[?.!]?\s*$", re.I
 
 _SUFFIX = (r"(?:street|st|avenue|ave|av|boulevard|blvd|road|rd|place|pl|drive|dr|lane|ln|parkway|pkwy|terrace|ter"
            r"|court|ct|way|plaza|plz|square|sq|highway|hwy|expressway|expy|turnpike|tpke|loop|walk|row|crescent"
-           r"|circle|path|slip|alley|broadway|bowery|concourse)")
+           r"|circle|path|slip|alley|broadway|bowery|concourse|oval)")
 # Street words need a letter and are never a preposition, so "311 near 200
 # Water Street" finds "200 Water Street", not "311 near 200 Water Street".
 _STREET_WORD = r"(?!(?:near|at|in|on|around|of|for|by|from|to|and|or)\b)[A-Za-z0-9'.]*[A-Za-z][A-Za-z0-9'.]*"
@@ -204,6 +204,8 @@ def place_phrase(text: str) -> str | None:
             found.append(phrase)
     # A named building or park ("Wagner Houses", "Crotona Park") is the place,
     # before any neighbourhood word elsewhere in the question.
+    # An acronym is not a place to guess at: "ER" (in "ER visits") once matched GramERcy by substring.
+    found = [f for f in found if len(f) > 3 or f.lower() in nta.ALIASES]
     named = next((f for f in found if _NAMED_PLACE_RE.search(f) and f.lower() not in _known_neighbourhoods()), None)
     if named:
         return named

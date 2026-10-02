@@ -334,6 +334,8 @@ def _and(items: list[str]) -> str:
 LIVE_POINTER = ("Riprap reads records, not the street. For a live depth reading use the FloodNet dashboard "
                 "(dataviz.floodnet.nyc); official warnings come from the National Weather Service "
                 "(weather.gov) and Notify NYC.")
+BOTH_HAZARDS = ("This question names flooding and heat. Riprap keeps them as separate briefings and does not weigh one "
+                "against the other: this is the flood record, and asking about heat alone at this place gives the heat record.")
 HEAT_LIVE_POINTER = ("Riprap reads records, not the street. Official heat warnings come from the National Weather "
                      "Service (weather.gov/okx) and Notify NYC; during a heat emergency the city lists its cooling "
                      "centers at finder.nyc.gov/coolingcenters.")
@@ -396,8 +398,12 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
                             for d in docs if d.section == sec)
         parts.append(f"**{sec}.**\n" + (body or NO_EVIDENCE_LINE))
     pointer = HEAT_LIVE_POINTER if heat_answer.hazard_of(question) == "heat" else LIVE_POINTER
-    parts.append(NON_SCOPE_FOOTER.replace("**Out of scope.** ", f"**Out of scope.** {pointer} ", 1)
-                 if now else NON_SCOPE_FOOTER)
+    footer = NON_SCOPE_FOOTER.replace("**Out of scope.** ", f"**Out of scope.** {pointer} ", 1) if now else NON_SCOPE_FOOTER
+    if question and heat_answer.hazard_of(question) == "flood" and heat_answer.HEAT_RE.search(question) \
+            and not heat_answer.INDOOR_HEATING_RE.search(question):
+        # "Which is the bigger problem here, flooding or heat?" got the flood record and no word about heat.
+        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {BOTH_HAZARDS} ", 1)
+    parts.append(footer)
     return "\n\n".join(parts)
 
 

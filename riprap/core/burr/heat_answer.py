@@ -39,7 +39,7 @@ import re
 HEAT_RE = re.compile(
     r"\bheat(?:[- ]?waves?)?\b(?!\s*(?:and|&|/|or)\s*hot water)|\boverheat|\bhot(?:ter|test)?\b(?!\s+water)|\btemperatures?\b"
     r"|\bcooling (?:cent(?:er|re)s?|sites?)\b|\bcool (?:off|down)\b|\bspray showers?\b|\b(?:public|swimming) pools?\b"
-    r"|\bswelter|\b(?:8[5-9]|9\d|1[01]\d)[- ]?(?:°|degrees?\b|deg\b)|\bair[- ]condition"
+    r"|\bswelter|\bscorch|\b(?:8[5-9]|9\d|1[01]\d)[- ]?(?:°|degrees?\b|deg\b)|\bair[- ]condition"
     r"|\bdays? (?:above|over|at or above) (?:8[5-9]|9\d|1[01]\d)\b|\b(?:cooler|coolest|warmer|warmest)\b"
     # Found by questions written without sight of these rules: "air temp", "will it be over 95", "hit 90 or
     # above", "forecast highs", "cool places", "what will summers be like".
@@ -54,8 +54,14 @@ INDOOR_HEATING = ("This reads as a question about indoor heating (no heat or hot
                   "311) and are enforced by the Department of Housing Preservation and Development.")
 
 # The basketball team: "what time is the Heat game at Barclays Center".
-SPORT_RE = re.compile(r"\bmiami heat\b|\bheat (?:game|tickets?)\b|\bthe Heat\b(?-i:(?<=Heat))(?= (?:game|play|are|vs|beat|lost|won))", re.I)
-NOT_WEATHER = ("This reads as a question about the Miami Heat, not the weather. Riprap reports flood and heat records "
+_TEAMS = r"(?:knicks|nets|celtics|lakers|bulls|sixers|76ers|nba|playoffs?)"
+# The basketball team, and "hot" as fashionable ("hottest new restaurants"). Not "hot spots": those can be heat.
+# ponytail: a word list; a classifier is the upgrade if real questions keep slipping past it.
+SPORT_RE = re.compile(r"\bmiami heat\b|\bheat (?:game|tickets?)\b|\bthe Heat\b(?-i:(?<=Heat))(?= (?:game|play|are|vs|beat|lost|won))"
+                      rf"|\bheat\b[^.?!]*\b{_TEAMS}\b|\b{_TEAMS}\b[^.?!]*\bheat\b"
+                      r"|\bhot(?:test)?\s+(?:new\s+)?(?:restaurants?|bars?|clubs?|tickets?|takes?|deals?|sauce|dogs?|tubs?|yoga|pot"
+                      r"|wings|chicken|stocks?|real estate)\b", re.I)
+NOT_WEATHER = ("This does not read as a question about hot weather. Riprap reports flood and heat records "
                "for New York City places, each cited to its source.")
 
 SURFACE = ("heat_surface", "heat_surface_nta")
@@ -76,7 +82,7 @@ TOPICS = (
      COOLING),
     (re.compile(r"emergency (?:room|department)|\b(?:er|ed) visits?\b|hospitali[sz]|heat (?:illness|stroke|exhaustion|stress)"
                 r"|\bsick\b|\bhealth\b(?! department)", re.I), VISITS),
-    (re.compile(r"vulnerab|\bhvi\b|\bindex\b", re.I), HVI),
+    (re.compile(r"vulnerab|\bhvi\b|\bindex\b|\bat risk\b", re.I), HVI),
     (re.compile(r"\btrees?\b|canopy|\bshade|\bpaved|\bpaving|pavement|impervious|green (?:space|cover)|vegetat", re.I), COVER),
     (re.compile(r"advisor(?:y|ies)|\bwarnings?\b|\balerts?\b|\bwatch\b", re.I), ALERTS),
     (re.compile(r"\bsurface\b|landsat|satellite|heat island|hot ?spots?|\b(?:run|runs|ran|get|gets|is|are) (?:the )?hottest\b"
@@ -87,7 +93,7 @@ TOPICS = (
 )
 # Heat deaths are published for the city as a whole only, so no source here holds them for a place.
 _DEATHS_RE = re.compile(r"\bdeaths?\b|\bdied\b|\bmortality\b|\bfatalit", re.I)
-_SCORE_RE = re.compile(r"\b(?:scores?|ratings?|rated|grades?|rank(?:ed|ing|s)?)\b", re.I)
+_SCORE_RE = re.compile(r"\b(?:scores?|ratings?|rated|grades?|rank(?:ed|ing|s)?)\b|^\s*rate\b|\byou rate\b|\bon a scale\b|\bscale of \d", re.I)
 # The inside of a building, or one block on a coming day: nobody forecasts that.
 _INDOORS_RE = re.compile(r"\b(?:my|our|the|this) (?:apartment|unit|building|home|house|room|classroom|block|street|playground)\b"
                          r"|\bindoors?\b|\binside\b|\b(?:apartment|apt\.?) \w+\b|\bon my block\b", re.I)
@@ -218,7 +224,9 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     if _SCORE_RE.search(q):
         docs = have(HVI)
         return ("no_score", docs) if docs else None
-    if (_INDOORS_RE.search(q) or _DATE_RE.search(q)) and (_WILL_RE.search(q) or _NEAR_RE.search(q)):
+    # ("My kids will inherit our house. How many more heat waves in the coming decades?" asks for the projection.)
+    if (_INDOORS_RE.search(q) or _DATE_RE.search(q)) and (_WILL_RE.search(q) or _NEAR_RE.search(q)) and not (
+            _FAR_RE.search(q) and not _DATE_RE.search(q)):
         docs = have(FORECAST, ALERTS, SURFACE)
         return ("no_prediction_heat", docs) if docs else None
     if _DEATHS_RE.search(q):

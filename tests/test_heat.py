@@ -331,7 +331,7 @@ def test_the_record_and_a_year_in_any_position_reach_their_leads():
 
 def test_the_basketball_team_is_not_the_weather():
     plan = heuristic_plan("what time is the Heat game at Barclays Center tonight")
-    assert plan["intent"] == "not_implemented" and "Miami Heat" in plan["rationale"]
+    assert plan["intent"] == "not_implemented" and "hot weather" in plan["rationale"]
     # "Heat score" is a question about a score for heat, not the game's (the first version of this rule caught it).
     assert heuristic_plan("What is the heat score for 2940 Brighton 3rd St, Brooklyn?")["intent"] == "single_address"
     assert heuristic_plan("how bad is the heat at Barclays Center tonight")["focus"]["hazard"] == "heat"
@@ -583,3 +583,37 @@ def test_station_coordinates_are_the_weather_services_own():
     for acis, icao in (("NYCthr", "KNYC"), ("LGAthr", "KLGA"), ("JFKthr", "KJFK")):
         row = next(s for s in weather.STATIONS if s[0] == acis)
         assert list(row[2:]) == official[icao][:2], acis
+
+
+def test_the_second_unseen_set():
+    """Inputs from tests/golden/unseen_heat2.json that the first run got wrong."""
+    # An acronym is not a place: "ER" once matched Gramercy by substring, for a question about the city.
+    assert heuristic_plan("which parts of the city have the most heat related ER visits")["targets"][0]["text"] == "NYC"
+    # "Oval" is a street word: Stuyvesant Oval once went to Bedford-Stuyvesant.
+    plan = heuristic_plan("will my apartment at 14 Stuyvesant Oval go over 90 inside next August? top floor, faces west")
+    assert plan["place"]["kind"] == "address" and plan["targets"][0]["text"].startswith("14 Stuyvesant Oval")
+    # The coming decades are the projection, even when the asker mentions a house.
+    q = "My kids will inherit our house in Port Richmond. How many more heat waves is the city expecting there in the coming decades?"
+    assert ha.answer(q, T)[0] == "facts" and ha.answer(q, T)[1][0] == "npcc4_heat"
+    assert ha.answer(f"Will my apartment at {A} overheat on July 4 2035?", T)[0] == "no_prediction_heat"
+    # A rating by any wording is a score.
+    q = "rate jackson heights heat risk on a scale of 1 to 10"
+    assert ha.asks_something(q) and ha.answer(q, T) == ("no_score", ["hvi"])
+    assert ha.answer("What is the rate of heat ER visits here?", T)[0] != "no_score"
+    # Basketball and fashion are not the weather; hot spots can be.
+    for q in ("heat knicks friday at the garden, who you got", "hottest new restaurants in williamsburg right now"):
+        assert heuristic_plan(q)["intent"] == "not_implemented", q
+    assert heuristic_plan("where are the heat hot spots in Hunts Point")["focus"]["hazard"] == "heat"
+    # A scorcher is a hot day.
+    assert ha.hazard_of("Ive lived in Parkchester since 1984 and I swear there are more scorchers now. Do the records back that up?") == "heat"
+    # Who is at risk: the department's index first.
+    assert ha.answer("who is most at risk from heat in brownsville", T)[1][0] == "hvi"
+
+
+def test_a_flood_answer_to_a_question_that_also_names_heat_says_so():
+    from riprap.core.burr.synthesis import BOTH_HAZARDS, _render
+
+    both = _render([], [], [], question="Which is the bigger problem at 80 Pioneer Street, flooding or heat?")
+    assert BOTH_HAZARDS in both
+    assert BOTH_HAZARDS not in _render([], [], [], question="Has 80 Pioneer Street flooded?")
+    assert BOTH_HAZARDS not in _render([], [], [], question="Is 80 Pioneer Street hotter than the city?")
