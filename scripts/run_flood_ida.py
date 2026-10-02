@@ -31,6 +31,7 @@ land, since radar sees through cloud.
 
     uv run python scripts/run_flood_ida.py --inputs-only   # fetch and cache the scenes
     python3 gpu_lock.py uv run python scripts/run_flood_ida.py
+    uv run python scripts/run_flood_ida.py --rescore        # rescore the saved probabilities
 
 Writes data/experimental/flood_terramind_ida.json and, under outputs/flood_ida/
 (git-ignored), the inputs and the flood raster.
@@ -179,6 +180,42 @@ def predict(net, s2, s1, dem, batch: int = 8):
     return (prob / np.maximum(hits, 1))[:h, :w]
 
 
+def sweep(prob, seen, transform, crs) -> list[dict]:
+    """The Ida score at lower flood thresholds, with the binomial chance of
+    as many hits or more if marks fell at random (marks cluster, so this
+    overstates the evidence), and the number of separate places the hits
+    are at (marks within 1 km of each other are one place)."""
+    import geopandas as gpd
+    import numpy as np
+    import rasterio
+    import run_eo_batch as eo
+    from scipy.ndimage import distance_transform_edt
+    from scipy.stats import binom
+
+    marks = gpd.read_file(ROOT / "data" / "ida_2021_hwms_ny.geojson").to_crs(crs)
+    rows, cols = rasterio.transform.rowcol(transform, marks.geometry.x.values, marks.geometry.y.values)
+    out = []
+    for th in (0.5, 0.3, 0.1, 0.05):
+        a = np.where(prob >= th, 1, 0).astype("uint8")
+        a[~seen] = 255
+        r = eo.ida_marks_score(a, transform, crs)
+        near = distance_transform_edt(a != 1) * transform.a <= 500
+        hit = [(x, y) for x, y, rr, cc in zip(marks.geometry.x, marks.geometry.y, rows, cols, strict=True)
+               if 0 <= rr < a.shape[0] and 0 <= cc < a.shape[1] and seen[rr, cc] and near[rr, cc]]
+        places: list[list] = []
+        for x, y in hit:
+            for p in places:
+                if any(np.hypot(x - u, y - v) < 1000 for u, v in p):
+                    p.append((x, y))
+                    break
+            else:
+                places.append([(x, y)])
+        out.append({"threshold": th, **r, "places_hit": len(places),
+                    "binomial_p_at_least_this_many": round(float(binom.sf(r["n_marks_with_water"] - 1, r["n_marks"],
+                                                                          r["chance_share"])), 3)})
+    return out
+
+
 def main() -> int:
     import numpy as np
     import rasterio
@@ -192,8 +229,11 @@ def main() -> int:
     print(f"inputs ready in {time.time() - t0:.0f} s", flush=True)
     if "--inputs-only" in sys.argv:  # fetch the scenes without holding the GPU lock
         return 0
-    net = load_model()
-    prob = predict(net, s2, s1, dem)
+    saved = CACHE / "flood_prob.npy"
+    if "--rescore" in sys.argv and saved.exists():  # score the saved probabilities again, no model run
+        prob = np.load(saved).astype("float32")
+    else:
+        prob = predict(load_model(), s2, s1, dem)
     flood = prob >= 0.5
     land = eo.land_mask(ref)
     with rasterio.open(ROOT / "data" / "eo" / "prithvi_new_water_2021-09-01.tif") as src:
@@ -221,6 +261,7 @@ def main() -> int:
         "threshold": "flood probability 0.5 (argmax of two classes)",
         "same_land_as_prithvi": eo.ida_marks_score(same_land, transform, crs),
         "all_land_with_radar_and_optical": eo.ida_marks_score(all_land, transform, crs),
+        "threshold_sweep": sweep(prob, prithvi_seen, transform, crs),
         "flood_share_of_land_seen_pct": round(100 * float(flood[prithvi_seen].mean()), 2),
         "flood_share_of_open_water_outside_land_pct": round(100 * float(flood[water_outside_land].mean()), 2),
         "event_s2_clear_on_land_pct": round(100 * float(clear[2][land].mean()), 1),

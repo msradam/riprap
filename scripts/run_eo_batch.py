@@ -156,7 +156,7 @@ def ida_marks_score(a, transform, crs, radius_m: float = 500) -> dict:
     at = [(r, c) for r, c in zip(rows, cols, strict=True) if 0 <= r < a.shape[0] and 0 <= c < a.shape[1] and seen[r, c]]
     hit = sum(bool(near[r, c]) for r, c in at)
     out = {"n_marks": len(at), "n_marks_with_water": hit, "marks_pct": round(100 * hit / max(len(at), 1)),
-           "chance_pct": round(100 * float(near[seen].mean())),
+           "chance_pct": round(100 * float(near[seen].mean())), "chance_share": round(float(near[seen].mean()), 4),
            "new_water_km2": round(float((a == 1).sum()) * res * res / 1e6, 2)}
     out["against_chance"] = "more than chance gives" if out["marks_pct"] > out["chance_pct"] else "no better than chance"
     return out

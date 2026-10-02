@@ -1,6 +1,6 @@
 {
  "what": "TerraMind-base-Flood (official, ImpactMesh) on Hurricane Ida, scored as the Prithvi layer is",
- "run_date": "2026-10-01",
+ "run_date": "2026-10-02",
  "model": "ibm-esa-geospatial/TerraMind-base-Flood",
  "revision": "1e4b2429d17234922f8d92beb0d725af4db85c08",
  "file": "TerraMind_v1_base_ImpactMesh_flood.pt",
@@ -72,6 +72,7 @@
   "n_marks_with_water": 4,
   "marks_pct": 3,
   "chance_pct": 1,
+  "chance_share": 0.0115,
   "new_water_km2": 0.06,
   "against_chance": "more than chance gives"
  },
@@ -80,11 +81,62 @@
   "n_marks_with_water": 6,
   "marks_pct": 4,
   "chance_pct": 1,
+  "chance_share": 0.0126,
   "new_water_km2": 0.07,
   "against_chance": "more than chance gives"
  },
+ "threshold_sweep": [
+  {
+   "threshold": 0.5,
+   "n_marks": 153,
+   "n_marks_with_water": 4,
+   "marks_pct": 3,
+   "chance_pct": 1,
+   "chance_share": 0.0115,
+   "new_water_km2": 0.06,
+   "against_chance": "more than chance gives",
+   "places_hit": 1,
+   "binomial_p_at_least_this_many": 0.101
+  },
+  {
+   "threshold": 0.3,
+   "n_marks": 153,
+   "n_marks_with_water": 4,
+   "marks_pct": 3,
+   "chance_pct": 2,
+   "chance_share": 0.0179,
+   "new_water_km2": 0.08,
+   "against_chance": "more than chance gives",
+   "places_hit": 1,
+   "binomial_p_at_least_this_many": 0.294
+  },
+  {
+   "threshold": 0.1,
+   "n_marks": 153,
+   "n_marks_with_water": 13,
+   "marks_pct": 8,
+   "chance_pct": 2,
+   "chance_share": 0.0227,
+   "new_water_km2": 0.11,
+   "against_chance": "more than chance gives",
+   "places_hit": 2,
+   "binomial_p_at_least_this_many": 0.0
+  },
+  {
+   "threshold": 0.05,
+   "n_marks": 153,
+   "n_marks_with_water": 13,
+   "marks_pct": 8,
+   "chance_pct": 3,
+   "chance_share": 0.0278,
+   "new_water_km2": 0.14,
+   "against_chance": "more than chance gives",
+   "places_hit": 2,
+   "binomial_p_at_least_this_many": 0.0
+  }
+ ],
  "flood_share_of_land_seen_pct": 0.01,
- "flood_share_of_open_water_outside_land_pct": 0.38,
+ "flood_share_of_open_water_outside_land_pct": 0.43,
  "event_s2_clear_on_land_pct": 88.6,
  "prithvi_for_comparison": {
   "n_marks": 153,
@@ -92,5 +144,5 @@
   "marks_pct": 11,
   "chance_pct": 14
  },
- "seconds": 487
+ "seconds": 20
 }
