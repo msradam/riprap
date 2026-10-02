@@ -136,6 +136,29 @@ An earlier check on 104 windows from one calm stretch (May to September
 0.085 m), and the forecast was removed on that evidence. The longer record
 above, with two winters in it, is the fairer test.
 
+Newer open forecasters, zero-shot, on the same 635 windows
+(`scripts/backtest_surge_candidates.py`, run 2026-10-01,
+`data/experimental/surge_candidates.json`). Each reads the same 1,024
+hours; a model that gives quantiles is scored on its median.
+
+| Model | Mean error, all | Mean error, 109 storm windows | Error in the peak | Minor flood windows foreseen (of 23), false alarms | Difference from the current model, 95% interval |
+|---|---|---|---|---|---|
+| Current (TTM r2, fine-tuned) | 0.115 m | 0.209 m | 0.157 m | 1, 1 | |
+| Granite TTM r3 | 0.115 m | 0.213 m | 0.189 m | 2, 0 | -0.5 to +0.5 cm |
+| Granite FlowState r1.1 | 0.113 m | 0.212 m | 0.177 m | 2, 2 | -0.6 to +0.3 cm |
+| Granite PatchTST-FM r2 | 0.109 m | 0.209 m | 0.174 m | 3, 2 | -1.0 to -0.3 cm |
+| Chronos-2 | 0.110 m | 0.210 m | 0.178 m | 3, 2 | -0.9 to -0.1 cm |
+| Last day's mean held | 0.133 m | 0.241 m | 0.240 m | 6, 5 | +1.1 to +2.6 cm |
+
+The interval comes from resampling the windows in runs of 14 days, since
+windows a day apart share three of their four days. PatchTST-FM r2 and
+Chronos-2 beat the current model's mean error by about half a centimetre,
+which is real but small. Every one of them misses the peak by more, and the
+peak is what a surge sentence quotes. Their 90th percentiles reach the
+minor flood stage in 7 to 10 of the 23 windows, at the cost of 32 to 60
+false alarms in 612 windows that stayed below it. None replaces the current
+model.
+
 Not built: the list of assets below the forecast peak. On the days that
 matter the model's peak is too low (1 of 23), so the list would be empty
 when a flood came, and a 30 m elevation model cannot place a subway entrance
@@ -184,6 +207,45 @@ The training labels were the base model's own output for Ida (166
 polygons, and 332 copies of them pasted onto other scenes), so the model
 card's flood score of 0.60 measures agreement with itself. The owner's
 reproduction scored 0.08 to 0.12 on real scenes.
+
+#### The official flood model, same test
+
+IBM and ESA publish `TerraMind-base-Flood`, fine-tuned on ImpactMesh-Flood
+(Copernicus EMS flood maps with Sentinel-1 radar, Sentinel-2 and the
+Copernicus DEM over four dates: a month before, just before, the event and
+after). `scripts/run_flood_ida.py` ran it over the city for Ida (run
+2026-10-01): Sentinel-2 on 13 and 25 August, 2 September (the Prithvi
+layer's post scene) and 7 September; radar on 26 July, 19 August,
+12 September and 24 September. Planetary Computer has no radar pass that
+covers the city between 19 August and 12 September, so the radar's event
+image is 11 days after the rain.
+
+| Measure | TerraMind-base-Flood | Prithvi NYC Pluvial |
+|---|---|---|
+| Land the model marks as flooded, of the land both saw | 0.06 km² | 3.79 km² of new water |
+| Surveyed Ida marks with flood within 500 m | 4 of 153 (3%) | 17 of 153 (11%) |
+| Share of the land within 500 m of the model's flood (chance) | 1.2% | 14% |
+
+The four marks are one place: Van Cortlandt Lake beside the Major Deegan in
+the Bronx. Counted as independent, four hits against a 1.2% chance rate
+would come up one time in ten by luck (binomial, `p = 0.10`). At a lower
+threshold that nobody would have chosen in advance (a flood probability
+of 0.1) it reaches 13 marks at two places. So it has no citywide skill on
+Ida either.
+
+The model itself works. On 300 of ImpactMesh's validation patches, read with
+the same code, it finds flood water with an IoU of 0.615 and a recall of
+0.907 (`data/experimental/flood_terramind_impactmesh_check.json`). Those
+patches are river and coastal floods mapped by Copernicus, water that
+stands for days. Ida's water in New York drained within hours, before any
+satellite passed. That is the limit, not the model, and no tuning of a
+satellite water model will get past it.
+
+Recommendation for the owner: retire the satellite water layer rather than
+tune it. Two models of different make, one of them official and working as
+designed on its own data, both miss Ida's flooding. The result file is
+`data/experimental/flood_terramind_ida.json`; the weights are listed under
+provenance below.
 
 ### TerraMind NYC adapters
 
@@ -279,6 +341,30 @@ box as building, and between two dates of one year (2021-06-16 and
 2021-09-29) 4.6% of pixels change label. New buildings cover far less than
 that in a year, so a difference between two years would be the model's
 noise. The city's building footprints and DOB permits are the record.
+
+### Weights read by the experiments
+
+Every file below comes from its publisher's own Hugging Face repository at a
+pinned commit. The PyTorch checkpoints are read with
+`torch.load(..., weights_only=True)`, which admits tensors and an
+`OrderedDict` and no code; each one's SHA-256 is the file's own hash, which
+is also its Git LFS identifier. Nothing trained in these experiments is in
+this repository: trained weights are saved as safetensors under the
+git-ignored `outputs/` folder, and the owner decides what to publish.
+
+| Model | Repository at commit | File | Format | SHA-256 | Used by |
+|---|---|---|---|---|---|
+| TerraMind 1.0 base | `ibm-esa-geospatial/TerraMind-1.0-base` at `fb96c70` | `TerraMind_v1_base.pt` | PyTorch, `weights_only=True` | `83c3a0938067c83867a46e564443c2fa38383bf4f966d931b11cb025b847d7ec` | the app's land-cover batch, `check_tim.py`, `train_cover.py` |
+| TerraMind 1.0 small | `ibm-esa-geospatial/TerraMind-1.0-small` at `960f754` | `TerraMind_v1_small.pt` | PyTorch, `weights_only=True` | `755e9cce9483fd61334ef66c79f805406db5151a8b44a685c8fbbe023c684701` | `train_cover.py` |
+| TerraMind 1.0 tiny | `ibm-esa-geospatial/TerraMind-1.0-tiny` at `2b5ac0a` | `TerraMind_v1_tiny.pt` | PyTorch, `weights_only=True` | `e56ea9ebcd4451078b9ca4893d5cd8a89bbee376ae16829c3e7fbbbc76de0eba` | `train_cover.py` |
+| TerraMind-base-Flood | `ibm-esa-geospatial/TerraMind-base-Flood` at `1e4b242` | `TerraMind_v1_base_ImpactMesh_flood.pt` | PyTorch (a Lightning checkpoint of tensors), `weights_only=True` | `22627584c2db618c2f6ddb64b411a95762a893becb25104e3f66bfebecaa71e9` | `run_flood_ida.py`, `check_flood_impactmesh.py` |
+| Granite TTM r3 | `ibm-granite/granite-timeseries-ttm-r3`, branch `1024-96-r3` at `c6da085` | safetensors | safetensors | not needed | `backtest_surge_candidates.py` |
+| Granite FlowState r1.1 | `ibm-granite/granite-timeseries-flowstate-r1`, branch `r1.1` at `b80e0f1` | safetensors | safetensors | not needed | `backtest_surge_candidates.py` |
+| Granite PatchTST-FM r2 | `ibm-granite/granite-timeseries-patchtst-fm-r2` at `b125275` | safetensors | safetensors | not needed | `backtest_surge_candidates.py` |
+| Chronos-2 | `amazon/chronos-2` at `29ec376` | safetensors | safetensors | not needed | `backtest_surge_candidates.py` |
+
+All are Apache-2.0 except PatchTST-FM r2, which its card offers under
+OpenMDW 1.0 or Apache 2.0 at the user's choice.
 
 ## Inference energy
 
