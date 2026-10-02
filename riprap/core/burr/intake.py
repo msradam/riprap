@@ -320,7 +320,11 @@ def _plan_for(q: str, hazard: str) -> dict:
         if scope := _wide_area(q):
             return {"intent": "neighborhood", "rationale": f"Heuristic match: {scope}.",
                     "targets": [{"type": "nta", "text": scope}], "place": place}
-        if _QUESTION_RE.search(q) and not landmark_phrase(q):
+        # Nothing left once the heat words are gone ("heat", "extreme heat"): the word alone was once
+        # geocoded to a heat-treating works in Brooklyn and briefed.
+        bare = re.sub(r"\b(?:extreme|excessive|briefing|risk|exposure|hazard|profile|report|summer|the|in|at|for|of|on|an?)\b",
+                      " ", heat_answer.HEAT_RE.sub(" ", _address_from_query(q)), flags=re.IGNORECASE).strip(" ,.?!")
+        if not bare or (_QUESTION_RE.search(q) and not landmark_phrase(q)):
             return {"intent": "not_implemented", "rationale": NO_PLACE_HEAT, "targets": [], "place": place}
     if heat and place["kind"] == "neighborhood" and not nta.resolve(place["text"]) and _WIDE_AREA_RE.search(place["text"]) \
             and (scope := _wide_area(q)):

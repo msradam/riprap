@@ -44,7 +44,7 @@ HEAT_RE = re.compile(
     # Found by questions written without sight of these rules: "air temp", "will it be over 95", "hit 90 or
     # above", "forecast highs", "cool places", "what will summers be like".
     r"|\btemps?\b|\b(?:over|above|hit|hits|reach(?:es|ed)?|top(?:s|ped)?)\s+(?:8[5-9]|9\d|1[01]\d)\b|\bhighs\b"
-    r"|\bcool (?:places?|spots?|spaces?)\b|\bstay(?:ing)? cool\b|\bsummers\b", re.I)
+    r"|\bcool (?:places?|spots?|spaces?)\b|\bstay(?:ing)? cool\b|\bsummers\b|\brecord highs?\b", re.I)
 # A cold apartment: no heat, a radiator, the landlord. Not this briefing.
 INDOOR_HEATING_RE = re.compile(
     r"\bheat\s*(?:and|&|/|or)\s*hot water|\bno heat\b|\bheat(?:ing)? (?:complaints?|violations?|season|is (?:off|out|broken))"

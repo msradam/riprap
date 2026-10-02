@@ -86,6 +86,7 @@ def test_advice_about_heat_is_declined_in_heats_own_words(query):
     "need a list of cool places within walking distance of Van Dyke Houses for a flyer, libraries pools senior centers",
     "cooling centers and libraries near Stapleton Houses, and what is the closest hospital",
     "what will summers be like on the south shore of staten island when my kids are my age, say the 2060s",
+    "What is the record high at Central Park?",
 ])
 def test_heat_questions_nobody_here_wrote_are_heat_questions(query):
     assert ha.hazard_of(query) == "heat"
@@ -128,6 +129,10 @@ def test_a_borough_or_the_city_is_a_place_for_a_heat_question(query, code):
 def test_a_heat_question_with_no_place_says_so_in_heats_words():
     plan = heuristic_plan("How hot does it get, and is there a heat advisory?")
     assert plan["intent"] == "not_implemented" and "names none" in plan["rationale"] and "FloodNet" not in plan["rationale"]
+    # The word alone names no place: it was once geocoded to a heat-treating works and briefed.
+    for q in ("heat", "extreme heat", "Heat?"):
+        assert heuristic_plan(q)["intent"] == "not_implemented", q
+    assert heuristic_plan("gantry plaza state park heat")["targets"][0]["text"] == "gantry plaza state park"
 
 
 @pytest.mark.parametrize("query,targets", [
