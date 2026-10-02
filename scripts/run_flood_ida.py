@@ -264,6 +264,8 @@ def main() -> int:
         "threshold_sweep": sweep(prob, prithvi_seen, transform, crs),
         "flood_share_of_land_seen_pct": round(100 * float(flood[prithvi_seen].mean()), 2),
         "flood_share_of_open_water_outside_land_pct": round(100 * float(flood[water_outside_land].mean()), 2),
+        "s1_db_median_on_land_by_date": [[round(float(np.median(s1[t, b][land & (s1[t, b] != 0)])), 2) for b in (0, 1)]
+                                         for t in range(4)],  # VV, VH; ImpactMesh-Flood means are -9.98, -15.97
         "event_s2_clear_on_land_pct": round(100 * float(clear[2][land].mean()), 1),
         "prithvi_for_comparison": {k: json.loads((ROOT / "data" / "experimental" / "water.json").read_text())[k]
                                    for k in ("n_marks", "n_marks_with_water", "marks_pct", "chance_pct")},

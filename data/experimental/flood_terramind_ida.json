@@ -137,6 +137,24 @@
  ],
  "flood_share_of_land_seen_pct": 0.01,
  "flood_share_of_open_water_outside_land_pct": 0.43,
+ "s1_db_median_on_land_by_date": [
+  [
+   -5.62,
+   -12.84
+  ],
+  [
+   -5.63,
+   -12.83
+  ],
+  [
+   -5.69,
+   -12.76
+  ],
+  [
+   -5.56,
+   -12.84
+  ]
+ ],
  "event_s2_clear_on_land_pct": 88.6,
  "prithvi_for_comparison": {
   "n_marks": 153,
@@ -144,5 +162,5 @@
   "marks_pct": 11,
   "chance_pct": 14
  },
- "seconds": 20
+ "seconds": 16
 }

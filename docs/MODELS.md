@@ -214,7 +214,7 @@ IBM and ESA publish `TerraMind-base-Flood`, fine-tuned on ImpactMesh-Flood
 (Copernicus EMS flood maps with Sentinel-1 radar, Sentinel-2 and the
 Copernicus DEM over four dates: a month before, just before, the event and
 after). `scripts/run_flood_ida.py` ran it over the city for Ida (run
-2026-10-01): Sentinel-2 on 13 and 25 August, 2 September (the Prithvi
+2026-10-02): Sentinel-2 on 13 and 25 August, 2 September (the Prithvi
 layer's post scene) and 7 September; radar on 26 July, 19 August,
 12 September and 24 September. Planetary Computer has no radar pass that
 covers the city between 19 August and 12 September, so the radar's event
@@ -226,20 +226,30 @@ image is 11 days after the rain.
 | Surveyed Ida marks with flood within 500 m | 4 of 153 (3%) | 17 of 153 (11%) |
 | Share of the land within 500 m of the model's flood (chance) | 1.2% | 14% |
 
-The four marks are one place: Van Cortlandt Lake beside the Major Deegan in
-the Bronx. Counted as independent, four hits against a 1.2% chance rate
+The four marks are one place in Van Cortlandt Park in the Bronx: two survey
+sites 214 m apart, on the golf course beside the Major Deegan and at Van
+Cortlandt Pool, on ground that was dry before the storm. Counted as independent, four hits against a 1.2% chance rate
 would come up one time in ten by luck (binomial, `p = 0.10`). At a lower
 threshold that nobody would have chosen in advance (a flood probability
 of 0.1) it reaches 13 marks at two places. So it has no citywide skill on
 Ida either.
 
-The model itself works. On 300 of ImpactMesh's validation patches, read with
-the same code, it finds flood water with an IoU of 0.615 and a recall of
-0.907 (`data/experimental/flood_terramind_impactmesh_check.json`). Those
-patches are river and coastal floods mapped by Copernicus, water that
-stands for days. Ida's water in New York drained within hours, before any
-satellite passed. That is the limit, not the model, and no tuning of a
-satellite water model will get past it.
+The model works on its own kind of data. On 300 of ImpactMesh's validation
+patches, with the same model loading and normalisation, it finds the flood
+water Copernicus mapped with an IoU of 0.615 and a recall of 0.907
+(`data/experimental/flood_terramind_impactmesh_check.json`). Validation
+patches can come from events seen in training, so this checks the setup,
+not skill on a new place. The Ida inputs it does not exercise (the band
+order, radar in dB, the dates in order, the elevation repeated) were checked
+by hand against the dataset's own files. Over the city's land the radar's
+medians are about -5.6 dB (VV) and -12.8 dB (VH) on every date, brighter than
+the dataset's means of -10.0 and -16.0 as built-up ground is, and far from
+what linear values would give. Dense city is also unlike most of the floods
+the model was trained on. Nothing in this
+test separates the model from the timing: the optical event image is a day
+after the rain and the radar's eleven days. A satellite that passes a day or
+more after a flood that drained within hours cannot see it, and tuning a
+model does not move the pass.
 
 Recommendation for the owner: retire the satellite water layer rather than
 tune it. Two models of different make, one of them official and working as
@@ -328,11 +338,16 @@ own land cover tokens with a second encoder and decoder (the sampler) and
 then reads them beside the image. An earlier note said the generation
 weights were in neither repository. They are in the pinned base checkpoint;
 the first check built the model without them, so its sampler was random.
-`scripts/check_tim.py` loads all 323 sampler tensors from the checkpoint
-(each is checked equal to it) and reruns the same box and key. On
-2021-06-16 the corrected `tim_nyc` agrees with WorldCover on 89.8% of
-pixels with each of three generation seeds (mean IoU 0.538), `lulc_nyc` on
-90.2% (0.546), and `tim_nyc` with the random sampler on 89.5% (0.532). So
+It left 310 of the sampler's 323 tensors random (13 are shared with the
+encoder embeddings it did load). `scripts/check_tim.py` loads all 323
+through TerraTorch's own filter, which raises if one is missing (a separate
+check found each equal to the checkpoint), and reruns the same box and key.
+On 2021-06-16, with Sentinel-2 on the app's scale (scenes before 2022
+lifted by 1000, which is why `lulc_nyc` reads 90.2% here and 90.5% in the
+unlifted run above), the corrected `tim_nyc` agrees with WorldCover on 89.8%
+of pixels with each of three generation seeds (mean IoU 0.538), `lulc_nyc`
+on 90.2% (0.546), and `tim_nyc` with one unseeded draw of random sampler
+weights on 89.5% (0.532). So
 thinking in modalities adds nothing here, and it is not used
 (`data/experimental/tim_check.json`).
 
