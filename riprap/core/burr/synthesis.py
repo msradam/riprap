@@ -294,6 +294,9 @@ LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From
                 "no_prediction_heat": "Riprap cannot predict what will happen in one building, on one block or on a "
                                       "named day: no source here does that. What the Weather Service expects for the "
                                       "area over the next 7 days, and what has been measured here:",
+                "no_ranking": "Riprap does not rank places against each other or pick out the worst part of one. The "
+                              "record below is for the whole of the place named; ask about one neighbourhood or "
+                              "community district for its own:",
                 "no_score": "Riprap computes no score or rating of its own. The Health Department publishes an index "
                             "for the neighbourhood, quoted here with what it is and is not:",
                 "surface_yes": "At the surface, yes.", "surface_no": "At the surface, no."}

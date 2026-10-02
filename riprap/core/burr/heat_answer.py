@@ -195,10 +195,15 @@ def count_sentence(question: str, facts: list[str], values: dict | None) -> str 
     return f"{n} day{'s' if n != 1 else ''} at or above 90°F at {v['station']} in {m.group(1)}{partial}."
 
 
+_PARTS = r"(?:parts?|areas?|neighbou?rhoods?|blocks?|districts?|streets?|places?)"
+_RANK_RE = re.compile(rf"\b(?:which|what)\s+{_PARTS}\b|\b(?:hottest|coolest|worst|most vulnerable)\s+{_PARTS}\b"
+                      r"|\bwhere\b[^?.]*\b(?:hottest|coolest|worst|most)\b", re.I)
+
+
 def answer(question: str, texts: dict[str, str], values: dict | None = None) -> tuple[str, list[str]] | None:
     """(lead, facts) for a heat question, or None when no heat source
     answered. Leads: "facts", "count", "heat_forecast", "no_prediction_heat",
-    "no_score", "surface_yes", "surface_no" (synthesis.LEAD_PHRASES)."""
+    "no_score", "no_ranking", "surface_yes", "surface_no" (synthesis.LEAD_PHRASES)."""
     from riprap.core.burr import answer_checks as ac
 
     q = question or ""
@@ -245,7 +250,9 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
             if v.get("cooler_in_every_image"):
                 return ("surface_no" if hotter else "surface_yes"), docs
         return ("facts", [*docs, *(d for d in subjects if d not in docs)][:4]) if docs else None
+    # "Which parts of the Bronx ...", "the hottest block in ...": the record for the place, said to be no ranking.
+    facts = "no_ranking" if _RANK_RE.search(q) else "facts"
     if subjects:
-        return ("count" if ac.is_count_question(q) and not any(d in COOLING for d in subjects) else "facts"), subjects[:4]
+        return ("count" if ac.is_count_question(q) and not any(d in COOLING for d in subjects) else facts), subjects[:4]
     docs = have(SURFACE, HVI, ("city_landcover", "city_landcover_nta"), STATION)
-    return ("facts", docs[:4]) if docs else None
+    return (facts, docs[:4]) if docs else None

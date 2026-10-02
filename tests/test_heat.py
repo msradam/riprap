@@ -243,6 +243,8 @@ A = "90-01 183rd Street, Queens"
     # A score: Riprap computes none, and quotes the department's index as what it is.
     (f"What is the heat score for {A}?", "no_score", ["hvi"]),
     (f"How does {A} rank for heat?", "no_score", ["hvi"]),
+    (f"What is the hottest block near {A}?", "no_ranking", ["heat_surface"]),
+    ("Which parts of the Bronx should worry most about heat?", "no_ranking", ["heat_surface", "hvi", "city_landcover", "heat_station"]),
     # A building or a block on a coming day: nobody predicts that.
     (f"Will my apartment at {A} overheat this weekend?", "no_prediction_heat", ["nws_heat_forecast", "nws_heat_alerts", "heat_surface"]),
     (f"How hot will it get inside my building at {A} tomorrow?", "no_prediction_heat",
@@ -345,7 +347,7 @@ def test_code_set_leads_are_exempt_from_the_word_checks_and_have_phrases():
     from riprap.core.burr import answer_checks as ac
     from riprap.core.burr.synthesis import LEAD_PHRASES
 
-    for lead in ("heat_forecast", "no_prediction_heat", "no_score", "surface_yes", "surface_no"):
+    for lead in ("heat_forecast", "no_prediction_heat", "no_score", "no_ranking", "surface_yes", "surface_no"):
         assert lead in ac.CODE_LEADS and LEAD_PHRASES[lead]
         assert ac.check_lead(lead, ["heat_surface"], "Is it hotter here?", T, V) == []
 
