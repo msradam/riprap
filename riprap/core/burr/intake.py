@@ -119,7 +119,34 @@ _WIDE_CODES = ("BX", "BK", "MN", "QN", "SI", "NYC")
 _WIDE_NAMES = {"BX": "Bronx", "BK": "Brooklyn", "MN": "Manhattan", "QN": "Queens", "SI": "Staten Island"}
 # Words beside "heat" that name nothing: "extreme heat risk in the south Bronx" is the borough.
 _HEAT_FILLER = (r"\b(?:extreme|excessive|briefing|risk|exposure|hazard|profile|report|summer|the|in|at|for|of|on|an?|around|near|by"
-                r"|north|south|east|west|shore|side|central|upper|lower|please|and|wave|waves)\b|[^\w\s]")
+                r"|please|and|wave|waves)\b|[^\w\s]")
+# A part of a borough by direction. Staten Island's three community districts carry such names; elsewhere a
+# direction names no boundary Riprap holds.
+_DIRECTION_RE = re.compile(r"\b(?:north|south|east|west)(?:ern|east|west)?\b|\b(?:upper|lower|central|mid|shore|side|end|island)\b", re.I)
+_SI_PARTS = (("north shore", "SI01"), ("mid island", "SI02"), ("mid-island", "SI02"), ("south shore", "SI03"))
+NO_BOUNDARY = ("Riprap reads boroughs, community districts and neighbourhoods, and \"{part}\" is none of those: it has "
+               "no official boundary here. Ask about the borough, a community district such as {code}01, or a "
+               "neighbourhood in it by name.")
+
+
+def _part_of_borough(text: str, scope: str, place: dict) -> dict | None:
+    """The plan for a borough named with a direction ("south bronx", "Staten
+    Island North Shore"): the community district of that name on Staten
+    Island, and elsewhere a statement that it has no boundary. It once got
+    the whole borough's figures under its own name. None when the words
+    beside the borough are not all directions."""
+    if scope == "NYC":
+        return None
+    words = re.sub(_HEAT_FILLER, " ", _WIDE_AREA_RE.sub(" ", text), flags=re.IGNORECASE).split()
+    if not words or any(not _DIRECTION_RE.fullmatch(w) for w in words):
+        return None
+    low = " ".join(text.lower().split())
+    if code := next((c for name, c in _SI_PARTS if scope == "SI" and name in low), None):
+        return {"intent": "neighborhood", "rationale": f"Heuristic match: community district {code}.",
+                "targets": [{"type": "district", "text": code}], "place": place}
+    part = re.sub(_HEAT_FILLER, " ", text, flags=re.IGNORECASE)
+    return {"intent": "not_implemented", "targets": [], "place": place,
+            "rationale": NO_BOUNDARY.format(part=" ".join(part.split()), code=scope)}
 
 
 def _wide_area(q: str) -> str | None:
@@ -134,8 +161,13 @@ def _wide_area(q: str) -> str | None:
 
 # "Is Mott Haven hotter than Riverdale?", "compare heat vulnerability BK16 vs BK06", "Corona vs Forest Hills, ...".
 _HEAT_COMPARE_RE = re.compile(
-    r"^\W*(?:is|are|was|were)\s+(?:it\s+)?(.+?)\s+(?:any\s+|much\s+)?(?:hott?er|warmer|cooler|more [\w ]+?|less [\w ]+?)\s+than\s+(.+?)\s*[?.,]"
-    r"|^\W*compare\s+(?:the\s+)?(?:[a-z ]+?\s+)?(.+?)\s+(?:to|with|and|vs\.?|versus)\s+(.+?)\s*(?:[?.,]|$)"
+    r"^\W*(?:why\s+)?(?:is|are|was|were)\s+(?:it\s+)?(.+?)\s+(?:any\s+|much\s+)?(?:hott?er|warmer|cooler|(?:rated\s+)?more [\w ]+?|less [\w ]+?)\s+than\s+(.+?)\s*[?.,]"
+    # "compare heat vulnerability BK16 vs BK06", "compare Hunts Point and Riverdale heat" (a free run of words
+    # before the first place once swallowed "Hunts").
+    r"|^\W*compare\s+(?:the\s+)?(?:(?:extreme\s+)?heat(?:\s+(?:vulnerability|risk|exposure|index|records?))?|surface temperatures?"
+    r"|(?:tree\s+)?canopy)?\s*(?:(?:in|at|of|for|between)\s+)?(.+?)\s+(?:to|with|and|vs\.?|versus)\s+(.+?)\s*(?:[?.,]|$)"
+    # "how does heat in BX02 compare with MN08"
+    r"|^\W*how (?:does|do|did)\s+(?:the\s+)?(?:heat\s+)?(?:(?:in|at)\s+)?(.+?)\s+compare[sd]?\s+(?:with|to)\s+(.+?)\s*(?:[?.,]|$)"
     r"|^\W*(.+?)\s+(?:vs\.?|versus)\s+(.+?)\s*(?:[?.,]|$)", re.IGNORECASE)
 
 
@@ -328,6 +360,8 @@ def _plan_for(q: str, hazard: str) -> dict:
         # (the whole question once went to the geocoder and came back as a
         # Weather Service office in Albany).
         if scope := _wide_area(q):
+            if part := _part_of_borough(heat_answer.HEAT_RE.sub(" ", q), scope, place):
+                return part
             # Words left beside the borough that ask nothing name something in it ("heat briefing for curtis
             # high school staten island" once got the whole borough): those words go to the geocoder.
             rest = re.sub(_HEAT_FILLER, " ", _WIDE_AREA_RE.sub(" ", heat_answer.HEAT_RE.sub(" ", q)), flags=re.IGNORECASE).split()
@@ -341,8 +375,19 @@ def _plan_for(q: str, hazard: str) -> dict:
         bare = re.sub(_HEAT_FILLER, " ", heat_answer.HEAT_RE.sub(" ", _address_from_query(q)), flags=re.IGNORECASE).strip(" ,.?!")
         if not bare or (_QUESTION_RE.search(q) and not landmark_phrase(q)):
             return {"intent": "not_implemented", "rationale": NO_PLACE_HEAT, "targets": [], "place": place}
+        # What is left is the place: "heat 10474" once went to the geocoder whole and came back as a
+        # heat-treating works; a ZIP alone is declined as a ZIP, and the geocoder never sees the word heat.
+        rest = resolve_query(bare)
+        if rest["kind"] == "invalid":
+            return {"intent": "not_implemented", "rationale": rest["message"], "targets": [], "place": rest}
+        if not _QUESTION_RE.search(q) and not landmark_phrase(q):
+            return {"intent": "single_address", "rationale": "Heuristic match: single_address.", "place": place,
+                    "targets": [{"type": "address", "text": bare}]}
     # Only when the rest of the name is a direction: "Staten Island Mall" and "Bronx Zoo" are landmarks for the
     # geocoder (the mall once got the borough's reading, 13°F cooler than its own).
+    if heat and place["kind"] == "neighborhood" and not nta.resolve(place["text"]) and (scope := _wide_area(place["text"])) \
+            and (part := _part_of_borough(place["text"], scope, place)):
+        return part  # "South Bronx", "Staten Island North Shore"
     if heat and place["kind"] == "neighborhood" and not nta.resolve(place["text"]) and _WIDE_AREA_RE.search(place["text"]) \
             and not re.sub(r"\b(?:the|north|south|east|west|shore|side|central|upper|lower|mid|downtown|uptown|end|of)\b|\W", "",
                            _WIDE_AREA_RE.sub("", place["text"]), flags=re.I) \
@@ -587,6 +632,10 @@ def resolve_area(state: State) -> State:
         name, _, boro = target.partition(", ")
         matches = ([district] if district else []) or (nta.resolve(name) if name else [])
         matches = [m for m in matches if m["borough"] == boro] or matches  # "Murray Hill, Queens"
+        # "East Harlem (South)", "Bushwick West": the half the query names, not the first of the two.
+        half = re.search(re.escape(name) + r"\s*\(?\s*(north|south|east|west|central)\b", state.get("query") or "", re.IGNORECASE)
+        if half and not district:
+            matches = nta.resolve(f"{name} ({half.group(1).title()})") or matches
         if not matches:
             rec["ok"], rec["err"] = False, f"no neighborhood matches {target!r}"
             trace.append(rec)

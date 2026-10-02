@@ -54,7 +54,7 @@ traps each sentence carries are in [METHODOLOGY.md](METHODOLOGY.md).
 | Source | Publisher | Used for |
 |---|---|---|
 | Landsat 8 and 9 Collection 2 Level 2 surface temperature | USGS, read through Microsoft Planetary Computer | How much warmer or cooler the surface is than the city's land average, over 18 clear summer images of 2023 to 2026 (`data/heat/surface_temp.tif`, baked by `scripts/bake_surface_temperature.py`) |
-| Heat Vulnerability Index, 2023 | NYC Department of Health and Mental Hygiene, Environment and Health Data Portal | The department's 1 to 5 rank for a neighbourhood or community district, with its air conditioning and green space figures |
+| Heat Vulnerability Index, 2023 | NYC Department of Health and Mental Hygiene, Environment and Health Data Portal | The department's 1 to 5 rank for a neighbourhood or community district; for a neighbourhood, also the file's air conditioning share (a survey estimate shared across neighbouring neighbourhoods) and green space share |
 | Heat stress emergency department visits, 2018 to 2022 | NYC Health Department, from New York State SPARCS | Visits by residents of a community district, borough or the city, with the age-adjusted rate; suppressed counts are stated as suppressed |
 | NYC Land Cover 2017, 6 inch | NYC Open Data (`he6d-2qns`) | Tree canopy and paved share (shared with flood) |
 | Daily station records | NOAA Regional Climate Centers, ACIS | Days at or above 90 F this year and last, the 1991 to 2020 average, the year's highest reading and the record, at the nearest of Central Park, LaGuardia and JFK |

@@ -270,14 +270,14 @@ A = "90-01 183rd Street, Queens"
     (f"What is the heat vulnerability index at {A}?", "facts", ["hvi"]),
     (f"How many emergency room visits for heat illness near {A}?", "count", ["heat_visits"]),
     (f"Where can people cool off near {A}?", "facts", ["cool_features"]),
-    (f"Where is the nearest cooling center to {A}?", "facts", ["cool_features"]),
+    (f"Where is the nearest cooling center to {A}?", "cooling_centers", ["cool_features"]),
     # Canopy: the city's map, then the model's estimate, as in a flood answer.
     (f"How much tree canopy shades {A} in the heat?", "facts", ["city_landcover", "landcover"]),
     # From the unseen set: an apartment by number, a calendar date, "the next 30 years", deaths, a pool's hours.
     (f"How hot will apartment 6C at {A} get on Saturday afternoon", "no_prediction_heat",
      ["nws_heat_forecast", "nws_heat_alerts", "heat_surface"]),
     (f"Is it going to keep getting hotter near {A} over the next 30 years", "facts", ["npcc4_heat"]),
-    (f"How many heat-related deaths near {A} per year?", "cannot_answer", ["heat_visits"]),
+    (f"How many heat-related deaths near {A} per year?", "no_deaths", ["heat_visits"]),
     (f"Is the pool near {A} open today and are there spray showers?", "facts", ["cool_features"]),
     (f"How hot does it get near {A} and where are the cooling centers and is there a heat advisory", "facts",
      ["cool_features", "nws_heat_alerts", "heat_surface", "heat_station"]),
@@ -499,7 +499,7 @@ def test_the_station_record_names_the_station_its_distance_and_the_normal(monkey
     assert seen["sid"] == "NYCthr" and v["station"] == "Central Park" and v["days_ge_90"] == 12
     assert v["days_ge_90_last_year"] == 14 and v["normal_days_ge_90"] == 17 and v["by_year"][2025] == 14
     n = v["narrative"]
-    assert "reached 90°F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; the 1991 to 2020 average is 17 a year" in n
+    assert "reached 90°F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; a full year averaged 17 in 1991 to 2020" in n
     assert "100°F on 2026-07-02" in n and "the station's readings, not this address's" in n
     assert weather.station_record(40.64, -73.78, today=date(2026, 10, 2))["station"] == "JFK Airport"
 
@@ -670,7 +670,7 @@ def test_what_a_fresh_reviewer_broke():
     for q, name in (("Is the Staten Island Mall a heat island?", "Staten Island Mall"), ("How hot is the Bronx Zoo?", "Bronx Zoo")):
         plan = heuristic_plan(q)
         assert plan["intent"] == "single_address" and plan["targets"][0]["text"].startswith(name), plan
-    assert heuristic_plan("heat on the Staten Island North Shore")["targets"][0]["text"] == "SI"
+    assert heuristic_plan("heat on the Staten Island North Shore")["targets"][0]["text"] == "SI01"
 
 
 def test_the_station_record_stands_on_new_years_day(monkeypatch):
@@ -724,7 +724,7 @@ def test_what_a_blind_judge_found_in_the_second_round(monkeypatch):
     # Words beside a borough that ask nothing name something in it; a question about the borough does not.
     plan = heuristic_plan("heat briefing for around curtis high school staten island")
     assert plan["intent"] == "single_address" and plan["targets"][0]["text"] == "curtis high school, Staten Island, NY"
-    for q in ("heat in the south bronx", "queens heat", "bronx heat vulnerability", "extreme heat risk staten island north shore",
+    for q in ("heat in the bronx", "queens heat", "bronx heat vulnerability", "extreme heat risk staten island north shore",
               "Which parts of the Bronx should worry most about heat?"):
         assert heuristic_plan(q)["intent"] == "neighborhood", q
 
@@ -737,3 +737,57 @@ def test_a_capped_list_of_cooling_places_says_it_is_capped():
     few = cooling._summary([("spray shower", f"Park {i}", 100.0 + i) for i in range(3)], "within 800 m of this address", d)
     assert "at 8 parks or playgrounds" in many["narrative"] and "the six nearest: Park 0" in many["narrative"]
     assert "nearest first: Park 0" in few["narrative"]
+
+
+def test_what_three_personas_found():
+    """A council staffer, a reporter and a public health researcher used the running app; each input here went wrong."""
+    from riprap.core.burr.intake import _heat_compare
+
+    # A ZIP after the word heat was geocoded whole and came back as a heat-treating works in Brooklyn.
+    for q in ("heat 10474", "10474 heat"):
+        plan = heuristic_plan(q)
+        assert plan["intent"] == "not_implemented" and "ZIP code" in plan["rationale"], q
+    # A part of a borough got the whole borough's figures under its own name.
+    for q in ("south bronx heat", "isn't the South Bronx the hottest part of the city?"):
+        plan = heuristic_plan(q)
+        assert plan["intent"] == "not_implemented" and "no official boundary" in plan["rationale"], q
+    for q in ("north shore staten island heat", "heat Staten Island North Shore"):
+        assert heuristic_plan(q)["targets"] == [{"type": "district", "text": "SI01"}], q
+    assert heuristic_plan("heat in the Bronx")["targets"][0]["text"] == "BX"
+    # A comparison in other words was answered for the first place only.
+    assert [t["text"] for t in _heat_compare("compare Hunts Point and Riverdale heat")] == ["Hunts Point", "Riverdale"]
+    assert [t["text"] for t in _heat_compare("how does heat in BX02 compare with MN08")] == ["BX02", "MN08"]
+    assert [t["text"] for t in _heat_compare("Why is Port Richmond rated more heat vulnerable than Todt Hill?")] == ["Port Richmond", "Todt Hill"]
+    assert _heat_compare("how does Hunts Point compare with the city") is None
+    # Questions no source answers were given the nearest figure with no word that it was not the answer.
+    visits = {"heat_visits": {"period": "2018 to 2022", "n": 21}}
+    for q in ("How many heat stress hospitalizations were there here in 2023?", "How many heat emergency visits here in 2024?",
+              "Is the heat illness visit rate here significantly higher than the city's?", "How many days above 95 degrees were there in 2025 near here?"):
+        assert ha.answer(q, T, visits)[0] == "cannot_answer", q
+    assert ha.answer("how many heat emergency visits here", T, visits) == ("count", ["heat_visits"])
+    assert ha.answer("How many people died from heat here?", T)[0] == "no_deaths"
+    # A ranking asked of the city, where no index row exists, is still told that Riprap ranks nothing.
+    no_index = {k: v for k, v in T.items() if k != "hvi"}
+    assert ha.answer("Which community district is the hottest in the city? Rank them by heat vulnerability.", no_index)[0] == "no_ranking"
+    # Cooling centers are answered about first; the parks list follows.
+    assert ha.answer("how many cooling centers are near here", T)[0] == "cooling_centers"
+    # A trend question gets the station's decades, not this year and last.
+    by_year = {y: 10 + (y - 1991) // 10 for y in range(1991, 2027)}
+    trend = ha.trend_sentence("Has the number of 90 degree days gone up over the years?", ["heat_station"],
+                              {"heat_station": {"station": "JFK Airport", "year": 2026, "by_year": by_year}})
+    assert trend == ("At JFK Airport the yearly count of days at or above 90°F averaged 10.0 in 1991 to 2000, 11.0 in 2001 to "
+                     "2010, 12.0 in 2011 to 2020 and 13.0 in 2021 to 2025.")
+    assert ha.trend_sentence("How many days hit 90 this year?", ["heat_station"], {"heat_station": {"station": "x", "by_year": by_year}}) is None
+    # "How hot does East Harlem get" is about the place's surface as well as the station.
+    assert "heat_surface" in ha.answer("how hot does East Harlem get", T)[1]
+
+
+def test_the_named_half_of_a_neighbourhood_is_the_one_briefed():
+    from riprap.core.burr.intake import resolve_area
+
+    from burr.core import State
+
+    for q, name in (("heat in East Harlem (South)", "East Harlem (South)"), ("heat East Harlem south", "East Harlem (South)"),
+                    ("heat in East Harlem", "East Harlem (North)")):
+        out = resolve_area(State({"first_target": "East Harlem", "query": q, "trace": []}))
+        assert out["nta"]["nta_name"] == name, q

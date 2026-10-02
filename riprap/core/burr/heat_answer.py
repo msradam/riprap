@@ -85,16 +85,17 @@ EXPERIMENTAL = ("landcover", "landcover_nta")
 TOPICS = (
     (re.compile(r"cooling (?:cent|site)|cool (?:off|down)|spray shower|\bpools?\b|sprinkler|where can (?:i|we|people|residents)", re.I),
      COOLING),
-    (re.compile(r"emergency (?:room|department)|\b(?:er|ed) visits?\b|hospitali[sz]|heat (?:illness|stroke|exhaustion|stress)"
+    (re.compile(r"emergency (?:room|department|visits?)|\b(?:er|ed) visits?\b|hospitali[sz]|heat (?:illness|stroke|exhaustion|stress)"
                 r"|\bsick\b|\bhealth\b(?! department)", re.I), VISITS),
     (re.compile(r"vulnerab|\bhvi\b|(?<!heat )\bindex\b|\bat risk\b", re.I), HVI),
     (re.compile(r"\bheat index\b|\bfeels? like\b|\bhumid", re.I), OBS),
     (re.compile(r"\btrees?\b|canopy|\bshade|\bpaved|\bpaving|pavement|impervious|green (?:space|cover)|vegetat", re.I), COVER),
     (re.compile(r"advisor(?:y|ies)|\bwarnings?\b|\balerts?\b|\bwatch\b", re.I), ALERTS),
     (re.compile(r"\bsurface\b|landsat|satellite|heat island|hot ?spots?|\b(?:run|runs|ran|get|gets|is|are) (?:the )?hottest\b"
-                r"|\bhottest (?:parts?|blocks?|areas?|places?|spots?)\b|how hot (?:does|do) it get", re.I), SURFACE),
+                r"|\bhottest (?:parts?|blocks?|areas?|places?|spots?)\b|how hot (?:does|do) .{0,40}?\bget\b", re.I), SURFACE),
     (re.compile(r"\b(?:8[5-9]|9\d|1[01]\d)[- ]?(?:°|degrees?\b|deg\b)|\bhot days?\b|\brecord\b|hottest (?:day|it)"
                 r"|how hot (?:did|was|has|does|do)|\b(?:this|last) (?:summer|year)\b|so far this|scorcher|\bthe records\b|\bused to\b"
+                r"|\bover the years\b|\b(?:gone|going|went) up\b|\btrend|\bincreas"
                 r"|\b(?:hit|reach(?:ed)?|top(?:ped)?|over|above) (?:8[5-9]|9\d|1[01]\d)\b", re.I), STATION),
 )
 # Heat deaths are published for the city as a whole only, so no source here holds them for a place.
@@ -217,6 +218,28 @@ def record_sentence(question: str, facts: list[str], values: dict | None) -> str
             f"{v['record_since']}).")
 
 
+_TREND_RE = re.compile(r"\bover the years\b|\b(?:gone|going|went) up\b|\btrend|\bincreas|\bmore\b[^.?!]*\b(?:than|now)\b"
+                       r"|\bused to\b|\bthe records\b", re.I)
+
+
+def trend_sentence(question: str, facts: list[str], values: dict | None) -> str | None:
+    """For "have 90 degree days gone up over the years": the station's own
+    yearly counts as decade averages, as the lead. The sentence about this
+    year and last says nothing about a trend."""
+    doc = next((d for d in STATION if d in facts), None)
+    v = (values or {}).get(doc) if doc else None
+    if not isinstance(v, dict) or not _TREND_RE.search(question or ""):
+        return None
+    by_year = {int(y): n for y, n in (v.get("by_year") or {}).items() if int(y) != v.get("year")}  # whole years only
+    spans = [(a, b) for a, b in ((1991, 2000), (2001, 2010), (2011, 2020), (2021, max(by_year, default=0)))
+             if all(y in by_year for y in range(a, b + 1)) and b >= a]
+    if len(spans) < 3:
+        return None
+    parts = [f"{sum(by_year[y] for y in range(a, b + 1)) / (b - a + 1):.1f} in {a} to {b}" for a, b in spans]
+    return (f"At {v['station']} the yearly count of days at or above 90°F averaged {', '.join(parts[:-1])} and "
+            f"{parts[-1]}.")
+
+
 def count_sentence(question: str, facts: list[str], values: dict | None) -> str | None:
     """For "how many days reached 90 in 2023": that year's count from the
     station's own yearly record, as the count lead. None when the question
@@ -242,7 +265,7 @@ def count_sentence(question: str, facts: list[str], values: dict | None) -> str 
 
 _ALERTS_AT = next(i for i, (_, ids) in enumerate(TOPICS) if ids == ALERTS)
 _PARTS = r"(?:parts?|areas?|neighbou?rhoods?|blocks?|districts?|streets?|places?)"
-_RANK_RE = re.compile(rf"\b(?:which|what)\s+{_PARTS}\b|\b(?:hottest|coolest|worst|most vulnerable)\s+{_PARTS}\b"
+_RANK_RE = re.compile(rf"\b(?:which|what)\s+(?:community\s+)?{_PARTS}\b|\brank\b|\btop (?:five|ten|\d+)\b|\b(?:hottest|coolest|worst|most vulnerable)\s+{_PARTS}\b"
                       r"|\bwhere\b[^?.]*\b(?:hottest|coolest|worst|most)\b", re.I)
 
 
@@ -306,8 +329,10 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     subjects = sorted(subjects, key=lambda d: d in EXPERIMENTAL)
     tf = time_frame(q)
     if _SCORE_RE.search(q):
-        docs = have(HVI)
-        return ("no_score", docs) if docs else None
+        if docs := have(HVI):
+            return "no_score", docs
+        if not _RANK_RE.search(q):
+            return None  # a score asked where the index did not answer: nothing is quoted in its place
     # ("My kids will inherit our house. How many more heat waves in the coming decades?" asks for the projection.)
     if (_INDOORS_RE.search(q) or _DATE_RE.search(q)) and (_WILL_RE.search(q) or _NEAR_RE.search(q)) and not (
             _FAR_RE.search(q) and not _DATE_RE.search(q)):
@@ -316,7 +341,18 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
         docs = have(FORECAST, ALERTS, SURFACE)
         return ("no_prediction_heat", docs) if docs else None
     if _DEATHS_RE.search(q):
-        return "cannot_answer", have(VISITS)
+        return "no_deaths", have(VISITS)
+    # Things no source here holds, said plainly, with the nearest record after: hospital admissions, visits in a
+    # year outside the file's period, and whether a difference is significant (the file prints no intervals).
+    period = next((re.findall(r"\d{4}", str(v.get("period") or "")) for d in VISITS
+                   if isinstance(v := (values or {}).get(d), dict)), [])
+    year = _YEAR_RE.search(q)
+    if re.search(r"hospitali[sz]|\badmissions?\b|\bsignifican|\bconfidence\b|margin of error|\bstatistical", q, re.I) or (
+            any(d in VISITS for d in subjects) and year and len(period) == 2
+            and not int(period[0]) <= int(year.group(1)) <= int(period[1])):
+        return "cannot_answer", (have(VISITS) or subjects)[:4]
+    if re.search(r"cooling cent", q, re.I) and all(d in COOLING for d in subjects) and (docs := have(COOLING)):
+        return "cooling_centers", docs  # asked alone; beside other things it is one of the facts
     if TOPICS[_ALERTS_AT][0].search(q) and (not have(ALERTS) or _YEAR_RE.search(q) or re.search(r"\bhow many\b|\bwere\b|\blast (?:summer|year)\b", q, re.I)):
         # The alert source did not answer, or the question is about past alerts, which no source here holds:
         # "no active advisory" must not stand as the answer to either.
@@ -337,7 +373,9 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
         return ("heat_forecast", docs) if docs else None
     if _COUNT_DAYS_RE.search(q) or (ac.is_count_question(q) and any(d in STATION for d in subjects)):
         docs = have(STATION)
-        return ("count", docs) if docs else None
+        # The record counts days at 90°F: a question about 95 or 100 is told it is not answered, then given that.
+        other = any(t != "90" for t in _DEGREES_RE.findall(_YEAR_RE.sub(" ", q)))
+        return (("cannot_answer" if other else "count"), docs) if docs else None
     if _COMPARE_CITY_RE.search(q) and not any(d in COVER or d in HVI for d in subjects):
         docs = have(SURFACE)
         v = (values or {}).get(docs[0]) if docs else None

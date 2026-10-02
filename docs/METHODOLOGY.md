@@ -122,7 +122,9 @@ Each heat sentence carries the trap that goes with its figure:
   difference from the city's land average in the same image, as a mean over
   every clear image with the range image by image
   (`scripts/bake_surface_temperature.py`). The 90 m cells are three by three blocks of Landsat's own 30 m pixels, drawn where
-  those pixels are. The reading is of land only:
+  those pixels are. A district's or neighbourhood's reading takes in its parks and open land, and tall
+  buildings shade the ground at the late-morning overpass, so a dense district can read
+  cool. The reading is of land only:
   cells over water are left out, so a pier is not cooled by the river beside
   it, and a 150 m circle weighs each 90 m cell by the share of it inside the
   circle. A yes or no to "is it hotter here" is given only "at the

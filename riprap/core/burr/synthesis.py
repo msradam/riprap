@@ -305,6 +305,11 @@ LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From
                 "no_prediction_far": "Riprap cannot predict what will happen in one building, on one block or on a "
                                      "named day: no source here does that, and the Weather Service's forecast runs "
                                      "7 days ahead. What has been measured here:",
+                "no_deaths": "Heat deaths are published for the city as a whole only, so no source here holds them for "
+                             "a place. What the Health Department publishes by district is emergency visits for heat "
+                             "illness:",
+                "cooling_centers": "The city opens cooling centers only during a heat emergency and lists them then at "
+                                   "finder.nyc.gov/coolingcenters, so none are listed here. What NYC Parks lists:",
                 "no_score": "Riprap computes no score or rating of its own. The Health Department publishes an index "
                             "for the neighbourhood, quoted here with what it is and is not:",
                 "surface_yes": "At the surface, yes.", "surface_no": "At the surface, no."}
@@ -345,7 +350,7 @@ LIVE_POINTER = ("Riprap reads records, not the street. For a live depth reading 
 BOTH_HAZARDS = ("This question names flooding and heat. Riprap keeps them as separate briefings and does not weigh one "
                 "against the other: this is the flood record, and asking about heat alone at this place gives the heat record.")
 MORE_PLACES = ("This question names more than one place ({names}). Riprap reads one place at a time, and this answer is "
-               "for the place named at the top; ask about each on its own, or set two side by side with \"A vs B\".")
+               "for the place named at the top; ask about each on its own, or set two side by side with \"heat A vs B\".")
 HEAT_LIVE_POINTER = ("Riprap reads records, not the street. Official heat warnings come from the National Weather "
                      "Service (weather.gov/okx) and Notify NYC; during a heat emergency the city lists its cooling "
                      "centers at finder.nyc.gov/coolingcenters.")
@@ -562,11 +567,13 @@ def synthesize(state, use_llm: bool = True) -> dict:
                 lead, lead_phrase = "facts", LEAD_PHRASES["facts"]
             elif sentence:
                 lead_phrase = f"{sentence} {lead_phrase}"
-        if lead == "count" and (days := heat_answer.count_sentence(question, facts, values)):
+        if lead == "count" and (days := heat_answer.count_sentence(question, facts, values)
+                                or heat_answer.trend_sentence(question, facts, values)):
             lead_phrase = f"{days} {lead_phrase}"  # "how many days reached 90 in 2023": that year, from the station's record
             record_lead = True
         elif lead == "facts" and (peak := heat_answer.year_sentence(question, facts, values)
-                                  or heat_answer.record_sentence(question, facts, values)):
+                                  or heat_answer.record_sentence(question, facts, values)
+                                  or heat_answer.trend_sentence(question, facts, values)):
             lead_phrase = f"{peak} {lead_phrase}"  # "how hot did it get in 2025", "the hottest day on record"
             record_lead = True
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,

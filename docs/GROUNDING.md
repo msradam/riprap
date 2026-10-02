@@ -290,7 +290,10 @@ lead and the facts in this order:
 | A count of hot days | The year asked about, from the station's own yearly record; none when the question names another threshold than 90°F or a span of years | The station sentence |
 | Hotter or cooler than the city | "At the surface, yes." or "At the surface, no.", only when the question gives one direction, the city is the baseline and every Landsat image agrees; neutral otherwise | The surface measurement |
 | Hotter than another place, another borough or "than usual" | Neutral | Each place's own sentences |
-| Deaths | The cannot-answer line: they are published for the city only | Heat illness visits |
+| Deaths | "Heat deaths are published for the city as a whole only ..." | Heat illness visits |
+| Hospital admissions, visits in a year outside the file's period, whether a difference is significant, a count of days at a threshold other than 90°F | The cannot-answer line | The nearest record, after the statement that it is not the answer |
+| Cooling centers, asked alone | "The city opens cooling centers only during a heat emergency ..." | NYC Parks spray showers and pools |
+| A trend in hot days | The station's yearly counts as decade averages | The station sentence |
 | Past heat alerts, or an alert source that did not answer | The cannot-answer line: "no active advisory" is never the answer to either | What the live sources returned |
 | A named source (the index, visits, canopy, places to cool off) | Neutral, or the count lead | That source |
 | Anything else about heat | Neutral | The surface measurement, the index, the land cover map, the station record |
@@ -308,16 +311,21 @@ house number is never read as a year or a temperature. A flood answer to a
 question that names both hazards says that the two are separate briefings
 and that Riprap does not weigh one against the other.
 
-A question that names two neighbourhoods without comparing them is answered
+A part of a borough by direction ("the South Bronx") has no boundary here and
+is told so; Staten Island's North Shore, Mid-Island and South Shore are its
+three community districts. A ZIP code is declined as a ZIP. A neighbourhood
+that the city splits in two ("East Harlem (South)") is the half the query
+names. A question that names two neighbourhoods without comparing them is answered
 for one, and the answer says so and how to ask for both. A place outside New
 York City is declined as soon as it resolves, naming the place found. A
 borough or the city is named as a whole in the opening.
 
-How it was tested: 116 unit tests (`tests/test_heat.py`), independent keys
+How it was tested: 118 unit tests (`tests/test_heat.py`), independent keys
 for the facts (`tests/golden/keys_heat.py`), two question sets written by
 agents that had seen none of the code (`tests/golden/unseen_heat.json`,
 `unseen_heat2.json`), a blind judge, and a reviewer with no part in the
-build who ran inputs until answers broke. The first unseen set found the
+build who ran inputs until answers broke, and three personas (a council staffer, a
+reporter, a public health researcher) who used the running app. The first unseen set found the
 place parser, not the sources: about a third of sixty went wrong on the
 first run, almost all in finding the place or the hazard. The second set
 and the reviewer found the rules: an inverted yes or no, a house number

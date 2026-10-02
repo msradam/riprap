@@ -38,7 +38,8 @@ def get_projections() -> dict:
     out["narrative"] = (
         f"NPCC4 (2024) projects {a['days_ge_90'][25]} to {a['days_ge_90'][75]} days a year at or above 90°F in New York "
         f"City by the 2050s and {b['days_ge_90'][25]} to {b['days_ge_90'][75]} by the 2080s, as its middle range (25th "
-        f"to 75th percentile), against {BASELINE['days_ge_90']} a year in 1981-2010; the 90th percentile is "
+        f"to 75th percentile), against {BASELINE['days_ge_90']} a year in 1981-2010 (a baseline that matches Central "
+        f"Park's record, not an airport's); the 90th percentile is "
         f"{a['days_ge_90'][90]} days by the 2050s and {b['days_ge_90'][90]} by the 2080s. Days at or above 95°F go "
         f"from {BASELINE['days_ge_95']} a year to {a['days_ge_95'][25]} to {a['days_ge_95'][75]} by the 2050s and "
         f"{b['days_ge_95'][25]} to {b['days_ge_95'][75]} by the 2080s, and heat waves from {BASELINE['heat_waves']} a "

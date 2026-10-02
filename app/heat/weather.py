@@ -83,7 +83,7 @@ def station_record(lat: float, lon: float, today: date | None = None) -> dict | 
     n, last = by_year[year], by_year[year - 1]
     narrative = (f"At {name}, the nearest long-record weather station ({dist} km away), the air temperature reached 90°F "
                  f"on {n} day{'s' if n != 1 else ''} in {year} through {through} and on {last} in {year - 1}; "
-                 f"the {NORMAL[0]} to {NORMAL[1]} average is {normal} a year. The highest reading of {year} was "
+                 f"a full year averaged {normal} in {NORMAL[0]} to {NORMAL[1]}. The highest reading of {year} was "
                  f"{peak_f}°F on {peak_day}"
                  + (f", and the station's record is {record['record_f']}°F, set on {record['record_date']} (records "
                     f"from {record['record_since']})" if record else "")
@@ -160,7 +160,7 @@ def observation(lat: float, lon: float) -> dict | None:
     hi_c, rh = (p.get("heatIndex") or {}).get("value"), (p.get("relativeHumidity") or {}).get("value")
     dist = round(_km(lat, lon, slat, slon), 1)
     name = name.split(",")[0]
-    narrative = f"The air at {name}, the nearest weather station ({dist} km away), was {_f(temp_c)}°F at {at:%H:%M} on {at:%Y-%m-%d}"
+    narrative = f"The air at {name}, the nearest weather station ({dist} km away), was {_f(temp_c)}°F at {at:%H:%M} Eastern on {at:%Y-%m-%d}"
     if hi_c is not None:
         narrative += f", with a heat index of {_f(hi_c)}°F"
     elif rh is not None:

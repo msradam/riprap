@@ -81,7 +81,8 @@ A heat answer, from
 > conditioning, income and the share of Black residents; it is not a
 > measurement of heat at an address, and the department notes that every
 > neighbourhood has residents at risk, whatever its score. For Brighton Beach
-> the department lists 86.6% of households with air conditioning and 14.1%
+> the department's file gives 86.6% of households with air conditioning (a
+> survey estimate it shares across neighbouring neighbourhoods) and 14.1%
 > green space [hvi].
 
 A query about outdoor heat gets the heat briefing; a bare address or district

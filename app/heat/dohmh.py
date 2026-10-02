@@ -72,8 +72,8 @@ def _hvi_nta(code: str, name: str, where: str) -> dict | None:
                              "covers residential neighbourhoods and leaves out parks, airports and cemeteries."}
     narrative = (f"The NYC Health Department's Heat Vulnerability Index ({year}, from 2016 to 2020 data) scores "
                  f"{name}{where} {_score(a['hvi'])}. "
-                 f"{RANK_TRAP} For {name} the department lists {a['ac_pct']}% of households with air conditioning and "
-                 f"{a['green_pct']}% green space.")
+                 f"{RANK_TRAP} For {name} the department's file gives {a['ac_pct']}% of households with air conditioning (a "
+                 f"survey estimate it shares across neighbouring neighbourhoods) and {a['green_pct']}% green space.")
     return {"available": True, "hvi": a["hvi"], "area": name, "area_code": code, "year": year, "ac_pct": a["ac_pct"],
             "green_pct": a["green_pct"], "median_income": a["median_income"], "narrative": narrative,
             "headline_value": f"{a['hvi']} of 5 ({name})"}

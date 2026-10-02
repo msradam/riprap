@@ -101,8 +101,12 @@ def _summary(geom_4326, where: str) -> dict | None:
                  f"{'warmer' if hi > 0 else 'cooler'}"
     else:
         spread = f"image by image it ran from {abs(lo):.1f}°F cooler to {hi:.1f}°F warmer"
+    # Fewer images than were baked: say so, or 16 beside a neighbour's 18 reads as a different record.
+    n_all = len(m["images"])
+    images = f"{len(diffs)} clear summer images" if len(diffs) == n_all else \
+        f"{len(diffs)} of the {n_all} clear summer images (the others did not see enough of this place)"
     narrative = (f"Landsat measured the surface of {where} {_diff(mean)} the city's land average, over "
-                 f"{len(diffs)} clear summer images from {first} to {last}, each taken at {m['local_time']}; {spread}. "
+                 f"{images} from {first} to {last}, each taken at {m['local_time']}; {spread}. "
                  f"In the latest image, on {last}, the surface here read {latest_f}°F against a city average of "
                  f"{last_img['city_land_mean_f']}°F. {TRAP}")
     return {"mean_diff_f": mean, "min_diff_f": lo, "max_diff_f": hi, "n_images": len(diffs), "first": first, "last": last,
@@ -119,4 +123,4 @@ def for_point(lat: float, lon: float, radius_m: float = RADIUS_M) -> dict | None
 
 
 def for_polygon(polygon) -> dict | None:
-    return _summary(polygon, "this area")
+    return _summary(polygon, "this area (its parks and open land included)")
