@@ -4,8 +4,8 @@
  "address": "90-01 183rd Street, Queens, NY 11423",
  "question": "Will it be dangerously hot this week at 90-01 183rd Street, Queens?",
  "hazard": "heat",
- "generated_at": "2026-10-02T15:57Z",
- "riprap_commit": "e79c102",
+ "generated_at": "2026-10-02T16:26Z",
+ "riprap_commit": "a0f50ef",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -2099,9 +2099,9 @@
   "lon": -73.777712,
   "nta": null,
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the National Weather Service, as issued for the next 7 days; Riprap predicts nothing itself: Over the next 7 days the National Weather Service expects daytime highs of 83\u00b0F today, 70\u00b0F Saturday, 66\u00b0F Sunday, 69\u00b0F Monday, 61\u00b0F Tuesday, 62\u00b0F Wednesday, 67\u00b0F Thursday in the 2.5 km grid cell around this place (issued 2026-10-02 10:17 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 85\u00b0F on Friday October 2 [nws_heat_forecast]. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours [nws_heat_forecast]. The Weather Service wrote this for an area; it is not a prediction for a building. No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 15:57 UTC [nws_heat_alerts].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the National Weather Service, as issued for the next 7 days; Riprap predicts nothing itself: Over the next 7 days the National Weather Service expects daytime highs of 83\u00b0F today, 70\u00b0F Saturday, 66\u00b0F Sunday, 69\u00b0F Monday, 61\u00b0F Tuesday, 62\u00b0F Wednesday, 67\u00b0F Thursday in the 2.5 km grid cell around this place (issued 2026-10-02 10:17 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 85\u00b0F on Friday October 2 [nws_heat_forecast]. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours [nws_heat_forecast]. The Weather Service wrote this for an area; it is not a prediction for a building. No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 16:26 UTC [nws_heat_alerts].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the National Weather Service, as issued for the next 7 days; Riprap predicts nothing itself: Over the next 7 days the National Weather Service expects daytime highs of 83\u00b0F today, 70\u00b0F Saturday, 66\u00b0F Sunday, 69\u00b0F Monday, 61\u00b0F Tuesday, 62\u00b0F Wednesday, 67\u00b0F Thursday in the 2.5 km grid cell around this place (issued 2026-10-02 10:17 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 85\u00b0F on Friday October 2 [nws_heat_forecast]. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours [nws_heat_forecast]. The Weather Service wrote this for an area; it is not a prediction for a building. No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 15:57 UTC [nws_heat_alerts].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the National Weather Service, as issued for the next 7 days; Riprap predicts nothing itself: Over the next 7 days the National Weather Service expects daytime highs of 83\u00b0F today, 70\u00b0F Saturday, 66\u00b0F Sunday, 69\u00b0F Monday, 61\u00b0F Tuesday, 62\u00b0F Wednesday, 67\u00b0F Thursday in the 2.5 km grid cell around this place (issued 2026-10-02 10:17 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 85\u00b0F on Friday October 2 [nws_heat_forecast]. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours [nws_heat_forecast]. The Weather Service wrote this for an area; it is not a prediction for a building. No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 16:26 UTC [nws_heat_alerts].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -2120,7 +2120,7 @@
     },
     {
      "section": "answer",
-     "text": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 15:57 UTC.",
+     "text": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 16:26 UTC.",
      "doc_ids": [
       "nws_heat_alerts"
      ],
@@ -2151,9 +2151,9 @@
     "title": "NWS gridpoint forecast for the 2.5 km cell containing the place (api.weather.gov/gridpoints): daytime high temperatures and hourly apparent temperature. Advisory criteria from the New York office's definitions page (weather.gov/okx/wwa_definitions, read 2026-10-02).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "nws_heat_alerts": {
@@ -2162,9 +2162,9 @@
     "title": "NWS active alerts at the place (api.weather.gov/alerts/active), heat events only: Heat Advisory, Extreme Heat Watch, Extreme Heat Warning.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "heat_surface": {
@@ -2228,9 +2228,9 @@
     "title": "NWS station observations (api.weather.gov/stations/{id}/observations/latest): air temperature, relative humidity and heat index at the nearest of the region's airport and Central Park stations.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "heat_station": {
@@ -2239,9 +2239,9 @@
     "title": "NOAA Regional Climate Centers, ACIS web services (data.rcc- acis.org/StnData): daily maximum temperature at the threaded station records for Central Park, LaGuardia Airport and JFK Airport; yearly counts of days at or above 90\u00b0F and yearly maxima.",
     "url": "https://www.rcc-acis.org/docs_webservices.html",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "cool_features": {
@@ -2327,18 +2327,18 @@
   "not_checked": [],
   "deployment": "nyc",
   "heat_surface": {
-   "mean_diff_f": 7.6,
-   "min_diff_f": 5.6,
+   "mean_diff_f": 7.7,
+   "min_diff_f": 5.7,
    "max_diff_f": 9.3,
    "n_images": 18,
    "first": "2023-07-23",
    "last": "2026-08-08",
-   "latest_surface_f": 105.2,
+   "latest_surface_f": 105.3,
    "latest_city_mean_f": 97.9,
    "warmer_in_every_image": true,
    "cooler_in_every_image": false,
-   "narrative": "Landsat measured the surface of the ground within 150 m of this address at 7.6\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 5.6 to 9.3\u00b0F warmer. In the latest image, on 2026-08-08, the surface here read 105.2\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
-   "headline_value": "+7.6\u00b0F against the city's land average",
+   "narrative": "Landsat measured the surface of the ground within 150 m of this address at 7.7\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 5.7 to 9.3\u00b0F warmer. In the latest image, on 2026-08-08, the surface here read 105.3\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
+   "headline_value": "+7.7\u00b0F against the city's land average",
    "radius_m": 150
   },
   "hvi": {
@@ -2392,11 +2392,11 @@
    "station": "JFK Airport",
    "station_id": "KJFK",
    "distance_km": 8.1,
-   "observed": "2026-10-02 11:30",
+   "observed": "2026-10-02 12:00",
    "temp_f": 75,
    "heat_index_f": 76,
    "humidity_pct": 69,
-   "narrative": "The air at JFK Airport, the nearest weather station (8.1 km away), was 75\u00b0F at 11:30 on 2026-10-02, with a heat index of 76\u00b0F. This is the station's reading, not this address's.",
+   "narrative": "The air at JFK Airport, the nearest weather station (8.1 km away), was 75\u00b0F at 12:00 on 2026-10-02, with a heat index of 76\u00b0F. This is the station's reading, not this address's.",
    "headline_value": "75\u00b0F at JFK Airport"
   },
   "heat_station": {
@@ -2617,8 +2617,8 @@
   "nws_heat_alerts": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 15:57 UTC.",
-   "retrieved_at": "2026-10-02T15:57:02Z",
+   "narrative": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 16:26 UTC.",
+   "retrieved_at": "2026-10-02T16:26:48Z",
    "error": null
   },
   "nws_heat_forecast": {
@@ -2744,8 +2744,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790956622.2605162,
-    "elapsed_s": 0.03,
+    "started_at": 1790958408.551094,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {
      "address": "90-01 183 STREET, Hollis, NY, USA",
@@ -2757,7 +2757,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790956622.290432,
+    "started_at": 1790958408.6006641,
     "elapsed_s": 0.0001,
     "err": null,
     "result": {
@@ -2769,15 +2769,15 @@
    {
     "step": "heat_surface",
     "ok": true,
-    "started_at": 1790956622.2912261,
-    "elapsed_s": 0.04,
+    "started_at": 1790958408.60191,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {}
    },
    {
     "step": "hvi",
     "ok": true,
-    "started_at": 1790956622.291997,
+    "started_at": 1790958408.60178,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2785,7 +2785,7 @@
    {
     "step": "heat_visits",
     "ok": true,
-    "started_at": 1790956622.2926168,
+    "started_at": 1790958408.602836,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2793,39 +2793,39 @@
    {
     "step": "city_landcover",
     "ok": true,
-    "started_at": 1790956622.29318,
-    "elapsed_s": 0.03,
+    "started_at": 1790958408.605191,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {}
    },
    {
     "step": "landcover",
     "ok": true,
-    "started_at": 1790956622.296299,
-    "elapsed_s": 0.1,
+    "started_at": 1790958408.604772,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_obs",
     "ok": true,
-    "started_at": 1790956622.2961469,
-    "elapsed_s": 0.16,
+    "started_at": 1790958408.604286,
+    "elapsed_s": 0.12,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_station",
     "ok": true,
-    "started_at": 1790956622.30431,
-    "elapsed_s": 0.22,
+    "started_at": 1790958408.6047091,
+    "elapsed_s": 0.14,
     "err": null,
     "result": {}
    },
    {
     "step": "cool_features",
     "ok": true,
-    "started_at": 1790956622.304249,
+    "started_at": 1790958408.605577,
     "elapsed_s": 0.01,
     "err": null,
     "result": {}
@@ -2833,31 +2833,31 @@
    {
     "step": "nws_heat_alerts",
     "ok": true,
-    "started_at": 1790956622.304348,
-    "elapsed_s": 0.29,
+    "started_at": 1790958408.607101,
+    "elapsed_s": 0.25,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_forecast",
     "ok": true,
-    "started_at": 1790956622.3058949,
-    "elapsed_s": 0.31,
+    "started_at": 1790958408.607145,
+    "elapsed_s": 0.53,
     "err": null,
     "result": {}
    },
    {
     "step": "npcc4_heat",
     "ok": true,
-    "started_at": 1790956622.3097138,
-    "elapsed_s": 0.0,
+    "started_at": 1790958408.608522,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790956622.6134698,
+    "started_at": 1790958409.139976,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2866,15 +2866,15 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790956622.6135979,
+    "started_at": 1790958409.1401331,
     "ok": true,
     "result": {
-     "n_chars": 1407,
+     "n_chars": 1448,
      "n_citations": 11,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0038
+    "elapsed_s": 0.0032
    }
   ],
   "models": [

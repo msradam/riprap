@@ -4,8 +4,8 @@
  "address": "Astoria Park, Queens, NY",
  "question": "Should I go running in Astoria Park in this heat today?",
  "hazard": "heat",
- "generated_at": "2026-10-02T15:57Z",
- "riprap_commit": "e79c102",
+ "generated_at": "2026-10-02T16:26Z",
+ "riprap_commit": "a0f50ef",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -2102,7 +2102,7 @@
   "trace": [
    {
     "step": "reconcile_templated",
-    "started_at": 1790956630.950965,
+    "started_at": 1790958416.302851,
     "ok": true,
     "result": {
      "n_chars": 512,

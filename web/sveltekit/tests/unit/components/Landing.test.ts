@@ -91,7 +91,7 @@ describe('Landing smoke', () => {
       '/gallery/hollis-heat-week/'
     ]);
     // The heat figure is a surface temperature, and its label says so.
-    expect(text(cards[5])).toContain('12.2°F');
+    expect(text(cards[5])).toContain('12.4°F');
     expect(text(cards[5].querySelector('.proof-figure-label')!)).toContain('not the air');
     expect(text(cards[6])).toContain('Riprap predicts nothing itself');
     expect(text(heads[1])).toBe(

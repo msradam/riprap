@@ -85,12 +85,12 @@ export const PROOF: Proof[] = [
     slug: 'hunts-point-heat',
     kind: 'Heat at an address',
     figure: {
-      text: '12.2°F',
+      text: '12.4°F',
       label: "warmer than the city's land average: the surface of the ground, not the air",
-      from: "The surface of the ground within 150 m of this address ran 12.2°F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature)."
+      from: "The surface of the ground within 150 m of this address ran 12.4°F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature)."
     },
     quotes: [
-      "The surface of the ground within 150 m of this address ran 12.2°F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature).",
+      "The surface of the ground within 150 m of this address ran 12.4°F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature).",
       "Its neighbourhood, Hunts Point, scores 5 out of 5 on the Health Department's Heat Vulnerability Index, a rank among neighbourhoods and not a measurement."
     ]
   },

@@ -4,8 +4,8 @@
  "address": "1 West 72nd Street, Manhattan, NY",
  "question": "How many days reached 90 degrees in 2025 near 1 West 72nd Street, Manhattan?",
  "hazard": "heat",
- "generated_at": "2026-10-02T15:57Z",
- "riprap_commit": "e79c102",
+ "generated_at": "2026-10-02T16:26Z",
+ "riprap_commit": "a0f50ef",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -2099,9 +2099,9 @@
   "lon": -73.975905,
   "nta": null,
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n14 days at or above 90\u00b0F at Central Park in 2025. From the sources consulted: At Central Park, the nearest long-record weather station (1.1 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; the 1991 to 2020 average is 17 a year [heat_station]. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869) [heat_station]. These are the station's readings, not this address's.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n14 days at or above 90\u00b0F at Central Park in 2025. From the sources consulted: At Central Park, the nearest long-record weather station (0.6 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; the 1991 to 2020 average is 17 a year [heat_station]. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869) [heat_station]. These are the station's readings, not this address's.\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word; its first sentence is read from the same station's yearly record.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n14 days at or above 90\u00b0F at Central Park in 2025. From the sources consulted: At Central Park, the nearest long-record weather station (1.1 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; the 1991 to 2020 average is 17 a year [heat_station]. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869) [heat_station]. These are the station's readings, not this address's.\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\n14 days at or above 90\u00b0F at Central Park in 2025. From the sources consulted: At Central Park, the nearest long-record weather station (0.6 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; the 1991 to 2020 average is 17 a year [heat_station]. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869) [heat_station]. These are the station's readings, not this address's.\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word; its first sentence is read from the same station's yearly record.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -2112,7 +2112,7 @@
    "claims": [
     {
      "section": "answer",
-     "text": "At Central Park, the nearest long-record weather station (1.1 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; the 1991 to 2020 average is 17 a year. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869). These are the station's readings, not this address's.",
+     "text": "At Central Park, the nearest long-record weather station (0.6 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; the 1991 to 2020 average is 17 a year. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869). These are the station's readings, not this address's.",
      "doc_ids": [
       "heat_station"
      ],
@@ -2132,7 +2132,7 @@
    "answer_flags": [],
    "checks": [
     "citations and numbers on every claim",
-    "lead rules on the answer, which is the cited text word for word"
+    "lead rules on the answer, which is the cited text word for word; its first sentence is read from the same station's yearly record"
    ],
    "answered": true
   },
@@ -2143,9 +2143,9 @@
     "title": "NOAA Regional Climate Centers, ACIS web services (data.rcc- acis.org/StnData): daily maximum temperature at the threaded station records for Central Park, LaGuardia Airport and JFK Airport; yearly counts of days at or above 90\u00b0F and yearly maxima.",
     "url": "https://www.rcc-acis.org/docs_webservices.html",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "heat_surface": {
@@ -2209,9 +2209,9 @@
     "title": "NWS station observations (api.weather.gov/stations/{id}/observations/latest): air temperature, relative humidity and heat index at the nearest of the region's airport and Central Park stations.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "cool_features": {
@@ -2231,9 +2231,9 @@
     "title": "NWS active alerts at the place (api.weather.gov/alerts/active), heat events only: Heat Advisory, Extreme Heat Watch, Extreme Heat Warning.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "nws_heat_forecast": {
@@ -2242,9 +2242,9 @@
     "title": "NWS gridpoint forecast for the 2.5 km cell containing the place (api.weather.gov/gridpoints): daytime high temperatures and hourly apparent temperature. Advisory criteria from the New York office's definitions page (weather.gov/okx/wwa_definitions, read 2026-10-02).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "npcc4_heat": {
@@ -2319,18 +2319,18 @@
   "not_checked": [],
   "deployment": "nyc",
   "heat_surface": {
-   "mean_diff_f": -5.2,
-   "min_diff_f": -6.7,
-   "max_diff_f": -3.4,
+   "mean_diff_f": -4.4,
+   "min_diff_f": -5.8,
+   "max_diff_f": -2.3,
    "n_images": 18,
    "first": "2023-07-23",
    "last": "2026-08-08",
-   "latest_surface_f": 92.8,
+   "latest_surface_f": 93.6,
    "latest_city_mean_f": 97.9,
    "warmer_in_every_image": false,
    "cooler_in_every_image": true,
-   "narrative": "Landsat measured the surface of the ground within 150 m of this address at 5.2\u00b0F cooler than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 3.4 to 6.7\u00b0F cooler. In the latest image, on 2026-08-08, the surface here read 92.8\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
-   "headline_value": "-5.2\u00b0F against the city's land average",
+   "narrative": "Landsat measured the surface of the ground within 150 m of this address at 4.4\u00b0F cooler than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 2.3 to 5.8\u00b0F cooler. In the latest image, on 2026-08-08, the surface here read 93.6\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
+   "headline_value": "-4.4\u00b0F against the city's land average",
    "radius_m": 150
   },
   "hvi": {
@@ -2383,18 +2383,18 @@
   "heat_obs": {
    "station": "Central Park",
    "station_id": "KNYC",
-   "distance_km": 1.1,
-   "observed": "2026-10-02 10:51",
-   "temp_f": 75,
-   "heat_index_f": 75,
+   "distance_km": 0.6,
+   "observed": "2026-10-02 11:51",
+   "temp_f": 77,
+   "heat_index_f": 78,
    "humidity_pct": 69,
-   "narrative": "The air at Central Park, the nearest weather station (1.1 km away), was 75\u00b0F at 10:51 on 2026-10-02, with a heat index of 75\u00b0F. This is the station's reading, not this address's.",
-   "headline_value": "75\u00b0F at Central Park"
+   "narrative": "The air at Central Park, the nearest weather station (0.6 km away), was 77\u00b0F at 11:51 on 2026-10-02, with a heat index of 78\u00b0F. This is the station's reading, not this address's.",
+   "headline_value": "77\u00b0F at Central Park"
   },
   "heat_station": {
    "station": "Central Park",
    "station_id": "NYCthr",
-   "distance_km": 1.1,
+   "distance_km": 0.6,
    "year": 2026,
    "through": "2026-10-01",
    "days_ge_90": 12,
@@ -2589,7 +2589,7 @@
    "record_since": "1869",
    "max_f": 100,
    "max_date": "2026-07-02",
-   "narrative": "At Central Park, the nearest long-record weather station (1.1 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; the 1991 to 2020 average is 17 a year. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869). These are the station's readings, not this address's.",
+   "narrative": "At Central Park, the nearest long-record weather station (0.6 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; the 1991 to 2020 average is 17 a year. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869). These are the station's readings, not this address's.",
    "headline_value": "12 days at 90\u00b0F or above in 2026 (Central Park)"
   },
   "cool_features": {
@@ -2612,8 +2612,8 @@
   "nws_heat_alerts": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 15:57 UTC.",
-   "retrieved_at": "2026-10-02T15:57:07Z",
+   "narrative": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 16:26 UTC.",
+   "retrieved_at": "2026-10-02T16:26:53Z",
    "error": null
   },
   "nws_heat_forecast": {
@@ -2739,8 +2739,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790956627.455607,
-    "elapsed_s": 0.04,
+    "started_at": 1790958413.274816,
+    "elapsed_s": 0.08,
     "err": null,
     "result": {
      "address": "1 WEST 72 STREET, New York, NY, USA",
@@ -2752,7 +2752,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790956627.494608,
+    "started_at": 1790958413.351282,
     "elapsed_s": 0.0001,
     "err": null,
     "result": {
@@ -2764,7 +2764,7 @@
    {
     "step": "heat_surface",
     "ok": true,
-    "started_at": 1790956627.4953768,
+    "started_at": 1790958413.352193,
     "elapsed_s": 0.03,
     "err": null,
     "result": {}
@@ -2772,15 +2772,15 @@
    {
     "step": "hvi",
     "ok": true,
-    "started_at": 1790956627.497313,
-    "elapsed_s": 0.01,
+    "started_at": 1790958413.352237,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_visits",
     "ok": true,
-    "started_at": 1790956627.497213,
+    "started_at": 1790958413.353321,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2788,7 +2788,7 @@
    {
     "step": "city_landcover",
     "ok": true,
-    "started_at": 1790956627.496783,
+    "started_at": 1790958413.354681,
     "elapsed_s": 0.01,
     "err": null,
     "result": {}
@@ -2796,39 +2796,39 @@
    {
     "step": "landcover",
     "ok": true,
-    "started_at": 1790956627.4984179,
-    "elapsed_s": 0.06,
+    "started_at": 1790958413.3553548,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_obs",
     "ok": true,
-    "started_at": 1790956627.498989,
-    "elapsed_s": 0.2,
+    "started_at": 1790958413.3576598,
+    "elapsed_s": 0.11,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_station",
     "ok": true,
-    "started_at": 1790956627.501552,
-    "elapsed_s": 0.3,
+    "started_at": 1790958413.357635,
+    "elapsed_s": 0.14,
     "err": null,
     "result": {}
    },
    {
     "step": "cool_features",
     "ok": true,
-    "started_at": 1790956627.503989,
-    "elapsed_s": 0.0,
+    "started_at": 1790958413.357607,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_alerts",
     "ok": true,
-    "started_at": 1790956627.504986,
+    "started_at": 1790958413.357881,
     "elapsed_s": 0.19,
     "err": null,
     "result": {}
@@ -2836,15 +2836,15 @@
    {
     "step": "nws_heat_forecast",
     "ok": true,
-    "started_at": 1790956627.5055392,
-    "elapsed_s": 0.29,
+    "started_at": 1790958413.358751,
+    "elapsed_s": 0.22,
     "err": null,
     "result": {}
    },
    {
     "step": "npcc4_heat",
     "ok": true,
-    "started_at": 1790956627.506596,
+    "started_at": 1790958413.365057,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2852,7 +2852,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790956627.7998972,
+    "started_at": 1790958413.5743191,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2861,15 +2861,15 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790956627.8000379,
+    "started_at": 1790958413.574395,
     "ok": true,
     "result": {
-     "n_chars": 1004,
+     "n_chars": 1111,
      "n_citations": 11,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0042
+    "elapsed_s": 0.0022
    }
   ],
   "models": [

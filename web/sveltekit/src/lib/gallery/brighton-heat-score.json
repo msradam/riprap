@@ -4,8 +4,8 @@
  "address": "2940 Brighton 3rd St, Brooklyn, NY",
  "question": "What is the heat score for 2940 Brighton 3rd St, Brooklyn?",
  "hazard": "heat",
- "generated_at": "2026-10-02T15:57Z",
- "riprap_commit": "e79c102",
+ "generated_at": "2026-10-02T16:26Z",
+ "riprap_commit": "a0f50ef",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -2099,9 +2099,9 @@
   "lon": -73.9653338,
   "nta": null,
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nRiprap computes no score or rating of its own. The Health Department publishes an index for the neighbourhood, quoted here with what it is and is not: The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Brighton Beach, the neighbourhood around this address, at 4 out of 5 [hvi]. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. For Brighton Beach the department lists 86.6% of households with air conditioning and 14.1% green space [hvi].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nRiprap computes no score or rating of its own. The Health Department publishes an index for the neighbourhood, quoted here with what it is and is not: The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Brighton Beach, the neighbourhood around this address, at 4 out of 5 [hvi]. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. For Brighton Beach the department lists 86.6% of households with air conditioning and 14.1% green space [hvi].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nRiprap computes no score or rating of its own. The Health Department publishes an index for the neighbourhood, quoted here with what it is and is not: The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Brighton Beach, the neighbourhood around this address, at 4 out of 5 [hvi]. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. For Brighton Beach the department lists 86.6% of households with air conditioning and 14.1% green space [hvi].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nRiprap computes no score or rating of its own. The Health Department publishes an index for the neighbourhood, quoted here with what it is and is not: The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Brighton Beach, the neighbourhood around this address, at 4 out of 5 [hvi]. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. For Brighton Beach the department lists 86.6% of households with air conditioning and 14.1% green space [hvi].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -2198,9 +2198,9 @@
     "title": "NWS station observations (api.weather.gov/stations/{id}/observations/latest): air temperature, relative humidity and heat index at the nearest of the region's airport and Central Park stations.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "heat_station": {
@@ -2209,9 +2209,9 @@
     "title": "NOAA Regional Climate Centers, ACIS web services (data.rcc- acis.org/StnData): daily maximum temperature at the threaded station records for Central Park, LaGuardia Airport and JFK Airport; yearly counts of days at or above 90\u00b0F and yearly maxima.",
     "url": "https://www.rcc-acis.org/docs_webservices.html",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "cool_features": {
@@ -2231,9 +2231,9 @@
     "title": "NWS active alerts at the place (api.weather.gov/alerts/active), heat events only: Heat Advisory, Extreme Heat Watch, Extreme Heat Warning.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "nws_heat_forecast": {
@@ -2242,9 +2242,9 @@
     "title": "NWS gridpoint forecast for the 2.5 km cell containing the place (api.weather.gov/gridpoints): daytime high temperatures and hourly apparent temperature. Advisory criteria from the New York office's definitions page (weather.gov/okx/wwa_definitions, read 2026-10-02).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "npcc4_heat": {
@@ -2319,18 +2319,18 @@
   "not_checked": [],
   "deployment": "nyc",
   "heat_surface": {
-   "mean_diff_f": 3.3,
-   "min_diff_f": 0.1,
-   "max_diff_f": 5.2,
+   "mean_diff_f": 3.0,
+   "min_diff_f": -0.3,
+   "max_diff_f": 5.0,
    "n_images": 17,
    "first": "2023-07-23",
    "last": "2026-08-08",
-   "latest_surface_f": 100.2,
+   "latest_surface_f": 99.9,
    "latest_city_mean_f": 97.9,
-   "warmer_in_every_image": true,
+   "warmer_in_every_image": false,
    "cooler_in_every_image": false,
-   "narrative": "Landsat measured the surface of the ground within 150 m of this address at 3.3\u00b0F warmer than the city's land average, over 17 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.1 to 5.2\u00b0F warmer. In the latest image, on 2026-08-08, the surface here read 100.2\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
-   "headline_value": "+3.3\u00b0F against the city's land average",
+   "narrative": "Landsat measured the surface of the ground within 150 m of this address at 3.0\u00b0F warmer than the city's land average, over 17 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.3\u00b0F cooler to 5.0\u00b0F warmer. In the latest image, on 2026-08-08, the surface here read 99.9\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
+   "headline_value": "+3.0\u00b0F against the city's land average",
    "radius_m": 150
   },
   "hvi": {
@@ -2384,11 +2384,11 @@
    "station": "JFK Airport",
    "station_id": "KJFK",
    "distance_km": 18.2,
-   "observed": "2026-10-02 11:30",
+   "observed": "2026-10-02 12:00",
    "temp_f": 75,
    "heat_index_f": 76,
    "humidity_pct": 69,
-   "narrative": "The air at JFK Airport, the nearest weather station (18.2 km away), was 75\u00b0F at 11:30 on 2026-10-02, with a heat index of 76\u00b0F. This is the station's reading, not this address's.",
+   "narrative": "The air at JFK Airport, the nearest weather station (18.2 km away), was 75\u00b0F at 12:00 on 2026-10-02, with a heat index of 76\u00b0F. This is the station's reading, not this address's.",
    "headline_value": "75\u00b0F at JFK Airport"
   },
   "heat_station": {
@@ -2607,15 +2607,15 @@
     "Grady Playground"
    ],
    "pools": [],
-   "narrative": "NYC Parks lists spray showers at 7 parks or playgrounds within 800 m of this address (lists updated 2026-09-03 and 2026-09-15); nearest first: Grady Playground (spray shower, 307 m), Brighton Playground (spray shower, 520 m), Century Playground (spray shower, 536 m), Coney Island Beach Zone 3A (spray shower, 565 m), Coney Island Beach Zone 2A (spray shower, 710 m), Coney Island Beach Zone 1B (spray shower, 731 m). Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311).",
+   "narrative": "NYC Parks lists spray showers at 7 parks or playgrounds within 800 m of this address (lists updated 2026-09-03 and 2026-09-15); the six nearest: Grady Playground (spray shower, 307 m), Brighton Playground (spray shower, 520 m), Century Playground (spray shower, 536 m), Coney Island Beach Zone 3A (spray shower, 565 m), Coney Island Beach Zone 2A (spray shower, 710 m), Coney Island Beach Zone 1B (spray shower, 731 m). Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311).",
    "headline_value": "7 spray shower sites, 0 pools",
    "radius_m": 800
   },
   "nws_heat_alerts": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 15:57 UTC.",
-   "retrieved_at": "2026-10-02T15:57:06Z",
+   "narrative": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 16:26 UTC.",
+   "retrieved_at": "2026-10-02T16:26:52Z",
    "error": null
   },
   "nws_heat_forecast": {
@@ -2741,8 +2741,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790956625.795174,
-    "elapsed_s": 0.08,
+    "started_at": 1790958411.747413,
+    "elapsed_s": 0.13,
     "err": null,
     "result": {
      "address": "2940, Brighton 3rd Street, Brighton Beach, Brooklyn, Kings County, New York, 11235, United States",
@@ -2754,7 +2754,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790956625.878699,
+    "started_at": 1790958411.878628,
     "elapsed_s": 0.0001,
     "err": null,
     "result": {
@@ -2766,7 +2766,7 @@
    {
     "step": "heat_surface",
     "ok": true,
-    "started_at": 1790956625.879696,
+    "started_at": 1790958411.879313,
     "elapsed_s": 0.03,
     "err": null,
     "result": {}
@@ -2774,7 +2774,7 @@
    {
     "step": "hvi",
     "ok": true,
-    "started_at": 1790956625.879744,
+    "started_at": 1790958411.880648,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2782,7 +2782,7 @@
    {
     "step": "heat_visits",
     "ok": true,
-    "started_at": 1790956625.8805802,
+    "started_at": 1790958411.880682,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2790,7 +2790,7 @@
    {
     "step": "city_landcover",
     "ok": true,
-    "started_at": 1790956625.882463,
+    "started_at": 1790958411.88079,
     "elapsed_s": 0.01,
     "err": null,
     "result": {}
@@ -2798,23 +2798,23 @@
    {
     "step": "landcover",
     "ok": true,
-    "started_at": 1790956625.8823948,
-    "elapsed_s": 0.07,
+    "started_at": 1790958411.8811939,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_obs",
     "ok": true,
-    "started_at": 1790956625.8852391,
-    "elapsed_s": 0.11,
+    "started_at": 1790958411.882813,
+    "elapsed_s": 0.12,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_station",
     "ok": true,
-    "started_at": 1790956625.885082,
+    "started_at": 1790958411.882845,
     "elapsed_s": 0.14,
     "err": null,
     "result": {}
@@ -2822,7 +2822,7 @@
    {
     "step": "cool_features",
     "ok": true,
-    "started_at": 1790956625.8858528,
+    "started_at": 1790958411.882878,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2830,23 +2830,23 @@
    {
     "step": "nws_heat_alerts",
     "ok": true,
-    "started_at": 1790956625.886569,
-    "elapsed_s": 0.21,
+    "started_at": 1790958411.8859031,
+    "elapsed_s": 0.2,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_forecast",
     "ok": true,
-    "started_at": 1790956625.889014,
-    "elapsed_s": 0.38,
+    "started_at": 1790958411.886492,
+    "elapsed_s": 0.24,
     "err": null,
     "result": {}
    },
    {
     "step": "npcc4_heat",
     "ok": true,
-    "started_at": 1790956625.8896582,
+    "started_at": 1790958411.8925052,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2854,7 +2854,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790956626.272897,
+    "started_at": 1790958412.123578,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2863,15 +2863,15 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790956626.2729971,
+    "started_at": 1790958412.123662,
     "ok": true,
     "result": {
-     "n_chars": 1258,
+     "n_chars": 1299,
      "n_citations": 11,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0022
+    "elapsed_s": 0.0018
    }
   ],
   "models": [

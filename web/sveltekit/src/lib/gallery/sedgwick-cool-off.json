@@ -4,8 +4,8 @@
  "address": "1520 Sedgwick Avenue, Bronx, NY",
  "question": "Where can people cool off near 1520 Sedgwick Avenue, Bronx?",
  "hazard": "heat",
- "generated_at": "2026-10-02T15:57Z",
- "riprap_commit": "e79c102",
+ "generated_at": "2026-10-02T16:26Z",
+ "riprap_commit": "a0f50ef",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -2099,9 +2099,9 @@
   "lon": -73.924541,
   "nta": null,
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: NYC Parks lists spray showers at 9 parks or playgrounds within 800 m of this address (lists updated 2026-09-03 and 2026-09-15); nearest first: Sedgwick Playground (spray shower, 172 m), Plimpton Playground (spray shower, 370 m), Half-Nelson Playground (spray shower, 437 m), Quisqueya Plgd (spray shower, 547 m), Ogden Plimpton Playground (spray shower, 565 m), Wallenberg Plgd (spray shower, 672 m) [cool_features]. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311) [cool_features].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: NYC Parks lists spray showers at 9 parks or playgrounds within 800 m of this address (lists updated 2026-09-03 and 2026-09-15); the six nearest: Sedgwick Playground (spray shower, 172 m), Plimpton Playground (spray shower, 370 m), Half-Nelson Playground (spray shower, 437 m), Quisqueya Plgd (spray shower, 547 m), Ogden Plimpton Playground (spray shower, 565 m), Wallenberg Plgd (spray shower, 672 m) [cool_features]. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311) [cool_features].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: NYC Parks lists spray showers at 9 parks or playgrounds within 800 m of this address (lists updated 2026-09-03 and 2026-09-15); nearest first: Sedgwick Playground (spray shower, 172 m), Plimpton Playground (spray shower, 370 m), Half-Nelson Playground (spray shower, 437 m), Quisqueya Plgd (spray shower, 547 m), Ogden Plimpton Playground (spray shower, 565 m), Wallenberg Plgd (spray shower, 672 m) [cool_features]. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311) [cool_features].\n\n**Out of scope.** This briefing does not assess title, structural condition, or compliance with specific zoning rules. Where a probe was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: NYC Parks lists spray showers at 9 parks or playgrounds within 800 m of this address (lists updated 2026-09-03 and 2026-09-15); the six nearest: Sedgwick Playground (spray shower, 172 m), Plimpton Playground (spray shower, 370 m), Half-Nelson Playground (spray shower, 437 m), Quisqueya Plgd (spray shower, 547 m), Ogden Plimpton Playground (spray shower, 565 m), Wallenberg Plgd (spray shower, 672 m) [cool_features]. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311) [cool_features].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -2112,7 +2112,7 @@
    "claims": [
     {
      "section": "answer",
-     "text": "NYC Parks lists spray showers at 9 parks or playgrounds within 800 m of this address (lists updated 2026-09-03 and 2026-09-15); nearest first: Sedgwick Playground (spray shower, 172 m), Plimpton Playground (spray shower, 370 m), Half-Nelson Playground (spray shower, 437 m), Quisqueya Plgd (spray shower, 547 m), Ogden Plimpton Playground (spray shower, 565 m), Wallenberg Plgd (spray shower, 672 m). Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311).",
+     "text": "NYC Parks lists spray showers at 9 parks or playgrounds within 800 m of this address (lists updated 2026-09-03 and 2026-09-15); the six nearest: Sedgwick Playground (spray shower, 172 m), Plimpton Playground (spray shower, 370 m), Half-Nelson Playground (spray shower, 437 m), Quisqueya Plgd (spray shower, 547 m), Ogden Plimpton Playground (spray shower, 565 m), Wallenberg Plgd (spray shower, 672 m). Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311).",
      "doc_ids": [
       "cool_features"
      ],
@@ -2209,9 +2209,9 @@
     "title": "NWS station observations (api.weather.gov/stations/{id}/observations/latest): air temperature, relative humidity and heat index at the nearest of the region's airport and Central Park stations.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "heat_station": {
@@ -2220,9 +2220,9 @@
     "title": "NOAA Regional Climate Centers, ACIS web services (data.rcc- acis.org/StnData): daily maximum temperature at the threaded station records for Central Park, LaGuardia Airport and JFK Airport; yearly counts of days at or above 90\u00b0F and yearly maxima.",
     "url": "https://www.rcc-acis.org/docs_webservices.html",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "nws_heat_alerts": {
@@ -2231,9 +2231,9 @@
     "title": "NWS active alerts at the place (api.weather.gov/alerts/active), heat events only: Heat Advisory, Extreme Heat Watch, Extreme Heat Warning.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "nws_heat_forecast": {
@@ -2242,9 +2242,9 @@
     "title": "NWS gridpoint forecast for the 2.5 km cell containing the place (api.weather.gov/gridpoints): daytime high temperatures and hourly apparent temperature. Advisory criteria from the New York office's definitions page (weather.gov/okx/wwa_definitions, read 2026-10-02).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T15:57Z",
-    "retrieved_at": "2026-10-02T15:57Z",
-    "vintage": "2026-10-02T15:57Z",
+    "date_modified": "2026-10-02T16:26Z",
+    "retrieved_at": "2026-10-02T16:26Z",
+    "vintage": "2026-10-02T16:26Z",
     "maturity": "production"
    },
    "npcc4_heat": {
@@ -2319,18 +2319,18 @@
   "not_checked": [],
   "deployment": "nyc",
   "heat_surface": {
-   "mean_diff_f": -3.8,
-   "min_diff_f": -4.7,
-   "max_diff_f": -2.4,
+   "mean_diff_f": -4.0,
+   "min_diff_f": -4.9,
+   "max_diff_f": -2.7,
    "n_images": 16,
    "first": "2023-07-23",
    "last": "2026-08-08",
-   "latest_surface_f": 93.3,
+   "latest_surface_f": 93.0,
    "latest_city_mean_f": 97.9,
    "warmer_in_every_image": false,
    "cooler_in_every_image": true,
-   "narrative": "Landsat measured the surface of the ground within 150 m of this address at 3.8\u00b0F cooler than the city's land average, over 16 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 2.4 to 4.7\u00b0F cooler. In the latest image, on 2026-08-08, the surface here read 93.3\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
-   "headline_value": "-3.8\u00b0F against the city's land average",
+   "narrative": "Landsat measured the surface of the ground within 150 m of this address at 4.0\u00b0F cooler than the city's land average, over 16 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 2.7 to 4.9\u00b0F cooler. In the latest image, on 2026-08-08, the surface here read 93.0\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
+   "headline_value": "-4.0\u00b0F against the city's land average",
    "radius_m": 150
   },
   "hvi": {
@@ -2381,139 +2381,139 @@
    "radius_m": 500
   },
   "heat_obs": {
-   "station": "Central Park",
-   "station_id": "KNYC",
-   "distance_km": 7.9,
-   "observed": "2026-10-02 10:51",
-   "temp_f": 75,
-   "heat_index_f": 75,
-   "humidity_pct": 69,
-   "narrative": "The air at Central Park, the nearest weather station (7.9 km away), was 75\u00b0F at 10:51 on 2026-10-02, with a heat index of 75\u00b0F. This is the station's reading, not this address's.",
-   "headline_value": "75\u00b0F at Central Park"
+   "station": "LaGuardia Airport",
+   "station_id": "KLGA",
+   "distance_km": 8.4,
+   "observed": "2026-10-02 11:55",
+   "temp_f": 81,
+   "heat_index_f": 82,
+   "humidity_pct": 54,
+   "narrative": "The air at LaGuardia Airport, the nearest weather station (8.4 km away), was 81\u00b0F at 11:55 on 2026-10-02, with a heat index of 82\u00b0F. This is the station's reading, not this address's.",
+   "headline_value": "81\u00b0F at LaGuardia Airport"
   },
   "heat_station": {
-   "station": "Central Park",
-   "station_id": "NYCthr",
-   "distance_km": 7.9,
+   "station": "LaGuardia Airport",
+   "station_id": "LGAthr",
+   "distance_km": 8.4,
    "year": 2026,
    "through": "2026-10-01",
-   "days_ge_90": 12,
-   "days_ge_90_last_year": 14,
-   "normal_days_ge_90": 17,
+   "days_ge_90": 20,
+   "days_ge_90_last_year": 26,
+   "normal_days_ge_90": 22,
    "by_year": {
-    "1991": 39,
+    "1991": 34,
     "1992": 9,
-    "1993": 39,
-    "1994": 19,
-    "1995": 29,
-    "1996": 3,
-    "1997": 12,
-    "1998": 8,
-    "1999": 27,
-    "2000": 7,
-    "2001": 15,
-    "2002": 32,
-    "2003": 8,
-    "2004": 2,
-    "2005": 23,
-    "2006": 8,
-    "2007": 10,
-    "2008": 12,
-    "2009": 7,
-    "2010": 37,
-    "2011": 20,
-    "2012": 19,
-    "2013": 17,
-    "2014": 8,
+    "1993": 26,
+    "1994": 22,
+    "1995": 23,
+    "1996": 6,
+    "1997": 17,
+    "1998": 11,
+    "1999": 26,
+    "2000": 12,
+    "2001": 17,
+    "2002": 35,
+    "2003": 17,
+    "2004": 7,
+    "2005": 30,
+    "2006": 22,
+    "2007": 23,
+    "2008": 19,
+    "2009": 8,
+    "2010": 48,
+    "2011": 19,
+    "2012": 28,
+    "2013": 21,
+    "2014": 6,
     "2015": 20,
-    "2016": 22,
-    "2017": 13,
-    "2018": 21,
-    "2019": 15,
-    "2020": 20,
-    "2021": 17,
-    "2022": 25,
-    "2023": 12,
+    "2016": 32,
+    "2017": 17,
+    "2018": 38,
+    "2019": 26,
+    "2020": 34,
+    "2021": 25,
+    "2022": 30,
+    "2023": 16,
     "2024": 21,
-    "2025": 14,
-    "2026": 12
+    "2025": 26,
+    "2026": 20
    },
    "max_by_year": {
     "1991": [
-     102,
-     "1991-07-21"
+     101,
+     "1991-07-20"
     ],
     "1992": [
-     93,
+     97,
      "1992-07-14"
     ],
     "1993": [
-     102,
+     99,
      "1993-07-10"
     ],
     "1994": [
-     98,
-     "1994-06-19"
+     99,
+     "1994-07-08"
     ],
     "1995": [
-     102,
+     103,
      "1995-07-15"
     ],
     "1996": [
-     96,
+     97,
      "1996-05-20"
     ],
     "1997": [
-     97,
+     99,
      "1997-07-15"
     ],
     "1998": [
-     93,
-     "1998-07-22"
+     95,
+     "1998-06-26"
     ],
     "1999": [
      101,
      "1999-07-06"
     ],
     "2000": [
-     93,
-     "2000-05-07"
+     95,
+     "2000-06-11"
     ],
     "2001": [
-     103,
+     104,
      "2001-08-09"
     ],
     "2002": [
      98,
-     "2002-08-13"
+     "2002-07-04"
     ],
     "2003": [
-     94,
-     "2003-07-05"
+     97,
+     "2003-06-27"
     ],
     "2004": [
-     91,
+     94,
      "2004-06-09"
     ],
     "2005": [
-     99,
+     100,
      "2005-08-13"
     ],
     "2006": [
-     97,
+     102,
      "2006-08-02"
     ],
     "2007": [
-     92,
+     98,
      "2007-08-02"
     ],
     "2008": [
-     96,
-     "2008-07-19"
+     100,
+     "2008-06-10"
     ],
     "2009": [
-     92,
-     "2009-08-17"
+     94,
+     "2009-08-10"
     ],
     "2010": [
      103,
@@ -2524,73 +2524,73 @@
      "2011-07-22"
     ],
     "2012": [
-     100,
+     101,
      "2012-07-18"
     ],
     "2013": [
-     98,
-     "2013-07-18"
+     100,
+     "2013-07-19"
     ],
     "2014": [
-     92,
+     93,
      "2014-09-02"
     ],
     "2015": [
-     97,
+     95,
      "2015-09-08"
     ],
     "2016": [
-     96,
-     "2016-08-13"
+     99,
+     "2016-07-23"
     ],
     "2017": [
-     94,
-     "2017-07-20"
+     101,
+     "2017-06-13"
     ],
     "2018": [
-     96,
-     "2018-07-01"
+     98,
+     "2018-08-28"
     ],
     "2019": [
-     95,
+     100,
      "2019-07-21"
     ],
     "2020": [
-     96,
-     "2020-07-06"
+     97,
+     "2020-07-28"
     ],
     "2021": [
-     98,
+     100,
      "2021-06-30"
     ],
     "2022": [
-     97,
+     98,
      "2022-08-09"
     ],
     "2023": [
-     93,
+     96,
      "2023-09-07"
     ],
     "2024": [
-     95,
-     "2024-08-01"
+     97,
+     "2024-07-16"
     ],
     "2025": [
-     99,
+     101,
      "2025-06-24"
     ],
     "2026": [
-     100,
+     104,
      "2026-07-02"
     ]
    },
-   "record_f": 106,
-   "record_date": "1936-07-09",
-   "record_since": "1869",
-   "max_f": 100,
+   "record_f": 107,
+   "record_date": "1966-07-03",
+   "record_since": "1939",
+   "max_f": 104,
    "max_date": "2026-07-02",
-   "narrative": "At Central Park, the nearest long-record weather station (7.9 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; the 1991 to 2020 average is 17 a year. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869). These are the station's readings, not this address's.",
-   "headline_value": "12 days at 90\u00b0F or above in 2026 (Central Park)"
+   "narrative": "At LaGuardia Airport, the nearest long-record weather station (8.4 km away), the air temperature reached 90\u00b0F on 20 days in 2026 through 2026-10-01 and on 26 in 2025; the 1991 to 2020 average is 22 a year. The highest reading of 2026 was 104\u00b0F on 2026-07-02, and the station's record is 107\u00b0F, set on 1966-07-03 (records from 1939). These are the station's readings, not this address's.",
+   "headline_value": "20 days at 90\u00b0F or above in 2026 (LaGuardia Airport)"
   },
   "cool_features": {
    "n_spray_shower_sites": 9,
@@ -2609,15 +2609,15 @@
     "Wallenberg Plgd"
    ],
    "pools": [],
-   "narrative": "NYC Parks lists spray showers at 9 parks or playgrounds within 800 m of this address (lists updated 2026-09-03 and 2026-09-15); nearest first: Sedgwick Playground (spray shower, 172 m), Plimpton Playground (spray shower, 370 m), Half-Nelson Playground (spray shower, 437 m), Quisqueya Plgd (spray shower, 547 m), Ogden Plimpton Playground (spray shower, 565 m), Wallenberg Plgd (spray shower, 672 m). Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311).",
+   "narrative": "NYC Parks lists spray showers at 9 parks or playgrounds within 800 m of this address (lists updated 2026-09-03 and 2026-09-15); the six nearest: Sedgwick Playground (spray shower, 172 m), Plimpton Playground (spray shower, 370 m), Half-Nelson Playground (spray shower, 437 m), Quisqueya Plgd (spray shower, 547 m), Ogden Plimpton Playground (spray shower, 565 m), Wallenberg Plgd (spray shower, 672 m). Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311).",
    "headline_value": "9 spray shower sites, 0 pools",
    "radius_m": 800
   },
   "nws_heat_alerts": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 15:57 UTC.",
-   "retrieved_at": "2026-10-02T15:57:09Z",
+   "narrative": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 16:26 UTC.",
+   "retrieved_at": "2026-10-02T16:26:55Z",
    "error": null
   },
   "nws_heat_forecast": {
@@ -2743,8 +2743,8 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790956629.1257548,
-    "elapsed_s": 0.06,
+    "started_at": 1790958414.724528,
+    "elapsed_s": 0.07,
     "err": null,
     "result": {
      "address": "1520 SEDGWICK AVENUE, Bronx, NY, USA",
@@ -2756,7 +2756,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790956629.187757,
+    "started_at": 1790958414.797868,
     "elapsed_s": 0.0001,
     "err": null,
     "result": {
@@ -2768,15 +2768,15 @@
    {
     "step": "heat_surface",
     "ok": true,
-    "started_at": 1790956629.1896288,
-    "elapsed_s": 0.11,
+    "started_at": 1790958414.798603,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {}
    },
    {
     "step": "hvi",
     "ok": true,
-    "started_at": 1790956629.19328,
+    "started_at": 1790958414.799318,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2784,7 +2784,7 @@
    {
     "step": "heat_visits",
     "ok": true,
-    "started_at": 1790956629.194788,
+    "started_at": 1790958414.800378,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2792,63 +2792,63 @@
    {
     "step": "city_landcover",
     "ok": true,
-    "started_at": 1790956629.199027,
-    "elapsed_s": 0.04,
+    "started_at": 1790958414.800351,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "landcover",
     "ok": true,
-    "started_at": 1790956629.199709,
-    "elapsed_s": 0.14,
+    "started_at": 1790958414.800321,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_obs",
     "ok": true,
-    "started_at": 1790956629.200581,
-    "elapsed_s": 0.28,
+    "started_at": 1790958414.8015969,
+    "elapsed_s": 0.11,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_station",
     "ok": true,
-    "started_at": 1790956629.217025,
-    "elapsed_s": 0.37,
+    "started_at": 1790958414.8035252,
+    "elapsed_s": 0.14,
     "err": null,
     "result": {}
    },
    {
     "step": "cool_features",
     "ok": true,
-    "started_at": 1790956629.220413,
-    "elapsed_s": 0.01,
+    "started_at": 1790958414.805163,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_alerts",
     "ok": true,
-    "started_at": 1790956629.226231,
-    "elapsed_s": 0.36,
+    "started_at": 1790958414.8073359,
+    "elapsed_s": 0.21,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_forecast",
     "ok": true,
-    "started_at": 1790956629.2330182,
-    "elapsed_s": 0.42,
+    "started_at": 1790958414.807304,
+    "elapsed_s": 0.33,
     "err": null,
     "result": {}
    },
    {
     "step": "npcc4_heat",
     "ok": true,
-    "started_at": 1790956629.2335858,
+    "started_at": 1790958414.807366,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2856,7 +2856,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790956629.652137,
+    "started_at": 1790958415.142682,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2865,15 +2865,15 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790956629.6523468,
+    "started_at": 1790958415.142805,
     "ok": true,
     "result": {
-     "n_chars": 1230,
+     "n_chars": 1273,
      "n_citations": 11,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0055
+    "elapsed_s": 0.0032
    }
   ],
   "models": [
