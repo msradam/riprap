@@ -416,9 +416,10 @@ async def api_agent_stream(q: str):
 
 
 @app.get("/api/district/{code}")
-def api_district(code: str, no_llm: bool = False):
+def api_district(code: str, no_llm: bool = False, hazard: str = Query("flood", pattern="^(flood|heat)$")):
     """Evidence summary for an NYC community district (QN12, BK15): the
-    neighbourhood pipeline over the union of the district's NTAs."""
+    neighbourhood pipeline over the union of the district's NTAs, for its
+    flood evidence or, with hazard=heat, its heat evidence."""
     from riprap.core.burr.app import district_summary
     from riprap.core.burr.place import parse_district
 
@@ -426,7 +427,7 @@ def api_district(code: str, no_llm: bool = False):
     if not found:
         return JSONResponse({"error": refusal or f"{code!r} is not a community district code such as QN12"},
                             status_code=404)
-    return JSONResponse(_to_json_safe(district_summary(found, no_llm=no_llm)))
+    return JSONResponse(_to_json_safe(district_summary(found, no_llm=no_llm, hazard=hazard)))
 
 
 @app.get("/api/nyc311/flood_requests")

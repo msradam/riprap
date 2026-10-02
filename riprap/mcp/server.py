@@ -6,8 +6,8 @@ the well-designed ones expose a median of ~19% of the wrapped API's
 operations through curation, not mirroring (arxiv.org/html/2507.16044).
 
   list_sources(deployment)            the stones and pebbles a deployment runs
-  get_evidence(address)               cited evidence for an address, no LLM
-  get_district_summary(code)          the same for an NYC community district
+  get_evidence(address, hazard)       cited evidence for an address, no LLM (flood, or heat in NYC)
+  get_district_summary(code, hazard)  the same for an NYC community district
   get_citation(deployment, doc_id)    provenance and vintage for one source
   nyc311_flood_requests(...)          311 flood requests near a point or in a district
   plan_query(question, address)       how a question would be routed, without running it
@@ -34,7 +34,11 @@ mcp = MCPServer(
     instructions=(
         "Riprap composes public-record flood data (FEMA, NOAA, USGS, NWS, "
         "NYC 311, NYC DEP, FloodNet) into cited evidence for a US street "
-        "address. Every evidence item carries its sentence, the source's own "
+        "address, and for New York City public-record heat data as well "
+        "(Landsat surface temperature, the Health Department's index and heat "
+        "illness visits, station records, the Weather Service's forecast, "
+        "NPCC4): pass hazard='heat', or ask get_briefing a heat question. "
+        "Every evidence item carries its sentence, the source's own "
         "figures (value), its source URL and data vintage, and a doc_id "
         "resolvable via get_citation. Riprap "
         "is an informational reference, not a FEMA flood zone determination, "
@@ -137,9 +141,23 @@ def _evidence_payload(out: dict) -> dict:
     return {**body, "record": _record(out, body)}
 
 
+def _heat_plan(place: str) -> dict:
+    """The plan for a bare place's heat briefing."""
+    from riprap.core.burr.app import plan_for
+
+    plan = plan_for(place, no_llm=True)
+    if plan["intent"] not in ("not_implemented", "out_of_scope"):
+        plan["focus"] = {"hazard": "heat", "time_frame": "any", "assets": []}
+    return plan
+
+
 @mcp.tool()
-def get_evidence(address: str) -> dict:
-    """Cited flood evidence for a US street address, without an LLM.
+def get_evidence(address: str, hazard: str = "flood") -> dict:
+    """Cited flood evidence for a US street address, without an LLM; with
+    hazard="heat", the heat evidence for a New York City address (measured
+    surface temperature, the Health Department's vulnerability index and
+    heat illness visits, the station record, the Weather Service's forecast
+    and alerts, NPCC4 projections, NYC Parks cooling features).
 
     Geocodes the address, routes it to the deployment covering it, runs
     every data source for that place and returns one entry per source
@@ -152,20 +170,28 @@ def get_evidence(address: str) -> dict:
     """
     from riprap.core.burr.app import run
 
+    if hazard not in ("flood", "heat"):
+        return {"error": f"hazard must be 'flood' or 'heat', not {hazard!r}"}
+    if hazard == "heat":
+        return _evidence_payload(run(address, _heat_plan(address), no_llm=True))
     return _evidence_payload(run(address, no_llm=True))
 
 
 @mcp.tool()
-def get_district_summary(community_district: str) -> dict:
+def get_district_summary(community_district: str, hazard: str = "flood") -> dict:
     """The same evidence for an NYC community district, such as QN12
     (Jamaica, St. Albans, Hollis) or BK15 (Sheepshead Bay, Homecrest):
     shares of the district in the Sandy and DEP extents, terrain, 311 flood
     complaints, the exposed subway entrances, schools, NYCHA developments
     and hospitals, NYC Planning's floodplain counts and DOB permits, without
-    an LLM."""
+    an LLM. With hazard="heat": the district's surface temperature against
+    the city's, its Heat Vulnerability Index and heat illness visits, tree
+    canopy, the station record, the forecast and NYC Parks cooling features."""
     from riprap.core.burr.app import district_summary
 
-    return _evidence_payload(district_summary(community_district, no_llm=True))
+    if hazard not in ("flood", "heat"):
+        return {"error": f"hazard must be 'flood' or 'heat', not {hazard!r}"}
+    return _evidence_payload(district_summary(community_district, no_llm=True, hazard=hazard))
 
 
 @mcp.tool()
@@ -231,6 +257,9 @@ def plan_query(question: str, address: str | None = None) -> dict:
 def get_briefing(address: str, question: str | None = None) -> dict:
     """The flood-exposure briefing for a US street address, optionally
     answering a question about it ("Has this block flooded since Ida?").
+    A question about outdoor heat ("Is this block hotter than the rest of
+    the city?", "Will it be dangerously hot this week?") gets the heat
+    briefing's answer instead, for New York City addresses.
     Works without an LLM: the briefing is then the cited evidence, a
     question is answered by rules over its words, and `mode` is "no_llm"
     (the HTTP API calls the same value `grounding.tier`).
