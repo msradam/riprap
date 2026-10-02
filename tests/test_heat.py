@@ -661,6 +661,7 @@ def test_what_a_fresh_reviewer_broke():
     for q in ("Is it too hot for my kids to play outside in Hunts Point today?", "What precautions should residents of QN12 take in a heat wave?",
               "Would you recommend moving to Hunts Point given the heat?", "Do I need an air conditioner at 80 Pioneer Street, Brooklyn?"):
         assert heuristic_plan(q)["intent"] == "out_of_scope", q
+    assert heuristic_plan("Will the playground at Tompkins Square Park be too hot to use on the afternoon of July 15?")["intent"] != "out_of_scope"
     # A named day by ordinal or by holiday is still a named day.
     for q in (f"Will it reach 100 on July 4th at {A}?", f"Will it be hot on Labor Day at {A}?"):
         assert ha.answer(q, T)[0] == "no_prediction_heat", q

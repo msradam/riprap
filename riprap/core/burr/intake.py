@@ -195,7 +195,7 @@ _HEAT_ADVICE_RE = re.compile(
     r"|\bshould (i|we|my \w+)\b|\bis it (too hot|ok|okay) to\b|\bcan (i|we|my \w+) (go|run|walk|exercise|work|play|leave)\b"
     r"|\bsymptoms?\b|\bwhat (should|do) (i|we) do\b|\bhow (do|can|should) (i|we) (stay|keep|treat|protect|cool)\b"
     # Found by a reviewer: advice asked without "should I".
-    r"|\btoo hot (?:for|to)\b|\bprecautions?\b|\brecommend|\bdo (?:i|we) need\b|\bis it safe\b|\bsafe (?:to|for)\b"
+    r"|\bis it too hot for\b|\bprecautions?\b|\brecommend|\bdo (?:i|we) need\b|\bis it safe\b|\bsafe (?:to|for)\b"
     r"|\bwhat should (?:\w+ ){1,4}(?:do|take)\b", re.I)
 
 

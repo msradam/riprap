@@ -104,6 +104,10 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
                 # The parser's span carries the borough the query implies; the
                 # model's "90-01 183rd St in Hollis" matched no place.
                 targets = guard["targets"]
+            elif place_kind == "neighborhood" and guard["intent"] == "single_address" and intent in POLYGON_INTENTS:
+                # A named building ("Red Hook Houses") is a point for the geocoder; the model made it
+                # an area, which matched no tabulation area.
+                intent, targets = "single_address", guard["targets"]
             elif place_kind == "district":
                 # The code parser read the district code; the model's own words
                 # ("Queens Community Board 12") match no tabulation area.

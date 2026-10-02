@@ -73,3 +73,18 @@ def test_a_district_code_in_the_query_outranks_the_planners_words(monkeypatch):
     plan = app.plan_for("How many flood complaints has Queens Community Board 12 had?")
     assert plan["intent"] == "neighborhood"
     assert plan["targets"] == [{"type": "district", "text": "QN12"}]
+
+
+def test_a_named_building_stays_a_point_when_the_model_calls_it_an_area(monkeypatch):
+    """"Red Hook Houses: which is worse there, flooding or heat?" got a
+    neighbourhood plan for "Red Hook Houses", which is no tabulation area."""
+    import app.planner as planner
+
+    q = "Red Hook Houses: which is worse there, flooding or heat?"
+    monkeypatch.setattr(app, "_tier", lambda: "llm")
+    monkeypatch.setattr(app, "llm_bare", lambda: False, raising=False)
+    monkeypatch.setattr(planner, "plan", lambda *a, **k: planner.Plan(
+        intent="neighborhood", targets=[{"type": "nta", "text": "Red Hook Houses"}], rationale="x", question=q))
+    plan = app.plan_for(q)
+    assert plan["intent"] == "single_address" and plan["targets"][0]["type"] == "address"
+    assert plan["targets"][0]["text"].startswith("Red Hook Houses")
