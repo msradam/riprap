@@ -97,6 +97,9 @@ uv sync --extra ml                                    # the surge forecast
 uv sync --extra eo                                    # to rerun the batch jobs
 uv run python scripts/backtest_surge.py               # writes data/experimental/surge.json
 uv run python scripts/run_eo_batch.py --heavy-rain-since 2017 --min-inches 1.5
+# The land-cover weights are local: prepare the labels and train them first.
+uv run python scripts/prepare_landcover_labels.py     # also: --bake-city-map for data/landcover_nyc_2017.tif
+uv run python scripts/train_cover.py --model terramind_base_px
 uv run python scripts/run_landcover_batch.py --years 2018 2021 2024 2026
 ```
 
@@ -284,9 +287,19 @@ provenance below.
 Since 2026-10-02 the land-cover layer comes from a model trained here on the
 city's own map. It estimates, for each 10 m Sentinel-2 pixel, the share in
 eight classes: tree canopy, grass and shrub, bare soil, water, building, road,
-other paved and railroad. Riprap reports three groups (paved or built over,
-green, water) and, inside green, the tree canopy share, which matters for
-urban heat.
+other paved and railroad. Riprap reports paved or built over, green and,
+inside green, the tree canopy share, which matters for urban heat; water
+and bare ground are stated where either is 1% or more.
+
+The city's own 2017 map is the measured source, and it comes first. A
+question about paving or canopy is answered with the map's sentence, cited
+to NYC Open Data (`city_landcover`, read from `data/landcover_nyc_2017.tif`,
+the 6 inch classes counted into 30 m cells). The model's sentence follows it
+as the estimate for the latest imagery. Its hedge says what the test below
+found: read as if it were 2021, the 2017 map is closer to the 2021 map (3.0
+points mean error per group) than this model (4.8 at best), so the map is
+the more accurate source for the year it covers. The 2021 map is CC BY-NC-SA
+and is never shipped; only its scores are quoted.
 
 It is TerraMind 1.0 base (IBM and ESA, the same pinned checkpoint as before)
 with a UNet decoder, plus a small per-pixel network on the twelve bands whose
@@ -298,7 +311,8 @@ against the city's 2017 six-inch land cover map (NYC Open Data), counted into
 the decoder's rate, and the weights that score best on validation squares are
 kept. Training took 49 minutes on an Apple M5. The weights (412 MB of
 safetensors) are not published; `app/experimental.py` pins them by SHA-256
-(`15dc40f`), and the batch job refuses a file with another hash.
+(`15dc40f`), and the batch job refuses a file with another hash. Publishing
+them is the owner's decision.
 
 **The test.** The city is cut into 2 km squares; one in five is a test square
 the model never saw in training. Each model is scored on 2021 Sentinel-2
@@ -329,7 +343,7 @@ the final choice was made on validation.
 | This model (TerraMind base with a per-pixel branch) | 5.3 / 4.8 | 0.77 / 0.83 | 0.90 / 0.90 | 1.9 / 2.2 | 2.0 |
 | The same, second seed | 5.3 / 4.8 | 0.76 / 0.83 | 0.90 / 0.90 | 1.7 / 2.5 | 1.8 |
 | TerraMind small with a per-pixel branch | 5.4 / 4.8 | 0.77 / 0.82 | 0.90 / 0.90 | 1.4 / 2.0 | 2.1 |
-| TerraMind base alone | 6.8 / 6.3 | 0.62 / 0.72 | 0.81 / 0.80 | 4.2 / 4.5 | 3.8 |
+| TerraMind base alone | 6.8 / 6.3 | 0.62 / 0.72 | 0.82 / 0.81 | 4.2 / 4.5 | 3.8 |
 | TerraMind small alone | 6.6 / 6.0 | 0.66 / 0.73 | 0.84 / 0.83 | 1.7 / 3.2 | 5.5 |
 | TerraMind tiny alone | 7.0 / 6.6 | 0.65 / 0.70 | 0.83 / 0.81 | 1.3 / 3.3 | 5.7 |
 | A UNet with no pretraining (two seeds) | 6.4 / 5.5 and 6.3 / 5.4 | 0.64 / 0.76 | 0.89 / 0.88 | 1.0 / 1.1 and 1.3 / 3.4 | 4.0 and 5.6 |
@@ -340,8 +354,10 @@ the final choice was made on validation.
 
 So TerraMind earns its place only with the per-pixel branch: alone, every
 size is worse than a UNet with no pretraining; with it, it beats every other
-model on mean error and on paving, and on canopy every model but the
-TESSERA probe, and it is the steadiest between two images of one year. (The
+model on mean error, ties TerraMind small with the same branch on paving,
+and on canopy is behind only the TESSERA probe (and, by 0.002 of R² on the
+June image, TerraMind small with the branch); it is among the steadiest
+between two images of one year. (The
 UNet's first-round weights, its last rather than its best on validation,
 scored 6.2 and 5.3, a little better than the 6.4 and 5.5 above; either way
 it trails.) The adapter's "trees and shrubs" class is counted as canopy
@@ -368,7 +384,11 @@ at 30 m, and the model sees about as much of it as the maps do.
 **In the app.** `scripts/run_landcover_batch.py` maps each summer since 2018
 with the clearest full-city dates, writes five percent bands at 30 m to
 `data/eo/landcover_<year>.tif`, and scores the 2021 map against the city's
-2021 map on the test squares. For 2021 it
+2021 map on the test squares. A run that does not rescore (no 2021 in the
+run, or no 2021 key on the machine) leaves the saved evaluation as it was.
+The app reads the latest year that sees at least nine tenths of the ground
+the best year sees, so a half-clouded year does not stand for a whole
+place. For 2021 it
 reads a typical district's paved share 1.7 points above the city map's on
 the test squares (median gap 1.8 points, largest 7.8); a 30 m cell's paved
 share is off by 6.6 points on average (R² 0.90) and its canopy share by 8.4
@@ -423,10 +443,10 @@ own land cover tokens with a second encoder and decoder (the sampler) and
 then reads them beside the image. An earlier note said the generation
 weights were in neither repository. They are in the pinned base checkpoint;
 the first check built the model without them, so its sampler was random.
-It left 310 of the sampler's 323 tensors random (13 are shared with the
-encoder embeddings it did load). `scripts/check_tim.py` loads all 323
-through TerraTorch's own filter, which raises if one is missing (a separate
-check found each equal to the checkpoint), and reruns the same box and key.
+`scripts/check_tim.py` rebuilds that state (all 323 sampler tensors missing
+from the load, `sampler_tensors_random` in the result file), then loads all
+323 through TerraTorch's own filter, which raises if one is missing (249 of
+them change value on loading), and reruns the same box and key.
 On 2021-06-16, with Sentinel-2 on the app's scale (scenes before 2022
 lifted by 1000, which is why `lulc_nyc` reads 90.2% here and 90.5% in the
 unlifted run above), the corrected `tim_nyc` agrees with WorldCover on 89.8%
@@ -448,7 +468,7 @@ git-ignored `outputs/` folder, and the owner decides what to publish.
 
 | Model | Repository at commit | File | Format | SHA-256 | Used by |
 |---|---|---|---|---|---|
-| TerraMind 1.0 base | `ibm-esa-geospatial/TerraMind-1.0-base` at `fb96c70` | `TerraMind_v1_base.pt` | PyTorch, `weights_only=True` | `83c3a0938067c83867a46e564443c2fa38383bf4f966d931b11cb025b847d7ec` | the app's land-cover batch, `check_tim.py`, `train_cover.py` |
+| TerraMind 1.0 base | `ibm-esa-geospatial/TerraMind-1.0-base` at `fb96c70` | `TerraMind_v1_base.pt` | PyTorch, `weights_only=True` | `83c3a0938067c83867a46e564443c2fa38383bf4f966d931b11cb025b847d7ec` | `train_cover.py`, `check_tim.py` (the land-cover batch reads only the trained weights) |
 | TerraMind 1.0 small | `ibm-esa-geospatial/TerraMind-1.0-small` at `960f754` | `TerraMind_v1_small.pt` | PyTorch, `weights_only=True` | `755e9cce9483fd61334ef66c79f805406db5151a8b44a685c8fbbe023c684701` | `train_cover.py` |
 | TerraMind 1.0 tiny | `ibm-esa-geospatial/TerraMind-1.0-tiny` at `2b5ac0a` | `TerraMind_v1_tiny.pt` | PyTorch, `weights_only=True` | `e56ea9ebcd4451078b9ca4893d5cd8a89bbee376ae16829c3e7fbbbc76de0eba` | `train_cover.py` |
 | TerraMind-base-Flood | `ibm-esa-geospatial/TerraMind-base-Flood` at `1e4b242` | `TerraMind_v1_base_ImpactMesh_flood.pt` | PyTorch (a Lightning checkpoint of tensors), `weights_only=True` | `22627584c2db618c2f6ddb64b411a95762a893becb25104e3f66bfebecaa71e9` | `run_flood_ida.py`, `check_flood_impactmesh.py` |

@@ -73,7 +73,7 @@ references:
     authors:
       - name: "IBM Research and the European Space Agency"
     year: 2025
-    notes: "Base of the experimental land-cover layer, msradam/TerraMind-NYC-Adapters. Apache-2.0. https://huggingface.co/ibm-esa-geospatial/TerraMind-1.0-base"
+    notes: "Base of the experimental NYC land-cover model, fine-tuned in this repository on NYC Land Cover 2017 (scripts/train_cover.py). Apache-2.0. https://huggingface.co/ibm-esa-geospatial/TerraMind-1.0-base"
   - type: software
     title: "riprap-models: reproduction of three NYC fine-tuned foundation models"
     authors:

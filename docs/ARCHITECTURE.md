@@ -227,7 +227,8 @@ Point pebbles:
 | **usgs_gauges** *(live, federal)* | Live stage at the nearest USGS stream gauge (OGC API). | empirical |
 | **ttm_battery_surge** *(live, experimental)* | A 96-hour forecast of the surge at the Battery from the author's Granite TTM fine-tune, hedged. Says it is not installed without the `ml` extra. | modeled |
 | **prithvi_water** *(experimental)* | New surface water a satellite model showed near this address after Hurricane Ida and other heavy rain, from saved batch output. | modeled |
-| **landcover** *(experimental)* | Paved and green shares near this address by year, from a satellite land-cover model's saved output. | modeled |
+| **city_landcover** | Paved, green and tree canopy shares near this address, from the city's 2017 land cover map (6 inch). Quoted when a question asks. | empirical |
+| **landcover** *(experimental)* | The same shares from the latest satellite imagery, a land-cover model's saved output, after the city map's sentence. | modeled |
 
 Polygon pebbles, for a neighbourhood or a community district: `sandy_nta`,
 the three `dep_*_nta` scenarios, `microtopo_nta`, `nyc311_nta`,
