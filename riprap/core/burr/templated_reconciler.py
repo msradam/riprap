@@ -269,7 +269,8 @@ def nothing_built(state) -> str:
     if hazard_of(state.get("plan")) == "heat" and state.get("deployment") != "nyc":
         where = (state.get("geocode") or {}).get("address") or "this place"
         return (f"{_scope_header()}\n\nRiprap's heat briefing covers New York City only, and the place it found for "
-                f"this query is outside it: {where}. If you meant a place in the city, add its borough.")
+                f"this query is outside it: {where}. So this briefing has no heat evidence to show. If you meant a place "
+                "in the city, add its borough.")
     ok = {t.get("step"): t.get("ok") for t in state.get("trace") or []}
     consulted = state.get("consulted") or []
     failed = [e["title"] for e in consulted if ok.get(e["id"]) is False]

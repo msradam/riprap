@@ -54,7 +54,7 @@ INDOOR_HEATING = ("This reads as a question about indoor heating (no heat or hot
                   "311) and are enforced by the Department of Housing Preservation and Development.")
 
 # The basketball team: "what time is the Heat game at Barclays Center".
-SPORT_RE = re.compile(r"\bmiami heat\b|\bheat (?:game|tickets?|roster|score)\b|\bthe Heat\b(?-i:(?<=Heat))(?= (?:game|play|are|vs|beat|lost|won))", re.I)
+SPORT_RE = re.compile(r"\bmiami heat\b|\bheat (?:game|tickets?)\b|\bthe Heat\b(?-i:(?<=Heat))(?= (?:game|play|are|vs|beat|lost|won))", re.I)
 NOT_WEATHER = ("This reads as a question about the Miami Heat, not the weather. Riprap reports flood and heat records "
                "for New York City places, each cited to its source.")
 

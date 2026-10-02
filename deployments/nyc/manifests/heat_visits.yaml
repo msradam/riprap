@@ -18,7 +18,7 @@ config:
   args:
     - {source: lat}
     - {source: lon}
-  on_none: offline
+  on_none: passthrough  # no row for this place (a park, an airport, a borough) is not a failure
 
 provenance:
   date_modified: 2024-08-24

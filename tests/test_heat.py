@@ -157,6 +157,9 @@ def test_heat_outside_the_city_is_said_not_briefed():
              "geocode": {"address": "30 Montgomery Street, Jersey City, New Jersey"}}
     text = nothing_built(state)
     assert "covers New York City only" in text and "30 Montgomery Street, Jersey City" in text
+    from riprap.core.compliance import check_briefing
+
+    assert not check_briefing(text).failed  # it is shown as a briefing, so the disclosure checks run on it
 
 
 def test_bare_places_and_questions():
@@ -327,6 +330,8 @@ def test_the_record_and_a_year_in_any_position_reach_their_leads():
 def test_the_basketball_team_is_not_the_weather():
     plan = heuristic_plan("what time is the Heat game at Barclays Center tonight")
     assert plan["intent"] == "not_implemented" and "Miami Heat" in plan["rationale"]
+    # "Heat score" is a question about a score for heat, not the game's (the first version of this rule caught it).
+    assert heuristic_plan("What is the heat score for 2940 Brighton 3rd St, Brooklyn?")["intent"] == "single_address"
     assert heuristic_plan("how bad is the heat at Barclays Center tonight")["focus"]["hazard"] == "heat"
 
 
