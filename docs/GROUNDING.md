@@ -283,7 +283,7 @@ lead and the facts in this order:
 |---|---|---|
 | A score, a rating, a grade or a ranking | "Riprap computes no score or rating of its own ..." | The Health Department's index, as the department's |
 | The hottest or worst part of a place | "Riprap does not rank places against each other or pick out the worst part of one ..." | The record for the whole place named |
-| One apartment, one block or a calendar date in the future | "Riprap cannot predict what will happen in one building, on one block or on a named day ..." | The Weather Service's forecast and alerts, the surface measurement |
+| One apartment, one block or a calendar date in the future | "Riprap cannot predict what will happen in one building, on one block or on a named day ..." | The Weather Service's forecast and alerts, the surface measurement; for a day the 7-day forecast cannot reach (next July, next summer), what was measured here and the station record instead |
 | Now, today | Neutral | The latest observation, any active heat alert, the forecast; what the question names comes first |
 | The coming days | "From the National Weather Service, as issued for the next 7 days; Riprap predicts nothing itself:" | The forecast and alerts |
 | The coming decades | Neutral | NPCC4 Table 4 |
@@ -308,7 +308,12 @@ house number is never read as a year or a temperature. A flood answer to a
 question that names both hazards says that the two are separate briefings
 and that Riprap does not weigh one against the other.
 
-How it was tested: 115 unit tests (`tests/test_heat.py`), independent keys
+A question that names two neighbourhoods without comparing them is answered
+for one, and the answer says so and how to ask for both. A place outside New
+York City is declined as soon as it resolves, naming the place found. A
+borough or the city is named as a whole in the opening.
+
+How it was tested: 116 unit tests (`tests/test_heat.py`), independent keys
 for the facts (`tests/golden/keys_heat.py`), two question sets written by
 agents that had seen none of the code (`tests/golden/unseen_heat.json`,
 `unseen_heat2.json`), a blind judge, and a reviewer with no part in the
@@ -316,8 +321,10 @@ build who ran inputs until answers broke. The first unseen set found the
 place parser, not the sources: about a third of sixty went wrong on the
 first run, almost all in finding the place or the hazard. The second set
 and the reviewer found the rules: an inverted yes or no, a house number
-read as a year, a landmark answered with its borough's figure. Each is now
-a test built from the input that found it.
+read as a year, a landmark answered with its borough's figure. The
+independent key agreed on 1,581 of 1,623 facts and found the surface raster
+half a Landsat pixel out of place and Central Park's coordinate rounded by
+530 m. Each is now a test built from the input that found it, or a fixture.
 
 ## 311 counts
 

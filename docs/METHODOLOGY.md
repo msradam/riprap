@@ -121,7 +121,8 @@ Each heat sentence carries the trap that goes with its figure:
   temperature in one image depends on the day, so the sentence gives the
   difference from the city's land average in the same image, as a mean over
   every clear image with the range image by image
-  (`scripts/bake_surface_temperature.py`). The reading is of land only:
+  (`scripts/bake_surface_temperature.py`). The 90 m cells are three by three blocks of Landsat's own 30 m pixels, drawn where
+  those pixels are. The reading is of land only:
   cells over water are left out, so a pier is not cooled by the river beside
   it, and a 150 m circle weighs each 90 m cell by the share of it inside the
   circle. A yes or no to "is it hotter here" is given only "at the
