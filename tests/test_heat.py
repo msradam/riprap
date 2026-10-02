@@ -776,16 +776,20 @@ def test_what_three_personas_found():
     trend = ha.trend_sentence("Has the number of 90 degree days gone up over the years?", ["heat_station"],
                               {"heat_station": {"station": "JFK Airport", "year": 2026, "by_year": by_year}})
     assert trend == ("At JFK Airport the yearly count of days at or above 90°F averaged 10.0 in 1991 to 2000, 11.0 in 2001 to "
-                     "2010, 12.0 in 2011 to 2020 and 13.0 in 2021 to 2025.")
+                     "2010, 12.0 in 2011 to 2020 and 13.0 in 2021 to 2025 [heat_station].")
+    # A trend in visits is not a trend in hot days: the visits file is one five-year total.
+    q = "heat-related emergency department visits here 2019 to 2024 trend"
+    assert ha.answer(q, T, visits)[0] == "cannot_answer"
+    assert ha.trend_sentence(q, ["heat_visits", "heat_station"], {"heat_station": {"station": "JFK Airport", "year": 2026, "by_year": by_year}}) is None
     assert ha.trend_sentence("How many days hit 90 this year?", ["heat_station"], {"heat_station": {"station": "x", "by_year": by_year}}) is None
     # "How hot does East Harlem get" is about the place's surface as well as the station.
     assert "heat_surface" in ha.answer("how hot does East Harlem get", T)[1]
 
 
 def test_the_named_half_of_a_neighbourhood_is_the_one_briefed():
-    from riprap.core.burr.intake import resolve_area
-
     from burr.core import State
+
+    from riprap.core.burr.intake import resolve_area
 
     for q, name in (("heat in East Harlem (South)", "East Harlem (South)"), ("heat East Harlem south", "East Harlem (South)"),
                     ("heat in East Harlem", "East Harlem (North)")):

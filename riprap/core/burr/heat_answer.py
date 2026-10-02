@@ -226,7 +226,7 @@ def trend_sentence(question: str, facts: list[str], values: dict | None) -> str 
     """For "have 90 degree days gone up over the years": the station's own
     yearly counts as decade averages, as the lead. The sentence about this
     year and last says nothing about a trend."""
-    doc = next((d for d in STATION if d in facts), None)
+    doc = facts[0] if facts and facts[0] in STATION else None  # only when the station record is what was asked about
     v = (values or {}).get(doc) if doc else None
     if not isinstance(v, dict) or not _TREND_RE.search(question or ""):
         return None
@@ -237,7 +237,7 @@ def trend_sentence(question: str, facts: list[str], values: dict | None) -> str 
         return None
     parts = [f"{sum(by_year[y] for y in range(a, b + 1)) / (b - a + 1):.1f} in {a} to {b}" for a, b in spans]
     return (f"At {v['station']} the yearly count of days at or above 90°F averaged {', '.join(parts[:-1])} and "
-            f"{parts[-1]}.")
+            f"{parts[-1]} [{doc}].")
 
 
 def count_sentence(question: str, facts: list[str], values: dict | None) -> str | None:
@@ -346,10 +346,10 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     # year outside the file's period, and whether a difference is significant (the file prints no intervals).
     period = next((re.findall(r"\d{4}", str(v.get("period") or "")) for d in VISITS
                    if isinstance(v := (values or {}).get(d), dict)), [])
-    year = _YEAR_RE.search(q)
     if re.search(r"hospitali[sz]|\badmissions?\b|\bsignifican|\bconfidence\b|margin of error|\bstatistical", q, re.I) or (
-            any(d in VISITS for d in subjects) and year and len(period) == 2
-            and not int(period[0]) <= int(year.group(1)) <= int(period[1])):
+            any(d in VISITS for d in subjects) and (_TREND_RE.search(q) or any(
+                len(period) == 2 and not int(period[0]) <= int(y) <= int(period[1]) for y in _YEAR_RE.findall(q)))):
+        # (The visits file is one five-year total: no year in it, and no trend.)
         return "cannot_answer", (have(VISITS) or subjects)[:4]
     if re.search(r"cooling cent", q, re.I) and all(d in COOLING for d in subjects) and (docs := have(COOLING)):
         return "cooling_centers", docs  # asked alone; beside other things it is one of the facts
