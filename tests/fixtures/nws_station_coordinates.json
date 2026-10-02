@@ -1,0 +1,87 @@
+{
+ "KNYC": [
+  40.7833,
+  -73.9667,
+  "New York City, Central Park"
+ ],
+ "KLGA": [
+  40.7792,
+  -73.88,
+  "New York, La Guardia Airport"
+ ],
+ "KJFK": [
+  40.6392,
+  -73.7639,
+  "New York, Kennedy International Airport"
+ ],
+ "KEWR": [
+  40.6825,
+  -74.1694,
+  "Newark, Newark International Airport"
+ ],
+ "KFRG": [
+  40.7344,
+  -73.4164,
+  "Farmingdale - Republic Airport"
+ ],
+ "KHPN": [
+  41.0624,
+  -73.7046,
+  "White Plains - Westchester County Airport"
+ ],
+ "KSWF": [
+  41.5,
+  -74.1,
+  "Newburgh / Stewart"
+ ],
+ "KPOU": [
+  41.6267,
+  -73.8842,
+  "Poughkeepsie, Dutchess County Airport"
+ ],
+ "KALB": [
+  42.7472,
+  -73.7991,
+  "Albany International Airport"
+ ],
+ "KBOS": [
+  42.3606,
+  -71.0106,
+  "Boston, Logan International Airport"
+ ],
+ "KBED": [
+  42.4681,
+  -71.2946,
+  "Laurence G Hanscom Field Airport"
+ ],
+ "KORD": [
+  41.9797,
+  -87.9044,
+  "Chicago, Chicago-O'Hare International Airport"
+ ],
+ "KMDW": [
+  41.7842,
+  -87.7553,
+  "Chicago, Chicago Midway Airport"
+ ],
+ "KSEA": [
+  47.4447,
+  -122.3136,
+  "Seattle, Seattle-Tacoma International Airport"
+ ],
+ "KBFI": [
+  47.5455,
+  -122.3147,
+  "Boeing Field - King County International Airport"
+ ],
+ "KSFO": [
+  37.6196,
+  -122.3656,
+  "San Francisco, San Francisco International Airport"
+ ],
+ "KOAK": [
+  37.7213,
+  -122.2211,
+  "San Francisco Bay Oakland International Airport"
+ ]
+}

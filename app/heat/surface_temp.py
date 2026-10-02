@@ -23,8 +23,8 @@ from functools import lru_cache
 from pathlib import Path
 
 DIR = Path(__file__).resolve().parents[2] / "data" / "heat"
-RADIUS_M = 150  # the thermal sensor samples at 100 m; a 150 m circle holds about nine 90 m cells
-MIN_CELLS = 3
+RADIUS_M = 150  # the thermal sensor samples at 100 m; a 150 m circle is the area of about nine 90 m cells
+MIN_CELLS = 3  # cells' worth of ground an image must have seen (by area inside the shape)
 MIN_IMAGES = 5
 TRAP = ("This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, "
         "not the air temperature a person feels.")
@@ -41,6 +41,26 @@ def _diff(x: float) -> str:
     return "within half a degree of" if abs(x) < 0.5 else f"at {abs(x):.1f}°F {'warmer' if x > 0 else 'cooler'} than"
 
 
+FINE = 9  # sub-cells per side when weighing a cell by its share inside a shape (10 m for 90 m cells)
+
+
+def _coverage(geom, transform, shape):
+    """(H, W) share of each cell inside the shape. A 150 m circle touches
+    cells whose far edge is 240 m out; counting those whole once made the
+    reading cover a wider patch than its sentence states. A large area is
+    read by cell centres, where the edge does not matter."""
+    import numpy as np
+    from rasterio.features import rasterize
+    from rasterio.transform import Affine
+
+    h, w = shape
+    if h * w > 2500:
+        return rasterize([(geom, 1)], out_shape=shape, transform=transform, fill=0, dtype="uint8").astype("float32")
+    fine = rasterize([(geom, 1)], out_shape=(h * FINE, w * FINE), transform=transform * Affine.scale(1 / FINE), fill=0,
+                     dtype="uint8")
+    return fine.reshape(h, FINE, w, FINE).mean(axis=(1, 3)).astype("float32")
+
+
 def _summary(geom_4326, where: str) -> dict | None:
     import geopandas as gpd
     import numpy as np
@@ -53,20 +73,22 @@ def _summary(geom_4326, where: str) -> dict | None:
     with rasterio.open(DIR / "surface_temp.tif") as src:
         g = gpd.GeoSeries([geom_4326], crs="EPSG:4326").to_crs(src.crs).iloc[0]
         try:
-            outside, _, window = raster_geometry_mask(src, [g], crop=True, all_touched=True)
+            _, _, window = raster_geometry_mask(src, [g], crop=True, all_touched=True)
         except ValueError:  # the shape does not touch the raster
             return None
         a = src.read(window=window).astype("float32")
-        a[:, outside] = np.nan
         a[a == src.nodata] = np.nan
-    # Per image: the mean over the cells it saw, when it saw enough of the place.
-    seen = (~np.isnan(a)).sum(axis=(1, 2))
-    most = int(seen.max()) if seen.size else 0
+        weight = _coverage(g, src.window_transform(window), a.shape[1:])
+    # Per image: the mean over the place, each cell weighted by the share of it
+    # inside the shape, when the image saw enough of the place.
+    valid = ~np.isnan(a)
+    seen = (valid * weight).sum(axis=(1, 2))
+    most = float(seen.max()) if seen.size else 0.0
     if most < MIN_CELLS:
         return None
     ok = seen >= max(MIN_CELLS, 0.8 * most)
-    with np.errstate(invalid="ignore"):
-        per_image = np.nanmean(a.reshape(len(a), -1), axis=1) / 10
+    with np.errstate(invalid="ignore", divide="ignore"):
+        per_image = (np.nan_to_num(a) * weight).sum(axis=(1, 2)) / seen / 10
     diffs = [(img, float(d)) for img, d, k in zip(m["images"], per_image, ok, strict=True) if k]
     if len(diffs) < MIN_IMAGES:
         return None

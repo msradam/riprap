@@ -567,3 +567,17 @@ def test_quiet_rules_for_live_heat_readings():
     assert not Q["nws_heat_forecast"]({"max_high_f": 82, "max_apparent_f": 85})
     assert Q["nws_heat_forecast"]({"max_high_f": 93}) and Q["nws_heat_forecast"]({"max_high_f": 88, "max_apparent_f": 97})
     assert "city_landcover" not in Q  # canopy is a ground condition of heat: quoted in a plain heat briefing
+
+
+def test_station_coordinates_are_the_weather_services_own():
+    # An independent key found the JFK distance 1.2 km out: the table held the airport's reference point, not
+    # the instruments'. Both station tables are pinned to api.weather.gov/stations/{id}, saved 2026-10-02.
+    from app.context import nws_obs
+    from app.heat import weather
+
+    official = json.loads((ROOT / "tests" / "fixtures" / "nws_station_coordinates.json").read_text())
+    for sid, _, lat, lon in nws_obs.STATIONS:
+        assert [lat, lon] == official[sid][:2], sid
+    for acis, icao in (("NYCthr", "KNYC"), ("LGAthr", "KLGA"), ("JFKthr", "KJFK")):
+        row = next(s for s in weather.STATIONS if s[0] == acis)
+        assert list(row[2:]) == official[icao][:2], acis

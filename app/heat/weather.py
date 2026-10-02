@@ -28,8 +28,8 @@ from riprap.core import http
 
 ACIS_URL = "https://data.rcc-acis.org/StnData"
 # The city's three threaded long-record stations (ACIS ids), with their coordinates.
-STATIONS = (("NYCthr", "Central Park", 40.7794, -73.9692), ("LGAthr", "LaGuardia Airport", 40.7794, -73.8800),
-            ("JFKthr", "JFK Airport", 40.6413, -73.7781))
+STATIONS = (("NYCthr", "Central Park", 40.7833, -73.9667), ("LGAthr", "LaGuardia Airport", 40.7792, -73.88),
+            ("JFKthr", "JFK Airport", 40.6392, -73.7639))  # the instruments' own coordinates (see app/context/nws_obs.py)
 NORMAL = (1991, 2020)
 NY = ZoneInfo("America/New_York")
 # NWS New York (OKX) criteria, weather.gov/okx/wwa_definitions, read 2026-10-02.

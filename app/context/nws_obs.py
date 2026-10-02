@@ -19,31 +19,34 @@ from riprap.core import http
 DOC_ID = "nws_obs"
 CITATION = "NWS station observations API (api.weather.gov/stations)"
 
-# NYC + Hudson Corridor ASOS stations. Picker is haversine-nearest, so adding
+# NYC + Hudson Corridor ASOS stations, at the coordinates the Weather Service
+# gives for each station (api.weather.gov/stations/{id}; a test pins them to a
+# saved copy). An earlier table used airport reference points, up to 2 km from
+# the instruments. Picker is haversine-nearest, so adding
 # upstate stations enables Albany / Poughkeepsie / Newburgh queries without
 # breaking NYC behaviour (NYC stations stay closer for NYC lat/lon).
 STATIONS = [
     # NYC region
-    ("KNYC", "Central Park, NY",         40.7794, -73.9692),
-    ("KLGA", "LaGuardia Airport, NY",    40.7794, -73.8800),
-    ("KJFK", "JFK Airport, NY",          40.6413, -73.7781),
-    ("KEWR", "Newark Liberty, NJ",       40.6925, -74.1687),
-    ("KFRG", "Republic Farmingdale, NY", 40.7288, -73.4134),
+    ("KNYC", "Central Park, NY", 40.7833, -73.9667),
+    ("KLGA", "LaGuardia Airport, NY", 40.7792, -73.88),
+    ("KJFK", "JFK Airport, NY", 40.6392, -73.7639),
+    ("KEWR", "Newark Liberty, NJ", 40.6825, -74.1694),
+    ("KFRG", "Republic Farmingdale, NY", 40.7344, -73.4164),
     # Hudson Corridor (south → north)
-    ("KHPN", "White Plains, NY",         41.0670, -73.7076),
-    ("KSWF", "Newburgh-Stewart, NY",     41.5042, -74.1048),
-    ("KPOU", "Poughkeepsie, NY",         41.6262, -73.8842),
-    ("KALB", "Albany Intl, NY",          42.7475, -73.8025),
+    ("KHPN", "White Plains, NY", 41.0624, -73.7046),
+    ("KSWF", "Newburgh-Stewart, NY", 41.5, -74.1),
+    ("KPOU", "Poughkeepsie, NY", 41.6267, -73.8842),
+    ("KALB", "Albany Intl, NY", 42.7472, -73.7991),
     # Other cities, some of them deployments (Chicago, Seattle). Without
     # these a query outside New York gets Albany, hundreds of km away.
-    ("KBOS", "Boston Logan, MA",         42.3606, -71.0097),
-    ("KBED", "Hanscom Field, MA",        42.4699, -71.2890),
-    ("KORD", "Chicago O'Hare, IL",       41.9786, -87.9048),
-    ("KMDW", "Chicago Midway, IL",       41.7868, -87.7522),
-    ("KSEA", "Seattle-Tacoma, WA",       47.4502, -122.3088),
-    ("KBFI", "Boeing Field, WA",         47.5300, -122.3019),
-    ("KSFO", "San Francisco Intl, CA",   37.6213, -122.3790),
-    ("KOAK", "Oakland Intl, CA",         37.7213, -122.2208),
+    ("KBOS", "Boston Logan, MA", 42.3606, -71.0106),
+    ("KBED", "Hanscom Field, MA", 42.4681, -71.2946),
+    ("KORD", "Chicago O'Hare, IL", 41.9797, -87.9044),
+    ("KMDW", "Chicago Midway, IL", 41.7842, -87.7553),
+    ("KSEA", "Seattle-Tacoma, WA", 47.4447, -122.3136),
+    ("KBFI", "Boeing Field, WA", 47.5455, -122.3147),
+    ("KSFO", "San Francisco Intl, CA", 37.6196, -122.3656),
+    ("KOAK", "Oakland Intl, CA", 37.7213, -122.2211),
 ]
 
 
