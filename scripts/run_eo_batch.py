@@ -139,6 +139,29 @@ def run_event(rain_date: date, bbox: list[float], out: Path, max_cloud: float) -
             "land_seen_share": round(float(observed.sum() / land_mask(ref).sum()), 3), "pairs": len(pairs)}
 
 
+def ida_marks_score(a, transform, crs, radius_m: float = 500) -> dict:
+    """Hold a water raster for Ida (1 water, 0 none, 255 unobserved) against
+    the high-water marks USGS surveyed after the storm, and against chance:
+    how many observed marks have water within `radius_m`, and what share of
+    all the observed land lies that close to water."""
+    import geopandas as gpd
+    import rasterio
+    from scipy.ndimage import distance_transform_edt
+
+    marks = gpd.read_file(ROOT / "data" / "ida_2021_hwms_ny.geojson").to_crs(crs)
+    rows, cols = rasterio.transform.rowcol(transform, marks.geometry.x.values, marks.geometry.y.values)
+    res = transform.a
+    seen = a != 255
+    near = distance_transform_edt(a != 1) * res <= radius_m
+    at = [(r, c) for r, c in zip(rows, cols, strict=True) if 0 <= r < a.shape[0] and 0 <= c < a.shape[1] and seen[r, c]]
+    hit = sum(bool(near[r, c]) for r, c in at)
+    out = {"n_marks": len(at), "n_marks_with_water": hit, "marks_pct": round(100 * hit / max(len(at), 1)),
+           "chance_pct": round(100 * float(near[seen].mean())),
+           "new_water_km2": round(float((a == 1).sum()) * res * res / 1e6, 2)}
+    out["against_chance"] = "more than chance gives" if out["marks_pct"] > out["chance_pct"] else "no better than chance"
+    return out
+
+
 def evaluate(out: Path, report: Path) -> dict | None:
     """Hold the Ida layer against the high-water marks USGS surveyed after
     the storm, and against chance: how many marks have new water within
@@ -146,36 +169,25 @@ def evaluate(out: Path, report: Path) -> dict | None:
     new water. Then ask whether new water that recurs across storms marks
     flood-prone ground. Written to data/experimental/water.json, which the
     hedge on every satellite sentence quotes."""
-    import geopandas as gpd
     import numpy as np
     import rasterio
     from rasterio.warp import Resampling, reproject
-    from scipy.ndimage import distance_transform_edt
 
     tif = out / "prithvi_new_water_2021-09-01.tif"
     if not tif.exists():
         return None
     with rasterio.open(tif) as src:
         a, tags, transform, crs = src.read(1), src.tags(), src.transform, src.crs
-        marks = gpd.read_file(ROOT / "data" / "ida_2021_hwms_ny.geojson").to_crs(crs)
-        rows, cols = rasterio.transform.rowcol(transform, marks.geometry.x.values, marks.geometry.y.values)
-        res = transform.a
+    res = transform.a
     from app.eo import prithvi
 
     n_land = int(land_mask(prithvi.grid(NYC_BBOX)).sum())
     seen = a != 255
-    near = distance_transform_edt(a != 1) * res <= 500  # within 500 m of a new-water pixel
-    at = [(r, c) for r, c in zip(rows, cols, strict=True) if 0 <= r < a.shape[0] and 0 <= c < a.shape[1] and seen[r, c]]
-    hit = sum(bool(near[r, c]) for r, c in at)
     result = {"model": tags.get("model"), "revision": tags.get("revision"), "run_date": str(date.today()),
               "event": "2021-09-01", "post_scene": tags.get("post_scene"),
               # The fields the hedge sentence reads.
-              "n_marks": len(at), "n_marks_with_water": hit, "marks_pct": round(100 * hit / max(len(at), 1)),
-              "chance_pct": round(100 * float(near[seen].mean())),
-              "new_water_km2": round(float((a == 1).sum()) * res * res / 1e6, 2),
+              **ida_marks_score(a, transform, crs),
               "land_seen_share": round(float(seen.sum() / n_land), 3)}
-    result["against_chance"] = ("more than chance gives" if result["marks_pct"] > result["chance_pct"]
-                                else "no better than chance")
     events = {}
     n_new, n_seen = np.zeros(a.shape, "uint8"), np.zeros(a.shape, "uint8")
     for e in sorted(out.glob("prithvi_new_water_*.tif")):

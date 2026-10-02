@@ -1,0 +1,96 @@
+{
+ "what": "TerraMind-base-Flood (official, ImpactMesh) on Hurricane Ida, scored as the Prithvi layer is",
+ "run_date": "2026-10-01",
+ "model": "ibm-esa-geospatial/TerraMind-base-Flood",
+ "revision": "1e4b2429d17234922f8d92beb0d725af4db85c08",
+ "file": "TerraMind_v1_base_ImpactMesh_flood.pt",
+ "sha256": "22627584c2db618c2f6ddb64b411a95762a893becb25104e3f66bfebecaa71e9",
+ "licence": "Apache-2.0 (model card and repository metadata)",
+ "s2_dates": [
+  "2021-08-13",
+  "2021-08-25",
+  "2021-09-02",
+  "2021-09-07"
+ ],
+ "s1_dates": [
+  "2021-07-26",
+  "2021-08-19",
+  "2021-09-12",
+  "2021-09-24"
+ ],
+ "s1_relative_orbit": 33,
+ "scenes": {
+  "S2L2A": [
+   [
+    "S2A_MSIL2A_20210813T154911_R054_T18TXL_20210814T051639",
+    "S2A_MSIL2A_20210813T154911_R054_T18TXK_20210926T233456",
+    "S2A_MSIL2A_20210813T154911_R054_T18TWL_20210814T063950",
+    "S2A_MSIL2A_20210813T154911_R054_T18TWK_20210814T055254"
+   ],
+   [
+    "S2B_MSIL2A_20210825T153809_R011_T18TXL_20210826T030730",
+    "S2B_MSIL2A_20210825T153809_R011_T18TXK_20210826T032902",
+    "S2B_MSIL2A_20210825T153809_R011_T18TWL_20210826T025515",
+    "S2B_MSIL2A_20210825T153809_R011_T18TWK_20210826T041421"
+   ],
+   [
+    "S2A_MSIL2A_20210902T154911_R054_T18TXL_20210903T042643",
+    "S2A_MSIL2A_20210902T154911_R054_T18TXK_20210903T042442",
+    "S2A_MSIL2A_20210902T154911_R054_T18TWL_20210903T050849",
+    "S2A_MSIL2A_20210902T154911_R054_T18TWK_20210903T055945"
+   ],
+   [
+    "S2B_MSIL2A_20210907T154809_R054_T18TXL_20210908T045401",
+    "S2B_MSIL2A_20210907T154809_R054_T18TXK_20210908T070745",
+    "S2B_MSIL2A_20210907T154809_R054_T18TWL_20210908T035137",
+    "S2B_MSIL2A_20210907T154809_R054_T18TWK_20210908T043508"
+   ]
+  ],
+  "S1RTC": [
+   [
+    "S1A_IW_GRDH_1SDV_20210726T225121_20210726T225146_038955_0498AC_rtc"
+   ],
+   [
+    "S1A_IW_GRDH_1SDV_20210819T225123_20210819T225148_039305_04A43C_rtc"
+   ],
+   [
+    "S1A_IW_GRDH_1SDV_20210912T225124_20210912T225149_039655_04B049_rtc"
+   ],
+   [
+    "S1A_IW_GRDH_1SDV_20210924T225124_20210924T225149_039830_04B62A_rtc"
+   ]
+  ],
+  "DEM": [
+   "Copernicus_DSM_COG_10_N40_00_W075_00_DEM",
+   "Copernicus_DSM_COG_10_N40_00_W074_00_DEM"
+  ]
+ },
+ "normalisation": "ImpactMesh-Flood v0 statistics, IBM/ImpactMesh 6c76a0a",
+ "threshold": "flood probability 0.5 (argmax of two classes)",
+ "same_land_as_prithvi": {
+  "n_marks": 153,
+  "n_marks_with_water": 4,
+  "marks_pct": 3,
+  "chance_pct": 1,
+  "new_water_km2": 0.06,
+  "against_chance": "more than chance gives"
+ },
+ "all_land_with_radar_and_optical": {
+  "n_marks": 159,
+  "n_marks_with_water": 6,
+  "marks_pct": 4,
+  "chance_pct": 1,
+  "new_water_km2": 0.07,
+  "against_chance": "more than chance gives"
+ },
+ "flood_share_of_land_seen_pct": 0.01,
+ "flood_share_of_open_water_outside_land_pct": 0.38,
+ "event_s2_clear_on_land_pct": 88.6,
+ "prithvi_for_comparison": {
+  "n_marks": 153,
+  "n_marks_with_water": 17,
+  "marks_pct": 11,
+  "chance_pct": 14
+ },
+ "seconds": 487
+}

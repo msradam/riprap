@@ -1,0 +1,29 @@
+{
+ "what": "Check that Riprap feeds TerraMind-base-Flood the way it was trained, on\nImpactMesh-Flood's own validation samples (experimental, one-off).",
+ "run_date": "2026-10-02",
+ "model": "ibm-esa-geospatial/TerraMind-base-Flood@1e4b2429d17234922f8d92beb0d725af4db85c08",
+ "dataset": "ibm-esa-geospatial/ImpactMesh-Flood (CC BY 4.0), validation split",
+ "n_patches": 300,
+ "seed": 0,
+ "confusion_mask_by_pred": {
+  "no_water": [
+   15425804,
+   563494
+  ],
+  "permanent_water": [
+   1436084,
+   183083
+  ],
+  "flood_water": [
+   145739,
+   1426689
+  ]
+ },
+ "flood_iou": 0.615,
+ "flood_recall": 0.907,
+ "flood_precision": 0.656,
+ "permanent_water_called_flood_pct": 11.3,
+ "no_water_called_flood_pct": 3.52,
+ "patches_with_flood": 210,
+ "seconds": 225
+}
