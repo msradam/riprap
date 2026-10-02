@@ -1,18 +1,18 @@
 {
  "KNYC": [
-  40.7833,
-  -73.9667,
-  "New York City, Central Park"
+  40.77898,
+  -73.96925,
+  "NY CITY CENTRAL PARK (ACIS and NCEI USW00094728; api.weather.gov rounds it to 40.7833, -73.9667)"
  ],
  "KLGA": [
-  40.7792,
-  -73.88,
-  "New York, La Guardia Airport"
+  40.77945,
+  -73.88027,
+  "LAGUARDIA AIRPORT (ACIS and NCEI USW00014732)"
  ],
  "KJFK": [
-  40.6392,
+  40.63915,
   -73.7639,
-  "New York, Kennedy International Airport"
+  "JFK INTERNATIONAL AIRPORT (ACIS and NCEI USW00094789)"
  ],
  "KEWR": [
   40.6825,

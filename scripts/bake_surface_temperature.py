@@ -164,7 +164,10 @@ def main() -> int:
 
     ref30 = prithvi.grid(NYC_BBOX, res=30.0)
     h, w = ref30.shape[0] // 3, ref30.shape[1] // 3
-    t90 = ref30.rio.transform() * Affine.scale(3)
+    # Landsat's pixel centres sit on multiples of 30 m and this grid's cell edges do, so the nearest pixel to
+    # each cell centre is the one half a pixel east and south of it. The transform says where the data is.
+    # (Found by an independent key: every reading matched the ground 15 m east and south of its circle.)
+    t90 = ref30.rio.transform() * Affine.translation(0.5, 0.5) * Affine.scale(3)
     # The city's land: inside a 2020 neighborhood tabulation area.
     land = rasterize([(g, 1) for g in nta.load().to_crs(ref30.rio.crs).geometry], out_shape=(h, w), transform=t90,
                      fill=0, dtype="uint8") == 1

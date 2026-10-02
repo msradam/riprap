@@ -95,7 +95,7 @@
    "time_utc": "2024-08-27T15:33:26Z",
    "platform": "landsat-8",
    "scene_cloud_cover_pct": 2.3,
-   "clear_land_pct": 98.1,
+   "clear_land_pct": 98.2,
    "city_land_mean_f": 100.5
   },
   {
@@ -158,8 +158,8 @@
    "time_utc": "2026-06-13T15:39:10Z",
    "platform": "landsat-9",
    "scene_cloud_cover_pct": 3.0,
-   "clear_land_pct": 98.7,
-   "city_land_mean_f": 106.2
+   "clear_land_pct": 98.8,
+   "city_land_mean_f": 106.3
   },
   {
    "id": "LC08_L2SP_014032_20260723_02_T1",
@@ -187,7 +187,7 @@
    "time_utc": "2023-06-05T15:39:19Z",
    "platform": "landsat-9",
    "scene_cloud_cover_pct": 14.7,
-   "clear_land_pct": 65.7
+   "clear_land_pct": 65.8
   },
   {
    "id": "LC09_L2SP_013032_20230716_02_T2",
@@ -211,7 +211,7 @@
    "time_utc": "2024-07-17T15:39:24Z",
    "platform": "landsat-8",
    "scene_cloud_cover_pct": 9.6,
-   "clear_land_pct": 92.3
+   "clear_land_pct": 92.4
   },
   {
    "id": "LC09_L2SP_013032_20240803_02_T1",
@@ -235,7 +235,7 @@
    "time_utc": "2025-06-11T15:33:16Z",
    "platform": "landsat-8",
    "scene_cloud_cover_pct": 6.5,
-   "clear_land_pct": 94.0
+   "clear_land_pct": 94.1
   },
   {
    "id": "LC09_L2SP_013032_20250619_02_T1",
@@ -251,7 +251,7 @@
    "time_utc": "2025-07-04T15:39:38Z",
    "platform": "landsat-8",
    "scene_cloud_cover_pct": 9.8,
-   "clear_land_pct": 87.0
+   "clear_land_pct": 87.1
   },
   {
    "id": "LC09_L2SP_013032_20250721_02_T1",
@@ -267,7 +267,7 @@
    "time_utc": "2025-07-28T15:39:44Z",
    "platform": "landsat-9",
    "scene_cloud_cover_pct": 5.2,
-   "clear_land_pct": 94.9
+   "clear_land_pct": 95.0
   },
   {
    "id": "LC08_L2SP_013032_20250830_02_T1",
@@ -275,7 +275,7 @@
    "time_utc": "2025-08-30T15:33:46Z",
    "platform": "landsat-8",
    "scene_cloud_cover_pct": 8.4,
-   "clear_land_pct": 93.3
+   "clear_land_pct": 93.2
   },
   {
    "id": "LC08_L2SP_014032_20260605_02_T1",
@@ -299,7 +299,7 @@
    "time_utc": "2026-06-30T15:33:03Z",
    "platform": "landsat-8",
    "scene_cloud_cover_pct": 16.3,
-   "clear_land_pct": 85.5
+   "clear_land_pct": 85.6
   },
   {
    "id": "LC09_L2SP_013032_20260708_02_T1",
@@ -307,7 +307,7 @@
    "time_utc": "2026-07-08T15:33:12Z",
    "platform": "landsat-9",
    "scene_cloud_cover_pct": 4.7,
-   "clear_land_pct": 91.3
+   "clear_land_pct": 91.4
   },
   {
    "id": "LC09_L2SP_013032_20260724_02_T1",
@@ -363,7 +363,7 @@
  "n_images": 18,
  "local_time": "about 11:35 am Eastern Daylight Time",
  "cell_spread_f_median": 5.1,
- "cell_spread_f_p90": 8.3,
- "land_cells": 96600,
- "land_cells_clear_in_every_image": 82290
+ "cell_spread_f_p90": 8.2,
+ "land_cells": 96522,
+ "land_cells_clear_in_every_image": 82266
 }

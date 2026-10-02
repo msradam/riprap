@@ -28,8 +28,10 @@ from riprap.core import http
 
 ACIS_URL = "https://data.rcc-acis.org/StnData"
 # The city's three threaded long-record stations (ACIS ids), with their coordinates.
-STATIONS = (("NYCthr", "Central Park", 40.7833, -73.9667), ("LGAthr", "LaGuardia Airport", 40.7792, -73.88),
-            ("JFKthr", "JFK Airport", 40.6392, -73.7639))  # the instruments' own coordinates (see app/context/nws_obs.py)
+# The instruments' coordinates as ACIS and NCEI give them. (api.weather.gov rounds Central Park to whole arc
+# minutes, 530 m from the instrument at Belvedere Castle.)
+STATIONS = (("NYCthr", "Central Park", 40.77898, -73.96925), ("LGAthr", "LaGuardia Airport", 40.77945, -73.88027),
+            ("JFKthr", "JFK Airport", 40.63915, -73.7639))
 NORMAL = (1991, 2020)
 NY = ZoneInfo("America/New_York")
 # NWS New York (OKX) criteria, weather.gov/okx/wwa_definitions, read 2026-10-02.

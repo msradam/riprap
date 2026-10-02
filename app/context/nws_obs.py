@@ -27,9 +27,9 @@ CITATION = "NWS station observations API (api.weather.gov/stations)"
 # breaking NYC behaviour (NYC stations stay closer for NYC lat/lon).
 STATIONS = [
     # NYC region
-    ("KNYC", "Central Park, NY", 40.7833, -73.9667),
-    ("KLGA", "LaGuardia Airport, NY", 40.7792, -73.88),
-    ("KJFK", "JFK Airport, NY", 40.6392, -73.7639),
+    ("KNYC", "Central Park, NY", 40.77898, -73.96925),
+    ("KLGA", "LaGuardia Airport, NY", 40.77945, -73.88027),
+    ("KJFK", "JFK Airport, NY", 40.63915, -73.7639),
     ("KEWR", "Newark Liberty, NJ", 40.6825, -74.1694),
     ("KFRG", "Republic Farmingdale, NY", 40.7344, -73.4164),
     # Hudson Corridor (south → north)
