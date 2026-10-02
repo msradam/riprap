@@ -26,6 +26,9 @@ DATA_PATH = Path(__file__).resolve().parents[2] / "data" / "nyc_ntas_2020.geojso
 # be exhaustive here; the fuzzy matcher catches most cases. This handles the
 # few hard ones where the official NTA name differs from local usage.
 ALIASES = {
+    "bed stuy":         "Bedford-Stuyvesant (West)",
+    "bed-stuy":         "Bedford-Stuyvesant (West)",
+    "bedstuy":          "Bedford-Stuyvesant (West)",
     "the rockaways":    "Rockaway Beach-Arverne-Edgemere",
     "rockaway":         "Rockaway Beach-Arverne-Edgemere",
     "brighton":         "Brighton Beach",

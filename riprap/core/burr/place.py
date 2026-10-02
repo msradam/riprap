@@ -326,5 +326,9 @@ def geocode_matches(asked: str, got: str) -> bool:
     # A direction alone ("east") does not identify the street.
     street = {w for w in named if w not in {"east", "west", "north", "south"}} or set(named) or set(a[1:2])
     g = _tokens(got)
+    if g and re.fullmatch(r"\d+(?:-\d+)?", g[0]):
+        # The result leads with its own house number: that is the one to match. ("400 1/2, Bay Street" was
+        # once an exact match for "1 Bay Street", by the 1 in "1/2".)
+        return g[0].replace("-", "") == number.replace("-", "") and bool(street & set(g))
     has_number = number in g or number.replace("-", "") in {t.replace("-", "") for t in g}
     return has_number and bool(street & set(g))

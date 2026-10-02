@@ -49,7 +49,8 @@ HEAT_RE = re.compile(
     r"|\bcool (?:places?|spots?|spaces?)\b|\bstay(?:ing)? cool\b|\bsummers\b"
     r"|\brecord highs?\b(?!\s+(?:tide|water|surge|rain))"
     # Trees and shade are asked about for heat; paving alone stays with the flood briefing.
-    r"|\b(?:tree )?canopy\b|\btree cover\b|\bstreet trees\b|\bshad(?:e|ed|y)\b", re.I)
+    r"|\b(?:tree )?canopy\b|\btree cover\b|\bstreet trees\b|\bshad(?:e|ed|y)\b"
+    r"|\bsprinklers?\b|\b(?:a|the|any|nearest|closest|outdoor|indoor|city|kiddie) pools?\b|\bpools? (?:and|or|near|nearby|open)\b", re.I)
 # A cold apartment: no heat, a radiator, the landlord. Not this briefing.
 INDOOR_HEATING_RE = re.compile(
     r"\bheat\s*(?:and|&|/|or)\s*hot water|\bno heat\b|\bheat(?:ing)? (?:complaints?|violations?|season|is (?:off|out|broken))"
@@ -95,7 +96,8 @@ TOPICS = (
                 r"|\bhottest (?:parts?|blocks?|areas?|places?|spots?)\b|how hot (?:does|do) .{0,40}?\bget\b", re.I), SURFACE),
     (re.compile(r"\b(?:8[5-9]|9\d|1[01]\d)[- ]?(?:°|degrees?\b|deg\b)|\bhot days?\b|\brecord\b|hottest (?:day|it)"
                 r"|how hot (?:did|was|has|does|do)|\b(?:this|last) (?:summer|year)\b|so far this|scorcher|\bthe records\b|\bused to\b"
-                r"|\bover the years\b|\b(?:gone|going|went) up\b|\btrend|\bincreas"
+                r"|\bover the years\b|\b(?:gone|going|went) up\b|\btrend|\bincreas|\b(?:gotten|got) (?:worse|hotter|warmer)\b"
+                r"|\bsince (?:19|20)\d\d\b"
                 r"|\b(?:hit|reach(?:ed)?|top(?:ped)?|over|above) (?:8[5-9]|9\d|1[01]\d)\b", re.I), STATION),
 )
 # Heat deaths are published for the city as a whole only, so no source here holds them for a place.
@@ -166,7 +168,7 @@ def asks_something(text: str) -> bool:
     vulnerability index"). "Heat", "extreme heat" or "heat risk" alone ask
     for the heat briefing."""
     t = text or ""
-    return bool(any(p.search(t) for p, _ in TOPICS) or _TODAY_RE.search(t) or _NEAR_RE.search(t) or _FAR_RE.search(t)
+    return bool(any(p.search(t) for p, _ in TOPICS) or _TODAY_RE.search(t) or _NEAR_RE.search(t) or _FAR_RE.search(t) or _RANK_RE.search(t)
                 or _SCORE_RE.search(t) or _COMPARE_CITY_RE.search(t) or _COUNT_DAYS_RE.search(t))
 
 
@@ -219,7 +221,7 @@ def record_sentence(question: str, facts: list[str], values: dict | None) -> str
 
 
 _TREND_RE = re.compile(r"\bover the years\b|\b(?:gone|going|went) up\b|\btrend|\bincreas|\bmore\b[^.?!]*\b(?:than|now)\b"
-                       r"|\bused to\b|\bthe records\b", re.I)
+                       r"|\bused to\b|\bthe records\b|\b(?:gotten|getting|got) (?:worse|hotter|warmer)\b|\bsince (?:19|20)\d\d\b", re.I)
 
 
 def trend_sentence(question: str, facts: list[str], values: dict | None) -> str | None:
@@ -291,18 +293,24 @@ def places_named(question: str) -> list[str]:
     """The neighbourhoods a question names, when it names more than one
     tabulation area and is neither a comparison nor about a street address:
     the answer covers one, and says so."""
-    from app.areas import nta  # noqa: PLC0415
     from riprap.core.burr.intake import _heat_compare  # noqa: PLC0415
     from riprap.core.burr.place import (  # noqa: PLC0415
-        _LANDMARK,
-        _known_neighbourhoods,
         extract_address,
     )
 
     q = question or ""
     if extract_address(q) or _heat_compare(q):
         return []
-    low, found = q.lower(), {}
+    names = neighbourhoods_in(q)
+    return names if len(names) > 1 else []
+
+
+def neighbourhoods_in(question: str) -> list[str]:
+    """The distinct tabulation areas a question names, by the name it uses, in order."""
+    from app.areas import nta  # noqa: PLC0415
+    from riprap.core.burr.place import _LANDMARK, _known_neighbourhoods  # noqa: PLC0415
+
+    low, found = (question or "").lower(), {}
     for n in sorted(_known_neighbourhoods(), key=len, reverse=True):
         m = re.search(rf"\b{re.escape(n)}\b(?!\s+(?:{_SUFFIX}|{_LANDMARK})\b)", low)
         if m and not any(m.start() >= v[0] and m.end() <= v[1] for v in found.values()) and (hits := nta.resolve(n)):
@@ -310,7 +318,7 @@ def places_named(question: str) -> list[str]:
     spans = {}
     for n, (_, _, code) in sorted(found.items(), key=lambda kv: kv[1][0]):
         spans.setdefault(code, n.title())
-    return list(spans.values()) if len(spans) > 1 else []
+    return list(spans.values())
 
 
 def answer(question: str, texts: dict[str, str], values: dict | None = None) -> tuple[str, list[str]] | None:
@@ -346,11 +354,15 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     # year outside the file's period, and whether a difference is significant (the file prints no intervals).
     period = next((re.findall(r"\d{4}", str(v.get("period") or "")) for d in VISITS
                    if isinstance(v := (values or {}).get(d), dict)), [])
+    if re.search(r"\bat night\b|\bnight[- ]?time\b|\bovernight\b|\bindoors?\b|\binside\b", q, re.I):
+        # Landsat passes in the late morning and the stations report daily highs: nothing here is a night or an
+        # indoor reading.
+        return "cannot_answer", have(STATION, SURFACE)[:2]
     if re.search(r"hospitali[sz]|\badmissions?\b|\bsignifican|\bconfidence\b|margin of error|\bstatistical", q, re.I) or (
             any(d in VISITS for d in subjects) and (_TREND_RE.search(q) or any(
                 len(period) == 2 and not int(period[0]) <= int(y) <= int(period[1]) for y in _YEAR_RE.findall(q)))):
         # (The visits file is one five-year total: no year in it, and no trend.)
-        return "cannot_answer", (have(VISITS) or subjects)[:4]
+        return "cannot_answer", (have(VISITS) or subjects or have(HVI, STATION))[:4]
     if re.search(r"cooling cent", q, re.I) and all(d in COOLING for d in subjects) and (docs := have(COOLING)):
         return "cooling_centers", docs  # asked alone; beside other things it is one of the facts
     if TOPICS[_ALERTS_AT][0].search(q) and (not have(ALERTS) or _YEAR_RE.search(q) or re.search(r"\bhow many\b|\bwere\b|\blast (?:summer|year)\b", q, re.I)):

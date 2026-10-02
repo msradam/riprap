@@ -92,6 +92,11 @@ def _summary(geom_4326, where: str) -> dict | None:
     if len(diffs) < MIN_IMAGES:
         return None
     values = [d for _, d in diffs]
+    if max(abs(v) for v in values) < 0.05:
+        # The city as a whole is the baseline: it has no reading against itself ("0.0 to 0.0°F cooler").
+        return {"narrative": "Landsat surface temperature is given here as a difference from the city's land average, so "
+                             "the city as a whole has no reading of its own; a borough, a community district or a "
+                             "neighbourhood does.", "n_images": len(diffs)}
     mean, lo, hi = round(sum(values) / len(values), 1), round(min(values), 1), round(max(values), 1)
     last_img, last_d = diffs[-1]
     first, last = diffs[0][0]["time_utc"][:10], last_img["time_utc"][:10]

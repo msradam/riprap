@@ -795,3 +795,46 @@ def test_the_named_half_of_a_neighbourhood_is_the_one_briefed():
                     ("heat in East Harlem", "East Harlem (North)")):
         out = resolve_area(State({"first_target": "East Harlem", "query": q, "trace": []}))
         assert out["nta"]["nta_name"] == name, q
+
+
+def test_what_a_blind_verifier_found_after_the_personas():
+    """77 fresh queries in the same ten areas; each input here still went wrong."""
+    from riprap.core.burr.intake import _heat_compare
+    from riprap.core.burr.place import geocode_matches
+
+    # A geocoder result with another house number is not the address asked for ("1/2" holds a 1).
+    assert not geocode_matches("1 Bay Street, Staten Island", "400 1/2, Bay Street, Staten Island, Richmond County, New York, 10301")
+    assert geocode_matches("1 Bay Street, Staten Island", "1 BAY STREET, Staten Island, NY, USA")
+    assert geocode_matches("233 S Wacker Drive, Chicago", "Willis Tower, 233, South Wacker Drive, Chicago")
+    # A part of a borough inside a question, and a ZIP inside a question.
+    for q in ("whats the heat vulnerability index for the south bronx", "is eastern queens hot in summer"):
+        plan = heuristic_plan(q)
+        assert plan["intent"] == "not_implemented" and "no official boundary" in plan["rationale"], q
+    assert heuristic_plan("heat on staten island's north shore")["targets"][0]["text"] == "SI01"
+    for q in ("heat in zip 10035", "is 11212 hot"):
+        assert "ZIP code" in heuristic_plan(q)["rationale"], q
+    assert heuristic_plan("How hot did it get in 2025 near JFK Airport?")["intent"] == "single_address"  # a year is not a ZIP
+    # Two places set side by side in other words; three places are not a pair.
+    for q, pair in (("which is hotter, mott haven or riverdale", ["Mott Haven", "Riverdale"]),
+                    ("hunts point compared to park slope for heat", ["Hunts Point", "Park Slope"]),
+                    ("difference in heat between QN12 and jamaica", ["QN12", "Jamaica"]),
+                    ("brownsville or the upper east side, where is heat worse", ["Brownsville", "Upper East Side"])):
+        assert [t["text"] for t in _heat_compare(q)] == pair, q
+    q = "compare heat in brownsville, jackson heights and tottenville"
+    assert _heat_compare(q) is None and ha.places_named(q) == ["Brownsville", "Jackson Heights", "Tottenville"]
+    # A ranking of a borough is the borough with the no-ranking lead, not a landmark for the geocoder.
+    assert heuristic_plan("top 5 worst neighborhoods for heat in brooklyn")["targets"][0]["text"] == "BK"
+    # A nickname is the neighbourhood, not a point called an address.
+    assert heuristic_plan("bed stuy heat")["intent"] == "neighborhood"
+    # Sprinklers and pools are asked about for heat.
+    assert ha.hazard_of("pools and sprinklers near 108-25 62nd dr forest hills") == "heat"
+    assert ha.hazard_of("water pools in the street outside 80 Pioneer Street when it rains") == "flood"
+    # Night and indoor readings exist in no source here; a worsening trend is the station's decades.
+    assert ha.answer("how hot does it get at night in corona queens", T)[0] == "cannot_answer"
+    assert ha.answer("has heat gotten worse here since 2000", T)[1][0] == "heat_station"
+    # The city as a whole has no reading against itself.
+    from app.areas import nta
+    from app.heat import surface_temp as st
+
+    v = st.for_polygon(nta.by_borough("NYC")["geometry"])
+    assert v and "mean_diff_f" not in v and "no reading of its own" in v["narrative"]
