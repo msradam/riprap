@@ -121,8 +121,11 @@ Each heat sentence carries the trap that goes with its figure:
   temperature in one image depends on the day, so the sentence gives the
   difference from the city's land average in the same image, as a mean over
   every clear image with the range image by image
-  (`scripts/bake_surface_temperature.py`). A yes or no to "is it hotter
-  here" is given only "at the surface", and only when every image agrees.
+  (`scripts/bake_surface_temperature.py`). The reading is of land only:
+  cells over water are left out, so a pier is not cooled by the river beside
+  it, and a 150 m circle weighs each 90 m cell by the share of it inside the
+  circle. A yes or no to "is it hotter here" is given only "at the
+  surface", only against the city, and only when every image agrees.
 - **A vulnerability index is a rank, not a measurement.** The Health
   Department's Heat Vulnerability Index scores a neighbourhood 1 to 5
   against the others from a model of heat deaths. Riprap quotes it as the
