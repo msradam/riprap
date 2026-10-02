@@ -44,6 +44,10 @@
 /* A long question truncates here; the briefing heading shows it in full. */
 .app-header-query-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .app-header-query-icon { color: var(--ink-tertiary); }
+/* The glyph is drawn here, not in the markup: axe cannot measure the
+   contrast of a symbol-only text node and flagged it for review at any
+   colour. --ink-tertiary on --paper-deep is 5.88:1. */
+.app-header-query-icon::before { content: '⌕'; }
 .app-header-query-edit {
   margin-left: auto;
   font-size: 14px;

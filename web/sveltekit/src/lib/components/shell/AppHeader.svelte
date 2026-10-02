@@ -68,7 +68,7 @@
           onclick={onResetCold}
           aria-label="Edit query"
         >
-          <span class="app-header-query-icon" aria-hidden="true">⌕</span>
+          <span class="app-header-query-icon" aria-hidden="true"></span>
           <span class="app-header-query-text">{query}</span>
           <span class="app-header-query-edit">edit</span>
         </button>

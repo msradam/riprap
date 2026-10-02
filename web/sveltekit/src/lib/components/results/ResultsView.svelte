@@ -97,12 +97,13 @@
   // A district briefing has no In brief paragraph: no heading, no jump.
   let hasLeadText = $derived(!!model.lead || model.answer.length > 0);
   // In page order: a question page sets the map before the evidence, a
-  // place page the evidence (left column) before the map (right).
+  // place page the evidence (left column) before the map (right). A
+  // comparison renders none of the three, so it offers none of the jumps.
   let jumps = $derived.by(() => {
     const evidence = showEvidence ? [{ href: '#brief-evidence', label: 'Evidence' }] : [];
     const map = showMap ? [{ href: '#brief-map', label: 'Map' }] : [];
     return [
-      ...(hasLeadText ? [{ href: '#brief-answer', label: model.leadLabel === 'In brief' ? 'In brief' : 'Answer' }] : []),
+      ...(hasLeadText && !isCompare ? [{ href: '#brief-answer',label: model.leadLabel === 'In brief' ? 'In brief' : 'Answer' }] : []),
       ...(isPlace ? [...evidence, ...map] : [...map, ...evidence]),
       { href: '#brief-sources', label: 'Sources' }
     ];
@@ -146,11 +147,13 @@
     run.stopped ? suggestedDistrict([model.lead ?? '', ...model.answer.flat().map((p) => p.text)].join(' ')) : null
   );
   // The report takes focus when the run ends and nothing else has it,
-  // so a keyboard reader is not sent back through the header.
+  // so a keyboard reader is not sent back through the header. Focus must
+  // not scroll: an answer taller than a phone screen was scrolled into
+  // view as it landed, which moved the whole page (CLS 0.13 to 0.17).
   $effect(() => {
     if (!readyText) return;
     tick().then(() => {
-      if (document.activeElement === document.body) document.getElementById('brief-answer')?.focus();
+      if (document.activeElement === document.body) document.getElementById('brief-answer')?.focus({ preventScroll: true });
     });
   });
   $effect(() => {

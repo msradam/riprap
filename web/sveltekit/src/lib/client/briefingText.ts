@@ -105,8 +105,9 @@ export function figureOf(c: Pick<Card, 'scalars' | 'headline' | 'title' | 'figur
   return { value: noun ? `${value} ${noun}` : value, label: null };
 }
 
-/** The space after a full stop that starts a new sentence. */
-const SENTENCE_GAP = /(?<=\.)\s+(?=[A-Z0-9])/;
+/** The space after a full stop that starts a new sentence. Not after an
+ *  abbreviation in a place name ("St. Albans", "Mt. Hope", "Ft. Greene"). */
+const SENTENCE_GAP = /(?<=\.)(?<!\b(?:St|Mt|Ft|Dr|Ave|Blvd|No)\.)\s+(?=[A-Z0-9])/;
 
 /** The finding sentence(s) for a card, split after the first sentence so
  *  the table can set the first one heavier. The body or sub line (the

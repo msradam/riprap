@@ -430,13 +430,14 @@
     .ev-cite.is-empty {
       display: none;
     }
-    .ev-fig,
-    .ev-fig-label {
+    .ev-fig {
       display: inline;
-      margin: 0;
     }
-    .ev-fig-label::before {
-      content: ' ';
+    /* Under the value, as in the wide table: on one line the two parts
+       ran together ("26 spray shower sites 3 pools"). */
+    .ev-fig-label {
+      margin: 0;
+      max-width: none;
     }
     .ev-label {
       display: inline;

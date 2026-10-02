@@ -74,6 +74,10 @@ describe('figureOf', () => {
 });
 
 describe('findingOf', () => {
+  it('does not end a sentence at a place-name abbreviation', () => {
+    const card = { body: 'Its neighbourhoods score Hollis 5, St. Albans 4. The index ranks neighbourhoods.' } as Card;
+    expect(findingOf(card)).toEqual({ first: 'Its neighbourhoods score Hollis 5, St. Albans 4.', rest: 'The index ranks neighbourhoods.' });
+  });
   it('uses the templated body, not the narration headline (the Sandy misreading)', () => {
     const sandy = card({
       headline: 'The 2012 Hurricane Sandy inundation extent (NYC OEM) at this address.',
