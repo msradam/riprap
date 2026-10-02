@@ -1,0 +1,46 @@
+id: heat_obs
+type: live
+title: Latest air temperature at the nearest weather station
+answers: "the air temperature right now at the nearest National Weather Service station, with the heat index when it is reported"
+stone: touchstone
+hazard: heat
+tier: empirical
+adapter: python_call
+
+# The same station observation the flood briefing reads for rain, read for
+# temperature and heat index (api.weather.gov, cached ten minutes).
+spatial:
+  scope: point
+
+config:
+  module: app.heat.weather
+  function: observation
+  args:
+    - {source: lat}
+    - {source: lon}
+  on_none: passthrough
+
+provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
+  source_name: National Weather Service (NOAA), latest observation at the nearest station
+  source_url: https://api.weather.gov/
+  license: U.S. Public Domain
+  doc_id: heat_obs
+  citation: >-
+    NWS station observations (api.weather.gov/stations/{id}/observations/latest):
+    air temperature, relative humidity and heat index at the nearest of the
+    region's airport and Central Park stations.
+
+narration:
+  short: The latest air temperature at the nearest National Weather Service station.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: NWS api.weather.gov unreachable.
+
+display:
+  variant: scalars
+  order: 30
+  kind: text

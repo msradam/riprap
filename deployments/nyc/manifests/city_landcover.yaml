@@ -3,6 +3,7 @@ type: baked
 title: NYC Land Cover 2017 (6 inch), tree canopy and paved share
 answers: "how much of a place is paved or built over, how much is green and how much is under tree canopy, measured by the city's 2017 land cover map"
 stone: cornerstone
+hazard: any
 tier: empirical
 adapter: python_call
 

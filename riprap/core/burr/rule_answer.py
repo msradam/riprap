@@ -34,6 +34,10 @@ A question that names two things ("was it in the Sandy area, and how many
 311 complaints") gets both: the first rule that fires sets the lead and
 every other named source is added to the facts.
 
+A question about outdoor heat is answered by the heat rules
+(heat_answer.py), which `answer` hands it to; everything below is the
+flood half.
+
 Returns None when no rule names what the question is about. The caller
 then asks the model, if one is configured, or shows the evidence.
 """
@@ -43,6 +47,7 @@ from __future__ import annotations
 import re
 
 from riprap.core.burr import answer_checks as ac
+from riprap.core.burr import heat_answer
 
 ASSET_DOCS = ("mta_entrance_exposure", "doe_school_exposure", "nycha_development_exposure", "doh_hospital_exposure")
 # What reports the present, and what a forecast question is answered with, in order.
@@ -211,6 +216,8 @@ def _asks_future(q: str) -> bool:
 
 def time_frame(question: str) -> str:
     q = question or ""
+    if heat_answer.hazard_of(q) == "heat":
+        return heat_answer.time_frame(q)
     if asks_now(q) and not _asks_future(q):
         return "now"
     if _asks_future(q) or ac.dep_scenario_asked(q):
@@ -277,15 +284,28 @@ def asks_something(text: str) -> bool:
     """True when words beside a place name a source or a time frame
     ("200 Water Street Manhattan FEMA flood zone"): a question typed as a
     search phrase. The word "flood" alone does not count."""
+    if heat_answer.hazard_of(text) == "heat":
+        return heat_answer.asks_something(text)
     return bool(asks_now(text) or _FUTURE_RE.search(text or "") or _named_ids(text or "")
                 or _HISTORY_RE.search(text or "") or any(p.search(text or "") for p, _, _ in EXPERIMENTAL))
+
+
+def names_flood(clause: str) -> bool:
+    """A clause that is plainly about flooding: the word itself, or a flood
+    source by name (the Sandy zone, 311, a FEMA map, the tide). The heat
+    rules ask this of every clause without a heat word: "It was hot last
+    summer. Was it inside the Sandy zone?" is a flood question. An alert or a
+    warning alone is not enough: both hazards have them."""
+    c = clause or ""
+    return bool(_FLOOD_RE.search(c) or [i for i in _named_ids(c) if i != "nws_alerts"]
+                or EXPERIMENTAL[0][0].search(c) or EXPERIMENTAL[2][0].search(c))
 
 
 def recognised(question: str) -> bool:
     """True when a rule knows what kind of question this is, from its words alone."""
     q = question or ""
     return bool(asks_now(q) or _FUTURE_RE.search(q) or _named_ids(q) or _FLOOD_RE.search(q)
-                or any(p.search(q) for p, _, _ in EXPERIMENTAL))
+                or any(p.search(q) for p, _, _ in EXPERIMENTAL) or heat_answer.hazard_of(q) == "heat")
 
 
 _SAFE_RE = re.compile(r"\b(safe|dry|high(er)? ground|spared|protected|outside|not (in|inside|exposed|at risk))\b", re.I)
@@ -362,6 +382,8 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     of each part, and the first part's yes or no when it has one."""
     if not question:
         return None
+    if heat_answer.hazard_of(question) == "heat":
+        return heat_answer.answer(question, texts, values)
     question = _HOUSE_YEAR_RE.sub("", question)
     parts = [(c, _answer_one(c, texts, values, generic=False)) for c in _clauses(question)]
     parts = [(c, a) for c, a in parts if a and a[1]]

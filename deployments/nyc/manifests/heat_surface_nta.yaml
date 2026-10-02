@@ -1,0 +1,50 @@
+id: heat_surface_nta
+type: baked
+title: Summer surface temperature from Landsat, against the city's average
+answers: "how much warmer or cooler the ground surface in this area is than the city's land average on clear summer mornings, measured by Landsat; surface temperature, not air temperature"
+stone: cornerstone
+hazard: heat
+tier: empirical
+adapter: python_call
+
+# Reads data/heat/surface_temp.tif, baked by scripts/bake_surface_temperature.py:
+# one band per clear summer Landsat image, each cell as a difference from the
+# city's land mean in the same image. No request is made per briefing.
+spatial:
+  scope: polygon
+
+config:
+  module: app.heat.surface_temp
+  function: for_polygon
+  args:
+    - {source: polygon_4326}
+  on_none: offline
+
+provenance:
+  date_modified: "2026"
+  retrieved_at: 2026-10-02
+  date_modified_field: last
+  source_name: Landsat 8 and 9 Collection 2 Level 2 surface temperature (USGS), via Microsoft Planetary Computer
+  source_url: https://planetarycomputer.microsoft.com/dataset/landsat-c2-l2
+  license: U.S. Public Domain (USGS Landsat)
+  doc_id: heat_surface_nta
+  citation: >-
+    Landsat Collection 2 Level 2 Science Products, surface temperature band
+    (USGS EROS), Landsat 8 and 9, WRS row 032, Tier 1 scenes of 1 June to 10
+    September with at least 95% of the city's land clear. Riprap averages 30 m
+    pixels into 90 m cells and reports each cell against the city's land mean
+    in the same image (scripts/bake_surface_temperature.py; the images are
+    listed in data/heat/surface_temp.json).
+
+narration:
+  short: Surface temperature in this area against the city's land average, from clear summer Landsat images.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: The baked surface temperature raster was not found on this server.
+
+display:
+  variant: raster
+  order: 10
+  kind: text

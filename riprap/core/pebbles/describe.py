@@ -38,6 +38,7 @@ def describe_deployment(stones_reg: StoneRegistry, pebble_reg: Registry) -> dict
                 "type": m.type,
                 "title": m.title,
                 "stone": m.stone,
+                "hazard": m.hazard,  # flood, heat, or any (runs in both briefings)
                 "tier": m.tier,
                 "maturity": m.maturity,
                 # point pebbles run for address intents, polygon pebbles

@@ -1,0 +1,47 @@
+id: nws_heat_forecast_nta
+type: live
+title: NWS seven-day forecast highs and apparent temperature
+answers: "the National Weather Service's forecast daytime highs and highest apparent temperature (heat index) for the next seven days at the place, with its heat advisory thresholds"
+stone: lodestone
+hazard: heat
+tier: modeled
+adapter: python_call
+
+# api.weather.gov: the point's forecast grid cell (cached a day), then its
+# forecast and hourly grid (cached ten minutes). The Weather Service's
+# forecast, quoted as issued; Riprap forecasts nothing.
+spatial:
+  scope: polygon
+
+config:
+  module: app.heat.weather
+  function: forecast_area
+  args:
+    - {source: polygon_4326}
+  on_none: passthrough
+
+provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
+  source_name: National Weather Service (NOAA), gridpoint forecast, New York office (OKX)
+  source_url: https://api.weather.gov/
+  license: U.S. Public Domain
+  doc_id: nws_heat_forecast_nta
+  citation: >-
+    NWS gridpoint forecast for the 2.5 km cell containing the place
+    (api.weather.gov/gridpoints): daytime high temperatures and hourly
+    apparent temperature. Advisory criteria from the New York office's
+    definitions page (weather.gov/okx/wwa_definitions, read 2026-10-02).
+
+narration:
+  short: The National Weather Service's forecast highs for the next seven days at this place.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: NWS api.weather.gov unreachable.
+
+display:
+  variant: scalars
+  order: 20
+  kind: text

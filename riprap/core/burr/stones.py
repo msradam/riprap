@@ -13,6 +13,10 @@ Which pebbles run depends on the intent:
   live_now                  point pebbles of `type: live`
   neighborhood,
   development_check         polygon pebbles (spatial.scope: polygon)
+
+and on the hazard the plan's focus names: a flood briefing runs the flood
+sources, a heat briefing the heat ones, and sources marked `hazard: any`
+run in both.
 """
 from __future__ import annotations
 
@@ -40,6 +44,14 @@ FLOOR = {
     "development_check": ("area_boundary", "sandy_nta", "dep_moderate_2050_nta", "dob_permits_nta"),
 }
 
+# A heat question never skips the measurement and the forecast.
+HEAT_FLOOR = {
+    "single_address": ("heat_surface", "nws_heat_forecast"),
+    "compare": ("heat_surface", "nws_heat_forecast"),
+    "live_now": ("nws_heat_alerts", "nws_heat_forecast", "heat_obs"),
+    "neighborhood": ("area_boundary", "heat_surface_nta", "nws_heat_forecast_nta"),
+}
+
 # What an analyst checks for a question's focus, whatever the planner
 # chose: the record of past floods, the live signals, the asset register.
 # Ids outside the intent's scope (point vs area) are ignored.
@@ -64,8 +76,16 @@ DEP_FLOOR = ("dep_moderate_current", "dep_moderate_2050", "dep_extreme_2080",
              "dep_moderate_current_nta", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
 
 
+def hazard_of(plan: dict | None) -> str:
+    """The briefing a plan asks for: "heat", or "flood" (the default, and
+    what every plan made before heat existed means)."""
+    return "heat" if ((plan or {}).get("focus") or {}).get("hazard") == "heat" else "flood"
+
+
 def floor_for(plan: dict) -> set[str]:
     focus = plan.get("focus") or {}
+    if hazard_of(plan) == "heat":
+        return set(HEAT_FLOOR.get(plan.get("intent"), ()))
     keys = [("time_frame", focus.get("time_frame")), *(("assets", a) for a in focus.get("assets") or [])]
     floor = set(FLOOR.get(plan.get("intent"), ())).union(*(FOCUS_FLOOR.get(k, ()) for k in keys))
     return floor | set(DEP_FLOOR) if _DEP_RE.search(plan.get("question") or "") else floor
@@ -79,7 +99,7 @@ def select_pebbles(plan: dict | None, registry) -> list[str]:
     selector (a small classifier) can replace the planner's choice."""
     plan = plan or {}
     intent = plan.get("intent")
-    ids = [p.id for p in registry.all() if p.stone != "capstone" and _wants(p.manifest, intent)]
+    ids = [p.id for p in registry.all() if p.stone != "capstone" and _wants(p.manifest, intent, hazard_of(plan))]
     chosen = plan.get("pebbles")
     if not plan.get("question") or chosen is None:
         if plan.get("question") and intent != "development_check":
@@ -94,15 +114,15 @@ def select_pebbles(plan: dict | None, registry) -> list[str]:
     return [i for i in ids if i in keep]
 
 
-def _wants(manifest, intent: str | None) -> bool:
+def _wants(manifest, intent: str | None, hazard: str = "flood") -> bool:
     scope = "polygon" if intent in POLYGON_INTENTS else "point"
-    if manifest.spatial.scope not in (scope, "any"):
+    if manifest.spatial.scope not in (scope, "any") or manifest.hazard not in (hazard, "any"):
         return False
     return intent != "live_now" or manifest.type == "live"
 
 
 def pebbles_for(deployment: str | None, lat: float | None = None, lon: float | None = None,
-                intent: str | None = None) -> list[str]:
+                intent: str | None = None, hazard: str = "flood") -> list[str]:
     """Pebble ids to run for a query, in Stone then display order.
 
     `deployment` is a deployment name, or "__none__" when no city covers
@@ -117,7 +137,7 @@ def pebbles_for(deployment: str | None, lat: float | None = None, lon: float | N
     bbox = dep.bbox if dep is not None else None
     order = {s: i for i, s in enumerate(DATA_STONES)}
     pebbles = [p for p in get_registry(deployment).all()
-               if p.stone in order and _wants(p.manifest, intent)]
+               if p.stone in order and _wants(p.manifest, intent, hazard)]
     if lat is not None and lon is not None:
         pebbles = [p for p in pebbles if p.fires_at(lat, lon, bbox)]
     pebbles.sort(key=lambda p: (order[p.stone],
@@ -146,7 +166,8 @@ def _all_data_pebble_ids() -> list[str]:
 def _to_run(state) -> list[str]:
     """Pebbles the fan-out runs: those covering the point, restricted to
     the selection when there is one."""
-    ids = pebbles_for(state.get("deployment"), state.get("lat"), state.get("lon"), state.get("intent"))
+    ids = pebbles_for(state.get("deployment"), state.get("lat"), state.get("lon"), state.get("intent"),
+                      hazard_of(state.get("plan")))
     selected = state.get("selected_pebbles")
     return ids if selected is None else [i for i in ids if i in selected]
 
@@ -156,7 +177,7 @@ class StonesAction(MapActions):
 
     @property
     def reads(self) -> list[str]:
-        return ["lat", "lon", "deployment", "intent", "polygon_wkt", "selected_pebbles"]
+        return ["lat", "lon", "deployment", "intent", "polygon_wkt", "selected_pebbles", "plan"]
 
     @property
     def writes(self) -> list[str]:
@@ -177,7 +198,7 @@ class StonesAction(MapActions):
             for k in s.keys():
                 if k == "trace":
                     trace.extend(s["trace"])
-                elif k not in ("lat", "lon", "deployment", "intent", "polygon_wkt", "selected_pebbles"):
+                elif k not in ("lat", "lon", "deployment", "intent", "polygon_wkt", "selected_pebbles", "plan"):
                     updates[k] = s[k]
         for declared in self.writes:
             if declared != "trace" and declared not in updates and state.get(declared) is None:

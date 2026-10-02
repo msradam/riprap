@@ -1,0 +1,49 @@
+id: heat_visits
+type: baked
+title: Heat illness emergency department visits by community district (Health Department)
+answers: "how many residents of the community district were treated in emergency departments for heat illness over five summers, and the rate against the city's"
+stone: cornerstone
+hazard: heat
+tier: empirical
+adapter: python_call
+
+# Reads data/heat/dohmh_heat.json (scripts/bake_heat_records.py): published
+# aggregates by community district, with the department's suppression notes.
+spatial:
+  scope: point
+
+config:
+  module: app.heat.dohmh
+  function: visits_for_point
+  args:
+    - {source: lat}
+    - {source: lon}
+  on_none: offline
+
+provenance:
+  date_modified: 2024-08-24
+  retrieved_at: 2026-10-02
+  source_name: NYC Department of Health and Mental Hygiene, Environment and Health Data Portal, heat stress emergency department visits
+  source_url: https://a816-dohbesp.nyc.gov/IndicatorPublic/data-explorer/weather-related-illness/?id=2443
+  license: Apache-2.0 (github.com/nychealth/EHDP-data)
+  doc_id: heat_visits
+  citation: >-
+    NYC DOHMH Environment and Health Data Portal, indicator 2443, Heat stress:
+    5-year emergency department visits, 2018-22, by community district
+    (github.com/nychealth/EHDP-data, indicators/data/2443.json). NYC residents
+    treated in a NYC emergency department in May to September for the effects
+    of heat; from New York State SPARCS hospital discharge data. Counts under
+    11 are suppressed.
+
+narration:
+  short: Heat illness emergency department visits by residents of the community district, 2018 to 2022.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: The baked Health Department heat records were not found on this server.
+
+display:
+  variant: scalars
+  order: 30
+  kind: text

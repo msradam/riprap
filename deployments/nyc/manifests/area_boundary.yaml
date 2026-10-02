@@ -3,6 +3,7 @@ type: baked
 title: Area boundary (2020 Neighborhood Tabulation Areas)
 answers: "the outline of the neighborhood or community district the briefing covers"
 stone: cornerstone
+hazard: any
 tier: empirical
 adapter: python_call
 

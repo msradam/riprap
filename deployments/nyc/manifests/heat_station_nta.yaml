@@ -1,0 +1,45 @@
+id: heat_station_nta
+type: live
+title: Days at 90°F or above at the nearest long-record weather station
+answers: "how many days reached 90°F this year and last year at the nearest long-record weather station (Central Park, LaGuardia or JFK), the 1991 to 2020 average, and the year's highest temperature"
+stone: touchstone
+hazard: heat
+tier: empirical
+adapter: python_call
+
+# One request to the Regional Climate Centers' ACIS service, cached six hours.
+spatial:
+  scope: polygon
+
+config:
+  module: app.heat.weather
+  function: station_record_area
+  args:
+    - {source: polygon_4326}
+  on_none: passthrough
+
+provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
+  source_name: NOAA Regional Climate Centers, Applied Climate Information System (ACIS), daily station records
+  source_url: https://www.rcc-acis.org/docs_webservices.html
+  license: U.S. Public Domain
+  doc_id: heat_station_nta
+  citation: >-
+    NOAA Regional Climate Centers, ACIS web services (data.rcc-
+    acis.org/StnData): daily maximum temperature at the threaded station
+    records for Central Park, LaGuardia Airport and JFK Airport; yearly counts
+    of days at or above 90°F and yearly maxima.
+
+narration:
+  short: Days at or above 90°F this year at the nearest long-record station, against its 1991 to 2020 average.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: The climate station service (ACIS) did not answer.
+
+display:
+  variant: scalars
+  order: 40
+  kind: text

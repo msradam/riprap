@@ -38,7 +38,7 @@ from riprap.core.burr.intake import (
     select_deployment,
     select_sources,
 )
-from riprap.core.burr.stones import POLYGON_INTENTS, StonesAction
+from riprap.core.burr.stones import POLYGON_INTENTS, StonesAction, hazard_of
 from riprap.core.burr.templated_reconciler import reconcile_templated
 
 log = logging.getLogger("riprap.burr.app")
@@ -111,6 +111,8 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
                 targets = guard["targets"]
             if intent == "development_check" and guard["intent"] != "development_check":
                 intent = "neighborhood"  # the words name no construction (intake._DEVELOPMENT_RE)
+            # The hazard is decided in code from the question's words, never by the model.
+            focus = {**(focus or {}), "hazard": hazard_of(guard)}
             if forecast_question(query):
                 # Decided in code: a forecast question is about what is coming,
                 # so it runs the Lodestone's forecast pebbles, never live_now.
@@ -275,11 +277,13 @@ def iter_steps(query: str, plan: dict | None = None):
         yield {"kind": "final", **_final(holder["state"])}
 
 
-def district_summary(code: str, *, no_llm: bool = False) -> dict:
+def district_summary(code: str, *, no_llm: bool = False, hazard: str = "flood") -> dict:
     """The neighbourhood evidence for a community district (QN12, BK06),
-    run over the union of the district's NTAs."""
+    run over the union of the district's NTAs: its flood evidence, or with
+    hazard="heat" its heat evidence."""
     plan = {"intent": "neighborhood", "targets": [{"type": "nta", "text": code}],
-            "rationale": f"Community district summary: {code}."}
+            "rationale": f"Community district summary: {code}.",
+            "focus": {"hazard": hazard, "time_frame": "any", "assets": []}}
     return run(f"Community district {code}", plan, no_llm=no_llm)
 
 
@@ -317,7 +321,8 @@ def run_compare(query: str, plan: dict, runner=None) -> dict:
         return runner(query, {**plan, "intent": "single_address"})
     results = []
     for label, t in zip(("PLACE A", "PLACE B"), targets, strict=False):
-        sub = {"intent": "single_address", "targets": [t], "rationale": plan.get("rationale")}
+        sub = {"intent": "single_address", "targets": [t], "rationale": plan.get("rationale"),
+               "focus": plan.get("focus")}  # two heat briefings for a heat comparison
         results.append((label, t["text"], runner(t["text"], sub)))
     out = {**results[0][2]}
     out.update(

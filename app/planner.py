@@ -61,7 +61,7 @@ INTENTS = {
         "Use when the question asks for something Riprap does not provide: "
         "advice on buying, renting or selling property, insurance prices, "
         "legal advice, a prediction for a specific future day, or a hazard "
-        "other than flooding (heat, air quality, earthquakes). Still extract "
+        "other than flooding or heat (air quality, earthquakes). Still extract "
         "the place as a target and set focus.hazard."
     ),
     "compare": (
@@ -105,7 +105,7 @@ PLAN_SCHEMA_DESC = """Return JSON with these keys:
 """
 
 
-SYSTEM_PROMPT = f"""You are Riprap's query planner. You read a flood-exposure question, decide which intent fits, which place it is about, and which of the listed data sources are needed to answer it. You do not have any data yet.
+SYSTEM_PROMPT = f"""You are Riprap's query planner. You read a flood or heat exposure question, decide which intent fits, which place it is about, and which of the listed data sources are needed to answer it. You do not have any data yet.
 
 Intents:
 {chr(10).join(f"  - {k}: {v}" for k, v in INTENTS.items())}

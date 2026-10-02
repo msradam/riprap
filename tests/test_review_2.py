@@ -217,10 +217,13 @@ def test_a_district_reads_the_sensors_inside_it(monkeypatch):
     # From the fourth unseen set: advice and another hazard, phrased as no rule expected.
     ("Thinking about renting a ground floor apt at 2636 East 14th St, Brooklyn 11235. should I take it or is the "
      "flood risk too high?", "flood"),
-    ("which blocks around 104 W 136th St in Harlem get the hottest in summer?", "heat"),
+    ("is the smog bad around 104 W 136th St in Harlem in summer?", "air"),
 ])
 def test_advice_and_other_hazards_are_declined_however_they_are_phrased(query, hazard):
     plan = heuristic_plan(query)
     assert plan["intent"] == "out_of_scope" and plan["focus"]["hazard"] == hazard
+    # Heat was "another hazard" until the heat briefing (2026-10-02): the same unseen question is now routed to it.
+    hot = heuristic_plan("which blocks around 104 W 136th St in Harlem get the hottest in summer?")
+    assert hot["intent"] == "single_address" and hot["focus"]["hazard"] == "heat"
     # A question about the flood record that mentions summer is still answered.
     assert heuristic_plan("Did 80 Pioneer Street, Brooklyn flood last summer?")["intent"] == "single_address"

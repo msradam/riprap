@@ -1,0 +1,44 @@
+id: nws_heat_alerts
+type: live
+title: NWS active heat advisories, watches and warnings
+answers: "whether a National Weather Service heat advisory, extreme heat watch or extreme heat warning is active at the place, right now"
+stone: lodestone
+hazard: heat
+tier: modeled
+adapter: python_call
+
+# The same alerts endpoint the flood briefing reads, filtered to heat events.
+spatial:
+  scope: point
+
+config:
+  module: app.heat.weather
+  function: alerts
+  args:
+    - {source: lat}
+    - {source: lon}
+  on_none: passthrough
+
+provenance:
+  date_modified: at_fetch
+  retrieved_at: at_fetch
+  source_name: National Weather Service (NOAA), active alerts at point
+  source_url: https://api.weather.gov/
+  license: U.S. Public Domain
+  doc_id: nws_heat_alerts
+  citation: >-
+    NWS active alerts at the place (api.weather.gov/alerts/active), heat
+    events only: Heat Advisory, Extreme Heat Watch, Extreme Heat Warning.
+
+narration:
+  short: Active NWS heat advisories, watches and warnings at this place.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: NWS alerts endpoint unreachable.
+
+display:
+  variant: tabular
+  order: 10
+  kind: list

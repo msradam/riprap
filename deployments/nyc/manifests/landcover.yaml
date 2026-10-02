@@ -3,6 +3,7 @@ type: baked
 title: Land cover from satellite, NYC land-cover model (experimental)
 answers: "experimental estimate, from the latest satellite imagery, of how much of a place is paved or built over, how much is green and how much is tree canopy; it reads no change between years, and the city's 2017 map (city_landcover) is the measured source"
 stone: cornerstone
+hazard: any
 maturity: experimental
 tier: modeled
 adapter: python_call

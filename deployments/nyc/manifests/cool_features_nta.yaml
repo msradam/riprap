@@ -1,0 +1,45 @@
+id: cool_features_nta
+type: baked
+title: NYC Parks spray showers and pools
+answers: "the NYC Parks spray showers and public pools in this area, and where the city lists its cooling centers"
+stone: keystone
+hazard: heat
+tier: empirical
+adapter: python_call
+
+# Reads data/heat/parks_cooling.json (scripts/bake_heat_records.py). Cooling
+# centers are not copied: the city lists them only during a heat emergency.
+spatial:
+  scope: polygon
+
+config:
+  module: app.heat.cooling
+  function: for_polygon
+  args:
+    - {source: polygon_4326}
+  on_none: offline
+
+provenance:
+  date_modified: 2026-09-15
+  retrieved_at: 2026-10-02
+  source_name: NYC Parks, Spray Showers and Pools (NYC Open Data)
+  source_url: https://data.cityofnewyork.us/d/ckaz-6gaa
+  license: NYC Open Data Terms of Use
+  doc_id: cool_features_nta
+  citation: >-
+    NYC Parks Spray Showers (NYC Open Data ckaz-6gaa, rows updated 2026-09-03)
+    and NYC Parks Pools (y5rm-wagw, rows updated 2026-09-15). Spray showers
+    are counted by park or playground.
+
+narration:
+  short: NYC Parks spray showers and pools in this area.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: The baked NYC Parks cooling list was not found on this server.
+
+display:
+  variant: register
+  order: 10
+  kind: list

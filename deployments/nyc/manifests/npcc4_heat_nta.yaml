@@ -1,0 +1,44 @@
+id: npcc4_heat_nta
+type: baked
+title: NPCC4 (2024) extreme heat projections
+answers: "projected days a year at or above 90°F and 95°F and heat waves in New York City for the 2030s, 2050s and 2080s (NPCC4), for the city as a whole"
+stone: lodestone
+hazard: heat
+tier: modeled
+adapter: python_call
+
+spatial:
+  scope: polygon
+
+config:
+  module: app.heat.npcc4
+  function: get_projections_area
+  args:
+    - {source: polygon_4326}
+  on_none: passthrough
+
+provenance:
+  date_modified: 2024
+  retrieved_at: 2026-10-02
+  source_name: NPCC4, New York City Panel on Climate Change (2024)
+  source_url: https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/nyas.15116
+  license: CC-BY-NC 4.0 (Annals of the New York Academy of Sciences)
+  doc_id: npcc4_heat_nta
+  citation: >-
+    Braneon, C. et al. (2024). NPCC4: New York City climate risk information
+    2022, observations and projections. Annals of the New York Academy of
+    Sciences, Vol. 1539 (doi:10.1111/nyas.15116), Table 4: projections for
+    extreme heat and extreme precipitation events in NYC, baseline 1981-2010.
+
+narration:
+  short: NYC Panel on Climate Change (2024) projections of days at or above 90°F for New York City.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: The NPCC4 heat table was not available when this briefing ran.
+
+display:
+  variant: tabular
+  order: 50
+  kind: stat

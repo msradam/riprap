@@ -51,6 +51,10 @@ RELEVANT = (
 )
 
 
+# Leads only code sets, never a model: honest silence, a neutral lead, or (for heat) a yes or no "at the
+# surface" read from the measurement's own value, which the word patterns below do not understand.
+CODE_LEADS = ("cannot_answer", "experimental", "no_prediction", "heat_forecast", "no_prediction_heat", "no_score",
+              "surface_yes", "surface_no")
 _AREA_SHARE_RE = re.compile(r"([\d.]+)% of this area lies inside")
 # "Is there any ...", "are there ...": a yes needs only one.
 ANY_RE = re.compile(r"\b(any|is there an?|are there|was there an?|were there)\b", re.I)
@@ -300,8 +304,8 @@ def check_lead(lead: str, facts: list[str], question: str, docs: dict[str, str],
     """Extractive mode: check the model's lead against the facts it chose.
     The facts are template sentences shown verbatim, so only the lead and
     the choice of facts can be wrong."""
-    if lead in ("cannot_answer", "experimental", "no_prediction"):
-        return []  # no yes, no or count to check: silence, or a neutral lead set by code
+    if lead in CODE_LEADS:
+        return []  # no yes, no or count to check: silence, or a lead set by a rule from a source's own value
     if not facts:
         return [("empty", f"lead {lead!r} with no facts")]
     texts = dict(zip(facts, (docs.get(i, "") for i in facts), strict=True))

@@ -31,7 +31,7 @@ from dataclasses import dataclass
 from burr.core import State, action
 
 from riprap.core import llm
-from riprap.core.burr import answer_checks, evidence, rule_answer
+from riprap.core.burr import answer_checks, evidence, heat_answer, rule_answer
 from riprap.core.burr.templated_reconciler import NON_SCOPE_FOOTER, _scope_header, compose_briefing
 
 log = logging.getLogger("riprap.synthesis")
@@ -151,7 +151,7 @@ def claims_schema(doc_ids: list[str], sections: list[str]) -> dict:
     }
 
 
-SYSTEM_PROMPT = """You write the body of a flood-exposure evidence briefing for one place, as JSON claims.
+SYSTEM_PROMPT = """You write the body of a flood or heat exposure evidence briefing for one place, as JSON claims.
 
 Rules:
 - Use only the documents given. Each claim is one plain-language sentence that restates what its cited documents say.
@@ -168,7 +168,7 @@ Rules:
 # the ids of the facts. The reader sees those facts word for word, and a
 # question page shows no model-written section claims, so asking for them
 # only cost generation time (about 1,100 tokens, over a minute on a laptop).
-EXTRACTIVE_SYSTEM = """You answer a question about flood exposure at one place by choosing from numbered documents. You write no prose.
+EXTRACTIVE_SYSTEM = """You answer a question about flood or heat exposure at one place by choosing from numbered documents. You write no prose.
 
 Return JSON with "answer": "lead" is one of yes, no, partly, count, cannot_answer, and "facts" lists the ids of one to four documents that support the lead, most relevant first. The reader sees a fixed phrase for the lead followed by those documents' text, word for word. Use "no" only when the facts report an absence (outside, none, zero). Use "partly" when some but not all of what was asked about is affected. Use "count" when the question asks how many or how much. Use "cannot_answer" with no facts when the documents do not answer the question. Use only ids from the list."""
 LEADS = ("yes", "no", "partly", "count", "cannot_answer")
@@ -284,7 +284,16 @@ LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From
                 "facts": "From the sources consulted:",
                 "experimental": "From an experimental model, not a measurement:",
                 "no_prediction": "Riprap cannot predict whether a particular place floods on a given day: no source "
-                                 "or model here does that. What the Weather Service expects, and what the maps show:"}
+                                 "or model here does that. What the Weather Service expects, and what the maps show:",
+                # Heat (heat_answer.py).
+                "heat_forecast": "From the National Weather Service, as issued for the next 7 days; Riprap predicts "
+                                 "nothing itself:",
+                "no_prediction_heat": "Riprap cannot predict the temperature inside a building or on one block: no "
+                                      "source here does that. What the Weather Service expects for the area over the "
+                                      "next 7 days, and what has been measured here:",
+                "no_score": "Riprap computes no score or rating of its own. The Health Department publishes an index "
+                            "for the neighbourhood, quoted here with what it is and is not:",
+                "surface_yes": "At the surface, yes.", "surface_no": "At the surface, no."}
 
 
 def _documents(state) -> tuple[list[Doc], list, object]:
@@ -319,6 +328,9 @@ def _and(items: list[str]) -> str:
 LIVE_POINTER = ("Riprap reads records, not the street. For a live depth reading use the FloodNet dashboard "
                 "(dataviz.floodnet.nyc); official warnings come from the National Weather Service "
                 "(weather.gov) and Notify NYC.")
+HEAT_LIVE_POINTER = ("Riprap reads records, not the street. Official heat warnings come from the National Weather "
+                     "Service (weather.gov/okx) and Notify NYC; during a heat emergency the city lists its cooling "
+                     "centers at finder.nyc.gov/coolingcenters.")
 
 
 def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: str = "",
@@ -377,7 +389,8 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
                                           not in d.text.lower() else d.text, d.doc_id, every=d.experimental)
                             for d in docs if d.section == sec)
         parts.append(f"**{sec}.**\n" + (body or NO_EVIDENCE_LINE))
-    parts.append(NON_SCOPE_FOOTER.replace("**Out of scope.** ", f"**Out of scope.** {LIVE_POINTER} ", 1)
+    pointer = HEAT_LIVE_POINTER if heat_answer.hazard_of(question) == "heat" else LIVE_POINTER
+    parts.append(NON_SCOPE_FOOTER.replace("**Out of scope.** ", f"**Out of scope.** {pointer} ", 1)
                  if now else NON_SCOPE_FOOTER)
     return "\n\n".join(parts)
 
@@ -522,6 +535,8 @@ def synthesize(state, use_llm: bool = True) -> dict:
                 lead, lead_phrase = "facts", LEAD_PHRASES["facts"]
             elif sentence:
                 lead_phrase = f"{sentence} {lead_phrase}"
+        if lead == "count" and (days := heat_answer.count_sentence(question, facts, values)):
+            lead_phrase = f"{days} {lead_phrase}"  # "how many days reached 90 in 2023": that year, from the station's record
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
                                focus, texts, values, experimental)
     elif question:
@@ -577,9 +592,12 @@ def synthesize(state, use_llm: bool = True) -> dict:
     if question:
         checks.append("lead rules on the answer, which is the cited text word for word")
     # A bare address opens with the same verified "In brief" lead as no-LLM mode.
-    from riprap.core.burr.templated_reconciler import _lead
+    from riprap.core.burr.stones import hazard_of
+    from riprap.core.burr.templated_reconciler import _heat_lead, _lead
 
-    brief = _lead(state, items) if not question and state.get("intent") == "single_address" else None
+    brief = None
+    if not question and state.get("intent") == "single_address":
+        brief = _heat_lead(state, items, area=False) if hazard_of(plan) == "heat" else _lead(state, items)
     paragraph = _render(kept, docs, sections, question, lead_phrase, empty, brief,
                         now=bool(question) and (focus or {}).get("time_frame") == "now")
     paragraph = paragraph.replace(_scope_header(), _scope_header(state), 1)  # outside every city: say what was not read

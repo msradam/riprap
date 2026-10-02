@@ -1,0 +1,49 @@
+id: hvi_nta
+type: baked
+title: NYC Heat Vulnerability Index (Health Department)
+answers: "the NYC Health Department's Heat Vulnerability Index (1 to 5) for the neighbourhood or community district, a rank among neighbourhoods, with the air conditioning and green space figures published beside it"
+stone: cornerstone
+hazard: heat
+tier: modeled
+adapter: python_call
+
+# Reads data/heat/dohmh_heat.json (scripts/bake_heat_records.py). The index is
+# the department's own: Riprap computes no score.
+spatial:
+  scope: polygon
+
+config:
+  module: app.heat.dohmh
+  function: hvi_for_area
+  args:
+    - {source: query}
+  on_none: offline
+
+provenance:
+  date_modified: 2023-10-21
+  retrieved_at: 2026-10-02
+  source_name: NYC Department of Health and Mental Hygiene, Environment and Health Data Portal, Heat Vulnerability Index
+  source_url: https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/hvi/
+  license: Apache-2.0 (github.com/nychealth/EHDP-data)
+  doc_id: hvi_nta
+  citation: >-
+    NYC DOHMH Environment and Health Data Portal, Heat Vulnerability Index
+    2023 by 2020 neighborhood tabulation area and community district
+    (github.com/nychealth/EHDP-data, key-topics/heat-vulnerability-index/hvi-
+    nta-2020.csv and indicators/data/2191.json). The department builds it from
+    American Community Survey 2016-2020, 2017 LiDAR, the 2020 Census,
+    ECOSTRESS thermal imaging of 27 August 2020 and the 2017 Housing and
+    Vacancy Survey.
+
+narration:
+  short: The Health Department's Heat Vulnerability Index for the neighbourhood, a rank from 1 to 5.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: The baked Health Department heat records were not found on this server.
+
+display:
+  variant: scalars
+  order: 20
+  kind: text

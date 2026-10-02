@@ -27,6 +27,7 @@ from typing import Any
 
 from burr.core import State, action
 
+from riprap.core.burr import heat_answer
 from riprap.core.burr.pebble import trace_rec_for
 from riprap.core.burr.place import (
     ELSEWHERE_RE,
@@ -35,19 +36,25 @@ from riprap.core.burr.place import (
     landmark_phrase,
     resolve_query,
 )
-from riprap.core.burr.rule_answer import _clauses, asks_now, recognised  # one definition of "now"
+from riprap.core.burr.rule_answer import (  # one definition of "now"
+    _clauses,
+    asks_now,
+    recognised,
+    time_frame,
+)
 
 # Trailing risk phrases ("... at risk of flooding?", "... flood risk").
 _TRAILING_RE = re.compile(
     r"[\s,]*(?:at\s+risk(?:\s+(?:of|for))?(?:\s+(?:flooding|flood|flooded))?"
     r"|flood(?:ing|ed)?(?:\s+(?:risk|exposure|hazard))?"
+    r"|(?:extreme\s+)?heat(?:\s+(?:risk|exposure|hazard|briefing))?"
     r"|hazard\s+exposure)\s*\??\s*$",
     re.IGNORECASE,
 )
 # Leading clause that ends in a preposition and contains a risk/ask trigger,
 # e.g. "flood risk at ", "what's the flood risk for ", "briefing on ".
 _LEADIN_PREP_RE = re.compile(
-    r"^.*?\b(?:flood(?:ing)?|risk|hazard|briefing|report|exposure"
+    r"^.*?\b(?:flood(?:ing)?|heat|risk|hazard|briefing|report|exposure"
     r"|assess(?:ment)?)\b[^,\d]*?\b(?:at|for|near|of|in|on|around)\s+",
     re.IGNORECASE,
 )
@@ -129,9 +136,11 @@ def forecast_question(query: str) -> bool:
     return bool(_FORECAST_Q_RE.search(query or "")) and not _FUTURE_DAY_RE.search(query or "")
 
 
-_OTHER_HAZARD_RE = {"heat": re.compile(r"\b(heat island|heat ?waves?|heat vulnerab|extreme heat|hot(ter|test)?\b[^.?!]{0,30}\bsummer"
-                                       r"|(surface|air) temperatures?|cooling cent(er|re)s?)", re.I),
-                    "air": re.compile(r"\b(air quality|aqi|air pollution|smog|pm ?2\.5|ozone(?! park))\b", re.I)}
+_OTHER_HAZARD_RE = {"air": re.compile(r"\b(air quality|aqi|air pollution|smog|pm ?2\.5|ozone(?! park))\b", re.I)}
+# Advice about heat: what to do, whether it is safe, what is wrong with someone.
+_HEAT_ADVICE_RE = re.compile(
+    r"\bshould (i|we|my \w+)\b|\bis it (too hot|ok|okay) to\b|\bcan (i|we|my \w+) (go|run|walk|exercise|work|play|leave)\b"
+    r"|\bsymptoms?\b|\bwhat (should|do) (i|we) do\b|\bhow (do|can|should) (i|we) (stay|keep|treat|protect|cool)\b", re.I)
 
 
 _BOROUGH_WORDS = {"manhattan": "Manhattan", "brooklyn": "Brooklyn", "queens": "Queens", "bronx": "Bronx",
@@ -180,29 +189,42 @@ def heuristic_plan(query: str) -> dict:
       no house number and names an NTA       -> neighborhood
       anything else                          -> single_address
     """
+    q = (query or "").strip()
+    if heat_answer.INDOOR_HEATING_RE.search(q) and not re.search(r"\bflood", q, re.IGNORECASE):
+        return {"intent": "not_implemented", "rationale": heat_answer.INDOOR_HEATING, "targets": []}
+    hazard = heat_answer.hazard_of(q)
+    plan = _plan_for(q, hazard)
+    if hazard == "heat" and plan["intent"] != "not_implemented":
+        # The focus the heat sources are chosen by; the time frame comes from the heat rules.
+        plan["focus"] = {"hazard": "heat", "time_frame": heat_answer.time_frame(q), "assets": []}
+    return plan
+
+
+def _plan_for(q: str, hazard: str) -> dict:
+    """The plan for a query whose hazard is known (see heuristic_plan)."""
     from app.areas import nta  # noqa: PLC0415
     from app.planner import _not_implemented_message  # noqa: PLC0415
 
-    q = (query or "").strip()
+    heat = hazard == "heat"
     # A named future day is a prediction, declined as one ("Will it flood on
     # October 15" was once told Riprap cannot reconstruct a past date).
-    msg = None if _FUTURE_DAY_RE.search(q) else _not_implemented_message(q)
+    msg = None if _FUTURE_DAY_RE.search(q) or heat else _not_implemented_message(q)
     if msg:
         return {"intent": "not_implemented", "rationale": msg, "targets": []}
-    for hazard, pattern in _OTHER_HAZARD_RE.items():
-        # ("It gets hot here in the summer and the basement floods" is still a flood question, and so
-        # is "It was hot last summer. Was it inside the Sandy zone?": another sentence asks about flooding.)
-        if pattern.search(q) and not re.search(r"\bflood", q, re.IGNORECASE) and not any(
+    for other, pattern in _OTHER_HAZARD_RE.items():
+        # ("It was smoggy last summer. Was it inside the Sandy zone?": another sentence asks about flooding.)
+        if pattern.search(q) and not heat and not re.search(r"\bflood", q, re.IGNORECASE) and not any(
                 recognised(c) for c in _clauses(q) if not pattern.search(c)):
-            return {"intent": "out_of_scope", "rationale": f"Heuristic match: {hazard} question.",
-                    "focus": {"hazard": hazard, "time_frame": "any", "assets": []},
+            return {"intent": "out_of_scope", "rationale": f"Heuristic match: {other} question.",
+                    "focus": {"hazard": other, "time_frame": "any", "assets": []},
                     "targets": [{"type": "address", "text": _address_from_query(q)}]}
     # A prediction for a named day with no place has nothing to answer with;
     # with a place, the rules decline the prediction and quote what is
     # forecast and mapped there (rule_answer: no_prediction).
-    if _OUT_OF_SCOPE_RE.search(q) or (_FUTURE_DAY_RE.search(q) and not _names_a_place(q)):
+    if _OUT_OF_SCOPE_RE.search(q) or (heat and _HEAT_ADVICE_RE.search(q)) or (
+            not heat and _FUTURE_DAY_RE.search(q) and not _names_a_place(q)):
         return {"intent": "out_of_scope", "rationale": "Heuristic match: out of scope.",
-                "focus": {"hazard": "flood", "time_frame": "any", "assets": []},
+                "focus": {"hazard": hazard, "time_frame": "any", "assets": []},
                 "targets": [{"type": "address", "text": _address_from_query(q)}]}
     m = _COMPARE_RE.match(q)
     # A comparison of two addresses. "Compare the current and 2080 flood maps
@@ -224,7 +246,7 @@ def heuristic_plan(query: str) -> dict:
     if place["kind"] == "district":
         return {"intent": area_intent, "rationale": f"Heuristic match: community district {place['text']}.",
                 "targets": [{"type": "district", "text": place["text"]}], "place": place}
-    live = asks_now(q) and not forecast_question(q) and not _FUTURE_DAY_RE.search(q)
+    live = (time_frame(q) == "now") if heat else asks_now(q) and not forecast_question(q) and not _FUTURE_DAY_RE.search(q)
     # Another city or state named in the question ("Pike Place Market in Seattle").
     elsewhere = ELSEWHERE_RE.search(q) if place["text"] and not ELSEWHERE_RE.search(place["text"]) else None
     if place["kind"] == "address":
@@ -273,7 +295,7 @@ def heuristic_plan(query: str) -> dict:
     kind = "nta" if intent in ("neighborhood", "development_check") else "address"
     out = {"intent": intent, "rationale": f"Heuristic match: {intent}.",
            "targets": [{"type": kind, "text": target}], "place": place}
-    if forecast_question(q) or _FUTURE_DAY_RE.search(q):
+    if not heat and (forecast_question(q) or _FUTURE_DAY_RE.search(q)):
         out["focus"] = {"hazard": "flood", "time_frame": "future", "assets": []}
     return out
 
@@ -470,7 +492,7 @@ def select_sources(state: State) -> State:
     """Decide which pebbles run (stones.select_pebbles) and record the
     sources consulted and the ones not checked. Unchosen pebbles appear in
     the trace as skipped, not failed."""
-    from riprap.core.burr.stones import pebbles_for, select_pebbles  # noqa: PLC0415
+    from riprap.core.burr.stones import hazard_of, pebbles_for, select_pebbles  # noqa: PLC0415
     from riprap.core.pebbles.bridge import get_registry  # noqa: PLC0415
 
     trace = list(state.get("trace", []))
@@ -478,7 +500,7 @@ def select_sources(state: State) -> State:
     plan = {**(state.get("plan") or {}), "intent": state.get("intent")}
     selected = select_pebbles(plan, registry)
     available = pebbles_for(state.get("deployment"), state.get("lat"), state.get("lon"),
-                            state.get("intent"))
+                            state.get("intent"), hazard_of(plan))
 
     def entry(pid):
         m = registry.get(pid).manifest

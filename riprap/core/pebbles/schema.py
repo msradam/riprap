@@ -146,6 +146,10 @@ class _PebbleBase(BaseModel):
     # planner reads it to choose which pebbles a question needs.
     answers: str | None = None
     stone: str  # which Stone this pebble rolls up to
+    # Which briefing the source belongs to: a flood briefing runs the flood
+    # sources, a heat briefing the heat ones, and `any` runs in both (the
+    # area outline, the weather observation, the city's land cover map).
+    hazard: Literal["flood", "heat", "any"] = "flood"
     # experimental: a model output or a city feed whose evaluation does not
     # support showing it as plain evidence; it is labelled wherever it appears.
     maturity: Literal["production", "experimental"] = "production"

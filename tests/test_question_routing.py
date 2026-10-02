@@ -6,12 +6,14 @@ from app.planner import _validate, plan_schema
 from riprap.core.burr.intake import heuristic_plan
 from riprap.core.burr.stones import FLOOR, select_pebbles
 from riprap.core.burr.synthesis import CANNOT_ANSWER, Doc, _render, verify
-from riprap.core.burr.templated_reconciler import SCOPE_REFUSAL, refusal
+from riprap.core.burr.templated_reconciler import HEAT_REFUSAL, SCOPE_REFUSAL, refusal
 from riprap.core.pebbles.bridge import get_registry
 
 NYC = get_registry("nyc")
-POINT = [p.id for p in NYC.all() if p.manifest.spatial.scope in ("point", "any")]  # "any": the harbour gauges
-AREA = [p.id for p in NYC.all() if p.manifest.spatial.scope in ("polygon", "any")]
+# A plan with no heat focus is a flood briefing: the flood sources and the ones both briefings share.
+FLOOD = [p for p in NYC.all() if p.manifest.hazard in ("flood", "any")]
+POINT = [p.id for p in FLOOD if p.manifest.spatial.scope in ("point", "any")]  # "any": the harbour gauges
+AREA = [p.id for p in FLOOD if p.manifest.spatial.scope in ("polygon", "any")]
 
 
 def test_a_district_runs_the_area_sources_and_the_harbour_gauges():
@@ -83,10 +85,14 @@ def test_render_opens_with_answer_or_cannot_answer_line():
 
 def test_out_of_scope_gets_fixed_text():
     assert heuristic_plan("Should I buy the house at 2017 East 17th Street?")["intent"] == "out_of_scope"
-    heat = heuristic_plan("Is 560 Grand Street a heat island in the summer?")
-    assert heat["intent"] == "out_of_scope" and heat["focus"]["hazard"] == "heat"
+    # Heat is a briefing now (tests/test_heat.py); air quality is still another hazard.
+    air = heuristic_plan("How bad is the air quality at 560 Grand Street?")
+    assert air["intent"] == "out_of_scope" and air["focus"]["hazard"] == "air"
     assert refusal({"intent": "out_of_scope", "plan": {"focus": {"hazard": "flood"}}}) == SCOPE_REFUSAL
-    assert "heat" in refusal({"intent": "out_of_scope", "plan": {"focus": {"hazard": "heat"}}})
+    assert "air-quality" in refusal({"intent": "out_of_scope", "plan": {"focus": {"hazard": "air"}}})
+    # Advice about heat is declined in heat's own words, with where to go instead.
+    heat = refusal({"intent": "out_of_scope", "plan": {"focus": {"hazard": "heat"}}})
+    assert heat == HEAT_REFUSAL and "health or safety advice" in heat and "911" in heat
 
 
 def test_numbers_from_the_users_question_are_exempt():

@@ -49,12 +49,21 @@ SCOPE_REFUSAL = (
     "Service Center (msc.fema.gov); for a home in New York City, FloodHelpNY "
     "(floodhelpny.org) explains flood insurance and resiliency options."
 )
-COVERAGE_REFUSAL = (
-    "Riprap's New York City deployment covers flood evidence only. It has no {what} "
-    "sources for this place, so it cannot answer this question. Ask about flooding "
-    "at this address to see what it does cover."
+HEAT_REFUSAL = (
+    "Riprap does not answer this question. It reports public heat evidence for a place: "
+    "the measured surface temperature, the Health Department's vulnerability index and "
+    "heat illness counts, station records and the Weather Service's forecast, each cited "
+    "to its source. It does not give health or safety advice, or say what to do in the "
+    "heat. For that, see the NYC Health Department's extreme heat guidance (nyc.gov/health), "
+    "the National Weather Service (weather.gov/safety/heat) or call 311; in an emergency "
+    "call 911."
 )
-_HAZARD_WORDS = {"heat": "heat", "air": "air-quality"}
+COVERAGE_REFUSAL = (
+    "Riprap's New York City deployment covers flood and heat evidence. It has no {what} "
+    "sources for this place, so it cannot answer this question. Ask about flooding or "
+    "heat at this address to see what it does cover."
+)
+_HAZARD_WORDS = {"air": "air-quality"}
 
 
 def refusal(state) -> str:
@@ -63,8 +72,10 @@ def refusal(state) -> str:
     if state.get("intent") == "not_implemented":
         return plan.get("rationale") or "Riprap cannot answer this query."
     hazard = (plan.get("focus") or {}).get("hazard", "flood")
+    if hazard == "heat":
+        return HEAT_REFUSAL
     if hazard != "flood":
-        return COVERAGE_REFUSAL.format(what=_HAZARD_WORDS.get(hazard, "non-flood"))
+        return COVERAGE_REFUSAL.format(what=_HAZARD_WORDS.get(hazard, "other"))
     return SCOPE_REFUSAL
 
 
@@ -205,6 +216,42 @@ def _area_lead(state, items) -> str | None:
     return " ".join(f"{c['text']} {''.join(f'[{i}]' for i in c['doc_ids'])}." for c in kept) or None
 
 
+def _heat_lead(state, items, area: bool) -> str | None:
+    """A heat briefing's opening for an address or an area: the measured
+    surface temperature, the tree canopy on the city's map and the Health
+    Department's index, each from its source's value, cited, and checked by
+    the claim verifier like any claim."""
+    from riprap.core.burr.synthesis import Doc, verify
+
+    sfx = "_nta" if area else ""
+    by_pebble = {e.pebble_id: e for e in items}
+    claims = []
+
+    def add(pid: str, text: str):
+        claims.append({"section": "lead", "text": text, "doc_ids": [by_pebble[pid].doc_id]})
+
+    v = state.get(f"heat_surface{sfx}")
+    if f"heat_surface{sfx}" in by_pebble and isinstance(v, dict) and v.get("mean_diff_f") is not None:
+        d = v["mean_diff_f"]
+        where = "this area" if area else f"the ground within {v['radius_m']:.0f} m of this address"
+        how = "within half a degree of" if abs(d) < 0.5 else f"{abs(d):.1f}°F {'warmer' if d > 0 else 'cooler'} than"
+        add(f"heat_surface{sfx}", f"The surface of {where} ran {how} the city's land average over {v['n_images']} clear "
+                                  "summer Landsat images (surface temperature, not air temperature)")
+    v = state.get(f"city_landcover{sfx}")
+    if f"city_landcover{sfx}" in by_pebble and isinstance(v, dict) and v.get("tree_canopy_pct") is not None:
+        where = "this area" if area else f"the ground within {v['radius_m']:.0f} m"
+        add(f"city_landcover{sfx}", f"{v['tree_canopy_pct']}% of {where} is under tree canopy and {v['built_pct']}% is "
+                                    "paved or built over on the city's 2017 land cover map")
+    v = state.get(f"hvi{sfx}")
+    if f"hvi{sfx}" in by_pebble and isinstance(v, dict) and v.get("hvi") is not None:
+        whose = "This area" if area else f"Its neighbourhood, {v['area']},"
+        add(f"hvi{sfx}", f"{whose} scores {v['hvi']} out of 5 on the Health Department's Heat Vulnerability Index, a "
+                         "rank among neighbourhoods and not a measurement")
+    docs = [Doc(e.doc_id, "lead", e.text, False) for e in items]
+    kept, _ = verify(claims, docs)
+    return " ".join(f"{c['text']} {''.join(f'[{i}]' for i in c['doc_ids'])}." for c in kept) or None
+
+
 def no_place(state) -> str:
     """The briefing when the query named no place the geocoder could find."""
     asked = (state.get("first_target") or state.get("query") or "").strip()
@@ -252,10 +299,24 @@ _QUIET_UNLESS = {
     "city_landcover": lambda v: False,
     "city_landcover_nta": lambda v: False,
 }
+# A plain heat briefing quotes the city's land cover map (canopy is a ground
+# condition of heat), and the live readings only on a hot day: an air
+# temperature of 85 F or a forecast high of 90 F.
+# ponytail: fixed thresholds; use the Weather Service's own HeatRisk category if the briefing ever reads it.
+_QUIET_UNLESS_HEAT = {
+    "landcover": lambda v: False,
+    "landcover_nta": lambda v: False,
+    **{k: (lambda v: (v.get("temp_f") or 0) >= 85) for k in ("heat_obs", "heat_obs_nta")},
+    **{k: (lambda v: (v.get("max_high_f") or 0) >= 90 or (v.get("max_apparent_f") or 0) >= 95)
+       for k in ("nws_heat_forecast", "nws_heat_forecast_nta")},
+}
 
 
 def _quiet(state, e) -> bool:
-    notable = _QUIET_UNLESS.get(e.pebble_id)
+    from riprap.core.burr.stones import hazard_of
+
+    rules = _QUIET_UNLESS_HEAT if hazard_of(state.get("plan")) == "heat" else _QUIET_UNLESS
+    notable = rules.get(e.pebble_id)
     value = state.get(e.pebble_id)
     return bool(notable) and isinstance(value, dict) and not notable(value)
 
@@ -273,8 +334,14 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
     sections = [_scope_header(state)]
     question = (state.get("plan") or {}).get("question")
     intent = state.get("intent")
-    lead = (_lead(state, items) if intent == "single_address" and not question
-            else _area_lead(state, items) if intent == "neighborhood" and not question else None)
+    from riprap.core.burr.stones import hazard_of
+
+    if hazard_of(state.get("plan")) == "heat":
+        lead = (_heat_lead(state, items, area=intent == "neighborhood")
+                if intent in ("single_address", "neighborhood") and not question else None)
+    else:
+        lead = (_lead(state, items) if intent == "single_address" and not question
+                else _area_lead(state, items) if intent == "neighborhood" and not question else None)
     if lead:
         sections.append(f"**In brief.**\n{lead}")
     dep, dep_done = _dep_sentence(state, items), False
