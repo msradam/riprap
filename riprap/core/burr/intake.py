@@ -265,7 +265,7 @@ def heuristic_plan(query: str) -> dict:
         return {"intent": "not_implemented", "rationale": heat_answer.NOT_WEATHER, "targets": []}
     hazard = heat_answer.hazard_of(q)
     plan = _plan_for(q, hazard)
-    if hazard == "heat" and plan["intent"] != "not_implemented":
+    if hazard == "heat":  # (a refusal too: the page then calls it a heat briefing that is not available, not a flood one)
         # The focus the heat sources are chosen by; the time frame comes from the heat rules.
         plan["focus"] = {"hazard": "heat", "time_frame": heat_answer.time_frame(q), "assets": []}
     return plan
@@ -450,7 +450,23 @@ def plan_intent(state: State) -> State:
         rec["elapsed_s"] = round(time.time() - rec["started_at"], 2)
 
 
-@action(reads=["lat", "lon"], writes=["deployment", "trace"])
+def _heat_outside_nyc(state: State, deployment: str, trace: list) -> State | None:
+    """A heat query for a place outside New York City is declined here, as
+    a response the page shows, with the place it found. (Left to the end, the
+    page had no evidence and showed nothing at all.)"""
+    from riprap.core.burr.stones import hazard_of  # noqa: PLC0415
+
+    plan = state.get("plan") or {}
+    if hazard_of(plan) != "heat" or deployment == "nyc":
+        return None
+    where = (state.get("geocode") or {}).get("address") or "this place"
+    msg = (f"Riprap's heat briefing covers New York City only, and the place it found for this query is outside it: "
+           f"{where}. If you meant a place in the city, add its borough.")
+    return state.update(deployment=deployment, intent="not_implemented",
+                        plan={**plan, "intent": "not_implemented", "rationale": msg}, trace=trace)
+
+
+@action(reads=["lat", "lon", "plan", "geocode"], writes=["deployment", "intent", "plan", "trace"])
 def select_deployment(state: State) -> State:
     """Pick the deployment whose coverage bbox contains the geocoded point.
 
@@ -480,13 +496,13 @@ def select_deployment(state: State) -> State:
         # Sentinel `__none__` (not None) so Stones can tell "out of
         # coverage: run the federal pebbles only" from "no deployment
         # resolved yet: fall back to the env var".
-        return state.update(deployment="__none__", trace=trace)
+        return _heat_outside_nyc(state, "__none__", trace) or state.update(deployment="__none__", trace=trace)
     rec["ok"] = True
     rec["result"] = {"deployment": dep.name, "city": dep.city,
                      "state": dep.state}
     rec["elapsed_s"] = round(time.time() - rec["started_at"], 4)
     trace.append(rec)
-    return state.update(deployment=dep.name, trace=trace)
+    return _heat_outside_nyc(state, dep.name, trace) or state.update(deployment=dep.name, trace=trace)
 
 
 @action(reads=["first_target", "query"], writes=["geocode", "lat", "lon", "trace"])

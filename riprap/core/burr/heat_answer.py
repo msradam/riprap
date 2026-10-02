@@ -47,7 +47,9 @@ HEAT_RE = re.compile(
     # above", "forecast highs", "cool places", "what will summers be like".
     r"|\btemps?\b|\b(?:over|above|hit|hits|reach(?:es|ed)?|top(?:s|ped)?)\s+(?:8[5-9]|9\d|1[01]\d)\b|\bhighs\b"
     r"|\bcool (?:places?|spots?|spaces?)\b|\bstay(?:ing)? cool\b|\bsummers\b"
-    r"|\brecord highs?\b(?!\s+(?:tide|water|surge|rain))", re.I)
+    r"|\brecord highs?\b(?!\s+(?:tide|water|surge|rain))"
+    # Trees and shade are asked about for heat; paving alone stays with the flood briefing.
+    r"|\b(?:tree )?canopy\b|\btree cover\b|\bstreet trees\b|\bshad(?:e|ed|y)\b", re.I)
 # A cold apartment: no heat, a radiator, the landlord. Not this briefing.
 INDOOR_HEATING_RE = re.compile(
     r"\bheat\s*(?:and|&|/|or)\s*hot water|\bno heat\b|\bheat(?:ing)? (?:complaints?|violations?|season|is (?:off|out|broken))"
@@ -223,6 +225,9 @@ def count_sentence(question: str, facts: list[str], values: dict | None) -> str 
     v = (values or {}).get(doc) if doc else None
     question = _sans_house(question)
     m = _YEAR_RE.search(question)
+    if not m and isinstance(v, dict) and v.get("year"):  # "this year", "last year": the station record's own years
+        rel = re.search(r"\b(this|last) (?:year|summer)\b|\bso far\b", question, re.I)
+        m = rel and re.match(r"(\d+)", str(v["year"] - (1 if (rel.group(1) or "").lower() == "last" else 0)))
     if not m or not isinstance(v, dict) or not _COUNT_DAYS_RE.search(question) or _SPAN_RE.search(question):
         return None
     # The record counts days at 90°F or above: a question about 95 or 100 is not answered by that count.
@@ -346,6 +351,6 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     # "Which parts of the Bronx ...", "the hottest block in ...": the record for the place, said to be no ranking.
     facts = "no_ranking" if _RANK_RE.search(q) else "facts"
     if subjects:
-        return ("count" if ac.is_count_question(q) and not any(d in COOLING for d in subjects) else facts), subjects[:4]
+        return ("count" if ac.is_count_question(q) and not any(d in COOLING or d in COVER for d in subjects) else facts), subjects[:4]
     docs = have(SURFACE, HVI, ("city_landcover", "city_landcover_nta"), STATION)
     return (facts, docs[:4]) if docs else None

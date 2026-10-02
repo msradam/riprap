@@ -37,9 +37,10 @@ export const isHeat = (plan: Pick<PlanInfo, 'focus'> | null | undefined): boolea
 
 /** What the briefing is called. A planned run that is not a heat run is a
  *  flood run. Before the plan arrives the hazard is unknown, and it is not
- *  guessed from the query text. */
-export function hazardLabel(plan: Pick<PlanInfo, 'focus'> | null | undefined): string {
-  if (!plan) return 'Briefing';
+ *  guessed from the query text. A query the planner declines without
+ *  naming a hazard (a cold apartment, basketball) is neither. */
+export function hazardLabel(plan: (Pick<PlanInfo, 'focus'> & { intent?: string }) | null | undefined): string {
+  if (!plan || (plan.intent === 'not_implemented' && !plan.focus?.hazard)) return 'Briefing';
   return isHeat(plan) ? 'Heat briefing' : 'Flood-exposure briefing';
 }
 

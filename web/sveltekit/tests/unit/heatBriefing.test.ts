@@ -18,6 +18,8 @@ describe('hazardLabel', () => {
   it('is neutral until the plan arrives', () => {
     expect(hazardLabel(null)).toBe('Briefing');
     expect(hazardLabel(undefined)).toBe('Briefing');
+    expect(hazardLabel({ intent: 'not_implemented' })).toBe('Briefing');
+    expect(hazardLabel({ intent: 'not_implemented', focus: { hazard: 'heat' } })).toBe('Heat briefing');
   });
   it('names a heat run from the plan', () => {
     expect(hazardLabel({ focus: { hazard: 'heat' } })).toBe('Heat briefing');

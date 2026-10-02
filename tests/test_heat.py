@@ -272,7 +272,7 @@ A = "90-01 183rd Street, Queens"
     (f"Where can people cool off near {A}?", "facts", ["cool_features"]),
     (f"Where is the nearest cooling center to {A}?", "facts", ["cool_features"]),
     # Canopy: the city's map, then the model's estimate, as in a flood answer.
-    (f"How much tree canopy shades {A} in the heat?", "count", ["city_landcover", "landcover"]),
+    (f"How much tree canopy shades {A} in the heat?", "facts", ["city_landcover", "landcover"]),
     # From the unseen set: an apartment by number, a calendar date, "the next 30 years", deaths, a pool's hours.
     (f"How hot will apartment 6C at {A} get on Saturday afternoon", "no_prediction_heat",
      ["nws_heat_forecast", "nws_heat_alerts", "heat_surface"]),
@@ -636,7 +636,10 @@ def test_what_a_fresh_reviewer_broke():
               "What is the record high tide at the Battery?"):
         assert ha.hazard_of(q) == "flood", q
     assert ha.hazard_of("Where can kids cool off near Mariners Harbor Houses?") == "heat"
-    assert ha.count_sentence("How many days hit 90 last year near 2020 Grand Concourse, Bronx?", ["heat_station"], V) is None
+    assert ha.count_sentence("How many days hit 90 last year near 2020 Grand Concourse, Bronx?", ["heat_station"], V) == (
+        "15 days at or above 90°F at JFK Airport in 2025.")  # last year, not the house number's year
+    assert ha.count_sentence("How many days hit 90 this year near here?", ["heat_station"], V) == (
+        "10 days at or above 90°F at JFK Airport in 2026 through 2026-10-01.")
     assert ha.year_sentence("How hot did it get at 2025 Broadway, Manhattan?", ["heat_station"], {"heat_station": {
         "station": "Central Park", "max_by_year": {2025: [99, "2025-06-24"]}}}) is None
     assert ha.time_frame("How hot does it get at 2050 Bartow Avenue, Bronx?") != "future"
