@@ -264,6 +264,12 @@ def nothing_built(state) -> str:
     to respond and which answered with nothing, not a bare "no data"."""
     if state.get("lat") is None:
         return no_place(state)
+    from riprap.core.burr.stones import hazard_of
+
+    if hazard_of(state.get("plan")) == "heat" and state.get("deployment") != "nyc":
+        where = (state.get("geocode") or {}).get("address") or "this place"
+        return (f"{_scope_header()}\n\nRiprap's heat briefing covers New York City only, and the place it found for "
+                f"this query is outside it: {where}. If you meant a place in the city, add its borough.")
     ok = {t.get("step"): t.get("ok") for t in state.get("trace") or []}
     consulted = state.get("consulted") or []
     failed = [e["title"] for e in consulted if ok.get(e["id"]) is False]

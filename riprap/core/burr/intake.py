@@ -30,6 +30,7 @@ from burr.core import State, action
 from riprap.core.burr import heat_answer
 from riprap.core.burr.pebble import trace_rec_for
 from riprap.core.burr.place import (
+    _NAMED_PLACE_RE,
     ELSEWHERE_RE,
     extract_address,
     geocode_matches,
@@ -109,6 +110,58 @@ NO_PLACE_NOW = ("Riprap reads the records for one place at a time, and this ques
                 "flooding across the city right now, use the FloodNet sensor dashboard (dataviz.floodnet.nyc); "
                 "official warnings come from the National Weather Service (weather.gov/okx) and Notify NYC. "
                 "Add an address or a neighbourhood to get the readings near it.")
+NO_PLACE_HEAT = ("Riprap reads the records for one place at a time, and this question names none it could find. "
+                 "Add a street address, a neighbourhood, a community district such as QN12, or a borough. Official "
+                 "heat warnings for the whole city come from the National Weather Service (weather.gov/okx) and "
+                 "Notify NYC.")
+_WIDE_AREA_RE = re.compile(r"\b(?:(the bronx|bronx)|(brooklyn)|(manhattan)|(queens)|(staten island)"
+                           r"|(nyc|new york city|the city|citywide|city-wide|the five boroughs))\b", re.IGNORECASE)
+_WIDE_CODES = ("BX", "BK", "MN", "QN", "SI", "NYC")
+
+
+def _wide_area(q: str) -> str | None:
+    """The borough a heat question names, or NYC for the whole city, when it
+    names exactly one: a heat question about the Bronx is answered for the
+    Bronx (the forecast, the alerts, the surface mean, the station), where
+    a flood question needs a place."""
+    named = {code for m in _WIDE_AREA_RE.finditer(q or "") for code, g in zip(_WIDE_CODES, m.groups(), strict=True) if g}
+    boroughs = named - {"NYC"}
+    return next(iter(boroughs)) if len(boroughs) == 1 else "NYC" if named == {"NYC"} else None
+
+
+# "Is Mott Haven hotter than Riverdale?", "compare heat vulnerability BK16 vs BK06", "Corona vs Forest Hills, ...".
+_HEAT_COMPARE_RE = re.compile(
+    r"^\W*(?:is|are|was|were)\s+(?:it\s+)?(.+?)\s+(?:any\s+|much\s+)?(?:hott?er|warmer|cooler|more [\w ]+?|less [\w ]+?)\s+than\s+(.+?)\s*[?.,]"
+    r"|^\W*compare\s+(?:the\s+)?(?:[a-z ]+?\s+)?(.+?)\s+(?:to|with|and|vs\.?|versus)\s+(.+?)\s*(?:[?.,]|$)"
+    r"|^\W*(.+?)\s+(?:vs\.?|versus)\s+(.+?)\s*(?:[?.,]|$)", re.IGNORECASE)
+
+
+def _heat_compare(q: str) -> list[dict] | None:
+    """Two places a heat question sets side by side, each as a target, or
+    None when it names fewer than two (or the second is the city itself)."""
+    from app.areas import nta  # noqa: PLC0415
+
+    m = _HEAT_COMPARE_RE.match(q + ("" if q.rstrip().endswith(("?", ".", ",")) else "?"))
+    if not m:
+        return None
+    targets = []
+    for words in (g for g in m.groups() if g):
+        if re.search(r"\b(rest of|the city|average|nyc|new york city|citywide)\b", words, re.IGNORECASE):
+            return None
+        place = resolve_query(words)
+        if place["kind"] == "district":
+            targets.append({"type": "district", "text": place["text"]})
+        elif place["kind"] == "address":
+            targets.append({"type": "address", "text": _with_borough(place["text"], words)})
+        elif place["kind"] == "neighborhood" and nta.resolve(place["text"]):
+            targets.append({"type": "nta", "text": place["text"]})
+        elif place["kind"] == "neighborhood":
+            targets.append({"type": "address", "text": f"{place['text']}, New York, NY"})
+        else:
+            return None
+    return targets if len(targets) == 2 and targets[0]["text"].lower() != targets[1]["text"].lower() else None
+
+
 # A forecast for a named future day or date ("Will X flood next Tuesday?").
 # Needs a future word, so "Did it flood on Monday?" stays a history question.
 _FUTURE_DAY_RE = re.compile(
@@ -139,7 +192,8 @@ def forecast_question(query: str) -> bool:
 _OTHER_HAZARD_RE = {"air": re.compile(r"\b(air quality|aqi|air pollution|smog|pm ?2\.5|ozone(?! park))\b", re.I)}
 # Advice about heat: what to do, whether it is safe, what is wrong with someone.
 _HEAT_ADVICE_RE = re.compile(
-    r"\bshould (i|we|my \w+)\b|\bis it (too hot|ok|okay) to\b|\bcan (i|we|my \w+) (go|run|walk|exercise|work|play|leave)\b"
+    r"\b(?:bad|good|smart|wise|dumb|terrible) idea\b|\bthinking (?:of|about) (?:renting|buying|moving)\b"
+    r"|\bshould (i|we|my \w+)\b|\bis it (too hot|ok|okay) to\b|\bcan (i|we|my \w+) (go|run|walk|exercise|work|play|leave)\b"
     r"|\bsymptoms?\b|\bwhat (should|do) (i|we) do\b|\bhow (do|can|should) (i|we) (stay|keep|treat|protect|cool)\b", re.I)
 
 
@@ -168,7 +222,15 @@ def _with_borough(span: str, query: str) -> str:
              if re.search(rf"\bin (?:the )?{word}\b", query, re.IGNORECASE)]
     if len(named) == 1:
         return f"{span}, {named[0]}"
-    return f"{span}, Queens" if re.match(r"\s*\d+-\d+\s", span) else span
+    if re.match(r"\s*\d+-\d+\s", span):
+        return f"{span}, Queens"
+    # A neighbourhood named elsewhere in the question ("... for Central Harlem near Harlem Hospital (506 Lenox
+    # Avenue)"): its borough, when every area of that name is in one borough.
+    from riprap.core.burr.place import place_phrase  # noqa: PLC0415
+
+    near = place_phrase(query.replace(span.split(",")[0], " "))
+    boroughs = {h["borough"] for h in nta.resolve(near)} if near else set()
+    return f"{span}, {next(iter(boroughs))}" if len(boroughs) == 1 else span
 
 
 def _names_a_place(query: str) -> bool:
@@ -226,7 +288,9 @@ def _plan_for(q: str, hazard: str) -> dict:
         return {"intent": "out_of_scope", "rationale": "Heuristic match: out of scope.",
                 "focus": {"hazard": hazard, "time_frame": "any", "assets": []},
                 "targets": [{"type": "address", "text": _address_from_query(q)}]}
-    m = _COMPARE_RE.match(q)
+    if heat and (pair := _heat_compare(q)):
+        return {"intent": "compare", "rationale": "Heuristic match: compare.", "targets": pair}
+    m = None if heat else _COMPARE_RE.match(q)
     # A comparison of two addresses. "Compare the current and 2080 flood maps
     # at 89-11 Merrick Boulevard" names one place and was once briefed as a
     # building called The Current in New Jersey.
@@ -247,6 +311,21 @@ def _plan_for(q: str, hazard: str) -> dict:
         return {"intent": area_intent, "rationale": f"Heuristic match: community district {place['text']}.",
                 "targets": [{"type": "district", "text": place["text"]}], "place": place}
     live = (time_frame(q) == "now") if heat else asks_now(q) and not forecast_question(q) and not _FUTURE_DAY_RE.search(q)
+    if heat and place["kind"] is None:
+        # No address, district, neighbourhood or named building. A borough or the
+        # city is a place for a heat question; a question with none is told so
+        # (the whole question once went to the geocoder and came back as a
+        # Weather Service office in Albany).
+        if scope := _wide_area(q):
+            return {"intent": "neighborhood", "rationale": f"Heuristic match: {scope}.",
+                    "targets": [{"type": "nta", "text": scope}], "place": place}
+        if _QUESTION_RE.search(q) and not landmark_phrase(q):
+            return {"intent": "not_implemented", "rationale": NO_PLACE_HEAT, "targets": [], "place": place}
+    if heat and place["kind"] == "neighborhood" and not nta.resolve(place["text"]) and _WIDE_AREA_RE.search(place["text"]) \
+            and (scope := _wide_area(q)):
+        # "Staten Island North Shore" is no tabulation area's name: the borough it names is the place.
+        return {"intent": "neighborhood", "rationale": f"Heuristic match: {scope}.",
+                "targets": [{"type": "nta", "text": scope}], "place": place}
     # Another city or state named in the question ("Pike Place Market in Seattle").
     elsewhere = ELSEWHERE_RE.search(q) if place["text"] and not ELSEWHERE_RE.search(place["text"]) else None
     if place["kind"] == "address":
@@ -285,7 +364,8 @@ def _plan_for(q: str, hazard: str) -> dict:
             target = f"{place['text']}, {elsewhere.group(0).title()}"
         elif place["kind"] is None and not ELSEWHERE_RE.search(q) and (mark := landmark_phrase(q)):
             target = f"{mark}, New York, NY"  # "is jamaica hospital flooding right now": the landmark, for the geocoder
-        elif place["kind"] == "neighborhood" and _QUESTION_RE.search(q) and not _OTHER_STATE_RE.search(q):
+        elif place["kind"] == "neighborhood" and not _OTHER_STATE_RE.search(q) and (
+                _QUESTION_RE.search(q) or (heat and _NAMED_PLACE_RE.search(place["text"]))):
             # A place name inside a question ("Did Hamilton Beach flood during Sandy and ...", "Does
             # Rockaway Boulevard flood?"): the name for the geocoder, never the rest of the sentence.
             target = f"{place['text']}, New York, NY"
@@ -460,6 +540,8 @@ def resolve_area(state: State) -> State:
     try:
         district = nta.by_district(target) if re.fullmatch(r"\s*(MN|BX|BK|QN|SI)\s*\d{2}\s*", target,
                                                                re.IGNORECASE) else None
+        if re.fullmatch(r"\s*(MN|BX|BK|QN|SI|NYC)\s*", target, re.IGNORECASE):  # a borough or the city (heat)
+            district = nta.by_borough(target.strip())
         # No whole-question fallback: scanning the question for any place
         # name matched a borough first ("Queens") and returned Astoria.
         name, _, boro = target.partition(", ")

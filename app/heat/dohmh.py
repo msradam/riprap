@@ -111,11 +111,15 @@ def hvi_for_area(query) -> dict | None:
 
 
 def _visits(code: str) -> dict | None:
+    """Visits for a community district ('QN12'), a borough ('QN') or the city ('NYC')."""
     d = _data()
-    v = d and d["ed_visits"]["district"].get(code)
+    if d is None:
+        return None
+    e = d["ed_visits"]
+    v = e["citywide"] if code == "NYC" else e["borough"].get(code) if len(code) == 2 else e["district"].get(code)
     if v is None:
         return None
-    e, where = d["ed_visits"], _district_words(code)
+    where = "New York City" if code == "NYC" else BOROUGH[code] if len(code) == 2 else _district_words(code)
     when = f"{e['months']} of {e['period']}"
     if v.get("n") is None:
         return {"available": True, "suppressed": True, "district": code, "period": e["period"], "n": None,
@@ -124,9 +128,10 @@ def _visits(code: str) -> dict | None:
                              "A withheld count is not a zero."}
     city = e["citywide"]
     narrative = (f"Residents of {where} made {v['n']} emergency department visits for heat illness in {when}, an "
-                 f"age-adjusted rate of {v['age_adjusted_rate']:.1f} per 100,000 a year against {city['age_adjusted_rate']:.1f} "
-                 f"citywide (NYC Health Department, from state hospital records). Visits are counted by where the "
-                 f"patient lives, and only when diagnosed as heat illness.")
+                 f"age-adjusted rate of {v['age_adjusted_rate']:.1f} per 100,000 a year"
+                 + ("" if code == "NYC" else f" against {city['age_adjusted_rate']:.1f} citywide")
+                 + " (NYC Health Department, from state hospital records). Visits are counted by where the "
+                 "patient lives, and only when diagnosed as heat illness.")
     return {"available": True, "suppressed": False, "district": code, "period": e["period"], "n": v["n"],
             "age_adjusted_rate": v["age_adjusted_rate"], "citywide_age_adjusted_rate": city["age_adjusted_rate"],
             "narrative": narrative, "headline_value": f"{v['n']} visits, {v['age_adjusted_rate']:.1f} per 100,000 a year"}
@@ -141,7 +146,7 @@ def visits_for_area(query) -> dict | None:
     from app.areas import nta
 
     code = ((query.extras.get("area_code") if query else None) or "").upper().replace(" ", "")
-    if code and not re.fullmatch(r"(MN|BX|BK|QN|SI)\d\d", code):
+    if code and not re.fullmatch(r"(MN|BX|BK|QN|SI)(\d\d)?|NYC", code):
         g = nta.load()
         hit = g[g["nta2020"] == code]
         code = "" if hit.empty else hit.iloc[0]["cdta2020"]

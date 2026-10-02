@@ -288,9 +288,9 @@ LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From
                 # Heat (heat_answer.py).
                 "heat_forecast": "From the National Weather Service, as issued for the next 7 days; Riprap predicts "
                                  "nothing itself:",
-                "no_prediction_heat": "Riprap cannot predict the temperature inside a building or on one block: no "
-                                      "source here does that. What the Weather Service expects for the area over the "
-                                      "next 7 days, and what has been measured here:",
+                "no_prediction_heat": "Riprap cannot predict what will happen in one building, on one block or on a "
+                                      "named day: no source here does that. What the Weather Service expects for the "
+                                      "area over the next 7 days, and what has been measured here:",
                 "no_score": "Riprap computes no score or rating of its own. The Health Department publishes an index "
                             "for the neighbourhood, quoted here with what it is and is not:",
                 "surface_yes": "At the surface, yes.", "surface_no": "At the surface, no."}
@@ -537,6 +537,8 @@ def synthesize(state, use_llm: bool = True) -> dict:
                 lead_phrase = f"{sentence} {lead_phrase}"
         if lead == "count" and (days := heat_answer.count_sentence(question, facts, values)):
             lead_phrase = f"{days} {lead_phrase}"  # "how many days reached 90 in 2023": that year, from the station's record
+        elif lead == "facts" and (peak := heat_answer.year_sentence(question, facts, values)):
+            lead_phrase = f"{peak} {lead_phrase}"  # "how hot did it get in 2025": that year's highest reading
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
                                focus, texts, values, experimental)
     elif question:

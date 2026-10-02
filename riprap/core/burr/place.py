@@ -87,7 +87,8 @@ _ZIP_ONLY_RE = re.compile(r"^\s*(\d{5})(?:-\d{4})?\s*[?.!]?\s*$")
 _NOT_PLACE = {"is", "are", "was", "were", "what", "how", "has", "have", "does", "did", "do", "tell", "show",
               "can", "could", "will", "would", "which", "where", "when", "why", "who", "the", "a", "an", "i",
               "nyc", "new", "york", "city", "fema", "dep", "nws", "noaa", "usgs", "mta", "nycha", "doe", "sandy",
-              "ida", "hurricane", "floodnet", "npcc4", "ny", "in", "we're", "i'm", "it's", "its"}
+              "ida", "hurricane", "floodnet", "npcc4", "ny", "in", "we're", "i'm", "it's", "its",
+              "national", "weather", "service", "health", "department", "council", "npcc", "heat", "landsat"}
 
 
 def _district(prefix: str, n: int) -> tuple[str | None, str | None]:
@@ -176,7 +177,8 @@ def place_phrase(text: str) -> str | None:
     from app.areas import nta  # noqa: PLC0415
 
     found: list[str] = []
-    for run in _CAPS_RUN_RE.findall(text or ""):
+    for m in _CAPS_RUN_RE.finditer(text or ""):
+        run = m.group(0)
         words = run.split()
         # A known neighbourhood is kept whole, before any word is stripped
         # from it: "East New York" was once cut to "East" (the East Village)
@@ -190,9 +192,21 @@ def place_phrase(text: str) -> str | None:
             words = words[1:]
         while words and words[-1].lower().strip(".,") in _NOT_PLACE:
             words = words[:-1]
-        phrase = " ".join(words).strip(" ,")
+        phrase = " ".join(words).strip(" ,.")
+        # One capitalised word that opens a sentence is the sentence's first
+        # word, not a place ("Thinking of renting ..." was once geocoded to a
+        # trail upstate), and a compass word alone is half a name ("East" of
+        # "East 109th" once resolved to the East Village).
+        opens = not (text or "")[:m.start()].strip() or (text or "")[:m.start()].rstrip()[-1:] in ".!?:"
+        if len(words) == 1 and (opens or phrase.lower() in _HALF_NAMES) and phrase.lower() not in _known_neighbourhoods():
+            continue
         if phrase and len(words) <= 4 and phrase.lower() not in _BOROUGH:
             found.append(phrase)
+    # A named building or park ("Wagner Houses", "Crotona Park") is the place,
+    # before any neighbourhood word elsewhere in the question.
+    named = next((f for f in found if _NAMED_PLACE_RE.search(f) and f.lower() not in _known_neighbourhoods()), None)
+    if named:
+        return named
     for phrase in found:
         hits = nta.resolve(phrase)
         # The resolver matches substrings: the phrase must be whole words of the name, or an alias.
@@ -224,6 +238,10 @@ def landmark_phrase(text: str) -> str | None:
     return max(named, key=len).title() if named else None
 
 
+_HALF_NAMES = {"east", "west", "north", "south", "upper", "lower", "new", "old", "fort", "mount", "saint", "st"}
+# A capitalised run that ends in one of these names a building, a campus or a park.
+_NAMED_PLACE_RE = re.compile(r"\s(?:Houses|Towers|Homes|Park|Playground|Hospital|Library|Pool|Terminal|Airport|Stadium"
+                             r"|College|University|Center|Centre|Plaza|Museum|Zoo|Garden|Gardens|Field)$")
 # After a neighbourhood's name these make it a building or a station, not the area.
 _LANDMARK = (r"(?:hospital|houses|station|terminal|cent(?:er|re)|college|university|library|school|mall|airport"
              r"|stadium|bridge|tunnel|cemetery|medical|market|pier|ferry|yards?|depot)")

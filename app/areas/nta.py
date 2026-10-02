@@ -101,6 +101,26 @@ def by_district(code: str) -> dict | None:
             "cdta": hit.iloc[0]["cdtaname"], "geometry": hit.geometry.union_all()}
 
 
+BOROUGH_CODES = {"MN": "Manhattan", "BX": "Bronx", "BK": "Brooklyn", "QN": "Queens", "SI": "Staten Island"}
+
+
+@lru_cache(maxsize=8)
+def by_borough(code: str) -> dict | None:
+    """A borough ('BX') or the whole city ('NYC') as one area: the union of
+    its tabulation areas, shaped like an NTA match. A heat question about a
+    borough is answered from the sources that hold at that scale."""
+    g = load()
+    code = (code or "").upper()
+    if code == "NYC":
+        return {"nta_code": "NYC", "nta_name": "New York City", "borough": "New York City", "cdta": None,
+                "geometry": g.geometry.union_all()}
+    name = BOROUGH_CODES.get(code)
+    if not name:
+        return None
+    return {"nta_code": code, "nta_name": "the Bronx" if code == "BX" else name, "borough": name, "cdta": None,
+            "geometry": g[g["boroname"] == name].geometry.union_all()}
+
+
 def _row_to_dict(row) -> dict:
     return {
         "nta_code":  row["nta2020"],

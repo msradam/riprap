@@ -57,20 +57,37 @@ def station_record(lat: float, lon: float, today: date | None = None) -> dict | 
     if today.year not in rows or today.year - 1 not in rows:
         return None
     by_year = {y: int(c[0]) for y, (c, _) in rows.items()}
+    max_by_year = {y: [int(p[0]), p[1]] for y, (_, p) in rows.items() if p[0] != "M"}
     normal_years = [by_year[y] for y in range(NORMAL[0], NORMAL[1] + 1) if y in by_year]
     if len(normal_years) < 30:
         return None
     normal = round(sum(normal_years) / len(normal_years))
     through = body["meta"]["valid_daterange"][0][1]
     peak_f, peak_day = rows[today.year][1]
+    # The station's all-time record, over its whole period of record (cached a day; it rarely changes).
+    record = None
+    try:
+        rr = http.post(ACIS_URL, timeout=20.0, ttl_s=24 * 3600, json={
+            "sid": sid, "sdate": "por", "edate": "por", "meta": ["valid_daterange"],
+            "elems": [{"name": "maxt", "interval": "dly", "duration": "dly", "smry": {"reduce": "max", "add": "date"},
+                       "smry_only": 1}]})
+        rr.raise_for_status()
+        (rec_f, rec_day), since = rr.json()["smry"][0], rr.json()["meta"]["valid_daterange"][0][0]
+        record = {"record_f": int(rec_f), "record_date": rec_day, "record_since": since[:4]}
+    except Exception:  # noqa: BLE001 - the year's figures stand without the record
+        pass
     dist = round(_km(lat, lon, slat, slon), 1)
     n, last = by_year[today.year], by_year[today.year - 1]
     narrative = (f"At {name}, the nearest long-record weather station ({dist} km away), the air temperature reached 90°F "
                  f"on {n} day{'s' if n != 1 else ''} in {today.year} through {through} and on {last} in {today.year - 1}; "
                  f"the {NORMAL[0]} to {NORMAL[1]} average is {normal} a year. The highest reading of {today.year} was "
-                 f"{peak_f}°F on {peak_day}. These are the station's readings, not this address's.")
+                 f"{peak_f}°F on {peak_day}"
+                 + (f", and the station's record is {record['record_f']}°F, set on {record['record_date']} (records "
+                    f"from {record['record_since']})" if record else "")
+                 + ". These are the station's readings, not this address's.")
     return {"station": name, "station_id": sid, "distance_km": dist, "year": today.year, "through": through,
             "days_ge_90": n, "days_ge_90_last_year": last, "normal_days_ge_90": normal, "by_year": by_year,
+            "max_by_year": max_by_year, **(record or {}),
             "max_f": int(peak_f), "max_date": peak_day, "narrative": narrative,
             "headline_value": f"{n} days at 90°F or above in {today.year} ({name})"}
 

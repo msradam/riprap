@@ -321,8 +321,12 @@ def run_compare(query: str, plan: dict, runner=None) -> dict:
         return runner(query, {**plan, "intent": "single_address"})
     results = []
     for label, t in zip(("PLACE A", "PLACE B"), targets, strict=False):
-        sub = {"intent": "single_address", "targets": [t], "rationale": plan.get("rationale"),
-               "focus": plan.get("focus")}  # two heat briefings for a heat comparison
+        sub = {"intent": "single_address", "targets": [t], "rationale": plan.get("rationale")}
+        if hazard_of(plan) == "heat":
+            # A heat comparison: each place answers the question asked (its rules quote the
+            # sources the question names), and a district or neighbourhood is read as an area.
+            sub.update(focus=plan.get("focus"), question=plan.get("question") or query.strip(),
+                       intent="neighborhood" if t.get("type") in ("nta", "district") else "single_address")
         results.append((label, t["text"], runner(t["text"], sub)))
     out = {**results[0][2]}
     out.update(

@@ -297,8 +297,11 @@ def names_flood(clause: str) -> bool:
     summer. Was it inside the Sandy zone?" is a flood question. An alert or a
     warning alone is not enough: both hazards have them."""
     c = clause or ""
-    return bool(_FLOOD_RE.search(c) or [i for i in _named_ids(c) if i != "nws_alerts"]
-                or EXPERIMENTAL[0][0].search(c) or EXPERIMENTAL[2][0].search(c))
+    # (A school, a hospital or public housing is an asset of either briefing, and a satellite measures both.)
+    # ("Scenario" alone is a projection of either hazard; a stormwater or rain word makes it the city's flood maps.)
+    dep_named = re.search(r"stormwater|storm water|\bdep\b|\brain|flood maps?", c, re.I)
+    return bool(_FLOOD_RE.search(c) or EXPERIMENTAL[2][0].search(c)
+                or [i for i in _named_ids(c) if i != "nws_alerts" and i not in ASSET_DOCS and (dep_named or i not in DEP)])
 
 
 def recognised(question: str) -> bool:

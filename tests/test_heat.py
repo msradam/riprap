@@ -76,6 +76,83 @@ def test_advice_about_heat_is_declined_in_heats_own_words(query):
     assert refusal({"intent": "out_of_scope", "plan": plan}) == HEAT_REFUSAL
 
 
+# Questions written by an agent that had seen none of the rules (tests/golden/unseen_heat.json, first run
+# 2026-10-02). Each of these went wrong the first time: no heat word the pattern knew, a place the parser
+# missed, or a borough where a place was wanted.
+@pytest.mark.parametrize("query", [
+    "will it be over 95 this weekend in Tottenville", "forecast highs next 3 days Flushing Meadows Corona Park",
+    "how many days hit 90 or above in Central Park in summer 2024",
+    "How hot did the surface get around Polo Grounds Towers last summer? I mean the satellite number, not air temp",
+    "need a list of cool places within walking distance of Van Dyke Houses for a flyer, libraries pools senior centers",
+    "cooling centers and libraries near Stapleton Houses, and what is the closest hospital",
+    "what will summers be like on the south shore of staten island when my kids are my age, say the 2060s",
+])
+def test_heat_questions_nobody_here_wrote_are_heat_questions(query):
+    assert ha.hazard_of(query) == "heat"
+
+
+@pytest.mark.parametrize("query,place", [
+    ("Thinking of renting a top floor apartment near Marcy Houses, is that a bad idea because of heat?", "Marcy Houses"),
+    ("I live in Wagner Houses. Where can I cool off after the senior center on East 109th closes?", "Wagner Houses"),
+    ("cooling centers near Queensbridge Houses", "Queensbridge Houses"),
+    ("current temp + any heat alerts, Brownsville Houses", "Brownsville Houses"),
+    ("how hot is it right now near Crotona Park", "Crotona Park"),
+    ("what time is the Heat game at Barclays Center tonight", "Barclays Center"),
+])
+def test_a_named_building_or_park_is_the_place_not_the_sentences_first_word(query, place):
+    # "Thinking" was once geocoded to a trail upstate, and "East" of "East 109th" to the East Village.
+    from riprap.core.burr.place import resolve_query
+
+    assert resolve_query(query)["text"] == place
+
+
+@pytest.mark.parametrize("query,code", [
+    ("Is there a heat advisory in effect for Manhattan right now?", "MN"),
+    ("What was the hottest day on record in Brooklyn and when was it?", "BK"),
+    ("Is the Weather Service expecting a heat advisory in the Bronx tomorrow?", "BX"),
+    ("How many 90 degree days is NYC projected to have by the 2050s according to NPCC?", "NYC"),
+    ("How many heat-related deaths does the city report per year, and what years does that cover?", "NYC"),
+])
+def test_a_borough_or_the_city_is_a_place_for_a_heat_question(query, code):
+    # (The second once went to the geocoder whole and came back as a Weather Service office in Albany.)
+    plan = heuristic_plan(query)
+    assert plan["intent"] == "neighborhood" and plan["targets"] == [{"type": "nta", "text": code}]
+    from app.areas import nta
+
+    area = nta.by_borough(code)
+    assert area["nta_code"] == code and area["geometry"].area > 0
+    # A flood question still needs a place: a borough alone is not one.
+    assert heuristic_plan("Queens")["targets"][0]["text"] != "QN"
+
+
+def test_a_heat_question_with_no_place_says_so_in_heats_words():
+    plan = heuristic_plan("How hot does it get, and is there a heat advisory?")
+    assert plan["intent"] == "not_implemented" and "names none" in plan["rationale"] and "FloodNet" not in plan["rationale"]
+
+
+@pytest.mark.parametrize("query,targets", [
+    ("Is Mott Haven hotter than Riverdale? By how much?", [("nta", "Mott Haven"), ("nta", "Riverdale")]),
+    ("compare heat vulnerability BK16 vs BK06", [("district", "BK16"), ("district", "BK06")]),
+    ("Corona vs Forest Hills, surface temperature and tree canopy", [("nta", "Corona"), ("nta", "Forest Hills")]),
+])
+def test_two_places_in_a_heat_question_are_compared_not_merged(query, targets):
+    # The first was once answered "At the surface, yes." from Mott Haven against the city, with Riverdale unread.
+    plan = heuristic_plan(query)
+    assert plan["intent"] == "compare" and [(t["type"], t["text"]) for t in plan["targets"]] == targets
+    assert heuristic_plan("Is Hunts Point hotter than the rest of the city?")["intent"] == "neighborhood"
+    assert ra.answer("Is Mott Haven hotter than Riverdale?", {"heat_surface_nta": "x"}, {"heat_surface_nta": {"warmer_in_every_image": True}}) == (
+        "facts", ["heat_surface_nta"])
+
+
+def test_heat_outside_the_city_is_said_not_briefed():
+    from riprap.core.burr.templated_reconciler import nothing_built
+
+    state = {"lat": 40.717, "lon": -74.04, "deployment": "__none__", "plan": {"focus": {"hazard": "heat"}},
+             "geocode": {"address": "30 Montgomery Street, Jersey City, New Jersey"}}
+    text = nothing_built(state)
+    assert "covers New York City only" in text and "30 Montgomery Street, Jersey City" in text
+
+
 def test_bare_places_and_questions():
     from app.planner import is_bare_place
 
@@ -181,6 +258,16 @@ A = "90-01 183rd Street, Queens"
     (f"Where is the nearest cooling center to {A}?", "facts", ["cool_features"]),
     # Canopy: the city's map, then the model's estimate, as in a flood answer.
     (f"How much tree canopy shades {A} in the heat?", "count", ["city_landcover", "landcover"]),
+    # From the unseen set: an apartment by number, a calendar date, "the next 30 years", deaths, a pool's hours.
+    (f"How hot will apartment 6C at {A} get on Saturday afternoon", "no_prediction_heat",
+     ["nws_heat_forecast", "nws_heat_alerts", "heat_surface"]),
+    (f"Will the playground near {A} be too hot to use on the afternoon of July 15?", "no_prediction_heat",
+     ["nws_heat_forecast", "nws_heat_alerts", "heat_surface"]),
+    (f"Is it going to keep getting hotter near {A} over the next 30 years", "facts", ["npcc4_heat"]),
+    (f"How many heat-related deaths near {A} per year?", "cannot_answer", ["heat_visits"]),
+    (f"Is the pool near {A} open today and are there spray showers?", "facts", ["cool_features"]),
+    (f"How hot does it get near {A} and where are the cooling centers and is there a heat advisory", "facts",
+     ["cool_features", "nws_heat_alerts", "heat_surface", "heat_station"]),
     # Anything else about heat: the measurement, the index, the map and the station.
     (f"Tell me about extreme heat at {A}?", "facts", ["heat_surface", "hvi", "city_landcover", "heat_station"]),
 ])
@@ -206,6 +293,14 @@ def test_the_count_of_hot_days_for_a_named_year_comes_from_the_stations_own_reco
         "10 days at or above 90°F at JFK Airport in 2026 through 2026-10-01.")
     assert ha.count_sentence(q.replace("2023", "1950"), ["heat_station"], V) is None  # a year the record does not hold
     assert ha.count_sentence(f"How hot was it near {A} in 2023?", ["heat_station"], V) is None
+
+
+def test_the_highest_reading_of_a_named_year_comes_from_the_stations_own_record():
+    v = {"heat_station": {**V["heat_station"], "max_by_year": {2025: [101, "2025-06-24"]}}}
+    q = f"how hot did it get near {A} during the heat wave in late June 2025"
+    assert ha.year_sentence(q, ["heat_station"], v) == "The highest reading at JFK Airport in 2025 was 101°F on 2025-06-24."
+    assert ha.year_sentence(q.replace("2025", "1950"), ["heat_station"], v) is None
+    assert ha.year_sentence(f"How many days above 90 near {A} in 2025?", ["heat_station"], v) is None  # a count, not a peak
 
 
 def test_time_frames():
