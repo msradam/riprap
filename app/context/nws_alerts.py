@@ -3,8 +3,8 @@
 api.weather.gov/alerts/active?point={lat},{lon}, no auth, JSON.
 NWS requires a User-Agent; the shared client in riprap.core.http sends one.
 
-We surface only flood-relevant categories so the doc the reconciler
-sees is short and on-topic.
+We surface only the categories of one hazard (flood by default, or heat)
+so the doc the reconciler sees is short and on-topic.
 """
 from __future__ import annotations
 
@@ -23,12 +23,18 @@ _FLOOD_EVENT_KEYWORDS = (
 )
 
 
-def _is_flood_relevant(event_name: str) -> bool:
+# Heat Advisory, Extreme Heat Watch and Warning (Excessive Heat until 2025).
+_KEYWORDS = {"flood": _FLOOD_EVENT_KEYWORDS, "heat": ("heat",)}
+_NONE = {"flood": "No active NWS flood, coastal or wind alerts at this point",
+         "heat": "No active NWS heat advisory, watch or warning at this point"}
+
+
+def _relevant(event_name: str, kind: str) -> bool:
     e = (event_name or "").lower()
-    return any(k in e for k in _FLOOD_EVENT_KEYWORDS)
+    return any(k in e for k in _KEYWORDS[kind])
 
 
-def alerts_at(lat: float, lon: float) -> list[dict[str, Any]]:
+def alerts_at(lat: float, lon: float, kind: str = "flood") -> list[dict[str, Any]]:
     r = http.get(
         "https://api.weather.gov/alerts/active",
         params={"point": f"{lat:.4f},{lon:.4f}"},
@@ -41,7 +47,7 @@ def alerts_at(lat: float, lon: float) -> list[dict[str, Any]]:
     for f in r.json().get("features", []):
         p = f.get("properties", {}) or {}
         event = p.get("event") or ""
-        if not _is_flood_relevant(event):
+        if not _relevant(event, kind):
             continue
         out.append({
             "id": p.get("id"),
@@ -53,15 +59,16 @@ def alerts_at(lat: float, lon: float) -> list[dict[str, Any]]:
             "sent": p.get("sent"),
             "effective": p.get("effective"),
             "expires": p.get("expires"),
+            "ends": p.get("ends"),
             "sender_name": p.get("senderName"),
             "areaDesc": p.get("areaDesc"),
         })
     return out
 
 
-def summary_for_point(lat: float, lon: float) -> dict:
+def summary_for_point(lat: float, lon: float, kind: str = "flood") -> dict:
     try:
-        active = alerts_at(lat, lon)
+        active = alerts_at(lat, lon, kind)
     except Exception as e:
         return {"n_active": 0, "alerts": [], "narrative": None, "error": str(e)}
     n = len(active)
@@ -69,7 +76,7 @@ def summary_for_point(lat: float, lon: float) -> dict:
     now = datetime.now(UTC)
     checked = now.strftime("%Y-%m-%d %H:%M UTC")
     if n == 0:
-        narrative = f"No active NWS flood, coastal or wind alerts at this point, checked {checked}."
+        narrative = f"{_NONE[kind]}, checked {checked}."
     elif n == 1:
         narrative = (
             f"1 active NWS alert at this point, checked {checked}: "

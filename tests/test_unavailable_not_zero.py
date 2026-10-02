@@ -68,7 +68,7 @@ def test_no_active_alerts_is_a_true_zero(monkeypatch):
     from app.context import nws_alerts
     from riprap.core.pebbles.bridge import fetch_pebble
 
-    monkeypatch.setattr(nws_alerts, "alerts_at", lambda lat, lon: [])
+    monkeypatch.setattr(nws_alerts, "alerts_at", lambda lat, lon, kind="flood": [])
     value, _, err = fetch_pebble("nws_alerts", 40.7, -74.0, deployment="federal")
     assert err is None and value["n_active"] == 0 and value["narrative"].startswith("No active")
 

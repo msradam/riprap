@@ -1,0 +1,36 @@
+Source: https://par.nsf.gov/servlets/purl/10543413 (NSF Public Access Repository copy of the Wiley version of record, DOI 10.1111/nyas.15116), fetched 2026-10-02, text by pdftotext -layout, PDF page 17
+
+TA B L E 4       Projections for extreme heat and extreme precipitation events in NYC for 2030-2100.
+
+  2030s                                                  Baseline                   10th Percentile     25th Percentile       75th Percentile       90th Percentile
+  Days at or above 90◦ F                                 17                         27                  27                    46                   54
+  Days at or above 95◦ F                                 4                          8                   8                     17                   27
+  Days at or below 32◦ F                                 70                         34                  39                    52                   58
+  Days at or above 1 inch precipitation                  14                         14                  14                    16                   17
+  Days at or above 2 inches precipitation                3                          3                   3                     4                    5
+  Days at or above 4 inches precipitation                0.2                        0.2                 0.3                   0.4                  0.4
+  Number of heat waves                                   2                          3                   3                     6                    7
+  Avg. length of heat waves (days)                       4                          5                   5                     5                    6
+
+  2050s
+  Days at or above 90◦ F                                 17                         32                  38                    62                   69
+                          ◦
+  Days at or above 95 F                                  4                          10                  14                    32                   35
+  Days at or below 32◦ F                                 70                         17                  31                    48                   52
+  Days at or above 1 inch precipitation                  14                         14                  15                    17                   17
+  Days at or above 2 inches precipitation                3                          3                   4                     5                    5
+  Days at or above 4 inches precipitation                0.2                        0.2                 0.3                   0.4                  0.4
+  Number of heat waves                                   2                          4                   5                     8                    9
+  Avg. length of heat waves (days)                       4                          5                   5                     6                    6
+
+  2080s
+  Days at or above 90◦ F                                 17                         46                  46                    85                   108
+  Days at or above 95◦ F                                 4                          17                  17                    54                   73
+  Days at or below 32◦ F                                 70                         3                   9                     39                   48
+  Days at or above 1 inch precipitation                  14                         14                  15                    17                   18
+  Days at or above 2 inches precipitation                3                          4                   4                     6                    6
+  Days at or above 4 inches precipitation                0.2                        0.3                 0.4                   0.6                  0.7
+  Number of heat waves                                   2                          6                   6                     9                    10
+  Avg. length of heat waves (days)                       4                          5                   5                     8                    10
+
+Note: Baseline data are for 1981-2010.

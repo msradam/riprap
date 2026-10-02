@@ -1,0 +1,2196 @@
+{
+ "what": "Bake the NYC Health Department's heat records for the app.",
+ "retrieved_at": "2026-10-02",
+ "license": "Apache-2.0 (nychealth/EHDP-data); source data NYC DOHMH and NYS SPARCS",
+ "hvi": {
+  "year": 2023,
+  "nta": {
+   "source_url": "https://raw.githubusercontent.com/nychealth/EHDP-data/production/key-topics/heat-vulnerability-index/hvi-nta-2020.csv",
+   "commit": "804bb0a3a5d62b93c04df8f89af5d0076485aeed",
+   "date_modified": "2023-10-21",
+   "areas": {
+    "BX0101": {
+     "name": "Mott Haven-Port Morris",
+     "district": "BX01",
+     "hvi": 5,
+     "surface_temp_f": 88.4,
+     "green_pct": 18.8,
+     "ac_pct": 84.3,
+     "median_income": 24474
+    },
+    "BX0102": {
+     "name": "Melrose",
+     "district": "BX01",
+     "hvi": 5,
+     "surface_temp_f": 87.9,
+     "green_pct": 23.4,
+     "ac_pct": 84.3,
+     "median_income": 29306
+    },
+    "BX0201": {
+     "name": "Hunts Point",
+     "district": "BX02",
+     "hvi": 5,
+     "surface_temp_f": 90.2,
+     "green_pct": 10.2,
+     "ac_pct": 84.3,
+     "median_income": 30057
+    },
+    "BX0202": {
+     "name": "Longwood",
+     "district": "BX02",
+     "hvi": 5,
+     "surface_temp_f": 87.9,
+     "green_pct": 19.4,
+     "ac_pct": 84.3,
+     "median_income": 29117
+    },
+    "BX0301": {
+     "name": "Morrisania",
+     "district": "BX03",
+     "hvi": 5,
+     "surface_temp_f": 87.5,
+     "green_pct": 25.9,
+     "ac_pct": 75.8,
+     "median_income": 26474
+    },
+    "BX0302": {
+     "name": "Claremont Village-Claremont (East)",
+     "district": "BX03",
+     "hvi": 5,
+     "surface_temp_f": 87.7,
+     "green_pct": 21.9,
+     "ac_pct": 75.8,
+     "median_income": 31144
+    },
+    "BX0303": {
+     "name": "Crotona Park East",
+     "district": "BX03",
+     "hvi": 5,
+     "surface_temp_f": 88.5,
+     "green_pct": 20.7,
+     "ac_pct": 75.8,
+     "median_income": 34091
+    },
+    "BX0401": {
+     "name": "Concourse-Concourse Village",
+     "district": "BX04",
+     "hvi": 5,
+     "surface_temp_f": 87.0,
+     "green_pct": 15.4,
+     "ac_pct": 84.6,
+     "median_income": 31509
+    },
+    "BX0402": {
+     "name": "Highbridge",
+     "district": "BX04",
+     "hvi": 4,
+     "surface_temp_f": 84.7,
+     "green_pct": 26.5,
+     "ac_pct": 84.6,
+     "median_income": 32705
+    },
+    "BX0403": {
+     "name": "Mount Eden-Claremont (West)",
+     "district": "BX04",
+     "hvi": 5,
+     "surface_temp_f": 86.2,
+     "green_pct": 16.0,
+     "ac_pct": 83.4,
+     "median_income": 39686
+    },
+    "BX0501": {
+     "name": "University Heights (South)-Morris Heights",
+     "district": "BX05",
+     "hvi": 5,
+     "surface_temp_f": 85.4,
+     "green_pct": 25.9,
+     "ac_pct": 79.7,
+     "median_income": 30532
+    },
+    "BX0502": {
+     "name": "Mount Hope",
+     "district": "BX05",
+     "hvi": 5,
+     "surface_temp_f": 86.4,
+     "green_pct": 13.9,
+     "ac_pct": 79.7,
+     "median_income": 35600
+    },
+    "BX0503": {
+     "name": "Fordham Heights",
+     "district": "BX05",
+     "hvi": 5,
+     "surface_temp_f": 86.3,
+     "green_pct": 10.6,
+     "ac_pct": 84.0,
+     "median_income": 40334
+    },
+    "BX0601": {
+     "name": "West Farms",
+     "district": "BX06",
+     "hvi": 5,
+     "surface_temp_f": 87.4,
+     "green_pct": 23.1,
+     "ac_pct": 75.8,
+     "median_income": 26619
+    },
+    "BX0602": {
+     "name": "Tremont",
+     "district": "BX06",
+     "hvi": 5,
+     "surface_temp_f": 87.8,
+     "green_pct": 21.4,
+     "ac_pct": 75.8,
+     "median_income": 25069
+    },
+    "BX0603": {
+     "name": "Belmont",
+     "district": "BX06",
+     "hvi": 5,
+     "surface_temp_f": 87.0,
+     "green_pct": 22.3,
+     "ac_pct": 77.4,
+     "median_income": 30923
+    },
+    "BX0701": {
+     "name": "University Heights (North)-Fordham",
+     "district": "BX07",
+     "hvi": 4,
+     "surface_temp_f": 85.3,
+     "green_pct": 25.7,
+     "ac_pct": 86.5,
+     "median_income": 38594
+    },
+    "BX0702": {
+     "name": "Bedford Park",
+     "district": "BX07",
+     "hvi": 3,
+     "surface_temp_f": 83.9,
+     "green_pct": 21.1,
+     "ac_pct": 87.7,
+     "median_income": 38456
+    },
+    "BX0703": {
+     "name": "Norwood",
+     "district": "BX07",
+     "hvi": 3,
+     "surface_temp_f": 84.2,
+     "green_pct": 29.5,
+     "ac_pct": 86.8,
+     "median_income": 36484
+    },
+    "BX0801": {
+     "name": "Kingsbridge Heights-Van Cortlandt Village",
+     "district": "BX08",
+     "hvi": 3,
+     "surface_temp_f": 83.9,
+     "green_pct": 30.2,
+     "ac_pct": 88.8,
+     "median_income": 44490
+    },
+    "BX0802": {
+     "name": "Kingsbridge-Marble Hill",
+     "district": "BX08",
+     "hvi": 4,
+     "surface_temp_f": 87.3,
+     "green_pct": 24.4,
+     "ac_pct": 89.5,
+     "median_income": 52212
+    },
+    "BX0803": {
+     "name": "Riverdale-Spuyten Duyvil",
+     "district": "BX08",
+     "hvi": 1,
+     "surface_temp_f": 82.7,
+     "green_pct": 60.7,
+     "ac_pct": 88.8,
+     "median_income": 93821
+    },
+    "BX0901": {
+     "name": "Soundview-Bruckner-Bronx River",
+     "district": "BX09",
+     "hvi": 4,
+     "surface_temp_f": 87.1,
+     "green_pct": 25.3,
+     "ac_pct": 88.8,
+     "median_income": 33625
+    },
+    "BX0902": {
+     "name": "Soundview-Clason Point",
+     "district": "BX09",
+     "hvi": 4,
+     "surface_temp_f": 87.3,
+     "green_pct": 37.9,
+     "ac_pct": 88.8,
+     "median_income": 50076
+    },
+    "BX0903": {
+     "name": "Castle Hill-Unionport",
+     "district": "BX09",
+     "hvi": 4,
+     "surface_temp_f": 88.3,
+     "green_pct": 23.2,
+     "ac_pct": 88.8,
+     "median_income": 48326
+    },
+    "BX0904": {
+     "name": "Parkchester",
+     "district": "BX09",
+     "hvi": 4,
+     "surface_temp_f": 87.9,
+     "green_pct": 34.4,
+     "ac_pct": 88.8,
+     "median_income": 57222
+    },
+    "BX1001": {
+     "name": "Westchester Square",
+     "district": "BX10",
+     "hvi": 5,
+     "surface_temp_f": 89.7,
+     "green_pct": 15.5,
+     "ac_pct": 88.5,
+     "median_income": 48654
+    },
+    "BX1002": {
+     "name": "Throgs Neck-Schuylerville",
+     "district": "BX10",
+     "hvi": 2,
+     "surface_temp_f": 87.1,
+     "green_pct": 35.3,
+     "ac_pct": 95.8,
+     "median_income": 77234
+    },
+    "BX1003": {
+     "name": "Pelham Bay-Country Club-City Island",
+     "district": "BX10",
+     "hvi": 2,
+     "surface_temp_f": 86.4,
+     "green_pct": 31.2,
+     "ac_pct": 95.8,
+     "median_income": 77906
+    },
+    "BX1004": {
+     "name": "Co-op City",
+     "district": "BX10",
+     "hvi": 4,
+     "surface_temp_f": 87.3,
+     "green_pct": 34.9,
+     "ac_pct": 95.8,
+     "median_income": 53302
+    },
+    "BX1101": {
+     "name": "Pelham Parkway-Van Nest",
+     "district": "BX11",
+     "hvi": 4,
+     "surface_temp_f": 88.2,
+     "green_pct": 19.7,
+     "ac_pct": 87.5,
+     "median_income": 51509
+    },
+    "BX1102": {
+     "name": "Morris Park",
+     "district": "BX11",
+     "hvi": 3,
+     "surface_temp_f": 88.9,
+     "green_pct": 32.8,
+     "ac_pct": 87.5,
+     "median_income": 70166
+    },
+    "BX1103": {
+     "name": "Pelham Gardens",
+     "district": "BX11",
+     "hvi": 4,
+     "surface_temp_f": 89.3,
+     "green_pct": 32.6,
+     "ac_pct": 87.5,
+     "median_income": 84854
+    },
+    "BX1104": {
+     "name": "Allerton",
+     "district": "BX11",
+     "hvi": 4,
+     "surface_temp_f": 87.7,
+     "green_pct": 27.2,
+     "ac_pct": 87.5,
+     "median_income": 41411
+    },
+    "BX1201": {
+     "name": "Williamsbridge-Olinville",
+     "district": "BX12",
+     "hvi": 5,
+     "surface_temp_f": 87.2,
+     "green_pct": 28.2,
+     "ac_pct": 83.5,
+     "median_income": 49454
+    },
+    "BX1202": {
+     "name": "Eastchester-Edenwald-Baychester",
+     "district": "BX12",
+     "hvi": 5,
+     "surface_temp_f": 88.9,
+     "green_pct": 35.8,
+     "ac_pct": 85.1,
+     "median_income": 72553
+    },
+    "BX1203": {
+     "name": "Wakefield-Woodlawn",
+     "district": "BX12",
+     "hvi": 5,
+     "surface_temp_f": 88.4,
+     "green_pct": 28.5,
+     "ac_pct": 83.0,
+     "median_income": 69872
+    },
+    "BK0101": {
+     "name": "Greenpoint",
+     "district": "BK01",
+     "hvi": 2,
+     "surface_temp_f": 85.9,
+     "green_pct": 12.7,
+     "ac_pct": 93.4,
+     "median_income": 93269
+    },
+    "BK0102": {
+     "name": "Williamsburg",
+     "district": "BK01",
+     "hvi": 2,
+     "surface_temp_f": 85.2,
+     "green_pct": 16.4,
+     "ac_pct": 93.4,
+     "median_income": 114295
+    },
+    "BK0103": {
+     "name": "South Williamsburg",
+     "district": "BK01",
+     "hvi": 4,
+     "surface_temp_f": 87.8,
+     "green_pct": 20.9,
+     "ac_pct": 92.1,
+     "median_income": 31836
+    },
+    "BK0104": {
+     "name": "East Williamsburg",
+     "district": "BK01",
+     "hvi": 4,
+     "surface_temp_f": 88.2,
+     "green_pct": 11.6,
+     "ac_pct": 91.7,
+     "median_income": 55278
+    },
+    "BK0201": {
+     "name": "Brooklyn Heights",
+     "district": "BK02",
+     "hvi": 1,
+     "surface_temp_f": 82.3,
+     "green_pct": 26.9,
+     "ac_pct": 90.2,
+     "median_income": 158668
+    },
+    "BK0202": {
+     "name": "Downtown Brooklyn-DUMBO-Boerum Hill",
+     "district": "BK02",
+     "hvi": 2,
+     "surface_temp_f": 83.8,
+     "green_pct": 21.6,
+     "ac_pct": 90.2,
+     "median_income": 131688
+    },
+    "BK0203": {
+     "name": "Fort Greene",
+     "district": "BK02",
+     "hvi": 2,
+     "surface_temp_f": 84.5,
+     "green_pct": 31.6,
+     "ac_pct": 90.2,
+     "median_income": 102413
+    },
+    "BK0204": {
+     "name": "Clinton Hill",
+     "district": "BK02",
+     "hvi": 2,
+     "surface_temp_f": 84.7,
+     "green_pct": 30.4,
+     "ac_pct": 90.2,
+     "median_income": 104318
+    },
+    "BK0301": {
+     "name": "Bedford-Stuyvesant (West)",
+     "district": "BK03",
+     "hvi": 3,
+     "surface_temp_f": 85.2,
+     "green_pct": 23.2,
+     "ac_pct": 89.1,
+     "median_income": 66250
+    },
+    "BK0302": {
+     "name": "Bedford-Stuyvesant (East)",
+     "district": "BK03",
+     "hvi": 4,
+     "surface_temp_f": 84.8,
+     "green_pct": 27.1,
+     "ac_pct": 88.5,
+     "median_income": 62351
+    },
+    "BK0401": {
+     "name": "Bushwick (West)",
+     "district": "BK04",
+     "hvi": 4,
+     "surface_temp_f": 86.6,
+     "green_pct": 14.2,
+     "ac_pct": 88.1,
+     "median_income": 72440
+    },
+    "BK0402": {
+     "name": "Bushwick (East)",
+     "district": "BK04",
+     "hvi": 4,
+     "surface_temp_f": 85.3,
+     "green_pct": 22.0,
+     "ac_pct": 88.1,
+     "median_income": 55604
+    },
+    "BK0501": {
+     "name": "Cypress Hills",
+     "district": "BK05",
+     "hvi": 4,
+     "surface_temp_f": 86.3,
+     "green_pct": 21.3,
+     "ac_pct": 88.8,
+     "median_income": 53266
+    },
+    "BK0502": {
+     "name": "East New York (North)",
+     "district": "BK05",
+     "hvi": 5,
+     "surface_temp_f": 88.6,
+     "green_pct": 19.9,
+     "ac_pct": 86.6,
+     "median_income": 46004
+    },
+    "BK0503": {
+     "name": "East New York-New Lots",
+     "district": "BK05",
+     "hvi": 5,
+     "surface_temp_f": 88.9,
+     "green_pct": 19.3,
+     "ac_pct": 86.3,
+     "median_income": 48396
+    },
+    "BK0504": {
+     "name": "Spring Creek-Starrett City",
+     "district": "BK05",
+     "hvi": 4,
+     "surface_temp_f": 87.2,
+     "green_pct": 40.6,
+     "ac_pct": 88.8,
+     "median_income": 34107
+    },
+    "BK0505": {
+     "name": "East New York-City Line",
+     "district": "BK05",
+     "hvi": 4,
+     "surface_temp_f": 86.8,
+     "green_pct": 29.6,
+     "ac_pct": 88.8,
+     "median_income": 44320
+    },
+    "BK0601": {
+     "name": "Carroll Gardens-Cobble Hill-Gowanus-Red Hook",
+     "district": "BK06",
+     "hvi": 2,
+     "surface_temp_f": 85.6,
+     "green_pct": 18.2,
+     "ac_pct": 91.9,
+     "median_income": 126250
+    },
+    "BK0602": {
+     "name": "Park Slope",
+     "district": "BK06",
+     "hvi": 1,
+     "surface_temp_f": 83.4,
+     "green_pct": 29.4,
+     "ac_pct": 92.3,
+     "median_income": 152764
+    },
+    "BK0701": {
+     "name": "Windsor Terrace-South Slope",
+     "district": "BK07",
+     "hvi": 1,
+     "surface_temp_f": 84.4,
+     "green_pct": 28.7,
+     "ac_pct": 92.8,
+     "median_income": 115974
+    },
+    "BK0702": {
+     "name": "Sunset Park (West)",
+     "district": "BK07",
+     "hvi": 3,
+     "surface_temp_f": 86.8,
+     "green_pct": 10.5,
+     "ac_pct": 93.0,
+     "median_income": 55856
+    },
+    "BK0703": {
+     "name": "Sunset Park (Central)",
+     "district": "BK07",
+     "hvi": 2,
+     "surface_temp_f": 83.8,
+     "green_pct": 21.0,
+     "ac_pct": 93.0,
+     "median_income": 56229
+    },
+    "BK0801": {
+     "name": "Prospect Heights",
+     "district": "BK08",
+     "hvi": 2,
+     "surface_temp_f": 83.9,
+     "green_pct": 23.5,
+     "ac_pct": 86.5,
+     "median_income": 127330
+    },
+    "BK0802": {
+     "name": "Crown Heights (North)",
+     "district": "BK08",
+     "hvi": 4,
+     "surface_temp_f": 85.0,
+     "green_pct": 22.9,
+     "ac_pct": 86.5,
+     "median_income": 49625
+    },
+    "BK0901": {
+     "name": "Crown Heights (South)",
+     "district": "BK09",
+     "hvi": 4,
+     "surface_temp_f": 84.7,
+     "green_pct": 20.3,
+     "ac_pct": 87.5,
+     "median_income": 59482
+    },
+    "BK0902": {
+     "name": "Prospect Lefferts Gardens-Wingate",
+     "district": "BK09",
+     "hvi": 5,
+     "surface_temp_f": 86.3,
+     "green_pct": 22.8,
+     "ac_pct": 87.9,
+     "median_income": 57061
+    },
+    "BK1001": {
+     "name": "Bay Ridge",
+     "district": "BK10",
+     "hvi": 2,
+     "surface_temp_f": 85.3,
+     "green_pct": 29.4,
+     "ac_pct": 93.9,
+     "median_income": 81206
+    },
+    "BK1002": {
+     "name": "Dyker Heights",
+     "district": "BK10",
+     "hvi": 3,
+     "surface_temp_f": 87.5,
+     "green_pct": 18.3,
+     "ac_pct": 93.8,
+     "median_income": 62798
+    },
+    "BK1101": {
+     "name": "Bensonhurst",
+     "district": "BK11",
+     "hvi": 4,
+     "surface_temp_f": 87.9,
+     "green_pct": 14.3,
+     "ac_pct": 91.6,
+     "median_income": 57100
+    },
+    "BK1102": {
+     "name": "Bath Beach",
+     "district": "BK11",
+     "hvi": 2,
+     "surface_temp_f": 86.3,
+     "green_pct": 21.9,
+     "ac_pct": 91.1,
+     "median_income": 81204
+    },
+    "BK1103": {
+     "name": "Gravesend (West)",
+     "district": "BK11",
+     "hvi": 4,
+     "surface_temp_f": 87.6,
+     "green_pct": 14.6,
+     "ac_pct": 91.3,
+     "median_income": 60222
+    },
+    "BK1201": {
+     "name": "Sunset Park (East)-Borough Park (West)",
+     "district": "BK12",
+     "hvi": 3,
+     "surface_temp_f": 85.9,
+     "green_pct": 14.2,
+     "ac_pct": 92.7,
+     "median_income": 49839
+    },
+    "BK1202": {
+     "name": "Borough Park",
+     "district": "BK12",
+     "hvi": 4,
+     "surface_temp_f": 89.1,
+     "green_pct": 20.9,
+     "ac_pct": 91.5,
+     "median_income": 40929
+    },
+    "BK1203": {
+     "name": "Kensington",
+     "district": "BK12",
+     "hvi": 3,
+     "surface_temp_f": 86.8,
+     "green_pct": 22.9,
+     "ac_pct": 91.8,
+     "median_income": 65416
+    },
+    "BK1204": {
+     "name": "Mapleton-Midwood (West)",
+     "district": "BK12",
+     "hvi": 3,
+     "surface_temp_f": 88.2,
+     "green_pct": 31.2,
+     "ac_pct": 91.4,
+     "median_income": 58354
+    },
+    "BK1301": {
+     "name": "Gravesend (South)",
+     "district": "BK13",
+     "hvi": 4,
+     "surface_temp_f": 87.1,
+     "green_pct": 24.1,
+     "ac_pct": 86.6,
+     "median_income": 51007
+    },
+    "BK1302": {
+     "name": "Coney Island-Sea Gate",
+     "district": "BK13",
+     "hvi": 5,
+     "surface_temp_f": 86.7,
+     "green_pct": 19.5,
+     "ac_pct": 86.6,
+     "median_income": 35021
+    },
+    "BK1303": {
+     "name": "Brighton Beach",
+     "district": "BK13",
+     "hvi": 4,
+     "surface_temp_f": 86.5,
+     "green_pct": 14.1,
+     "ac_pct": 86.6,
+     "median_income": 41680
+    },
+    "BK1401": {
+     "name": "Flatbush",
+     "district": "BK14",
+     "hvi": 4,
+     "surface_temp_f": 86.6,
+     "green_pct": 22.6,
+     "ac_pct": 90.4,
+     "median_income": 64270
+    },
+    "BK1402": {
+     "name": "Flatbush (West)-Ditmas Park-Parkville",
+     "district": "BK14",
+     "hvi": 3,
+     "surface_temp_f": 86.8,
+     "green_pct": 37.0,
+     "ac_pct": 90.6,
+     "median_income": 70247
+    },
+    "BK1403": {
+     "name": "Midwood",
+     "district": "BK14",
+     "hvi": 3,
+     "surface_temp_f": 88.9,
+     "green_pct": 28.4,
+     "ac_pct": 90.6,
+     "median_income": 61662
+    },
+    "BK1501": {
+     "name": "Gravesend (East)-Homecrest",
+     "district": "BK15",
+     "hvi": 3,
+     "surface_temp_f": 88.6,
+     "green_pct": 19.7,
+     "ac_pct": 94.4,
+     "median_income": 62530
+    },
+    "BK1502": {
+     "name": "Madison",
+     "district": "BK15",
+     "hvi": 3,
+     "surface_temp_f": 88.5,
+     "green_pct": 23.9,
+     "ac_pct": 95.2,
+     "median_income": 78158
+    },
+    "BK1503": {
+     "name": "Sheepshead Bay-Manhattan Beach-Gerritsen Beach",
+     "district": "BK15",
+     "hvi": 2,
+     "surface_temp_f": 86.5,
+     "green_pct": 25.0,
+     "ac_pct": 95.4,
+     "median_income": 71336
+    },
+    "BK1601": {
+     "name": "Ocean Hill",
+     "district": "BK16",
+     "hvi": 5,
+     "surface_temp_f": 86.5,
+     "green_pct": 20.6,
+     "ac_pct": 81.7,
+     "median_income": 44376
+    },
+    "BK1602": {
+     "name": "Brownsville",
+     "district": "BK16",
+     "hvi": 5,
+     "surface_temp_f": 87.9,
+     "green_pct": 25.7,
+     "ac_pct": 81.7,
+     "median_income": 29438
+    },
+    "BK1701": {
+     "name": "East Flatbush-Erasmus",
+     "district": "BK17",
+     "hvi": 5,
+     "surface_temp_f": 87.3,
+     "green_pct": 16.9,
+     "ac_pct": 89.5,
+     "median_income": 57436
+    },
+    "BK1702": {
+     "name": "East Flatbush-Farragut",
+     "district": "BK17",
+     "hvi": 5,
+     "surface_temp_f": 89.2,
+     "green_pct": 21.4,
+     "ac_pct": 89.9,
+     "median_income": 62692
+    },
+    "BK1703": {
+     "name": "East Flatbush-Rugby",
+     "district": "BK17",
+     "hvi": 5,
+     "surface_temp_f": 88.6,
+     "green_pct": 18.1,
+     "ac_pct": 89.6,
+     "median_income": 64814
+    },
+    "BK1704": {
+     "name": "East Flatbush-Remsen Village",
+     "district": "BK17",
+     "hvi": 5,
+     "surface_temp_f": 87.0,
+     "green_pct": 16.7,
+     "ac_pct": 88.9,
+     "median_income": 46989
+    },
+    "BK1801": {
+     "name": "Flatlands",
+     "district": "BK18",
+     "hvi": 5,
+     "surface_temp_f": 88.9,
+     "green_pct": 24.3,
+     "ac_pct": 92.5,
+     "median_income": 78015
+    },
+    "BK1802": {
+     "name": "Marine Park-Mill Basin-Bergen Beach",
+     "district": "BK18",
+     "hvi": 3,
+     "surface_temp_f": 88.7,
+     "green_pct": 29.2,
+     "ac_pct": 92.5,
+     "median_income": 85417
+    },
+    "BK1803": {
+     "name": "Canarsie",
+     "district": "BK18",
+     "hvi": 4,
+     "surface_temp_f": 87.6,
+     "green_pct": 27.9,
+     "ac_pct": 92.5,
+     "median_income": 83025
+    },
+    "MN0101": {
+     "name": "Financial District-Battery Park City",
+     "district": "MN01",
+     "hvi": 1,
+     "surface_temp_f": 80.8,
+     "green_pct": 14.6,
+     "ac_pct": 98.1,
+     "median_income": 184087
+    },
+    "MN0102": {
+     "name": "Tribeca-Civic Center",
+     "district": "MN01",
+     "hvi": 1,
+     "surface_temp_f": 83.9,
+     "green_pct": 11.3,
+     "ac_pct": 96.7,
+     "median_income": 208844
+    },
+    "MN0201": {
+     "name": "SoHo-Little Italy-Hudson Square",
+     "district": "MN02",
+     "hvi": 1,
+     "surface_temp_f": 85.5,
+     "green_pct": 8.0,
+     "ac_pct": 98.1,
+     "median_income": 128118
+    },
+    "MN0202": {
+     "name": "Greenwich Village",
+     "district": "MN02",
+     "hvi": 1,
+     "surface_temp_f": 84.9,
+     "green_pct": 19.1,
+     "ac_pct": 98.1,
+     "median_income": 153063
+    },
+    "MN0203": {
+     "name": "West Village",
+     "district": "MN02",
+     "hvi": 1,
+     "surface_temp_f": 84.3,
+     "green_pct": 19.4,
+     "ac_pct": 98.1,
+     "median_income": 133594
+    },
+    "MN0301": {
+     "name": "Chinatown-Two Bridges",
+     "district": "MN03",
+     "hvi": 3,
+     "surface_temp_f": 84.5,
+     "green_pct": 21.2,
+     "ac_pct": 91.1,
+     "median_income": 30435
+    },
+    "MN0302": {
+     "name": "Lower East Side",
+     "district": "MN03",
+     "hvi": 2,
+     "surface_temp_f": 84.4,
+     "green_pct": 29.2,
+     "ac_pct": 91.1,
+     "median_income": 49768
+    },
+    "MN0303": {
+     "name": "East Village",
+     "district": "MN03",
+     "hvi": 2,
+     "surface_temp_f": 84.6,
+     "green_pct": 25.8,
+     "ac_pct": 91.1,
+     "median_income": 78778
+    },
+    "MN0401": {
+     "name": "Chelsea-Hudson Yards",
+     "district": "MN04",
+     "hvi": 1,
+     "surface_temp_f": 84.9,
+     "green_pct": 13.6,
+     "ac_pct": 97.6,
+     "median_income": 134928
+    },
+    "MN0402": {
+     "name": "Hell's Kitchen",
+     "district": "MN04",
+     "hvi": 2,
+     "surface_temp_f": 85.2,
+     "green_pct": 11.4,
+     "ac_pct": 97.6,
+     "median_income": 91319
+    },
+    "MN0501": {
+     "name": "Midtown South-Flatiron-Union Square",
+     "district": "MN05",
+     "hvi": 1,
+     "surface_temp_f": 85.2,
+     "green_pct": 6.2,
+     "ac_pct": 97.6,
+     "median_income": 150938
+    },
+    "MN0502": {
+     "name": "Midtown-Times Square",
+     "district": "MN05",
+     "hvi": 1,
+     "surface_temp_f": 82.4,
+     "green_pct": 3.9,
+     "ac_pct": 97.3,
+     "median_income": 153141
+    },
+    "MN0601": {
+     "name": "Stuyvesant Town-Peter Cooper Village",
+     "district": "MN06",
+     "hvi": 1,
+     "surface_temp_f": 83.6,
+     "green_pct": 42.8,
+     "ac_pct": 93.9,
+     "median_income": 138646
+    },
+    "MN0602": {
+     "name": "Gramercy",
+     "district": "MN06",
+     "hvi": 1,
+     "surface_temp_f": 85.6,
+     "green_pct": 16.3,
+     "ac_pct": 93.9,
+     "median_income": 148808
+    },
+    "MN0603": {
+     "name": "Murray Hill-Kips Bay",
+     "district": "MN06",
+     "hvi": 1,
+     "surface_temp_f": 84.5,
+     "green_pct": 17.2,
+     "ac_pct": 93.9,
+     "median_income": 128383
+    },
+    "MN0604": {
+     "name": "East Midtown-Turtle Bay",
+     "district": "MN06",
+     "hvi": 1,
+     "surface_temp_f": 83.7,
+     "green_pct": 12.6,
+     "ac_pct": 93.9,
+     "median_income": 149392
+    },
+    "MN0701": {
+     "name": "Upper West Side-Lincoln Square",
+     "district": "MN07",
+     "hvi": 1,
+     "surface_temp_f": 82.9,
+     "green_pct": 20.9,
+     "ac_pct": 92.2,
+     "median_income": 145352
+    },
+    "MN0702": {
+     "name": "Upper West Side (Central)",
+     "district": "MN07",
+     "hvi": 1,
+     "surface_temp_f": 83.1,
+     "green_pct": 30.6,
+     "ac_pct": 92.2,
+     "median_income": 128724
+    },
+    "MN0703": {
+     "name": "Upper West Side-Manhattan Valley",
+     "district": "MN07",
+     "hvi": 1,
+     "surface_temp_f": 83.3,
+     "green_pct": 34.1,
+     "ac_pct": 90.7,
+     "median_income": 109108
+    },
+    "MN0801": {
+     "name": "Upper East Side-Lenox Hill-Roosevelt Island",
+     "district": "MN08",
+     "hvi": 1,
+     "surface_temp_f": 84.0,
+     "green_pct": 24.0,
+     "ac_pct": 96.4,
+     "median_income": 114842
+    },
+    "MN0802": {
+     "name": "Upper East Side-Carnegie Hill",
+     "district": "MN08",
+     "hvi": 1,
+     "surface_temp_f": 84.2,
+     "green_pct": 17.8,
+     "ac_pct": 96.4,
+     "median_income": 190924
+    },
+    "MN0803": {
+     "name": "Upper East Side-Yorkville",
+     "district": "MN08",
+     "hvi": 1,
+     "surface_temp_f": 84.7,
+     "green_pct": 23.7,
+     "ac_pct": 96.4,
+     "median_income": 110894
+    },
+    "MN0901": {
+     "name": "Morningside Heights",
+     "district": "MN09",
+     "hvi": 2,
+     "surface_temp_f": 83.2,
+     "green_pct": 40.9,
+     "ac_pct": 88.3,
+     "median_income": 63588
+    },
+    "MN0902": {
+     "name": "Manhattanville-West Harlem",
+     "district": "MN09",
+     "hvi": 3,
+     "surface_temp_f": 84.7,
+     "green_pct": 25.9,
+     "ac_pct": 87.8,
+     "median_income": 42536
+    },
+    "MN0903": {
+     "name": "Hamilton Heights-Sugar Hill",
+     "district": "MN09",
+     "hvi": 3,
+     "surface_temp_f": 83.6,
+     "green_pct": 30.7,
+     "ac_pct": 87.8,
+     "median_income": 55164
+    },
+    "MN1001": {
+     "name": "Harlem (South)",
+     "district": "MN10",
+     "hvi": 5,
+     "surface_temp_f": 86.4,
+     "green_pct": 19.6,
+     "ac_pct": 82.2,
+     "median_income": 69599
+    },
+    "MN1002": {
+     "name": "Harlem (North)",
+     "district": "MN10",
+     "hvi": 5,
+     "surface_temp_f": 86.1,
+     "green_pct": 25.3,
+     "ac_pct": 82.2,
+     "median_income": 52333
+    },
+    "MN1101": {
+     "name": "East Harlem (South)",
+     "district": "MN11",
+     "hvi": 4,
+     "surface_temp_f": 85.2,
+     "green_pct": 26.7,
+     "ac_pct": 85.1,
+     "median_income": 37367
+    },
+    "MN1102": {
+     "name": "East Harlem (North)",
+     "district": "MN11",
+     "hvi": 5,
+     "surface_temp_f": 86.1,
+     "green_pct": 27.5,
+     "ac_pct": 84.9,
+     "median_income": 30740
+    },
+    "MN1201": {
+     "name": "Washington Heights (South)",
+     "district": "MN12",
+     "hvi": 2,
+     "surface_temp_f": 83.4,
+     "green_pct": 23.6,
+     "ac_pct": 92.3,
+     "median_income": 54829
+    },
+    "MN1202": {
+     "name": "Washington Heights (North)",
+     "district": "MN12",
+     "hvi": 1,
+     "surface_temp_f": 82.6,
+     "green_pct": 34.0,
+     "ac_pct": 92.3,
+     "median_income": 62394
+    },
+    "MN1203": {
+     "name": "Inwood",
+     "district": "MN12",
+     "hvi": 3,
+     "surface_temp_f": 86.7,
+     "green_pct": 18.3,
+     "ac_pct": 92.3,
+     "median_income": 64778
+    },
+    "QN0101": {
+     "name": "Astoria (North)-Ditmars-Steinway",
+     "district": "QN01",
+     "hvi": 2,
+     "surface_temp_f": 87.0,
+     "green_pct": 22.7,
+     "ac_pct": 92.7,
+     "median_income": 88608
+    },
+    "QN0102": {
+     "name": "Old Astoria-Hallets Point",
+     "district": "QN01",
+     "hvi": 3,
+     "surface_temp_f": 85.9,
+     "green_pct": 23.3,
+     "ac_pct": 92.7,
+     "median_income": 77237
+    },
+    "QN0103": {
+     "name": "Astoria (Central)",
+     "district": "QN01",
+     "hvi": 2,
+     "surface_temp_f": 85.4,
+     "green_pct": 14.8,
+     "ac_pct": 92.7,
+     "median_income": 92361
+    },
+    "QN0104": {
+     "name": "Astoria (East)-Woodside (North)",
+     "district": "QN01",
+     "hvi": 3,
+     "surface_temp_f": 86.7,
+     "green_pct": 19.3,
+     "ac_pct": 92.6,
+     "median_income": 74410
+    },
+    "QN0105": {
+     "name": "Queensbridge-Ravenswood-Dutch Kills",
+     "district": "QN01",
+     "hvi": 3,
+     "surface_temp_f": 87.0,
+     "green_pct": 21.8,
+     "ac_pct": 92.7,
+     "median_income": 52283
+    },
+    "QN0201": {
+     "name": "Long Island City-Hunters Point",
+     "district": "QN02",
+     "hvi": 2,
+     "surface_temp_f": 87.4,
+     "green_pct": 8.2,
+     "ac_pct": 91.9,
+     "median_income": 150208
+    },
+    "QN0202": {
+     "name": "Sunnyside",
+     "district": "QN02",
+     "hvi": 3,
+     "surface_temp_f": 87.7,
+     "green_pct": 24.3,
+     "ac_pct": 91.9,
+     "median_income": 63750
+    },
+    "QN0203": {
+     "name": "Woodside",
+     "district": "QN02",
+     "hvi": 3,
+     "surface_temp_f": 87.7,
+     "green_pct": 19.3,
+     "ac_pct": 91.9,
+     "median_income": 63460
+    },
+    "QN0301": {
+     "name": "Jackson Heights",
+     "district": "QN03",
+     "hvi": 2,
+     "surface_temp_f": 86.9,
+     "green_pct": 25.0,
+     "ac_pct": 94.1,
+     "median_income": 61985
+    },
+    "QN0302": {
+     "name": "East Elmhurst",
+     "district": "QN03",
+     "hvi": 4,
+     "surface_temp_f": 89.3,
+     "green_pct": 25.5,
+     "ac_pct": 94.1,
+     "median_income": 60792
+    },
+    "QN0303": {
+     "name": "North Corona",
+     "district": "QN03",
+     "hvi": 3,
+     "surface_temp_f": 87.8,
+     "green_pct": 18.2,
+     "ac_pct": 94.3,
+     "median_income": 66227
+    },
+    "QN0401": {
+     "name": "Elmhurst",
+     "district": "QN04",
+     "hvi": 3,
+     "surface_temp_f": 87.7,
+     "green_pct": 20.2,
+     "ac_pct": 95.3,
+     "median_income": 60591
+    },
+    "QN0402": {
+     "name": "Corona",
+     "district": "QN04",
+     "hvi": 3,
+     "surface_temp_f": 88.2,
+     "green_pct": 15.9,
+     "ac_pct": 95.5,
+     "median_income": 54263
+    },
+    "QN0501": {
+     "name": "Maspeth",
+     "district": "QN05",
+     "hvi": 3,
+     "surface_temp_f": 87.5,
+     "green_pct": 15.4,
+     "ac_pct": 95.5,
+     "median_income": 85400
+    },
+    "QN0502": {
+     "name": "Ridgewood",
+     "district": "QN05",
+     "hvi": 2,
+     "surface_temp_f": 84.5,
+     "green_pct": 20.8,
+     "ac_pct": 95.7,
+     "median_income": 78452
+    },
+    "QN0503": {
+     "name": "Glendale",
+     "district": "QN05",
+     "hvi": 2,
+     "surface_temp_f": 86.0,
+     "green_pct": 23.0,
+     "ac_pct": 95.7,
+     "median_income": 79115
+    },
+    "QN0504": {
+     "name": "Middle Village",
+     "district": "QN05",
+     "hvi": 2,
+     "surface_temp_f": 86.1,
+     "green_pct": 28.2,
+     "ac_pct": 95.7,
+     "median_income": 99184
+    },
+    "QN0601": {
+     "name": "Rego Park",
+     "district": "QN06",
+     "hvi": 3,
+     "surface_temp_f": 87.6,
+     "green_pct": 27.9,
+     "ac_pct": 92.4,
+     "median_income": 79334
+    },
+    "QN0602": {
+     "name": "Forest Hills",
+     "district": "QN06",
+     "hvi": 2,
+     "surface_temp_f": 86.6,
+     "green_pct": 35.7,
+     "ac_pct": 92.4,
+     "median_income": 89356
+    },
+    "QN0701": {
+     "name": "College Point",
+     "district": "QN07",
+     "hvi": 2,
+     "surface_temp_f": 87.7,
+     "green_pct": 31.0,
+     "ac_pct": 94.1,
+     "median_income": 63646
+    },
+    "QN0702": {
+     "name": "Whitestone-Beechhurst",
+     "district": "QN07",
+     "hvi": 2,
+     "surface_temp_f": 88.2,
+     "green_pct": 38.2,
+     "ac_pct": 94.1,
+     "median_income": 88616
+    },
+    "QN0703": {
+     "name": "Bay Terrace-Clearview",
+     "district": "QN07",
+     "hvi": 1,
+     "surface_temp_f": 87.2,
+     "green_pct": 48.3,
+     "ac_pct": 94.1,
+     "median_income": 89375
+    },
+    "QN0704": {
+     "name": "Murray Hill-Broadway Flushing",
+     "district": "QN07",
+     "hvi": 3,
+     "surface_temp_f": 89.0,
+     "green_pct": 38.0,
+     "ac_pct": 94.1,
+     "median_income": 56635
+    },
+    "QN0705": {
+     "name": "East Flushing",
+     "district": "QN07",
+     "hvi": 3,
+     "surface_temp_f": 89.5,
+     "green_pct": 38.3,
+     "ac_pct": 94.1,
+     "median_income": 49559
+    },
+    "QN0706": {
+     "name": "Queensboro Hill",
+     "district": "QN07",
+     "hvi": 2,
+     "surface_temp_f": 87.7,
+     "green_pct": 40.5,
+     "ac_pct": 94.1,
+     "median_income": 56633
+    },
+    "QN0707": {
+     "name": "Flushing-Willets Point",
+     "district": "QN07",
+     "hvi": 4,
+     "surface_temp_f": 88.0,
+     "green_pct": 18.7,
+     "ac_pct": 94.2,
+     "median_income": 40476
+    },
+    "QN0801": {
+     "name": "Kew Gardens Hills",
+     "district": "QN08",
+     "hvi": 2,
+     "surface_temp_f": 87.9,
+     "green_pct": 40.4,
+     "ac_pct": 94.9,
+     "median_income": 80977
+    },
+    "QN0802": {
+     "name": "Pomonok-Electchester-Hillcrest",
+     "district": "QN08",
+     "hvi": 2,
+     "surface_temp_f": 88.2,
+     "green_pct": 37.2,
+     "ac_pct": 94.9,
+     "median_income": 73900
+    },
+    "QN0803": {
+     "name": "Fresh Meadows-Utopia",
+     "district": "QN08",
+     "hvi": 2,
+     "surface_temp_f": 87.7,
+     "green_pct": 46.0,
+     "ac_pct": 94.9,
+     "median_income": 78920
+    },
+    "QN0804": {
+     "name": "Jamaica Estates-Holliswood",
+     "district": "QN08",
+     "hvi": 1,
+     "surface_temp_f": 86.2,
+     "green_pct": 53.0,
+     "ac_pct": 94.9,
+     "median_income": 75468
+    },
+    "QN0805": {
+     "name": "Jamaica Hills-Briarwood",
+     "district": "QN08",
+     "hvi": 2,
+     "surface_temp_f": 87.9,
+     "green_pct": 31.5,
+     "ac_pct": 94.9,
+     "median_income": 77420
+    },
+    "QN0901": {
+     "name": "Kew Gardens",
+     "district": "QN09",
+     "hvi": 1,
+     "surface_temp_f": 85.5,
+     "green_pct": 45.6,
+     "ac_pct": 91.9,
+     "median_income": 83340
+    },
+    "QN0902": {
+     "name": "Richmond Hill",
+     "district": "QN09",
+     "hvi": 4,
+     "surface_temp_f": 89.0,
+     "green_pct": 21.9,
+     "ac_pct": 91.9,
+     "median_income": 69836
+    },
+    "QN0903": {
+     "name": "South Richmond Hill",
+     "district": "QN09",
+     "hvi": 4,
+     "surface_temp_f": 90.5,
+     "green_pct": 17.2,
+     "ac_pct": 91.9,
+     "median_income": 75089
+    },
+    "QN0904": {
+     "name": "Ozone Park (North)",
+     "district": "QN09",
+     "hvi": 4,
+     "surface_temp_f": 89.0,
+     "green_pct": 17.3,
+     "ac_pct": 91.9,
+     "median_income": 66250
+    },
+    "QN0905": {
+     "name": "Woodhaven",
+     "district": "QN09",
+     "hvi": 3,
+     "surface_temp_f": 87.5,
+     "green_pct": 24.6,
+     "ac_pct": 91.9,
+     "median_income": 74508
+    },
+    "QN1001": {
+     "name": "South Ozone Park",
+     "district": "QN10",
+     "hvi": 3,
+     "surface_temp_f": 89.7,
+     "green_pct": 24.3,
+     "ac_pct": 94.3,
+     "median_income": 83326
+    },
+    "QN1002": {
+     "name": "Ozone Park",
+     "district": "QN10",
+     "hvi": 3,
+     "surface_temp_f": 88.7,
+     "green_pct": 28.9,
+     "ac_pct": 94.3,
+     "median_income": 73349
+    },
+    "QN1003": {
+     "name": "Howard Beach-Lindenwood",
+     "district": "QN10",
+     "hvi": 2,
+     "surface_temp_f": 87.8,
+     "green_pct": 32.3,
+     "ac_pct": 94.3,
+     "median_income": 74510
+    },
+    "QN1101": {
+     "name": "Auburndale",
+     "district": "QN11",
+     "hvi": 3,
+     "surface_temp_f": 89.4,
+     "green_pct": 37.6,
+     "ac_pct": 93.7,
+     "median_income": 69107
+    },
+    "QN1102": {
+     "name": "Bayside",
+     "district": "QN11",
+     "hvi": 1,
+     "surface_temp_f": 87.4,
+     "green_pct": 45.7,
+     "ac_pct": 93.7,
+     "median_income": 99392
+    },
+    "QN1103": {
+     "name": "Douglaston-Little Neck",
+     "district": "QN11",
+     "hvi": 1,
+     "surface_temp_f": 85.8,
+     "green_pct": 56.0,
+     "ac_pct": 93.7,
+     "median_income": 92524
+    },
+    "QN1104": {
+     "name": "Oakland Gardens-Hollis Hills",
+     "district": "QN11",
+     "hvi": 1,
+     "surface_temp_f": 87.0,
+     "green_pct": 51.9,
+     "ac_pct": 93.7,
+     "median_income": 81212
+    },
+    "QN1201": {
+     "name": "Jamaica",
+     "district": "QN12",
+     "hvi": 5,
+     "surface_temp_f": 89.7,
+     "green_pct": 14.7,
+     "ac_pct": 84.9,
+     "median_income": 59511
+    },
+    "QN1202": {
+     "name": "South Jamaica",
+     "district": "QN12",
+     "hvi": 5,
+     "surface_temp_f": 90.2,
+     "green_pct": 30.4,
+     "ac_pct": 84.2,
+     "median_income": 74932
+    },
+    "QN1203": {
+     "name": "Baisley Park",
+     "district": "QN12",
+     "hvi": 5,
+     "surface_temp_f": 89.0,
+     "green_pct": 35.2,
+     "ac_pct": 84.2,
+     "median_income": 71000
+    },
+    "QN1204": {
+     "name": "Springfield Gardens (North)-Rochdale Village",
+     "district": "QN12",
+     "hvi": 5,
+     "surface_temp_f": 88.4,
+     "green_pct": 41.5,
+     "ac_pct": 84.2,
+     "median_income": 71526
+    },
+    "QN1205": {
+     "name": "St. Albans",
+     "district": "QN12",
+     "hvi": 5,
+     "surface_temp_f": 89.8,
+     "green_pct": 38.1,
+     "ac_pct": 84.6,
+     "median_income": 82656
+    },
+    "QN1206": {
+     "name": "Hollis",
+     "district": "QN12",
+     "hvi": 5,
+     "surface_temp_f": 90.5,
+     "green_pct": 32.2,
+     "ac_pct": 85.3,
+     "median_income": 78934
+    },
+    "QN1301": {
+     "name": "Glen Oaks-Floral Park-New Hyde Park",
+     "district": "QN13",
+     "hvi": 2,
+     "surface_temp_f": 88.9,
+     "green_pct": 48.5,
+     "ac_pct": 92.8,
+     "median_income": 97360
+    },
+    "QN1302": {
+     "name": "Bellerose",
+     "district": "QN13",
+     "hvi": 2,
+     "surface_temp_f": 88.3,
+     "green_pct": 47.3,
+     "ac_pct": 92.8,
+     "median_income": 91455
+    },
+    "QN1303": {
+     "name": "Queens Village",
+     "district": "QN13",
+     "hvi": 4,
+     "surface_temp_f": 90.8,
+     "green_pct": 32.7,
+     "ac_pct": 92.9,
+     "median_income": 85043
+    },
+    "QN1304": {
+     "name": "Cambria Heights",
+     "district": "QN13",
+     "hvi": 4,
+     "surface_temp_f": 90.0,
+     "green_pct": 39.1,
+     "ac_pct": 92.8,
+     "median_income": 102008
+    },
+    "QN1305": {
+     "name": "Laurelton",
+     "district": "QN13",
+     "hvi": 4,
+     "surface_temp_f": 89.0,
+     "green_pct": 36.0,
+     "ac_pct": 92.8,
+     "median_income": 89450
+    },
+    "QN1306": {
+     "name": "Springfield Gardens (South)-Brookville",
+     "district": "QN13",
+     "hvi": 3,
+     "surface_temp_f": 87.1,
+     "green_pct": 44.5,
+     "ac_pct": 92.8,
+     "median_income": 92171
+    },
+    "QN1307": {
+     "name": "Rosedale",
+     "district": "QN13",
+     "hvi": 3,
+     "surface_temp_f": 86.9,
+     "green_pct": 43.9,
+     "ac_pct": 92.8,
+     "median_income": 99659
+    },
+    "QN1401": {
+     "name": "Far Rockaway-Bayswater",
+     "district": "QN14",
+     "hvi": 4,
+     "surface_temp_f": 86.8,
+     "green_pct": 37.2,
+     "ac_pct": 83.2,
+     "median_income": 50042
+    },
+    "QN1402": {
+     "name": "Rockaway Beach-Arverne-Edgemere",
+     "district": "QN14",
+     "hvi": 5,
+     "surface_temp_f": 85.5,
+     "green_pct": 25.9,
+     "ac_pct": 83.2,
+     "median_income": 52885
+    },
+    "QN1403": {
+     "name": "Breezy Point-Belle Harbor-Rockaway Park-Broad Channel",
+     "district": "QN14",
+     "hvi": 3,
+     "surface_temp_f": 85.2,
+     "green_pct": 24.9,
+     "ac_pct": 83.2,
+     "median_income": 98668
+    },
+    "SI0101": {
+     "name": "St. George-New Brighton",
+     "district": "SI01",
+     "hvi": 3,
+     "surface_temp_f": 85.6,
+     "green_pct": 42.3,
+     "ac_pct": 90.7,
+     "median_income": 53683
+    },
+    "SI0102": {
+     "name": "Tompkinsville-Stapleton-Clifton-Fox Hills",
+     "district": "SI01",
+     "hvi": 4,
+     "surface_temp_f": 88.1,
+     "green_pct": 38.9,
+     "ac_pct": 90.7,
+     "median_income": 49928
+    },
+    "SI0103": {
+     "name": "Rosebank-Shore Acres-Park Hill",
+     "district": "SI01",
+     "hvi": 3,
+     "surface_temp_f": 89.4,
+     "green_pct": 37.6,
+     "ac_pct": 90.7,
+     "median_income": 72362
+    },
+    "SI0104": {
+     "name": "West New Brighton-Silver Lake-Grymes Hill",
+     "district": "SI01",
+     "hvi": 1,
+     "surface_temp_f": 85.7,
+     "green_pct": 57.2,
+     "ac_pct": 90.7,
+     "median_income": 90110
+    },
+    "SI0105": {
+     "name": "Westerleigh-Castleton Corners",
+     "district": "SI01",
+     "hvi": 2,
+     "surface_temp_f": 88.1,
+     "green_pct": 49.5,
+     "ac_pct": 90.7,
+     "median_income": 106188
+    },
+    "SI0106": {
+     "name": "Port Richmond",
+     "district": "SI01",
+     "hvi": 4,
+     "surface_temp_f": 89.8,
+     "green_pct": 32.4,
+     "ac_pct": 90.7,
+     "median_income": 64652
+    },
+    "SI0107": {
+     "name": "Mariner's Harbor-Arlington-Graniteville",
+     "district": "SI01",
+     "hvi": 2,
+     "surface_temp_f": 87.1,
+     "green_pct": 43.9,
+     "ac_pct": 90.7,
+     "median_income": 80467
+    },
+    "SI0201": {
+     "name": "Grasmere-Arrochar-South Beach-Dongan Hills",
+     "district": "SI02",
+     "hvi": 2,
+     "surface_temp_f": 89.6,
+     "green_pct": 44.2,
+     "ac_pct": 98.4,
+     "median_income": 75313
+    },
+    "SI0202": {
+     "name": "New Dorp-Midland Beach",
+     "district": "SI02",
+     "hvi": 2,
+     "surface_temp_f": 89.6,
+     "green_pct": 41.2,
+     "ac_pct": 98.4,
+     "median_income": 86993
+    },
+    "SI0203": {
+     "name": "Todt Hill-Emerson Hill-Lighthouse Hill-Manor Heights",
+     "district": "SI02",
+     "hvi": 1,
+     "surface_temp_f": 83.1,
+     "green_pct": 73.9,
+     "ac_pct": 98.4,
+     "median_income": 86396
+    },
+    "SI0204": {
+     "name": "New Springville-Willowbrook-Bulls Head-Travis",
+     "district": "SI02",
+     "hvi": 1,
+     "surface_temp_f": 85.6,
+     "green_pct": 54.0,
+     "ac_pct": 98.4,
+     "median_income": 83750
+    },
+    "SI0301": {
+     "name": "Oakwood-Richmondtown",
+     "district": "SI03",
+     "hvi": 1,
+     "surface_temp_f": 88.3,
+     "green_pct": 52.1,
+     "ac_pct": 96.7,
+     "median_income": 103526
+    },
+    "SI0302": {
+     "name": "Great Kills-Eltingville",
+     "district": "SI03",
+     "hvi": 1,
+     "surface_temp_f": 89.7,
+     "green_pct": 47.7,
+     "ac_pct": 96.7,
+     "median_income": 108786
+    },
+    "SI0303": {
+     "name": "Arden Heights-Rossville",
+     "district": "SI03",
+     "hvi": 1,
+     "surface_temp_f": 87.9,
+     "green_pct": 56.5,
+     "ac_pct": 96.7,
+     "median_income": 93474
+    },
+    "SI0304": {
+     "name": "Annadale-Huguenot-Prince's Bay-Woodrow",
+     "district": "SI03",
+     "hvi": 1,
+     "surface_temp_f": 86.0,
+     "green_pct": 63.7,
+     "ac_pct": 96.7,
+     "median_income": 97841
+    },
+    "SI0305": {
+     "name": "Tottenville-Charleston",
+     "district": "SI03",
+     "hvi": 1,
+     "surface_temp_f": 86.3,
+     "green_pct": 60.5,
+     "ac_pct": 96.7,
+     "median_income": 111447
+    }
+   }
+  },
+  "district": {
+   "source_url": "https://raw.githubusercontent.com/nychealth/EHDP-data/production/indicators/data/2191.json",
+   "commit": "59f3230d04d6b69f75322bc3fae435f4eef550cc",
+   "date_modified": "2023-12-29",
+   "areas": {
+    "BX01": 5,
+    "BX02": 5,
+    "BX03": 5,
+    "BX04": 5,
+    "BX05": 5,
+    "BX06": 5,
+    "BX07": 4,
+    "BX08": 1,
+    "BX09": 4,
+    "BX10": 2,
+    "BX11": 4,
+    "BX12": 5,
+    "BK01": 3,
+    "BK02": 2,
+    "BK03": 4,
+    "BK04": 3,
+    "BK05": 5,
+    "BK06": 2,
+    "BK07": 2,
+    "BK08": 4,
+    "BK09": 4,
+    "BK10": 2,
+    "BK11": 4,
+    "BK12": 3,
+    "BK13": 4,
+    "BK14": 4,
+    "BK15": 3,
+    "BK16": 5,
+    "BK17": 5,
+    "BK18": 3,
+    "MN01": 1,
+    "MN02": 1,
+    "MN03": 2,
+    "MN04": 2,
+    "MN05": 1,
+    "MN06": 1,
+    "MN07": 1,
+    "MN08": 1,
+    "MN09": 3,
+    "MN10": 5,
+    "MN11": 4,
+    "MN12": 2,
+    "QN01": 3,
+    "QN02": 3,
+    "QN03": 3,
+    "QN04": 3,
+    "QN05": 1,
+    "QN06": 2,
+    "QN07": 2,
+    "QN08": 2,
+    "QN09": 3,
+    "QN10": 3,
+    "QN11": 1,
+    "QN12": 5,
+    "QN13": 4,
+    "QN14": 4,
+    "SI01": 2,
+    "SI02": 1,
+    "SI03": 1
+   }
+  }
+ },
+ "ed_visits": {
+  "period": "2018 to 2022",
+  "months": "May to September",
+  "source_url": "https://raw.githubusercontent.com/nychealth/EHDP-data/production/indicators/data/2443.json",
+  "commit": "582de2d0b5f427bc52294a92a07eb920242654db",
+  "date_modified": "2024-08-24",
+  "district": {
+   "MN01": {
+    "n": null,
+    "n_note": "Number is suppressed for confidentiality reasons.",
+    "annual_rate": null,
+    "annual_rate_note": "Number is suppressed for confidentiality reasons.",
+    "age_adjusted_rate": null,
+    "age_adjusted_rate_note": "Number is suppressed for confidentiality reasons."
+   },
+   "MN02": {
+    "n": 14,
+    "annual_rate": 1.6,
+    "age_adjusted_rate": 1.4
+   },
+   "MN03": {
+    "n": 36,
+    "annual_rate": 2.2,
+    "age_adjusted_rate": 2.1
+   },
+   "MN04": {
+    "n": 25,
+    "annual_rate": 8.1,
+    "age_adjusted_rate": 7.7
+   },
+   "MN05": {
+    "n": null,
+    "n_note": "Numbers <11 are suppressed as required by the Statewide Planning and Research Cooperative System (SPARCS) to protect patient confidentiality.",
+    "annual_rate": null,
+    "annual_rate_note": "Numbers <11 are suppressed as required by the Statewide Planning and Research Cooperative System (SPARCS) to protect patient confidentiality.",
+    "age_adjusted_rate": null,
+    "age_adjusted_rate_note": "Numbers <11 are suppressed as required by the Statewide Planning and Research Cooperative System (SPARCS) to protect patient confidentiality."
+   },
+   "MN06": {
+    "n": 36,
+    "annual_rate": 11.3,
+    "age_adjusted_rate": 9.5
+   },
+   "MN07": {
+    "n": 40,
+    "annual_rate": 6.3,
+    "age_adjusted_rate": 5.6
+   },
+   "MN08": {
+    "n": 30,
+    "annual_rate": 5.4,
+    "age_adjusted_rate": 5
+   },
+   "MN09": {
+    "n": 34,
+    "annual_rate": 4.2,
+    "age_adjusted_rate": 4.7
+   },
+   "MN10": {
+    "n": 50,
+    "annual_rate": 3.6,
+    "age_adjusted_rate": 4
+   },
+   "MN11": {
+    "n": 62,
+    "annual_rate": 23.9,
+    "age_adjusted_rate": 23.2
+   },
+   "MN12": {
+    "n": 47,
+    "annual_rate": 11.8,
+    "age_adjusted_rate": 11.5
+   },
+   "BX01": {
+    "n": 36,
+    "annual_rate": 9.3,
+    "age_adjusted_rate": 9.5
+   },
+   "BX02": {
+    "n": 21,
+    "annual_rate": 4.1,
+    "age_adjusted_rate": 4.4
+   },
+   "BX03": {
+    "n": 30,
+    "annual_rate": 4.8,
+    "age_adjusted_rate": 5.9
+   },
+   "BX04": {
+    "n": 45,
+    "annual_rate": 3.4,
+    "age_adjusted_rate": 4.5
+   },
+   "BX05": {
+    "n": 39,
+    "annual_rate": 4.2,
+    "age_adjusted_rate": 3.9
+   },
+   "BX06": {
+    "n": 34,
+    "annual_rate": 12.9,
+    "age_adjusted_rate": 18.4
+   },
+   "BX07": {
+    "n": 49,
+    "annual_rate": 15.8,
+    "age_adjusted_rate": 16.5
+   },
+   "BX08": {
+    "n": 26,
+    "annual_rate": 12.1,
+    "age_adjusted_rate": 11.9
+   },
+   "BX09": {
+    "n": 63,
+    "annual_rate": 14,
+    "age_adjusted_rate": 13.9
+   },
+   "BX10": {
+    "n": 44,
+    "annual_rate": 7.6,
+    "age_adjusted_rate": 9.4
+   },
+   "BX11": {
+    "n": 35,
+    "annual_rate": 2.5,
+    "age_adjusted_rate": 3.2
+   },
+   "BX12": {
+    "n": 40,
+    "annual_rate": 5.8,
+    "age_adjusted_rate": 5.9
+   },
+   "BK01": {
+    "n": 42,
+    "annual_rate": 4,
+    "age_adjusted_rate": 4
+   },
+   "BK02": {
+    "n": 33,
+    "annual_rate": 9.9,
+    "age_adjusted_rate": 10.2
+   },
+   "BK03": {
+    "n": 75,
+    "annual_rate": 24.1,
+    "age_adjusted_rate": 23.9
+   },
+   "BK04": {
+    "n": 30,
+    "annual_rate": 13.2,
+    "age_adjusted_rate": 12.8
+   },
+   "BK05": {
+    "n": 56,
+    "annual_rate": 13.2,
+    "age_adjusted_rate": 13.4
+   },
+   "BK06": {
+    "n": 21,
+    "annual_rate": 3.7,
+    "age_adjusted_rate": 4.2
+   },
+   "BK07": {
+    "n": 29,
+    "annual_rate": 2.1,
+    "age_adjusted_rate": 2.7
+   },
+   "BK08": {
+    "n": 35,
+    "annual_rate": 6.4,
+    "age_adjusted_rate": 6.7
+   },
+   "BK09": {
+    "n": 23,
+    "annual_rate": 4.1,
+    "age_adjusted_rate": 4.1
+   },
+   "BK10": {
+    "n": 22,
+    "annual_rate": 2.4,
+    "age_adjusted_rate": 3.1
+   },
+   "BK11": {
+    "n": 50,
+    "annual_rate": 11.7,
+    "age_adjusted_rate": 11.4
+   },
+   "BK12": {
+    "n": 26,
+    "annual_rate": 5.9,
+    "age_adjusted_rate": 5.5
+   },
+   "BK13": {
+    "n": 48,
+    "annual_rate": 7.5,
+    "age_adjusted_rate": 12.2
+   },
+   "BK14": {
+    "n": 37,
+    "annual_rate": 3,
+    "age_adjusted_rate": 5.1
+   },
+   "BK15": {
+    "n": 25,
+    "annual_rate": 3.7,
+    "age_adjusted_rate": 3.9
+   },
+   "BK16": {
+    "n": 41,
+    "annual_rate": 5.5,
+    "age_adjusted_rate": 7.9
+   },
+   "BK17": {
+    "n": 39,
+    "annual_rate": 8.6,
+    "age_adjusted_rate": 11.1
+   },
+   "BK18": {
+    "n": 59,
+    "annual_rate": 15,
+    "age_adjusted_rate": 14.2
+   },
+   "QN01": {
+    "n": 61,
+    "annual_rate": 5,
+    "age_adjusted_rate": 5
+   },
+   "QN02": {
+    "n": 24,
+    "annual_rate": 3,
+    "age_adjusted_rate": 3.3
+   },
+   "QN03": {
+    "n": 35,
+    "annual_rate": 3.6,
+    "age_adjusted_rate": 4
+   },
+   "QN04": {
+    "n": 50,
+    "annual_rate": 4.5,
+    "age_adjusted_rate": 5.3
+   },
+   "QN05": {
+    "n": 37,
+    "annual_rate": 10.7,
+    "age_adjusted_rate": 11.5
+   },
+   "QN06": {
+    "n": 27,
+    "annual_rate": 11.3,
+    "age_adjusted_rate": 14.4
+   },
+   "QN07": {
+    "n": 52,
+    "annual_rate": 9,
+    "age_adjusted_rate": 8.2
+   },
+   "QN08": {
+    "n": 32,
+    "annual_rate": 7.1,
+    "age_adjusted_rate": 7.2
+   },
+   "QN09": {
+    "n": 37,
+    "annual_rate": 3.5,
+    "age_adjusted_rate": 3.6
+   },
+   "QN10": {
+    "n": 35,
+    "annual_rate": 3.4,
+    "age_adjusted_rate": 3.3
+   },
+   "QN11": {
+    "n": 14,
+    "annual_rate": 2,
+    "age_adjusted_rate": 2.5
+   },
+   "QN12": {
+    "n": 79,
+    "annual_rate": 7.9,
+    "age_adjusted_rate": 7.6
+   },
+   "QN13": {
+    "n": 38,
+    "annual_rate": 3.3,
+    "age_adjusted_rate": 4.8
+   },
+   "QN14": {
+    "n": 54,
+    "annual_rate": 22.2,
+    "age_adjusted_rate": 21.8
+   },
+   "SI01": {
+    "n": 114,
+    "annual_rate": 16.5,
+    "age_adjusted_rate": 18.3
+   },
+   "SI02": {
+    "n": 55,
+    "annual_rate": 7.5,
+    "age_adjusted_rate": 12.7
+   },
+   "SI03": {
+    "n": 78,
+    "annual_rate": 12.5,
+    "age_adjusted_rate": 13.9
+   }
+  },
+  "borough": {
+   "BX": {
+    "n": 498,
+    "annual_rate": 6.9,
+    "age_adjusted_rate": 7.1
+   },
+   "BK": {
+    "n": 749,
+    "annual_rate": 5.6,
+    "age_adjusted_rate": 5.7
+   },
+   "MN": {
+    "n": 428,
+    "annual_rate": 5.2,
+    "age_adjusted_rate": 5.1
+   },
+   "QN": {
+    "n": 621,
+    "annual_rate": 5.3,
+    "age_adjusted_rate": 5.3
+   },
+   "SI": {
+    "n": 253,
+    "annual_rate": 10.2,
+    "age_adjusted_rate": 10.4
+   }
+  },
+  "citywide": {
+   "n": 2549,
+   "annual_rate": 5.9,
+   "age_adjusted_rate": 6
+  }
+ }
+}

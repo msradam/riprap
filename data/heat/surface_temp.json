@@ -1,0 +1,369 @@
+{
+ "what": "Bake summer land surface temperature over New York City from Landsat.",
+ "run_date": "2026-10-02",
+ "source": "Landsat Collection 2 Level 2 Science Products, surface temperature (USGS), via Microsoft Planetary Computer",
+ "rule": {
+  "months": "1 June to 10 September",
+  "tier": "T1",
+  "max_scene_cloud_pct": 20,
+  "min_clear_land_pct": 95.0,
+  "cell_m": 90,
+  "kelvin": "DN x 0.00341802 + 149.0"
+ },
+ "years": [
+  2023,
+  2024,
+  2025,
+  2026
+ ],
+ "images": [
+  {
+   "id": "LC09_L2SP_014032_20230723_02_T1",
+   "tier": "T1",
+   "time_utc": "2023-07-23T15:39:27Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 4.8,
+   "clear_land_pct": 99.0,
+   "city_land_mean_f": 104.4
+  },
+  {
+   "id": "LC08_L2SP_014032_20230731_02_T1",
+   "tier": "T1",
+   "time_utc": "2023-07-31T15:39:42Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 14.2,
+   "clear_land_pct": 98.6,
+   "city_land_mean_f": 102.6
+  },
+  {
+   "id": "LC09_L2SP_013032_20230801_02_T1",
+   "tier": "T1",
+   "time_utc": "2023-08-01T15:33:23Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 1.4,
+   "clear_land_pct": 96.5,
+   "city_land_mean_f": 101.8
+  },
+  {
+   "id": "LC08_L2SP_013032_20230809_02_T1",
+   "tier": "T1",
+   "time_utc": "2023-08-09T15:33:32Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 0.4,
+   "clear_land_pct": 97.8,
+   "city_land_mean_f": 100.6
+  },
+  {
+   "id": "LC08_L2SP_014032_20230901_02_T1",
+   "tier": "T1",
+   "time_utc": "2023-09-01T15:39:51Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 1.1,
+   "clear_land_pct": 97.7,
+   "city_land_mean_f": 88.3
+  },
+  {
+   "id": "LC09_L2SP_013032_20230902_02_T1",
+   "tier": "T1",
+   "time_utc": "2023-09-02T15:33:38Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 0.3,
+   "clear_land_pct": 99.1,
+   "city_land_mean_f": 92.7
+  },
+  {
+   "id": "LC09_L2SP_013032_20240702_02_T1",
+   "tier": "T1",
+   "time_utc": "2024-07-02T15:32:54Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 0.4,
+   "clear_land_pct": 99.7,
+   "city_land_mean_f": 103.2
+  },
+  {
+   "id": "LC09_L2SP_014032_20240810_02_T1",
+   "tier": "T1",
+   "time_utc": "2024-08-10T15:39:25Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 7.6,
+   "clear_land_pct": 99.1,
+   "city_land_mean_f": 99.7
+  },
+  {
+   "id": "LC08_L2SP_013032_20240827_02_T1",
+   "tier": "T1",
+   "time_utc": "2024-08-27T15:33:26Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 2.3,
+   "clear_land_pct": 98.1,
+   "city_land_mean_f": 100.5
+  },
+  {
+   "id": "LC08_L2SP_014032_20240903_02_T1",
+   "tier": "T1",
+   "time_utc": "2024-09-03T15:39:44Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 0.1,
+   "clear_land_pct": 98.7,
+   "city_land_mean_f": 86.8
+  },
+  {
+   "id": "LC09_L2SP_013032_20240904_02_T1",
+   "tier": "T1",
+   "time_utc": "2024-09-04T15:33:23Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 0.4,
+   "clear_land_pct": 99.4,
+   "city_land_mean_f": 90.9
+  },
+  {
+   "id": "LC08_L2SP_014032_20250602_02_T1",
+   "tier": "T1",
+   "time_utc": "2025-06-02T15:39:20Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 5.5,
+   "clear_land_pct": 97.9,
+   "city_land_mean_f": 89.6
+  },
+  {
+   "id": "LC09_L2SP_013032_20250603_02_T1",
+   "tier": "T1",
+   "time_utc": "2025-06-03T15:33:06Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 2.3,
+   "clear_land_pct": 97.9,
+   "city_land_mean_f": 96.4
+  },
+  {
+   "id": "LC08_L2SP_013032_20250729_02_T1",
+   "tier": "T1",
+   "time_utc": "2025-07-29T15:33:34Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 9.3,
+   "clear_land_pct": 100.0,
+   "city_land_mean_f": 115.7
+  },
+  {
+   "id": "LC09_L2SP_013032_20250822_02_T1",
+   "tier": "T1",
+   "time_utc": "2025-08-22T15:33:48Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 0.1,
+   "clear_land_pct": 99.1,
+   "city_land_mean_f": 95.6
+  },
+  {
+   "id": "LC09_L2SP_014032_20260613_02_T1",
+   "tier": "T1",
+   "time_utc": "2026-06-13T15:39:10Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 3.0,
+   "clear_land_pct": 98.7,
+   "city_land_mean_f": 106.2
+  },
+  {
+   "id": "LC08_L2SP_014032_20260723_02_T1",
+   "tier": "T1",
+   "time_utc": "2026-07-23T15:39:24Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 2.1,
+   "clear_land_pct": 99.5,
+   "city_land_mean_f": 96.8
+  },
+  {
+   "id": "LC08_L2SP_014032_20260808_02_T1",
+   "tier": "T1",
+   "time_utc": "2026-08-08T15:39:31Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 13.5,
+   "clear_land_pct": 98.9,
+   "city_land_mean_f": 97.9
+  }
+ ],
+ "skipped": [
+  {
+   "id": "LC09_L2SP_014032_20230605_02_T1",
+   "tier": "T1",
+   "time_utc": "2023-06-05T15:39:19Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 14.7,
+   "clear_land_pct": 65.7
+  },
+  {
+   "id": "LC09_L2SP_013032_20230716_02_T2",
+   "tier": "T2",
+   "time_utc": "2023-07-16T15:33:17Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 14.7,
+   "clear_land_pct": 15.9
+  },
+  {
+   "id": "LC08_L2SP_013032_20240608_02_T1",
+   "tier": "T1",
+   "time_utc": "2024-06-08T15:32:46Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 10.8,
+   "clear_land_pct": 63.8
+  },
+  {
+   "id": "LC08_L2SP_014032_20240717_02_T1",
+   "tier": "T1",
+   "time_utc": "2024-07-17T15:39:24Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 9.6,
+   "clear_land_pct": 92.3
+  },
+  {
+   "id": "LC09_L2SP_013032_20240803_02_T1",
+   "tier": "T1",
+   "time_utc": "2024-08-03T15:33:12Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 18.7,
+   "clear_land_pct": 64.9
+  },
+  {
+   "id": "LC09_L2SP_014032_20240826_02_T1",
+   "tier": "T1",
+   "time_utc": "2024-08-26T15:39:38Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 7.8,
+   "clear_land_pct": 50.7
+  },
+  {
+   "id": "LC08_L2SP_013032_20250611_02_T1",
+   "tier": "T1",
+   "time_utc": "2025-06-11T15:33:16Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 6.5,
+   "clear_land_pct": 94.0
+  },
+  {
+   "id": "LC09_L2SP_013032_20250619_02_T1",
+   "tier": "T1",
+   "time_utc": "2025-06-19T15:33:19Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 8.1,
+   "clear_land_pct": 73.2
+  },
+  {
+   "id": "LC08_L2SP_014032_20250704_02_T1",
+   "tier": "T1",
+   "time_utc": "2025-07-04T15:39:38Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 9.8,
+   "clear_land_pct": 87.0
+  },
+  {
+   "id": "LC09_L2SP_013032_20250721_02_T1",
+   "tier": "T1",
+   "time_utc": "2025-07-21T15:33:32Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 6.6,
+   "clear_land_pct": 69.6
+  },
+  {
+   "id": "LC09_L2SP_014032_20250728_02_T1",
+   "tier": "T1",
+   "time_utc": "2025-07-28T15:39:44Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 5.2,
+   "clear_land_pct": 94.9
+  },
+  {
+   "id": "LC08_L2SP_013032_20250830_02_T1",
+   "tier": "T1",
+   "time_utc": "2025-08-30T15:33:46Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 8.4,
+   "clear_land_pct": 93.3
+  },
+  {
+   "id": "LC08_L2SP_014032_20260605_02_T1",
+   "tier": "T1",
+   "time_utc": "2026-06-05T15:38:57Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 17.3,
+   "clear_land_pct": 86.1
+  },
+  {
+   "id": "LC09_L2SP_014032_20260629_02_T1",
+   "tier": "T1",
+   "time_utc": "2026-06-29T15:39:21Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 17.6,
+   "clear_land_pct": 83.6
+  },
+  {
+   "id": "LC08_L2SP_013032_20260630_02_T1",
+   "tier": "T1",
+   "time_utc": "2026-06-30T15:33:03Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 16.3,
+   "clear_land_pct": 85.5
+  },
+  {
+   "id": "LC09_L2SP_013032_20260708_02_T1",
+   "tier": "T1",
+   "time_utc": "2026-07-08T15:33:12Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 4.7,
+   "clear_land_pct": 91.3
+  },
+  {
+   "id": "LC09_L2SP_013032_20260724_02_T1",
+   "tier": "T1",
+   "time_utc": "2026-07-24T15:33:25Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 2.9,
+   "clear_land_pct": 86.6
+  },
+  {
+   "id": "LC09_L2SP_014032_20260731_02_T1",
+   "tier": "T1",
+   "time_utc": "2026-07-31T15:39:39Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 17.6,
+   "clear_land_pct": 64.5
+  },
+  {
+   "id": "LC09_L2SP_013032_20260809_02_T1",
+   "tier": "T1",
+   "time_utc": "2026-08-09T15:33:30Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 13.2,
+   "clear_land_pct": 92.8
+  },
+  {
+   "id": "LC08_L2SP_013032_20260817_02_T2",
+   "tier": "T2",
+   "time_utc": "2026-08-17T15:33:24Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 3.8,
+   "clear_land_pct": 100.0
+  },
+  {
+   "id": "LC08_L2SP_014032_20260824_02_T1",
+   "tier": "T1",
+   "time_utc": "2026-08-24T15:39:39Z",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 16.5,
+   "clear_land_pct": 11.0
+  },
+  {
+   "id": "LC09_L2SP_013032_20260825_02_T1",
+   "tier": "T1",
+   "time_utc": "2026-08-25T15:33:33Z",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 8.5,
+   "clear_land_pct": 62.1
+  }
+ ],
+ "first": "2023-07-23",
+ "last": "2026-08-08",
+ "n_images": 18,
+ "local_time": "about 11:35 am Eastern Daylight Time",
+ "cell_spread_f_median": 5.1,
+ "cell_spread_f_p90": 8.3,
+ "land_cells": 96600,
+ "land_cells_clear_in_every_image": 82290
+}
