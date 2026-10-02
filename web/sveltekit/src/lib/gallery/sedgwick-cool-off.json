@@ -4,8 +4,8 @@
  "address": "1520 Sedgwick Avenue, Bronx, NY",
  "question": "Where can people cool off near 1520 Sedgwick Avenue, Bronx?",
  "hazard": "heat",
- "generated_at": "2026-10-02T16:26Z",
- "riprap_commit": "a0f50ef",
+ "generated_at": "2026-10-02T17:04Z",
+ "riprap_commit": "041f401",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -2209,9 +2209,9 @@
     "title": "NWS station observations (api.weather.gov/stations/{id}/observations/latest): air temperature, relative humidity and heat index at the nearest of the region's airport and Central Park stations.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T16:26Z",
-    "retrieved_at": "2026-10-02T16:26Z",
-    "vintage": "2026-10-02T16:26Z",
+    "date_modified": "2026-10-02T17:04Z",
+    "retrieved_at": "2026-10-02T17:04Z",
+    "vintage": "2026-10-02T17:04Z",
     "maturity": "production"
    },
    "heat_station": {
@@ -2220,9 +2220,9 @@
     "title": "NOAA Regional Climate Centers, ACIS web services (data.rcc- acis.org/StnData): daily maximum temperature at the threaded station records for Central Park, LaGuardia Airport and JFK Airport; yearly counts of days at or above 90\u00b0F and yearly maxima.",
     "url": "https://www.rcc-acis.org/docs_webservices.html",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T16:26Z",
-    "retrieved_at": "2026-10-02T16:26Z",
-    "vintage": "2026-10-02T16:26Z",
+    "date_modified": "2026-10-02T17:04Z",
+    "retrieved_at": "2026-10-02T17:04Z",
+    "vintage": "2026-10-02T17:04Z",
     "maturity": "production"
    },
    "nws_heat_alerts": {
@@ -2231,9 +2231,9 @@
     "title": "NWS active alerts at the place (api.weather.gov/alerts/active), heat events only: Heat Advisory, Extreme Heat Watch, Extreme Heat Warning.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T16:26Z",
-    "retrieved_at": "2026-10-02T16:26Z",
-    "vintage": "2026-10-02T16:26Z",
+    "date_modified": "2026-10-02T17:04Z",
+    "retrieved_at": "2026-10-02T17:04Z",
+    "vintage": "2026-10-02T17:04Z",
     "maturity": "production"
    },
    "nws_heat_forecast": {
@@ -2242,9 +2242,9 @@
     "title": "NWS gridpoint forecast for the 2.5 km cell containing the place (api.weather.gov/gridpoints): daytime high temperatures and hourly apparent temperature. Advisory criteria from the New York office's definitions page (weather.gov/okx/wwa_definitions, read 2026-10-02).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T16:26Z",
-    "retrieved_at": "2026-10-02T16:26Z",
-    "vintage": "2026-10-02T16:26Z",
+    "date_modified": "2026-10-02T17:04Z",
+    "retrieved_at": "2026-10-02T17:04Z",
+    "vintage": "2026-10-02T17:04Z",
     "maturity": "production"
    },
    "npcc4_heat": {
@@ -2329,7 +2329,7 @@
    "latest_city_mean_f": 97.9,
    "warmer_in_every_image": false,
    "cooler_in_every_image": true,
-   "narrative": "Landsat measured the surface of the ground within 150 m of this address at 4.0\u00b0F cooler than the city's land average, over 16 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 2.7 to 4.9\u00b0F cooler. In the latest image, on 2026-08-08, the surface here read 93.0\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
+   "narrative": "Landsat measured the surface of the ground within 150 m of this address at 4.0\u00b0F cooler than the city's land average, over 16 of the 18 clear summer images (the others did not see enough of this place) from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 2.7 to 4.9\u00b0F cooler. In the latest image, on 2026-08-08, the surface here read 93.0\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
    "headline_value": "-4.0\u00b0F against the city's land average",
    "radius_m": 150
   },
@@ -2342,7 +2342,7 @@
    "ac_pct": 79.7,
    "green_pct": 25.9,
    "median_income": 30532,
-   "narrative": "The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores University Heights (South)-Morris Heights, the neighbourhood around this address, at 5 out of 5, the highest risk group. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. For University Heights (South)-Morris Heights the department lists 79.7% of households with air conditioning and 25.9% green space.",
+   "narrative": "The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores University Heights (South)-Morris Heights, the neighbourhood around this address, at 5 out of 5, the highest risk group. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. For University Heights (South)-Morris Heights the department's file gives 79.7% of households with air conditioning (a survey estimate it shares across neighbouring neighbourhoods) and 25.9% green space.",
    "headline_value": "5 of 5 (University Heights (South)-Morris Heights)"
   },
   "heat_visits": {
@@ -2384,12 +2384,12 @@
    "station": "LaGuardia Airport",
    "station_id": "KLGA",
    "distance_km": 8.4,
-   "observed": "2026-10-02 11:55",
-   "temp_f": 81,
-   "heat_index_f": 82,
-   "humidity_pct": 54,
-   "narrative": "The air at LaGuardia Airport, the nearest weather station (8.4 km away), was 81\u00b0F at 11:55 on 2026-10-02, with a heat index of 82\u00b0F. This is the station's reading, not this address's.",
-   "headline_value": "81\u00b0F at LaGuardia Airport"
+   "observed": "2026-10-02 12:40",
+   "temp_f": 82,
+   "heat_index_f": 84,
+   "humidity_pct": 55,
+   "narrative": "The air at LaGuardia Airport, the nearest weather station (8.4 km away), was 82\u00b0F at 12:40 Eastern on 2026-10-02, with a heat index of 84\u00b0F. This is the station's reading, not this address's.",
+   "headline_value": "82\u00b0F at LaGuardia Airport"
   },
   "heat_station": {
    "station": "LaGuardia Airport",
@@ -2589,7 +2589,7 @@
    "record_since": "1939",
    "max_f": 104,
    "max_date": "2026-07-02",
-   "narrative": "At LaGuardia Airport, the nearest long-record weather station (8.4 km away), the air temperature reached 90\u00b0F on 20 days in 2026 through 2026-10-01 and on 26 in 2025; the 1991 to 2020 average is 22 a year. The highest reading of 2026 was 104\u00b0F on 2026-07-02, and the station's record is 107\u00b0F, set on 1966-07-03 (records from 1939). These are the station's readings, not this address's.",
+   "narrative": "At LaGuardia Airport, the nearest long-record weather station (8.4 km away), the air temperature reached 90\u00b0F on 20 days in 2026 through 2026-10-01 and on 26 in 2025; a full year averaged 22 in 1991 to 2020. The highest reading of 2026 was 104\u00b0F on 2026-07-02, and the station's record is 107\u00b0F, set on 1966-07-03 (records from 1939). These are the station's readings, not this address's.",
    "headline_value": "20 days at 90\u00b0F or above in 2026 (LaGuardia Airport)"
   },
   "cool_features": {
@@ -2616,8 +2616,8 @@
   "nws_heat_alerts": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 16:26 UTC.",
-   "retrieved_at": "2026-10-02T16:26:55Z",
+   "narrative": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-02 17:04 UTC.",
+   "retrieved_at": "2026-10-02T17:04:15Z",
    "error": null
   },
   "nws_heat_forecast": {
@@ -2737,14 +2737,14 @@
      "90": 10
     }
    },
-   "narrative": "NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010; the 90th percentile is 69 days by the 2050s and 108 by the 2080s. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood."
+   "narrative": "NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010 (a baseline that matches Central Park's record, not an airport's); the 90th percentile is 69 days by the 2050s and 108 by the 2080s. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood."
   },
   "trace": [
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1790958414.724528,
-    "elapsed_s": 0.07,
+    "started_at": 1790960654.7874298,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "address": "1520 SEDGWICK AVENUE, Bronx, NY, USA",
@@ -2756,7 +2756,7 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790958414.797868,
+    "started_at": 1790960654.81802,
     "elapsed_s": 0.0001,
     "err": null,
     "result": {
@@ -2768,15 +2768,15 @@
    {
     "step": "heat_surface",
     "ok": true,
-    "started_at": 1790958414.798603,
-    "elapsed_s": 0.03,
+    "started_at": 1790960654.819123,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {}
    },
    {
     "step": "hvi",
     "ok": true,
-    "started_at": 1790958414.799318,
+    "started_at": 1790960654.8189702,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2784,7 +2784,7 @@
    {
     "step": "heat_visits",
     "ok": true,
-    "started_at": 1790958414.800378,
+    "started_at": 1790960654.820071,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2792,39 +2792,39 @@
    {
     "step": "city_landcover",
     "ok": true,
-    "started_at": 1790958414.800351,
-    "elapsed_s": 0.01,
+    "started_at": 1790960654.82158,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {}
    },
    {
     "step": "landcover",
     "ok": true,
-    "started_at": 1790958414.800321,
-    "elapsed_s": 0.05,
+    "started_at": 1790960654.8211231,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_obs",
     "ok": true,
-    "started_at": 1790958414.8015969,
-    "elapsed_s": 0.11,
+    "started_at": 1790960654.821159,
+    "elapsed_s": 0.12,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_station",
     "ok": true,
-    "started_at": 1790958414.8035252,
-    "elapsed_s": 0.14,
+    "started_at": 1790960654.824548,
+    "elapsed_s": 0.16,
     "err": null,
     "result": {}
    },
    {
     "step": "cool_features",
     "ok": true,
-    "started_at": 1790958414.805163,
+    "started_at": 1790960654.8251112,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2832,23 +2832,23 @@
    {
     "step": "nws_heat_alerts",
     "ok": true,
-    "started_at": 1790958414.8073359,
-    "elapsed_s": 0.21,
+    "started_at": 1790960654.824617,
+    "elapsed_s": 0.22,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_forecast",
     "ok": true,
-    "started_at": 1790958414.807304,
-    "elapsed_s": 0.33,
+    "started_at": 1790960654.824647,
+    "elapsed_s": 0.25,
     "err": null,
     "result": {}
    },
    {
     "step": "npcc4_heat",
     "ok": true,
-    "started_at": 1790958414.807366,
+    "started_at": 1790960654.825784,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2856,7 +2856,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790958415.142682,
+    "started_at": 1790960655.0765572,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2865,7 +2865,7 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790958415.142805,
+    "started_at": 1790960655.07663,
     "ok": true,
     "result": {
      "n_chars": 1273,
@@ -2873,7 +2873,7 @@
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0032
+    "elapsed_s": 0.002
    }
   ],
   "models": [

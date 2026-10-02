@@ -4,8 +4,8 @@
  "address": "East Harlem",
  "question": "Is East Harlem hotter than the rest of the city?",
  "hazard": "heat",
- "generated_at": "2026-10-02T16:26Z",
- "riprap_commit": "a0f50ef",
+ "generated_at": "2026-10-02T17:04Z",
+ "riprap_commit": "041f401",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -2110,9 +2110,9 @@
    "n_matches": 1
   },
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: Landsat measured the surface of this area at 1.0\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.0 to 3.1\u00b0F warmer [heat_surface_nta]. In the latest image, on 2026-08-08, the surface here read 98.5\u00b0F against a city average of 97.9\u00b0F [heat_surface_nta]. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: Landsat measured the surface of this area (its parks and open land included) at 1.0\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.0 to 3.1\u00b0F warmer [heat_surface_nta]. In the latest image, on 2026-08-08, the surface here read 98.5\u00b0F against a city average of 97.9\u00b0F [heat_surface_nta]. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: Landsat measured the surface of this area at 1.0\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.0 to 3.1\u00b0F warmer [heat_surface_nta]. In the latest image, on 2026-08-08, the surface here read 98.5\u00b0F against a city average of 97.9\u00b0F [heat_surface_nta]. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**Answer.**\nFrom the sources consulted: Landsat measured the surface of this area (its parks and open land included) at 1.0\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.0 to 3.1\u00b0F warmer [heat_surface_nta]. In the latest image, on 2026-08-08, the surface here read 98.5\u00b0F against a city average of 97.9\u00b0F [heat_surface_nta]. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -2123,7 +2123,7 @@
    "claims": [
     {
      "section": "answer",
-     "text": "Landsat measured the surface of this area at 1.0\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.0 to 3.1\u00b0F warmer. In the latest image, on 2026-08-08, the surface here read 98.5\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
+     "text": "Landsat measured the surface of this area (its parks and open land included) at 1.0\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.0 to 3.1\u00b0F warmer. In the latest image, on 2026-08-08, the surface here read 98.5\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
      "doc_ids": [
       "heat_surface_nta"
      ],
@@ -2220,9 +2220,9 @@
     "title": "NWS station observations (api.weather.gov/stations/{id}/observations/latest): air temperature, relative humidity and heat index at the nearest of the region's airport and Central Park stations.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T16:26Z",
-    "retrieved_at": "2026-10-02T16:26Z",
-    "vintage": "2026-10-02T16:26Z",
+    "date_modified": "2026-10-02T17:04Z",
+    "retrieved_at": "2026-10-02T17:04Z",
+    "vintage": "2026-10-02T17:04Z",
     "maturity": "production"
    },
    "heat_station_nta": {
@@ -2231,9 +2231,9 @@
     "title": "NOAA Regional Climate Centers, ACIS web services (data.rcc- acis.org/StnData): daily maximum temperature at the threaded station records for Central Park, LaGuardia Airport and JFK Airport; yearly counts of days at or above 90\u00b0F and yearly maxima.",
     "url": "https://www.rcc-acis.org/docs_webservices.html",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T16:26Z",
-    "retrieved_at": "2026-10-02T16:26Z",
-    "vintage": "2026-10-02T16:26Z",
+    "date_modified": "2026-10-02T17:04Z",
+    "retrieved_at": "2026-10-02T17:04Z",
+    "vintage": "2026-10-02T17:04Z",
     "maturity": "production"
    },
    "cool_features_nta": {
@@ -2253,9 +2253,9 @@
     "title": "NWS active alerts at the place (api.weather.gov/alerts/active), heat events only: Heat Advisory, Extreme Heat Watch, Extreme Heat Warning.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T16:26Z",
-    "retrieved_at": "2026-10-02T16:26Z",
-    "vintage": "2026-10-02T16:26Z",
+    "date_modified": "2026-10-02T17:04Z",
+    "retrieved_at": "2026-10-02T17:04Z",
+    "vintage": "2026-10-02T17:04Z",
     "maturity": "production"
    },
    "nws_heat_forecast_nta": {
@@ -2264,9 +2264,9 @@
     "title": "NWS gridpoint forecast for the 2.5 km cell containing the place (api.weather.gov/gridpoints): daytime high temperatures and hourly apparent temperature. Advisory criteria from the New York office's definitions page (weather.gov/okx/wwa_definitions, read 2026-10-02).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T16:26Z",
-    "retrieved_at": "2026-10-02T16:26Z",
-    "vintage": "2026-10-02T16:26Z",
+    "date_modified": "2026-10-02T17:04Z",
+    "retrieved_at": "2026-10-02T17:04Z",
+    "vintage": "2026-10-02T17:04Z",
     "maturity": "production"
    },
    "npcc4_heat_nta": {
@@ -2532,7 +2532,7 @@
    "latest_city_mean_f": 97.9,
    "warmer_in_every_image": false,
    "cooler_in_every_image": false,
-   "narrative": "Landsat measured the surface of this area at 1.0\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.0 to 3.1\u00b0F warmer. In the latest image, on 2026-08-08, the surface here read 98.5\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
+   "narrative": "Landsat measured the surface of this area (its parks and open land included) at 1.0\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.0 to 3.1\u00b0F warmer. In the latest image, on 2026-08-08, the surface here read 98.5\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
    "headline_value": "+1.0\u00b0F against the city's land average"
   },
   "hvi_nta": {
@@ -2544,7 +2544,7 @@
    "ac_pct": 84.9,
    "green_pct": 27.5,
    "median_income": 30740,
-   "narrative": "The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores East Harlem (North) at 5 out of 5, the highest risk group. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. For East Harlem (North) the department lists 84.9% of households with air conditioning and 27.5% green space.",
+   "narrative": "The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores East Harlem (North) at 5 out of 5, the highest risk group. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. For East Harlem (North) the department's file gives 84.9% of households with air conditioning (a survey estimate it shares across neighbouring neighbourhoods) and 27.5% green space.",
    "headline_value": "5 of 5 (East Harlem (North))"
   },
   "heat_visits_nta": {
@@ -2588,7 +2588,7 @@
    "temp_f": 77,
    "heat_index_f": 78,
    "humidity_pct": 69,
-   "narrative": "The air at Central Park, the nearest weather station (3.7 km away), was 77\u00b0F at 11:51 on 2026-10-02, with a heat index of 78\u00b0F. This is the station's reading, not this area's.",
+   "narrative": "The air at Central Park, the nearest weather station (3.7 km away), was 77\u00b0F at 11:51 Eastern on 2026-10-02, with a heat index of 78\u00b0F. This is the station's reading, not this area's.",
    "headline_value": "77\u00b0F at Central Park"
   },
   "heat_station_nta": {
@@ -2789,7 +2789,7 @@
    "record_since": "1869",
    "max_f": 100,
    "max_date": "2026-07-02",
-   "narrative": "At Central Park, the nearest long-record weather station (3.7 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; the 1991 to 2020 average is 17 a year. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869). These are the station's readings, not this area's.",
+   "narrative": "At Central Park, the nearest long-record weather station (3.7 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-01 and on 14 in 2025; a full year averaged 17 in 1991 to 2020. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869). These are the station's readings, not this area's.",
    "headline_value": "12 days at 90\u00b0F or above in 2026 (Central Park)"
   },
   "cool_features_nta": {
@@ -2822,8 +2822,8 @@
   "nws_heat_alerts_nta": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS heat advisory, watch or warning for this area, checked 2026-10-02 16:26 UTC.",
-   "retrieved_at": "2026-10-02T16:26:47Z",
+   "narrative": "No active NWS heat advisory, watch or warning for this area, checked 2026-10-02 17:04 UTC.",
+   "retrieved_at": "2026-10-02T17:04:07Z",
    "error": null
   },
   "nws_heat_forecast_nta": {
@@ -2943,13 +2943,13 @@
      "90": 10
     }
    },
-   "narrative": "NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010; the 90th percentile is 69 days by the 2050s and 108 by the 2080s. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood."
+   "narrative": "NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010 (a baseline that matches Central Park's record, not an airport's); the 90th percentile is 69 days by the 2050s and 108 by the 2080s. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood."
   },
   "trace": [
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790958407.042623,
+    "started_at": 1790960646.964051,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2968,8 +2968,8 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790958407.043493,
-    "elapsed_s": 0.0001,
+    "started_at": 1790960646.9644449,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "deployment": "nyc",
@@ -2980,87 +2980,87 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1790958407.045016,
-    "elapsed_s": 0.02,
+    "started_at": 1790960646.965884,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_surface_nta",
     "ok": true,
-    "started_at": 1790958407.0457401,
-    "elapsed_s": 0.07,
+    "started_at": 1790960646.9663098,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {}
    },
    {
     "step": "hvi_nta",
     "ok": true,
-    "started_at": 1790958407.047133,
-    "elapsed_s": 0.01,
+    "started_at": 1790960646.965912,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_visits_nta",
     "ok": true,
-    "started_at": 1790958407.049126,
-    "elapsed_s": 0.01,
+    "started_at": 1790960646.9658492,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {}
    },
    {
     "step": "city_landcover_nta",
     "ok": true,
-    "started_at": 1790958407.049054,
-    "elapsed_s": 0.03,
+    "started_at": 1790960646.9669492,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "landcover_nta",
     "ok": true,
-    "started_at": 1790958407.062231,
-    "elapsed_s": 0.06,
+    "started_at": 1790960646.967206,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_obs_nta",
     "ok": true,
-    "started_at": 1790958407.069846,
-    "elapsed_s": 0.12,
+    "started_at": 1790960646.970313,
+    "elapsed_s": 0.14,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_station_nta",
     "ok": true,
-    "started_at": 1790958407.070003,
-    "elapsed_s": 0.15,
+    "started_at": 1790960646.9685938,
+    "elapsed_s": 0.14,
     "err": null,
     "result": {}
    },
    {
     "step": "cool_features_nta",
     "ok": true,
-    "started_at": 1790958407.070061,
-    "elapsed_s": 0.02,
+    "started_at": 1790960646.968349,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_alerts_nta",
     "ok": true,
-    "started_at": 1790958407.070112,
-    "elapsed_s": 0.27,
+    "started_at": 1790960646.9732559,
+    "elapsed_s": 0.2,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_forecast_nta",
     "ok": true,
-    "started_at": 1790958407.0709262,
+    "started_at": 1790960646.9720478,
     "elapsed_s": 0.23,
     "err": null,
     "result": {}
@@ -3068,15 +3068,15 @@
    {
     "step": "npcc4_heat_nta",
     "ok": true,
-    "started_at": 1790958407.0711732,
-    "elapsed_s": 0.01,
+    "started_at": 1790960646.9752672,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {}
    },
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790958407.343207,
+    "started_at": 1790960647.203118,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -3085,15 +3085,15 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790958407.343294,
+    "started_at": 1790960647.203199,
     "ok": true,
     "result": {
-     "n_chars": 1103,
+     "n_chars": 1138,
      "n_citations": 12,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0576
+    "elapsed_s": 0.0617
    }
   ],
   "models": [

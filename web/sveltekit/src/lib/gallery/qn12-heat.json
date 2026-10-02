@@ -4,8 +4,8 @@
  "address": "QN12",
  "question": null,
  "hazard": "heat",
- "generated_at": "2026-10-02T16:26Z",
- "riprap_commit": "a0f50ef",
+ "generated_at": "2026-10-02T17:04Z",
+ "riprap_commit": "041f401",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -2109,9 +2109,9 @@
    "n_matches": 1
   },
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThe surface of this area ran 5.3\u00b0F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature) [heat_surface_nta]. 18.9% of this area is under tree canopy and 67.1% is paved or built over on the city's 2017 land cover map [city_landcover_nta]. This area scores 5 out of 5 on the Health Department's Heat Vulnerability Index, a rank among neighbourhoods and not a measurement [hvi_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. Landsat measured the surface of this area at 5.3\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 4.1 to 7.4\u00b0F warmer [heat_surface_nta]. In the latest image, on 2026-08-08, the surface here read 102.1\u00b0F against a city average of 97.9\u00b0F [heat_surface_nta]. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels. The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Queens community district 12 at 5 out of 5, the highest risk group; its neighbourhoods score Baisley Park 5, Hollis 5, Jamaica 5, South Jamaica 5, Springfield Gardens (North)-Rochdale Village 5, St. Albans 5 [hvi_nta]. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. Residents of Queens community district 12 made 79 emergency department visits for heat illness in May to September of 2018 to 2022, an age-adjusted rate of 7.6 per 100,000 a year against 6.0 citywide (NYC Health Department, from state hospital records) [heat_visits_nta]. Visits are counted by where the patient lives, and only when diagnosed as heat illness. New York City's 2017 land cover map (6 inch, from LiDAR and aerial imagery) shows that 67.1% of this area is paved or built over and 32.3% is green (18.9% tree canopy) [city_landcover_nta].\n\n**Live Observer.**\nAt JFK Airport, the nearest long-record weather station (6.0 km away), the air temperature reached 90\u00b0F on 10 days in 2026 through 2026-10-01 and on 15 in 2025; the 1991 to 2020 average is 11 a year [heat_station_nta]. The highest reading of 2026 was 102\u00b0F on 2026-07-02, and the station's record is 104\u00b0F, set on 1966-07-03 (records from 1948) [heat_station_nta]. These are the station's readings, not this area's.\n\n**Asset Register.**\nNYC Parks lists spray showers at 26 parks or playgrounds, 2 outdoor pools and 1 indoor pool in this area (lists updated 2026-09-03 and 2026-09-15); the pools are Liberty Pool, Liberty Wading Pool, Roy Wilkins Pool [cool_features_nta]. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311) [cool_features_nta].\n\n**Projector.**\nNo active NWS heat advisory, watch or warning for this area, checked 2026-10-02 16:26 UTC [nws_heat_alerts_nta]. NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010; the 90th percentile is 69 days by the 2050s and 108 by the 2080s [npcc4_heat_nta]. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9 [npcc4_heat_nta]. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood [npcc4_heat_nta].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThe surface of this area ran 5.3\u00b0F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature) [heat_surface_nta]. 18.9% of this area is under tree canopy and 67.1% is paved or built over on the city's 2017 land cover map [city_landcover_nta]. This area scores 5 out of 5 on the Health Department's Heat Vulnerability Index, a rank among neighbourhoods and not a measurement [hvi_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. Landsat measured the surface of this area (its parks and open land included) at 5.3\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 4.1 to 7.4\u00b0F warmer [heat_surface_nta]. In the latest image, on 2026-08-08, the surface here read 102.1\u00b0F against a city average of 97.9\u00b0F [heat_surface_nta]. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels. The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Queens community district 12 at 5 out of 5, the highest risk group; its neighbourhoods score Baisley Park 5, Hollis 5, Jamaica 5, South Jamaica 5, Springfield Gardens (North)-Rochdale Village 5, St. Albans 5 [hvi_nta]. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. Residents of Queens community district 12 made 79 emergency department visits for heat illness in May to September of 2018 to 2022, an age-adjusted rate of 7.6 per 100,000 a year against 6.0 citywide (NYC Health Department, from state hospital records) [heat_visits_nta]. Visits are counted by where the patient lives, and only when diagnosed as heat illness. New York City's 2017 land cover map (6 inch, from LiDAR and aerial imagery) shows that 67.1% of this area is paved or built over and 32.3% is green (18.9% tree canopy) [city_landcover_nta].\n\n**Live Observer.**\nAt JFK Airport, the nearest long-record weather station (6.0 km away), the air temperature reached 90\u00b0F on 10 days in 2026 through 2026-10-01 and on 15 in 2025; a full year averaged 11 in 1991 to 2020 [heat_station_nta]. The highest reading of 2026 was 102\u00b0F on 2026-07-02, and the station's record is 104\u00b0F, set on 1966-07-03 (records from 1948) [heat_station_nta]. These are the station's readings, not this area's.\n\n**Asset Register.**\nNYC Parks lists spray showers at 26 parks or playgrounds, 2 outdoor pools and 1 indoor pool in this area (lists updated 2026-09-03 and 2026-09-15); the pools are Liberty Pool, Liberty Wading Pool, Roy Wilkins Pool [cool_features_nta]. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311) [cool_features_nta].\n\n**Projector.**\nNo active NWS heat advisory, watch or warning for this area, checked 2026-10-02 17:04 UTC [nws_heat_alerts_nta]. NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010 (a baseline that matches Central Park's record, not an airport's); the 90th percentile is 69 days by the 2050s and 108 by the 2080s [npcc4_heat_nta]. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9 [npcc4_heat_nta]. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood [npcc4_heat_nta].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThe surface of this area ran 5.3\u00b0F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature) [heat_surface_nta]. 18.9% of this area is under tree canopy and 67.1% is paved or built over on the city's 2017 land cover map [city_landcover_nta]. This area scores 5 out of 5 on the Health Department's Heat Vulnerability Index, a rank among neighbourhoods and not a measurement [hvi_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. Landsat measured the surface of this area at 5.3\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 4.1 to 7.4\u00b0F warmer [heat_surface_nta]. In the latest image, on 2026-08-08, the surface here read 102.1\u00b0F against a city average of 97.9\u00b0F [heat_surface_nta]. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels. The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Queens community district 12 at 5 out of 5, the highest risk group; its neighbourhoods score Baisley Park 5, Hollis 5, Jamaica 5, South Jamaica 5, Springfield Gardens (North)-Rochdale Village 5, St. Albans 5 [hvi_nta]. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. Residents of Queens community district 12 made 79 emergency department visits for heat illness in May to September of 2018 to 2022, an age-adjusted rate of 7.6 per 100,000 a year against 6.0 citywide (NYC Health Department, from state hospital records) [heat_visits_nta]. Visits are counted by where the patient lives, and only when diagnosed as heat illness. New York City's 2017 land cover map (6 inch, from LiDAR and aerial imagery) shows that 67.1% of this area is paved or built over and 32.3% is green (18.9% tree canopy) [city_landcover_nta].\n\n**Live Observer.**\nAt JFK Airport, the nearest long-record weather station (6.0 km away), the air temperature reached 90\u00b0F on 10 days in 2026 through 2026-10-01 and on 15 in 2025; the 1991 to 2020 average is 11 a year [heat_station_nta]. The highest reading of 2026 was 102\u00b0F on 2026-07-02, and the station's record is 104\u00b0F, set on 1966-07-03 (records from 1948) [heat_station_nta]. These are the station's readings, not this area's.\n\n**Asset Register.**\nNYC Parks lists spray showers at 26 parks or playgrounds, 2 outdoor pools and 1 indoor pool in this area (lists updated 2026-09-03 and 2026-09-15); the pools are Liberty Pool, Liberty Wading Pool, Roy Wilkins Pool [cool_features_nta]. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311) [cool_features_nta].\n\n**Projector.**\nNo active NWS heat advisory, watch or warning for this area, checked 2026-10-02 16:26 UTC [nws_heat_alerts_nta]. NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010; the 90th percentile is 69 days by the 2050s and 108 by the 2080s [npcc4_heat_nta]. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9 [npcc4_heat_nta]. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood [npcc4_heat_nta].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment.\n\n**In brief.**\nThe surface of this area ran 5.3\u00b0F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature) [heat_surface_nta]. 18.9% of this area is under tree canopy and 67.1% is paved or built over on the city's 2017 land cover map [city_landcover_nta]. This area scores 5 out of 5 on the Health Department's Heat Vulnerability Index, a rank among neighbourhoods and not a measurement [hvi_nta].\n\n**Hazard Reader.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. Landsat measured the surface of this area (its parks and open land included) at 5.3\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 4.1 to 7.4\u00b0F warmer [heat_surface_nta]. In the latest image, on 2026-08-08, the surface here read 102.1\u00b0F against a city average of 97.9\u00b0F [heat_surface_nta]. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels. The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Queens community district 12 at 5 out of 5, the highest risk group; its neighbourhoods score Baisley Park 5, Hollis 5, Jamaica 5, South Jamaica 5, Springfield Gardens (North)-Rochdale Village 5, St. Albans 5 [hvi_nta]. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. Residents of Queens community district 12 made 79 emergency department visits for heat illness in May to September of 2018 to 2022, an age-adjusted rate of 7.6 per 100,000 a year against 6.0 citywide (NYC Health Department, from state hospital records) [heat_visits_nta]. Visits are counted by where the patient lives, and only when diagnosed as heat illness. New York City's 2017 land cover map (6 inch, from LiDAR and aerial imagery) shows that 67.1% of this area is paved or built over and 32.3% is green (18.9% tree canopy) [city_landcover_nta].\n\n**Live Observer.**\nAt JFK Airport, the nearest long-record weather station (6.0 km away), the air temperature reached 90\u00b0F on 10 days in 2026 through 2026-10-01 and on 15 in 2025; a full year averaged 11 in 1991 to 2020 [heat_station_nta]. The highest reading of 2026 was 102\u00b0F on 2026-07-02, and the station's record is 104\u00b0F, set on 1966-07-03 (records from 1948) [heat_station_nta]. These are the station's readings, not this area's.\n\n**Asset Register.**\nNYC Parks lists spray showers at 26 parks or playgrounds, 2 outdoor pools and 1 indoor pool in this area (lists updated 2026-09-03 and 2026-09-15); the pools are Liberty Pool, Liberty Wading Pool, Roy Wilkins Pool [cool_features_nta]. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311) [cool_features_nta].\n\n**Projector.**\nNo active NWS heat advisory, watch or warning for this area, checked 2026-10-02 17:04 UTC [nws_heat_alerts_nta]. NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010 (a baseline that matches Central Park's record, not an airport's); the 90th percentile is 69 days by the 2050s and 108 by the 2080s [npcc4_heat_nta]. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9 [npcc4_heat_nta]. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood [npcc4_heat_nta].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -2193,9 +2193,9 @@
     "title": "NWS station observations (api.weather.gov/stations/{id}/observations/latest): air temperature, relative humidity and heat index at the nearest of the region's airport and Central Park stations.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T16:26Z",
-    "retrieved_at": "2026-10-02T16:26Z",
-    "vintage": "2026-10-02T16:26Z",
+    "date_modified": "2026-10-02T17:04Z",
+    "retrieved_at": "2026-10-02T17:04Z",
+    "vintage": "2026-10-02T17:04Z",
     "maturity": "production"
    },
    "heat_station_nta": {
@@ -2204,9 +2204,9 @@
     "title": "NOAA Regional Climate Centers, ACIS web services (data.rcc- acis.org/StnData): daily maximum temperature at the threaded station records for Central Park, LaGuardia Airport and JFK Airport; yearly counts of days at or above 90\u00b0F and yearly maxima.",
     "url": "https://www.rcc-acis.org/docs_webservices.html",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T16:26Z",
-    "retrieved_at": "2026-10-02T16:26Z",
-    "vintage": "2026-10-02T16:26Z",
+    "date_modified": "2026-10-02T17:04Z",
+    "retrieved_at": "2026-10-02T17:04Z",
+    "vintage": "2026-10-02T17:04Z",
     "maturity": "production"
    },
    "cool_features_nta": {
@@ -2226,9 +2226,9 @@
     "title": "NWS active alerts at the place (api.weather.gov/alerts/active), heat events only: Heat Advisory, Extreme Heat Watch, Extreme Heat Warning.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T16:26Z",
-    "retrieved_at": "2026-10-02T16:26Z",
-    "vintage": "2026-10-02T16:26Z",
+    "date_modified": "2026-10-02T17:04Z",
+    "retrieved_at": "2026-10-02T17:04Z",
+    "vintage": "2026-10-02T17:04Z",
     "maturity": "production"
    },
    "nws_heat_forecast_nta": {
@@ -2237,9 +2237,9 @@
     "title": "NWS gridpoint forecast for the 2.5 km cell containing the place (api.weather.gov/gridpoints): daytime high temperatures and hourly apparent temperature. Advisory criteria from the New York office's definitions page (weather.gov/okx/wwa_definitions, read 2026-10-02).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-02T16:26Z",
-    "retrieved_at": "2026-10-02T16:26Z",
-    "vintage": "2026-10-02T16:26Z",
+    "date_modified": "2026-10-02T17:04Z",
+    "retrieved_at": "2026-10-02T17:04Z",
+    "vintage": "2026-10-02T17:04Z",
     "maturity": "production"
    },
    "npcc4_heat_nta": {
@@ -2503,7 +2503,7 @@
    "latest_city_mean_f": 97.9,
    "warmer_in_every_image": true,
    "cooler_in_every_image": false,
-   "narrative": "Landsat measured the surface of this area at 5.3\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 4.1 to 7.4\u00b0F warmer. In the latest image, on 2026-08-08, the surface here read 102.1\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
+   "narrative": "Landsat measured the surface of this area (its parks and open land included) at 5.3\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 4.1 to 7.4\u00b0F warmer. In the latest image, on 2026-08-08, the surface here read 102.1\u00b0F against a city average of 97.9\u00b0F. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels.",
    "headline_value": "+5.3\u00b0F against the city's land average"
   },
   "hvi_nta": {
@@ -2578,12 +2578,12 @@
    "station": "JFK Airport",
    "station_id": "KJFK",
    "distance_km": 6.0,
-   "observed": "2026-10-02 12:00",
-   "temp_f": 75,
-   "heat_index_f": 76,
-   "humidity_pct": 69,
-   "narrative": "The air at JFK Airport, the nearest weather station (6.0 km away), was 75\u00b0F at 12:00 on 2026-10-02, with a heat index of 76\u00b0F. This is the station's reading, not this area's.",
-   "headline_value": "75\u00b0F at JFK Airport"
+   "observed": "2026-10-02 12:45",
+   "temp_f": 79,
+   "heat_index_f": 79,
+   "humidity_pct": 61,
+   "narrative": "The air at JFK Airport, the nearest weather station (6.0 km away), was 79\u00b0F at 12:45 Eastern on 2026-10-02, with a heat index of 79\u00b0F. This is the station's reading, not this area's.",
+   "headline_value": "79\u00b0F at JFK Airport"
   },
   "heat_station_nta": {
    "station": "JFK Airport",
@@ -2783,7 +2783,7 @@
    "record_since": "1948",
    "max_f": 102,
    "max_date": "2026-07-02",
-   "narrative": "At JFK Airport, the nearest long-record weather station (6.0 km away), the air temperature reached 90\u00b0F on 10 days in 2026 through 2026-10-01 and on 15 in 2025; the 1991 to 2020 average is 11 a year. The highest reading of 2026 was 102\u00b0F on 2026-07-02, and the station's record is 104\u00b0F, set on 1966-07-03 (records from 1948). These are the station's readings, not this area's.",
+   "narrative": "At JFK Airport, the nearest long-record weather station (6.0 km away), the air temperature reached 90\u00b0F on 10 days in 2026 through 2026-10-01 and on 15 in 2025; a full year averaged 11 in 1991 to 2020. The highest reading of 2026 was 102\u00b0F on 2026-07-02, and the station's record is 104\u00b0F, set on 1966-07-03 (records from 1948). These are the station's readings, not this area's.",
    "headline_value": "10 days at 90\u00b0F or above in 2026 (JFK Airport)"
   },
   "cool_features_nta": {
@@ -2830,8 +2830,8 @@
   "nws_heat_alerts_nta": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS heat advisory, watch or warning for this area, checked 2026-10-02 16:26 UTC.",
-   "retrieved_at": "2026-10-02T16:26:44Z",
+   "narrative": "No active NWS heat advisory, watch or warning for this area, checked 2026-10-02 17:04 UTC.",
+   "retrieved_at": "2026-10-02T17:04:04Z",
    "error": null
   },
   "nws_heat_forecast_nta": {
@@ -2951,13 +2951,13 @@
      "90": 10
     }
    },
-   "narrative": "NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010; the 90th percentile is 69 days by the 2050s and 108 by the 2080s. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood."
+   "narrative": "NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010 (a baseline that matches Central Park's record, not an airport's); the 90th percentile is 69 days by the 2050s and 108 by the 2080s. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood."
   },
   "trace": [
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790958404.1075919,
+    "started_at": 1790960643.807523,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2976,8 +2976,8 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790958404.111595,
-    "elapsed_s": 0.0059,
+    "started_at": 1790960643.808964,
+    "elapsed_s": 0.0027,
     "err": null,
     "result": {
      "deployment": "nyc",
@@ -2988,7 +2988,7 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1790958404.119071,
+    "started_at": 1790960643.8126762,
     "elapsed_s": 0.04,
     "err": null,
     "result": {}
@@ -2996,15 +2996,15 @@
    {
     "step": "heat_surface_nta",
     "ok": true,
-    "started_at": 1790958404.1197639,
-    "elapsed_s": 0.07,
+    "started_at": 1790960643.812743,
+    "elapsed_s": 0.04,
     "err": null,
     "result": {}
    },
    {
     "step": "hvi_nta",
     "ok": true,
-    "started_at": 1790958404.1210449,
+    "started_at": 1790960643.813153,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -3012,71 +3012,71 @@
    {
     "step": "heat_visits_nta",
     "ok": true,
-    "started_at": 1790958404.124104,
-    "elapsed_s": 0.02,
+    "started_at": 1790960643.813866,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "city_landcover_nta",
     "ok": true,
-    "started_at": 1790958404.123908,
-    "elapsed_s": 0.04,
+    "started_at": 1790960643.821416,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {}
    },
    {
     "step": "landcover_nta",
     "ok": true,
-    "started_at": 1790958404.124305,
-    "elapsed_s": 0.08,
+    "started_at": 1790960643.8213708,
+    "elapsed_s": 0.06,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_obs_nta",
     "ok": true,
-    "started_at": 1790958404.123968,
-    "elapsed_s": 0.15,
+    "started_at": 1790960643.823058,
+    "elapsed_s": 0.16,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_station_nta",
     "ok": true,
-    "started_at": 1790958404.123758,
-    "elapsed_s": 0.18,
+    "started_at": 1790960643.829354,
+    "elapsed_s": 0.19,
     "err": null,
     "result": {}
    },
    {
     "step": "cool_features_nta",
     "ok": true,
-    "started_at": 1790958404.125622,
-    "elapsed_s": 0.04,
+    "started_at": 1790960643.832684,
+    "elapsed_s": 0.02,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_alerts_nta",
     "ok": true,
-    "started_at": 1790958404.125373,
-    "elapsed_s": 0.19,
+    "started_at": 1790960643.837777,
+    "elapsed_s": 0.24,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_forecast_nta",
     "ok": true,
-    "started_at": 1790958404.1390011,
-    "elapsed_s": 0.3,
+    "started_at": 1790960643.839144,
+    "elapsed_s": 0.21,
     "err": null,
     "result": {}
    },
    {
     "step": "npcc4_heat_nta",
     "ok": true,
-    "started_at": 1790958404.143476,
+    "started_at": 1790960643.839865,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -3084,7 +3084,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790958404.444308,
+    "started_at": 1790960644.075053,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -3093,15 +3093,15 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790958404.4444191,
+    "started_at": 1790960644.07514,
     "ok": true,
     "result": {
-     "n_chars": 4542,
+     "n_chars": 4645,
      "n_citations": 12,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.002
+    "elapsed_s": 0.0016
    }
   ],
   "models": [
