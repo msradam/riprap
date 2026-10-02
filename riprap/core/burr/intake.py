@@ -116,6 +116,10 @@ NO_PLACE_HEAT = ("Riprap reads the records for one place at a time, and this que
 _WIDE_AREA_RE = re.compile(r"\b(?:(the bronx|bronx)|(brooklyn)|(manhattan)|(queens)|(staten island)"
                            r"|(nyc|new york city|the city|citywide|city-wide|the five boroughs))\b", re.IGNORECASE)
 _WIDE_CODES = ("BX", "BK", "MN", "QN", "SI", "NYC")
+_WIDE_NAMES = {"BX": "Bronx", "BK": "Brooklyn", "MN": "Manhattan", "QN": "Queens", "SI": "Staten Island"}
+# Words beside "heat" that name nothing: "extreme heat risk in the south Bronx" is the borough.
+_HEAT_FILLER = (r"\b(?:extreme|excessive|briefing|risk|exposure|hazard|profile|report|summer|the|in|at|for|of|on|an?|around|near|by"
+                r"|north|south|east|west|shore|side|central|upper|lower|please|and|wave|waves)\b|[^\w\s]")
 
 
 def _wide_area(q: str) -> str | None:
@@ -324,12 +328,17 @@ def _plan_for(q: str, hazard: str) -> dict:
         # (the whole question once went to the geocoder and came back as a
         # Weather Service office in Albany).
         if scope := _wide_area(q):
+            # Words left beside the borough that ask nothing name something in it ("heat briefing for curtis
+            # high school staten island" once got the whole borough): those words go to the geocoder.
+            rest = re.sub(_HEAT_FILLER, " ", _WIDE_AREA_RE.sub(" ", heat_answer.HEAT_RE.sub(" ", q)), flags=re.IGNORECASE).split()
+            if scope != "NYC" and len(rest) >= 2 and not heat_answer.asks_something(q) and not _QUESTION_RE.search(q):
+                return {"intent": "single_address", "rationale": "Heuristic match: single_address.", "place": place,
+                        "targets": [{"type": "address", "text": f"{' '.join(rest)}, {_WIDE_NAMES[scope]}, NY"}]}
             return {"intent": "neighborhood", "rationale": f"Heuristic match: {scope}.",
                     "targets": [{"type": "nta", "text": scope}], "place": place}
         # Nothing left once the heat words are gone ("heat", "extreme heat"): the word alone was once
         # geocoded to a heat-treating works in Brooklyn and briefed.
-        bare = re.sub(r"\b(?:extreme|excessive|briefing|risk|exposure|hazard|profile|report|summer|the|in|at|for|of|on|an?)\b",
-                      " ", heat_answer.HEAT_RE.sub(" ", _address_from_query(q)), flags=re.IGNORECASE).strip(" ,.?!")
+        bare = re.sub(_HEAT_FILLER, " ", heat_answer.HEAT_RE.sub(" ", _address_from_query(q)), flags=re.IGNORECASE).strip(" ,.?!")
         if not bare or (_QUESTION_RE.search(q) and not landmark_phrase(q)):
             return {"intent": "not_implemented", "rationale": NO_PLACE_HEAT, "targets": [], "place": place}
     # Only when the rest of the name is a direction: "Staten Island Mall" and "Bronx Zoo" are landmarks for the

@@ -84,6 +84,11 @@ NON_SCOPE_FOOTER = (
     "condition, or compliance with specific zoning rules. Where a probe "
     "was offline at run time, the relevant section omits that signal."
 )
+HEAT_NON_SCOPE_FOOTER = (
+    "**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or "
+    "predict the heat on a given day at a given address. Where a source was offline at run time, the relevant "
+    "section omits that signal."
+)
 
 
 # The three point DEP scenarios, in time order, and the words for each.
@@ -233,7 +238,11 @@ def _heat_lead(state, items, area: bool) -> str | None:
     v = state.get(f"heat_surface{sfx}")
     if f"heat_surface{sfx}" in by_pebble and isinstance(v, dict) and v.get("mean_diff_f") is not None:
         d = v["mean_diff_f"]
-        where = "this area" if area else f"the ground within {v['radius_m']:.0f} m of this address"
+        whole = (state.get("nta") or {}).get("nta_code") in ("BX", "BK", "MN", "QN", "SI", "NYC")
+        name = (state.get("nta") or {}).get("nta_name")
+        # A borough or the city is said to be one: a school that resolved to its borough once read "this area".
+        where = (f"{'the Bronx' if name == 'Bronx' else name} as a whole" if whole else "this area") if area \
+            else f"the ground within {v['radius_m']:.0f} m of this address"
         how = "within half a degree of" if abs(d) < 0.5 else f"{abs(d):.1f}°F {'warmer' if d > 0 else 'cooler'} than"
         add(f"heat_surface{sfx}", f"The surface of {where} ran {how} the city's land average over {v['n_images']} clear "
                                   "summer Landsat images (surface temperature, not air temperature)")
@@ -369,7 +378,7 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
             sections.append(f"**{evidence.stone_heading(stone)}**\n{body}")
     if len(sections) == 1:
         return nothing_built(state), {}
-    sections.append(NON_SCOPE_FOOTER)
+    sections.append(HEAT_NON_SCOPE_FOOTER if hazard_of(state.get("plan")) == "heat" else NON_SCOPE_FOOTER)
     return "\n\n".join(sections), evidence.citations(items)
 
 

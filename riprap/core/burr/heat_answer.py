@@ -241,6 +241,50 @@ _RANK_RE = re.compile(rf"\b(?:which|what)\s+{_PARTS}\b|\b(?:hottest|coolest|wors
                       r"|\bwhere\b[^?.]*\b(?:hottest|coolest|worst|most)\b", re.I)
 
 
+_MONTHS = ("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec")
+_MONTH_RE = re.compile(r"\b(" + "|".join(_MONTHS) + r")[a-z]*\b", re.I)
+
+
+def _beyond_forecast(q: str, today=None) -> bool:
+    """The question names a time the 7-day forecast cannot reach: next summer
+    or next year, or a month that is neither this one nor the next."""
+    from datetime import date
+
+    if _NEAR_RE.search(q):
+        return False
+    if re.search(r"\bnext (?:summer|year)\b|\b(?:labor|memorial|independence) day\b|\b(?:fourth|4th) of july\b|\bjuly fourth\b", q, re.I):
+        return True
+    now = (today or date.today()).month
+    named = {_MONTHS.index(m.group(1).lower()[:3]) + 1 for m in _MONTH_RE.finditer(q) if m.group(1).lower() != "may" or re.search(r"\bin may\b|\bmay \d", q, re.I)}
+    return bool(named) and not named & {now, now % 12 + 1}
+
+
+def places_named(question: str) -> list[str]:
+    """The neighbourhoods a question names, when it names more than one
+    tabulation area and is neither a comparison nor about a street address:
+    the answer covers one, and says so."""
+    from app.areas import nta  # noqa: PLC0415
+    from riprap.core.burr.intake import _heat_compare  # noqa: PLC0415
+    from riprap.core.burr.place import (  # noqa: PLC0415
+        _LANDMARK,
+        _known_neighbourhoods,
+        extract_address,
+    )
+
+    q = question or ""
+    if extract_address(q) or _heat_compare(q):
+        return []
+    low, found = q.lower(), {}
+    for n in sorted(_known_neighbourhoods(), key=len, reverse=True):
+        m = re.search(rf"\b{re.escape(n)}\b(?!\s+(?:{_SUFFIX}|{_LANDMARK})\b)", low)
+        if m and not any(m.start() >= v[0] and m.end() <= v[1] for v in found.values()) and (hits := nta.resolve(n)):
+            found[n] = (m.start(), m.end(), hits[0]["nta_code"])
+    spans = {}
+    for n, (_, _, code) in sorted(found.items(), key=lambda kv: kv[1][0]):
+        spans.setdefault(code, n.title())
+    return list(spans.values()) if len(spans) > 1 else []
+
+
 def answer(question: str, texts: dict[str, str], values: dict | None = None) -> tuple[str, list[str]] | None:
     """(lead, facts) for a heat question, or None when no heat source
     answered. Leads: "facts", "count", "heat_forecast", "no_prediction_heat",
@@ -262,6 +306,8 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     # ("My kids will inherit our house. How many more heat waves in the coming decades?" asks for the projection.)
     if (_INDOORS_RE.search(q) or _DATE_RE.search(q)) and (_WILL_RE.search(q) or _NEAR_RE.search(q)) and not (
             _FAR_RE.search(q) and not _DATE_RE.search(q)):
+        if _beyond_forecast(q) and (docs := have(SURFACE, STATION)):
+            return "no_prediction_far", docs  # this week's forecast says nothing about next July
         docs = have(FORECAST, ALERTS, SURFACE)
         return ("no_prediction_heat", docs) if docs else None
     if _DEATHS_RE.search(q):

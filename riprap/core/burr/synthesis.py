@@ -32,7 +32,12 @@ from burr.core import State, action
 
 from riprap.core import llm
 from riprap.core.burr import answer_checks, evidence, heat_answer, rule_answer
-from riprap.core.burr.templated_reconciler import NON_SCOPE_FOOTER, _scope_header, compose_briefing
+from riprap.core.burr.templated_reconciler import (
+    HEAT_NON_SCOPE_FOOTER,
+    NON_SCOPE_FOOTER,
+    _scope_header,
+    compose_briefing,
+)
 
 log = logging.getLogger("riprap.synthesis")
 
@@ -297,6 +302,9 @@ LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From
                 "no_ranking": "Riprap does not rank places against each other or pick out the worst part of one. The "
                               "record below is for the whole of the place named; ask about one neighbourhood or "
                               "community district for its own:",
+                "no_prediction_far": "Riprap cannot predict what will happen in one building, on one block or on a "
+                                     "named day: no source here does that, and the Weather Service's forecast runs "
+                                     "7 days ahead. What has been measured here:",
                 "no_score": "Riprap computes no score or rating of its own. The Health Department publishes an index "
                             "for the neighbourhood, quoted here with what it is and is not:",
                 "surface_yes": "At the surface, yes.", "surface_no": "At the surface, no."}
@@ -336,6 +344,8 @@ LIVE_POINTER = ("Riprap reads records, not the street. For a live depth reading 
                 "(weather.gov) and Notify NYC.")
 BOTH_HAZARDS = ("This question names flooding and heat. Riprap keeps them as separate briefings and does not weigh one "
                 "against the other: this is the flood record, and asking about heat alone at this place gives the heat record.")
+MORE_PLACES = ("This question names more than one place ({names}). Riprap reads one place at a time, and this answer is "
+               "for the place named at the top; ask about each on its own, or set two side by side with \"A vs B\".")
 HEAT_LIVE_POINTER = ("Riprap reads records, not the street. Official heat warnings come from the National Weather "
                      "Service (weather.gov/okx) and Notify NYC; during a heat emergency the city lists its cooling "
                      "centers at finder.nyc.gov/coolingcenters.")
@@ -397,8 +407,12 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
                                           not in d.text.lower() else d.text, d.doc_id, every=d.experimental)
                             for d in docs if d.section == sec)
         parts.append(f"**{sec}.**\n" + (body or NO_EVIDENCE_LINE))
-    pointer = HEAT_LIVE_POINTER if heat_answer.hazard_of(question) == "heat" else LIVE_POINTER
-    footer = NON_SCOPE_FOOTER.replace("**Out of scope.** ", f"**Out of scope.** {pointer} ", 1) if now else NON_SCOPE_FOOTER
+    heat = heat_answer.hazard_of(question) == "heat"
+    pointer = HEAT_LIVE_POINTER if heat else LIVE_POINTER
+    footer = HEAT_NON_SCOPE_FOOTER if heat else NON_SCOPE_FOOTER
+    footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {pointer} ", 1) if now else footer
+    if heat and (others := heat_answer.places_named(question)):
+        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {MORE_PLACES.format(names=_and(others))} ", 1)
     if question and re.search(r"\bflood", question, re.I) and re.search(r"\bheat\b|\bhott?(?:er|est)?\b", question, re.I) \
             and not heat_answer.INDOOR_HEATING_RE.search(question):
         # "Which is the bigger problem here, flooding or heat?" got the flood record and no word about heat.
@@ -534,6 +548,7 @@ def synthesize(state, use_llm: bool = True) -> dict:
             facts = [*facts, *(d for d in rule_answer.experimental(question, texts)[1] if d in absent and d not in facts)]
         answer = (rule_answer.soften(lead, facts, values), facts, [])
     lead_phrase, answer_flags, lead, lead_fact = "", notes, None, None
+    record_lead = False
     if question and ruled is not None:
         lead, facts, _ = answer
         rel = answer_checks.relevant_doc(question, texts)
@@ -549,9 +564,11 @@ def synthesize(state, use_llm: bool = True) -> dict:
                 lead_phrase = f"{sentence} {lead_phrase}"
         if lead == "count" and (days := heat_answer.count_sentence(question, facts, values)):
             lead_phrase = f"{days} {lead_phrase}"  # "how many days reached 90 in 2023": that year, from the station's record
+            record_lead = True
         elif lead == "facts" and (peak := heat_answer.year_sentence(question, facts, values)
                                   or heat_answer.record_sentence(question, facts, values)):
             lead_phrase = f"{peak} {lead_phrase}"  # "how hot did it get in 2025", "the hottest day on record"
+            record_lead = True
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
                                focus, texts, values, experimental)
     elif question:
@@ -605,7 +622,8 @@ def synthesize(state, use_llm: bool = True) -> dict:
                                focus, texts, values, experimental)
     checks = ["citations and numbers on every claim"]
     if question:
-        checks.append("lead rules on the answer, which is the cited text word for word")
+        checks.append("lead rules on the answer, which is the cited text word for word"
+                      + ("; its first sentence is read from the same station's yearly record" if record_lead else ""))
     # A bare address opens with the same verified "In brief" lead as no-LLM mode.
     from riprap.core.burr.stones import hazard_of
     from riprap.core.burr.templated_reconciler import _heat_lead, _lead

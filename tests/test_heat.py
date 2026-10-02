@@ -276,8 +276,6 @@ A = "90-01 183rd Street, Queens"
     # From the unseen set: an apartment by number, a calendar date, "the next 30 years", deaths, a pool's hours.
     (f"How hot will apartment 6C at {A} get on Saturday afternoon", "no_prediction_heat",
      ["nws_heat_forecast", "nws_heat_alerts", "heat_surface"]),
-    (f"Will the playground near {A} be too hot to use on the afternoon of July 15?", "no_prediction_heat",
-     ["nws_heat_forecast", "nws_heat_alerts", "heat_surface"]),
     (f"Is it going to keep getting hotter near {A} over the next 30 years", "facts", ["npcc4_heat"]),
     (f"How many heat-related deaths near {A} per year?", "cannot_answer", ["heat_visits"]),
     (f"Is the pool near {A} open today and are there spray showers?", "facts", ["cool_features"]),
@@ -595,7 +593,7 @@ def test_the_second_unseen_set():
     # The coming decades are the projection, even when the asker mentions a house.
     q = "My kids will inherit our house in Port Richmond. How many more heat waves is the city expecting there in the coming decades?"
     assert ha.answer(q, T)[0] == "facts" and ha.answer(q, T)[1][0] == "npcc4_heat"
-    assert ha.answer(f"Will my apartment at {A} overheat on July 4 2035?", T)[0] == "no_prediction_heat"
+    assert ha.answer(f"Will my apartment at {A} overheat on July 4 2035?", T)[0].startswith("no_prediction")
     # A rating by any wording is a score.
     q = "rate jackson heights heat risk on a scale of 1 to 10"
     assert ha.asks_something(q) and ha.answer(q, T) == ("no_score", ["hvi"])
@@ -664,7 +662,7 @@ def test_what_a_fresh_reviewer_broke():
     assert heuristic_plan("Will the playground at Tompkins Square Park be too hot to use on the afternoon of July 15?")["intent"] != "out_of_scope"
     # A named day by ordinal or by holiday is still a named day.
     for q in (f"Will it reach 100 on July 4th at {A}?", f"Will it be hot on Labor Day at {A}?"):
-        assert ha.answer(q, T)[0] == "no_prediction_heat", q
+        assert ha.answer(q, T)[0].startswith("no_prediction"), q
     # A landmark with a borough in its name is the landmark, not the borough.
     for q, name in (("Is the Staten Island Mall a heat island?", "Staten Island Mall"), ("How hot is the Bronx Zoo?", "Bronx Zoo")):
         plan = heuristic_plan(q)
@@ -692,3 +690,47 @@ def test_the_surface_reading_is_of_land():
     # 89 South Street, Manhattan, on the East River: the river once pulled this to -9.3.
     v = st.for_point(40.7056, -74.0018)
     assert v and -5 < v["mean_diff_f"] < -2
+
+
+def test_what_a_blind_judge_found_in_the_second_round(monkeypatch):
+    from datetime import date
+
+    from riprap.core.burr import synthesis as syn
+    from riprap.core.burr.synthesis import _render
+
+    # A named day months away is refused with what was measured, not with this week's forecast.
+    q = f"Will the playground near {A} be too hot to use on the afternoon of July 15?"
+    assert ha._beyond_forecast(q, today=date(2026, 10, 2)) and not ha._beyond_forecast(q, today=date(2026, 7, 10))
+    assert ha._beyond_forecast("will my apartment go over 90 inside next summer", today=date(2026, 7, 10))
+    assert not ha._beyond_forecast("will my apartment overheat this weekend", today=date(2026, 10, 2))
+    assert not ha._beyond_forecast("it may get hot in my apartment tomorrow", today=date(2026, 10, 2))
+    monkeypatch.setattr(ha, "_beyond_forecast", lambda q, today=None: True)
+    assert ha.answer(q, T) == ("no_prediction_far", ["heat_surface", "heat_station"])
+    assert "7 days ahead" in syn.LEAD_PHRASES["no_prediction_far"]
+    # A question that names two neighbourhoods is answered for one, and says so; a comparison and an address do not.
+    assert ha.places_named("who is most at risk from heat in Corona and Elmhurst. seniors living alone?") == ["Corona", "Elmhurst"]
+    assert ha.places_named("which parts of Washington Heights and Inwood run hottest") == ["Washington Heights", "Inwood"]
+    assert ha.places_named("Is Mott Haven hotter than Riverdale?") == []
+    assert ha.places_named("How hot is it in Red Hook and Carroll Gardens?") == []  # one tabulation area
+    assert ha.places_named(f"heat at {A} in Hollis near Jamaica") == []
+    assert "names more than one place (Corona and Elmhurst)" in _render([], [], [], question="who is most at risk from heat in Corona and Elmhurst?")
+    # A heat answer's footer is about heat.
+    out = _render([], [], [], question="How hot is Hunts Point?")
+    assert "temperature inside a building" in out and "zoning" not in out
+    assert "zoning" in _render([], [], [], question="Has Hunts Point flooded?")
+    # Words beside a borough that ask nothing name something in it; a question about the borough does not.
+    plan = heuristic_plan("heat briefing for around curtis high school staten island")
+    assert plan["intent"] == "single_address" and plan["targets"][0]["text"] == "curtis high school, Staten Island, NY"
+    for q in ("heat in the south bronx", "queens heat", "bronx heat vulnerability", "extreme heat risk staten island north shore",
+              "Which parts of the Bronx should worry most about heat?"):
+        assert heuristic_plan(q)["intent"] == "neighborhood", q
+
+
+def test_a_capped_list_of_cooling_places_says_it_is_capped():
+    from app.heat import cooling
+
+    d = {"sources": {"spray shower": {"date_modified": "2026-09-03"}, "pool": {"date_modified": "2026-09-15"}}}
+    many = cooling._summary([("spray shower", f"Park {i}", 100.0 + i) for i in range(8)], "within 800 m of this address", d)
+    few = cooling._summary([("spray shower", f"Park {i}", 100.0 + i) for i in range(3)], "within 800 m of this address", d)
+    assert "at 8 parks or playgrounds" in many["narrative"] and "the six nearest: Park 0" in many["narrative"]
+    assert "nearest first: Park 0" in few["narrative"]

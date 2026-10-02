@@ -58,9 +58,10 @@ def _summary(sites: list[tuple[str, str, float]], where: str, d: dict) -> dict:
             best.setdefault(f"{s[0]}|{s[1]}", s)
         near = list(best.values())[:6]
         if near:
-            narrative += "; nearest first: " + ", ".join(f"{park} ({kind}, {m:.0f} m)" for kind, park, m in near)
+            narrative += ("; the six nearest: " if len(best) > 6 else "; nearest first: ") + ", ".join(f"{park} ({kind}, {m:.0f} m)" for kind, park, m in near)
         elif outdoor or indoor:
-            narrative += f"; the pools are {', '.join([*outdoor, *indoor][:6])}"
+            pools = [*outdoor, *indoor]
+            narrative += f"; {'among the pools are' if len(pools) > 6 else 'the pools are'} {', '.join(pools[:6])}"
         narrative += f". {SEASON} {CENTERS}"
     return {"n_spray_shower_sites": len(showers), "n_outdoor_pools": len(outdoor), "n_indoor_pools": len(indoor),
             "n_sites": len(showers) + len(outdoor) + len(indoor), "spray_shower_sites": showers[:40],
