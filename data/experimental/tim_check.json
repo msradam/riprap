@@ -1,0 +1,193 @@
+{
+ "what": "Re-test the thinking-in-modalities adapter (`tim_nyc`) with TerraMind's\ngeneration weights loaded (experimental, one-off).",
+ "run_date": "2026-10-01",
+ "bbox": [
+  -74.03,
+  40.6,
+  -73.84,
+  40.8
+ ],
+ "date": "2021-06-16",
+ "scenes": [
+  "S2B_MSIL2A_20210616T153809_R011_T18TXK_20210617T040755",
+  "S2B_MSIL2A_20210616T153809_R011_T18TXL_20210617T033618",
+  "S2B_MSIL2A_20210616T153809_R011_T18TWK_20210617T043800",
+  "S2B_MSIL2A_20210616T153809_R011_T18TWL_20210617T042622"
+ ],
+ "key": "ESA WorldCover 2021, collapsed to the adapters' five classes",
+ "classes": [
+  "water",
+  "built",
+  "trees",
+  "grass",
+  "bare"
+ ],
+ "base": "ibm-esa-geospatial/TerraMind-1.0-base@fb96c70d0a5f68dcc44030b89cbfd8ec3fb0c67a",
+ "adapters": "msradam/TerraMind-NYC-Adapters@984341631d10db4fb699f76cd5d5bc7d8b3690b3",
+ "runs": [
+  {
+   "model": "lulc_nyc",
+   "seed": null,
+   "agreement": 0.9021,
+   "miou": 0.5464,
+   "iou": [
+    0.942,
+    0.903,
+    0.454,
+    0.433,
+    0.0
+   ],
+   "pred_share": [
+    0.207,
+    0.665,
+    0.083,
+    0.045,
+    0.0
+   ],
+   "truth_share": [
+    0.203,
+    0.627,
+    0.117,
+    0.048,
+    0.006
+   ],
+   "pixels": 3379485,
+   "seconds": 25
+  },
+  {
+   "model": "tim_nyc, random sampler (as first checked)",
+   "seed": 0,
+   "sampler_tensors_random": 323,
+   "lora_layers": 96,
+   "lora_layers_merged": 96,
+   "lora_layers_unmatched": [],
+   "agreement": 0.895,
+   "miou": 0.5323,
+   "iou": [
+    0.928,
+    0.902,
+    0.419,
+    0.412,
+    0.001
+   ],
+   "pred_share": [
+    0.21,
+    0.657,
+    0.071,
+    0.062,
+    0.0
+   ],
+   "truth_share": [
+    0.203,
+    0.627,
+    0.117,
+    0.048,
+    0.006
+   ],
+   "pixels": 3379485,
+   "seconds": 69
+  },
+  {
+   "model": "tim_nyc, sampler from the base checkpoint",
+   "seed": 0,
+   "sampler_tensors": 323,
+   "sampler_tensors_changed": 249,
+   "lora_layers": 96,
+   "lora_layers_merged": 96,
+   "lora_layers_unmatched": [],
+   "agreement": 0.898,
+   "miou": 0.5379,
+   "iou": [
+    0.941,
+    0.902,
+    0.402,
+    0.444,
+    0.0
+   ],
+   "pred_share": [
+    0.206,
+    0.668,
+    0.063,
+    0.063,
+    0.0
+   ],
+   "truth_share": [
+    0.203,
+    0.627,
+    0.117,
+    0.048,
+    0.006
+   ],
+   "pixels": 3379485,
+   "seconds": 91
+  },
+  {
+   "model": "tim_nyc, sampler from the base checkpoint",
+   "seed": 1,
+   "sampler_tensors": 323,
+   "sampler_tensors_changed": 249,
+   "lora_layers": 96,
+   "lora_layers_merged": 96,
+   "lora_layers_unmatched": [],
+   "agreement": 0.898,
+   "miou": 0.5378,
+   "iou": [
+    0.941,
+    0.902,
+    0.401,
+    0.444,
+    0.0
+   ],
+   "pred_share": [
+    0.206,
+    0.668,
+    0.063,
+    0.063,
+    0.0
+   ],
+   "truth_share": [
+    0.203,
+    0.627,
+    0.117,
+    0.048,
+    0.006
+   ],
+   "pixels": 3379485,
+   "seconds": 122
+  },
+  {
+   "model": "tim_nyc, sampler from the base checkpoint",
+   "seed": 2,
+   "sampler_tensors": 323,
+   "sampler_tensors_changed": 249,
+   "lora_layers": 96,
+   "lora_layers_merged": 96,
+   "lora_layers_unmatched": [],
+   "agreement": 0.8979,
+   "miou": 0.5376,
+   "iou": [
+    0.941,
+    0.902,
+    0.401,
+    0.443,
+    0.0
+   ],
+   "pred_share": [
+    0.206,
+    0.668,
+    0.063,
+    0.063,
+    0.0
+   ],
+   "truth_share": [
+    0.203,
+    0.627,
+    0.117,
+    0.048,
+    0.006
+   ],
+   "pixels": 3379485,
+   "seconds": 234
+  }
+ ]
+}

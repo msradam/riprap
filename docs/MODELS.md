@@ -261,9 +261,18 @@ the training code fed it). Training fed radar on a scale the model's
 statistics do not match, and an empty elevation channel. Riprap reads
 Sentinel-2 only.
 
-The thinking-in-modalities adapter (`tim_nyc`) needs TerraMind's generation
-weights, which are in neither repository. Without them it agrees with
-WorldCover on 90.3%, the same as `lulc_nyc`. It is not used.
+The thinking-in-modalities adapter (`tim_nyc`) first generates TerraMind's
+own land cover tokens with a second encoder and decoder (the sampler) and
+then reads them beside the image. An earlier note said the generation
+weights were in neither repository. They are in the pinned base checkpoint;
+the first check built the model without them, so its sampler was random.
+`scripts/check_tim.py` loads all 323 sampler tensors from the checkpoint
+(each is checked equal to it) and reruns the same box and key. On
+2021-06-16 the corrected `tim_nyc` agrees with WorldCover on 89.8% of
+pixels with each of three generation seeds (mean IoU 0.538), `lulc_nyc` on
+90.2% (0.546), and `tim_nyc` with the random sampler on 89.5% (0.532). So
+thinking in modalities adds nothing here, and it is not used
+(`data/experimental/tim_check.json`).
 
 Not built: new construction. The `buildings_nyc` adapter labels 57% of that
 box as building, and between two dates of one year (2021-06-16 and

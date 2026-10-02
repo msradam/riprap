@@ -23,9 +23,9 @@ WorldCover 2021 on one box of Manhattan, Brooklyn and Queens
   * the Sentinel-1 and elevation inputs carry nothing. Training fed radar
     on the wrong scale and an empty elevation channel, and zeros in both
     give the same map as real data, so only Sentinel-2 is read;
-  * the thinking-in-modalities adapter (`tim_nyc`) needs TerraMind's
-    generation weights, which are in neither repository; without them it
-    scores the same as this one.
+  * the thinking-in-modalities adapter (`tim_nyc`), with its generation
+    weights loaded from the base checkpoint (scripts/check_tim.py), scores
+    no better than this one, so it is not used.
 """
 
 from __future__ import annotations
