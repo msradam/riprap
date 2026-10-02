@@ -199,9 +199,9 @@
   },
   {
     "id": "n34",
-    "kind": "refuse",
+    "kind": "heat",
     "query": "which blocks around 104 W 136th St in Harlem get the hottest in summer?",
-    "expect": "Declines, says it covers flood records only and does not answer questions about heat."
+    "expect": "Since October 2026 this is answered: the heat briefing's surface record for the address, with a statement that Riprap ranks no blocks. (Written when Riprap covered flood only and declined it; the flood runner skips this kind, and tests/golden/unseen_heat*.json hold the heat questions.)"
   },
   {
     "id": "n35",
