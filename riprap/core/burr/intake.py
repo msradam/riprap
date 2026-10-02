@@ -226,9 +226,10 @@ def _with_borough(span: str, query: str) -> str:
         return f"{span}, Queens"
     # A neighbourhood named elsewhere in the question ("... for Central Harlem near Harlem Hospital (506 Lenox
     # Avenue)"): its borough, when every area of that name is in one borough.
-    from riprap.core.burr.place import place_phrase  # noqa: PLC0415
+    from riprap.core.burr.place import _known_neighbourhoods  # noqa: PLC0415
 
-    near = place_phrase(query.replace(span.split(",")[0], " "))
+    rest = query.replace(span.split(",")[0], " ").lower()
+    near = max((n for n in _known_neighbourhoods() if re.search(rf"\b{re.escape(n)}\b", rest)), key=len, default=None)
     boroughs = {h["borough"] for h in nta.resolve(near)} if near else set()
     return f"{span}, {next(iter(boroughs))}" if len(boroughs) == 1 else span
 
