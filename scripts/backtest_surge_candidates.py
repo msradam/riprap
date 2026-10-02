@@ -12,7 +12,7 @@ quantiles are scored on the median; the flood-stage question is also asked
 of their 90th percentile. NOAA series are cached under outputs/surge_cache/.
 
 With --finetuned outputs/surge_models/chronos2_battery the Battery fine-tune
-of Chronos-2 (scripts/finetune_chronos2_surge.py, trained on 2015 to 2024 only)
+of Chronos-2 (scripts/finetune_chronos2_surge.py, trained before 2024-07-01, checkpoint chosen on the rest of 2024)
 is scored too, as chronos_2_battery_ft.
 
 Writes data/experimental/surge_candidates.json.

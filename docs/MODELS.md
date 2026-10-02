@@ -137,7 +137,7 @@ An earlier check on 104 windows from one calm stretch (May to September
 above, with two winters in it, is the fairer test.
 
 Newer open forecasters, zero-shot, on the same 635 windows
-(`scripts/backtest_surge_candidates.py`, run 2026-10-01,
+(`scripts/backtest_surge_candidates.py`, run 2026-10-02,
 `data/experimental/surge_candidates.json`). Each reads the same 1,024
 hours; a model that gives quantiles is scored on its median.
 
@@ -165,14 +165,18 @@ a LoRA adapter on Chronos-2, trained on the Battery residual before
 2024-07-01, with the checkpoint chosen on the second half of 2024 (step 200
 of 700; the loss rose after). It beats the current model on mean error by
 0.9 cm, with the interval clear of zero, is level on the peak, and foresees
-2 of the 23 flood windows with no false alarm. That is better on every
-measure, by a small margin, and it still misses 21 of the 23 floods, so the
-sentence's real weakness stays. It is not in the app: the surge forecast
+2 of the 23 flood windows with no false alarm. The 23 windows come from five
+storms, so 2 against 1 is about one storm. Two cautions: the backtest reads
+the gauge's value at the top of each hour, while the current model's card
+says it trained on hourly means, which may favour a model trained the way it
+is tested; and what the zero-shot models saw in pretraining is not known
+here. So the fine-tune is better on the average by a small margin and level
+on the peak, and it still misses 21 of the 23 floods; the sentence's real
+weakness stays. It is not in the app: the surge forecast
 runs per request, so the server needs the weights, and these are on the
 owner's machine only (`outputs/surge_models/chronos2_battery/`, 478 MB of
 safetensors). Switching needs the owner to publish them, and adds the
-`chronos-forecasting` package to the `ml` extra. A forecast takes about
-0.03 s on CPU.
+`chronos-forecasting` package to the `ml` extra.
 
 Not built: the list of assets below the forecast peak. On the days that
 matter the model's peak is too low (1 of 23), so the list would be empty
