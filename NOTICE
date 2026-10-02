@@ -21,16 +21,17 @@ Models:
 
   - An LLM behind an OpenAI-compatible endpoint the operator
     configures, for example IBM Granite 4.1 8B (Apache 2.0).
-  - Three experimental models, fine-tuned by the author. Their output is
-    labelled experimental wherever it appears (docs/MODELS.md). Two are
+  - Two experimental models, fine-tuned by the author. Their output is
+    labelled experimental wherever it appears (docs/MODELS.md). One is
     published under Apache 2.0 and downloaded from Hugging Face at a
-    pinned commit when their optional extra is installed:
+    pinned commit when its optional extra is installed:
       msradam/Granite-TTM-r2-Battery-Surge, a fine-tune of IBM's
-        Granite TimeSeries TTM r2 (Apache 2.0);
-      msradam/Prithvi-EO-2.0-NYC-Pluvial, a fine-tune of NASA and
-        IBM's Prithvi-EO 2.0 (Apache 2.0).
+        Granite TimeSeries TTM r2 (Apache 2.0).
     Training and evaluation code: github.com/msradam/riprap-models.
-    The third, the NYC land-cover model, is IBM and ESA's TerraMind 1.0
+    (msradam/Prithvi-EO-2.0-NYC-Pluvial, a fine-tune of NASA and IBM's
+    Prithvi-EO 2.0, was a third until it was retired from the app in
+    October 2026; the scripts that tested it still download it.)
+    The other, the NYC land-cover model, is IBM and ESA's TerraMind 1.0
     base (Apache 2.0) fine-tuned in this repository
     (scripts/train_cover.py) on NYC Land Cover 2017; its weights are
     not published, and the app reads its saved maps (data/eo/).
@@ -60,10 +61,29 @@ Public-record data sources (no commercial APIs):
     311 service requests (each portal's terms of use), SeeClickFix
     public API for Albany, NY
 
-Earth-observation data, read by the experimental satellite layers:
+Earth-observation data:
   - Contains modified Copernicus Sentinel data (Sentinel-2 L2A, 2017 to
     2026), accessed through Microsoft Planetary Computer (Copernicus
-    Sentinel data terms)
+    Sentinel data terms), read by the land-cover model
+  - Landsat 8 and 9 Collection 2 Level 2 surface temperature, courtesy
+    of the U.S. Geological Survey (public domain), accessed through
+    Microsoft Planetary Computer: data/heat/surface_temp.tif and the map
+    overlay web/sveltekit/static/heat/surface.png
+
+Heat records (New York City):
+  - Heat Vulnerability Index and heat stress emergency department
+    visits, NYC Department of Health and Mental Hygiene, Environment
+    and Health Data Portal (github.com/nychealth/EHDP-data, Apache 2.0;
+    visits from New York State SPARCS): data/heat/dohmh_heat.json
+  - Daily station records, NOAA Regional Climate Centers, ACIS (U.S.
+    public domain)
+  - Forecasts, observations and alerts, National Weather Service (U.S.
+    public domain)
+  - NPCC4 extreme heat projections, Braneon et al. 2024, Annals of the
+    New York Academy of Sciences 1539, doi:10.1111/nyas.15116 (CC BY-NC
+    4.0), Table 4, quoted with citation
+  - NYC Parks Spray Showers and Pools, NYC Open Data ckaz-6gaa and
+    y5rm-wagw (NYC Open Data Terms of Use): data/heat/parks_cooling.json
   - NYC Land Cover 2017, 6 inch (NYC Office of Technology and
     Innovation, NYC Open Data he6d-2qns, NYC Open Data Terms of Use):
     quoted directly (data/landcover_nyc_2017.tif, aggregated to 30 m)

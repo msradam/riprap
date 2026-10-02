@@ -67,9 +67,11 @@ answer, it says so instead of guessing.
 ## Capabilities and Constraints
 
 - Inputs: street address, community district code, natural-language flood
-  question. Out-of-scope questions (buying, renting or insuring property,
-  legal advice, a forecast for a named day, a hazard other than flooding)
-  get a fixed refusal text.
+  or heat question. A query about outdoor heat gets the heat briefing; a
+  bare place gets its flood briefing, with a link to the heat one.
+  Out-of-scope questions (buying, renting or insuring property, legal,
+  health or safety advice, a forecast for a named day, a hazard other than
+  flooding or heat) get a fixed refusal text.
 - Output: an Answer (question mode), sections grouped by the Five Stones
   (Cornerstone, Keystone, Touchstone, Lodestone, Capstone), inline numbered
   citations with a citations list, "Sources consulted / Not checked",

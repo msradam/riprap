@@ -38,7 +38,7 @@ Every result carries an `emissions` block (`riprap/core/burr/app.py`,
 
 The ledger covers the LLM. The experimental surge model also runs in a
 briefing when it is installed: 1.5 million parameters on CPU, about a tenth
-of a second, and not metered. The satellite models run in batch jobs, not
+of a second, and not metered. The land-cover model runs in a batch job, not
 in a briefing.
 
 ## Measured on this laptop (2026-09-30)

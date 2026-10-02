@@ -21,9 +21,12 @@ a lead and up to four cited facts, and code checks that choice; the answer
 text is the sources' own sentences ([`docs/GROUNDING.md`](GROUNDING.md)).
 The gallery is built with no LLM.
 
-**Three experimental models**, described below. They are the author's
-fine-tunes: one forecasts surge at the Battery, one reads satellite scenes
-after storms, one maps paved, green and tree-covered land.
+**Two experimental models**, described below. They are the author's
+fine-tunes: one forecasts surge at the Battery, one maps paved, green and
+tree-covered land from the latest satellite imagery. A third, a satellite
+water layer, was retired on 2026-10-02 after two tests in which it found
+recorded floods no more often than chance; the tests are kept below. The
+heat briefing uses no model: its forecast is the National Weather Service's.
 
 `app/models_info.py` lists the models behind each result in its `models`
 field, and `/api/models` says which this server can use.
@@ -35,13 +38,12 @@ as claims (the mode now behind `RIPRAP_LLM_BARE=1`). `granite4:micro` kept
 
 ## Experimental models
 
-The gallery answers three questions with these models:
-[the Battery surge](https://msradam.github.io/riprap/gallery/battery-surge/),
-[surface water in BK18 after Ida](https://msradam.github.io/riprap/gallery/bk18-satellite/)
+The gallery answers two questions with these models:
+[the Battery surge](https://msradam.github.io/riprap/gallery/battery-surge/)
 and [paved, green and tree-covered land in QN12](https://msradam.github.io/riprap/gallery/qn12-paved/).
 
-Riprap is an app in development, and these three models are part of it.
-None has been shown to beat an official product. So their output is never
+Riprap is an app in development, and these two models are part of it.
+Neither has been shown to beat an official product. So their output is never
 shown as a measurement:
 
 - Every sentence from a model is written by one function,
@@ -54,28 +56,28 @@ shown as a measurement:
   is rerun the sentence changes with it. Nobody edits it by hand.
 - For a question about the past or the present a model never sets the
   answer's yes or no, and its sentence comes after the record. A question
-  about what a model showed ("did satellite imagery show flooding here
-  after Ida") gets the surveyed record first and no yes or no at all, so
-  the record's "Yes." cannot be read as the model's.
-- When the question asks only for what a model produces (land cover, what
-  the imagery showed in a district) and no official source in the briefing
-  answers the same thing, the lead is "From an experimental model, not a
-  measurement:". When an official source does answer, it comes first.
+  about what satellite imagery showed of a flood ("did satellite imagery
+  show flooding here after Ida") gets a lead that says Riprap quotes none
+  and why, then the surveyed record, with no yes or no.
+- When the question asks only for what a model produces and no official
+  source in the briefing answers the same thing, the lead is "From an
+  experimental model, not a measurement:". When an official source does
+  answer, it comes first: a land-cover question is answered with the city's
+  own 2017 map, and the model's estimate follows.
 - A language model, when one is configured, cannot rest a yes or no on an
   experimental source: code checks the lead against the measured facts only.
 - "Will it flood here" is not answered yes or no by anything. The lead says
   no source or model predicts that, and what the Weather Service expects and
   the maps show follows.
 - In a plain place briefing a model's sentence appears only when it shows
-  something (a notable surge, new water after Ida). It is always in the
-  evidence table, under "Experimental sources".
+  something (a notable surge). It is always in the evidence table, under
+  "Experimental sources".
 - On screen each sentence carries an "Experimental" badge; the print packet
   prints the same text; MCP items carry `maturity: "experimental"`.
 
 | Model | Repository and pinned commit | Runs | Extra |
 |---|---|---|---|
 | Granite TTM r2 Battery Surge | [`msradam/Granite-TTM-r2-Battery-Surge`](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge) at `181b892` | per request, on CPU (about 0.1 s) | `ml` |
-| Prithvi-EO 2.0 NYC Pluvial | [`msradam/Prithvi-EO-2.0-NYC-Pluvial`](https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial) at `25ce564` | in a batch job; the app reads the saved rasters | `eo`, for the batch only |
 | NYC land-cover model | not published; trained by `scripts/train_cover.py` on [`ibm-esa-geospatial/TerraMind-1.0-base`](https://huggingface.co/ibm-esa-geospatial/TerraMind-1.0-base) at `fb96c70`, weights pinned by SHA-256 `15dc40f` | in a batch job; the app reads the saved rasters | `eo`, for the batch only |
 
 The author's weights are loaded from safetensors files at those commits,
@@ -89,14 +91,13 @@ the land-cover model was trained on an Apple M5 in this repository.
 
 A default install has none of this: `uv sync` installs no torch, the surge
 source then says "the Battery surge forecast model is not available on this
-server; it needs the optional ml extra", and the satellite layers are read
+server; it needs the optional ml extra", and the land-cover maps are read
 from `data/eo/` with the core dependencies.
 
 ```bash
 uv sync --extra ml                                    # the surge forecast
 uv sync --extra eo                                    # to rerun the batch jobs
 uv run python scripts/backtest_surge.py               # writes data/experimental/surge.json
-uv run python scripts/run_eo_batch.py --heavy-rain-since 2017 --min-inches 1.5
 # The land-cover weights are local: prepare the labels and train them first.
 uv run python scripts/prepare_landcover_labels.py     # also: --bake-city-map for data/landcover_nyc_2017.tif
 uv run python scripts/train_cover.py --model terramind_base_px
@@ -184,6 +185,9 @@ owner's machine only (`outputs/surge_models/chronos2_battery/`, 478 MB of
 safetensors). Switching needs the owner to publish them, and adds the
 `chronos-forecasting` package to the `ml` extra.
 
+Decision (owner, 2026-10-02): the surge source stays as it is. The
+fine-tune's result is recorded here, and the app is not switched to it.
+
 Not built: the list of assets below the forecast peak. On the days that
 matter the model's peak is too low (1 of 23), so the list would be empty
 when a flood came, and a 30 m elevation model cannot place a subway entrance
@@ -196,29 +200,34 @@ with a 70/15/15 split of 2015 to 2024 the test window starts in mid 2023, so
 Ida (September 2021) is in the training data. The card is in another
 repository and is not edited from here.
 
-### Prithvi-EO 2.0 NYC Pluvial
+### The satellite water layer, retired 2026-10-02
 
-It labels each 10 m pixel of a Sentinel-2 scene as water or not.
+The app carried a layer of "new surface water after storms" from the
+author's Prithvi-EO 2.0 fine-tune
+([`msradam/Prithvi-EO-2.0-NYC-Pluvial`](https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial)
+at `25ce564`) until 2026-10-02. It was tested twice, and IBM and ESA's
+official flood model was put through both tests beside it. Neither found
+recorded floods more often than chance, so the layer is out of the app: no
+manifest, no reader, no rasters. A question about what satellite imagery
+showed of a flood is told that, and gets the surveyed record. The code that
+ran the tests is kept (`scripts/run_eo_batch.py`, `scripts/run_flood_ida.py`,
+`scripts/score_water_floodnet.py`, the loader in `app/eo/prithvi.py`), and
+the layer itself is in git history before commit `5e490c4`. What follows is
+the record of the two tests.
+
+**What it did.** It labels each 10 m pixel of a Sentinel-2 scene as water or not.
 `scripts/run_eo_batch.py` runs it on the clearest scene from the two days
 after a heavy rain and on a scene from the month before, and keeps the land
 pixels that are water after and were not before, where both scenes had a
 clear view. It was run for every day since 2017 with 1.5 inches of rain or
 more at Central Park: 15 of 50 such events had a usable pair of scenes.
 
-| Question | Answered | How |
-|---|---|---|
-| Did satellite imagery show standing water near this place after Hurricane Ida | Yes, as what the model showed | New water within 500 m, the scenes' dates, the share observed |
-| How much new surface water appeared in this district after Ida | Yes, as what the model showed | The same, over the district |
-| After which other storms did it show new water here | Yes | The saved events with a clear view of the place |
-| Is this area prone to water that lingers after heavy rain | No | Tested and failed, see below. The question is answered from the city's stormwater flood map |
-| Did the street or a basement flood | No | That water drains within hours; a satellite passes days apart and sees 10 to 20 m pixels |
-
-Test against surveyed flooding, `scripts/run_eo_batch.py --evaluate-only`,
+**The first test: Hurricane Ida.** Test against surveyed flooding, `scripts/run_eo_batch.py --evaluate-only`,
 run 2026-10-01. USGS surveyed 153 high-water marks after Ida in places the
 scenes saw clearly. The model shows new water within 500 m of 17 of them,
 11%. Of all the land it saw, 14% lies within 500 m of its new water. So a
 surveyed flood mark is no more likely to be near the model's water than a
-random spot. Every satellite sentence says so.
+random spot.
 
 Test of the lingering-water idea: land that showed new water after two or
 more storms (1.73 km², among land seen in at least three) should be
@@ -276,11 +285,67 @@ after the rain and the radar's eleven days. A satellite that passes a day or
 more after a flood that drained within hours cannot see it, and tuning a
 model does not move the pass.
 
-Recommendation for the owner: retire the satellite water layer rather than
-tune it. Two models of different make, one of them official and working as
-designed on its own data, both miss Ida's flooding. The result file is
-`data/experimental/flood_terramind_ida.json`; the weights are listed under
-provenance below.
+The result file is `data/experimental/flood_terramind_ida.json`; the
+weights are listed under provenance below. The Sentinel-2 inputs were on the
+scale the model was trained on: its dataset holds reflectance times 10,000
+with no offset (patches dated after January 2022 hold values down to -999,
+older ones sit near zero), and the 2021 Ida scenes carry no offset.
+
+#### The fair test: floods a satellite can see
+
+Ida's water drained before any satellite passed, so the Ida test shows that
+Ida is invisible from orbit, not that the layer is useless. The fair test
+is flooding that stands for hours: coastal and tidal flooding in places such
+as Howard Beach, City Island and the Rockaways. The key is FloodNet. For
+every Sentinel-1 and Sentinel-2 pass over the city since the first sensor
+came online (2021-03-05 to 2026-10-02; 194 radar passes and 851 optical
+ones, 374 sensors in good order), `scripts/score_water_floodnet.py` asked
+which sensors were recording a flood at the instant of the pass.
+
+| | Sentinel-1 | Sentinel-2 |
+|---|---|---|
+| Sensor and pass moments | 20,899 | 95,496 |
+| A flood event spans the pass | 11 | 164 |
+| Counted (for Sentinel-2, a clear view at the sensor) | 11 | 33 |
+
+That is 44 flooded moments on 28 dates at 12 sensors: Seaside 15, City
+Island 11, Howard Beach 10, Rosedale 3, and one each at five other places.
+The median depth at the pass was 77 mm. Each was set against five dry
+moments at the same sensor, satellite and orbit (220 in all, fixed seed).
+
+The rule was written before any model ran: under 10 flooded moments on
+under 3 dates is "too few to tell"; otherwise a model shows skill when,
+within 100 m of the sensor, it has at least five hits on at least two
+dates, a hit rate at least twice its false-alarm rate, and a one-sided
+Fisher exact p under 0.05. A hit counts only on land that the dry scene
+does not call water, so a sensor on a bulkhead is not always "near water".
+
+| At 100 m | Flooded moments with water marked | Dry moments with water marked | Fisher p |
+|---|---|---|---|
+| Prithvi NYC Pluvial (Sentinel-2 moments) | 1 of 33 (3.0%) | 11 of 162 (6.8%) | 0.90 |
+| TerraMind-base-Flood | 0 of 41 | 0 of 199 | 1.0 |
+| Microsoft ai4g-flood, precomputed radar detections (`ai-for-good-lab/ai4g-flood-dataset`, MIT; three of the dates) | 0 of 7 | 0 of 21 | 1.0 |
+
+At 50 m and 250 m the picture is the same (Prithvi 1 of 33 against 9 of
+162, and 10 of 33 against 44 of 162). Prithvi's one hit is at Seaside on
+2026-02-08, at a depth of 15 mm. TerraMind's highest flood probability
+within 100 m of any sensor was 0.014. The ai4g-flood detections nearest a
+flooded sensor on those passes were 1.3 to 26 km away, so they add nothing.
+
+What makes the test hard for a model, said plainly: the water is shallow
+and sits on streets about one pixel wide; TerraMind's second satellite
+never saw the flood (its event image is a median 41 or 79 hours from the
+moment); Prithvi labels only 22% of the open water the scene classification
+sees; and a first run was discarded for boxes cut at tile edges after its
+result, the same verdict, had been seen. What favours a model: any water
+pixel within 100 m counts, flooded moments are at high tide and dry ones at
+ordinary tides, and two sensors hold 23 of the 44 flooded moments.
+
+**Decision.** No skill, on Ida or on the floods a satellite can see. The
+layer was retired from the app on 2026-10-02 (owner's rule, set before the
+test: keep it only if a model shows skill there). The result file is
+`data/experimental/water_coastal_floodnet.json`, with every moment, its
+scenes and its depth.
 
 ### NYC land-cover model
 

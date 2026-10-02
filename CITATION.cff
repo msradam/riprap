@@ -22,9 +22,9 @@ abstract: >-
   experimental deployments on the same code. The briefing is built
   directly from the data, and a question is answered by rules over its
   words; an optional LLM can choose the answer's lead and facts instead,
-  and code checks that choice against the evidence. Three experimental
+  and code checks that choice against the evidence. Two experimental
   models fine-tuned by the author (a surge forecast for the Battery and
-  two satellite layers) answer some questions about the future; their
+  a land-cover model) add labelled sentences; their
   output is always labelled experimental, with its limits and tested
   accuracy. Thirteen disclosure checks drawn from
   FEMA, IPCC AR6, TCFD, ASTM E1527-21, EPA/CDC CERC, the AP Stylebook
@@ -67,7 +67,7 @@ references:
     authors:
       - name: "NASA IMPACT and IBM Research"
     year: 2024
-    notes: "Base of the experimental surface-water layer, msradam/Prithvi-EO-2.0-NYC-Pluvial. Apache-2.0. arXiv:2412.02732"
+    notes: "Base of the satellite water layer, msradam/Prithvi-EO-2.0-NYC-Pluvial, tested and retired from the app in October 2026. Apache-2.0. arXiv:2412.02732"
   - type: software
     title: "TerraMind 1.0"
     authors:

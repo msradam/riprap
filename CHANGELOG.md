@@ -4,6 +4,77 @@ All notable changes to Riprap. The hackathon submission tag is
 `v0.5.0` (build 2026-05-07); subsequent dates record polish work
 that landed on the hackathon-period production deploys.
 
+## [Unreleased] (a heat briefing, and the models settled) - 2026-10-02
+
+Riprap becomes a climate briefing: the same method, proved on a second
+hazard. Branches `models/terramind-nyc` and `climate/heat`; not tagged.
+
+### Added
+
+- **A heat briefing for New York City.** A query about outdoor heat ("heat
+  QN12", "extreme heat at 90-01 183rd Street, Queens", "Will it be dangerously
+  hot this week at ...") gets a briefing built like the flood one, from ten
+  public sources: Landsat surface temperature against the city's average
+  (18 clear summer images, 2023 to 2026), the Health Department's Heat
+  Vulnerability Index and heat illness emergency visits, the city's 2017
+  land cover map, days at or above 90 F at the nearest long-record station,
+  the latest observation, the Weather Service's forecast and heat alerts,
+  NPCC4 projections, and NYC Parks spray showers and pools. Each sentence
+  carries the caveat its figure needs. A bare place still gets its flood
+  briefing, and each page links to the other.
+- Heat questions answered by rules (`riprap/core/burr/heat_answer.py`): now,
+  the coming days (the Weather Service's forecast, named as its own), the
+  coming decades, counts of hot days, hotter or cooler than the city,
+  comparisons of two places, and the named sources. A borough or the city
+  is a place for a heat question.
+- Heat refusals: health or safety advice, a score or a ranking (the Health
+  Department's index is quoted as the department's), the temperature in one
+  building or on a named day, and indoor heating in winter, which is named
+  as such and sent to 311.
+- A `hazard` field on every manifest (`flood`, `heat` or `any`), and
+  `hazard=heat` on `/api/district/{code}`, `get_evidence` and
+  `get_district_summary`.
+- The city's 2017 land cover map as a measured source (`city_landcover`),
+  quoted before the land-cover model's estimate.
+- Ten heat entries in the gallery, a surface temperature overlay on the
+  map, and heat on the landing page.
+- Independent heat keys (`tests/golden/keys_heat.py`) and a question set
+  written without sight of the code (`tests/golden/unseen_heat.json`).
+
+### Changed
+
+- The land-cover layer is the NYC land-cover model (TerraMind 1.0 base
+  with a per-pixel branch, trained on the city's 2017 map), replacing the
+  `lulc_nyc` adapter. Its sentence states its measured error and that the
+  2017 map read as 2021 is closer to the 2021 map than the model is.
+- The place parser takes a named building or park in a question as the
+  place, and no longer takes a sentence's first capitalised word or a lone
+  compass word for one.
+- A question about what satellite imagery showed of a flood gets a lead
+  that says Riprap quotes none and why, then the surveyed record.
+
+### Removed
+
+- The satellite water layer (`prithvi_water`, `prithvi_water_nta`, its
+  fifteen rasters and its registry entry). Tested on Hurricane Ida and on
+  44 coastal and tidal flood moments that FloodNet sensors recorded at the
+  instant of a satellite pass, it and IBM and ESA's official flood model
+  found flooding no more often than chance (`docs/MODELS.md`).
+
+### Breaking
+
+For a program that reads Riprap's output:
+
+- `prithvi_water` and `prithvi_water_nta` are gone from results, the
+  catalogue and `/api/models`.
+- The land-cover value's `by_year`, `first_year`, `built_pct_first`,
+  `built_change_points` and `noise_points` are gone; `tree_pct` is
+  `tree_canopy_pct` (part of `green_pct`); `model` is the model's name.
+- `final.models[].repo` is null for a model whose weights are not
+  published, and `/api/models` keys that model by its name.
+- A heat question is no longer `out_of_scope`: it plans with
+  `focus.hazard: "heat"` and runs.
+
 ## [0.8.0] - 2026-10-01
 
 Four passes since 0.7.0, newest first: an independent review that restored

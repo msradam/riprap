@@ -53,7 +53,7 @@ sources' sentences word for word. They are tried in a fixed order:
    Weather Service's water-level forecast, the current stormwater scenario and
    the Sandy extent follow, then the experimental surge forecast, labelled;
 4. a question an experimental model answers (a surge at the Battery, land
-   cover and its change, what satellite scenes showed): the official source
+   cover): the official source
    for the same thing first when there is one, then the model's hedged
    sentence. With no official source the lead is "From an experimental model,
    not a measurement:". If the question is about past flooding, rule 5 sets
@@ -173,8 +173,9 @@ When the input is a question, not just a place, three more rules apply.
   Stone whose consulted sources all returned nothing says so: "Consulted X;
   it returned nothing for this place."
 - Questions Riprap does not answer (buying, renting or insuring property,
-  legal advice, a prediction for a specific day, or a hazard other than
-  flooding) get a fixed refusal text, never model prose.
+  legal advice, health or safety advice, a prediction for a specific day, or
+  a hazard other than flooding or heat) get a fixed refusal text, never
+  model prose.
 
 ### The answer and its checks
 
@@ -266,6 +267,47 @@ non-numeric fact ("inside" for "outside") with correct numbers passes. In
 the answer the text is the evidence text, so it cannot paraphrase; what can
 still be wrong is the lead and the choice of facts, and only the lead rules
 above are checked.
+
+## Heat questions
+
+A question about outdoor heat is answered by the same rule engine. The
+hazard is read from the question's words in code
+(`riprap/core/burr/heat_answer.py`, `hazard_of`), clause by clause: a heat
+word in a preamble does not make a flood question a heat one, and a street
+or neighbourhood with a heat word in its name ("Heath Avenue") is a place.
+The plan's focus then names the hazard, and only that hazard's sources run.
+`rule_answer.answer` hands the question to the heat rules, which pick the
+lead and the facts in this order:
+
+| The question asks for | Lead | Facts |
+|---|---|---|
+| A score, a rating, a grade or a ranking | "Riprap computes no score or rating of its own ..." | The Health Department's index, as the department's |
+| One apartment, one block or a calendar date in the future | "Riprap cannot predict what will happen in one building, on one block or on a named day ..." | The Weather Service's forecast and alerts, the surface measurement |
+| Now, today | Neutral | The latest observation, any active heat alert, the forecast; what the question names comes first |
+| The coming days | "From the National Weather Service, as issued for the next 7 days; Riprap predicts nothing itself:" | The forecast and alerts |
+| The coming decades | Neutral | NPCC4 Table 4 |
+| A count of hot days | The year asked about, from the station's own yearly record | The station sentence |
+| Hotter or cooler than the city | "At the surface, yes." or "At the surface, no.", only when every Landsat image agrees; neutral otherwise | The surface measurement |
+| Hotter than another place | Neutral, as a comparison of the two places | Each place's own sentences |
+| Deaths | The cannot-answer line: they are published for the city only | Heat illness visits |
+| A named source (the index, visits, canopy, places to cool off) | Neutral, or the count lead | That source |
+| Anything else about heat | Neutral | The surface measurement, the index, the land cover map, the station record |
+
+The heat leads are set only by code, from a source's own value, and are
+exempt from the word-pattern lead checks (`answer_checks.CODE_LEADS`), which
+were written for flood sentences. The facts are still the sources' sentences
+word for word. A borough or the city is a place for a heat question, read as
+an area; a place outside New York City is told that the heat briefing
+covers the city only. A cold apartment in winter is named as indoor heating
+and sent to 311. Advice ("should I", "is it too hot to", "is that a bad
+idea") is declined with where official guidance is.
+
+How it was tested: 103 unit tests (`tests/test_heat.py`), independent keys
+for the facts (`tests/golden/keys_heat.py`), and question sets written by
+agents that had seen none of the code (`tests/golden/unseen_heat.json`). The
+first unseen set found the place parser, not the sources: about a third of
+sixty went wrong on the first run, almost all in finding the place or the
+hazard.
 
 ## 311 counts
 

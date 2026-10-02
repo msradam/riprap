@@ -3,11 +3,12 @@
 > **What it is.** A web tool that takes an address, a neighbourhood or a
 > community district and produces a short, citation-grounded
 > **climate-exposure briefing**: evidence where every sentence links back
-> to the dataset or agency report it came from. NYC/flood is
-> the reference deployment (this document describes it end to end); the
-> same code runs three experimental city deployments (see
-> [`docs/multi-city.md`](multi-city.md)). Heat and air questions are
-> refused as out of scope.
+> to the dataset or agency report it came from. New York City is
+> the reference deployment, with a flood briefing (this document describes
+> it end to end) and a heat briefing built the same way
+> ([§4.1](#41-heat)); the same code runs three experimental city
+> deployments for flood (see [`docs/multi-city.md`](multi-city.md)). Air
+> quality questions are refused as out of scope.
 >
 > **Who it's for.** Urban planners, journalists on deadline, NYCEM grant
 > writers filing FEMA BRIC sub-applications, agency capital planners,
@@ -163,9 +164,11 @@ resolve_area        neighbourhood intents: a 2020 NTA polygon, or a
 select_deployment   which deployments/<city>/ bounding box contains the
   │                 target (out of coverage falls back to federal pebbles)
   ▼
-select_sources      stones.select_pebbles: the planner's choice plus a
-  │                 per-intent floor; every pebble for a bare place.
-  │                 Records `consulted` and `not_checked`
+select_sources      stones.select_pebbles: the sources of the plan's hazard
+  │                 (flood or heat, plus the shared ones); within them the
+  │                 planner's choice plus a per-intent floor, or every
+  │                 pebble for a bare place. Records `consulted` and
+  │                 `not_checked`
   ▼
 stones              ONE parallel MapActions fan-out over the selected
   │                 Cornerstone, Keystone, Touchstone and Lodestone pebbles
@@ -196,12 +199,14 @@ short result summary) that streams to the UI as `step` events on
 
 ### 3.1 NYC pebbles, plain language
 
-The NYC deployment has 41 pebbles: 37 in `deployments/nyc/manifests/` and
+The NYC deployment has 59 pebbles: 55 in `deployments/nyc/manifests/` and
 4 federal ones from `deployments/federal/` (`fema_nfhl`, `nws_alerts`,
-`nws_obs`, `usgs_gauges`) that are merged into every deployment. Of the 37,
-16 run for a point, 18 for a neighbourhood or district, and 3 for both
+`nws_obs`, `usgs_gauges`) that are merged into every deployment. Each names
+its briefing in a `hazard` field: 36 are flood sources, 18 are heat sources
+([§4.1](#41-heat)) and 5 run in both. Of the flood and shared sources, 20
+run for a point, 18 for a neighbourhood or district, and 3 for both
 (`noaa_tides`, `nws_water_forecast` and the experimental
-`ttm_battery_surge`, which read a harbour gauge). Five are experimental
+`ttm_battery_surge`, which read a harbour gauge). Three are experimental
 model layers ([MODELS.md](MODELS.md)); the rest are public records. Other deployments
 have their own, smaller, experimental sets (see
 [`docs/multi-city.md`](multi-city.md)).
@@ -226,14 +231,13 @@ Point pebbles:
 | **nws_obs** *(live, federal)* | Latest NWS hourly observation at the nearest station. | empirical |
 | **usgs_gauges** *(live, federal)* | Live stage at the nearest USGS stream gauge (OGC API). | empirical |
 | **ttm_battery_surge** *(live, experimental)* | A 96-hour forecast of the surge at the Battery from the author's Granite TTM fine-tune, hedged. Says it is not installed without the `ml` extra. | modeled |
-| **prithvi_water** *(experimental)* | New surface water a satellite model showed near this address after Hurricane Ida and other heavy rain, from saved batch output. | modeled |
 | **city_landcover** | Paved, green and tree canopy shares near this address, from the city's 2017 land cover map (6 inch). Quoted when a question asks. | empirical |
 | **landcover** *(experimental)* | The same shares from the latest satellite imagery, a land-cover model's saved output, after the city map's sentence. | modeled |
 
 Polygon pebbles, for a neighbourhood or a community district: `sandy_nta`,
 the three `dep_*_nta` scenarios, `microtopo_nta`, `nyc311_nta`,
 `floodnet_nta` (the sensors inside the area), `nws_alerts_nta`,
-`npcc4_slr_nta` and the experimental `prithvi_water_nta` and
+`npcc4_slr_nta`, `city_landcover_nta` and the experimental
 `landcover_nta` are area versions of the point pebbles. The harbour gauge
 pebbles run for an area too, read at its centre. The four register manifests (`mta_entrances_nta`,
 `doe_schools_nta`, `nycha_developments_nta`, `doh_hospitals_nta`) name the
@@ -283,22 +287,54 @@ one LLM call (`app/planner.py`); in no-LLM mode it is a regex heuristic
 | `live_now` | "is it flooding now", "current alerts" | geocode, live point pebbles only |
 | `compare` | "A vs B" | two `single_address` runs, merged |
 | `not_implemented` | Retrospective, ranking, cross-city queries | Returns a rationale immediately |
-| `out_of_scope` | Buy, rent, insure, legal advice, a specific-day forecast, a hazard other than flooding | A fixed refusal text |
+| `out_of_scope` | Buy, rent, insure, legal, health or safety advice, a specific-day forecast, a hazard other than flooding or heat | A fixed refusal text |
 
 With a question, only the planner's chosen pebbles and the intent's floor
 run (`riprap/core/burr/stones.py`, `FLOOR` and `select_pebbles`); the
 others are listed as not checked. The briefing then opens with an answer
 whose lead and facts are checked in code (docs/GROUNDING.md, "Questions").
 
+### 4.1 Heat
+
+Every intent above also runs for heat. The hazard is read from the query's
+words (`riprap/core/burr/heat_answer.py`): "heat QN12", "extreme heat at 90-01
+183rd Street, Queens" and "Will it be dangerously hot this week at ..." plan
+with `focus.hazard: heat`, and a plan with no such focus is a flood plan.
+Each manifest carries `hazard: flood | heat | any`, and source selection
+runs the plan's hazard plus `any` (the area outline, the city's land cover
+map and the land-cover model). So a heat briefing has the same Stones:
+
+| Pebble (each has an `_nta` area version) | What it says | Stone, class |
+|---|---|---|
+| **heat_surface** | Landsat surface temperature within 150 m, as a difference from the city's land average over 18 clear summer images, with the range image by image. Surface, not air, temperature. | Cornerstone, empirical |
+| **hvi** | The Health Department's Heat Vulnerability Index for the neighbourhood or district: a rank from 1 to 5, quoted as the department's. | Cornerstone, modeled |
+| **heat_visits** | Heat illness emergency visits by residents of the community district over five summers; a suppressed count is said to be suppressed. | Cornerstone, empirical |
+| **city_landcover** | Tree canopy and paved shares from the city's 2017 map (shared with flood). | Cornerstone, empirical |
+| **heat_station** *(live)* | Days at or above 90 F this year and last at the nearest long-record station, its 1991 to 2020 average and its record. | Touchstone, empirical |
+| **heat_obs** *(live)* | The latest air temperature and heat index at the nearest station. Quoted in a plain briefing only at 85 F or above. | Touchstone, empirical |
+| **cool_features** | NYC Parks spray showers and pools within 800 m, with a pointer to the city's cooling center finder. | Keystone, empirical |
+| **nws_heat_alerts** *(live)* | Active heat advisories, watches and warnings. | Lodestone, modeled |
+| **nws_heat_forecast** *(live)* | The Weather Service's seven-day highs and highest apparent temperature, with its advisory thresholds. Quoted in a plain briefing only when a high of 90 F is forecast. | Lodestone, modeled |
+| **npcc4_heat** | NPCC4 projections of days at or above 90 F, for the city as a whole. | Lodestone, modeled |
+
+A bare place gets its flood briefing, and the page links to the heat one;
+the two together would be about 1,460 words and 35 sources. A borough or
+the whole city is a place for a heat question and is read as an area. A
+heat comparison of two places runs both, each answering the question
+asked. The district route and the MCP tools take `hazard=heat`. The heat
+rules and refusals are in [GROUNDING.md](GROUNDING.md) ("Heat questions"),
+the traps each sentence carries in [METHODOLOGY.md](METHODOLOGY.md).
+
 HTTP routes: `/api/agent` (JSON), `/api/agent/stream` (SSE),
-`/api/agent/batch` (up to 25 addresses), `/api/district/{code}`,
+`/api/agent/batch` (up to 25 addresses), `/api/district/{code}` (with
+`?hazard=heat` for the heat evidence),
 `/api/nyc311/flood_requests`, `/api/register/{asset_class}` (schools and
 nycha) and the `/api/layers/*` map layers. Printing is the browser's own
 print of the `/print/{query_id}` page. The
 MCP server (`riprap/mcp/server.py`) exposes `list_sources`,
-`get_evidence`, `get_district_summary`, `get_citation`,
-`nyc311_flood_requests`, `plan_query` and `get_briefing(address,
-question)`. Every tool works without an LLM. Each `get_evidence` and
+`get_evidence(address, hazard)`, `get_district_summary(code, hazard)`,
+`get_citation`, `nyc311_flood_requests`, `plan_query` and
+`get_briefing(address, question)`. Every tool works without an LLM. Each `get_evidence` and
 `get_district_summary` item carries its sentence, the source's own figures
 (`value`), its `source_url` and its `vintage`.
 
@@ -358,11 +394,12 @@ check work with any model and any endpoint.
 
 A briefing needs no model. An LLM at any OpenAI-compatible endpoint is
 optional (for example Granite 4.1 8B over Ollama), used as the planner and
-to choose a question's lead and facts. Three experimental models, the
-author's fine-tunes, answer a few questions about the future: a surge
-forecast that runs on CPU in the server when the `ml` extra is installed,
-and two satellite models whose saved batch output the app reads. Every
-sentence from them goes through one hedging function. See
+to choose a question's lead and facts. Two experimental models, the
+author's fine-tunes, add labelled sentences: a surge forecast that runs on
+CPU in the server when the `ml` extra is installed, and a land-cover model
+whose saved maps the app reads after the city's own map. Every sentence
+from them goes through one hedging function. The heat briefing uses no
+model. See
 [MODELS.md](MODELS.md).
 
 ---

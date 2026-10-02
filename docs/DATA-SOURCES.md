@@ -8,12 +8,18 @@ terms.
 Riprap contacts only public-record federal, state and city sources at
 runtime, plus NOAA's gauge and Hugging Face when the experimental surge
 model is installed. No commercial APIs, no proprietary scores. The NYC
-deployment has 41 manifests: 37 in `deployments/nyc/manifests/` and 4 in
-`deployments/federal/manifests/`. A point manifest and its area version
-read the same source, so the table has fewer rows than that: 23 public
-sources, 20 of them read for an address and 18 for a neighbourhood or
-district. Five more manifests are the experimental model layers, listed
-after the table.
+deployment has 59 manifests: 55 in `deployments/nyc/manifests/` and 4 in
+`deployments/federal/manifests/`. Each manifest names its briefing in a
+`hazard` field: 36 are flood sources, 18 are heat sources and 5 run in both
+(the area outline, the city's land cover map and the land-cover model). A
+point manifest and its area version read the same source, so the tables
+have fewer rows than that. A flood briefing reads 24 public sources (21
+for an address, 19 for a neighbourhood or district); a heat briefing reads
+10 for an address and 11 for a district, two of them shared with flood (the
+land cover map and the area outline). The experimental model layers are
+listed after the tables.
+
+## Flood
 
 | Source | Publisher | Used for |
 |---|---|---|
@@ -37,14 +43,36 @@ after the table.
 | Community District Profiles | NYC Department of City Planning | Buildings, residential units and residents in a district's 1% annual chance floodplain |
 | 2020 Neighborhood Tabulation Areas | NYC Department of City Planning (`9nt8-h7nd`) | Area outlines |
 | NPCC4 sea-level projections | NYC Panel on Climate Change | Projected sea-level rise for New York City (the report's Table 1, relative to 1995-2014) |
+| NYC Land Cover 2017, 6 inch | NYC Office of Technology and Innovation, NYC Open Data (`he6d-2qns`) | Paved, green and tree canopy shares near an address or in an area; quoted when a question asks, and in every heat briefing |
+
+## Heat
+
+Why each is in, and what was left out, is in
+`research_notes/fable/climate/heat_sources.md` in the working notes; the
+traps each sentence carries are in [METHODOLOGY.md](METHODOLOGY.md).
+
+| Source | Publisher | Used for |
+|---|---|---|
+| Landsat 8 and 9 Collection 2 Level 2 surface temperature | USGS, read through Microsoft Planetary Computer | How much warmer or cooler the surface is than the city's land average, over 18 clear summer images of 2023 to 2026 (`data/heat/surface_temp.tif`, baked by `scripts/bake_surface_temperature.py`) |
+| Heat Vulnerability Index, 2023 | NYC Department of Health and Mental Hygiene, Environment and Health Data Portal | The department's 1 to 5 rank for a neighbourhood or community district, with its air conditioning and green space figures |
+| Heat stress emergency department visits, 2018 to 2022 | NYC Health Department, from New York State SPARCS | Visits by residents of a community district, borough or the city, with the age-adjusted rate; suppressed counts are stated as suppressed |
+| NYC Land Cover 2017, 6 inch | NYC Open Data (`he6d-2qns`) | Tree canopy and paved share (shared with flood) |
+| Daily station records | NOAA Regional Climate Centers, ACIS | Days at or above 90 F this year and last, the 1991 to 2020 average, the year's highest reading and the record, at the nearest of Central Park, LaGuardia and JFK |
+| Latest station observation | National Weather Service | Air temperature and heat index now, at the nearest station |
+| Gridpoint forecast | National Weather Service | Seven-day daytime highs and the highest apparent temperature for the 2.5 km cell, quoted as the Weather Service's, with the New York office's advisory thresholds |
+| Active alerts, heat events | National Weather Service | Heat advisories, extreme heat watches and warnings in effect |
+| NPCC4 extreme heat projections | NYC Panel on Climate Change | Days at or above 90 F and 95 F and heat waves a year for the 2030s, 2050s and 2080s (the report's Table 4, baseline 1981-2010), for the city as a whole |
+| Spray showers and pools | NYC Parks, NYC Open Data (`ckaz-6gaa`, `y5rm-wagw`) | Places to cool off within 800 m or in an area. Cooling centers are not copied: the city lists them only during a heat emergency, at finder.nyc.gov/coolingcenters |
+| 2020 Neighborhood Tabulation Areas | NYC Department of City Planning | Area outlines, and the neighbourhood an address is in (shared with flood) |
 
 ## Experimental model layers
 
 Model output, not records. Each is labelled experimental wherever it
-appears, with its limits and tested accuracy ([MODELS.md](MODELS.md)).
+appears, with its limits and tested accuracy ([MODELS.md](MODELS.md)). A
+third layer, new surface water after storms from a satellite model, was
+retired on 2026-10-02 after two tests showed no skill.
 
 | Layer | Made from | Used for |
 |---|---|---|
 | Battery surge forecast | The author's Granite TTM r2 fine-tune on NOAA CO-OPS water levels and tide predictions at The Battery, run per request | How far above the predicted tide the water may run in the next four days |
-| New surface water after storms | The author's Prithvi-EO 2.0 fine-tune on Copernicus Sentinel-2 L2A scenes (Microsoft Planetary Computer) after 15 heavy-rain events since 2017, picked from NOAA's daily rainfall at Central Park | What the satellite model showed near a place after Hurricane Ida and other storms |
 | Land cover from the latest imagery | The NYC land-cover model (TerraMind 1.0 base fine-tuned on NYC Land Cover 2017, NYC Open Data) on Copernicus Sentinel-2 L2A scenes of 2018, 2021, 2024 and 2026; scored against NYC Land Cover 2021 (The Nature Conservancy and UVM, CC BY-NC-SA 4.0, used only as a local test key) | Paved, green and tree canopy shares of a place, from the latest year; no change between years is read |

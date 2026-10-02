@@ -1,9 +1,11 @@
 # Riprap methodology
 
-Every claim cites its source: a public record from FEMA, NOAA, USGS or city
-open data, or, where it is labelled experimental, one of three models.
-Riprap reads 23 public data sources for New York City. This methodology was
-last updated 2026-10-01.
+Every claim cites its source: a public record from FEMA, NOAA, USGS, NASA
+and USGS Landsat, the city's Health Department or city open data, or, where
+it is labelled experimental, a model. For New York City a flood briefing
+reads 24 public data sources and a heat briefing 10 or 11
+([DATA-SOURCES.md](DATA-SOURCES.md)). This methodology was last updated
+2026-10-02.
 
 > Riprap reports evidence. It computes no score, tier or ranking, and no
 > language model scores anything. Each source's finding is one cited
@@ -29,8 +31,8 @@ evidence card.
 
 | Class | Meaning | NYC examples |
 |---|---|---|
-| empirical | Measured or observed | Sandy 2012 extent, Ida high-water marks, FloodNet sensors, tide and stream gauges, asset registers |
-| modeled | A scenario, a regulatory map or a forecast | FEMA flood zones, DEP stormwater scenarios, NWS alerts and water-level forecast, NPCC4 sea-level projections |
+| empirical | Measured or observed | Sandy 2012 extent, Ida high-water marks, FloodNet sensors, tide and stream gauges, asset registers; Landsat surface temperature, station records, heat illness visits, the city's land cover map |
+| modeled | A scenario, a regulatory map, an index or a forecast | FEMA flood zones, DEP stormwater scenarios, NWS alerts and forecasts, NPCC4 projections; the Heat Vulnerability Index |
 | proxy | An indirect indicator | 311 flood requests, terrain indices |
 
 The class is a label. It does not change how a sentence is weighted, since
@@ -105,19 +107,59 @@ Caveats that travel with the evidence:
 - A source that did not answer is named as unavailable. It supports
   neither a "no" nor a zero.
 
-## 8. The five Stones
+## 8. Heat
+
+A heat briefing is the same method on a second hazard. A query that asks
+about outdoor heat gets it; a bare place gets its flood briefing, with a
+link to the heat one. The two are kept apart because together they come to
+about 1,460 words and 35 sources for one place.
+
+Each heat sentence carries the trap that goes with its figure:
+
+- **Surface temperature is not air temperature.** Landsat measures roofs,
+  pavement and treetops at about 11:35 on clear summer mornings. A place's
+  temperature in one image depends on the day, so the sentence gives the
+  difference from the city's land average in the same image, as a mean over
+  every clear image with the range image by image
+  (`scripts/bake_surface_temperature.py`). A yes or no to "is it hotter
+  here" is given only "at the surface", and only when every image agrees.
+- **A vulnerability index is a rank, not a measurement.** The Health
+  Department's Heat Vulnerability Index scores a neighbourhood 1 to 5
+  against the others from a model of heat deaths. Riprap quotes it as the
+  department's, says what it is built from, and computes no score of its
+  own. Parks, airports and cemeteries have none.
+- **A suppressed count is not a zero.** Heat illness emergency visits are
+  published by community district over five summers, counted by where the
+  patient lives; counts under 11 are withheld, and the sentence says so.
+- **A station is one point.** Days at or above 90 F come from the nearest
+  of Central Park, LaGuardia and JFK, named with its distance. The three
+  read differently.
+- **A forecast is the Weather Service's.** A question about the coming
+  days gets its forecast and alerts, quoted as issued, with the New York
+  office's advisory thresholds beside them. Riprap forecasts nothing and
+  does not predict the temperature inside a building.
+- **Cooling centers exist only in a heat emergency.** The city lists them
+  then, on its own finder. Riprap lists NYC Parks spray showers and pools
+  (summer only) and points to the finder.
+- **311 "heat" is winter.** A question about no heat or hot water is about
+  indoor heating; Riprap says so and points to 311.
+
+A heat briefing is not health or safety advice, and it does not say what
+to do in the heat.
+
+## 9. The five Stones
 
 A briefing sorts its sources into five Stones. Each Stone is a class of
 evidence. Together they form the briefing, and every claim in the output
 traces back to the Stone that produced it.
 
-| Stone | Role | Sources |
-|---|---|---|
-| Cornerstone | The hazard reader | FEMA flood maps, DEP stormwater scenarios, the Sandy extent, Ida high-water marks, terrain |
-| Keystone | The asset register | Schools, subway entrances, public housing, hospitals, construction permits, floodplain counts |
-| Touchstone | The live observer | FloodNet sensors, 311 flood complaints, tide and stream gauges, weather observations |
-| Lodestone | The projector | NWS alerts and water-level forecasts, NPCC4 sea-level projections |
-| Capstone | The synthesizer | Writes one cited sentence per record, and answers a question by rules over its words |
+| Stone | Role | Flood sources | Heat sources |
+|---|---|---|---|
+| Cornerstone | The hazard reader | FEMA flood maps, DEP stormwater scenarios, the Sandy extent, Ida high-water marks, terrain | Landsat surface temperature, the Heat Vulnerability Index, heat illness visits, the city's land cover map |
+| Keystone | The asset register | Schools, subway entrances, public housing, hospitals, construction permits, floodplain counts | NYC Parks spray showers and pools |
+| Touchstone | The live observer | FloodNet sensors, 311 flood complaints, tide and stream gauges, weather observations | The station record of 90 F days, the latest air temperature |
+| Lodestone | The projector | NWS alerts and water-level forecasts, NPCC4 sea-level projections | The NWS forecast and heat alerts, NPCC4 heat projections |
+| Capstone | The synthesizer | Writes one cited sentence per record, and answers a question by rules over its words | The same |
 
 ## References
 

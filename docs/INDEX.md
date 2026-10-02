@@ -7,7 +7,7 @@ you're new; jump directly if you know what you need.
 |---|---|
 | [BACKGROUND.md](BACKGROUND.md) | Why Riprap exists, who it is for and not for, the Five Stones in full and how they generalise beyond NYC. |
 | [DATA-SOURCES.md](DATA-SOURCES.md) | The public sources behind the NYC deployment and what each is used for. |
-| [MODELS.md](MODELS.md) | The optional LLM, the three experimental models (what each can and cannot answer, with their backtests), and how energy is recorded. |
+| [MODELS.md](MODELS.md) | The optional LLM, the two experimental models (what each can and cannot answer, with their backtests), the retired satellite water layer and its two tests, and how energy is recorded. |
 | [REPOSITORY.md](REPOSITORY.md) | Code map: the pipeline at a glance, source-of-truth paths and the repository tree. |
 | [PRIVACY.md](PRIVACY.md) | What Riprap stores and sends, 311 redaction, and a do-no-harm note. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Full system shape: the one Burr app, Five-Stone taxonomy, evidence and LLM claims checked in code for citations and numbers, SvelteKit + FastAPI + MCP surface. Start here. |

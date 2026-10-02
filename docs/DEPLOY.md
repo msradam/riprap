@@ -86,5 +86,5 @@ LitServe) is not used: Riprap calls no remote model but the LLM.
 CPU inside the server (it downloads 12 MB of weights from Hugging Face on
 first use). The Docker image and the Modal host install the core
 dependencies only, so there the surge source says it is not installed. The
-satellite layers need nothing: they are saved files under `data/eo/`, made
-by batch jobs that need the `eo` extra ([MODELS.md](MODELS.md)).
+land-cover maps need nothing: they are saved files under `data/eo/`, made
+by a batch job that needs the `eo` extra ([MODELS.md](MODELS.md)).
