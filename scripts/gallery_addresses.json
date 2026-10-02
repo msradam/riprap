@@ -177,15 +177,91 @@
   "neighborhood": "Community district QN12, Queens",
   "address": "QN12",
   "question": "How much of QN12 is paved and how much is green?",
-  "reason": "An experimental satellite land-cover model answers, labelled as a proxy, with its agreement against ESA WorldCover and its own noise.",
-  "feature_doc": "landcover_nta"
+  "reason": "Land cover: the city's own 2017 map answers first, cited to it; an experimental satellite model's estimate for the latest imagery follows, labelled with its measured error.",
+  "feature_doc": "city_landcover_nta"
  },
  {
-  "slug": "bk18-satellite",
-  "neighborhood": "Community district BK18, Brooklyn",
-  "address": "BK18",
-  "question": "What did satellite imagery show in BK18 after Ida?",
-  "reason": "What an experimental satellite model showed after Hurricane Ida, with the plain statement that it did no better than chance against surveyed flood marks.",
-  "feature_doc": "prithvi_water_nta"
+  "slug": "hunts-point-heat",
+  "neighborhood": "Hunts Point, Bronx",
+  "address": "355 Food Center Drive, Bronx, NY",
+  "hazard": "heat",
+  "reason": "A heat briefing for an address: the surface around the food market ran warmer than the city's average in every clear summer Landsat image, with the neighbourhood's vulnerability index, tree canopy and the station record beside it.",
+  "feature_doc": "heat_surface"
+ },
+ {
+  "slug": "qn12-heat",
+  "neighborhood": "Community district QN12, Queens",
+  "address": "QN12",
+  "hazard": "heat",
+  "reason": "A district's heat on one page: measured surface temperature against the city's, the Health Department's index for each neighbourhood, heat illness visits, tree canopy and where to cool off.",
+  "feature_doc": "hvi_nta"
+ },
+ {
+  "slug": "si01-heat",
+  "neighborhood": "Community district SI01, Staten Island",
+  "address": "SI01",
+  "hazard": "heat",
+  "reason": "The North Shore of Staten Island: the same heat briefing for a leafier district, read from the same records."
+ },
+ {
+  "slug": "east-harlem-hotter",
+  "neighborhood": "East Harlem, Manhattan",
+  "address": "East Harlem",
+  "hazard": "heat",
+  "question": "Is East Harlem hotter than the rest of the city?",
+  "reason": "A yes or no the record does not give: across 18 summer images East Harlem's surface ran within half a degree of the city's average, cooler in some and warmer in others, so the answer quotes the measurement with no yes or no, and says it is the surface, not the air.",
+  "feature_doc": "heat_surface_nta"
+ },
+ {
+  "slug": "hollis-heat-week",
+  "neighborhood": "Hollis, Queens",
+  "address": "90-01 183rd Street, Queens, NY 11423",
+  "hazard": "heat",
+  "question": "Will it be dangerously hot this week at 90-01 183rd Street, Queens?",
+  "reason": "A question about the coming days: the National Weather Service's forecast and alerts, quoted as the Weather Service's, with its advisory thresholds beside them. Riprap forecasts nothing itself.",
+  "feature_doc": "nws_heat_forecast"
+ },
+ {
+  "slug": "red-hook-apartment-heat",
+  "neighborhood": "Red Hook, Brooklyn",
+  "address": "80 Pioneer Street, Brooklyn, NY",
+  "hazard": "heat",
+  "question": "Will my apartment at 80 Pioneer Street, Brooklyn overheat this weekend?",
+  "reason": "A prediction nobody can make: no source says how hot one apartment will get. The answer says so, then quotes the area forecast and what has been measured on the block."
+ },
+ {
+  "slug": "brighton-heat-score",
+  "neighborhood": "Brighton Beach, Brooklyn",
+  "address": "2940 Brighton 3rd St, Brooklyn, NY",
+  "hazard": "heat",
+  "question": "What is the heat score for 2940 Brighton 3rd St, Brooklyn?",
+  "reason": "Riprap computes no score. It says so, and quotes the Health Department's own index for the neighbourhood as what it is: a rank, not a measurement.",
+  "feature_doc": "hvi"
+ },
+ {
+  "slug": "upper-west-90-days",
+  "neighborhood": "Upper West Side, Manhattan",
+  "address": "1 West 72nd Street, Manhattan, NY",
+  "hazard": "heat",
+  "question": "How many days reached 90 degrees in 2025 near 1 West 72nd Street, Manhattan?",
+  "reason": "A count from the station record: the year asked about, at the nearest long-record station, with the station and its distance named.",
+  "feature_doc": "heat_station"
+ },
+ {
+  "slug": "sedgwick-cool-off",
+  "neighborhood": "Morris Heights, Bronx",
+  "address": "1520 Sedgwick Avenue, Bronx, NY",
+  "hazard": "heat",
+  "question": "Where can people cool off near 1520 Sedgwick Avenue, Bronx?",
+  "reason": "Places to cool off: NYC Parks spray showers and pools nearby, with the plain statement that cooling centers open only in a heat emergency and where the city lists them.",
+  "feature_doc": "cool_features"
+ },
+ {
+  "slug": "astoria-heat-advice",
+  "neighborhood": "Astoria, Queens",
+  "address": "Astoria Park, Queens, NY",
+  "hazard": "heat",
+  "question": "Should I go running in Astoria Park in this heat today?",
+  "reason": "A refusal: Riprap gives no health or safety advice, and says where official heat guidance is."
  }
 ]

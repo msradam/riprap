@@ -10,7 +10,8 @@ files, so the gallery needs no backend (GitHub Pages).
         uv run python scripts/build_gallery.py      # those entries with a model configured
 
 Entries with a `question` run the question; the rest run the bare place
-(an address or a community district). Without a model a question is
+(an address or a community district), as its flood briefing or, with
+`"hazard": "heat"`, its heat briefing. Without a model a question is
 answered by the rules. GALLERY_ONLY rebuilds just those slugs and keeps
 every other file and index entry as it is.
 
@@ -67,7 +68,8 @@ def main() -> int:
                 index.append(old_index[a["slug"]])
             continue
         t0 = time.time()
-        final = run(a.get("question") or a["address"])
+        # A heat entry with no question is the heat briefing for the place.
+        final = run(a.get("question") or (f"heat {a['address']}" if a.get("hazard") == "heat" else a["address"]))
         dep = deployment_by_name(final.get("deployment") or "nyc")
         stones = load_stones(dep.root)
         entry = {
@@ -75,6 +77,7 @@ def main() -> int:
             "neighborhood": a["neighborhood"],
             "address": a["address"],
             "question": a.get("question"),
+            "hazard": a.get("hazard", "flood"),
             "generated_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%MZ"),
             "riprap_commit": commit,
             "mode": (final.get("grounding") or {}).get("tier") or llm.tier(),
@@ -86,7 +89,7 @@ def main() -> int:
         }
         (OUT / f"{a['slug']}.json").write_text(json.dumps(entry, indent=1) + "\n")
         g = final.get("grounding") or {}
-        index.append({k: entry[k] for k in ("slug", "neighborhood", "address", "question",
+        index.append({k: entry[k] for k in ("slug", "neighborhood", "address", "question", "hazard",
                                             "generated_at", "mode", "model", "quantization")})
         print(f"{a['slug']:18s} {entry['mode']:7s} kept={len(g.get('claims') or [])} "
               f"dropped={len(g.get('dropped_claims') or [])} {time.time() - t0:.1f}s", flush=True)
@@ -95,6 +98,7 @@ def main() -> int:
     # picks up a new reason or featured source without being regenerated.
     by_slug = {a["slug"]: a for a in addresses}
     for e in index:
+        e["hazard"] = by_slug.get(e["slug"], {}).get("hazard", "flood")
         for k in ("reason", "feature_doc"):
             if by_slug.get(e["slug"], {}).get(k):
                 e[k] = by_slug[e["slug"]][k]
