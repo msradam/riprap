@@ -126,3 +126,12 @@ def test_a_rule_lead_that_fails_the_lead_checks_is_dropped_and_the_facts_stand(m
     out = _rules_run(monkeypatch, docs, "Has 80 Pioneer Street, Brooklyn flooded?", focus={"time_frame": "past"})
     answer = out["paragraph"].split("**Answer.**\n")[1].split("\n\n")[0]
     assert answer.startswith("From the sources consulted: 7 NYC 311") and "No." not in answer
+
+
+def test_a_heat_question_never_waits_on_the_model_planner(monkeypatch):
+    calls = _planner_that_counts(monkeypatch)
+    monkeypatch.setattr(syn, "RULES_FIRST", True)
+    wide = app.plan_for("Which parts of the Bronx should worry most about heat?")
+    pair = app.plan_for("compare heat at 80 Pioneer Street, Brooklyn vs 355 Food Center Drive, Bronx")
+    assert calls == [] and wide["focus"]["hazard"] == "heat" and wide["targets"][0]["text"] == "BX"
+    assert pair["intent"] == "compare" and len(pair["targets"]) == 2

@@ -139,6 +139,11 @@ def _rules_can_plan(query: str, guard: dict) -> bool:
     street address, a district or a neighbourhood: no planner call needed."""
     from riprap.core.burr import rule_answer
 
+    if hazard_of(guard) == "heat":
+        # The heat parser places a borough, the city and both sides of a
+        # comparison itself, and the heat rules answer; the model planner
+        # added a 10 to 35 s wait and changed nothing.
+        return rule_answer.recognised(query)
     kind = (guard.get("place") or {}).get("kind")
     placed = kind in ("address", "district") or (kind == "neighborhood" and guard["intent"] in POLYGON_INTENTS)
     return placed and guard["intent"] != "compare" and rule_answer.recognised(query)

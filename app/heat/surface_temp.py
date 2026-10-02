@@ -55,7 +55,7 @@ def _coverage(geom, transform, shape):
     h, w = shape
     if h * w > 2500:
         return rasterize([(geom, 1)], out_shape=shape, transform=transform, fill=0, dtype="uint8").astype("float32")
-    fine = rasterize([(geom, 1)], out_shape=(h * FINE, w * FINE), transform=transform * Affine.scale(1 / FINE), fill=0,
+    fine = rasterize([(geom, 1)], out_shape=(h * FINE, w * FINE), transform=transform @ Affine.scale(1 / FINE), fill=0,
                      dtype="uint8")
     return fine.reshape(h, FINE, w, FINE).mean(axis=(1, 3)).astype("float32")
 
