@@ -606,6 +606,7 @@ def test_the_second_unseen_set():
     assert heuristic_plan("where are the heat hot spots in Hunts Point")["focus"]["hazard"] == "heat"
     # A scorcher is a hot day.
     assert ha.hazard_of("Ive lived in Parkchester since 1984 and I swear there are more scorchers now. Do the records back that up?") == "heat"
+    assert ha.answer("I swear there are more scorchers now than in 1984. Do the records back that up?", T)[1][0] == "heat_station"
     # Who is at risk: the department's index first.
     assert ha.answer("who is most at risk from heat in brownsville", T)[1][0] == "hvi"
 

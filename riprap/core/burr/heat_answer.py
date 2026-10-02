@@ -88,7 +88,7 @@ TOPICS = (
     (re.compile(r"\bsurface\b|landsat|satellite|heat island|hot ?spots?|\b(?:run|runs|ran|get|gets|is|are) (?:the )?hottest\b"
                 r"|\bhottest (?:parts?|blocks?|areas?|places?|spots?)\b|how hot (?:does|do) it get", re.I), SURFACE),
     (re.compile(r"\b(?:8[5-9]|9\d|1[01]\d)[- ]?(?:°|degrees?\b|deg\b)|\bhot days?\b|\brecord\b|hottest (?:day|it)"
-                r"|how hot (?:did|was|has|does|do)|\b(?:this|last) (?:summer|year)\b|so far this"
+                r"|how hot (?:did|was|has|does|do)|\b(?:this|last) (?:summer|year)\b|so far this|scorcher|\bthe records\b|\bused to\b"
                 r"|\b(?:hit|reach(?:ed)?|top(?:ped)?|over|above) (?:8[5-9]|9\d|1[01]\d)\b", re.I), STATION),
 )
 # Heat deaths are published for the city as a whole only, so no source here holds them for a place.
