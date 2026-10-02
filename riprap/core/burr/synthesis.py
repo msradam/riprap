@@ -399,7 +399,7 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
         parts.append(f"**{sec}.**\n" + (body or NO_EVIDENCE_LINE))
     pointer = HEAT_LIVE_POINTER if heat_answer.hazard_of(question) == "heat" else LIVE_POINTER
     footer = NON_SCOPE_FOOTER.replace("**Out of scope.** ", f"**Out of scope.** {pointer} ", 1) if now else NON_SCOPE_FOOTER
-    if question and heat_answer.hazard_of(question) == "flood" and heat_answer.HEAT_RE.search(question) \
+    if question and re.search(r"\bflood", question, re.I) and re.search(r"\bheat\b|\bhott?(?:er|est)?\b", question, re.I) \
             and not heat_answer.INDOOR_HEATING_RE.search(question):
         # "Which is the bigger problem here, flooding or heat?" got the flood record and no word about heat.
         footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {BOTH_HAZARDS} ", 1)

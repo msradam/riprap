@@ -617,4 +617,77 @@ def test_a_flood_answer_to_a_question_that_also_names_heat_says_so():
     both = _render([], [], [], question="Which is the bigger problem at 80 Pioneer Street, flooding or heat?")
     assert BOTH_HAZARDS in both
     assert BOTH_HAZARDS not in _render([], [], [], question="Has 80 Pioneer Street flooded?")
+    assert BOTH_HAZARDS not in _render([], [], [], question="Did Sandy hit 89-11 Merrick Boulevard, Queens?")
     assert BOTH_HAZARDS not in _render([], [], [], question="Is 80 Pioneer Street hotter than the city?")
+
+
+def test_what_a_fresh_reviewer_broke():
+    """Each input here gave a wrong or misleading answer before it was fixed."""
+    hot = {"heat_surface": {"mean_diff_f": 5.7, "warmer_in_every_image": True, "cooler_in_every_image": False}}
+    # Polarity: "hot compared to the city" and "higher than the city average" ask "hotter", and were answered "no".
+    for q in ("Is Hunts Point hot compared to the rest of the city?", "Is the surface temperature here higher than the city average?"):
+        assert ha.answer(q, T, hot)[0] == "surface_yes", q
+    assert ha.answer("Is Hunts Point cooler than the rest of the city?", T, hot)[0] == "surface_no"
+    # Only the city is the baseline: another borough, another time and no direction at all get no yes or no.
+    for q in ("Is Bayside hotter than the rest of Queens?", "Is it hotter than usual in Hunts Point this summer?",
+              "Is Mott Haven hotter than Riverdale?", "Is it hotter or cooler than the city here?"):
+        assert ha.answer(q, T, hot)[0] == "facts", q
+    # A house number is not a temperature or a year.
+    for q in ("Did Sandy hit 89-11 Merrick Boulevard, Queens?", "Is Red Hook a hot spot for sewer backups?",
+              "Does the street outside 80 Pioneer Street, Brooklyn take on water most summers?",
+              "What is the record high tide at the Battery?"):
+        assert ha.hazard_of(q) == "flood", q
+    assert ha.hazard_of("Where can kids cool off near Mariners Harbor Houses?") == "heat"
+    assert ha.count_sentence("How many days hit 90 last year near 2020 Grand Concourse, Bronx?", ["heat_station"], V) is None
+    assert ha.year_sentence("How hot did it get at 2025 Broadway, Manhattan?", ["heat_station"], {"heat_station": {
+        "station": "Central Park", "max_by_year": {2025: [99, "2025-06-24"]}}}) is None
+    assert ha.time_frame("How hot does it get at 2050 Bartow Avenue, Bronx?") != "future"
+    # The count is of days at 90°F: another threshold, a span of years or a calendar day is not answered by it.
+    assert ha.count_sentence("How many days above 95 in 2025 in QN12?", ["heat_station"], V) is None
+    assert ha.count_sentence("How many days above 90 since 2023 in QN12?", ["heat_station"], V) is None
+    assert ha.count_sentence("How many days above 90 in 2025 in QN12?", ["heat_station"], V) == "15 days at or above 90°F at JFK Airport in 2025."
+    peaks = {"heat_station": {"station": "JFK Airport", "max_by_year": {2025: [102, "2025-06-25"]}, "record_f": 104,
+                              "record_date": "1966-07-03", "record_since": "1948"}}
+    assert ha.year_sentence("How hot was it on July 15, 2025 in QN12?", ["heat_station"], peaks) is None
+    assert ha.record_sentence("What is the record low temperature in QN12?", ["heat_station"], peaks) is None
+    assert ha.record_sentence("What is the record high in QN12?", ["heat_station"], peaks)
+    # The heat index is the weather's, not the Health Department's index.
+    assert ha.answer("Is the heat index above 100 in QN12?", T)[1][0] == "heat_obs"
+    # Past advisories are in no source, and an alert source that did not answer is not "no advisory".
+    assert ha.answer("How many heat advisories were issued in 2025 for QN12?", T)[0] == "cannot_answer"
+    assert ha.answer("Is there a heat advisory right now?", {k: v for k, v in T.items() if k != "nws_heat_alerts"})[0] == "cannot_answer"
+    assert ha.answer("Is there a heat advisory right now?", T)[0] == "facts"
+    # Advice, asked without "should I".
+    for q in ("Is it too hot for my kids to play outside in Hunts Point today?", "What precautions should residents of QN12 take in a heat wave?",
+              "Would you recommend moving to Hunts Point given the heat?", "Do I need an air conditioner at 80 Pioneer Street, Brooklyn?"):
+        assert heuristic_plan(q)["intent"] == "out_of_scope", q
+    # A named day by ordinal or by holiday is still a named day.
+    for q in (f"Will it reach 100 on July 4th at {A}?", f"Will it be hot on Labor Day at {A}?"):
+        assert ha.answer(q, T)[0] == "no_prediction_heat", q
+    # A landmark with a borough in its name is the landmark, not the borough.
+    for q, name in (("Is the Staten Island Mall a heat island?", "Staten Island Mall"), ("How hot is the Bronx Zoo?", "Bronx Zoo")):
+        plan = heuristic_plan(q)
+        assert plan["intent"] == "single_address" and plan["targets"][0]["text"].startswith(name), plan
+    assert heuristic_plan("heat on the Staten Island North Shore")["targets"][0]["text"] == "SI"
+
+
+def test_the_station_record_stands_on_new_years_day(monkeypatch):
+    from datetime import date
+    from types import SimpleNamespace
+
+    from app.heat import weather
+
+    rows = [[str(y), ["M" if y == 2027 else 10 + y % 7, 0], ["M" if y == 2027 else 95, f"{y}-07-10"]] for y in range(1991, 2028)]
+    monkeypatch.setattr(weather.http, "post", lambda *a, **k: SimpleNamespace(
+        raise_for_status=lambda: None, json=lambda: {"data": rows, "meta": {"valid_daterange": [["1869-01-01", "2026-12-31"]]},
+                                                      "smry": [[106, "1936-07-09"]]}))
+    v = weather.station_record(40.78, -73.97, today=date(2027, 1, 1))
+    assert v["year"] == 2026 and "in 2026 through 2026-12-31" in v["narrative"]
+
+
+def test_the_surface_reading_is_of_land():
+    from app.heat import surface_temp as st
+
+    # 89 South Street, Manhattan, on the East River: the river once pulled this to -9.3.
+    v = st.for_point(40.7056, -74.0018)
+    assert v and -5 < v["mean_diff_f"] < -2

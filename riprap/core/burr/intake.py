@@ -193,7 +193,10 @@ _OTHER_HAZARD_RE = {"air": re.compile(r"\b(air quality|aqi|air pollution|smog|pm
 _HEAT_ADVICE_RE = re.compile(
     r"\b(?:bad|good|smart|wise|dumb|terrible) idea\b|\bthinking (?:of|about) (?:renting|buying|moving)\b"
     r"|\bshould (i|we|my \w+)\b|\bis it (too hot|ok|okay) to\b|\bcan (i|we|my \w+) (go|run|walk|exercise|work|play|leave)\b"
-    r"|\bsymptoms?\b|\bwhat (should|do) (i|we) do\b|\bhow (do|can|should) (i|we) (stay|keep|treat|protect|cool)\b", re.I)
+    r"|\bsymptoms?\b|\bwhat (should|do) (i|we) do\b|\bhow (do|can|should) (i|we) (stay|keep|treat|protect|cool)\b"
+    # Found by a reviewer: advice asked without "should I".
+    r"|\btoo hot (?:for|to)\b|\bprecautions?\b|\brecommend|\bdo (?:i|we) need\b|\bis it safe\b|\bsafe (?:to|for)\b"
+    r"|\bwhat should (?:\w+ ){1,4}(?:do|take)\b", re.I)
 
 
 _BOROUGH_WORDS = {"manhattan": "Manhattan", "brooklyn": "Brooklyn", "queens": "Queens", "bronx": "Bronx",
@@ -329,7 +332,11 @@ def _plan_for(q: str, hazard: str) -> dict:
                       " ", heat_answer.HEAT_RE.sub(" ", _address_from_query(q)), flags=re.IGNORECASE).strip(" ,.?!")
         if not bare or (_QUESTION_RE.search(q) and not landmark_phrase(q)):
             return {"intent": "not_implemented", "rationale": NO_PLACE_HEAT, "targets": [], "place": place}
+    # Only when the rest of the name is a direction: "Staten Island Mall" and "Bronx Zoo" are landmarks for the
+    # geocoder (the mall once got the borough's reading, 13°F cooler than its own).
     if heat and place["kind"] == "neighborhood" and not nta.resolve(place["text"]) and _WIDE_AREA_RE.search(place["text"]) \
+            and not re.sub(r"\b(?:the|north|south|east|west|shore|side|central|upper|lower|mid|downtown|uptown|end|of)\b|\W", "",
+                           _WIDE_AREA_RE.sub("", place["text"]), flags=re.I) \
             and (scope := _wide_area(q)):
         # "Staten Island North Shore" is no tabulation area's name: the borough it names is the place.
         return {"intent": "neighborhood", "rationale": f"Heuristic match: {scope}.",

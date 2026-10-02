@@ -34,6 +34,8 @@ from __future__ import annotations
 
 import re
 
+from riprap.core.burr.place import _STREET_WORD, _SUFFIX
+
 # Outdoor heat. "Heath Avenue" and "heating" are not it, and neither is "hot
 # water": a 311 "HEAT/HOT WATER" complaint is about a cold apartment in winter.
 HEAT_RE = re.compile(
@@ -44,7 +46,8 @@ HEAT_RE = re.compile(
     # Found by questions written without sight of these rules: "air temp", "will it be over 95", "hit 90 or
     # above", "forecast highs", "cool places", "what will summers be like".
     r"|\btemps?\b|\b(?:over|above|hit|hits|reach(?:es|ed)?|top(?:s|ped)?)\s+(?:8[5-9]|9\d|1[01]\d)\b|\bhighs\b"
-    r"|\bcool (?:places?|spots?|spaces?)\b|\bstay(?:ing)? cool\b|\bsummers\b|\brecord highs?\b", re.I)
+    r"|\bcool (?:places?|spots?|spaces?)\b|\bstay(?:ing)? cool\b|\bsummers\b"
+    r"|\brecord highs?\b(?!\s+(?:tide|water|surge|rain))", re.I)
 # A cold apartment: no heat, a radiator, the landlord. Not this briefing.
 INDOOR_HEATING_RE = re.compile(
     r"\bheat\s*(?:and|&|/|or)\s*hot water|\bno heat\b|\bheat(?:ing)? (?:complaints?|violations?|season|is (?:off|out|broken))"
@@ -82,7 +85,8 @@ TOPICS = (
      COOLING),
     (re.compile(r"emergency (?:room|department)|\b(?:er|ed) visits?\b|hospitali[sz]|heat (?:illness|stroke|exhaustion|stress)"
                 r"|\bsick\b|\bhealth\b(?! department)", re.I), VISITS),
-    (re.compile(r"vulnerab|\bhvi\b|\bindex\b|\bat risk\b", re.I), HVI),
+    (re.compile(r"vulnerab|\bhvi\b|(?<!heat )\bindex\b|\bat risk\b", re.I), HVI),
+    (re.compile(r"\bheat index\b|\bfeels? like\b|\bhumid", re.I), OBS),
     (re.compile(r"\btrees?\b|canopy|\bshade|\bpaved|\bpaving|pavement|impervious|green (?:space|cover)|vegetat", re.I), COVER),
     (re.compile(r"advisor(?:y|ies)|\bwarnings?\b|\balerts?\b|\bwatch\b", re.I), ALERTS),
     (re.compile(r"\bsurface\b|landsat|satellite|heat island|hot ?spots?|\b(?:run|runs|ran|get|gets|is|are) (?:the )?hottest\b"
@@ -98,7 +102,8 @@ _SCORE_RE = re.compile(r"\b(?:scores?|ratings?|rated|grades?|rank(?:ed|ing|s)?)\
 _INDOORS_RE = re.compile(r"\b(?:my|our|the|this) (?:apartment|unit|building|home|house|room|classroom|block|street|playground)\b"
                          r"|\bindoors?\b|\binside\b|\b(?:apartment|apt\.?) \w+\b|\bon my block\b", re.I)
 # A calendar date ("on July 15", "the afternoon of 7/15"): beyond a seven-day forecast as a rule, and never forecast for one spot.
-_DATE_RE = re.compile(r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.? \d{1,2}\b|\b\d{1,2}/\d{1,2}\b", re.I)
+_DATE_RE = re.compile(r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.? \d{1,2}(?:st|nd|rd|th)?\b|\b\d{1,2}/\d{1,2}\b"
+                      r"|\b(?:labor|memorial|independence) day\b|\b(?:fourth|4th) of july\b|\bjuly fourth\b|\bjuneteenth\b", re.I)
 _WILL_RE = re.compile(r"\b(?:will|going to|gonna|expected to|likely to)\b|\bhow hot will\b", re.I)
 _TODAY_RE = re.compile(r"\b(?:today|this (?:morning|afternoon|evening)|outside now|current(?:ly)?)\b", re.I)
 _NEAR_RE = re.compile(r"\b(?:tomorrow|tonight|this (?:coming )?(?:week|weekend)|next (?:week|weekend|few days|couple of days)"
@@ -111,9 +116,25 @@ _COUNT_DAYS_RE = re.compile(r"\bhow many\b[^.?!]*\bdays?\b|\bnumber of\b[^.?!]*\
 _COMPARE_CITY_RE = re.compile(r"\b(?:hott?er|warmer|cooler)\b[^.?!]*\bthan\b|\bthan (?:the )?(?:rest of the |city|average)"
                               r"|\bcompared? (?:to|with) (?:the )?(?:rest of the )?(?:city|average)|\bheat island\b"
                               r"|\b(?:hott?er|warmer|cooler) (?:here|there)\b", re.I)
-# "Hotter than Riverdale" compares two places: the measurement here says nothing about there, so no yes or no.
-_THAN_ELSEWHERE_RE = re.compile(r"\bthan\b(?!\s+(?:the\s+)?(?:rest|city|average|most|other|nyc|new york|normal|usual|it should))", re.I)
+# The measurement is a difference from the city's land average, so it gives a yes or no only against the city:
+# "hotter than Riverdale", "than the rest of Queens" and "than usual" are other comparisons.
+_CITY = r"(?:the )?(?:rest of (?:the )?)?(?:city|nyc|new york(?: city)?|citywide|average|city'?s? average|city as a whole)\b(?! of)"
+_VS_CITY_RE = re.compile(rf"\bthan {_CITY}|\bcompared? (?:to|with) {_CITY}|\bheat island\b", re.I)
+_HOTTER_RE = re.compile(r"\b(?:hott?er|warmer|hot|higher|above)\b|heat island", re.I)
+_COOLER_RE = re.compile(r"\b(?:cooler|colder|cool|lower|below)\b", re.I)
 _YEAR_RE = re.compile(r"\b((?:19|20)\d\d)\b(?!s)")
+# A span of years ("since 2020", "from 2019 to 2024") is not one year.
+_SPAN_RE = re.compile(r"\b(?:since|from|between|after|before|over the (?:last|past))\b", re.I)
+_DEGREES_RE = re.compile(r"\b(8[5-9]|9\d|1[01]\d)\b(?!\s*(?:days?|years?|%|percent|m\b|km\b))")
+# A house number is not a year or a temperature ("near 2020 Grand Concourse", "Did Sandy hit 89-11 Merrick
+# Boulevard"): capitalised words up to a street word, or any words after "at" or "near". As rule_answer._HOUSE_YEAR_RE.
+_HOUSE_RE = re.compile(rf"(?:(?<!\bin )(?<!\bby )(?<!\bthe )(?<!\bsince )\b\d{{1,5}}(?:-\d{{1,4}})?(?=\s+(?:(?-i:[A-Z])[\w'.]*\s+){{0,3}}?{_SUFFIX}\b)"
+                       rf"|(?:(?<=\bat )|(?<=\bnear )|(?<=\baround )|(?<=\boutside ))\d{{1,5}}(?:-\d{{1,4}})?(?=\s+(?:{_STREET_WORD}\s+){{0,3}}?{_SUFFIX}\b))",
+                       re.I)
+
+
+def _sans_house(question: str) -> str:
+    return _HOUSE_RE.sub(" ", question or "")
 
 
 def hazard_of(question: str) -> str:
@@ -122,11 +143,17 @@ def hazard_of(question: str) -> str:
     the basement floods" is a flood question.)"""
     from riprap.core.burr import rule_answer
 
-    q = question or ""
+    q = _sans_house(question)
     if not HEAT_RE.search(q) or re.search(r"\bflood", q, re.I) or INDOOR_HEATING_RE.search(q):
         return "flood"
-    # A preamble about the heat before a question about a flood record is a flood question.
-    if any(rule_answer.names_flood(c) for c in rule_answer._clauses(q) if not HEAT_RE.search(c)):
+    # "Summers" alone is a weak heat word: beside water it is the season a street floods in.
+    if all(m.group(0).lower() == "summers" for m in HEAT_RE.finditer(q)) and re.search(
+            r"\b(?:water|rain\w*|storm\w*|sewer\w*|wet|damp|leak\w*|drain\w*)\b", q, re.I):
+        return "flood"
+    # A preamble about the heat before a question about a flood record is a flood question, and so is a clause
+    # that names a flood source beside a heat word ("a hot spot for sewer backups"). Harbor is in place names.
+    if any(rule_answer.names_flood(re.sub(r"\bharbor\b", " ", c, flags=re.I) if HEAT_RE.search(c) else c)
+           for c in rule_answer._clauses(q)):
         return "flood"
     return "heat"
 
@@ -152,7 +179,7 @@ def named(question: str, texts: dict[str, str]) -> list[str]:
 def time_frame(question: str) -> str:
     from riprap.core.burr import rule_answer
 
-    q = question or ""
+    q = _sans_house(question)
     if _FAR_RE.search(q):
         return "future"
     if _NEAR_RE.search(q) or (_WILL_RE.search(q) and not _INDOORS_RE.search(q)):
@@ -168,8 +195,10 @@ def year_sentence(question: str, facts: list[str], values: dict | None) -> str |
     the question names no year, or asks for a count of days."""
     doc = next((d for d in STATION if d in facts), None)
     v = (values or {}).get(doc) if doc else None
-    m = _YEAR_RE.search(question or "")
-    if not m or not isinstance(v, dict) or _COUNT_DAYS_RE.search(question or "") or not re.search(r"how hot|hottest|highest|record", question or "", re.I):
+    question = _sans_house(question)
+    m = _YEAR_RE.search(question)
+    if not m or not isinstance(v, dict) or _COUNT_DAYS_RE.search(question) or _DATE_RE.search(question) or _SPAN_RE.search(question) \
+            or not re.search(r"how hot|hottest|highest|record", question, re.I):
         return None
     peak = (v.get("max_by_year") or {}).get(int(m.group(1)), (v.get("max_by_year") or {}).get(m.group(1)))
     return f"The highest reading at {v['station']} in {m.group(1)} was {peak[0]}°F on {peak[1]}." if peak else None
@@ -179,8 +208,9 @@ def record_sentence(question: str, facts: list[str], values: dict | None) -> str
     """For "the hottest day on record": the station's all-time record, as the lead."""
     doc = next((d for d in STATION if d in facts), None)
     v = (values or {}).get(doc) if doc else None
-    if not isinstance(v, dict) or not v.get("record_f") or not re.search(r"\brecord\b|\ball[- ]time\b|\bever\b", question or "", re.I):
-        return None
+    if not isinstance(v, dict) or not v.get("record_f") or not re.search(r"\brecord\b|\ball[- ]time\b|\bever\b", question or "", re.I) \
+            or re.search(r"\b(?:low|lowest|cold|coldest|coolest|tide|rain\w*|snow\w*)\b", question or "", re.I):
+        return None  # the record held here is the highest temperature
     return (f"The record at {v['station']} is {v['record_f']}°F, set on {v['record_date']} (records from "
             f"{v['record_since']}).")
 
@@ -191,8 +221,12 @@ def count_sentence(question: str, facts: list[str], values: dict | None) -> str 
     names no year the record holds (the station sentence then answers)."""
     doc = next((d for d in STATION if d in facts), None)
     v = (values or {}).get(doc) if doc else None
-    m = _YEAR_RE.search(question or "")
-    if not m or not isinstance(v, dict) or not _COUNT_DAYS_RE.search(question or ""):
+    question = _sans_house(question)
+    m = _YEAR_RE.search(question)
+    if not m or not isinstance(v, dict) or not _COUNT_DAYS_RE.search(question) or _SPAN_RE.search(question):
+        return None
+    # The record counts days at 90°F or above: a question about 95 or 100 is not answered by that count.
+    if any(t != "90" for t in _DEGREES_RE.findall(_YEAR_RE.sub(" ", question))):
         return None
     n = (v.get("by_year") or {}).get(int(m.group(1)), (v.get("by_year") or {}).get(m.group(1)))
     if n is None:
@@ -201,6 +235,7 @@ def count_sentence(question: str, facts: list[str], values: dict | None) -> str 
     return f"{n} day{'s' if n != 1 else ''} at or above 90°F at {v['station']} in {m.group(1)}{partial}."
 
 
+_ALERTS_AT = next(i for i, (_, ids) in enumerate(TOPICS) if ids == ALERTS)
 _PARTS = r"(?:parts?|areas?|neighbou?rhoods?|blocks?|districts?|streets?|places?)"
 _RANK_RE = re.compile(rf"\b(?:which|what)\s+{_PARTS}\b|\b(?:hottest|coolest|worst|most vulnerable)\s+{_PARTS}\b"
                       r"|\bwhere\b[^?.]*\b(?:hottest|coolest|worst|most)\b", re.I)
@@ -212,7 +247,7 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     "no_score", "no_ranking", "surface_yes", "surface_no" (synthesis.LEAD_PHRASES)."""
     from riprap.core.burr import answer_checks as ac
 
-    q = question or ""
+    q = _sans_house(question)
 
     def have(*groups) -> list[str]:
         return [i for g in groups for i in g if texts.get(i)]
@@ -231,6 +266,10 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
         return ("no_prediction_heat", docs) if docs else None
     if _DEATHS_RE.search(q):
         return "cannot_answer", have(VISITS)
+    if TOPICS[_ALERTS_AT][0].search(q) and (not have(ALERTS) or _YEAR_RE.search(q) or re.search(r"\bhow many\b|\bwere\b|\blast (?:summer|year)\b", q, re.I)):
+        # The alert source did not answer, or the question is about past alerts, which no source here holds:
+        # "no active advisory" must not stand as the answer to either.
+        return "cannot_answer", have(ALERTS, OBS, FORECAST)
     if tf == "now":
         live = have(OBS, ALERTS, FORECAST)
         if any(d in COOLING for d in subjects) and not re.search(r"\bhot\b|temp|heat index|advisor|alert|warning", q, re.I):
@@ -251,8 +290,8 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     if _COMPARE_CITY_RE.search(q) and not any(d in COVER or d in HVI for d in subjects):
         docs = have(SURFACE)
         v = (values or {}).get(docs[0]) if docs else None
-        if docs and isinstance(v, dict) and ac.is_yes_no_question(q) and not _THAN_ELSEWHERE_RE.search(q):
-            hotter = bool(re.search(r"\b(?:hott?er|warmer)\b|heat island", q, re.I))
+        hotter, cooler = bool(_HOTTER_RE.search(q)), bool(_COOLER_RE.search(q))
+        if docs and isinstance(v, dict) and ac.is_yes_no_question(q) and _VS_CITY_RE.search(q) and hotter != cooler:
             if v.get("warmer_in_every_image"):
                 return ("surface_yes" if hotter else "surface_no"), docs
             if v.get("cooler_in_every_image"):

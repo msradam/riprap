@@ -188,6 +188,9 @@ def main() -> int:
         return 1
     OUT.mkdir(parents=True, exist_ok=True)
     a = np.stack(bands)
+    # Land only: the sentence compares "the ground" with the city's land average, and a pier's circle that took
+    # in the river once read 5°F cooler than its ground.
+    a[:, ~land] = NODATA
     with rasterio.open(OUT / "surface_temp.tif", "w", driver="COG", dtype="int16", count=len(a), height=h, width=w,
                        crs=ref30.rio.crs, transform=t90, compress="deflate",
                        predictor=2, nodata=NODATA) as dst:
