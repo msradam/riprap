@@ -137,7 +137,10 @@ describe('Landing smoke', () => {
       'Each is labelled experimental, states its tested accuracy in every sentence, and has a measured baseline to beat.'
     );
     expect(text(container)).not.toContain('days and years ahead');
-    expect(text(container)).toContain('87.1% agreement with ESA WorldCover, its own label source,');
+    expect(text(container)).toContain(
+      "it reads a typical district's paved share 1.7 points above the city's own 2021 map"
+    );
+    expect(text(container)).not.toContain('WorldCover');
     expect(container.querySelectorAll('h3')).toHaveLength(3);
     expect([...container.querySelectorAll('.exp-badge')].map((b) => b.textContent)).toEqual([
       'Experimental',
