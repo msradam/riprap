@@ -40,9 +40,11 @@ def get_projections() -> dict:
         f"City by the 2050s and {b['days_ge_90'][25]} to {b['days_ge_90'][75]} by the 2080s, as its middle range (25th "
         f"to 75th percentile), against {BASELINE['days_ge_90']} a year in 1981-2010; the 90th percentile is "
         f"{a['days_ge_90'][90]} days by the 2050s and {b['days_ge_90'][90]} by the 2080s. Days at or above 95°F go "
-        f"from {BASELINE['days_ge_95']} a year to {a['days_ge_95'][25]} to {a['days_ge_95'][75]} by the 2050s, and heat "
-        f"waves from {BASELINE['heat_waves']} a year to {a['heat_waves'][25]} to {a['heat_waves'][75]}. These "
-        "figures are for the city as a whole, not for a neighbourhood.")
+        f"from {BASELINE['days_ge_95']} a year to {a['days_ge_95'][25]} to {a['days_ge_95'][75]} by the 2050s and "
+        f"{b['days_ge_95'][25]} to {b['days_ge_95'][75]} by the 2080s, and heat waves from {BASELINE['heat_waves']} a "
+        f"year to {a['heat_waves'][25]} to {a['heat_waves'][75]} and then {b['heat_waves'][25]} to "
+        f"{b['heat_waves'][75]}. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and "
+        "SSP5-8.5), and are for the city as a whole, not for a neighbourhood.")
     return out
 
 

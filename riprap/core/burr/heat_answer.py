@@ -53,6 +53,11 @@ INDOOR_HEATING = ("This reads as a question about indoor heating (no heat or hot
                   "briefing covers outdoor summer heat only. Heating complaints go to 311 (portal.311.nyc.gov or call "
                   "311) and are enforced by the Department of Housing Preservation and Development.")
 
+# The basketball team: "what time is the Heat game at Barclays Center".
+SPORT_RE = re.compile(r"\bmiami heat\b|\bheat (?:game|tickets?|roster|score)\b|\bthe Heat\b(?-i:(?<=Heat))(?= (?:game|play|are|vs|beat|lost|won))", re.I)
+NOT_WEATHER = ("This reads as a question about the Miami Heat, not the weather. Riprap reports flood and heat records "
+               "for New York City places, each cited to its source.")
+
 SURFACE = ("heat_surface", "heat_surface_nta")
 HVI = ("hvi", "hvi_nta")
 VISITS = ("heat_visits", "heat_visits_nta")
@@ -89,7 +94,7 @@ _INDOORS_RE = re.compile(r"\b(?:my|our|the|this) (?:apartment|unit|building|home
 # A calendar date ("on July 15", "the afternoon of 7/15"): beyond a seven-day forecast as a rule, and never forecast for one spot.
 _DATE_RE = re.compile(r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.? \d{1,2}\b|\b\d{1,2}/\d{1,2}\b", re.I)
 _WILL_RE = re.compile(r"\b(?:will|going to|gonna|expected to|likely to)\b|\bhow hot will\b", re.I)
-_TODAY_RE = re.compile(r"\b(?:today|this (?:morning|afternoon|evening)|outside now)\b", re.I)
+_TODAY_RE = re.compile(r"\b(?:today|this (?:morning|afternoon|evening)|outside now|current(?:ly)?)\b", re.I)
 _NEAR_RE = re.compile(r"\b(?:tomorrow|tonight|this (?:coming )?(?:week|weekend)|next (?:week|weekend|few days|couple of days)"
                       r"|(?:next|coming) (?:\w+ )?(?:hours|days)|forecast|on (?:mon|tues|wednes|thurs|fri|satur|sun)day"
                       r"|heat ?wave (?:coming|expected|on the way))\b", re.I)
@@ -102,7 +107,7 @@ _COMPARE_CITY_RE = re.compile(r"\b(?:hott?er|warmer|cooler)\b[^.?!]*\bthan\b|\bt
                               r"|\b(?:hott?er|warmer|cooler) (?:here|there)\b", re.I)
 # "Hotter than Riverdale" compares two places: the measurement here says nothing about there, so no yes or no.
 _THAN_ELSEWHERE_RE = re.compile(r"\bthan\b(?!\s+(?:the\s+)?(?:rest|city|average|most|other|nyc|new york|normal|usual|it should))", re.I)
-_YEAR_RE = re.compile(r"\b(?:in|during|for|of)\s+((?:19|20)\d\d)\b")
+_YEAR_RE = re.compile(r"\b((?:19|20)\d\d)\b(?!s)")
 
 
 def hazard_of(question: str) -> str:
@@ -157,11 +162,21 @@ def year_sentence(question: str, facts: list[str], values: dict | None) -> str |
     the question names no year, or asks for a count of days."""
     doc = next((d for d in STATION if d in facts), None)
     v = (values or {}).get(doc) if doc else None
-    m = re.search(r"\b((?:19|20)\d\d)\b", question or "")
+    m = _YEAR_RE.search(question or "")
     if not m or not isinstance(v, dict) or _COUNT_DAYS_RE.search(question or "") or not re.search(r"how hot|hottest|highest|record", question or "", re.I):
         return None
     peak = (v.get("max_by_year") or {}).get(int(m.group(1)), (v.get("max_by_year") or {}).get(m.group(1)))
     return f"The highest reading at {v['station']} in {m.group(1)} was {peak[0]}°F on {peak[1]}." if peak else None
+
+
+def record_sentence(question: str, facts: list[str], values: dict | None) -> str | None:
+    """For "the hottest day on record": the station's all-time record, as the lead."""
+    doc = next((d for d in STATION if d in facts), None)
+    v = (values or {}).get(doc) if doc else None
+    if not isinstance(v, dict) or not v.get("record_f") or not re.search(r"\brecord\b|\ball[- ]time\b|\bever\b", question or "", re.I):
+        return None
+    return (f"The record at {v['station']} is {v['record_f']}°F, set on {v['record_date']} (records from "
+            f"{v['record_since']}).")
 
 
 def count_sentence(question: str, facts: list[str], values: dict | None) -> str | None:

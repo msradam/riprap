@@ -41,7 +41,6 @@ from riprap.core.burr.rule_answer import (  # one definition of "now"
     _clauses,
     asks_now,
     recognised,
-    time_frame,
 )
 
 # Trailing risk phrases ("... at risk of flooding?", "... flood risk").
@@ -255,6 +254,8 @@ def heuristic_plan(query: str) -> dict:
     q = (query or "").strip()
     if heat_answer.INDOOR_HEATING_RE.search(q) and not re.search(r"\bflood", q, re.IGNORECASE):
         return {"intent": "not_implemented", "rationale": heat_answer.INDOOR_HEATING, "targets": []}
+    if heat_answer.SPORT_RE.search(q):
+        return {"intent": "not_implemented", "rationale": heat_answer.NOT_WEATHER, "targets": []}
     hazard = heat_answer.hazard_of(q)
     plan = _plan_for(q, hazard)
     if hazard == "heat" and plan["intent"] != "not_implemented":
@@ -311,7 +312,9 @@ def _plan_for(q: str, hazard: str) -> dict:
     if place["kind"] == "district":
         return {"intent": area_intent, "rationale": f"Heuristic match: community district {place['text']}.",
                 "targets": [{"type": "district", "text": place["text"]}], "place": place}
-    live = (time_frame(q) == "now") if heat else asks_now(q) and not forecast_question(q) and not _FUTURE_DAY_RE.search(q)
+    # A heat question never narrows to the live sources: the baked records answer in a tenth of a second, and
+    # "is the pool open today" needs the list of pools, which is not a live source. The rules pick the facts.
+    live = not heat and asks_now(q) and not forecast_question(q) and not _FUTURE_DAY_RE.search(q)
     if heat and place["kind"] is None:
         # No address, district, neighbourhood or named building. A borough or the
         # city is a place for a heat question; a question with none is told so

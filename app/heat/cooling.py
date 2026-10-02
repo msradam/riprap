@@ -52,9 +52,13 @@ def _summary(sites: list[tuple[str, str, float]], where: str, d: dict) -> dict:
                              outdoor and _plural(len(outdoor), "outdoor pool"),
                              indoor and _plural(len(indoor), "indoor pool")) if p]
         narrative = f"NYC Parks lists {', '.join(parts[:-1]) + ' and ' + parts[-1] if len(parts) > 1 else parts[0]} {where} {listed}"
-        near = min((s for s in sites if s[2]), key=lambda s: s[2], default=None)
+        # The nearest of each park or playground, by name, so the list can be used.
+        best: dict[str, tuple[str, str, float]] = {}
+        for s in sorted((s for s in sites if s[2]), key=lambda s: s[2]):
+            best.setdefault(f"{s[0]}|{s[1]}", s)
+        near = list(best.values())[:6]
         if near:
-            narrative += f"; the nearest is the {near[0]} at {near[1]}, {near[2]:.0f} m away"
+            narrative += "; nearest first: " + ", ".join(f"{park} ({kind}, {m:.0f} m)" for kind, park, m in near)
         elif outdoor or indoor:
             narrative += f"; the pools are {', '.join([*outdoor, *indoor][:6])}"
         narrative += f". {SEASON} {CENTERS}"

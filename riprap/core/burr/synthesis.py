@@ -540,8 +540,9 @@ def synthesize(state, use_llm: bool = True) -> dict:
                 lead_phrase = f"{sentence} {lead_phrase}"
         if lead == "count" and (days := heat_answer.count_sentence(question, facts, values)):
             lead_phrase = f"{days} {lead_phrase}"  # "how many days reached 90 in 2023": that year, from the station's record
-        elif lead == "facts" and (peak := heat_answer.year_sentence(question, facts, values)):
-            lead_phrase = f"{peak} {lead_phrase}"  # "how hot did it get in 2025": that year's highest reading
+        elif lead == "facts" and (peak := heat_answer.year_sentence(question, facts, values)
+                                  or heat_answer.record_sentence(question, facts, values)):
+            lead_phrase = f"{peak} {lead_phrase}"  # "how hot did it get in 2025", "the hottest day on record"
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
                                focus, texts, values, experimental)
     elif question:

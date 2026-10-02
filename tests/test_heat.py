@@ -87,6 +87,7 @@ def test_advice_about_heat_is_declined_in_heats_own_words(query):
     "cooling centers and libraries near Stapleton Houses, and what is the closest hospital",
     "what will summers be like on the south shore of staten island when my kids are my age, say the 2060s",
     "What is the record high at Central Park?",
+    "current temp + any heat alerts, Brownsville Houses",
 ])
 def test_heat_questions_nobody_here_wrote_are_heat_questions(query):
     assert ha.hazard_of(query) == "heat"
@@ -170,8 +171,12 @@ def test_bare_places_and_questions():
 def test_intents_follow_the_place_and_the_time():
     assert heuristic_plan("heat QN12")["intent"] == "neighborhood"
     assert heuristic_plan("extreme heat at 350 5th Ave, Manhattan")["intent"] == "single_address"
+    # A heat question about now runs every heat source, not the live ones alone: "is the pool open today"
+    # needs the list of pools. The rules pick the live facts from the time frame.
     now = heuristic_plan("How hot is it right now in Hunts Point?")
-    assert now["intent"] == "live_now" and now["focus"]["time_frame"] == "now"
+    assert now["intent"] == "neighborhood" and now["focus"]["time_frame"] == "now"
+    assert heuristic_plan("How hot is it right now at 350 5th Ave, Manhattan?")["intent"] == "single_address"
+    assert heuristic_plan("Is it flooding right now at 350 5th Ave, Manhattan?")["intent"] == "live_now"  # flood, unchanged
     week = heuristic_plan("Will it be dangerously hot this week at 90-01 183rd Street, Queens?")
     assert week["intent"] == "single_address" and week["focus"]["time_frame"] == "future"
 
@@ -189,8 +194,8 @@ def test_a_heat_briefing_runs_the_heat_sources_and_a_flood_briefing_none_of_them
     assert area == {i for i in heat | shared if i.endswith("_nta") or i == "area_boundary"}
     flood = set(select_pebbles(heuristic_plan("350 5th Ave, Manhattan"), NYC))
     assert not flood & heat and "sandy" in flood and "city_landcover" in flood
-    live = set(select_pebbles(heuristic_plan("How hot is it right now at 350 5th Ave, Manhattan?"), NYC))
-    assert live == {"heat_obs", "heat_station", "nws_heat_forecast", "nws_heat_alerts"}
+    now = set(select_pebbles(heuristic_plan("How hot is it right now at 350 5th Ave, Manhattan?"), NYC))
+    assert now == got  # every heat source: the rules choose the live facts
 
 
 def test_a_plan_without_a_focus_is_a_flood_plan():
@@ -306,6 +311,23 @@ def test_the_highest_reading_of_a_named_year_comes_from_the_stations_own_record(
     assert ha.year_sentence(q, ["heat_station"], v) == "The highest reading at JFK Airport in 2025 was 101°F on 2025-06-24."
     assert ha.year_sentence(q.replace("2025", "1950"), ["heat_station"], v) is None
     assert ha.year_sentence(f"How many days above 90 near {A} in 2025?", ["heat_station"], v) is None  # a count, not a peak
+
+
+def test_the_record_and_a_year_in_any_position_reach_their_leads():
+    v = {"heat_station": {**V["heat_station"], "record_f": 104, "record_date": "1966-07-03", "record_since": "1948"}}
+    assert ha.record_sentence("What was the hottest day on record in Brooklyn?", ["heat_station"], v) == (
+        "The record at JFK Airport is 104°F, set on 1966-07-03 (records from 1948).")
+    assert ha.record_sentence("How hot was last summer?", ["heat_station"], v) is None
+    # "in summer 2024" names the year without "in 2024" (the unseen set's uh25, once answered with other years).
+    assert ha.count_sentence("how many days hit 90 or above in summer 2023", ["heat_station"], v) == (
+        "5 days at or above 90°F at JFK Airport in 2023.")
+    assert ha.count_sentence("how many 90 degree days by the 2050s", ["heat_station"], v) is None  # a decade is not a year
+
+
+def test_the_basketball_team_is_not_the_weather():
+    plan = heuristic_plan("what time is the Heat game at Barclays Center tonight")
+    assert plan["intent"] == "not_implemented" and "Miami Heat" in plan["rationale"]
+    assert heuristic_plan("how bad is the heat at Barclays Center tonight")["focus"]["hazard"] == "heat"
 
 
 def test_time_frames():
@@ -431,7 +453,8 @@ def test_the_heat_projection_quotes_the_published_table():
             assert dict(zip((10, 25, 75, 90), pcts, strict=True)) == npcc4.TABLE[decade][key], (decade, key)
     n = npcc4.get_projections()["narrative"]
     assert "38 to 62 days a year at or above 90°F in New York City by the 2050s" in n and "against 17 a year in 1981-2010" in n
-    assert "for the city as a whole, not for a neighbourhood" in n
+    assert "heat waves from 2 a year to 5 to 8 and then 6 to 9" in n and "17 to 54 by the 2080s" in n
+    assert "two emissions scenarios (SSP2-4.5 and SSP5-8.5)" in n and "for the city as a whole, not for a neighbourhood" in n
 
 
 def test_parks_cooling_counts_playgrounds_and_points_to_the_citys_cooling_center_list(monkeypatch):
@@ -446,6 +469,7 @@ def test_parks_cooling_counts_playgrounds_and_points_to_the_citys_cooling_center
     n = v["narrative"]
     assert "spray showers at 1 park or playground and 1 outdoor pool within 800 m" in n and "A Playground" in n
     assert "run in summer only" in n and "finder.nyc.gov/coolingcenters" in n and "only during a heat emergency" in n
+    assert "nearest first: A Playground (spray shower, " in n and "B Pool (outdoor pool, " in n  # names, usable as a list
     none = cooling.for_point(40.6, -73.9)
     assert none["n_sites"] == 0 and "lists no spray shower or public pool within 800 m" in none["narrative"]
 

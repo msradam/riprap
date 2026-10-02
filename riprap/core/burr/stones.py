@@ -48,7 +48,6 @@ FLOOR = {
 HEAT_FLOOR = {
     "single_address": ("heat_surface", "nws_heat_forecast"),
     "compare": ("heat_surface", "nws_heat_forecast"),
-    "live_now": ("nws_heat_alerts", "nws_heat_forecast", "heat_obs"),
     "neighborhood": ("area_boundary", "heat_surface_nta", "nws_heat_forecast_nta"),
 }
 
