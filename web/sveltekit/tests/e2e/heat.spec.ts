@@ -8,6 +8,9 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+// The sources are live public services: a slow one must not fail a journey that is otherwise right.
+test.setTimeout(150_000);
+
 async function noAxeViolations(page: Page, state: string) {
   await page
     .waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running' || a.effect?.getTiming().iterations === Infinity), null, { timeout: 5_000 })
@@ -27,7 +30,7 @@ test('an address gets a heat briefing with its traps and a way to the flood brie
   await ask(page, 'heat 355 Food Center Drive, Bronx');
   await expect(page.locator('.brief-kind')).toContainText('Heat briefing', { timeout: 30_000 });
   const briefing = page.locator('#region-briefing');
-  await expect(briefing).toContainText('surface temperature, not air temperature');
+  await expect(briefing).toContainText('surface temperature, not air temperature', { timeout: 90_000 });
   await expect(briefing).toContainText('a rank among neighbourhoods and not a measurement');
   await expect(briefing).not.toContainText('FloodNet');
   await expect(page.getByRole('link', { name: 'Flood briefing for this place' })).toBeVisible();
@@ -38,23 +41,23 @@ test('a district gets a heat briefing of heat sources only', async ({ page }) =>
   await ask(page, 'heat QN12');
   await expect(page.locator('.brief-kind')).toContainText('Heat briefing', { timeout: 30_000 });
   const briefing = page.locator('#region-briefing');
-  await expect(briefing).toContainText('emergency department visits for heat illness');
+  await expect(briefing).toContainText('emergency department visits for heat illness', { timeout: 90_000 });
   await expect(briefing).not.toContainText('Sandy');
   await noAxeViolations(page, 'heat district briefing');
 });
 
 test('a score is refused and the Health Department index is quoted as what it is', async ({ page }) => {
   await ask(page, 'What is the heat score for 2940 Brighton 3rd St, Brooklyn?');
-  await expect(page.getByRole('heading', { name: 'Answer' })).toBeVisible({ timeout: 30_000 });
-  await expect(page.locator('#brief-answer')).toContainText('Riprap computes no score or rating of its own');
+  await expect(page.getByRole('heading', { name: 'Answer' })).toBeVisible({ timeout: 90_000 });
+  await expect(page.locator('#brief-answer')).toContainText('Riprap computes no score or rating of its own', { timeout: 30_000 });
   await expect(page.locator('#brief-answer')).toContainText('Heat Vulnerability Index');
   await noAxeViolations(page, 'heat score refusal');
 });
 
 test('the forecast is the Weather Service’s, and a building is not predicted', async ({ page }) => {
   await ask(page, 'Will my apartment at 80 Pioneer Street, Brooklyn overheat this weekend?');
-  await expect(page.getByRole('heading', { name: 'Answer' })).toBeVisible({ timeout: 30_000 });
-  await expect(page.locator('#brief-answer')).toContainText('Riprap cannot predict what will happen in one building');
+  await expect(page.getByRole('heading', { name: 'Answer' })).toBeVisible({ timeout: 90_000 });
+  await expect(page.locator('#brief-answer')).toContainText('Riprap cannot predict what will happen in one building', { timeout: 30_000 });
   await expect(page.locator('#brief-answer')).toContainText('National Weather Service');
   await noAxeViolations(page, 'heat prediction refusal');
 });
