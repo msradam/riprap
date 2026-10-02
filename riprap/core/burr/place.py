@@ -215,6 +215,11 @@ def place_phrase(text: str) -> str | None:
         if phrase.lower() in nta.ALIASES or (hits and re.search(rf"\b{re.escape(phrase)}\b", hits[0]["nta_name"],
                                                                  re.IGNORECASE)):
             return phrase
+    # A misspelled name ("Bedford Stuyvesnt", once sent to Bedford Park in the Bronx by its first word):
+    # the neighbourhood it is closest to, when it is close.
+    for phrase in found:
+        if len(phrase.split()) > 1 and (near := _close_name(phrase)):
+            return near
     # Typed in lower case ("whats going on in hunts point"): a known
     # neighbourhood name as whole words, the longest one. Not when the name
     # is part of a street or a landmark ("Flushing Avenue", "Jamaica
@@ -229,7 +234,33 @@ def place_phrase(text: str) -> str | None:
              if re.search(rf"\b{re.escape(n)}\b(?!\s+(?:{_SUFFIX}|{_LANDMARK})\b)", low)]
     if known:
         return max(known, key=len).title()
+    words = re.findall(r"[a-z']+", low)
+    for n in (3, 2, 1):  # "heat brownsvile", "coney iland"
+        for i in range(len(words) - n + 1):
+            if near := _close_name(" ".join(words[i:i + n])):
+                return near
     return found[0] if found else None
+
+
+def _close_name(phrase: str) -> str | None:
+    """The neighbourhood a misspelled phrase is closest to, or None. Whole
+    names only, seven letters or more, so a common word is not corrected
+    into a place."""
+    import difflib  # noqa: PLC0415
+
+    from app.areas import nta  # noqa: PLC0415
+
+    p = phrase.lower().strip()
+    # Not a borough ("staten island" is not Hart Island) and not a hazard phrase ("heat island" is not either).
+    if len(p) < 7 or any(b in p for b in _BOROUGH) or re.search(r"\b(?:heat|hot|flood\w*|island)\b", p) and "iland" not in p:
+        return None
+    names = {re.sub(r"\s*\(.*?\)", "", n).strip().lower().replace("-", " "): n for n in nta.load()["ntaname"].dropna()}
+    names.update({k: k for k in _known_neighbourhoods() if len(k) >= 7})
+    hit = difflib.get_close_matches(p, list(names), n=1, cutoff=0.88)
+    if not hit or hit[0] == p or hit[0][0] != p[0] or len(hit[0].split()) != len(p.split()):
+        return None  # a typo keeps its first letter and its number of words ("is coney island" is no typo)
+    full = names[hit[0]]
+    return re.sub(r"\s*\(.*?\)", "", full).strip().title() if full != hit[0] else hit[0].title()
 
 
 def landmark_phrase(text: str) -> str | None:

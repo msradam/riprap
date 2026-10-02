@@ -838,3 +838,23 @@ def test_what_a_blind_verifier_found_after_the_personas():
 
     v = st.for_polygon(nta.by_borough("NYC")["geometry"])
     assert v and "mean_diff_f" not in v and "no reading of its own" in v["narrative"]
+
+
+def test_what_the_closing_blind_run_failed():
+    """Fifty queries written before any was run; these are the fails that had a small fix."""
+    # A hyphenated name is one place, not two.
+    assert ha.places_named("has Bedford-Stuyvesant gotten hotter over the last 30 years") == []
+    assert ha.places_named("heat in Bedford Stuyvesant and Brownsville") == ["Bedford Stuyvesant", "Brownsville"]
+    # A misspelled name is the neighbourhood it is closest to, never another one that shares its first word.
+    for q, name in (("heat vulnerabilty in Bedford Stuyvesnt", "Bedford-Stuyvesant"), ("heat brownsvile", "Brownsville")):
+        assert heuristic_plan(q)["targets"][0]["text"] == name, q
+    assert heuristic_plan("how hot is it this morning in corona")["targets"][0]["text"] == "Corona"
+    # "90F" is a temperature.
+    assert ha.hazard_of("trend in annual number of days above 90F at LaGuardia since 1970") == "heat"
+    # Questions with nothing to answer them say so: deaths, a group of people, a measure the table lacks.
+    assert ha.asks_something("heat-exacerbated deaths per year in MN10 and the citywide rate")
+    assert ha.answer("heat-exacerbated deaths per year here and the citywide rate", T)[0] == "no_deaths"
+    assert ha.answer("are kids here at higher risk from heat", T)[0] == "cannot_answer"
+    assert ha.answer("NPCC projections for mean temperature in the 2050s here", T)[0] == "cannot_answer"
+    # Going to the hospital is a visit.
+    assert ha.answer("how many people go to the hospital for heat here", T)[1][0] == "heat_visits"

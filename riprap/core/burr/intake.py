@@ -393,7 +393,7 @@ def _plan_for(q: str, hazard: str) -> dict:
                     "targets": [{"type": "nta", "text": scope}], "place": place}
         # Nothing left once the heat words are gone ("heat", "extreme heat"): the word alone was once
         # geocoded to a heat-treating works in Brooklyn and briefed.
-        bare = re.sub(_HEAT_FILLER, " ", heat_answer.HEAT_RE.sub(" ", _address_from_query(q)), flags=re.IGNORECASE).strip(" ,.?!")
+        bare = " ".join(re.sub(_HEAT_FILLER, " ", heat_answer.HEAT_RE.sub(" ", _address_from_query(q)), flags=re.IGNORECASE).split())
         if not bare or (_QUESTION_RE.search(q) and not landmark_phrase(q)):
             return {"intent": "not_implemented", "rationale": NO_PLACE_HEAT, "targets": [], "place": place}
         # What is left is the place: "heat 10474" once went to the geocoder whole and came back as a

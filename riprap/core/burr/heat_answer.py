@@ -41,11 +41,11 @@ from riprap.core.burr.place import _STREET_WORD, _SUFFIX
 HEAT_RE = re.compile(
     r"\bheat(?:[- ]?waves?)?\b(?!\s*(?:and|&|/|or)\s*hot water)|\boverheat|\bhot(?:ter|test)?\b(?!\s+water)|\btemperatures?\b"
     r"|\bcooling (?:cent(?:er|re)s?|sites?)\b|\bcool (?:off|down)\b|\bspray showers?\b|\b(?:public|swimming) pools?\b"
-    r"|\bswelter|\bscorch|\b(?:8[5-9]|9\d|1[01]\d)[- ]?(?:°|degrees?\b|deg\b)|\bair[- ]condition"
+    r"|\bswelter|\bscorch|\b(?:8[5-9]|9\d|1[01]\d)[- ]?(?:°|degrees?\b|deg\b|f\b)|\bair[- ]condition"
     r"|\bdays? (?:above|over|at or above) (?:8[5-9]|9\d|1[01]\d)\b|\b(?:cooler|coolest|warmer|warmest)\b"
     # Found by questions written without sight of these rules: "air temp", "will it be over 95", "hit 90 or
     # above", "forecast highs", "cool places", "what will summers be like".
-    r"|\btemps?\b|\b(?:over|above|hit|hits|reach(?:es|ed)?|top(?:s|ped)?)\s+(?:8[5-9]|9\d|1[01]\d)\b|\bhighs\b"
+    r"|\btemps?\b|\b(?:over|above|hit|hits|reach(?:es|ed)?|top(?:s|ped)?)\s+(?:8[5-9]|9\d|1[01]\d)f?\b|\bhighs\b"
     r"|\bcool (?:places?|spots?|spaces?)\b|\bstay(?:ing)? cool\b|\bsummers\b"
     r"|\brecord highs?\b(?!\s+(?:tide|water|surge|rain))"
     # Trees and shade are asked about for heat; paving alone stays with the flood briefing.
@@ -86,7 +86,7 @@ EXPERIMENTAL = ("landcover", "landcover_nta")
 TOPICS = (
     (re.compile(r"cooling (?:cent|site)|cool (?:off|down)|spray shower|\bpools?\b|sprinkler|where can (?:i|we|people|residents)", re.I),
      COOLING),
-    (re.compile(r"emergency (?:room|department|visits?)|\b(?:er|ed) visits?\b|hospitali[sz]|heat (?:illness|stroke|exhaustion|stress)"
+    (re.compile(r"emergency (?:room|department|visits?)|\b(?:go|goes|went|going|sent|end(?:s|ed)? up) (?:to|in|at) (?:the |a )?(?:hospital|er|emergency)\b|\bhospital visits?\b|\b(?:er|ed) visits?\b|hospitali[sz]|heat (?:illness|stroke|exhaustion|stress)"
                 r"|\bsick\b|\bhealth\b(?! department)", re.I), VISITS),
     (re.compile(r"vulnerab|\bhvi\b|(?<!heat )\bindex\b|\bat risk\b", re.I), HVI),
     (re.compile(r"\bheat index\b|\bfeels? like\b|\bhumid", re.I), OBS),
@@ -118,6 +118,10 @@ _FAR_RE = re.compile(r"\b20[3-9]\ds?\b|\b2100\b|decades?|century|climate change|
                      r"|by (?:the )?(?:middle|end) of the century|\b(?:next|coming) (?:\w+ )?years\b|\bwhen my kids\b"
                      r"|\bkeep getting (?:hotter|warmer)\b", re.I)
 _COUNT_DAYS_RE = re.compile(r"\bhow many\b[^.?!]*\bdays?\b|\bnumber of\b[^.?!]*\bdays?\b|\bdays? (?:above|over|at or above)\b", re.I)
+# People the index and the visits file do not break out, and climate measures Table 4 does not hold.
+_GROUP_RE = re.compile(r"\b(?:kids?|child(?:ren)?|infants?|bab(?:y|ies)|seniors?|elderly|older (?:adults|people|residents)|"
+                       r"by age|age groups?|outdoor workers|pregnan\w+)\b", re.I)
+_NOT_IN_TABLE_RE = re.compile(r"\b(?:mean|average) (?:annual |summer )?temperatures?\b|\bdegrees? (?:of )?warming\b|\bhumidity\b", re.I)
 _COMPARE_CITY_RE = re.compile(r"\b(?:hott?er|warmer|cooler)\b[^.?!]*\bthan\b|\bthan (?:the )?(?:rest of the |city|average)"
                               r"|\bcompared? (?:to|with) (?:the )?(?:rest of the )?(?:city|average)|\bheat island\b"
                               r"|\b(?:hott?er|warmer|cooler) (?:here|there)\b", re.I)
@@ -168,7 +172,7 @@ def asks_something(text: str) -> bool:
     vulnerability index"). "Heat", "extreme heat" or "heat risk" alone ask
     for the heat briefing."""
     t = text or ""
-    return bool(any(p.search(t) for p, _ in TOPICS) or _TODAY_RE.search(t) or _NEAR_RE.search(t) or _FAR_RE.search(t) or _RANK_RE.search(t)
+    return bool(any(p.search(t) for p, _ in TOPICS) or _TODAY_RE.search(t) or _NEAR_RE.search(t) or _FAR_RE.search(t) or _RANK_RE.search(t) or _DEATHS_RE.search(t) or _GROUP_RE.search(t)
                 or _SCORE_RE.search(t) or _COMPARE_CITY_RE.search(t) or _COUNT_DAYS_RE.search(t))
 
 
@@ -311,7 +315,10 @@ def neighbourhoods_in(question: str) -> list[str]:
     from riprap.core.burr.place import _LANDMARK, _known_neighbourhoods  # noqa: PLC0415
 
     low, found = (question or "").lower(), {}
-    for n in sorted(_known_neighbourhoods(), key=len, reverse=True):
+    # A hyphenated name is one place ("Bedford-Stuyvesant" was once reported as Bedford and Stuyvesant).
+    whole = {re.sub(r"\s*\(.*?\)", "", n).strip().lower() for n in nta.load()["ntaname"].dropna() if "-" in n}
+    whole |= {w.replace("-", " ") for w in whole}
+    for n in sorted({*whole, *_known_neighbourhoods()}, key=len, reverse=True):
         m = re.search(rf"\b{re.escape(n)}\b(?!\s+(?:{_SUFFIX}|{_LANDMARK})\b)", low)
         if m and not any(m.start() >= v[0] and m.end() <= v[1] for v in found.values()) and (hits := nta.resolve(n)):
             found[n] = (m.start(), m.end(), hits[0]["nta_code"])
@@ -354,6 +361,11 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     # year outside the file's period, and whether a difference is significant (the file prints no intervals).
     period = next((re.findall(r"\d{4}", str(v.get("period") or "")) for d in VISITS
                    if isinstance(v := (values or {}).get(d), dict)), [])
+    if _GROUP_RE.search(q) and re.search(r"risk|vulnerab|affect|danger|visits?|hospital|\bsick\b", q, re.I) and not re.search(
+            r"\b(?:my|our) (?:kids?|children)\b", q, re.I) and (docs := have(HVI, VISITS)):
+        return "cannot_answer", docs  # the index and the visits are for all residents: nothing here is by age or group
+    if _NOT_IN_TABLE_RE.search(q) and (docs := have(NPCC4, STATION)):
+        return "cannot_answer", docs[:2]
     if re.search(r"\bat night\b|\bnight[- ]?time\b|\bovernight\b|\bindoors?\b|\binside\b", q, re.I):
         # Landsat passes in the late morning and the stations report daily highs: nothing here is a night or an
         # indoor reading.
