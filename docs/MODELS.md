@@ -23,7 +23,7 @@ The gallery is built with no LLM.
 
 **Three experimental models**, described below. They are the author's
 fine-tunes: one forecasts surge at the Battery, one reads satellite scenes
-after storms, one maps paved and green land.
+after storms, one maps paved, green and tree-covered land.
 
 `app/models_info.py` lists the models behind each result in its `models`
 field, and `/api/models` says which this server can use.
@@ -38,7 +38,7 @@ as claims (the mode now behind `RIPRAP_LLM_BARE=1`). `granite4:micro` kept
 The gallery answers three questions with these models:
 [the Battery surge](https://msradam.github.io/riprap/gallery/battery-surge/),
 [surface water in BK18 after Ida](https://msradam.github.io/riprap/gallery/bk18-satellite/)
-and [paved and green land in QN12](https://msradam.github.io/riprap/gallery/qn12-paved/).
+and [paved, green and tree-covered land in QN12](https://msradam.github.io/riprap/gallery/qn12-paved/).
 
 Riprap is an app in development, and these three models are part of it.
 None has been shown to beat an official product. So their output is never
@@ -76,13 +76,16 @@ shown as a measurement:
 |---|---|---|---|
 | Granite TTM r2 Battery Surge | [`msradam/Granite-TTM-r2-Battery-Surge`](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge) at `181b892` | per request, on CPU (about 0.1 s) | `ml` |
 | Prithvi-EO 2.0 NYC Pluvial | [`msradam/Prithvi-EO-2.0-NYC-Pluvial`](https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial) at `25ce564` | in a batch job; the app reads the saved rasters | `eo`, for the batch only |
-| TerraMind NYC adapters (`lulc_nyc`) | [`msradam/TerraMind-NYC-Adapters`](https://huggingface.co/msradam/TerraMind-NYC-Adapters) at `9843416`, on [`ibm-esa-geospatial/TerraMind-1.0-base`](https://huggingface.co/ibm-esa-geospatial/TerraMind-1.0-base) at `fb96c70` | in a batch job; the app reads the saved rasters | `eo`, for the batch only |
+| NYC land-cover model | not published; trained by `scripts/train_cover.py` on [`ibm-esa-geospatial/TerraMind-1.0-base`](https://huggingface.co/ibm-esa-geospatial/TerraMind-1.0-base) at `fb96c70`, weights pinned by SHA-256 `15dc40f` | in a batch job; the app reads the saved rasters | `eo`, for the batch only |
 
-The author's weights are loaded from safetensors files at those commits.
-The TerraMind base is published only as a PyTorch checkpoint; it is read
-with `weights_only=True`, which admits tensors and no code. The models were
-trained on AMD Developer Cloud and are reproduced independently at
-[github.com/msradam/riprap-models](https://github.com/msradam/riprap-models).
+The author's weights are loaded from safetensors files at those commits,
+or, for the land-cover model, from a local safetensors file whose SHA-256
+must match. The TerraMind base is published only as a PyTorch checkpoint;
+it is read with `weights_only=True`, which admits tensors and no code. The
+surge and water models were trained on AMD Developer Cloud and are
+reproduced independently at
+[github.com/msradam/riprap-models](https://github.com/msradam/riprap-models);
+the land-cover model was trained on an Apple M5 in this repository.
 
 A default install has none of this: `uv sync` installs no torch, the surge
 source then says "the Battery surge forecast model is not available on this
@@ -276,81 +279,125 @@ designed on its own data, both miss Ida's flooding. The result file is
 `data/experimental/flood_terramind_ida.json`; the weights are listed under
 provenance below.
 
-### TerraMind NYC adapters
+### NYC land-cover model
 
-The `lulc_nyc` adapter labels each 10 m pixel of a Sentinel-2 scene with
-one of five classes. `scripts/run_landcover_batch.py` runs it on up to two
-clear dates of a year between 15 June and 30 September, so every year is
-mapped in full leaf. The year's map is the clearer date's map, and the
-second date fills only the pixels the first could not see. (An earlier
-version took a vote between the two dates. With two dates every
-disagreement is a tie, and the tie went to the paved class.) Riprap reports
-three groups: paved or built over, green (trees and grass), and water. A
-comparison of two years uses only the pixels both years labelled.
+Since 2026-10-02 the land-cover layer comes from a model trained here on the
+city's own map. It estimates, for each 10 m Sentinel-2 pixel, the share in
+eight classes: tree canopy, grass and shrub, bare soil, water, building, road,
+other paved and railroad. Riprap reports three groups (paved or built over,
+green, water) and, inside green, the tree canopy share, which matters for
+urban heat.
+
+It is TerraMind 1.0 base (IBM and ESA, the same pinned checkpoint as before)
+with a UNet decoder, plus a small per-pixel network on the twelve bands whose
+output is added to the decoder's. A ViT token is 16 pixels (160 m) across and
+its decoder never sees one pixel's spectrum; the per-pixel branch supplies
+that. `scripts/train_cover.py` trains it on two summer 2017 Sentinel-2 dates
+against the city's 2017 six-inch land cover map (NYC Open Data), counted into
+10 m cells, with a soft-label cross-entropy. The encoder learns at a tenth of
+the decoder's rate, and the weights that score best on validation squares are
+kept. Training took 49 minutes on an Apple M5. The weights (412 MB of
+safetensors) are not published; `app/experimental.py` pins them by SHA-256
+(`15dc40f`), and the batch job refuses a file with another hash.
+
+**The test.** The city is cut into 2 km squares; one in five is a test square
+the model never saw in training. Each model is scored on 2021 Sentinel-2
+images of those squares against the city's 2021 six-inch map (The Nature
+Conservancy and UVM, built from 2021 LiDAR and imagery), so the key is a
+different year, method and sensor from the training labels. That map is
+CC BY-NC-SA: it is used on this machine as a key only, and nothing drawn
+from it is in this repository except scores. Cells are 30 m (3 by 3 pixels),
+because Sentinel-2 is located to about a pixel. The model was chosen on the
+validation squares before the test was read. Two 2021 images were scored,
+16 June and 29 September (`scripts/eval_cover.py`,
+`data/experimental/landcover_nyc_eval.json`).
+
+| Model, 2021 test squares | Mean error per group (points), June / Sept | Canopy R² | Paved R² | A district's paved share against the map (median gap, points) | Two images of 2021, district paved share (19 in 20 under) |
+|---|---|---|---|---|---|
+| This model (TerraMind base with a per-pixel branch) | 5.3 / 4.8 | 0.77 / 0.83 | 0.90 / 0.90 | 1.9 / 2.2 | 2.0 |
+| The same, second seed | 5.3 / 4.8 | 0.76 / 0.83 | 0.90 / 0.90 | 1.7 / 2.5 | 1.8 |
+| TerraMind small with a per-pixel branch | 5.4 / 4.8 | 0.77 / 0.82 | 0.90 / 0.90 | 1.4 / 2.0 | 2.1 |
+| TerraMind base alone | 6.8 / 6.3 | 0.62 / 0.72 | 0.81 / 0.80 | 4.2 / 4.5 | 3.8 |
+| TerraMind small alone | 6.6 / 6.0 | 0.66 / 0.73 | 0.84 / 0.83 | 1.7 / 3.2 | 5.5 |
+| TerraMind tiny alone | 7.0 / 6.6 | 0.65 / 0.70 | 0.83 / 0.81 | 1.3 / 3.3 | 5.7 |
+| A UNet with no pretraining (two seeds) | 6.4 / 5.5 and 6.3 / 5.4 | 0.64 / 0.76 | 0.89 / 0.88 | 1.0 / 1.1 and 1.3 / 3.4 | 4.0 and 5.6 |
+| A per-pixel network on the twelve bands | 6.5 / 6.3 | 0.73 / 0.72 | 0.86 / 0.84 | 2.2 / 3.4 | 7.0 |
+| A probe on TESSERA embeddings (one per year; `geotessera` 0.10.2, registry v1, CC0) | 6.4 / 6.2 | 0.81 / 0.81 | 0.78 / 0.79 | 3.1 / 2.9 | n/a |
+| The old `lulc_nyc` adapter | 11.6 / 11.4 | 0.0 / -0.1 | 0.19 / 0.22 | 18.1 / 16.2 | 3.8 |
+| The 2017 map itself, read as 2021 | 3.0 / 2.9 | 0.93 / 0.92 | 0.92 / 0.92 | 1.6 / 1.5 | 0 |
+
+So TerraMind earns its place only with the per-pixel branch: alone, every
+size is worse than a UNet with no pretraining; with it, it beats every other
+model on pixels, canopy and paving, and it is the steadiest between two
+images of one year. The old adapter read a district's paved share 16 to 18
+points high against the city's own map, more than twice the 7.7 points it
+showed against WorldCover, and it had no skill on tree canopy. The 2017 map
+read as 2021 is better than any model for 2021, which is expected (most
+ground does not change in four years); the model's use is the years and
+places no six-inch map covers.
+
+**Change between years.** On the test squares, the model's change in a 30 m
+cell's paved share from 2017 to 2021 correlates with the two maps' change at
+r = 0.42 (canopy 0.45); the UNet's is 0.38 (0.29) and the old adapter's 0.16
+(0.17). The maps' own change is partly method: they were made five years
+apart with different imagery, and "other paved" falls 2.3 points citywide
+between them. At 1,530 sites of DOB new-building permits issued 2016 to 2019
+on test squares, the model's paved share rose 3.3 points against 0.4 at
+7,650 sites with no new-building or demolition permit within 200 m; a site's
+rise exceeds a control's 57% of the time (AUC 0.57). The maps themselves
+manage 0.59 on the same sites, so a permit point is a weak marker of change
+at 30 m, and the model sees about as much of it as the maps do.
+
+**In the app.** `scripts/run_landcover_batch.py` maps each summer since 2018
+with the clearest full-city dates, writes eight percent bands per pixel to
+`data/eo/landcover_<year>.tif`, and scores the 2021 map against the city's
+2021 map on the test squares. For 2021 it
+reads a typical district's paved share 1.7 points above the city map's on
+the test squares (median gap 1.8 points, largest 7.8); a 30 m cell's paved
+share is off by 6.6 points on average (R² 0.90) and its canopy share by 8.4
+(R² 0.77). Two images of one year differ by under 2.0 points in a district's
+paved share 19 times in 20 (2.7 in a neighbourhood's).
+
+Maps of different summers differ by much more. Every pair of years mapped
+is compared the same way, district by district:
+
+| Years | Districts whose paved shares differ by more than 2.0 points |
+|---|---|
+| 2018 and 2021 | 11 of 59 |
+| 2021 and 2026 | 11 of 59 |
+| 2018 and 2026 | 25 of 59 |
+| 2024 and 2026 | 30 of 59 |
+| 2021 and 2024 | 35 of 59 |
+| 2018 and 2024 | 49 of 59 |
+
+The 2024 map, made from one September image, stands apart from the rest,
+and even the closest pairs exceed what two images of one summer produce
+(the threshold is their 95th percentile, so about 3 of 59 by design). That is the images, not the ground. So the app reports
+the latest year only, and every land-cover sentence says that no change
+between years is read from the maps and why
+(`data/experimental/landcover.json`). The maps are saved at 30 m, the scale
+the model is scored at, as five bands: canopy, grass and shrub, bare soil,
+water, and paved or built over.
 
 | Question | Answered | How |
 |---|---|---|
-| How much of this district is paved or built over, and how much is green | Yes | Shares of the latest year's map |
-| How has land cover changed here since a given year | Only as a difference held against the model's noise | The paved share in the first and last year mapped; a difference inside the noise is reported as no measurable change |
-| If this paving trend continues, is runoff likely to rise here | No | Tested: differences beyond the noise are as frequent as the noise alone produces, so no trend is claimed. The shares are quoted and the sentence says so |
-| Has new construction appeared in this area | No | See below |
+| How much of this place is paved or built over, how much is green, how much is tree canopy | Yes | Mean shares of the latest year's map |
+| How has it changed since a given year | No | Maps of different summers differ by more than the model's noise (above); the sentence says so |
+| If this paving trend continues, is runoff likely to rise | No | No change is read, so no trend is |
+| Has new construction appeared | No | DOB permits and building footprints are the record; at a permit site the model and the maps both separate weakly |
 
-Test, `scripts/run_landcover_batch.py`, run 2026-10-01: the 2021 map against
-ESA WorldCover 2021 over the city's land. WorldCover is the adapter's own
-label source, so this measures how well it reproduces its labels, not how
-well it maps the ground.
+#### The adapter it replaced
 
-| Measure | Result |
-|---|---|
-| Same class of the five | 82.2% of pixels |
-| Same group of the three Riprap reports (paved, green, water) | 87.1% |
-| WorldCover's green land that the model also calls green | 66.3% |
-| WorldCover's pixels of each class given the same class | water 81.8%, built 97.5%, trees 42.8%, grass 68.5%, bare 14.8% |
-| A district's paved share, model minus WorldCover | median 7.7 points, largest gap 19.0 |
-| Agreement by borough | Bronx 80.7%, Brooklyn 86.4%, Manhattan 81.0%, Queens 83.3%, Staten Island 76.7% |
-
-So it calls much green ground paved, trees most of all, and a district's
-paved share reads about 8 points high. Every land-cover sentence says so.
-
-The model's own noise: two dates of one year (2021-06-16 and 2021-09-29,
-2026-06-20 and 2026-07-20), compared on the pixels both labelled. A
-district's paved share differs by 0.8 points at the median and by under
-3.7 points 19 times in 20. A neighbourhood's differs by 1.0 at the median and
-under 5.8 19 times in 20. A district is held against 3.7; a neighbourhood and
-an address (a 500 m circle) against 5.8. A difference between years inside
-that is reported as no measurable change.
-
-No trend is claimed. Between the first and the last year mapped, 3 of the 59
-community districts differ by more than 3.7 points (MN09 by 5.5 and MN12 by
-5.0 down, QN08 by 3.9 up). Noise alone would put about 3 of 59 beyond a
-19-in-20 threshold. In MN09 and MN12 the 2018 map stands apart and the three
-later years are level, which points at the 2018 image and not at the ground.
-So a larger difference is stated with that caution, and nothing about runoff
-follows from it. The saved results are in
-`data/experimental/landcover.json`.
-
-2018 and 2024 have one usable date each (the other clear dates covered only
-part of the city), so those years have no second date to fill cloud gaps.
-An earlier run mapped May scenes for 2026 and broke ties toward paved; both
-were found in review and the batch was rerun.
-
-Three things differ from the model card, each checked on one box of
-Manhattan, Brooklyn and Queens against ESA WorldCover 2021 (one-off checks
-of 2026-10-01; the results are in `data/experimental/landcover_checks.json`):
-
-The classes are not the card's. The card lists impervious, vegetation,
-water, bare or cropland, building. The training script
-(`experiments/05_terramind_nyc_finetune/data/slice_and_label_nyc.py` at tag
-`v0.7.0`) wrote water, built-up, trees and shrubs, grass and crops, other.
-With the script's order the adapter agrees with WorldCover on 90.5% of
-pixels. There is no building class.
-
-Two of its three inputs carry nothing. The architecture takes Sentinel-2,
-Sentinel-1 radar and elevation. Zeros for radar and elevation give the same
-map (90.5%) as real data (89.6% with radar in decibels, 90.4% with radar as
-the training code fed it). Training fed radar on a scale the model's
-statistics do not match, and an empty elevation channel. Riprap reads
-Sentinel-2 only.
+The `lulc_nyc` adapter (`msradam/TerraMind-NYC-Adapters` at `9843416`) was
+trained on ESA WorldCover, and three things differed from its card, each
+checked on one box of Manhattan, Brooklyn and Queens against WorldCover 2021
+(`data/experimental/landcover_checks.json`). Its classes are the training
+script's (water, built-up, trees and shrubs, grass and crops, other; with
+the script's order it agrees with WorldCover on 90.5% of pixels), not the
+card's, and there is no building class. Its radar and elevation inputs
+carry nothing: zeros give the same map. And its `buildings_nyc` sibling
+flips 4.6% of pixels between two images of one year, so it cannot show new
+construction.
 
 The thinking-in-modalities adapter (`tim_nyc`) first generates TerraMind's
 own land cover tokens with a second encoder and decoder (the sampler) and
@@ -369,12 +416,6 @@ on 90.2% (0.546), and `tim_nyc` with one unseeded draw of random sampler
 weights on 89.5% (0.532). So
 thinking in modalities adds nothing here, and it is not used
 (`data/experimental/tim_check.json`).
-
-Not built: new construction. The `buildings_nyc` adapter labels 57% of that
-box as building, and between two dates of one year (2021-06-16 and
-2021-09-29) 4.6% of pixels change label. New buildings cover far less than
-that in a year, so a difference between two years would be the model's
-noise. The city's building footprints and DOB permits are the record.
 
 ### Weights read by the experiments
 

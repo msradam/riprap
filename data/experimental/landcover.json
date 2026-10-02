@@ -1,8 +1,7 @@
 {
- "model": "msradam/TerraMind-NYC-Adapters",
- "revision": "984341631d10db4fb699f76cd5d5bc7d8b3690b3",
- "adapter": "lulc_nyc",
- "run_date": "2026-10-01",
+ "model": "terramind_base_px",
+ "weights_sha256": "15dc40f93277f456537d2705e538c7f333e561b40784b2aabfda1eec67c50116",
+ "run_date": "2026-10-02",
  "years": {
   "2018": [
    "2018-07-02"
@@ -19,29 +18,72 @@
    "2026-07-20"
   ]
  },
- "noise_points": 3.7,
- "noise_points_median": 0.8,
- "noise_points_small": 5.8,
- "noise_points_small_median": 1.0,
+ "noise_points": 2.0,
+ "noise_points_median": 0.7,
+ "noise_points_small": 2.7,
+ "noise_points_small_median": 0.8,
+ "between_years": [
+  {
+   "years": [
+    2018,
+    2021
+   ],
+   "districts": 59,
+   "beyond_noise": 11
+  },
+  {
+   "years": [
+    2018,
+    2024
+   ],
+   "districts": 59,
+   "beyond_noise": 49
+  },
+  {
+   "years": [
+    2018,
+    2026
+   ],
+   "districts": 59,
+   "beyond_noise": 25
+  },
+  {
+   "years": [
+    2021,
+    2024
+   ],
+   "districts": 59,
+   "beyond_noise": 35
+  },
+  {
+   "years": [
+    2021,
+    2026
+   ],
+   "districts": 59,
+   "beyond_noise": 11
+  },
+  {
+   "years": [
+    2024,
+    2026
+   ],
+   "districts": 59,
+   "beyond_noise": 30
+  }
+ ],
+ "between_years_worst": "2018 and 2024",
+ "between_years_beyond_noise": 49,
+ "between_years_districts": 59,
  "eval_year": 2021,
- "agreement_pct": 82.2,
- "group_agreement_pct": 87.1,
- "class_recall_pct": {
-  "water": 81.8,
-  "built": 97.5,
-  "trees": 42.8,
-  "grass": 68.5,
-  "bare": 14.8
- },
- "green_found_pct": 66.3,
- "district_built_minus_worldcover_points_median": 7.7,
- "district_built_gap_points_max": 19.0,
- "district_built_vs_worldcover": "7.7 points above",
- "by_borough_agreement_pct": {
-  "Bronx": 80.7,
-  "Brooklyn": 86.4,
-  "Manhattan": 81.0,
-  "Queens": 83.3,
-  "Staten Island": 76.7
- }
+ "key": "NYC land cover 2021, 6 inch (The Nature Conservancy and UVM), on the 2 km test squares",
+ "n_districts": 46,
+ "district_paved_minus_city_map_points_median": 1.7,
+ "district_paved_gap_points_median_abs": 1.8,
+ "district_paved_gap_points_max": 7.8,
+ "paved_mae_points_30m": 6.6,
+ "paved_r2_30m": 0.9,
+ "tree_canopy_mae_points_30m": 8.4,
+ "tree_canopy_r2_30m": 0.77,
+ "district_paved_vs_city_map": "1.7 points above"
 }

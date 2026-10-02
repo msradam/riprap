@@ -1,10 +1,10 @@
-"""Experimental: TerraMind land cover for batch jobs
-(scripts/run_landcover_batch.py).
+"""Experimental: the owner's TerraMind land-cover adapter, kept for comparison.
 
-Not used per request. The app reads the saved outputs
-(app/eo/landcover.py); this module loads the model and turns one
-Sentinel-2 scene into a five-class land-cover map at 10 m. Needs the `eo`
-extra.
+The app's land-cover layer was made with this adapter until 2026-10-02; it is
+now made by the NYC land-cover model (app/eo/cover.py), which beat it on the
+city's own 2021 map (docs/MODELS.md). This module is used only by the
+comparison scripts (scripts/eval_cover.py --run-adapter, scripts/check_tim.py)
+and for TerraMind's Sentinel-2 statistics. Needs the `eo` extra.
 
 The model is the owner's LoRA adapter `lulc_nyc` from
 `msradam/TerraMind-NYC-Adapters` on IBM and ESA's TerraMind 1.0 base. The
@@ -33,10 +33,16 @@ from __future__ import annotations
 import json
 import re
 import threading
+from dataclasses import dataclass
 
-from app import experimental
 
-MODEL = experimental.MODELS["landcover"]
+@dataclass(frozen=True)
+class _Adapter:
+    repo: str
+    revision: str
+
+
+MODEL = _Adapter("msradam/TerraMind-NYC-Adapters", "984341631d10db4fb699f76cd5d5bc7d8b3690b3")
 BASE_REPO, BASE_FILE = "ibm-esa-geospatial/TerraMind-1.0-base", "TerraMind_v1_base.pt"
 BASE_REVISION = "fb96c70d0a5f68dcc44030b89cbfd8ec3fb0c67a"
 ADAPTER = "lulc_nyc"

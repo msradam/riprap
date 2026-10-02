@@ -1,5 +1,6 @@
-"""The experimental land-cover source reads one raster per year and holds
-a change between years against the model's own noise. Offline."""
+"""The experimental land-cover source reads one raster per year (five bands
+of percent at 30 m), reports the latest year with enough ground in view, and
+never reads a change between years. Offline."""
 
 import json
 
@@ -19,25 +20,30 @@ LON, LAT = -73.778, 40.7128
 
 @pytest.fixture
 def maps(tmp_path, monkeypatch):
-    """2018: the west half built, the east half trees. 2026: `extra_cols`
-    more columns of the east half built, and `cloud_rows` rows at the top
-    with no label. Noise: 2 points for a district, 3 for a neighbourhood
-    (and for the 500 m circle of an address)."""
+    """A 3 km square of 30 m cells per year: the west `west_paved` columns
+    (of 100) paved, the rest tree canopy, unless `mixed` gives every cell the
+    same mix; `cloud_rows` rows at the top have no value."""
     x, y = Transformer.from_crs(4326, 32618, always_xy=True).transform(LON, LAT)
 
-    def write(year: int, extra_cols: int, cloud_rows: int = 0):
-        a = np.full((200, 200), lc.TREES, "uint8")
-        a[:, :100 + extra_cols] = lc.BUILT
-        a[:cloud_rows] = 255
-        with rasterio.open(tmp_path / f"landcover_{year}.tif", "w", driver="GTiff", dtype="uint8", count=1, height=200,
-                           width=200, crs="EPSG:32618", transform=from_origin(x - 1000, y + 1000, 10, 10),
+    def write(year: int, west_paved: int = 50, cloud_rows: int = 0, mixed: dict | None = None):
+        a = np.zeros((5, 100, 100), "uint8")  # percent of each cell in each group
+        a[lc.PAVED, :, :west_paved] = 100
+        a[lc.TREES, :, west_paved:] = 100
+        if mixed:
+            a[:] = 0
+            for band, pct in mixed.items():
+                a[band] = pct
+        a[:, :cloud_rows] = 255
+        with rasterio.open(tmp_path / f"landcover_{year}.tif", "w", driver="GTiff", dtype="uint8", count=5, height=100,
+                           width=100, crs="EPSG:32618", transform=from_origin(x - 1500, y + 1500, 30, 30),
                            nodata=255) as dst:
-            dst.write(a, 1)
-            dst.update_tags(dates="2018-05-01;2018-07-02")
+            dst.write(a)
+            dst.update_tags(dates=f"{year}-06-20;{year}-07-20")
 
     (tmp_path / "landcover.json").write_text(json.dumps({
-        "noise_points": 2.0, "noise_points_small": 3.0, "eval_year": 2021, "group_agreement_pct": 80.0,
-        "green_found_pct": 60.0, "district_built_vs_worldcover": "9.0 points above"}))
+        "noise_points": 2.0, "noise_points_small": 2.7, "eval_year": 2021,
+        "district_paved_vs_city_map": "1.7 points above", "district_paved_gap_points_max": 7.8,
+        "between_years_worst": "2018 and 2024", "between_years_beyond_noise": 49, "between_years_districts": 59}))
     monkeypatch.setattr(lc, "EO_DIR", tmp_path)
     monkeypatch.setattr(experimental, "EVAL_DIR", tmp_path)
     lc._dates_at.cache_clear()
@@ -46,50 +52,48 @@ def maps(tmp_path, monkeypatch):
 
 
 def test_shares_of_the_latest_year_with_the_hedge(maps):
-    maps(2018, 0)
+    maps(2018, west_paved=50)
     v = lc.for_point(LAT, LON)
-    assert v["year"] == 2018 and 48 <= v["built_pct"] <= 52 and 48 <= v["green_pct"] <= 52
+    assert v["year"] == 2018 and 47 <= v["built_pct"] <= 53 and 47 <= v["green_pct"] <= 53
+    assert v["tree_pct"] == v["green_pct"]
     n = v["narrative"]
-    assert n.startswith("Experimental: a satellite land-cover model labels") and "as paved or built over" in n
-    assert "it agreed with ESA WorldCover (its own label source) on 80.0% of" in n and "Rely on NYC's own land cover map" in n
+    assert n.startswith("Experimental: a satellite land-cover model estimates that") and "is paved or built over" in n
+    assert "against the city's own 2021 six-inch map, on squares it never trained on" in n
+    assert "district's paved share 1.7 points above the map's" in n and "Rely on NYC's own land cover maps" in n
 
 
-def test_a_change_inside_the_noise_is_no_change(maps):
-    maps(2018, 0)
-    maps(2026, 1)  # about 1 point more built: inside the 2 points of noise
+def test_mixed_cells_are_averaged_not_counted(maps):
+    # Every cell 40% roof, 35% canopy, 25% grass: counting one label per cell would say 0% or 100% paved.
+    maps(2018, mixed={lc.PAVED: 40, lc.TREES: 35, lc.GRASS: 25})
     v = lc.for_point(LAT, LON)
-    assert v["first_year"] == 2018 and abs(v["built_change_points"]) <= 2
-    assert v["noise_points"] == 3.0  # an address is judged by the neighbourhood-scale noise, not the district's
-    assert "so no change is measurable and no trend in runoff follows from it" in v["narrative"]
-    assert "possibly" not in v["narrative"]
+    assert v["built_pct"] == 40.0 and v["green_pct"] == 60.0 and v["tree_pct"] == 35.0
+    assert "(35.0% tree canopy)" in v["narrative"]
 
 
-def test_a_difference_beyond_the_noise_is_stated_and_no_trend_is_read_from_it(maps):
-    # Across the city such differences appear as often as the noise alone produces them.
-    maps(2018, 0)
-    maps(2026, 30)  # about 15 points more built
+def test_years_are_never_compared_and_the_sentence_says_why(maps):
+    maps(2018, mixed={lc.PAVED: 20, lc.TREES: 80})
+    maps(2026, mixed={lc.PAVED: 80, lc.TREES: 20})  # 60 points more paved: still not read as change
     v = lc.for_point(LAT, LON)
-    assert v["built_change_points"] > 10
-    assert "more than the 3.0 points by which two images of one year usually differ" in v["narrative"]
-    assert "so no trend in paving or runoff is read from it" in v["narrative"] and "possibly" not in v["narrative"]
+    assert v["year"] == 2026 and v["built_pct"] == 80.0
+    assert "first_year" not in v and "built_change_points" not in v and "by_year" not in v
+    n = v["narrative"]
+    assert "no change between years is read from it" in n
+    assert "between 2018 and 2024, 49 of 59 districts' paved shares differ by more than 2.0 points" in n
+    assert "in 2018" not in n  # the older map's share is not quoted
 
 
-def test_a_cloud_gap_in_one_year_is_not_read_as_change(maps):
-    # 2026 lost its top rows to cloud: the two years are compared on the
-    # pixels both labelled, and with too few in common they are not compared.
-    maps(2018, 0)
-    maps(2026, 0, cloud_rows=60)  # the circle keeps over 80% of its pixels
+def test_a_clouded_latest_year_falls_back_to_the_year_before(maps):
+    maps(2021, mixed={lc.PAVED: 30, lc.GRASS: 70})
+    maps(2026, mixed={lc.PAVED: 60, lc.GRASS: 40}, cloud_rows=100)  # nothing in view
     v = lc.for_point(LAT, LON)
-    assert v["built_change_points"] == 0 and v["built_pct"] == v["built_pct_first"]
-    maps(2026, 0, cloud_rows=95)  # under 80% in common
-    v = lc.for_point(LAT, LON)
-    assert "first_year" not in v and "in 2018 the" not in v["narrative"]
+    assert v["year"] == 2021 and v["built_pct"] == 30.0
 
 
 def test_an_evaluation_file_from_an_older_batch_does_not_break_the_sentence(maps, tmp_path):
-    maps(2018, 0)
+    maps(2018)
     (tmp_path / "landcover.json").write_text(json.dumps({"noise_points": 2.0}))
-    assert "its saved evaluation is out of date" in lc.for_point(LAT, LON)["narrative"]
+    n = lc.for_point(LAT, LON)["narrative"]
+    assert "its saved evaluation is out of date" in n and "no change between years is read from it" in n
 
 
 def test_no_saved_map_means_no_value(tmp_path, monkeypatch):

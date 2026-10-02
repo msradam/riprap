@@ -204,7 +204,8 @@ More in [docs/METHODOLOGY.md](docs/METHODOLOGY.md),
 ## Experimental models
 
 Riprap is an app in development, and three models its author fine-tuned are
-part of it. None has been shown to beat an official product, so their output
+part of it (the land-cover one in this repository, with its weights kept
+local). None has been shown to beat an official product, so their output
 is never a measurement: every sentence from one opens with "Experimental" or
 "Experimental forecast", states the model's limits and its tested accuracy, and
 names the official source to rely on. For a question about the past or the
@@ -215,14 +216,14 @@ present they never set the answer's yes or no. One rule in
 |---|---|---|
 | [Granite TTM r2 Battery Surge](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge) | How far above the predicted tide the water at the Battery may run in the next four days, and whether the total reaches the gauge's flood stage | On 635 four-day windows since January 2025 its mean error was 11.5 cm, against 13.3 cm for holding the last day's mean. It foresaw 1 of the 23 windows in which the water reached the minor flood stage |
 | [Prithvi-EO 2.0 NYC Pluvial](https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial) | Where satellite scenes showed new surface water after Hurricane Ida, and after which other heavy rains it showed any | Of 153 high-water marks surveyed after Ida, it showed new water within 500 m of 17 (11%), not yet better than chance (14%). It cannot see street or basement flooding, and it is not used to say a place is prone to standing water |
-| [TerraMind NYC adapters](https://huggingface.co/msradam/TerraMind-NYC-Adapters) | How much of a place is paved or built over and how much is green, in 2018, 2021, 2024 and 2026 | For 2021 it agreed with ESA WorldCover (its own label source) on 87.1% of the city's land as paved, green or water. It found 66.3% of WorldCover's green land and put a typical district's paved share 7.7 points above WorldCover's. Two images of one year differ by under 3.7 points in a district's paved share 19 times in 20, and differences between years beyond that turned up in 3 of 59 districts, which is what that noise alone produces. It is not used to claim a trend |
+| [NYC land-cover model](docs/MODELS.md#nyc-land-cover-model) (TerraMind 1.0 base, fine-tuned here) | How much of a place is paved or built over, how much is green and how much is tree canopy, from summer scenes of 2018, 2021, 2024 and 2026 | Trained on the city's 2017 six-inch land cover map and tested against its 2021 map on squares it never trained on: a typical district's paved share reads 1.7 points above the map's, and two images of one year differ by under 2.0 points 19 times in 20. The adapter it replaced read 16 to 18 points high against the same map. Maps of different summers differ by more than that, so it is not used to read change between years |
 
 The surge model runs on CPU when the `ml` extra is installed
 (`uv sync --extra ml`); without it the app says the model is not installed.
 The two satellite models run in batch jobs with the `eo` extra, and the app
 reads their saved output with no extra. What each can and cannot answer, the
 backtests and how to rerun them are in [docs/MODELS.md](docs/MODELS.md). The
-models are reproduced independently at
+surge and water models are reproduced independently at
 [github.com/msradam/riprap-models](https://github.com/msradam/riprap-models).
 
 ## Data sources
@@ -270,8 +271,12 @@ The experimental models are fine-tunes of other people's work: NASA and IBM's
 [Prithvi-EO 2.0](https://huggingface.co/ibm-nasa-geospatial), IBM and ESA's
 [TerraMind 1.0](https://huggingface.co/ibm-esa-geospatial/TerraMind-1.0-base)
 and IBM's [Granite TTM r2](https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2),
-all Apache 2.0. The fine-tunes and their evaluation are at
-[github.com/msradam/riprap-models](https://github.com/msradam/riprap-models).
+all Apache 2.0. The surge and water fine-tunes and their evaluation are at
+[github.com/msradam/riprap-models](https://github.com/msradam/riprap-models);
+the land-cover model is trained and scored by `scripts/train_cover.py` and
+`scripts/eval_cover.py` on NYC's land cover maps (2017 from NYC Open Data for
+training; 2021 from The Nature Conservancy and the University of Vermont,
+CC BY-NC-SA 4.0, used only to score it).
 Their limits are Riprap's to state, not their makers'. Satellite imagery is
 Copernicus Sentinel data, read through Microsoft's Planetary Computer.
 

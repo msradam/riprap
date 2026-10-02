@@ -1,32 +1,39 @@
-"""Batch earth-observation run: TerraMind land cover by year (experimental).
+"""Batch earth-observation run: NYC land cover by year (experimental).
 
-Runs offline, never per request. For each year it writes a 10 m land-cover
-raster of the city's land (data/eo/landcover_<year>.tif) for the app to
-read, and it scores the model so every sentence about it can state its
+Runs offline, never per request. For each year it writes a 30 m raster of
+the city's land (data/eo/landcover_<year>.tif) with five bands, the share of
+each cell in tree canopy, grass and shrub, bare soil, water, and paved or built
+over (building, road, other paved, railroad), in percent, 255 where there is
+no clear view, for the app to read. It scores the model so every sentence about it can state its
 accuracy (data/experimental/landcover.json).
 
     uv sync --extra eo
     uv run python scripts/run_landcover_batch.py --years 2018 2021 2024 2026
 
+The model (app/eo/cover.py) was trained by scripts/train_cover.py on the
+city's 2017 six-inch land cover map aggregated to the Sentinel-2 grid.
 Method:
   * scenes: for each year, the clearest Sentinel-2 L2A dates between 15
     June and 30 September (full leaf) that cover the whole city, up to
     --dates of them (Microsoft Planetary Computer, no key). Scenes from
     before January 2022 get the 1000 added that later scenes carry, so
     every year is on one scale;
-  * one map per date: the model sees one scene at a time, as in training;
-    cloud, shadow and missing pixels (the scene classification layer) get
-    no label;
-  * the year's map is the clearest date's map, with its unlabelled pixels
-    filled from the next date. (A vote between two dates is a tie wherever
-    they differ, and a tie-break favours one class.) The gap between two
-    dates' maps of one year is the model's own noise: a change between
-    years smaller than that is not reported as change;
-  * accuracy: the 2021 map against ESA WorldCover 2021 (the adapter's label
-    source, collapsed to the same five classes), citywide and by borough.
+  * one map per date; cloud, shadow and missing pixels (the scene
+    classification layer) get no value;
+  * the year's map is the clearest date's map, with its gaps filled from
+    the next date. The gap between two dates' maps of one year is the
+    model's own noise. Every pair of years is compared the same way: when
+    maps of different summers differ by more than that, which they do, no
+    change between years is read from them;
+  * accuracy: the 2021 map against the city's 2021 six-inch land cover
+    (The Nature Conservancy and UVM, CC BY-NC-SA 4.0), on the 2 km test
+    squares the model never trained on, when that map is on this machine
+    (outputs/terramind_nyc/labels_2021_10m.tif, from
+    scripts/prepare_landcover_labels.py). The map is a local test key: only
+    scores are written, never the map or anything drawn from it.
 
-The labels are a proxy from 10 m pixels, not a survey: the city's own land
-cover map (2017, 6 inch) and building footprints are the surveys.
+The fractions are a model's estimate from 10 m pixels, not a survey: the
+city's own land cover maps and building footprints are the surveys.
 """
 
 from __future__ import annotations
@@ -42,10 +49,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 NYC_BBOX = [-74.26, 40.49, -73.69, 40.92]
-# ESA WorldCover classes -> the adapter's five (app.eo.terramind.CLASSES), as
-# its training script collapsed them.
+# ESA WorldCover classes -> the old adapter's five, for scripts/check_tim.py.
 WORLDCOVER = {80: 0, 90: 0, 95: 0, 50: 1, 10: 2, 20: 2, 30: 3, 40: 3, 60: 4, 70: 4, 100: 4}
-BUILT = 1
+CITY_2021 = ROOT / "outputs" / "terramind_nyc" / "labels_2021_10m.tif"
 
 
 def scene_dates(year: int, bbox: list[float], max_cloud: float = 15.0) -> list[tuple[str, list]]:
@@ -88,14 +94,33 @@ def read_s2(items: list, ref, lift_old: bool):
     return s2, clear & (s2[1] > 0)
 
 
-def write_map(path: Path, classes, ref, **tags) -> None:
-    import rasterio
+GROUPS = ("tree_canopy", "grass_shrub", "bare_soil", "water", "paved")  # the bands saved, in order
 
+
+def write_map(path: Path, frac, ref, **tags) -> None:
+    """(8, H, W) fractions at 10 m (NaN where unseen) saved as five group
+    bands of percent at 30 m (3 by 3 pixels averaged, the scale the model is
+    scored at), 255 where fewer than five of the nine pixels were seen."""
+    import numpy as np
+    import rasterio
+    from rasterio.transform import Affine
+
+    from app.eo import cover
+
+    groups = np.stack([frac[0], frac[1], frac[2], frac[3], np.sum([frac[c] for c in cover.PAVED], 0)]).astype("float32")
+    h, w = groups.shape[1] // 3 * 3, groups.shape[2] // 3 * 3
+    blocks = groups[:, :h, :w].reshape(5, h // 3, 3, w // 3, 3)
+    seen = (~np.isnan(blocks[0])).sum(axis=(1, 3))
+    with np.errstate(invalid="ignore"):
+        mean = np.nanmean(blocks, axis=(2, 4))
+    a = np.where(seen[None] >= 5, np.clip(np.round(100 * np.nan_to_num(mean)), 0, 100), 255).astype("uint8")
+    t = ref.rio.transform()
     path.parent.mkdir(parents=True, exist_ok=True)
-    with rasterio.open(path, "w", driver="COG", dtype="uint8", count=1, height=classes.shape[0], width=classes.shape[1],
-                       crs=ref.rio.crs, transform=ref.rio.transform(), compress="deflate", nodata=255) as dst:
-        dst.write(classes, 1)
-        dst.update_tags(maturity="experimental", batch_run=str(date.today()), **tags)
+    with rasterio.open(path, "w", driver="COG", dtype="uint8", count=len(GROUPS), height=a.shape[1], width=a.shape[2],
+                       crs=ref.rio.crs, transform=t * Affine.scale(3), compress="deflate", nodata=255) as dst:
+        dst.write(a)
+        dst.descriptions = GROUPS
+        dst.update_tags(maturity="experimental", batch_run=str(date.today()), units="percent of the cell", **tags)
 
 
 def land_mask(ref):
@@ -108,11 +133,11 @@ def land_mask(ref):
     return rasterize(shapes, out_shape=ref.shape, transform=ref.rio.transform(), fill=0, dtype="uint8") == 1
 
 
-def run_year(year: int, bbox: list[float], out: Path, n_dates: int, ref, land) -> dict | None:
+def run_year(year: int, bbox: list[float], out: Path, n_dates: int, ref, land, net) -> dict | None:
     """Write the year's map; return its dates and the per-date maps."""
     import numpy as np
 
-    from app.eo import terramind
+    from app.eo import cover
 
     maps, used = [], []
     for day, items in scene_dates(year, bbox):
@@ -123,10 +148,9 @@ def run_year(year: int, bbox: list[float], out: Path, n_dates: int, ref, land) -
             continue  # this pass covers only part of the city
         if clear[land].mean() < 0.8:
             continue
-        s2[:, ~land] = 0  # the harbour is not classified
-        labels = terramind.classify(s2)
-        labels[~clear | ~land] = 255  # no label without a clear view, and none for the harbour
-        maps.append(labels)
+        frac = cover.predict(net, cover.normalise(s2)).astype("float16")
+        frac[:, ~clear | ~land] = np.nan  # no value without a clear view, and none for the harbour
+        maps.append(frac)
         used.append(day)
         print(f"{year}: {day}, {len(items)} scenes, {clear[land].mean():.1%} of the land clear", flush=True)
     if not maps:
@@ -134,10 +158,9 @@ def run_year(year: int, bbox: list[float], out: Path, n_dates: int, ref, land) -
         return None
     year_map = maps[0].copy()
     for later in maps[1:]:
-        year_map = np.where(year_map == 255, later, year_map)
+        year_map = np.where(np.isnan(year_map), later, year_map)
     write_map(out / f"landcover_{year}.tif", year_map, ref, year=str(year), dates=";".join(used),
-              model=terramind.MODEL.repo, revision=terramind.MODEL.revision, adapter=terramind.ADAPTER,
-              class_names=";".join(terramind.CLASSES))
+              model=cover.ARCH, weights_sha256=cover.SHA256, trained_on="NYC land cover 2017, 6 inch (NYC Open Data)")
     return {"year": year, "dates": used, "maps": maps, "map": year_map}
 
 
@@ -156,14 +179,19 @@ def zones(ref, column: str):
     return codes, raster
 
 
-def built_shares(labels, zone, where) -> dict[str, float]:
-    """The share of each zone's pixels (those in `where`) labelled built."""
+def paved_shares(frac, zone, where) -> dict[str, float]:
+    """Each zone's paved or built share (mean over its pixels in `where`)."""
+    import numpy as np
+
+    from app.eo import cover
+
+    paved = np.nansum(np.stack([frac[c].astype("float32") for c in cover.PAVED]), 0)
     codes, raster = zone
     out = {}
     for i, c in enumerate(codes):
         inside = (raster == i + 1) & where
-        if inside.sum():
-            out[c] = float((labels[inside] == BUILT).mean())
+        if inside.sum() >= 500:
+            out[c] = float(paved[inside].mean())
     return out
 
 
@@ -186,70 +214,87 @@ def worldcover(bbox: list[float], ref):
     return out
 
 
-def evaluate(results: dict[int, dict], bbox: list[float], ref, out_dir: Path) -> dict:
-    """The model's noise (two dates of one year) and its agreement with
-    WorldCover 2021, at the scales the app answers at."""
+def evaluate(results: dict[int, dict], ref, out_dir: Path, land) -> dict:
+    """The model's noise (two dates of one year) and its accuracy against the
+    city's 2021 map on the test squares, at the scales the app answers at."""
     import numpy as np
     import rasterio
-    from rasterio.features import rasterize
 
-    from app.areas import nta
-    from app.eo import terramind
+    from app.eo import cover
 
     years = {}
     for tif in sorted(out_dir.glob("landcover_*.tif")):  # every saved year, also ones this run did not make
         with rasterio.open(tif) as src:
             years[src.tags().get("year", tif.stem[-4:])] = src.tags().get("dates", "").split(";")
-    out: dict = {"model": terramind.MODEL.repo, "revision": terramind.MODEL.revision, "adapter": terramind.ADAPTER,
-                 "run_date": str(date.today()), "years": years}
+    out: dict = {"model": cover.ARCH, "weights_sha256": cover.SHA256, "run_date": str(date.today()), "years": years}
     districts, areas = zones(ref, "cdta2020"), zones(ref, "nta2020")
-    # Noise: the gap in built share between two dates of one year, on the pixels
-    # both dates labelled, for a district and for a neighbourhood (the nearest
-    # thing to the 500 m circle an address gets). The 95th percentile is quoted.
+    # Noise: the gap in paved share between two dates of one year, on the pixels
+    # both dates saw, for a district and for a neighbourhood (the nearest thing
+    # to the 500 m circle an address gets). The 95th percentile is quoted.
     for name, zone in (("noise_points", districts), ("noise_points_small", areas)):
         gaps = []
         for r in results.values():
             if len(r["maps"]) < 2:
                 continue
             a, b = r["maps"][0], r["maps"][1]
-            both = (a != 255) & (b != 255)
-            sa, sb = built_shares(a, zone, both), built_shares(b, zone, both)
+            both = ~np.isnan(a[0]) & ~np.isnan(b[0])
+            sa, sb = paved_shares(a, zone, both), paved_shares(b, zone, both)
             gaps += [abs(sa[c] - sb[c]) for c in sa if c in sb]
         if gaps:
             out[name] = round(100 * float(np.percentile(gaps, 95)), 1)
             out[f"{name}_median"] = round(100 * float(np.median(gaps)), 1)
-    year = 2021 if 2021 in results else min(results, key=lambda y: abs(y - 2021))
-    truth, pred = worldcover(bbox, ref), results[year]["map"]
-    both = (truth != 255) & (pred != 255)
-    out["eval_year"] = year
-    out["agreement_pct"] = round(100 * float((truth[both] == pred[both]).mean()), 1)
-    # The app reports three groups (paved or built, green, water): trees and grass together.
-    group = np.array([0, 1, 2, 2, 3, 255], dtype="uint8")
-    out["group_agreement_pct"] = round(100 * float((group[np.minimum(truth[both], 5)] == group[np.minimum(pred[both], 5)]).mean()), 1)
-    # How many of WorldCover's pixels of each class the model gives the same class.
-    out["class_recall_pct"] = {name: round(100 * float((pred[both & (truth == c)] == c).mean()), 1)
-                               for c, name in enumerate(terramind.CLASSES) if (both & (truth == c)).any()}
-    green = np.isin(truth, (2, 3)) & both
-    out["green_found_pct"] = round(100 * float(np.isin(pred[green], (2, 3)).mean()), 1)
-    # District level: the model's built share less WorldCover's, in points.
-    ours, theirs = built_shares(pred, districts, both), built_shares(truth, districts, both)
-    diffs = [100 * (ours[c] - theirs[c]) for c in ours if c in theirs]
-    out["district_built_minus_worldcover_points_median"] = round(float(np.median(diffs)), 1)
-    out["district_built_gap_points_max"] = round(float(np.max(np.abs(diffs))), 1)
-    bias = out["district_built_minus_worldcover_points_median"]
-    out["district_built_vs_worldcover"] = f"{abs(bias)} points {'above' if bias > 0 else 'below'}"  # for the hedge sentence
-    g = nta.load().to_crs(ref.rio.crs)
-    out["by_borough_agreement_pct"] = {}
-    for boro in sorted(g["boroname"].unique()):
-        zone = rasterize([(geom, 1) for geom in g[g["boroname"] == boro].geometry], out_shape=pred.shape,
-                         transform=ref.rio.transform(), fill=0, dtype="uint8") == 1
-        m = both & zone
-        out["by_borough_agreement_pct"][boro] = round(100 * float((truth[m] == pred[m]).mean()), 1)
+    # Between years: the same district comparison for every pair of years
+    # mapped in this run. When images of different summers differ by more than
+    # two images of one summer, no change between years can be read.
+    import itertools
+
+    pairs = []
+    for y1, y2 in itertools.combinations(sorted(results), 2):
+        a, b = results[y1]["map"], results[y2]["map"]
+        both = ~np.isnan(a[0]) & ~np.isnan(b[0])
+        sa, sb = paved_shares(a, districts, both), paved_shares(b, districts, both)
+        d = [100 * abs(sb[c] - sa[c]) for c in sa if c in sb]
+        pairs.append({"years": [y1, y2], "districts": len(d),
+                      "beyond_noise": int(sum(x > out.get("noise_points", 0) for x in d))})
+    out["between_years"] = pairs
+    if pairs:  # the pair that disagrees most, for the sentence
+        worst = max(pairs, key=lambda p: p["beyond_noise"] / max(p["districts"], 1))
+        out["between_years_worst"] = f"{worst['years'][0]} and {worst['years'][1]}"
+        out["between_years_beyond_noise"] = worst["beyond_noise"]
+        out["between_years_districts"] = worst["districts"]
+    if 2021 not in results or not CITY_2021.exists():
+        print("no 2021 map in this run or no city 2021 map on this machine: accuracy not rescored", flush=True)
+        return out
+    with rasterio.open(CITY_2021) as src:
+        truth, covered = src.read(list(range(1, 9))).astype("float32"), src.read(9)
+    pred = results[2021]["map"].astype("float32")
+    test = (cover.split_map(ref.shape) == 2) & land & (covered >= 0.95) & ~np.isnan(pred[0])
+    out["eval_year"] = 2021
+    out["key"] = "NYC land cover 2021, 6 inch (The Nature Conservancy and UVM), on the 2 km test squares"
+    ours, theirs = paved_shares(pred, districts, test), paved_shares(truth, districts, test)
+    diffs = np.array([100 * (ours[c] - theirs[c]) for c in ours if c in theirs])
+    out["n_districts"] = len(diffs)
+    out["district_paved_minus_city_map_points_median"] = round(float(np.median(diffs)), 1)
+    out["district_paved_gap_points_median_abs"] = round(float(np.median(np.abs(diffs))), 1)
+    out["district_paved_gap_points_max"] = round(float(np.abs(diffs).max()), 1)
+    # 30 m cells (3 by 3 pixels, all nine valid): mean absolute error of the
+    # paved and the canopy share, in points.
+    def block(a):
+        h, w = a.shape[-2] // 3 * 3, a.shape[-1] // 3 * 3
+        return a[..., :h, :w].reshape(*a.shape[:-2], h // 3, 3, w // 3, 3).mean(axis=(-3, -1))
+    ok = block(test.astype("float32")) == 1
+    for name, idx in (("paved", list(cover.PAVED)), ("tree_canopy", [0])):
+        p = block(np.nan_to_num(pred[idx]).sum(0))[ok]
+        t = block(truth[idx].sum(0))[ok]
+        out[f"{name}_mae_points_30m"] = round(100 * float(np.abs(p - t).mean()), 1)
+        out[f"{name}_r2_30m"] = round(float(1 - ((p - t) ** 2).sum() / ((t - t.mean()) ** 2).sum()), 2)
+    bias = out["district_paved_minus_city_map_points_median"]
+    out["district_paved_vs_city_map"] = f"{abs(bias)} points {'above' if bias > 0 else 'below'}"  # for the hedge
     return out
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="TerraMind land cover by year (experimental).")
+    ap = argparse.ArgumentParser(description="NYC land cover by year (experimental).")
     ap.add_argument("--years", nargs="+", type=int, required=True)
     ap.add_argument("--dates", type=int, default=2, help="clear dates per year")
     ap.add_argument("--bbox", nargs=4, type=float, default=NYC_BBOX)
@@ -257,20 +302,21 @@ def main() -> int:
     ap.add_argument("--eval-out", type=Path, default=ROOT / "data" / "experimental" / "landcover.json")
     args = ap.parse_args()
 
-    from app.eo import prithvi
+    from app.eo import cover, prithvi
 
     bbox = list(args.bbox)
     ref = prithvi.grid(bbox)
     land = land_mask(ref)
+    net = cover.load()
     results = {}
     for year in args.years:
-        r = run_year(year, bbox, args.out, args.dates, ref, land)
+        r = run_year(year, bbox, args.out, args.dates, ref, land, net)
         if r:
             results[year] = r
     if not results:
         return 1
     if bbox == NYC_BBOX:
-        report = evaluate(results, bbox, ref, args.out)
+        report = evaluate(results, ref, args.out, land)
         args.eval_out.parent.mkdir(parents=True, exist_ok=True)
         args.eval_out.write_text(json.dumps(report, indent=1) + "\n")
         print(json.dumps(report, indent=1))

@@ -24,11 +24,11 @@
       slug: 'bk18-satellite'
     },
     {
-      title: 'Paved and green land',
-      does: 'Labels how much of a place is paved or green, in 2018, 2021, 2024 and 2026. A TerraMind fine-tune.',
-      measured: '87.1% agreement with ESA WorldCover, its own label source, on paved, green or water for 2021.',
-      problem: "A district's paved share from two images of one year differs by under 3.7 points 19 times in 20, so a change between years has to clear that noise.",
-      card: `${HF}/TerraMind-NYC-Adapters`,
+      title: 'Paved, green and tree canopy',
+      does: "Estimates how much of each 10 m pixel is tree canopy, grass, paving or roof, in 2018, 2021, 2024 and 2026. A TerraMind fine-tune, trained on the city's own 2017 six-inch map.",
+      measured: "On squares it never trained on, it reads a typical district's paved share 1.7 points above the city's own 2021 map. The adapter it replaced read 16 to 18 points high.",
+      problem: 'Maps of different summers differ by more than two images of one summer, so it cannot yet show change between years. Telling real change from the images is the next result to earn.',
+      card: 'https://github.com/msradam/riprap/blob/main/docs/MODELS.md#nyc-land-cover-model',
       slug: 'qn12-paved'
     }
   ];
@@ -39,7 +39,7 @@
     <h2 id="frontier-h" class="land-h2">Open models, open problems</h2>
     <p class="land-intro">
       I fine-tuned three open models for New York: one forecasts surge at the Battery, one reads
-      satellite scenes after storms, one maps paved and green land. Each is labelled experimental,
+      satellite scenes after storms, one maps paved, green and tree-covered land. Each is labelled experimental,
       states its tested accuracy in every sentence, and has a measured baseline to beat.
     </p>
     <ul class="land-cards is-three">

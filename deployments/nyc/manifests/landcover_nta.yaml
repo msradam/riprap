@@ -1,7 +1,7 @@
 id: landcover_nta
 type: baked
-title: Land cover from satellite, TerraMind NYC adapter (experimental)
-answers: "experimental estimate of how much of a place is paved or built over and how much is green, and whether that changed between the years mapped"
+title: Land cover from satellite, NYC land-cover model (experimental)
+answers: "experimental estimate of how much of a place is paved or built over, how much is green and how much is tree canopy, and whether that changed between the years mapped"
 stone: cornerstone
 maturity: experimental
 tier: modeled
@@ -21,21 +21,22 @@ config:
 
 provenance:
   date_modified: "2026"
-  retrieved_at: 2026-10-01
-  source_name: TerraMind NYC land-cover adapter (msradam, experimental) on Copernicus Sentinel-2
-  source_url: https://huggingface.co/msradam/TerraMind-NYC-Adapters
-  license: Apache-2.0 (model); Copernicus Sentinel data terms (imagery)
+  retrieved_at: 2026-10-02
+  source_name: NYC land-cover model (Riprap, experimental) on Copernicus Sentinel-2, trained on NYC Land Cover 2017
+  source_url: https://github.com/msradam/riprap/blob/main/docs/MODELS.md
+  license: Copernicus Sentinel data terms (imagery); NYC Open Data terms of use (2017 training labels)
   doc_id: landcover_nta
   citation: >-
-    msradam/TerraMind-NYC-Adapters, adapter lulc_nyc (Apache-2.0), the owner's
-    LoRA adapter on IBM and ESA's TerraMind 1.0, run by
-    scripts/run_landcover_batch.py on Sentinel-2 L2A scenes (the adapter's
-    radar and elevation inputs are left empty). Contains modified Copernicus
-    Sentinel data, via Microsoft Planetary Computer. Experimental: a proxy from
-    10 m pixels trained on ESA WorldCover 2021 labels, not a survey.
+    Riprap's NYC land-cover model, trained by scripts/train_cover.py on NYC
+    Land Cover 2017 (6 inch, NYC Open Data) aggregated to 10 m and run by
+    scripts/run_landcover_batch.py on Sentinel-2 L2A scenes; scored against
+    NYC Land Cover 2021 (The Nature Conservancy and UVM) on squares it never
+    trained on. Contains modified Copernicus Sentinel data, via Microsoft
+    Planetary Computer. Experimental: an estimate from 10 m pixels, not a
+    survey.
 
 narration:
-  short: Paved and green shares of this area, from a satellite land-cover model (experimental).
+  short: Paved, green and tree canopy shares of this area, from a satellite land-cover model (experimental).
   template: "{narrative}"
 
 fallback:

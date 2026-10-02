@@ -35,8 +35,14 @@ def test_a_model_with_no_saved_evaluation_says_so(saved_evaluations):
 
 
 def test_models_are_pinned_to_a_commit_of_the_owners_repositories():
+    # A published model is pinned to a commit; the unpublished land-cover model to its weights' SHA-256.
     for m in experimental.MODELS.values():
-        assert m.repo.startswith("msradam/") and len(m.revision) == 40 and m.extra in ("ml", "eo")
+        assert m.extra in ("ml", "eo")
+        if m.repo.startswith("msradam/"):
+            assert len(m.revision) == 40
+        else:
+            assert m.repo.startswith("unpublished:") and len(m.revision) == 64
+            assert all(c in "0123456789abcdef" for c in m.revision)
 
 
 def test_every_experimental_nyc_source_reads_one_of_the_three_models():

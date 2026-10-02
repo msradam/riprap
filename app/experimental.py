@@ -1,7 +1,9 @@
 """Riprap's three experimental models, and the one rule for quoting them.
 
-The models are the owner's fine-tunes, published on Hugging Face and
-reproduced at github.com/msradam/riprap-models. None has been shown to
+The surge and water models are the owner's fine-tunes, published on Hugging
+Face and reproduced at github.com/msradam/riprap-models; the land-cover model
+is trained in this repository (scripts/train_cover.py) and its weights are
+not published. None has been shown to
 beat an official product, so nothing they produce is ever a measurement:
 
   * every sentence from a model goes through `hedge`, which opens it with
@@ -21,11 +23,14 @@ missing, says so in one sentence (`not_installed`).
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
 EVAL_DIR = Path(__file__).resolve().parents[1] / "data" / "experimental"
+# The land-cover model's weights are local (app/eo/cover.py); its saved maps carry this hash.
+COVER_SHA256 = "15dc40f93277f456537d2705e538c7f333e561b40784b2aabfda1eec67c50116"
 
 
 @dataclass(frozen=True)
@@ -68,18 +73,19 @@ MODELS = {
                  "stormwater flood maps",
     ),
     "landcover": Model(
-        name="TerraMind NYC land-cover adapter",
-        repo="msradam/TerraMind-NYC-Adapters",
-        revision="984341631d10db4fb699f76cd5d5bc7d8b3690b3",
+        name="NYC land-cover model",
+        repo="unpublished: trained by scripts/train_cover.py",
+        revision=os.environ.get("RIPRAP_COVER_SHA256", COVER_SHA256),  # SHA-256 of the weights, not a commit
         extra="eo",
-        limits="it labels 10 m satellite pixels and is a proxy, not a survey: a pixel that mixes street, roof, tree "
-               "and shadow gets one label, and it calls much green ground paved",
-        evaluation="for {eval_year} it agreed with ESA WorldCover (its own label source) on {group_agreement_pct}% of "
-                   "the city's land as paved, green or water and found {green_found_pct}% of WorldCover's green land, "
-                   "its paved share for a typical district was {district_built_vs_worldcover} WorldCover's, and two "
-                   "images of one year differ by under {noise_points} points in a district's paved share 19 times in "
-                   "20 ({noise_points_small} in a neighbourhood's)",
-        official="NYC's own land cover map (2017, 6 inch) and building footprints for a survey",
+        limits="it estimates the share of each 10 m satellite pixel that is canopy, grass, paving, roof, water or "
+               "bare ground, learned from the city's 2017 six-inch map, so detail finer than about 30 m is blurred "
+               "and a tree over a street counts as canopy",
+        evaluation="against the city's own 2021 six-inch map, on squares it never trained on, it read a typical "
+                   "district's paved share {district_paved_vs_city_map} the map's (at most "
+                   "{district_paved_gap_points_max} points off), and two images of one year differ by under "
+                   "{noise_points} points in a district's paved share 19 times in 20 ({noise_points_small} in a "
+                   "neighbourhood's)",
+        official="NYC's own land cover maps (2017 and 2021, 6 inch) and building footprints for a survey",
     ),
 }
 
