@@ -49,7 +49,6 @@ def _coverage(geom, transform, shape):
     cells whose far edge is 240 m out; counting those whole once made the
     reading cover a wider patch than its sentence states. A large area is
     read by cell centres, where the edge does not matter."""
-    import numpy as np
     from rasterio.features import rasterize
     from rasterio.transform import Affine
 
