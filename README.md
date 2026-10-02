@@ -265,7 +265,7 @@ Developer Hackathon, where it began and where the three models were trained;
 to IBM Research for Granite; to NYU's Center for Urban Science and Progress;
 to FloodNet (researchers at New York University and the City University of New
 York working with city agencies) for the sensor network and its open data; and
-to Andrew Hicks for civil-engineering review.
+to Andrew Hicks for the introduction to the ASCE network.
 
 The experimental models are fine-tunes of other people's work: NASA and IBM's
 [Prithvi-EO 2.0](https://huggingface.co/ibm-nasa-geospatial), IBM and ESA's
