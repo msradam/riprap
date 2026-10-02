@@ -460,6 +460,14 @@ git-ignored `outputs/` folder, and the owner decides what to publish.
 All are Apache-2.0 except PatchTST-FM r2, which its card offers under
 OpenMDW 1.0 or Apache 2.0 at the user's choice.
 
+Trained here, kept on the owner's machine under `outputs/` and not
+published:
+
+| Model | Built from | File | SHA-256 | Used by |
+|---|---|---|---|---|
+| NYC land-cover model (TerraMind base with a per-pixel branch) | TerraMind 1.0 base at `fb96c70`; NYC Land Cover 2017 and Sentinel-2 | `outputs/terramind_nyc/models/terramind_base_px.safetensors` (412 MB) | `15dc40f93277f456537d2705e538c7f333e561b40784b2aabfda1eec67c50116` | `run_landcover_batch.py`, the app's land-cover maps |
+| Chronos-2 Battery surge fine-tune (LoRA merged) | Chronos-2 at `29ec376`; NOAA 8518750 before 2024-07-01 | `outputs/surge_models/chronos2_battery/model.safetensors` (478 MB) | `f649bca160d71a53ca5550c7b660519c8650b9fec3b835b6f896e1c38941fa4e` | `backtest_surge_candidates.py --finetuned` |
+
 ## Inference energy
 
 `app/emissions.py` records every LLM call in a briefing with its tokens,
