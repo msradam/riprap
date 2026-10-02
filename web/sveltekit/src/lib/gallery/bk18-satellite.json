@@ -3,8 +3,8 @@
  "neighborhood": "Community district BK18, Brooklyn",
  "address": "BK18",
  "question": "What did satellite imagery show in BK18 after Ida?",
- "generated_at": "2026-10-01T17:37Z",
- "riprap_commit": "9c9891d",
+ "generated_at": "2026-10-02T12:32Z",
+ "riprap_commit": "63148e7",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -583,7 +583,7 @@
    {
     "id": "landcover",
     "type": "baked",
-    "title": "Land cover from satellite, TerraMind NYC adapter (experimental)",
+    "title": "Land cover from satellite, NYC land-cover model (experimental)",
     "stone": "cornerstone",
     "tier": "modeled",
     "maturity": "experimental",
@@ -596,17 +596,17 @@
      "icon": null
     },
     "narration": {
-     "short": "Paved and green shares near this address, from a satellite land-cover model (experimental).",
+     "short": "Paved, green and tree canopy shares near this address, from a satellite land-cover model (experimental).",
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "TerraMind NYC land-cover adapter (msradam, experimental) on Copernicus Sentinel-2",
-     "source_url": "https://huggingface.co/msradam/TerraMind-NYC-Adapters",
-     "license": "Apache-2.0 (model); Copernicus Sentinel data terms (imagery)",
-     "citation": "msradam/TerraMind-NYC-Adapters, adapter lulc_nyc (Apache-2.0), the owner's LoRA adapter on IBM and ESA's TerraMind 1.0, run by scripts/run_landcover_batch.py on Sentinel-2 L2A scenes (the adapter's radar and elevation inputs are left empty). Contains modified Copernicus Sentinel data, via Microsoft Planetary Computer. Experimental: a proxy from 10 m pixels trained on ESA WorldCover 2021 labels, not a survey.",
+     "source_name": "NYC land-cover model (Riprap, experimental) on Copernicus Sentinel-2, trained on NYC Land Cover 2017",
+     "source_url": "https://github.com/msradam/riprap/blob/main/docs/MODELS.md",
+     "license": "Copernicus Sentinel data terms (imagery); NYC Open Data terms of use (2017 training labels)",
+     "citation": "Riprap's NYC land-cover model, trained by scripts/train_cover.py on NYC Land Cover 2017 (6 inch, NYC Open Data) aggregated to 10 m and run by scripts/run_landcover_batch.py on Sentinel-2 L2A scenes; scored against NYC Land Cover 2021 (The Nature Conservancy and UVM) on squares it never trained on. Contains modified Copernicus Sentinel data, via Microsoft Planetary Computer. Experimental: an estimate from 10 m pixels, not a survey.",
      "doc_id": "landcover",
      "date_modified": "2026",
-     "retrieved_at": "2026-10-01"
+     "retrieved_at": "2026-10-02"
     },
     "fallback": {
      "on_offline": "skip",
@@ -616,7 +616,7 @@
    {
     "id": "landcover_nta",
     "type": "baked",
-    "title": "Land cover from satellite, TerraMind NYC adapter (experimental)",
+    "title": "Land cover from satellite, NYC land-cover model (experimental)",
     "stone": "cornerstone",
     "tier": "modeled",
     "maturity": "experimental",
@@ -629,17 +629,17 @@
      "icon": null
     },
     "narration": {
-     "short": "Paved and green shares of this area, from a satellite land-cover model (experimental).",
+     "short": "Paved, green and tree canopy shares of this area, from a satellite land-cover model (experimental).",
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "TerraMind NYC land-cover adapter (msradam, experimental) on Copernicus Sentinel-2",
-     "source_url": "https://huggingface.co/msradam/TerraMind-NYC-Adapters",
-     "license": "Apache-2.0 (model); Copernicus Sentinel data terms (imagery)",
-     "citation": "msradam/TerraMind-NYC-Adapters, adapter lulc_nyc (Apache-2.0), the owner's LoRA adapter on IBM and ESA's TerraMind 1.0, run by scripts/run_landcover_batch.py on Sentinel-2 L2A scenes (the adapter's radar and elevation inputs are left empty). Contains modified Copernicus Sentinel data, via Microsoft Planetary Computer. Experimental: a proxy from 10 m pixels trained on ESA WorldCover 2021 labels, not a survey.",
+     "source_name": "NYC land-cover model (Riprap, experimental) on Copernicus Sentinel-2, trained on NYC Land Cover 2017",
+     "source_url": "https://github.com/msradam/riprap/blob/main/docs/MODELS.md",
+     "license": "Copernicus Sentinel data terms (imagery); NYC Open Data terms of use (2017 training labels)",
+     "citation": "Riprap's NYC land-cover model, trained by scripts/train_cover.py on NYC Land Cover 2017 (6 inch, NYC Open Data) aggregated to 10 m and run by scripts/run_landcover_batch.py on Sentinel-2 L2A scenes; scored against NYC Land Cover 2021 (The Nature Conservancy and UVM) on squares it never trained on. Contains modified Copernicus Sentinel data, via Microsoft Planetary Computer. Experimental: an estimate from 10 m pixels, not a survey.",
      "doc_id": "landcover_nta",
      "date_modified": "2026",
-     "retrieved_at": "2026-10-01"
+     "retrieved_at": "2026-10-02"
     },
     "fallback": {
      "on_offline": "skip",
@@ -737,7 +737,7 @@
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC 311 Service Requests, flood-related complaints (5-year window).",
      "doc_id": "nyc311",
-     "date_modified": "2026-10-01T01:38:36+0000",
+     "date_modified": "2026-10-02T01:38:54+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -770,7 +770,7 @@
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
      "doc_id": "nyc311_nta",
-     "date_modified": "2026-10-01T01:38:36+0000",
+     "date_modified": "2026-10-02T01:38:54+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -1067,7 +1067,7 @@
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC DOB permits issued inside the neighborhood, cross-referenced with Sandy 2012 and DEP scenarios",
      "doc_id": "dob_permits_nta",
-     "date_modified": "2026-10-01T00:27:21+0000",
+     "date_modified": "2026-10-01T23:26:21+0000",
      "retrieved_at": "live"
     },
     "fallback": {
@@ -1568,12 +1568,12 @@
    },
    "landcover_nta": {
     "doc_id": "landcover_nta",
-    "source": "TerraMind NYC land-cover adapter (msradam, experimental) on Copernicus Sentinel-2",
-    "title": "msradam/TerraMind-NYC-Adapters, adapter lulc_nyc (Apache-2.0), the owner's LoRA adapter on IBM and ESA's TerraMind 1.0, run by scripts/run_landcover_batch.py on Sentinel-2 L2A scenes (the adapter's radar and elevation inputs are left empty). Contains modified Copernicus Sentinel data, via Microsoft Planetary Computer. Experimental: a proxy from 10 m pixels trained on ESA WorldCover 2021 labels, not a survey.",
-    "url": "https://huggingface.co/msradam/TerraMind-NYC-Adapters",
-    "license": "Apache-2.0 (model); Copernicus Sentinel data terms (imagery)",
+    "source": "NYC land-cover model (Riprap, experimental) on Copernicus Sentinel-2, trained on NYC Land Cover 2017",
+    "title": "Riprap's NYC land-cover model, trained by scripts/train_cover.py on NYC Land Cover 2017 (6 inch, NYC Open Data) aggregated to 10 m and run by scripts/run_landcover_batch.py on Sentinel-2 L2A scenes; scored against NYC Land Cover 2021 (The Nature Conservancy and UVM) on squares it never trained on. Contains modified Copernicus Sentinel data, via Microsoft Planetary Computer. Experimental: an estimate from 10 m pixels, not a survey.",
+    "url": "https://github.com/msradam/riprap/blob/main/docs/MODELS.md",
+    "license": "Copernicus Sentinel data terms (imagery); NYC Open Data terms of use (2017 training labels)",
     "date_modified": "2026",
-    "retrieved_at": "2026-10-01",
+    "retrieved_at": "2026-10-02",
     "vintage": "2026",
     "maturity": "experimental"
    },
@@ -1583,9 +1583,9 @@
     "title": "FloodNet NYC, community-led real-time street-flood sensor network. Data CC-BY-NC-SA 4.0; derivatives must carry the same license. Readings come from the FloodNet API (api.floodnet.nyc), which has no stable page per sensor or event, so the link is the project's data download page. https://www.floodnet.nyc/data-downloads",
     "url": "https://www.floodnet.nyc/data-downloads",
     "license": "CC-BY-NC-SA 4.0",
-    "date_modified": "2026-10-01T17:37Z",
-    "retrieved_at": "2026-10-01T17:37Z",
-    "vintage": "2026-10-01T17:37Z",
+    "date_modified": "2026-10-02T12:32Z",
+    "retrieved_at": "2026-10-02T12:32Z",
+    "vintage": "2026-10-02T12:32Z",
     "maturity": "production"
    },
    "nyc311_nta": {
@@ -1594,9 +1594,9 @@
     "title": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
-    "date_modified": "2026-10-01T01:38:36+0000",
-    "retrieved_at": "2026-10-01T17:37Z",
-    "vintage": "2026-10-01T01:38:36+0000",
+    "date_modified": "2026-10-02T01:38:54+0000",
+    "retrieved_at": "2026-10-02T12:32Z",
+    "vintage": "2026-10-02T01:38:54+0000",
     "maturity": "production"
    },
    "noaa_tides": {
@@ -1605,9 +1605,9 @@
     "title": "NOAA CO-OPS tide-gauge water level observations, nearest station to address.",
     "url": "https://tidesandcurrents.noaa.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T17:37Z",
-    "retrieved_at": "2026-10-01T17:37Z",
-    "vintage": "2026-10-01T17:37Z",
+    "date_modified": "2026-10-02T12:32Z",
+    "retrieved_at": "2026-10-02T12:32Z",
+    "vintage": "2026-10-02T12:32Z",
     "maturity": "production"
    },
    "dcp_floodplain_nta": {
@@ -1617,7 +1617,7 @@
     "url": "https://communityprofiles.planning.nyc.gov/",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2024-02-01",
-    "retrieved_at": "2026-10-01T17:37Z",
+    "retrieved_at": "2026-10-02T12:32Z",
     "vintage": "2024-02-01",
     "maturity": "production"
    },
@@ -1671,9 +1671,9 @@
     "title": "NWS active alerts for the area (flood / coastal / wind).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T17:37Z",
-    "retrieved_at": "2026-10-01T17:37Z",
-    "vintage": "2026-10-01T17:37Z",
+    "date_modified": "2026-10-02T12:32Z",
+    "retrieved_at": "2026-10-02T12:32Z",
+    "vintage": "2026-10-02T12:32Z",
     "maturity": "production"
    },
    "nws_water_forecast": {
@@ -1682,9 +1682,9 @@
     "title": "National Weather Service, National Water Prediction Service, official water-level forecast and flood stages for the nearest harbor gauge.",
     "url": "https://water.noaa.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-01T17:37Z",
-    "retrieved_at": "2026-10-01T17:37Z",
-    "vintage": "2026-10-01T17:37Z",
+    "date_modified": "2026-10-02T12:32Z",
+    "retrieved_at": "2026-10-02T12:32Z",
+    "vintage": "2026-10-02T12:32Z",
     "maturity": "production"
    },
    "ttm_battery_surge": {
@@ -1693,9 +1693,9 @@
     "title": "msradam/Granite-TTM-r2-Battery-Surge (Apache-2.0), the owner's fine-tune of IBM's Granite TTM r2, run on the last 1,024 hourly surge residuals at NOAA station 8518750 (The Battery). Experimental: no wind or pressure input; backtest in data/experimental/surge.json.",
     "url": "https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge",
     "license": "Apache-2.0 (model); U.S. Public Domain (gauge data)",
-    "date_modified": "2026-10-01T17:37Z",
-    "retrieved_at": "2026-10-01T17:37Z",
-    "vintage": "2026-10-01T17:37Z",
+    "date_modified": "2026-10-02T12:32Z",
+    "retrieved_at": "2026-10-02T12:32Z",
+    "vintage": "2026-10-02T12:32Z",
     "maturity": "experimental"
    },
    "npcc4_slr": {
@@ -1748,7 +1748,7 @@
    },
    {
     "id": "landcover_nta",
-    "title": "Land cover from satellite, TerraMind NYC adapter (experimental)",
+    "title": "Land cover from satellite, NYC land-cover model (experimental)",
     "stone": "cornerstone"
    },
    {
@@ -4198,44 +4198,15 @@
   },
   "landcover_nta": {
    "year": 2026,
-   "built_pct": 73.8,
-   "green_pct": 22.8,
-   "water_pct": 3.4,
-   "bare_pct": 0.0,
-   "by_year": {
-    "2018": {
-     "built_pct": 74.7,
-     "green_pct": 21.2,
-     "water_pct": 4.2,
-     "bare_pct": 0.0
-    },
-    "2021": {
-     "built_pct": 74.2,
-     "green_pct": 22.4,
-     "water_pct": 3.3,
-     "bare_pct": 0.0
-    },
-    "2024": {
-     "built_pct": 73.6,
-     "green_pct": 23.4,
-     "water_pct": 3.0,
-     "bare_pct": 0.0
-    },
-    "2026": {
-     "built_pct": 74.8,
-     "green_pct": 21.8,
-     "water_pct": 3.4,
-     "bare_pct": 0.0
-    }
-   },
+   "built_pct": 57.8,
+   "green_pct": 39.3,
+   "tree_pct": 15.4,
+   "water_pct": 0.8,
+   "bare_pct": 1.9,
    "dates": "2026-06-20;2026-07-20",
-   "model": "msradam/TerraMind-NYC-Adapters",
-   "first_year": 2018,
-   "built_pct_first": 74.7,
-   "built_change_points": -0.9,
-   "noise_points": 3.7,
-   "narrative": "Experimental: a satellite land-cover model labels 73.8% of this area as paved or built over and 22.8% as trees or grass, on Sentinel-2 scenes from 2026 (3.4% water); in 2018 the paved or built share was 74.7%, a difference of 0.9 points, inside the 3.7 points by which two images of one year can differ, so no change is measurable and no trend in runoff follows from it. Limits: it labels 10 m satellite pixels and is a proxy, not a survey: a pixel that mixes street, roof, tree and shadow gets one label, and it calls much green ground paved; for 2021 it agreed with ESA WorldCover (its own label source) on 87.1% of the city's land as paved, green or water and found 66.3% of WorldCover's green land, its paved share for a typical district was 7.7 points above WorldCover's, and two images of one year differ by under 3.7 points in a district's paved share 19 times in 20 (5.8 in a neighbourhood's). Rely on NYC's own land cover map (2017, 6 inch) and building footprints for a survey.",
-   "headline_value": "73.8% paved or built, 22.8% green (2026)"
+   "model": "unpublished: trained by scripts/train_cover.py",
+   "narrative": "Experimental: a satellite land-cover model estimates that 57.8% of this area is paved or built over and 39.3% is green (15.4% tree canopy), on Sentinel-2 scenes from 2026; no change between years is read from it, because its maps of different summers differ by more than two images of one summer do (between 2018 and 2024, 49 of 59 districts' paved shares differ by more than 2.0 points). Limits: it estimates the share of each 10 m satellite pixel that is canopy, grass, paving, roof, water or bare ground, learned from the city's 2017 six-inch map, so detail finer than about 30 m is blurred and a tree over a street counts as canopy; against the city's own 2021 six-inch map, on squares it never trained on, it read a typical district's paved share 1.7 points above the map's (at most 7.8 points off), and two images of one year differ by under 2.0 points in a district's paved share 19 times in 20 (2.7 in a neighbourhood's). Rely on NYC's own land cover maps (2017 and 2021, 6 inch) and building footprints for a survey.",
+   "headline_value": "57.8% paved or built, 39.3% green, 15.4% tree canopy (2026)"
   },
   "floodnet_nta": {
    "n_sensors": 7,
@@ -4347,63 +4318,91 @@
    "narrative": "7 FloodNet community sensors inside this area have logged 28 above-curb flood events in the last 3 years, the most recent starting 2026-08-20 22:34 UTC. Peak depth recorded by the sensors in good working order: 123 mm (4.8 in) on 2026-05-20. 1 sensor that logged 9 of these events is flagged by FloodNet for maintenance, so its depths are not used for the peak. The highest depth a flagged sensor recorded was 36 mm (1.4 in) on 2026-05-20. Most events: East 92nd Street (9); East 104th Street (6); Farragut Road (4)."
   },
   "nyc311_nta": {
-   "n": 2638,
+   "n": 2634,
    "capped": false,
    "radius_m": null,
    "where": "in Community District BK18 (by the record's community board field)",
    "years": 3,
    "by_year": {
-    "2023": 222,
+    "2023": 214,
     "2024": 752,
     "2025": 823,
-    "2026": 841
+    "2026": 845
    },
    "by_descriptor": {
-    "Sewer Backup (Use Comments) (SA)": 1124,
-    "Catch Basin Clogged/Flooding (Use Comments) (SC)": 607,
-    "Street Flooding (SJ)": 434,
-    "Catch Basin Clogged": 151,
+    "Sewer Backup (Use Comments) (SA)": 1119,
+    "Catch Basin Clogged/Flooding (Use Comments) (SC)": 606,
+    "Street Flooding (SJ)": 432,
+    "Catch Basin Clogged": 152,
     "Manhole Overflow (Use Comments) (SA1)": 147,
-    "Backup": 92,
+    "Backup": 93,
     "Flooding on Street": 63,
-    "Manhole Overflow": 19,
+    "Manhole Overflow": 21,
     "RAIN GARDEN FLOODING (SRGFLD)": 1
    },
    "by_kind": {
-    "sewer backup": 1216,
+    "sewer backup": 1212,
     "catch basin": 758,
-    "street flooding": 497,
-    "manhole overflow": 166,
+    "street flooding": 495,
+    "manhole overflow": 168,
     "rain garden flooding": 1
    },
    "most_recent": [
     {
-     "date": "2026-09-29",
-     "descriptor": "Backup",
-     "address": "1052 EAST 96 STREET"
+     "date": "2026-09-30",
+     "descriptor": "Manhole Overflow",
+     "address": "6901 AVENUE T"
     },
     {
-     "date": "2026-09-29",
+     "date": "2026-09-30",
+     "descriptor": "Backup",
+     "address": "1437 EAST 69 STREET"
+    },
+    {
+     "date": "2026-09-30",
      "descriptor": "Manhole Overflow",
      "address": "6903 AVENUE T"
     },
     {
-     "date": "2026-09-29",
-     "descriptor": "Manhole Overflow",
-     "address": "6927 AVENUE T"
+     "date": "2026-09-30",
+     "descriptor": "Catch Basin Clogged",
+     "address": "990 EAST 96 STREET"
     },
     {
      "date": "2026-09-29",
-     "descriptor": "Manhole Overflow",
-     "address": "AVENUE T"
-    },
-    {
-     "date": "2026-09-29",
-     "descriptor": "Manhole Overflow",
-     "address": "AVENUE T"
+     "descriptor": "Backup",
+     "address": "1052 EAST 96 STREET"
     }
    ],
    "points": [
+    {
+     "lat": 40.62047816304787,
+     "lon": -73.91045040241052,
+     "descriptor": "Manhole Overflow",
+     "date": "2026-09-30",
+     "address": "6901 AVENUE T"
+    },
+    {
+     "lat": 40.621733733783515,
+     "lon": -73.91200487907435,
+     "descriptor": "Backup",
+     "date": "2026-09-30",
+     "address": "1437 EAST 69 STREET"
+    },
+    {
+     "lat": 40.62048638900025,
+     "lon": -73.91043958490147,
+     "descriptor": "Manhole Overflow",
+     "date": "2026-09-30",
+     "address": "6903 AVENUE T"
+    },
+    {
+     "lat": 40.64646709587943,
+     "lon": -73.90518315201163,
+     "descriptor": "Catch Basin Clogged",
+     "date": "2026-09-30",
+     "address": "990 EAST 96 STREET"
+    },
     {
      "lat": 40.64507968970788,
      "lon": -73.90363202127239,
@@ -4795,44 +4794,16 @@
      "descriptor": "Backup",
      "date": "2026-09-26",
      "address": "8419 AVENUE N"
-    },
-    {
-     "lat": 40.633701991513774,
-     "lon": -73.9029747143097,
-     "descriptor": "Flooding on Street",
-     "date": "2026-09-26",
-     "address": "8624 AVENUE L"
-    },
-    {
-     "lat": 40.63123299175173,
-     "lon": -73.89814342923442,
-     "descriptor": "Flooding on Street",
-     "date": "2026-09-26",
-     "address": "8821 AVENUE N"
-    },
-    {
-     "lat": 40.638127451304015,
-     "lon": -73.92215483980122,
-     "descriptor": "Backup",
-     "date": "2026-09-26",
-     "address": "608 EAST 57 STREET"
-    },
-    {
-     "lat": 40.63606278200899,
-     "lon": -73.88816295528542,
-     "descriptor": "Backup",
-     "date": "2026-09-26",
-     "address": "1461 EAST 100 STREET"
     }
    ],
-   "headline_value": "2638 complaints",
-   "subhead_text": "1216 sewer backup, 758 catch basin, 497 street flooding, 166 manhole overflow, 1 rain garden flooding",
-   "narrative": "2638 NYC 311 flood-related complaints filed in Community District BK18 (by the record's community board field) in the last 3 years: 1216 sewer backup, 758 catch basin, 497 street flooding, 166 manhole overflow, 1 rain garden flooding.",
+   "headline_value": "2634 complaints",
+   "subhead_text": "1212 sewer backup, 758 catch basin, 495 street flooding, 168 manhole overflow, 1 rain garden flooding",
+   "narrative": "2634 NYC 311 flood-related complaints filed in Community District BK18 (by the record's community board field) in the last 3 years: 1212 sewer backup, 758 catch basin, 495 street flooding, 168 manhole overflow, 1 rain garden flooding.",
    "histogram": [
-    222,
+    214,
     752,
     823,
-    841
+    845
    ]
   },
   "noaa_tides": {
@@ -4842,12 +4813,12 @@
    "station_lon": -74.0142,
    "distance_km": 12.2,
    "datum": "MLLW",
-   "observed_ft": 5.64,
-   "observed_ft_mllw": 5.64,
-   "predicted_ft_mllw": 5.19,
-   "residual_ft": 0.45,
-   "obs_time": "2026-10-01 17:24",
-   "narrative": "Latest reading at The Battery, NY: 5.64 ft above MLLW (+0.45 ft vs predicted tide), observed 2026-10-01 17:24 UTC.",
+   "observed_ft": 1.82,
+   "observed_ft_mllw": 1.82,
+   "predicted_ft_mllw": 1.39,
+   "residual_ft": 0.43,
+   "obs_time": "2026-10-02 12:24",
+   "narrative": "Latest reading at The Battery, NY: 1.82 ft above MLLW (+0.43 ft vs predicted tide), observed 2026-10-02 12:24 UTC.",
    "error": null
   },
   "dcp_floodplain_nta": {
@@ -5263,25 +5234,25 @@
   "nws_alerts_nta": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-01 17:37 UTC.",
-   "retrieved_at": "2026-10-01T17:37:53Z",
+   "narrative": "No active NWS flood, coastal or wind alerts for this area (read at its centre), checked 2026-10-02 12:31 UTC.",
+   "retrieved_at": "2026-10-02T12:31:59Z",
    "error": null
   },
   "nws_water_forecast": {
    "gauge_id": "BATN6",
    "gauge_name": "The Battery",
    "distance_km": 12.2,
-   "forecast_peak_ft_mllw": 5.7,
-   "forecast_peak_time_utc": "2026-10-02T17:00:00Z",
-   "issued_utc": "2026-10-01T07:34:00Z",
+   "forecast_peak_ft_mllw": 6.0,
+   "forecast_peak_time_utc": "2026-10-04T19:00:00Z",
+   "issued_utc": "2026-10-02T07:58:00Z",
    "flood_stages_ft": {
     "major": 9.4,
     "moderate": 8.3,
     "minor": 7.0
    },
    "flood_category": null,
-   "forecast_until_utc": "2026-10-04T18:00:00Z",
-   "narrative": "The National Weather Service forecasts a peak water level of 5.7 ft above MLLW at The Battery, the nearest forecast gauge (12 km away), on 2026-10-02 17:00 UTC (forecast issued 2026-10-01 07:34 UTC), below the gauge's minor flood stage of 7.0 ft."
+   "forecast_until_utc": "2026-10-05T18:00:00Z",
+   "narrative": "The National Weather Service forecasts a peak water level of 6.0 ft above MLLW at The Battery, the nearest forecast gauge (12 km away), on 2026-10-04 19:00 UTC (forecast issued 2026-10-02 07:58 UTC), below the gauge's minor flood stage of 7.0 ft."
   },
   "ttm_battery_surge": {
    "available": true,
@@ -5291,118 +5262,118 @@
    "station_name": "The Battery",
    "context_hours": 1024,
    "horizon_hours": 96,
-   "last_observation_utc": "2026-10-01 17:00",
-   "forecast_peak_residual_m": 0.2,
-   "forecast_peak_residual_ft": 0.7,
-   "forecast_peak_residual_time_utc": "2026-10-02 06:00",
+   "last_observation_utc": "2026-10-02 12:00",
+   "forecast_peak_residual_m": 0.17,
+   "forecast_peak_residual_ft": 0.5,
+   "forecast_peak_residual_time_utc": "2026-10-03 15:00",
    "forecast_residual_m": [
-    0.134,
-    0.128,
-    0.138,
-    0.157,
-    0.168,
-    0.169,
-    0.178,
-    0.193,
-    0.188,
-    0.175,
-    0.173,
-    0.187,
-    0.203,
-    0.196,
-    0.182,
-    0.176,
-    0.188,
-    0.201,
-    0.199,
-    0.199,
-    0.199,
-    0.201,
-    0.199,
-    0.183,
-    0.169,
-    0.154,
-    0.152,
-    0.164,
-    0.174,
-    0.176,
-    0.183,
-    0.195,
-    0.191,
-    0.179,
-    0.173,
-    0.18,
-    0.191,
-    0.179,
+    0.12,
+    0.126,
+    0.137,
+    0.131,
+    0.12,
+    0.102,
+    0.094,
+    0.096,
+    0.103,
+    0.108,
+    0.124,
+    0.14,
     0.159,
+    0.16,
     0.151,
-    0.165,
-    0.184,
-    0.187,
-    0.187,
-    0.189,
-    0.189,
-    0.184,
-    0.162,
-    0.144,
-    0.128,
-    0.123,
-    0.134,
-    0.142,
+    0.141,
+    0.143,
     0.147,
-    0.155,
-    0.171,
-    0.174,
+    0.137,
+    0.116,
+    0.114,
+    0.127,
+    0.15,
+    0.157,
+    0.16,
+    0.16,
     0.168,
-    0.163,
-    0.167,
-    0.171,
-    0.155,
-    0.134,
+    0.157,
+    0.141,
+    0.117,
+    0.099,
+    0.091,
+    0.093,
+    0.096,
+    0.11,
+    0.122,
+    0.141,
+    0.148,
+    0.142,
+    0.131,
+    0.129,
+    0.127,
+    0.11,
+    0.08,
+    0.071,
+    0.08,
+    0.105,
+    0.117,
     0.128,
-    0.147,
-    0.171,
-    0.178,
-    0.181,
-    0.187,
-    0.192,
-    0.189,
-    0.167,
-    0.147,
-    0.13,
-    0.123,
-    0.13,
     0.139,
+    0.154,
+    0.151,
+    0.139,
+    0.116,
+    0.099,
+    0.088,
+    0.09,
+    0.095,
+    0.112,
+    0.126,
     0.145,
     0.155,
-    0.173,
-    0.177,
-    0.172,
-    0.167,
-    0.171,
-    0.174,
     0.155,
-    0.13,
-    0.118,
-    0.134,
-    0.159,
-    0.168,
-    0.17,
-    0.175,
-    0.183,
-    0.183,
-    0.163
+    0.15,
+    0.151,
+    0.153,
+    0.137,
+    0.107,
+    0.096,
+    0.104,
+    0.128,
+    0.137,
+    0.14,
+    0.15,
+    0.167,
+    0.167,
+    0.158,
+    0.138,
+    0.121,
+    0.108,
+    0.105,
+    0.104,
+    0.116,
+    0.125,
+    0.142,
+    0.15,
+    0.152,
+    0.15,
+    0.155,
+    0.161,
+    0.147,
+    0.116,
+    0.099,
+    0.101,
+    0.123,
+    0.131
    ],
    "flood_stages_ft": {
     "major": 9.4,
     "moderate": 8.3,
     "minor": 7.0
    },
-   "forecast_peak_total_ft_mllw": 6.0,
+   "forecast_peak_total_ft_mllw": 5.8,
    "forecast_peak_total_time_utc": "2026-10-02 17:00",
    "flood_category": null,
    "notable": false,
-   "narrative": "Experimental forecast: the water at The Battery may run up to 0.20 m (0.7 ft) above NOAA's predicted tide in the next 96 hours, counted from 2026-10-01 17:00 UTC, most around 2026-10-02 06:00 UTC; added to the predicted tide, the highest total would be 6.0 ft above MLLW on 2026-10-02 17:00 UTC, below the gauge's minor flood stage of 7.0 ft. Limits: it reads only the last 1,024 hours of the Battery gauge, with no wind or pressure input, so it cannot see a storm that has not yet reached the gauge; on 635 past 96-hour windows (2025-01-01 to 2026-09-27) its mean error was 11.5 cm, against 13.3 cm for assuming the last day's mean continues, and it foresaw 1 of the 23 windows in which the water reached the minor flood stage. Rely on the National Weather Service (weather.gov/okx) and Notify NYC; NOAA's ETSS and the Stevens Flood Advisory System model surge from the weather.",
+   "narrative": "Experimental forecast: the water at The Battery may run up to 0.17 m (0.5 ft) above NOAA's predicted tide in the next 96 hours, counted from 2026-10-02 12:00 UTC, most around 2026-10-03 15:00 UTC; added to the predicted tide, the highest total would be 5.8 ft above MLLW on 2026-10-02 17:00 UTC, below the gauge's minor flood stage of 7.0 ft. Limits: it reads only the last 1,024 hours of the Battery gauge, with no wind or pressure input, so it cannot see a storm that has not yet reached the gauge; on 635 past 96-hour windows (2025-01-01 to 2026-09-27) its mean error was 11.5 cm, against 13.3 cm for assuming the last day's mean continues, and it foresaw 1 of the 23 windows in which the water reached the minor flood stage. Rely on the National Weather Service (weather.gov/okx) and Notify NYC; NOAA's ETSS and the Stevens Flood Advisory System model surge from the weather.",
    "installed": true
   },
   "npcc4_slr_nta": {
@@ -5487,8 +5458,8 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1790876272.5572422,
-    "elapsed_s": 0.01,
+    "started_at": 1790944318.416184,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "nta_code": "BK18",
@@ -5506,8 +5477,8 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1790876272.569912,
-    "elapsed_s": 0.0002,
+    "started_at": 1790944318.421099,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {
      "deployment": "nyc",
@@ -5518,7 +5489,7 @@
    {
     "step": "dob_permits_nta",
     "ok": true,
-    "started_at": 1790876272.570452,
+    "started_at": 1790944318.421251,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -5528,39 +5499,39 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1790876272.5716748,
-    "elapsed_s": 0.09,
+    "started_at": 1790944318.421797,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {}
    },
    {
     "step": "sandy_nta",
     "ok": true,
-    "started_at": 1790876272.574632,
-    "elapsed_s": 0.38,
+    "started_at": 1790944318.4232802,
+    "elapsed_s": 0.35,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_extreme_2080_nta",
     "ok": true,
-    "started_at": 1790876272.661371,
-    "elapsed_s": 0.92,
+    "started_at": 1790944318.423349,
+    "elapsed_s": 0.99,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_2050_nta",
     "ok": true,
-    "started_at": 1790876272.661516,
-    "elapsed_s": 0.17,
+    "started_at": 1790944318.425568,
+    "elapsed_s": 0.22,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_current_nta",
     "ok": true,
-    "started_at": 1790876272.662147,
+    "started_at": 1790944318.430825,
     "elapsed_s": 0.1,
     "err": null,
     "result": {}
@@ -5568,32 +5539,32 @@
    {
     "step": "prithvi_water_nta",
     "ok": true,
-    "started_at": 1790876272.662112,
-    "elapsed_s": 0.57,
+    "started_at": 1790944318.4330308,
+    "elapsed_s": 0.51,
     "err": null,
     "result": {}
    },
    {
     "step": "microtopo_nta",
     "ok": true,
-    "started_at": 1790876272.666027,
-    "elapsed_s": 0.13,
+    "started_at": 1790944318.438627,
+    "elapsed_s": 0.18,
     "err": null,
     "result": {}
    },
    {
     "step": "landcover_nta",
     "ok": true,
-    "started_at": 1790876272.668051,
-    "elapsed_s": 0.35,
+    "started_at": 1790944318.449234,
+    "elapsed_s": 0.13,
     "err": null,
     "result": {}
    },
    {
     "step": "floodnet_nta",
     "ok": true,
-    "started_at": 1790876272.67008,
-    "elapsed_s": 0.9,
+    "started_at": 1790944318.448179,
+    "elapsed_s": 0.52,
     "err": null,
     "result": {
      "n_sensors": 7,
@@ -5603,28 +5574,28 @@
    {
     "step": "nyc311_nta",
     "ok": true,
-    "started_at": 1790876272.679729,
-    "elapsed_s": 2.58,
+    "started_at": 1790944318.455623,
+    "elapsed_s": 2.04,
     "err": null,
     "result": {}
    },
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1790876272.6820748,
-    "elapsed_s": 0.73,
+    "started_at": 1790944318.4638422,
+    "elapsed_s": 0.51,
     "err": null,
     "result": {
      "station": "8518750",
-     "observed_ft_mllw": 5.64,
-     "residual_ft": 0.45
+     "observed_ft_mllw": 1.82,
+     "residual_ft": 0.43
     }
    },
    {
     "step": "dcp_floodplain_nta",
     "ok": true,
-    "started_at": 1790876272.683806,
-    "elapsed_s": 0.72,
+    "started_at": 1790944318.4659572,
+    "elapsed_s": 0.59,
     "err": null,
     "result": {
      "n_buildings": 8690,
@@ -5634,8 +5605,8 @@
    {
     "step": "mta_entrances_nta",
     "ok": true,
-    "started_at": 1790876272.6896698,
-    "elapsed_s": 0.21,
+    "started_at": 1790944318.473672,
+    "elapsed_s": 0.25,
     "err": null,
     "result": {
      "n_entrances": 4,
@@ -5646,8 +5617,8 @@
    {
     "step": "nycha_developments_nta",
     "ok": true,
-    "started_at": 1790876272.6904168,
-    "elapsed_s": 0.04,
+    "started_at": 1790944318.484077,
+    "elapsed_s": 0.06,
     "err": null,
     "result": {
      "n_developments": 2,
@@ -5658,8 +5629,8 @@
    {
     "step": "doe_schools_nta",
     "ok": true,
-    "started_at": 1790876272.697342,
-    "elapsed_s": 0.11,
+    "started_at": 1790944318.491158,
+    "elapsed_s": 0.13,
     "err": null,
     "result": {
      "n_schools": 8,
@@ -5670,8 +5641,8 @@
    {
     "step": "doh_hospitals_nta",
     "ok": true,
-    "started_at": 1790876272.728199,
-    "elapsed_s": 0.06,
+    "started_at": 1790944318.537107,
+    "elapsed_s": 0.05,
     "err": null,
     "result": {
      "n_hospitals": 1,
@@ -5682,8 +5653,8 @@
    {
     "step": "nws_alerts_nta",
     "ok": true,
-    "started_at": 1790876272.7658792,
-    "elapsed_s": 0.64,
+    "started_at": 1790944318.5459452,
+    "elapsed_s": 0.48,
     "err": null,
     "result": {
      "n_active": 0
@@ -5692,24 +5663,24 @@
    {
     "step": "nws_water_forecast",
     "ok": true,
-    "started_at": 1790876272.791958,
-    "elapsed_s": 0.62,
+    "started_at": 1790944318.583262,
+    "elapsed_s": 0.39,
     "err": null,
     "result": {
      "gauge": "BATN6",
-     "forecast_peak_ft_mllw": 5.7,
+     "forecast_peak_ft_mllw": 6.0,
      "flood_category": null
     }
    },
    {
     "step": "ttm_battery_surge",
     "ok": true,
-    "started_at": 1790876272.800748,
-    "elapsed_s": 0.79,
+    "started_at": 1790944318.587426,
+    "elapsed_s": 0.43,
     "err": null,
     "result": {
-     "forecast_peak_residual_m": 0.2,
-     "forecast_peak_total_ft_mllw": 6.0,
+     "forecast_peak_residual_m": 0.17,
+     "forecast_peak_total_ft_mllw": 5.8,
      "flood_category": null,
      "installed": true
     }
@@ -5717,7 +5688,7 @@
    {
     "step": "npcc4_slr_nta",
     "ok": true,
-    "started_at": 1790876272.803762,
+    "started_at": 1790944318.617536,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -5725,7 +5696,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1790876275.263218,
+    "started_at": 1790944320.4915478,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -5734,7 +5705,7 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1790876275.263455,
+    "started_at": 1790944320.491648,
     "ok": true,
     "result": {
      "n_chars": 1538,
@@ -5742,7 +5713,7 @@
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0424
+    "elapsed_s": 0.0868
    }
   ],
   "models": [
@@ -5754,8 +5725,8 @@
     "latency_s": null
    },
    {
-    "name": "TerraMind NYC land-cover adapter (experimental)",
-    "repo": "msradam/TerraMind-NYC-Adapters",
+    "name": "NYC land-cover model (experimental)",
+    "repo": "unpublished: trained by scripts/train_cover.py",
     "where": "an earlier batch run; its saved output is read",
     "how": "precomputed",
     "latency_s": null
@@ -5765,7 +5736,7 @@
     "repo": "msradam/Granite-TTM-r2-Battery-Surge",
     "where": "CPU, in this server",
     "how": "loaded",
-    "latency_s": 0.79
+    "latency_s": 0.43
    }
   ],
   "compliance": {
