@@ -1,0 +1,258 @@
+{
+ "run_date": "2026-10-02",
+ "station": "8518750",
+ "first": "2025-01-01",
+ "last": "2026-09-27",
+ "step_hours": 24,
+ "context_hours": 1024,
+ "horizon_hours": 96,
+ "n_windows": 635,
+ "n_storm_windows": 109,
+ "stage_m_mllw": 2.134,
+ "n_flood_windows": 23,
+ "device": "cpu",
+ "versions": {
+  "torch": "2.11.0",
+  "transformers": "4.57.6",
+  "granite-tsfm": "0.3.9",
+  "chronos-forecasting": "2.3.2",
+  "huggingface-hub": "0.36.2"
+ },
+ "models": {
+  "current": {
+   "repo": "msradam/Granite-TTM-r2-Battery-Surge",
+   "commit": "181b892bf4c4693018a834d359427c279b315213",
+   "licence": "apache-2.0",
+   "package": "granite-tsfm",
+   "package_version": "0.3.9",
+   "context_hours": 1024,
+   "point": "the model's output",
+   "all": {
+    "n_windows": 635,
+    "mae_m": 0.115,
+    "peak_error_m": 0.157
+   },
+   "residual_peak_at_least_0.5_m": {
+    "n_windows": 109,
+    "mae_m": 0.209,
+    "peak_error_m": 0.357
+   },
+   "minor_flood_stage": {
+    "said_so": 1,
+    "false_alarms": 1
+   }
+  },
+  "zero": {
+   "baseline": true,
+   "all": {
+    "n_windows": 635,
+    "mae_m": 0.167,
+    "peak_error_m": 0.36,
+    "against_current": {
+     "mae_minus_current_m": 0.0525,
+     "ci95_m": [
+      0.0398,
+      0.065
+     ],
+     "block_windows": 14
+    }
+   },
+   "residual_peak_at_least_0.5_m": {
+    "n_windows": 109,
+    "mae_m": 0.281,
+    "peak_error_m": 0.617
+   },
+   "minor_flood_stage": {
+    "said_so": 0,
+    "false_alarms": 0
+   }
+  },
+  "last_value": {
+   "baseline": true,
+   "all": {
+    "n_windows": 635,
+    "mae_m": 0.133,
+    "peak_error_m": 0.237,
+    "against_current": {
+     "mae_minus_current_m": 0.0179,
+     "ci95_m": [
+      0.0122,
+      0.0258
+     ],
+     "block_windows": 14
+    }
+   },
+   "residual_peak_at_least_0.5_m": {
+    "n_windows": 109,
+    "mae_m": 0.246,
+    "peak_error_m": 0.446
+   },
+   "minor_flood_stage": {
+    "said_so": 5,
+    "false_alarms": 4
+   }
+  },
+  "mean_24h": {
+   "baseline": true,
+   "all": {
+    "n_windows": 635,
+    "mae_m": 0.133,
+    "peak_error_m": 0.24,
+    "against_current": {
+     "mae_minus_current_m": 0.0184,
+     "ci95_m": [
+      0.0112,
+      0.0259
+     ],
+     "block_windows": 14
+    }
+   },
+   "residual_peak_at_least_0.5_m": {
+    "n_windows": 109,
+    "mae_m": 0.241,
+    "peak_error_m": 0.463
+   },
+   "minor_flood_stage": {
+    "said_so": 6,
+    "false_alarms": 5
+   }
+  },
+  "granite_ttm_r3": {
+   "repo": "ibm-granite/granite-timeseries-ttm-r3",
+   "ref": "1024-96-r3",
+   "package": "granite-tsfm",
+   "package_version": "0.3.9",
+   "context_hours": 1024,
+   "commit": "c6da085bc334cb37b268c2312bc45f859cd316c9",
+   "licence": "apache-2.0",
+   "point": "median",
+   "all": {
+    "n_windows": 635,
+    "mae_m": 0.115,
+    "peak_error_m": 0.189,
+    "against_current": {
+     "mae_minus_current_m": -0.0005,
+     "ci95_m": [
+      -0.0047,
+      0.0052
+     ],
+     "block_windows": 14
+    }
+   },
+   "residual_peak_at_least_0.5_m": {
+    "n_windows": 109,
+    "mae_m": 0.213,
+    "peak_error_m": 0.404
+   },
+   "minor_flood_stage": {
+    "said_so": 2,
+    "false_alarms": 0,
+    "p90_said_so": 7,
+    "p90_false_alarms": 37
+   }
+  },
+  "granite_flowstate_r1_1": {
+   "repo": "ibm-granite/granite-timeseries-flowstate-r1",
+   "ref": "r1.1",
+   "package": "granite-tsfm",
+   "package_version": "0.3.9",
+   "context_hours": 1024,
+   "commit": "b80e0f1b1c2d90edebe3d4f243ad046a3f935daa",
+   "licence": "apache-2.0",
+   "point": "median",
+   "all": {
+    "n_windows": 635,
+    "mae_m": 0.113,
+    "peak_error_m": 0.177,
+    "against_current": {
+     "mae_minus_current_m": -0.0024,
+     "ci95_m": [
+      -0.0064,
+      0.0027
+     ],
+     "block_windows": 14
+    }
+   },
+   "residual_peak_at_least_0.5_m": {
+    "n_windows": 109,
+    "mae_m": 0.212,
+    "peak_error_m": 0.373
+   },
+   "minor_flood_stage": {
+    "said_so": 2,
+    "false_alarms": 2,
+    "p90_said_so": 8,
+    "p90_false_alarms": 32
+   }
+  },
+  "granite_patchtst_fm_r2": {
+   "repo": "ibm-granite/granite-timeseries-patchtst-fm-r2",
+   "ref": "main",
+   "package": "granite-tsfm",
+   "package_version": "0.3.9",
+   "context_hours": 1024,
+   "commit": "b125275f9204d37cbb81fe47b9cf5e08a521e829",
+   "licence": "openmdw-1.0",
+   "licence_note": "Card metadata says openmdw-1.0. The card's License section and the repo's LICENSE file say it is dual-licensed under OpenMDW 1.0 and Apache 2.0, at the user's choice.",
+   "point": "median",
+   "all": {
+    "n_windows": 635,
+    "mae_m": 0.109,
+    "peak_error_m": 0.174,
+    "against_current": {
+     "mae_minus_current_m": -0.0062,
+     "ci95_m": [
+      -0.0097,
+      -0.0025
+     ],
+     "block_windows": 14
+    }
+   },
+   "residual_peak_at_least_0.5_m": {
+    "n_windows": 109,
+    "mae_m": 0.209,
+    "peak_error_m": 0.369
+   },
+   "minor_flood_stage": {
+    "said_so": 3,
+    "false_alarms": 2,
+    "p90_said_so": 8,
+    "p90_false_alarms": 43
+   }
+  },
+  "chronos_2": {
+   "repo": "amazon/chronos-2",
+   "ref": "main",
+   "package": "chronos-forecasting",
+   "package_version": "2.3.2",
+   "context_hours": 1024,
+   "commit": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+   "licence": "apache-2.0",
+   "point": "median",
+   "all": {
+    "n_windows": 635,
+    "mae_m": 0.11,
+    "peak_error_m": 0.178,
+    "against_current": {
+     "mae_minus_current_m": -0.0053,
+     "ci95_m": [
+      -0.0089,
+      -0.0011
+     ],
+     "block_windows": 14
+    }
+   },
+   "residual_peak_at_least_0.5_m": {
+    "n_windows": 109,
+    "mae_m": 0.21,
+    "peak_error_m": 0.376
+   },
+   "minor_flood_stage": {
+    "said_so": 3,
+    "false_alarms": 2,
+    "p90_said_so": 10,
+    "p90_false_alarms": 60
+   }
+  }
+ }
+}
