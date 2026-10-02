@@ -11,6 +11,10 @@ zero-shot, on CPU, from safetensors pinned to a commit. Models that give
 quantiles are scored on the median; the flood-stage question is also asked
 of their 90th percentile. NOAA series are cached under outputs/surge_cache/.
 
+With --finetuned outputs/surge_models/chronos2_battery the Battery fine-tune
+of Chronos-2 (scripts/finetune_chronos2_surge.py, trained on 2015 to 2024 only)
+is scored too, as chronos_2_battery_ft.
+
 Writes data/experimental/surge_candidates.json.
 """
 from __future__ import annotations
@@ -147,6 +151,8 @@ def main() -> int:
     ap.add_argument("--step-hours", type=int, default=24)
     ap.add_argument("--only", nargs="*", default=list(CANDIDATES), help="candidate keys to run")
     ap.add_argument("--out", type=Path, default=ROOT / "data" / "experimental" / "surge_candidates.json")
+    ap.add_argument("--finetuned", type=Path, default=None,
+                    help="a Chronos-2 fine-tune from scripts/finetune_chronos2_surge.py, scored as chronos_2_battery_ft")
     a = ap.parse_args()
 
     import numpy as np
@@ -173,7 +179,21 @@ def main() -> int:
                         "package": "granite-tsfm", "package_version": version("granite-tsfm"),
                         "context_hours": C, "point": "the model's output"},
             **{b: {"baseline": True} for b in bt.BASELINES}}
-    for name in a.only:
+    for name in a.only + (["chronos_2_battery_ft"] if a.finetuned else []):
+        if name == "chronos_2_battery_ft":  # local weights from scripts/finetune_chronos2_surge.py
+            train = json.loads((a.finetuned / "training.json").read_text())
+            m = meta[name] = {"path": str(a.finetuned.resolve().relative_to(ROOT)), "licence": "apache-2.0",
+                              "package": "chronos-forecasting", "package_version": version("chronos-forecasting"),
+                              "context_hours": C, "finetune": {k: v for k, v in train.items() if k != "curve"}}
+            try:
+                med, q90 = run_chronos2(str(a.finetuned), past, H)
+                if not np.isfinite(med).all():
+                    raise RuntimeError("non-finite forecast values")
+                points[name], p90[name], m["point"] = med, q90, "median"
+            except Exception as e:  # noqa: BLE001 - recorded like any failed candidate
+                m["error"] = f"{type(e).__name__}: {e}"
+                print(f"{name} failed: {m['error']}", file=sys.stderr)
+            continue
         spec = CANDIDATES[name]
         m = meta[name] = {"repo": spec["repo"], "ref": spec["ref"], "package": spec["package"],
                           "package_version": version(spec["package"]), "context_hours": C}

@@ -253,6 +253,61 @@
     "p90_said_so": 10,
     "p90_false_alarms": 60
    }
+  },
+  "chronos_2_battery_ft": {
+   "path": "outputs/surge_models/chronos2_battery",
+   "licence": "apache-2.0",
+   "package": "chronos-forecasting",
+   "package_version": "2.3.2",
+   "context_hours": 1024,
+   "finetune": {
+    "base": "amazon/chronos-2",
+    "base_commit": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "mode": "lora",
+    "steps": 700,
+    "learning_rate": 5e-05,
+    "batch_size": 64,
+    "context_hours": 1024,
+    "horizon_hours": 96,
+    "train_hours_before": "2024-07-01",
+    "validation": [
+     "2024-07-01",
+     "2024-12-28",
+     181
+    ],
+    "fit_minutes": 31.2,
+    "validation_median_mae_m": {
+     "zero_shot": 0.0931,
+     "finetuned": 0.0903
+    },
+    "run_date": "2026-10-02",
+    "best_step": 200
+   },
+   "point": "median",
+   "all": {
+    "n_windows": 635,
+    "mae_m": 0.106,
+    "peak_error_m": 0.158,
+    "against_current": {
+     "mae_minus_current_m": -0.0089,
+     "ci95_m": [
+      -0.0123,
+      -0.0053
+     ],
+     "block_windows": 14
+    }
+   },
+   "residual_peak_at_least_0.5_m": {
+    "n_windows": 109,
+    "mae_m": 0.205,
+    "peak_error_m": 0.356
+   },
+   "minor_flood_stage": {
+    "said_so": 2,
+    "false_alarms": 0,
+    "p90_said_so": 5,
+    "p90_false_alarms": 38
+   }
   }
  }
 }
