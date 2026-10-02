@@ -361,8 +361,12 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     # year outside the file's period, and whether a difference is significant (the file prints no intervals).
     period = next((re.findall(r"\d{4}", str(v.get("period") or "")) for d in VISITS
                    if isinstance(v := (values or {}).get(d), dict)), [])
-    if _GROUP_RE.search(q) and re.search(r"risk|vulnerab|affect|danger|visits?|hospital|\bsick\b", q, re.I) and not re.search(
-            r"\b(?:my|our) (?:kids?|children)\b", q, re.I) and (docs := have(HVI, VISITS)):
+    from riprap.core.burr.rule_answer import _clauses  # noqa: PLC0415
+
+    # (In one clause: "my clients are seniors. How vulnerable is the district?" asks about the district.)
+    if any(_GROUP_RE.search(c) and re.search(r"risk|vulnerab|affect|danger|visits?|hospital|\bsick\b", c, re.I)
+           and not re.search(r"\b(?:my|our) (?:kids?|children|clients)\b", c, re.I) for c in _clauses(q)) and (
+            docs := have(HVI, VISITS)):
         return "cannot_answer", docs  # the index and the visits are for all residents: nothing here is by age or group
     if _NOT_IN_TABLE_RE.search(q) and (docs := have(NPCC4, STATION)):
         return "cannot_answer", docs[:2]

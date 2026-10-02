@@ -855,6 +855,8 @@ def test_what_the_closing_blind_run_failed():
     assert ha.asks_something("heat-exacerbated deaths per year in MN10 and the citywide rate")
     assert ha.answer("heat-exacerbated deaths per year here and the citywide rate", T)[0] == "no_deaths"
     assert ha.answer("are kids here at higher risk from heat", T)[0] == "cannot_answer"
+    q = "Most of my clients are seniors in this district. How vulnerable is it to heat, and how many people end up in the ER?"
+    assert ha.answer(q, T)[0] != "cannot_answer"
     assert ha.answer("NPCC projections for mean temperature in the 2050s here", T)[0] == "cannot_answer"
     # Going to the hospital is a visit.
     assert ha.answer("how many people go to the hospital for heat here", T)[1][0] == "heat_visits"
