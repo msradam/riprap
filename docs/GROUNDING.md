@@ -320,7 +320,7 @@ for one, and the answer says so and how to ask for both. A place outside New
 York City is declined as soon as it resolves, naming the place found. A
 borough or the city is named as a whole in the opening.
 
-How it was tested: 118 unit tests (`tests/test_heat.py`), independent keys
+How it was tested: 119 unit tests (`tests/test_heat.py`), independent keys
 for the facts (`tests/golden/keys_heat.py`), two question sets written by
 agents that had seen none of the code (`tests/golden/unseen_heat.json`,
 `unseen_heat2.json`), a blind judge, and a reviewer with no part in the
