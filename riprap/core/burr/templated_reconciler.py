@@ -296,8 +296,6 @@ _QUIET_UNLESS = {
     # The experimental models: quoted in a plain briefing only when they show
     # something, never as a wall of caveats. A question that asks gets them.
     "ttm_battery_surge": lambda v: v.get("notable"),
-    "prithvi_water": lambda v: v.get("new_water_m2"),
-    "prithvi_water_nta": lambda v: v.get("new_water_m2"),
     "landcover": lambda v: False,
     "landcover_nta": lambda v: False,
     # The city's land cover map: a question about paving or canopy gets it;

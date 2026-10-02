@@ -19,8 +19,6 @@ log = logging.getLogger("riprap.models")
 # source id -> (the experimental model behind it, where it ran, how).
 SOURCES = {
     "ttm_battery_surge": ("surge", "CPU, in this server", "loaded"),
-    **{s: ("water", "an earlier batch run; its saved output is read", "precomputed")
-       for s in ("prithvi_water", "prithvi_water_nta")},
     **{s: ("landcover", "an earlier batch run; its saved output is read", "precomputed")
        for s in ("landcover", "landcover_nta")},
 }
@@ -67,15 +65,13 @@ def loaded() -> dict:
     import sys
 
     from app.eo import landcover
-    from app.flood_layers import prithvi_water
     from riprap.core import llm
 
     surge = sys.modules.get("app.live.ttm_battery_surge")
     m = experimental.MODELS
     return {
         "in_process": {m["surge"].repo: bool(surge and surge._MODEL is not None)},
-        "precomputed": {m["water"].repo: bool(prithvi_water.events()),
-                        m["landcover"].name: bool(landcover.years())},
+        "precomputed": {m["landcover"].name: bool(landcover.years())},
         "installed": {"ml": bool(importlib.util.find_spec("tsfm_public")),
                       "eo": bool(importlib.util.find_spec("terratorch"))},
         "llm_endpoints": [{"model": e.model, "base_url": e.base_url} for e in llm.endpoints()],

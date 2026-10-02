@@ -133,7 +133,7 @@ def run_event(rain_date: date, bbox: list[float], out: Path, max_cloud: float) -
     with rasterio.open(tif, "w", **profile) as dst:
         dst.write(new_water, 1)
         dst.update_tags(rain_date=str(rain_date), batch_run=str(date.today()), model=prithvi.REPO,
-                        revision=prithvi.MODEL.revision, maturity="experimental",
+                        revision=prithvi.REVISION, maturity="experimental",
                         post_scene=";".join(p.id for p, _ in pairs), pre_scene=";".join(q.id for _, q in pairs))
     return {"rain_date": str(rain_date), "cog": str(tif), "new_water_pixels": int((new_water == 1).sum()),
             "land_seen_share": round(float(observed.sum() / land_mask(ref).sum()), 3), "pairs": len(pairs)}

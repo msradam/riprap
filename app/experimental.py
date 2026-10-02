@@ -1,9 +1,10 @@
-"""Riprap's three experimental models, and the one rule for quoting them.
+"""Riprap's two experimental models, and the one rule for quoting them.
 
-The surge and water models are the owner's fine-tunes, published on Hugging
-Face and reproduced at github.com/msradam/riprap-models; the land-cover model
-is trained in this repository (scripts/train_cover.py) and its weights are
-not published. None has been shown to
+The surge model is the owner's fine-tune, published on Hugging Face and
+reproduced at github.com/msradam/riprap-models; the land-cover model is
+trained in this repository (scripts/train_cover.py) and its weights are not
+published. (A third, a satellite water layer, was retired on 2026-10-02
+after two fair tests showed no skill: docs/MODELS.md.) Neither has been shown to
 beat an official product, so nothing they produce is ever a measurement:
 
   * every sentence from a model goes through `hedge`, which opens it with
@@ -56,20 +57,6 @@ MODELS = {
                    "of the {n_flood_windows} windows in which the water reached the minor flood stage",
         official="the National Weather Service (weather.gov/okx) and Notify NYC; NOAA's ETSS and the Stevens Flood "
                  "Advisory System model surge from the weather",
-    ),
-    "water": Model(
-        name="Prithvi-EO 2.0 NYC Pluvial",
-        repo="msradam/Prithvi-EO-2.0-NYC-Pluvial",
-        revision="25ce564199d8cfa8fefd5ac0e80e2d911b65ea60",
-        extra="eo",
-        limits="a satellite passes every few days and sees 10 to 20 m pixels, so street and basement flooding that "
-               "drains within hours is invisible to it, and its training labels were the base model's own output "
-               "for Hurricane Ida, not surveyed flooding",
-        evaluation="of {n_marks} high-water marks USGS surveyed after Ida, it showed new water within 500 m of "
-                   "{n_marks_with_water} ({marks_pct}%), {against_chance} ({chance_pct}% of the land it saw lies "
-                   "that close to its new water)",
-        official="the surveyed and measured record (USGS high-water marks, FloodNet sensors) and NYC DEP's "
-                 "stormwater flood maps",
     ),
     "landcover": Model(
         name="NYC land-cover model",

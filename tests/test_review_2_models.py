@@ -27,7 +27,7 @@ T = {
     "fema_nfhl": "This address sits in FEMA flood zone AE.",
     "dep_moderate_current": "This address is outside the modeled flooding in the NYC DEP stormwater scenario.",
 }
-MODELS = {"ttm_battery_surge", "landcover", "prithvi_water"}
+MODELS = {"ttm_battery_surge", "landcover"}
 
 
 @pytest.mark.parametrize("question", [
@@ -165,17 +165,17 @@ def test_a_compass_point_before_a_numbered_street_ends_no_sentence():
 
 
 def test_the_language_model_cannot_rest_a_yes_on_an_experimental_source(monkeypatch):
-    docs = [Doc("prithvi_water", "Hazard Reader", "Experimental: a satellite model showed 4,000 m² of new surface water "
-                "within 500 m of this address.", True),
+    docs = [Doc("landcover", "Hazard Reader", "Experimental: a satellite land-cover model estimates that 71.0% of the "
+                "ground within 500 m of this address is paved or built over.", True),
             Doc("fema_nfhl", "Hazard Reader", "This address sits in FEMA flood zone X.", False)]
     monkeypatch.setattr(syn, "RULES_FIRST", False)
     monkeypatch.setattr(syn, "_documents", lambda s: (docs, [], None))
     monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
-    monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: ({"claims": [], "answer": {"lead": "yes", "facts": ["prithvi_water"]}}, "m"))
+    monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: ({"claims": [], "answer": {"lead": "yes", "facts": ["landcover"]}}, "m"))
     out = syn.synthesize({"intent": "single_address", "plan": {"question": "Is this block a wet one?", "focus": {}}})
     answer = out["paragraph"].split("**Answer.**")[1].split("**")[0].strip()
     assert out["grounding"]["answer_mode"] == "extractive" and not answer.startswith("Yes")
-    assert answer.startswith("From the sources consulted: Experimental: a satellite model showed")
+    assert answer.startswith("From the sources consulted: Experimental: a satellite land-cover model estimates")
 
 
 def test_a_school_just_outside_the_sandy_outline_is_named_not_dropped():
@@ -400,11 +400,10 @@ def test_will_it_flood_is_declined_with_or_without_a_question_mark():
 
 def test_a_question_about_imagery_takes_no_yes_from_the_record():
     got = ra.answer("Did satellite imagery show flooding at 80 Pioneer Street, Brooklyn after Sandy?", T, SENSORS)
-    assert got[0] == "facts"  # the Sandy outline is not what imagery showed
+    assert got[0] == "no_satellite"  # the Sandy outline is not what imagery showed, and no yes rests on it
     far = {"ida_hwm": {"n_within_radius": 0}}
-    texts = {"ida_hwm": "No Hurricane Ida high-water marks were surveyed within 800 m of this address.",
-             "prithvi_water": "Experimental: a satellite model showed 0 m² of new surface water within 500 m."}
-    assert ra.answer("Did satellite imagery show flooding here after Ida?", texts, far)[0] != "cannot_answer"
+    texts = {"ida_hwm": "No Hurricane Ida high-water marks were surveyed within 800 m of this address."}
+    assert ra.answer("Did satellite imagery show flooding here after Ida?", texts, far) == ("no_satellite", ["ida_hwm"])
 
 
 @pytest.mark.parametrize("query,place", [
@@ -512,7 +511,6 @@ def test_a_borough_after_a_neighbourhood_keeps_the_match_exact():
 
 
 def test_imagery_after_ida_is_about_the_storm_not_the_time_since():
-    texts = {**T, "ida_hwm": "USGS surveyed 1 Hurricane Ida high-water mark within 800 m of this address.",
-             "prithvi_water": "Experimental: a satellite model showed 0 m² of new surface water within 500 m."}
+    texts = {**T, "ida_hwm": "USGS surveyed 1 Hurricane Ida high-water mark within 800 m of this address."}
     lead, facts = ra.answer("Did satellite imagery show flooding here after Ida?", texts, SENSORS)
-    assert lead == "facts" and facts == ["ida_hwm", "prithvi_water"]
+    assert lead == "no_satellite" and facts[0] == "ida_hwm"  # the storm's own record leads, with no yes or no

@@ -90,7 +90,6 @@ T = {
     "noaa_tides": "Latest reading at The Battery, NY: 4.1 ft above MLLW.",
     "nws_alerts": "No active NWS flood, coastal or wind alerts at this point.",
     "ttm_battery_surge": "Experimental forecast: the water at The Battery may run up to 0.20 m above the tide.",
-    "prithvi_water_nta": "Experimental: a satellite model showed 4,000 m² of new surface water in this area.",
     "dep_moderate_current_nta": "NYC DEP stormwater scenario: 7.2% of this area is modeled to flood from rainfall.",
     "landcover_nta": "Experimental: a satellite land-cover model labels 71.0% of this area as paved or built over.",
     "floodnet": "2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years.",
@@ -112,8 +111,6 @@ V = {"floodnet": {"n_sensors": 2, "n_flood_events_3y": 14, "n_flood_events_good_
     ("How much of BX02 is paved over and how much is green?", "experimental", ["landcover_nta"]),
     ("Has the land cover in SI03 changed much in the last few years?", "experimental", ["landcover_nta"]),
     ("If this paving trend continues, is runoff likely to rise in QN12?", "experimental", ["landcover_nta"]),
-    # What the satellite showed, when the question asks for it: after the surveyed record.
-    ("What did satellite imagery show in BK18 after Ida?", "experimental", ["prithvi_water_nta"]),
 ])
 def test_a_question_about_the_future_gets_the_models_hedged_answer(question, lead, facts):
     # A run has the point sources or the area ones, never both.
@@ -155,17 +152,18 @@ def test_will_it_flood_is_neither_refused_nor_answered_yes_or_no():
 
 @pytest.mark.parametrize("question,lead", [
     ("Has the block flooded since Hurricane Ida?", "yes"),
-    # What the imagery showed is the model's to say: the surveyed marks come
-    # first, and their "Yes." does not stand over the model's sentence.
-    ("Did satellite imagery show flooding near here after Ida?", "facts"),
+    # What satellite imagery showed: no source here says (the water layer was retired after two tests showed
+    # no skill), so the lead says that and the surveyed marks follow, with no "Yes." over them.
+    ("Did satellite imagery show flooding near here after Ida?", "no_satellite"),
 ])
 def test_a_model_never_sets_the_lead_of_a_question_about_past_flooding(question, lead):
-    point = {**{k: v for k, v in T.items() if not k.endswith("_nta")}, "prithvi_water": T["prithvi_water_nta"]}
+    point = {k: v for k, v in T.items() if not k.endswith("_nta")}
     got, facts = ra.answer(question, point, V)
     assert got == lead
-    models = [f for f in facts if f.startswith(("prithvi", "landcover", "ttm"))]
-    assert facts[0] not in models and facts[len(facts) - len(models):] == models
-    assert ("prithvi_water" in facts) == ("satellite" in question)
+    models = [f for f in facts if f.startswith(("landcover", "ttm"))]
+    assert facts[0] not in models and not models  # no model speaks about past flooding
+    if "satellite" in question:
+        assert facts[0] == "ida_hwm"  # the storm's own surveyed record leads
 
 
 def test_a_right_now_tide_question_adds_the_forecast_after_the_readings():
@@ -179,7 +177,8 @@ def test_experimental_sources_stay_out_of_a_plain_briefing_unless_notable():
     from riprap.core.burr.templated_reconciler import _QUIET_UNLESS
 
     assert not _QUIET_UNLESS["ttm_battery_surge"]({"notable": False}) and _QUIET_UNLESS["ttm_battery_surge"]({"notable": True})
-    assert not _QUIET_UNLESS["prithvi_water"]({"new_water_m2": 0}) and not _QUIET_UNLESS["landcover"]({"built_pct": 80})
+    assert not _QUIET_UNLESS["landcover"]({"built_pct": 80})
+    assert "prithvi_water" not in _QUIET_UNLESS  # the satellite water layer is retired (docs/MODELS.md)
 
 
 def test_without_the_model_the_official_forecast_still_answers_and_the_absence_is_said():

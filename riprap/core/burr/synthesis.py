@@ -285,6 +285,9 @@ LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From
                 "experimental": "From an experimental model, not a measurement:",
                 "no_prediction": "Riprap cannot predict whether a particular place floods on a given day: no source "
                                  "or model here does that. What the Weather Service expects, and what the maps show:",
+                "no_satellite": "Riprap quotes no satellite imagery of flooding: the satellite water layer it carried was "
+                                "retired after two tests in which it found recorded floods no more often than chance. "
+                                "What was surveyed and recorded here:",
                 # Heat (heat_answer.py).
                 "heat_forecast": "From the National Weather Service, as issued for the next 7 days; Riprap predicts "
                                  "nothing itself:",

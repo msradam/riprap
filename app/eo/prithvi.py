@@ -1,9 +1,14 @@
-"""Experimental: Prithvi-EO 2.0 water segmentation for batch jobs
-(scripts/run_eo_batch.py).
+"""Sentinel scene helpers for the batch jobs, and the Prithvi-EO 2.0 water
+model they were first written for.
 
-Not used per request. The app reads the saved outputs
-(app/flood_layers/prithvi_water.py); this module loads the model and turns
-a Sentinel-2 L2A window into a water mask. Needs the `eo` extra.
+The satellite water layer was retired from the app on 2026-10-02: on
+Hurricane Ida and again on coastal and tidal floods that FloodNet sensors
+recorded at the moment of a satellite pass, it found flooding no more often
+than chance (docs/MODELS.md). Nothing here runs per request. The scene
+helpers (`grid`, `read_band`, `clear_mask`, `search_scenes`) are used by the
+land-cover and surface-temperature batch jobs; `load_model` and `water_mask`
+are kept for the scripts that ran those tests (scripts/run_eo_batch.py,
+scripts/score_water_floodnet.py). Needs the `eo` extra.
 
 The model is the owner's fine-tune `msradam/Prithvi-EO-2.0-NYC-Pluvial`
 of NASA and IBM's Prithvi-EO 2.0 (300M, Sen1Floods11), loaded from its
@@ -17,12 +22,10 @@ from __future__ import annotations
 import logging
 import threading
 
-from app import experimental
-
 log = logging.getLogger("riprap.eo.prithvi")
 
-MODEL = experimental.MODELS["water"]
-REPO = MODEL.repo
+# The owner's fine-tune, pinned by commit (it was experimental.MODELS["water"] while the layer was in the app).
+REPO, REVISION = "msradam/Prithvi-EO-2.0-NYC-Pluvial", "25ce564199d8cfa8fefd5ac0e80e2d911b65ea60"
 WEIGHTS = "Prithvi_EO_2.0_NYC_Pluvial.safetensors"
 BANDS = ["B02", "B03", "B04", "B8A", "B11", "B12"]
 # Per-band mean and standard deviation of reflectance (0 to 1) the model was
@@ -64,7 +67,7 @@ def load_model():
                 },
                 loss="dice", ignore_index=-1,
             )
-            state = load_file(hf_hub_download(REPO, WEIGHTS, revision=MODEL.revision))
+            state = load_file(hf_hub_download(REPO, WEIGHTS, revision=REVISION))
             missing, unexpected = task.model.load_state_dict(
                 {k.removeprefix("model."): v for k, v in state.items() if k.startswith("model.")}, strict=False)
             if missing or unexpected:

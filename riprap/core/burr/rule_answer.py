@@ -22,10 +22,12 @@ The order of the rules:
 Two rules sit in front of these for questions about the future:
 
   * a question an experimental model can answer (a surge at the Battery,
-    what satellite scenes showed after a storm, land cover) gets that
-    model's hedged sentence, after the official source for the same thing
-    when there is one. For a question about past flooding the model's
-    sentence only follows the record; it never sets a yes or no;
+    land cover) gets that model's hedged sentence, after the official
+    source for the same thing when there is one. For a question about past
+    flooding a model never sets a yes or no;
+  * a question about what satellite imagery showed of a flood gets no model:
+    the satellite water layer was retired after two tests showed no skill
+    (docs/MODELS.md). The lead says so and the surveyed record follows;
   * "will it flood" at a place or on a day gets no yes or no and no
     refusal either: the lead says no source here predicts that, and the
     forecasts and scenarios that exist follow.
@@ -76,11 +78,12 @@ TOPICS = (
 # "standing water right now" wants the sensors, and "311 complaints about
 # standing water" wants the complaints.
 _PONDING_RE = re.compile(r"\blinger|standing water|\bponding|slow to drain|water (that )?(sits?|stays?|pools?|collects?)", re.I)
-# What the three experimental models can answer (app/experimental.py,
+# What satellite imagery showed of a flood: no source here says (the layer was retired, docs/MODELS.md).
+_SATELLITE_RE = re.compile(r"satellite|sentinel|from space|imagery", re.I)
+# What the two experimental models can answer (app/experimental.py,
 # docs/MODELS.md): question words, the model's documents, and the official
 # sources quoted before them (for land cover, the city's own 2017 map).
 EXPERIMENTAL = (
-    (re.compile(r"satellite|sentinel|from space|imagery", re.I), ("prithvi_water", "prithvi_water_nta"), ("ida_hwm",)),
     # ("Green" alone is a street, a park and a cemetery: "100 Green Street", "Bowling Green".)
     (re.compile(r"\bpaved|\bpaving|pavement|impervious|\bgreen(ery|er| spaces?| cover| areas?)\b|\b(how|is|are) green\b(?!-| (st|street|ave|avenue|pl|place|rd|road|ln|lane|point)\b)"
                 r"|much (of (it|this|the \w+) )?is green|\bland.?cover|built.?(over|up)|tree (cover|canopy)|vegetat|\brunoff",
@@ -286,8 +289,8 @@ def asks_something(text: str) -> bool:
     search phrase. The word "flood" alone does not count."""
     if heat_answer.hazard_of(text) == "heat":
         return heat_answer.asks_something(text)
-    return bool(asks_now(text) or _FUTURE_RE.search(text or "") or _named_ids(text or "")
-                or _HISTORY_RE.search(text or "") or any(p.search(text or "") for p, _, _ in EXPERIMENTAL))
+    return bool(asks_now(text) or _FUTURE_RE.search(text or "") or _named_ids(text or "") or _HISTORY_RE.search(text or "")
+                or _SATELLITE_RE.search(text or "") or any(p.search(text or "") for p, _, _ in EXPERIMENTAL))
 
 
 def names_flood(clause: str) -> bool:
@@ -300,14 +303,14 @@ def names_flood(clause: str) -> bool:
     # (A school, a hospital or public housing is an asset of either briefing, and a satellite measures both.)
     # ("Scenario" alone is a projection of either hazard; a stormwater or rain word makes it the city's flood maps.)
     dep_named = re.search(r"stormwater|storm water|\bdep\b|\brain|flood maps?", c, re.I)
-    return bool(_FLOOD_RE.search(c) or EXPERIMENTAL[2][0].search(c)
+    return bool(_FLOOD_RE.search(c) or EXPERIMENTAL[1][0].search(c)
                 or [i for i in _named_ids(c) if i != "nws_alerts" and i not in ASSET_DOCS and (dep_named or i not in DEP)])
 
 
 def recognised(question: str) -> bool:
     """True when a rule knows what kind of question this is, from its words alone."""
     q = question or ""
-    return bool(asks_now(q) or _FUTURE_RE.search(q) or _named_ids(q) or _FLOOD_RE.search(q)
+    return bool(asks_now(q) or _FUTURE_RE.search(q) or _named_ids(q) or _FLOOD_RE.search(q) or _SATELLITE_RE.search(q)
                 or any(p.search(q) for p, _, _ in EXPERIMENTAL) or heat_answer.hazard_of(q) == "heat")
 
 
@@ -422,7 +425,7 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
         # and a question about what the model showed gets no yes or no from
         # the record above it ("did satellite imagery show flooding" is not
         # answered "Yes." by a surveyed mark).
-        lead = "facts" if (models or EXPERIMENTAL[0][0].search(question)) and lead in ("yes", "no", "partly") else lead
+        lead = "facts" if (models or _SATELLITE_RE.search(question)) and lead in ("yes", "no", "partly") else lead
         return lead, [*[*facts, *(d for d in subjects if d not in facts)][:6], *models]
 
     if tf == "now":
@@ -445,11 +448,17 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
             lead = "facts"  # "will the schools flood by 2080": a scenario is not an observation
         return lead, assets
     happened = _happened_clause(question) if tf == "past" else None
+    if _SATELLITE_RE.search(question) and not models and not official and tf != "future":
+        # "What did satellite imagery show after Ida": no source here says. The
+        # storm's own surveyed record first, then the rest of the observed record.
+        storm = ac._storm_record(question)
+        seen = [d for d in (storm, *OBSERVED) if d and texts.get(d)]
+        return ("no_satellite", list(dict.fromkeys(seen))) if seen else None
     if happened:
-        # Whether it flooded is the record's to answer. Only the satellite
-        # model says anything about the past, and only when it is asked for:
-        # "Has the pavement here ever flooded?" is not a land-cover question.
-        models = [d for d in models if d.startswith("prithvi_water")]
+        # Whether it flooded is the record's to answer, and no model says
+        # anything about the past: "Has the pavement here ever flooded?" is
+        # not a land-cover question.
+        models = []
     # (A statement is not a question: "My landlord says it will never flood." is a preamble.)
     stated = question.rstrip().endswith((".", "!")) and not ac.is_yes_no_question(question)
     if _WILL_FLOOD_RE.search(question) and not stated and not (
