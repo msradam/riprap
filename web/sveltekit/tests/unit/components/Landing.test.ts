@@ -29,14 +29,17 @@ describe('Landing smoke', () => {
       '/q/Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?',
       '/q/How many street flooding complaints has community district QN12 had?',
       '/q/Which NYCHA developments in Brooklyn Community District 6 lie inside the 2012 Sandy inundation area?',
-      '/q/QN12'
+      '/q/QN12',
+      '/q/Will it be dangerously hot this week at 90-01 183rd Street, Queens?',
+      // A bare heat entry runs as "heat <place>"; the place alone is the flood briefing.
+      '/q/heat QN12'
     ]);
   });
 
   it('LandHero has one h1, and sets the specimen as a figure after the form: one link to the briefing, its question as text', () => {
     const { container, getByRole } = render(LandHero, heroProps);
     expect([...container.querySelectorAll('h1')].map((h) => h.textContent)).toEqual([
-      'The flood record for any New York City block, cited line by line.'
+      'The flood and heat record for any New York City block, cited line by line.'
     ]);
     const form = container.querySelector('form[role=search]')!;
     const figure = container.querySelector('figure')!;
@@ -74,7 +77,7 @@ describe('Landing smoke', () => {
     const { container } = render(LandProof, { cards: data.proof, count: data.count });
     expect(container.querySelector('h2')?.textContent).toBe('Real questions, answered from the record');
     const cards = [...container.querySelectorAll('li.land-card')];
-    expect(cards).toHaveLength(5);
+    expect(cards).toHaveLength(7);
     expect(cards[0].classList).toContain('is-wide');
     expect(text(cards[0])).toContain('17 of 36');
     const heads = cards.map((c) => c.querySelector('h3 a')!);
@@ -83,8 +86,14 @@ describe('Landing smoke', () => {
       '/gallery/bk06-nycha/',
       '/gallery/hunts-point-311/',
       '/gallery/gowanus-2050/',
-      '/gallery/brooklyn-heights-sensors/'
+      '/gallery/brooklyn-heights-sensors/',
+      '/gallery/hunts-point-heat/',
+      '/gallery/hollis-heat-week/'
     ]);
+    // The heat figure is a surface temperature, and its label says so.
+    expect(text(cards[5])).toContain('12.2°F');
+    expect(text(cards[5].querySelector('.proof-figure-label')!)).toContain('not the air');
+    expect(text(cards[6])).toContain('Riprap predicts nothing itself');
     expect(text(heads[1])).toBe(
       'Which NYCHA developments in Brooklyn Community District 6 lie inside the 2012 Sandy inundation area?'
     );
@@ -126,12 +135,15 @@ describe('Landing smoke', () => {
       'https://msc.fema.gov/portal/home',
       'https://www.floodhelpny.org/',
       'https://communityprofiles.planning.nyc.gov/',
+      'https://www.nyc.gov/health',
+      'https://www.weather.gov/safety/heat',
+      'https://finder.nyc.gov/coolingcenters',
       'https://rebuildbydesign.org/rainproof-nyc-map/'
     ]);
     expect(text(container)).toContain('Not affiliated with FEMA, NOAA, USGS or the City of New York.');
   });
 
-  it('says the three experimental models are there, labelled experimental, each with a baseline', () => {
+  it('says the two experimental models are there, labelled experimental, each with a baseline, and that the satellite water layer was retired', () => {
     const { container } = render(LandFrontier);
     expect(text(container)).toContain(
       'Each is labelled experimental, states its tested accuracy in every sentence, and has a measured baseline to beat.'
@@ -141,13 +153,23 @@ describe('Landing smoke', () => {
       "it reads a typical district's paved share 1.7 points above the city's own 2021 map"
     );
     expect(text(container)).not.toContain('WorldCover');
-    expect(container.querySelectorAll('h3')).toHaveLength(3);
-    expect([...container.querySelectorAll('.exp-badge')].map((b) => b.textContent)).toEqual([
-      'Experimental',
-      'Experimental',
-      'Experimental'
+    expect(text(container)).toContain('I fine-tuned two open models for New York');
+    expect([...container.querySelectorAll('h3')].map((h) => h.textContent)).toEqual([
+      'Storm surge at the Battery',
+      'Paved, green and tree canopy'
     ]);
-    expect([...container.querySelectorAll('dt')].filter((d) => d.textContent === 'The open problem')).toHaveLength(3);
+    expect([...container.querySelectorAll('.exp-badge')].map((b) => b.textContent)).toEqual(['Experimental', 'Experimental']);
+    expect([...container.querySelectorAll('dt')].filter((d) => d.textContent === 'The open problem')).toHaveLength(2);
+    // The city's map is the record; the model's estimate comes after it.
+    expect(text(container)).toContain("A briefing quotes that map first, and the model's estimate follows it.");
+    // The retired layer: one sentence, no card and no gallery link.
+    expect(text(container.querySelector('.frontier-retired')!)).toMatch(
+      /A third model, a satellite water layer, was retired on 2026-10-02 after two tests.*no more often than chance\./
+    );
+    expect(text(container)).not.toContain('Prithvi');
+    const hrefs = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href'));
+    expect(hrefs).not.toContain('/gallery/bk18-satellite/');
+    expect(hrefs).toContain('https://github.com/msradam/riprap/blob/main/docs/MODELS.md');
   });
 
   it('LandDevelopers has the anchor the readers line uses, a captioned keyboard-scrollable code block and the seven MCP tools', () => {
@@ -169,7 +191,7 @@ describe('Landing smoke', () => {
   it('LandStones names all five Stones, with its sources, at #methodology', () => {
     const { container } = render(LandStones);
     expect(container.querySelector('section')?.id).toBe('methodology');
-    expect(container.querySelector('h2')?.textContent).toBe('Built on 23 public sources');
+    expect(container.querySelector('h2')?.textContent).toBe('Built on 33 public sources');
     const t = text(container);
     for (const name of ['Cornerstone', 'Touchstone', 'Keystone', 'Lodestone', 'Capstone']) {
       expect(t).toContain(name);
@@ -184,6 +206,13 @@ describe('Landing smoke', () => {
       ['How answers are written', 'Capstone']
     ]);
     expect(t).toContain('USGS Hurricane Ida high-water marks');
+    // Each data Stone lists its heat sources on a line of their own.
+    expect([...container.querySelectorAll('.stone-heat')].map((s) => s.textContent?.split(',')[0])).toEqual([
+      'For heat: Landsat surface temperature',
+      'For heat: NYC Parks spray showers and pools',
+      'For heat: Weather station records of 90 degree days',
+      'For heat: The National Weather Service forecast and heat alerts'
+    ]);
     expect(t).toContain('FloodNet data is licensed CC-BY-NC-SA 4.0');
     expect(container.querySelector('.stones-licence a')?.getAttribute('href')).toBe(
       'https://github.com/msradam/riprap/blob/main/docs/DATA-SOURCES.md'

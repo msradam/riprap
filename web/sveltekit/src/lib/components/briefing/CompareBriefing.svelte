@@ -3,11 +3,14 @@
   import SourceNotes from './SourceNotes.svelte';
   import { parseBriefing } from '$lib/client/parseBriefing';
   import { citedIn } from '$lib/client/briefingText';
+  import { heatCompareRows, type CompareRow } from '$lib/client/briefingModel';
   import type { Citation } from '$lib/types/claim';
 
   interface Target {
     label: string;
     address: string;
+    /** The place's own result, keyed by source id. */
+    state?: Record<string, unknown>;
   }
 
   interface Props {
@@ -17,9 +20,12 @@
     /** Per-place step result payloads from the agent stream, keyed by step name. */
     structuredA?: Record<string, unknown>;
     structuredB?: Record<string, unknown>;
+    /** A heat comparison: the table shows the two places' heat records
+     *  and no flood rows. */
+    heat?: boolean;
   }
 
-  let { paragraph, citations, targets, structuredA = {}, structuredB = {} }: Props = $props();
+  let { paragraph, citations, targets, structuredA = {}, structuredB = {}, heat = false }: Props = $props();
 
   // Split the merged compare paragraph at the --- divider.
   // Each half begins with `## PLACE A/B: <address>` which we strip to get
@@ -52,12 +58,7 @@
     )
   );
 
-  interface DeltaRow {
-    label: string;
-    ctx: string;
-    aVal: string;
-    bVal: string;
-  }
+  type DeltaRow = CompareRow;
 
   function getNum(steps: Record<string, unknown>, stepName: string, field: string): number | undefined {
     const r = steps[stepName];
@@ -116,13 +117,16 @@
 
     return rows.slice(0, 4);
   });
+  // A heat comparison sets every heat record both places have, whether
+  // or not they differ; a flood comparison sets up to four differences.
+  const rows = $derived(heat ? heatCompareRows(targets[0]?.state ?? {}, targets[1]?.state ?? {}) : deltaRows);
 </script>
 
 <div class="compare-layout">
-  {#if deltaRows.length > 0}
+  {#if rows.length > 0}
     <section class="compare-delta-bar" aria-labelledby="compare-delta-h">
-      <h2 id="compare-delta-h" class="compare-delta-title">Key differences</h2>
-      <table class="compare-delta-table">
+      <h2 id="compare-delta-h" class="compare-delta-title">{heat ? 'Heat records, side by side' : 'Key differences'}</h2>
+      <table class={['compare-delta-table', heat && 'is-heat']}>
         <thead>
           <tr>
             <th scope="col">Measure</th>
@@ -131,9 +135,9 @@
           </tr>
         </thead>
         <tbody>
-          {#each deltaRows as row, j (j)}
+          {#each rows as row, j (j)}
             <tr>
-              <th scope="row">{row.label}{#if row.ctx}, {row.ctx}{/if}</th>
+              <th scope="row">{row.label}{#if row.ctx}<span class="compare-ctx">{heat ? '' : ', '}{row.ctx}</span>{/if}</th>
               <td class="data">{row.aVal}</td>
               <td class="data">{row.bVal}</td>
             </tr>
@@ -204,6 +208,13 @@
   }
   .compare-delta-table tbody th {
     font-weight: 600;
+  }
+  /* What a heat measure is, on its own line under its name. */
+  .is-heat .compare-ctx {
+    display: block;
+    max-width: 54ch;
+    font-weight: 400;
+    color: var(--ink-secondary);
   }
 
   .compare-cols {

@@ -128,6 +128,12 @@ describe('termsIn', () => {
     }]);
     expect(termsIn('', true)[0].reading).not.toMatch(/synthetic/i);
   });
+
+  it('reads the tiers for heat on a heat briefing', () => {
+    expect(termsIn('', true)[0].reading).toMatch(/observes flooding/);
+    expect(termsIn('', true, true)[0].reading).toMatch(/observes heat/);
+    expect(termsIn('', true, true)[0].reading).not.toMatch(/flood|311/);
+  });
 });
 
 describe('leadClause', () => {

@@ -20,7 +20,7 @@ export interface PlanInfo {
   rationale?: string;
   /** The user's question; empty for a bare address. */
   question?: string;
-  focus?: { hazard?: string | null; time?: string | null; asset?: string | null };
+  focus?: { hazard?: string | null; time?: string | null; asset?: string | null } | null;
   /** Pebble ids the planner chose to run. */
   pebbles?: string[];
   /** On `final.plan` only: the planner's model calls; absent or empty
@@ -30,6 +30,31 @@ export interface PlanInfo {
 
 /** True when a language model planned the query. */
 export const planned = (plan: PlanInfo | null | undefined): boolean => !!plan?.llm_calls?.length;
+
+/** True when the planner routed the query to the heat briefing. */
+export const isHeat = (plan: Pick<PlanInfo, 'focus'> | null | undefined): boolean =>
+  plan?.focus?.hazard === 'heat';
+
+/** What the briefing is called. A planned run that is not a heat run is a
+ *  flood run. Before the plan arrives the hazard is unknown, and it is not
+ *  guessed from the query text. */
+export function hazardLabel(plan: Pick<PlanInfo, 'focus'> | null | undefined): string {
+  if (!plan) return 'Briefing';
+  return isHeat(plan) ? 'Heat briefing' : 'Flood-exposure briefing';
+}
+
+/** The place a bare-place query names, without its hazard word: the
+ *  planner's single target when it gives one, otherwise the query less a
+ *  leading or trailing "heat" or "extreme heat". */
+export function placeQuery(queryText: string, plan?: Pick<PlanInfo, 'targets'> | null): string {
+  const targets = Array.isArray(plan?.targets) ? (plan.targets as { text?: unknown }[]) : [];
+  const text = targets.length === 1 ? targets[0]?.text : null;
+  if (typeof text === 'string' && text.trim()) return text.trim();
+  return queryText
+    .replace(/^\s*(extreme\s+)?heat\b[\s,:]*/i, '')
+    .replace(/[\s,]*\b(extreme\s+)?heat\s*$/i, '')
+    .trim();
+}
 
 /** True for an intent the planner answers with a statement instead of a
  *  briefing: the question is out of scope, or asks for something not built. */
@@ -131,8 +156,9 @@ export interface FinalResult {
   /** The place the backend resolved the query to; null when it could not. */
   geocode?: { address?: string; borough?: string; lat?: number; lon?: number; match?: "exact" | "closest" } | null;
   trace?: StepEvent[];
-  /** Present when intent === "compare". */
-  targets?: Array<{ label: string; address: string }>;
+  /** Present when intent === "compare". `state` is the place's own
+   *  result, keyed by source id as a single run's `final` is. */
+  targets?: Array<{ label: string; address: string; state?: Record<string, unknown> }>;
   /** Per-call emissions ledger from app/emissions.py. Optional. */
   emissions?: EmissionsSummary;
   /** Sources that ran for this query. */
@@ -150,7 +176,9 @@ export interface FinalResult {
 /** One model row from the backend's `final.models`. */
 export interface ModelRow {
   name: string;
-  repo: string;
+  /** A Hugging Face repository id or an endpoint's model tag; null for a
+   *  model whose weights are not published. */
+  repo: string | null;
   where: string;
   /** `endpoint`: an LLM endpoint was called. `loaded`: an experimental
    *  model ran in the server. `precomputed`: its saved output was read. */

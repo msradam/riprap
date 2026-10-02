@@ -15,6 +15,7 @@
   import ErrorCard from '$lib/components/states/ErrorCard.svelte';
   import { looksLikeQuestion, type RunState } from '$lib/client/runState.svelte';
   import { UNANSWERED } from '$lib/client/cardAdapter';
+  import { hazardLabel, isHeat, placeQuery } from '$lib/client/agentStream';
   import { boldFirstSentence, briefingModel, firstSentence, suggestedDistrict, type SnapshotMeta } from '$lib/client/briefingModel';
   import { resolve } from '$app/paths';
   import { briefingState } from '$lib/stores/briefingState.svelte';
@@ -66,13 +67,26 @@
   // A run the planner could not serve is not an address or district briefing.
   // During the wait the kind is known only for a question (from its text);
   // a district reads as an address until the final payload names it.
+  let hazard = $derived(hazardLabel(run.plan));
+  let heat = $derived(isHeat(run.plan));
   let kindLine = $derived(
-    run.notImplemented ? 'Flood-exposure briefing, not available'
-      : loading ? (isQuestionQuery ? 'Flood-exposure briefing, question' : 'Flood-exposure briefing')
+    run.notImplemented ? `${hazard}, not available`
+      : loading ? (isQuestionQuery ? `${hazard}, question` : hazard)
+      : isCompare ? `${hazard}, comparison`
       : model.kind === 'question'
-      ? run.finalResult?.area_boundary ? 'Flood-exposure briefing, district question' : 'Flood-exposure briefing, question'
-      : `Flood-exposure briefing, ${model.kind}`
+      ? run.finalResult?.area_boundary ? `${hazard}, district question` : `${hazard}, question`
+      : `${hazard}, ${model.kind}`
   );
+  // A bare-place briefing links to the same place's briefing for the other
+  // hazard. NYC runs only (the heat sources are the city's), and not on a
+  // gallery snapshot, whose counterpart is not in the gallery.
+  let otherBriefing = $derived.by(() => {
+    if (snapshot || !hasBriefing || run.stopped || isCompare || !isPlace || !model.nyc) return null;
+    const place = placeQuery(queryText, run.plan);
+    return heat
+      ? { label: 'Flood briefing for this place', query: place }
+      : { label: 'Heat briefing for this place', query: `heat ${place}` };
+  });
   // A place briefing is titled with the place as the reader typed it; the
   // meta line names the place it resolved to.
   let title = $derived(model.question ?? (queryText.trim() || model.place));
@@ -256,9 +270,16 @@
     {/if}
     {#if model.nyc && !run.stopped}
       <p class="brief-quiet brief-scope">
-        <!-- nyc-leak-ok: gated on model.nyc (the run was routed to the NYC deployment) -->
-        Live here or own property here? <a href="https://www.floodhelpny.org/" target="_blank" rel="noopener noreferrer">FloodHelpNY</a>
-        explains flood zones and insurance for New York City residents.
+        {#if heat}
+          During a heat emergency the city lists its cooling centers at
+          <a href="https://finder.nyc.gov/coolingcenters/" target="_blank" rel="noopener noreferrer">finder.nyc.gov/coolingcenters</a>;
+          heat safety guidance is at
+          <a href="https://www.nyc.gov/site/doh/health/emergency-preparedness/emergencies-extreme-weather-heat.page" target="_blank" rel="noopener noreferrer">nyc.gov/health</a>.
+        {:else}
+          <!-- nyc-leak-ok: gated on model.nyc (the run was routed to the NYC deployment) -->
+          Live here or own property here? <a href="https://www.floodhelpny.org/" target="_blank" rel="noopener noreferrer">FloodHelpNY</a>
+          explains flood zones and insurance for New York City residents.
+        {/if}
       </p>
     {/if}
   </div>
@@ -292,6 +313,8 @@
         {:else if hasBriefing && run.finishedAt}<span>Run <span class="data">{formatGeneratedAt(run.finishedAt)}</span></span>{/if}
         {#if hasBriefing && !run.stopped}<a href="#how-made" onclick={openHowMade}>How this briefing was made</a>{/if}
         {#if hasBriefing && !run.stopped && failedCount}<a href="#brief-sources">{failedCount} {failedCount === 1 ? 'source' : 'sources'} failed to respond</a>{/if}
+        <!-- A new run, so a full load, like the refusal's links below. -->
+        {#if otherBriefing}<a href={resolve('/(app)/q/[queryId]', { queryId: encodeURIComponent(otherBriefing.query) })} data-sveltekit-reload>{otherBriefing.label}</a>{/if}
       </p>
       {#if (hasBriefing && !run.stopped) || notice}
         <div class="brief-tools">
@@ -348,6 +371,7 @@
           targets={run.finalResult.targets}
           structuredA={run.compareStepsA}
           structuredB={run.compareStepsB}
+          {heat}
         />
         <div class="brief-compare-maps">
           {#each [{ key: 'A', place: run.compareAddressA, sandy: run.sandyFcA, dep: run.depFcA, proxy: run.proxyFcA, ida: run.idaHwmFcA }, { key: 'B', place: run.compareAddressB, sandy: run.sandyFcB, dep: run.depFcB, proxy: run.proxyFcB, ida: run.idaHwmFcB }] as m (m.key)}
@@ -355,6 +379,7 @@
               <figure class="brief-compare-map">
                 <LazyMap
                   address={m.place}
+                  heatSurface={heat ? null : undefined}
                   sandyEmpirical={m.sandy}
                   depModeled={m.dep}
                   proxy311={m.proxy}

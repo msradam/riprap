@@ -22,7 +22,7 @@ describe('modelLines', () => {
     const lines = modelLines([
       { name: 'Granite TTM r2 Battery Surge (experimental)', repo: 'msradam/granite-ttm-r2-battery-surge',
         where: 'CPU, in this server', how: 'loaded', latency_s: 0.42 },
-      { name: 'Prithvi-EO 2.0 NYC Pluvial (experimental)', repo: 'msradam/Prithvi-EO-2.0-NYC-Pluvial',
+      { name: 'A saved model (experimental)', repo: 'example/saved-model',
         where: 'an earlier batch run; its saved output is read', how: 'precomputed', latency_s: null },
       { name: 'LLM', repo: 'ibm-granite/granite-4.1-8b', where: 'LLM endpoint api.example.org', how: 'endpoint', latency_s: 2, calls: 1 },
     ]);
@@ -32,7 +32,17 @@ describe('modelLines', () => {
     expect(lines.map((l) => l.where)).toEqual([
       'CPU, in this server', 'An earlier batch run; its saved output is read', 'LLM endpoint api.example.org',
     ]);
-    expect(lines[1].href).toBe('https://huggingface.co/msradam/Prithvi-EO-2.0-NYC-Pluvial');
+    expect(lines[1].href).toBe('https://huggingface.co/example/saved-model');
+  });
+
+  it('prints an unpublished model (repo: null) with no link, and does not throw', () => {
+    // The land-cover model is trained in the repository and has no Hugging Face page.
+    const [line] = modelLines([
+      { name: 'NYC land-cover model (experimental)', repo: null,
+        where: 'an earlier batch run; its saved output is read', how: 'precomputed', latency_s: null },
+    ]);
+    expect(line.repo).toBe('weights not published');
+    expect(line.href).toBeNull();
   });
 
   it('returns nothing when models is missing', () => {

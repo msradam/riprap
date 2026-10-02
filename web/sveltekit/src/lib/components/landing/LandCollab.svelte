@@ -53,7 +53,7 @@
     <p class="land-intro">
       Riprap is built by Adam Munawar Rahman, open source under Apache-2.0. I'd like help with three
       things: a pilot in a studio course, council office or engineering firm; a second city; and
-      better ground truth for the surge and satellite models.
+      better ground truth for the surge and land-cover models.
     </p>
     <ul class="land-cards">
       {#each WAYS as w (w.title)}

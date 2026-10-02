@@ -2,6 +2,8 @@
   import LazyMap from '$lib/components/map/LazyMap.svelte';
   import EvidenceMark from '$lib/components/glyphs/EvidenceMark.svelte';
   import { AREA_BOUNDARY_LEGEND, type RunState } from '$lib/client/runState.svelte';
+  import { isHeat } from '$lib/client/agentStream';
+  import { fetchHeatSurface, type HeatSurface } from '$lib/client/mapLayers';
 
   /** The single-place map as a figure: the frame and its caption, layer
    *  switches labelled in words with counts, and the map points as a
@@ -23,6 +25,20 @@
    *  run starts with none. */
   let selectedPoint = $derived.by<string | null>(() => (void run, null));
   let shown = $derived(LAYERS.filter((l) => run.mapFeatureCounts[l.key] > 0));
+
+  // A heat briefing's map: the place over the surface-temperature image,
+  // with no flood layers. The caption and colour scale come from the
+  // image's own description.
+  let heat = $derived(isHeat(run.plan));
+  let surface = $state.raw<HeatSurface | null>(null);
+  $effect(() => {
+    if (heat) fetchHeatSurface().then((s) => (surface = s));
+  });
+  let heatCaption = $derived(
+    heat && surface
+      ? `Surface temperature against the city's land average, mean of ${surface.n_images} clear summer Landsat images (${surface.first} to ${surface.last}): blue is cooler, amber and red warmer. Surface, not air, temperature.`
+      : null
+  );
 
   const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
   /** What is plotted, in counts from the data. */
@@ -62,12 +78,20 @@
         areaBoundary={run.areaBoundary}
         {selectedPoint}
         onSelectPoint={(pid) => (selectedPoint = pid)}
+        heatSurface={heat ? surface : undefined}
       />
     </div>
     <figcaption>
-      Figure 1. {plotted.length ? `Plotted: ${plotted.join('; ')}.` : 'The place.'}{#if run.areaBoundary}{` The outline is the ${AREA_BOUNDARY_LEGEND.label}.`}{/if}{#if run.radii.length}{` Search radii (rings): ${run.radii.map((r) => `${r.label} ${r.radius_m} m`).join(', ')}.`}{/if}
+      Figure 1. {heatCaption ?? (plotted.length ? `Plotted: ${plotted.join('; ')}.` : 'The place.')}{#if run.areaBoundary}{` The outline is the ${AREA_BOUNDARY_LEGEND.label}.`}{/if}{#if run.radii.length}{` Search radii (rings): ${run.radii.map((r) => `${r.label} ${r.radius_m} m`).join(', ')}.`}{/if}
     </figcaption>
   </figure>
+  {#if heat && surface}
+    <ul class="map-stops" aria-label="Colour scale: degrees Fahrenheit against the city's land average">
+      {#each surface.stops_f as s (s.diff_f)}
+        <li><span class="map-stop" style:background="rgb({s.rgb.join(' ')})"></span><span class="data">{s.diff_f > 0 ? '+' : ''}{s.diff_f}°F</span></li>
+      {/each}
+    </ul>
+  {/if}
   {#if shown.length}
     <fieldset class="map-layers">
       <legend>Map layers</legend>
@@ -147,6 +171,25 @@
     margin: 8px 0 0;
     padding: 0;
     border: 0;
+  }
+  .map-stops {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .map-stops li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  /* The rule keeps the near-white middle stop visible on the paper. */
+  .map-stop {
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--rule-soft);
   }
   .map-layer-list {
     display: flex;

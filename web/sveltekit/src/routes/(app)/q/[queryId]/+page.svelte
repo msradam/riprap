@@ -7,7 +7,7 @@
   import { snapshotFromRun } from '$lib/client/briefingModel';
   import { pebbleManifest } from '$lib/stores/pebbleManifest.svelte';
   import { deployment } from '$lib/stores/deployment.svelte';
-  import { openAgentStream, NO_BACKEND } from '$lib/client/agentStream';
+  import { openAgentStream, hazardLabel, isHeat, NO_BACKEND } from '$lib/client/agentStream';
   import {
     fetchSandy, fetchDep, fetchProxyDots,
     fetchIdaHwm, fetchSandyNta, fetchDepNta
@@ -17,14 +17,13 @@
   // SvelteKit already decodes route params; decoding again would rewrite
   // a question that contains a literal "%20" or similar.
   let queryText = $derived(queryId);
+  const run = new RunState();
   // The tab names the place first, so several briefings can be told apart.
   let title = $derived(
     queryText
-      ? `${queryText.length > 60 ? `${queryText.slice(0, 59).trimEnd()}…` : queryText}, flood-exposure briefing, Riprap`
-      : 'Riprap: flood-exposure briefing'
+      ? `${queryText.length > 60 ? `${queryText.slice(0, 59).trimEnd()}…` : queryText}, ${hazardLabel(run.plan).toLowerCase()}, Riprap`
+      : 'Riprap: flood and heat briefings'
   );
-
-  const run = new RunState();
   const STOPPED_LABEL: Record<string, string> = {
     geocoder: 'stopped: could not resolve the place',
     'all-silent': 'stopped: no evidence found for this place',
@@ -39,8 +38,9 @@
   // Live-only map layers from /api/layers/*, once the address resolves.
   // Ida marks, FloodNet sensors and 311 points come from `final` instead
   // (RunState.applyFinal), so the map plots what the answer found.
+  // A heat run draws no flood layers (MapFigure adds its own overlay).
   $effect(() => {
-    if (!run.address) return;
+    if (!run.address || isHeat(run.plan)) return;
     const { lat, lon, source } = run.address;
     if (source === 'nta' && run.ntaCode) {
       fetchSandyNta(run.ntaCode).then((fc) => { run.sandyFc = fc; });
@@ -51,7 +51,7 @@
     }
   });
   $effect(() => {
-    if (!run.compareAddressA) return;
+    if (!run.compareAddressA || isHeat(run.plan)) return;
     const { lat, lon } = run.compareAddressA;
     fetchSandy(lat, lon).then((fc) => { run.sandyFcA = fc; });
     fetchDep(lat, lon).then((fc) => { run.depFcA = fc; });
@@ -59,7 +59,7 @@
     fetchIdaHwm(lat, lon).then((fc) => { run.idaHwmFcA = fc; });
   });
   $effect(() => {
-    if (!run.compareAddressB) return;
+    if (!run.compareAddressB || isHeat(run.plan)) return;
     const { lat, lon } = run.compareAddressB;
     fetchSandy(lat, lon).then((fc) => { run.sandyFcB = fc; });
     fetchDep(lat, lon).then((fc) => { run.depFcB = fc; });
@@ -74,9 +74,12 @@
     if (!queryText) return;
     runStartedAt = Date.now();
     briefingState.phase = 'planning';
+    // The header names no hazard until the plan says which briefing this is.
+    briefingState.hazard = hazardLabel(null);
     const stream = openAgentStream(queryText, {
       onPlan: (p) => {
         run.plan = p;
+        briefingState.hazard = isHeat(p) ? hazardLabel(p) : null;
         briefingState.phase = 'specialists';
       },
       onDeployment: async (d) => {
@@ -131,7 +134,7 @@
 
 <svelte:head>
   <title>{title}</title>
-  <meta name="description" content="Riprap: cited flood-exposure briefings for New York City places, from public data. Open source, Apache-2.0." />
+  <meta name="description" content="Riprap: cited flood and heat briefings for New York City places, from public data. Open source, Apache-2.0." />
 </svelte:head>
 
 <ResultsView {run} {queryText} />

@@ -1,8 +1,8 @@
 <script lang="ts">
-  /** Evidence, not advice: one compact line with the seven official
-   *  sources Riprap works alongside, and the independence line. It sits
-   *  just above "Build it with us"; the footer drops its own disclaimer
-   *  on the landing. */
+  /** Evidence, not advice: one compact line with the official sources
+   *  Riprap works alongside (for heat, the ones its own briefings name),
+   *  and the independence line. It sits just above "Build it with us";
+   *  the footer drops its own disclaimer on the landing. */
   const SOURCES = [
     {
       need: 'flooding right now',
@@ -23,6 +23,14 @@
     {
       need: 'people and housing in the floodplain',
       links: [{ name: 'NYC Planning Community District Profiles', href: 'https://communityprofiles.planning.nyc.gov/' }]
+    },
+    {
+      need: 'what to do in extreme heat',
+      links: [
+        { name: 'NYC Health Department', href: 'https://www.nyc.gov/health' },
+        { name: 'National Weather Service heat safety', href: 'https://www.weather.gov/safety/heat' },
+        { name: 'NYC Cooling Center Finder', href: 'https://finder.nyc.gov/coolingcenters' }
+      ]
     },
     {
       need: 'maps to explore',

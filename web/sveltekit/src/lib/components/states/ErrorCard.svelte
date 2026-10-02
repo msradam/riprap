@@ -64,7 +64,7 @@
       kind: 'Outside evidence coverage',
       headline: 'No source returned evidence for this point.',
       body:
-        `The address resolved, but every flood source came back empty. This is rare and usually means parkland, water, or a point with no civic data nearby. Try a street address nearby, or a neighborhood name.`,
+        `The address resolved, but every source came back empty. This is rare and usually means parkland, water, or a point with no civic data nearby. Try a street address nearby, or a neighborhood name.`,
       actions: [edit, sample]
     },
     grounding: {

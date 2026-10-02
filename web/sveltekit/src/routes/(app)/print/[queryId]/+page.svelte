@@ -10,6 +10,7 @@
   import { loadSnapshot, type PrintSnapshot } from '$lib/stores/briefingState.svelte';
   import { formatGeneratedAt } from '$lib/client/gallery';
   import { UNANSWERED } from '$lib/client/cardAdapter';
+  import { hazardLabel } from '$lib/client/agentStream';
   import { APP_VERSION } from '$lib/version';
   import { STATIC_SITE, QUICKSTART_URL } from '$lib/staticSite';
 
@@ -52,7 +53,9 @@
   let place = $derived(
     snapshot?.resolvedPlace && norm(snapshot.resolvedPlace) === norm(title) ? 'the place named above' : snapshot?.resolvedPlace
   );
-  let kindLine = $derived(snapshot?.kind ? `Flood-exposure briefing, ${snapshot.kind}` : 'Flood-exposure briefing');
+  // A snapshot saved before heat briefings carries no hazard: a flood briefing.
+  let hazard = $derived(hazardLabel({ focus: { hazard: snapshot?.hazard } }));
+  let kindLine = $derived(snapshot?.kind ? `${hazard}, ${snapshot.kind}` : hazard);
   let citations = $derived(snapshot ? Object.values(snapshot.citations).sort((a, b) => a.n - b.n) : []);
   let answerCites = $derived(citations.filter((c) => snapshot?.cited?.includes(c.id)));
   let cardCount = $derived(snapshot?.evidence?.groups.reduce((n, g) => n + g.cards.length, 0) ?? 0);
@@ -91,7 +94,7 @@
 
 <svelte:head>
   <title>Riprap briefing: {snapshot?.question || snapshot?.queryText || 'print'}</title>
-  <meta name="description" content="Riprap: cited flood-exposure briefings for New York City places, from public data. Open source, Apache-2.0." />
+  <meta name="description" content="Riprap: cited flood and heat briefings for New York City places, from public data. Open source, Apache-2.0." />
   <!-- eslint-disable-next-line svelte/no-at-html-tags -- string built from escaped CSS literals above -->
   {@html pageStyle}
 </svelte:head>

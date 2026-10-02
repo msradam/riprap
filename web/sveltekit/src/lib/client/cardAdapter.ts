@@ -19,7 +19,7 @@ import type {
   Card, CardVariant, FindingsData, ModelLine, StoneKey, StoneMember, StoneTrace
 } from '$lib/types/card';
 import type { TraceNode, TraceStatus } from '$lib/types/trace';
-import type { FinalResult, ModelRow } from '$lib/client/agentStream';
+import { isHeat, type FinalResult, type ModelRow } from '$lib/client/agentStream';
 import { pebbleManifest, type PebbleManifest } from '$lib/stores/pebbleManifest.svelte';
 
 /** Reasonable defaults — when the FSM doesn't supply a vintage, fall
@@ -79,6 +79,43 @@ const FIELD_LABELS: Record<string, string> = {
   stage_ft: 'Stream stage (ft)',
   discharge_cfs: 'Discharge (cfs)',
   n_gauges_in_area: 'Gauges in the area',
+  // heat_surface
+  mean_diff_f: "Surface against the city's land average (°F)",
+  min_diff_f: 'Smallest difference in one image (°F)',
+  max_diff_f: 'Largest difference in one image (°F)',
+  n_images: 'Clear summer images',
+  latest_surface_f: 'Surface in the latest image (°F)',
+  latest_city_mean_f: 'City land average in the latest image (°F)',
+  // hvi
+  hvi: 'Heat Vulnerability Index (of 5)',
+  ac_pct: 'Households with air conditioning (%)',
+  median_income: 'Median household income ($)',
+  // heat_visits
+  age_adjusted_rate: 'Age-adjusted rate (per 100,000 a year)',
+  citywide_age_adjusted_rate: 'Citywide age-adjusted rate (per 100,000 a year)',
+  // city_landcover, landcover (hvi also gives green_pct)
+  built_pct: 'Paved or built over (%)',
+  green_pct: 'Green cover (%)',
+  tree_canopy_pct: 'Tree canopy (%)',
+  water_pct: 'Water (%)',
+  bare_pct: 'Bare ground (%)',
+  // heat_obs. humidity_pct has no label on purpose: the evidence table's
+  // figure is the first scalar that is not a temperature, and humidity
+  // would stand as the figure of an air temperature row.
+  temp_f: 'Air temperature (°F)',
+  heat_index_f: 'Heat index (°F)',
+  // heat_station
+  days_ge_90: 'Days at 90°F or above',
+  days_ge_90_last_year: 'Days at 90°F or above, last year',
+  normal_days_ge_90: 'Days at 90°F or above, long-term average',
+  max_f: 'Highest air temperature (°F)',
+  // nws_heat_forecast
+  max_high_f: 'Highest forecast high (°F)',
+  max_apparent_f: 'Highest forecast apparent temperature (°F)',
+  // cool_features
+  n_spray_shower_sites: 'Parks or playgrounds with spray showers',
+  n_outdoor_pools: 'Outdoor pools',
+  n_indoor_pools: 'Indoor pools',
 };
 
 /**
@@ -169,8 +206,9 @@ function stoneForStep(name: string): StoneKey | null {
 
 /** Project the live trace against the deployment's pebble roster.
  *
- *  v0.4.5 §3: every Stone's expander shows the full intended roster —
- *  present specialists keep their live status; absent ones land as
+ *  v0.4.5 §3: every Stone's expander shows the roster for this run
+ *  (`inScope`: the run's hazard and kind of place). Present specialists
+ *  keep their live status; absent ones in scope land as
  *  `not_invoked` with their declared fallback message. The roster
  *  source is the active deployment's manifests (pebbleManifest.byStone),
  *  not a frontend-hardcoded list, so adding a city = no TS edits.
@@ -178,6 +216,7 @@ function stoneForStep(name: string): StoneKey | null {
 function fillRosterFromManifests(
   stone: StoneKey,
   liveByName: Map<string, StoneMember>,
+  inScope: (m: PebbleManifest) => boolean,
 ): StoneMember[] {
   const roster = pebbleManifest.byStone[stone] ?? [];
   const out: StoneMember[] = [];
@@ -194,7 +233,9 @@ function fillRosterFromManifests(
         name: p.title,
         tier: live.tier ?? p.tier ?? null,
       });
-    } else {
+    } else if (inScope(p)) {
+      // A source of the other briefing, or of the other kind of place,
+      // could not have run: it is not listed as "not run".
       out.push({
         id: p.id,
         name: p.title,
@@ -213,7 +254,7 @@ function fillRosterFromManifests(
   return out;
 }
 
-function buildStoneTraces(root: TraceNode | undefined | null): StoneTrace[] {
+function buildStoneTraces(root: TraceNode | undefined | null, inScope: (m: PebbleManifest) => boolean): StoneTrace[] {
   const buckets: Record<StoneKey, Map<string, StoneMember>> = {
     cornerstone: new Map(), keystone: new Map(),
     touchstone: new Map(), lodestone: new Map(), capstone: new Map(),
@@ -234,7 +275,7 @@ function buildStoneTraces(root: TraceNode | undefined | null): StoneTrace[] {
   }
   return (Object.keys(buckets) as StoneKey[]).map((key) => ({
     key,
-    members: fillRosterFromManifests(key, buckets[key]),
+    members: fillRosterFromManifests(key, buckets[key], inScope),
   }));
 }
 
@@ -420,8 +461,9 @@ export function modelLines(rows: ModelRow[] | undefined): ModelLine[] {
     if (latency && r.calls) latency += ` over ${r.calls} call${r.calls === 1 ? '' : 's'}`;
     return {
       name: r.name,
-      repo: r.repo,
-      href: hfHref(r.repo),
+      // An unpublished model has no repository (repo: null): say so, with no link.
+      repo: r.repo ?? 'weights not published',
+      href: r.repo ? hfHref(r.repo) : null,
       where: r.where.charAt(0).toUpperCase() + r.where.slice(1),
       how: HOW_LABEL[r.how] ?? r.how,
       latency,
@@ -481,14 +523,20 @@ const VALID_CARD_VARIANTS: Record<CardVariant, true> = {
   register: true, meta: true,
 };
 
+/** The city's land cover map and the land-cover model, for a point or an area. */
+const LANDCOVER_ID = /^(city_)?landcover(_nta)?$/;
+
 /** Intents that run polygon (neighborhood) pebbles instead of point ones. */
 export const POLYGON_INTENTS = new Set(['neighborhood', 'development_check']);
 
 /** True when a pebble belongs to the given intent's card scaffold. Keeps
  *  neighborhood-only pebbles off address pages (and vice versa) instead
  *  of rendering them as "No data" cards. A pebble with scope `any` runs
- *  for both. */
-export function pebbleInScope(m: PebbleManifest, intent: string | null | undefined): boolean {
+ *  for both. The other briefing's pebbles (flood sources on a heat run,
+ *  heat sources on a flood run) are out of scope too, so they are not
+ *  listed as "Not run". */
+export function pebbleInScope(m: PebbleManifest, intent: string | null | undefined, heat = false): boolean {
+  if (m.hazard && m.hazard !== 'any' && m.hazard !== (heat ? 'heat' : 'flood')) return false;
   const want = intent && POLYGON_INTENTS.has(intent) ? 'polygon' : 'point';
   const scope = m.scope ?? 'point';
   return scope === 'any' || scope === want;
@@ -700,12 +748,11 @@ export function adaptFinalToFindings(
     for (const c of n.children ?? []) walk(c);
   };
   walk(trace);
-  const inScope = (stoneId: string) =>
-    (pebbleManifest.byStone[stoneId] ?? []).filter((m) => pebbleInScope(m, intent));
+  const inScope = (m: PebbleManifest) => pebbleInScope(m, intent, isHeat(f.plan));
   for (const stone of pebbleManifest.stones) {
     // Per-pebble loop — single-pebble bespoke variants + the generic
     // templated fallback. Type-keyed dispatch by display.variant.
-    for (const m of inScope(stone.id)) {
+    for (const m of (pebbleManifest.byStone[stone.id] ?? []).filter(inScope)) {
       const value = (f as Record<string, unknown>)[m.id];
       let card: Card | null = null;
       if (m.display.variant === 'register') {
@@ -717,13 +764,17 @@ export function adaptFinalToFindings(
       }
       if (!card) card = buildTemplated(m, value, failedIds.has(m.id));
       if (card?.absent === 'Not available' && !failedIds.has(m.id)) noData.push({ id: m.id, title: m.title });
-      if (card) templatedCards.push({ ...card, experimental: m.maturity === 'experimental' });
+      // A heat source, and the land cover map on either briefing, states
+      // its figure in words; the evidence table shows that (figureOf).
+      const figure = card && !card.absent && (m.hazard === 'heat' || LANDCOVER_ID.test(m.id))
+        ? str(obj(value)?.headline_value) : null;
+      if (card) templatedCards.push({ ...card, ...(figure && { figure }), experimental: m.maturity === 'experimental' });
     }
   }
 
   return {
     cards: [...curatedCards, ...templatedCards].map(dropUnfilled),
-    stones: buildStoneTraces(trace),
+    stones: buildStoneTraces(trace, inScope),
     wallSeconds,
     emissions: (f as { emissions?: FindingsData['emissions'] }).emissions,
     noData,

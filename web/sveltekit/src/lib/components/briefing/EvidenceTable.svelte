@@ -137,7 +137,7 @@
         <div class="ev-measure">
           {#if find}{@render sentence(find.first)}{#if find.rest}{` ${find.rest}`}{/if}{/if}
           <span class="ev-dataset">{c.title}</span>
-          {#if longLabel}<span class="ev-dataset">Figure: {fig?.label}</span>{/if}
+          {#if longLabel}<span class="ev-dataset">Figure: {fig?.whole ?? fig?.label}</span>{/if}
         </div>
       {/if}
     </td>

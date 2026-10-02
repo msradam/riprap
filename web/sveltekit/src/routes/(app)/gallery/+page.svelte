@@ -7,6 +7,7 @@
 
   let questions = $derived(data.entries.filter((e) => e.question));
   let addresses = $derived(data.entries.filter((e) => !e.question));
+  let heatCount = $derived(data.entries.filter((e) => e.hazard === 'heat').length);
 
   // The note depends on how each answer was made, read from the entry's own
   // grounding. In extractive mode code sets the lead (and any refusal); the
@@ -48,11 +49,13 @@
 
 <svelte:head>
   <title>Riprap gallery</title>
-  <meta name="description" content="Precomputed Riprap flood-exposure briefings for New York City neighborhoods, served as static pages." />
+  <meta name="description" content="Precomputed Riprap flood and heat briefings for New York City places, served as static pages." />
 </svelte:head>
 
-{#snippet row(place: string, generatedAt: string, href: string, label: string, lead: string, reason?: string | null)}
-  <span class="gallery-place">{place}</span>
+<!-- Each row is tagged with its hazard after the place, so the heat
+     briefings can be found by scanning the first line of each row. -->
+{#snippet row(place: string, hazard: string | null | undefined, generatedAt: string, href: string, label: string, lead: string, reason?: string | null)}
+  <span class="gallery-place">{place} <span class={['gallery-hazard', hazard === 'heat' && 'is-heat']}>{hazard === 'heat' ? 'Heat' : 'Flood'}</span></span>
   {#if !sharedDate}<time class="gallery-date" datetime={generatedAt.slice(0, 10)}>{generatedAt.slice(0, 10)}</time>{/if}
   <a class="gallery-link" {href}>{label}</a>
   {#if reason}<p class="gallery-reason">{reason}</p>{/if}
@@ -66,6 +69,7 @@
     <p class="gallery-note">
       Snapshots generated ahead of time and saved as static pages. Opening one does not contact the
       Riprap backend, so the data is as of the generation date{#if sharedDate}, <time class="data" datetime={sharedDate}>{sharedDate}</time>{:else} shown{/if}.
+      Each entry is tagged Flood or Heat: {heatCount} of the {data.entries.length} are heat briefings.
     </p>
 
     <h2 class="gallery-group">Questions</h2>
@@ -75,6 +79,7 @@
         <li class="gallery-item">
           {@render row(
             e.neighborhood,
+            e.hazard,
             e.generated_at,
             `${resolve('/(app)/gallery/[slug]', { slug: e.slug })}/`,
             e.question ?? '',
@@ -98,6 +103,7 @@
         <li class="gallery-item">
           {@render row(
             e.neighborhood,
+            e.hazard,
             e.generated_at,
             `${resolve('/(app)/gallery/[slug]', { slug: e.slug })}/`,
             e.address,
@@ -182,6 +188,24 @@
   .gallery-place {
     font-size: 16px;
     font-weight: 600;
+  }
+  /* The hazard tag, in the shape of the Experimental badge. Heat is set
+     in ink, so it stands out from the flood rows on a scan. */
+  .gallery-hazard {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 0 5px;
+    border: 1px solid var(--rule-soft);
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--ink-secondary);
+    white-space: nowrap;
+  }
+  .gallery-hazard.is-heat {
+    border-color: var(--ink-secondary);
+    color: var(--ink);
   }
   .gallery-date {
     font-family: var(--font-mono);

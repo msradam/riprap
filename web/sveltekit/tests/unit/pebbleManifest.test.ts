@@ -22,6 +22,19 @@ describe('pebbleInScope', () => {
     expect(pebbleInScope(pebble(undefined), 'single_address')).toBe(true);
     expect(pebbleInScope(pebble(undefined), 'neighborhood')).toBe(false);
   });
+
+  it("keeps each briefing's sources out of the other", () => {
+    const of = (hazard?: PebbleManifest['hazard']) => ({ ...pebble('any'), hazard }) as PebbleManifest;
+    expect(pebbleInScope(of('heat'), 'single_address')).toBe(false);
+    expect(pebbleInScope(of('heat'), 'single_address', true)).toBe(true);
+    expect(pebbleInScope(of('flood'), 'single_address')).toBe(true);
+    expect(pebbleInScope(of('flood'), 'single_address', true)).toBe(false);
+    for (const heat of [false, true]) {
+      expect(pebbleInScope(of('any'), 'single_address', heat)).toBe(true);
+      // A manifest saved before the field existed is not restricted.
+      expect(pebbleInScope(of(undefined), 'single_address', heat)).toBe(true);
+    }
+  });
 });
 
 describe('loadForDeployment when the fetch fails', () => {

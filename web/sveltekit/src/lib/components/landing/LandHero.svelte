@@ -58,13 +58,15 @@
 
 <section class="land-section land-hero" aria-labelledby="land-h1">
   <div class="land-frame hero-grid">
-    <p class="hero-kind">Riprap, open-source flood evidence for New York City</p>
+    <p class="hero-kind">Riprap, open-source flood and heat evidence for New York City</p>
     <div class="hero-main">
-      <h1 id="land-h1">The flood record for any New York City block, cited line by line.</h1>
+      <h1 id="land-h1">The flood and heat record for any New York City block, cited line by line.</h1>
       <p class="hero-sub">
         Riprap joins street sensors, 311 complaints, flood maps and storm records for an address or
-        community district into one page. Every sentence carries its source and date, and the answer
-        is the record's own words: no language model writes it.
+        community district into one page. For heat it reads satellite surface temperature, tree
+        canopy, the Health Department's Heat Vulnerability Index and the Weather Service forecast.
+        Every sentence carries its source and date, and the answer is the record's own words: no
+        language model writes it.
       </p>
 
       {#if STATIC_SITE}
@@ -74,7 +76,7 @@
         </ul>
       {:else}
         <form class="hero-query" role="search" onsubmit={submit}>
-          <label for="land-query-input">Address, community district or flood question</label>
+          <label for="land-query-input">Address, community district, or a flood or heat question</label>
           <div class="hero-query-row">
             <input
               id="land-query-input"

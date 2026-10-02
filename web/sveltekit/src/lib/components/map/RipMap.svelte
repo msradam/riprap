@@ -4,6 +4,7 @@
   import 'maplibre-gl/dist/maplibre-gl.css';
   import type { Map as MapLibreMap, GeoJSONSource, Popup as PopupT } from 'maplibre-gl';
   import { POSITRON_NO_LABELS } from './baseStyle';
+  import type { HeatSurface } from '$lib/client/mapLayers';
   import { MapboxOverlay } from '@deck.gl/mapbox';
   import { GeoJsonLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
   import { PathStyleExtension } from '@deck.gl/extensions';
@@ -58,6 +59,10 @@
      *  a click on the map both set it through `onSelectPoint`. */
     selectedPoint?: string | null;
     onSelectPoint?: (pid: string | null) => void;
+    /** Heat briefings: the surface-temperature image drawn under the
+     *  marker and outline. Null on a heat run whose image has not loaded;
+     *  undefined on a flood run. */
+    heatSurface?: Pick<HeatSurface, 'image' | 'coordinates'> | null;
   }
 
   let {
@@ -73,6 +78,7 @@
     areaBoundary,
     selectedPoint = null,
     onSelectPoint,
+    heatSurface,
   }: Props = $props();
 
   let container: HTMLDivElement | null = $state(null);
@@ -335,6 +341,16 @@
     overlay.setProps({ layers: buildDeckLayers() });
   });
 
+  // The heat overlay sits under every other layer this component adds.
+  $effect(() => {
+    if (!ready || !map || !heatSurface || map.getSource('heat-surface')) return;
+    map.addSource('heat-surface', { type: 'image', url: heatSurface.image, coordinates: heatSurface.coordinates });
+    map.addLayer(
+      { id: 'heat-surface', type: 'raster', source: 'heat-surface', paint: { 'raster-opacity': 0.75 } },
+      'area-boundary-fill'
+    );
+  });
+
   // The first view holds the address and the plotted evidence points.
   $effect(() => {
     if (!map || !ready || areaBoundary) return;
@@ -521,7 +537,7 @@
   <div
     bind:this={container}
     role="application"
-    aria-label="Flood-exposure map for {address.label}"
+    aria-label="{heatSurface === undefined ? 'Flood-exposure map' : heatSurface ? 'Surface temperature map' : 'Map'} for {address.label}"
     class="rip-map-container"
   ></div>
 </div>

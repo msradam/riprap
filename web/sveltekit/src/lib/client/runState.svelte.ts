@@ -352,9 +352,10 @@ export class RunState {
 
   findingsData = $derived.by<FindingsData>(() => {
     void this.liveTick;
-    // The planner's intent picks the card scaffold (point vs polygon
-    // pebbles) while steps stream in; `final.intent` wins once it lands.
-    const live = { intent: this.plan?.intent, ...this.liveResults };
+    // The planner's intent and hazard pick the card scaffold (point vs
+    // polygon pebbles, flood vs heat) while steps stream in; `final.intent`
+    // and `final.plan` win once they land.
+    const live = { intent: this.plan?.intent, plan: this.plan ?? undefined, ...this.liveResults };
     if (this.finalResult) {
       const merged = { ...live, ...this.finalResult } as Partial<FinalResult>;
       return adaptFinalToFindings(merged, this.traceRoot, this.runWallSeconds, true);

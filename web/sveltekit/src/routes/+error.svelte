@@ -8,7 +8,7 @@
 
 <svelte:head>
   <title>Riprap: {notFound ? 'page not found' : 'error'}</title>
-  <meta name="description" content="Riprap: cited flood-exposure briefings for New York City places, from public data. Open source, Apache-2.0." />
+  <meta name="description" content="Riprap: cited flood and heat briefings for New York City places, from public data. Open source, Apache-2.0." />
 </svelte:head>
 
 <div class="error-page">

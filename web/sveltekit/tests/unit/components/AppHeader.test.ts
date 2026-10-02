@@ -6,6 +6,7 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
+import { page } from '$app/state';
 import AppHeader from '$lib/components/shell/AppHeader.svelte';
 import { resetStores, seedForCity } from '../helpers/stores';
 import { ALL_CITIES, NYC_LEAK_NEEDLES, NYC } from '../fixtures/cities';
@@ -53,6 +54,24 @@ describe('AppHeader chip text per deployment', () => {
       props: { query: 'test-query' },
     });
     expect(container.textContent).toBeTruthy();
+  });
+});
+
+describe('AppHeader off a briefing page', () => {
+  it('names both New York City briefings on the landing and the gallery index, and only there', () => {
+    const queryId = page.params.queryId;
+    page.params = {};
+    try {
+      seedForCity(NYC);
+      expect(render(AppHeader).container.querySelector('.app-header-context')?.textContent).toBe('flood and heat briefings');
+      // Another city has no heat briefing: its own line stays.
+      const other = ALL_CITIES.find((c) => c.key !== 'nyc')!;
+      resetStores();
+      seedForCity(other);
+      expect(render(AppHeader).container.querySelector('.app-header-context')?.textContent).toBe(other.deployment.hazard.toLowerCase());
+    } finally {
+      page.params = { queryId };
+    }
   });
 });
 

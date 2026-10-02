@@ -67,6 +67,30 @@
     nyc311_nta: 'NYC 311 history',
     dob_permits_nta: 'DOB permits',
     area_boundary: 'area outline',
+    heat_surface: 'Landsat surface temperature',
+    heat_surface_nta: 'Landsat surface temperature',
+    hvi: 'Heat Vulnerability Index',
+    hvi_nta: 'Heat Vulnerability Index',
+    heat_visits: 'heat illness visits',
+    heat_visits_nta: 'heat illness visits',
+    heat_station: 'station record',
+    heat_station_nta: 'station record',
+    heat_obs: 'air temperature',
+    heat_obs_nta: 'air temperature',
+    nws_heat_forecast: 'NWS forecast',
+    nws_heat_forecast_nta: 'NWS forecast',
+    nws_heat_alerts: 'NWS heat alerts',
+    nws_heat_alerts_nta: 'NWS heat alerts',
+    npcc4_heat: 'NPCC4 heat projections',
+    npcc4_heat_nta: 'NPCC4 heat projections',
+    cool_features: 'Parks cooling features',
+    cool_features_nta: 'Parks cooling features',
+    landcover: 'land cover model',
+    landcover_nta: 'land cover model',
+    // nyc-leak-ok: the city's own land cover map, an NYC-only source
+    city_landcover: 'NYC land cover map',
+    // nyc-leak-ok: as above
+    city_landcover_nta: 'NYC land cover map',
   };
 
   let visible = $derived(

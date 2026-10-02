@@ -37,6 +37,9 @@ export interface PebbleManifest {
   tier: Tier | null;
   /** 'experimental' pebbles get a visible badge on their card. */
   maturity?: 'production' | 'experimental';
+  /** The briefing the pebble belongs to; 'any' runs in both. Missing
+   *  (manifests saved before heat briefings) means no restriction. */
+  hazard?: 'flood' | 'heat' | 'any';
   /** 'polygon' pebbles run for neighborhood queries, 'point' for
    *  address queries, 'any' for both. Missing means 'point'. */
   scope?: 'point' | 'polygon' | 'any';

@@ -25,7 +25,9 @@ describe('the landing on the static build', () => {
       '/gallery/hollis-since-ida/',
       '/gallery/qn12-complaints/',
       '/gallery/bk06-nycha/',
-      '/gallery/qn12/'
+      '/gallery/qn12/',
+      '/gallery/hollis-heat-week/',
+      '/gallery/qn12-heat/'
     ]);
     expect(container.querySelector('a[href^="/q/"]')).toBeNull();
   });

@@ -6,6 +6,7 @@
  * is supplementary; the briefing is the deliverable.
  */
 import type { FeatureCollection } from 'geojson';
+import { asset } from '$app/paths';
 
 const EMPTY: FeatureCollection = { type: 'FeatureCollection', features: [] };
 
@@ -90,5 +91,34 @@ export async function fetchProxyDots(
     return { type: 'FeatureCollection', features };
   } catch {
     return EMPTY;
+  }
+}
+
+/** The heat briefing's map overlay (static/heat/surface.json): one
+ *  citywide image of mean summer surface temperature against the city's
+ *  land average, its corners for a MapLibre image source, and its colour
+ *  stops in degrees F. */
+export interface HeatSurface {
+  /** URL of the image. */
+  image: string;
+  coordinates: [[number, number], [number, number], [number, number], [number, number]];
+  stops_f: { diff_f: number; rgb: [number, number, number] }[];
+  n_images: number;
+  first: string;
+  last: string;
+}
+
+/** Null when the overlay cannot be read; the map then shows the place alone. */
+export async function fetchHeatSurface(): Promise<HeatSurface | null> {
+  // asset() puts the static file under the base path (BASE_PATH builds).
+  const url = asset('/heat/surface.json');
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const j = (await r.json()) as HeatSurface;
+    // `image` is a file name in the same folder as the JSON.
+    return { ...j, image: url.replace(/[^/]*$/, j.image) };
+  } catch {
+    return null;
   }
 }

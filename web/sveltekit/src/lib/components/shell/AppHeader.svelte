@@ -4,6 +4,7 @@
   import { briefingState } from '$lib/stores/briefingState.svelte';
   import { deployment } from '$lib/stores/deployment.svelte';
   import { STATIC_SITE } from '$lib/staticSite';
+  import { hazardLabel, isHeat } from '$lib/client/agentStream';
   import RipMark from './RipMark.svelte';
   import StatusPill from './StatusPill.svelte';
 
@@ -30,10 +31,20 @@
   //     to match the existing chip register
   //   - city rendered as a pill on the right side of the chip
   // Falls back to the hardcoded string while the API call is in flight
-  // or if it fails (offline-graceful).
-  const hazardText = $derived(
-    deployment.current?.hazard.toLowerCase() ?? 'flood-exposure briefing'
-  );
+  // or if it fails (offline-graceful). A heat briefing names its own
+  // hazard: the live route sets it from the plan, and a gallery snapshot
+  // carries its plan in the page data.
+  const hazardText = $derived.by(() => {
+    const entry = page.data?.entry;
+    const plan = entry?.final?.plan;
+    const own = briefingState.hazard ?? (isHeat(plan) ? hazardLabel(plan) : null);
+    // Off a briefing page (the landing, the gallery index) the line names
+    // both New York City briefings, not the deployment's flood line.
+    if (!own && !entry && !page.params.queryId && (deployment.current?.name ?? 'nyc') === 'nyc') {
+      return 'flood and heat briefings';
+    }
+    return (own ?? deployment.current?.hazard)?.toLowerCase() ?? 'flood-exposure briefing';
+  });
   const cityText = $derived(
     deployment.current ? `${deployment.current.city}${deployment.current.experimental ? ' (experimental)' : ''}` : null
   );

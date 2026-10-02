@@ -21,6 +21,8 @@ export interface GalleryIndexEntry {
   reason?: string | null;
   /** A doc id whose first sentence in the briefing is the entry's snippet. */
   feature_doc?: string | null;
+  /** 'heat' for a heat briefing; 'flood' or missing for a flood one. */
+  hazard?: string | null;
 }
 
 export interface GalleryEntry extends GalleryIndexEntry {
@@ -31,6 +33,13 @@ export interface GalleryEntry extends GalleryIndexEntry {
 }
 
 export const galleryIndex = index as GalleryIndexEntry[];
+
+/** What a reader types to run the entry's briefing live: its question,
+ *  or its place, with "heat" before the place of a bare heat entry (as
+ *  scripts/build_gallery.py runs it). The bare place alone starts the
+ *  flood briefing. */
+export const liveQuery = (e: Pick<GalleryIndexEntry, 'question' | 'address' | 'hazard'>): string =>
+  e.question ?? (e.hazard === 'heat' ? `heat ${e.address}` : e.address);
 
 /** An entry with `mode`, `model` and `answerMode` read from its own
  *  `final.grounding`, so every label says how that entry was made. The

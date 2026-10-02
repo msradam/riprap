@@ -6,7 +6,7 @@
 import { looksLikeQuestion, type RunState } from '$lib/client/runState.svelte';
 import { splitBriefing } from '$lib/client/parseBriefing';
 import { modeLine, POLYGON_INTENTS } from '$lib/client/cardAdapter';
-import { planned } from '$lib/client/agentStream';
+import { isHeat, planned } from '$lib/client/agentStream';
 import { formatGeneratedAt } from '$lib/client/gallery';
 import { citedIn, findingOf, termsIn } from '$lib/client/briefingText';
 import { sourceLists, type PrintSnapshot } from '$lib/stores/briefingState.svelte';
@@ -24,7 +24,7 @@ export type EvidenceRow = Card & { parts?: Card[] };
 /** `closed` groups (experimental sources) start folded. */
 export type EvidenceGroup = { key: string; name: string; role: string | null; cards: EvidenceRow[]; closed?: boolean };
 /** The card fields the evidence table prints. */
-export type EvidenceCard = Pick<Card, 'id' | 'source' | 'experimental' | 'title' | 'tier' | 'vintage' | 'citeId' | 'docId' | 'scalars' | 'headline' | 'variant'> & { parts?: EvidenceCard[] };
+export type EvidenceCard = Pick<Card, 'id' | 'source' | 'experimental' | 'title' | 'tier' | 'vintage' | 'citeId' | 'docId' | 'scalars' | 'headline' | 'figure' | 'variant'> & { parts?: EvidenceCard[] };
 
 const LEAD_RE = /^(Yes|No|Partly|In part|Not clear|Unclear)\.\s*/;
 const COUNT_RE = /^([\d,]+(?:\.\d+)?%?)\s+/;
@@ -327,6 +327,55 @@ export function evidenceGroups(cards: Card[], cited: string[], firstLabel = 'Beh
   return groups;
 }
 
+/** One row of a comparison table: a measure, what it is, and each place's value. */
+export interface CompareRow {
+  label: string;
+  ctx: string;
+  aVal: string;
+  bVal: string;
+}
+
+type Values = Record<string, unknown>;
+
+/** The rows of a heat comparison, from the two places' heat values
+ *  (`final.targets[i].state`). A row is set only when both places have
+ *  the value, and each says what it is: the surface row is the surface
+ *  against the city, never an air temperature. An area's values are
+ *  keyed with `_nta`. */
+export function heatCompareRows(a: Values, b: Values): CompareRow[] {
+  const rows: CompareRow[] = [];
+  const value = (s: Values, id: string): Values | null => {
+    const v = s[id] ?? s[`${id}_nta`];
+    return v && typeof v === 'object' && (v as Values).available !== false ? (v as Values) : null;
+  };
+  const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+  const row = (id: string, label: (v: Values) => string, ctx: string, cell: (v: Values) => string | null) => {
+    const [x, y] = [value(a, id), value(b, id)];
+    const [aVal, bVal] = [x && cell(x), y && cell(y)];
+    if (x && aVal && bVal) rows.push({ label: label(x), ctx, aVal, bVal });
+  };
+  const pct = (key: string) => (v: Values) => (num(v[key]) === null ? null : `${v[key]}%`);
+  const landcover = (v: Values) => `the city's ${v.year ?? 2017} land cover map`;
+
+  row('heat_surface', () => "Surface temperature against the city's land average",
+    'Landsat, clear summer late mornings; the surface of the ground, not the air',
+    (v) => {
+      const d = num(v.mean_diff_f);
+      return d === null ? null : `${d > 0 ? '+' : ''}${d.toFixed(1)}°F over ${v.n_images} images`;
+    });
+  row('hvi', (v) => `Heat Vulnerability Index (${v.year ?? 2023})`,
+    "the NYC Health Department's rank among neighbourhoods, not a measurement",
+    (v) => (num(v.hvi) === null ? null : `${v.hvi} of 5`));
+  row('city_landcover', (v) => `Tree canopy, ${landcover(v)}`, '', pct('tree_canopy_pct'));
+  row('city_landcover', (v) => `Paved or built over, ${landcover(v)}`, '', pct('built_pct'));
+  row('heat_visits', (v) => `Heat illness emergency visits, ${v.period ?? '2018 to 2022'}`,
+    "age-adjusted rate for residents of the place's community district",
+    (v) => (num(v.age_adjusted_rate) === null ? null : `${v.age_adjusted_rate} per 100,000 a year (${v.district})`));
+  row('heat_station', (v) => `Days at 90°F or above in ${v.year}`, 'at the nearest long-record weather station',
+    (v) => (num(v.days_ge_90) === null ? null : `${v.days_ge_90} (${v.station})`));
+  return rows;
+}
+
 /** Citation numbers by first appearance on the page: `order` is every
  *  doc id the page cites, top to bottom. Sources never cited follow in
  *  their existing order. Ids and anchors (`cite-{docId}`) do not change. */
@@ -541,7 +590,7 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
     stamp: meta && !modelListed ? meta.stamp : null,
     /** Live runs without a models list still name the model once. */
     modelLine: !meta && modelId && !modelListed ? modelId : null,
-    terms: termsIn(shownText, cards.length > 0),
+    terms: termsIn(shownText, cards.length > 0, isHeat(run.plan)),
     runFacts: runFacts(run),
     /** NYC-only resident resources are offered only on NYC runs. */
     nyc: (f?.deployment ?? deployment.current?.name) === 'nyc'
@@ -550,8 +599,8 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
 
 export type BriefingModel = ReturnType<typeof briefingModel>;
 
-const evidenceCard = ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline, variant, parts }: EvidenceRow): EvidenceCard =>
-  ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline, variant, ...(parts && { parts: parts.map(evidenceCard) }) });
+const evidenceCard = ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline, figure, variant, parts }: EvidenceRow): EvidenceCard =>
+  ({ id, source, experimental, title, tier, vintage, citeId, docId, scalars, headline, figure, variant, ...(parts && { parts: parts.map(evidenceCard) }) });
 
 /** Build the print snapshot from a finished run: the live route calls it
  *  when the stream ends, the gallery when a reader presses Print
@@ -576,6 +625,7 @@ export function snapshotFromRun(
     citations: m.citationsById,
     generatedAt,
     resolvedPlace: run.resolvedPlace,
+    hazard: run.plan?.focus?.hazard ?? null,
     question: m.question,
     mode: run.refused ? null : modeLine(g, planned(run.finalResult?.plan)),
     unanswered: m.unanswered,

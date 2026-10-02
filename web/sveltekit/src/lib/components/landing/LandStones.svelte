@@ -1,6 +1,8 @@
 <script lang="ts">
   /** The public sources behind a briefing, grouped by the five Stones:
-   *  a plain label leads each row, the Stone's name is its tag.
+   *  a plain label leads each row, the Stone's name is its tag. The count
+   *  in the heading is docs/DATA-SOURCES.md's: 24 flood sources and 11
+   *  heat sources, less the two read for both.
    *  Source names are the manifests' own (deployments/nyc/manifests and
    *  deployments/federal/manifests); the experimental model layers are in
    *  LandFrontier. */
@@ -17,6 +19,15 @@
     capstone:
       "Turns each record into one cited sentence and sets the answer's lead (Yes, No, a count) by fixed rules, not a language model."
   };
+  /** The heat briefing's sources, set under each Stone's flood sources.
+   *  The land cover map is read for both. */
+  const HEAT: Partial<Record<StoneKey, string>> = {
+    cornerstone:
+      "Landsat surface temperature, the NYC Health Department's Heat Vulnerability Index and heat illness emergency visits, the city's 2017 land cover map (tree canopy)",
+    touchstone: 'Weather station records of 90 degree days, the latest air temperature at the nearest station',
+    keystone: 'NYC Parks spray showers and pools',
+    lodestone: 'The National Weather Service forecast and heat alerts, NPCC4 heat projections'
+  };
   const LABELS: Record<StoneKey, string> = {
     cornerstone: 'Hazard maps and storm records',
     keystone: 'Places at risk',
@@ -29,17 +40,21 @@
 
 <section class="land-section" id="methodology" aria-labelledby="stones-h">
   <div class="land-frame">
-    <h2 id="stones-h" class="land-h2">Built on 23 public sources</h2>
+    <h2 id="stones-h" class="land-h2">Built on 33 public sources</h2>
     <p class="land-intro">
       City, state and federal records, read live or from their published files and sorted into five
-      Stones. No commercial data and no scores. Each record has its own portal; we know of no other
+      Stones: 24 for a flood briefing and 11 for a heat briefing, two of them shared. No commercial
+      data and no scores. Each record has its own portal; we know of no other
       tool that reads them together for one address.
     </p>
     <dl class="stones">
       {#each STONE_ORDER as key (key)}
         <div class="stone">
           <dt>{LABELS[key]} <span class="stone-tag">{STONE_META[key].name}</span></dt>
-          <dd>{SOURCES[key]}</dd>
+          <dd>
+            {SOURCES[key]}
+            {#if HEAT[key]}<span class="stone-heat">For heat: {HEAT[key]}</span>{/if}
+          </dd>
         </div>
       {/each}
     </dl>
@@ -86,6 +101,11 @@
     font-size: 14px;
     font-weight: 400;
     color: var(--ink-secondary);
+  }
+  /* A Stone's heat sources, on their own line under its flood sources. */
+  .stone-heat {
+    display: block;
+    margin-top: 4px;
   }
   .stones-licence {
     margin: 24px 0 0;

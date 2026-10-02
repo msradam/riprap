@@ -18,8 +18,8 @@
 </script>
 
 <svelte:head>
-  <title>Riprap: the flood record for any New York City block, cited</title>
-  <meta name="description" content="Ask about a New York City address, community district or flood question and get a one-page briefing in seconds, with every sentence cited to a public record and its date. Open source, open data, runs on a laptop." />
+  <title>Riprap: the flood and heat record for any New York City block, cited</title>
+  <meta name="description" content="Ask about flood or heat at a New York City address or community district and get a one-page briefing in seconds, with every sentence cited to a public record and its date. Open source, open data, runs on a laptop." />
 </svelte:head>
 
 <div class="land">

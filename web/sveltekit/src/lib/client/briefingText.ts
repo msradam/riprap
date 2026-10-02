@@ -65,14 +65,33 @@ function countNoun(phrase: string): string | null {
   return noun && /[a-z]s$/.test(noun) ? noun : null;
 }
 
+/** Where a figure stated in words ends its quantity: at the first comma
+ *  or opening parenthesis, or before "against", "at", "in" or "forecast". */
+const FIGURE_CUT = /,\s+|\s+(?=\()|\s+(?=(?:against|at|in|forecast)\s)/;
+
+/** A figure stated in words ("+7.5°F against the city's land average",
+ *  "5 of 5 (Jamaica)", "79 visits, 7.6 per 100,000 a year"), split so the
+ *  quantity fits the narrow Figure column. The rest is its label, and
+ *  `whole` is the figure as stated, which the table sets in the finding
+ *  cell when the label is too long to sit under the quantity. */
+function statedFigure(whole: string): { value: string; label: string | null; whole?: string } {
+  const m = FIGURE_CUT.exec(whole);
+  if (!m) return { value: whole, label: null };
+  const rest = whole.slice(m.index + m[0].length);
+  return { value: whole.slice(0, m.index), label: rest.replace(/^\((.*)\)$/, '$1'), whole };
+}
+
 /** The evidence table's figure: the finding's own quantity, the first
  *  scalar that is not a distance or a year. With scalars but none of
  *  those, nothing. Without scalars, a leading number in the headline
  *  with its unit or noun, else nothing. A bare count ("73") takes its
  *  noun from the rest of the headline or from the dataset's title
  *  ("Active DOB construction permits inside the neighborhood" gives
- *  "73 permits"). */
-export function figureOf(c: Pick<Card, 'scalars' | 'headline' | 'title'>): { value: string; label: string | null } | null {
+ *  "73 permits"). A card that states its figure in words (`figure`, set
+ *  for heat sources and the land cover map) shows that instead, and is
+ *  the one case where the figure is a temperature. */
+export function figureOf(c: Pick<Card, 'scalars' | 'headline' | 'title' | 'figure'>): { value: string; label: string | null; whole?: string } | null {
+  if (c.figure) return statedFigure(c.figure);
   if (c.scalars?.length) {
     const s = c.scalars.find((x) => !NOT_FIGURE_RE.test(x.label) && !TEMPERATURE_RE.test(`${x.value}${x.unit ?? ''}`));
     return s ? { value: s.unit ? `${s.value} ${s.unit}` : s.value, label: s.label } : null;
@@ -171,17 +190,18 @@ export const GLOSSARY: { term: string; re: RegExp; reading: string }[] = [
   }
 ];
 
-const TIER_TERM = {
+const tierTerm = (heat: boolean) => ({
   term: 'Measured, Modeled, Proxy',
-  reading:
-    'how directly a source observes flooding. Measured sources record it; modeled sources simulate a scenario; proxy sources, such as 311 complaints, indicate it indirectly.'
-};
+  reading: heat
+    ? 'how directly a source observes heat. Measured sources record it; modeled sources estimate or forecast it; proxy sources indicate it indirectly.'
+    : 'how directly a source observes flooding. Measured sources record it; modeled sources simulate a scenario; proxy sources, such as 311 complaints, indicate it indirectly.'
+});
 
 /** The glossary entries whose term appears in `text`, plus the tier words
- *  when the evidence table is on the page. */
-export function termsIn(text: string, withTiers: boolean): { term: string; reading: string }[] {
+ *  (read for heat on a heat briefing) when the evidence table is on the page. */
+export function termsIn(text: string, withTiers: boolean, heat = false): { term: string; reading: string }[] {
   const found = GLOSSARY.filter((g) => g.re.test(text)).map(({ term, reading }) => ({ term, reading }));
-  return withTiers ? [...found, TIER_TERM] : found;
+  return withTiers ? [...found, tierTerm(heat)] : found;
 }
 
 const SUBJECT_RE = /^This (?:address|area) (?:sits|is) /;

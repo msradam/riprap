@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { galleryIndex, loadGalleryEntry } from '$lib/client/gallery';
+import { galleryIndex, liveQuery, loadGalleryEntry } from '$lib/client/gallery';
 import { CHIPS, PROOF, SPECIMEN_SLUG } from '$lib/landing';
 
 // Read at build time: the landing ships the gallery count, the specimen's
@@ -18,7 +18,7 @@ export async function load() {
 
   const chips = CHIPS.map((c) => {
     const s = bySlug(c.slug);
-    return { ...c, query: s.question ?? s.address };
+    return { ...c, query: liveQuery(s) };
   });
   const proof = PROOF.map((p) => {
     const s = bySlug(p.slug);

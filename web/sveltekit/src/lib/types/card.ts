@@ -86,6 +86,12 @@ export type Card = {
   /** The pebble behind this card is marked experimental in its manifest. */
   experimental?: boolean;
 
+  /** The finding's figure as the source states it in words (a heat
+   *  source's `headline_value`: "+7.5°F against the city's land average").
+   *  The evidence table shows it in place of a figure read from the
+   *  scalars or the headline. */
+  figure?: string;
+
   /** Variant-specific body fields. Only the relevant ones are populated. */
   headline?: string;
   body?: string;

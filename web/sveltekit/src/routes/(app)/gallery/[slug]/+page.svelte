@@ -3,9 +3,10 @@
   import { resolve } from '$app/paths';
   import ResultsView from '$lib/components/results/ResultsView.svelte';
   import { RunState } from '$lib/client/runState.svelte';
-  import { galleryIndex, llmStamp, withGrounding } from '$lib/client/gallery';
+  import { galleryIndex, liveQuery, llmStamp, withGrounding } from '$lib/client/gallery';
   import { persistSnapshot } from '$lib/stores/briefingState.svelte';
   import { snapshotFromRun } from '$lib/client/briefingModel';
+  import { hazardLabel, isHeat } from '$lib/client/agentStream';
   import type { PageProps } from './$types';
 
   let { data }: PageProps = $props();
@@ -20,13 +21,21 @@
   let sibling = $derived(run.refused
     ? galleryIndex.find((e) => e.slug !== entry.slug && !e.question && e.address === entry.address) ?? null
     : null);
+  // A bare-place entry links to the same place's briefing for the other
+  // hazard, when the gallery holds one.
+  let heat = $derived(isHeat(run.plan));
+  let other = $derived(entry.question
+    ? null
+    : galleryIndex.find((e) => !e.question && e.address === entry.address && (e.hazard === 'heat') !== heat) ?? null);
   let meta = $derived({ generatedAt: entry.generated_at, commit: entry.riprap_commit, stamp: llmStamp(withGrounding(entry, entry.final.grounding)) });
 
   /** Save this entry as a print snapshot and open the print route. The
-   *  id is what a reader would type to run the same briefing live, so the
-   *  print route's "run this briefing" fallback leads somewhere sensible. */
+   *  id is what a reader would type to run the same briefing live ("heat
+   *  QN12" for a bare heat entry), so the print route's "run this
+   *  briefing" fallback starts the same briefing, and a place's heat and
+   *  flood entries do not share a snapshot key. */
   function print() {
-    const id = entry.question ?? entry.address;
+    const id = liveQuery(entry);
     persistSnapshot(snapshotFromRun(run, id, queryText, entry.generated_at, 'gallery'));
     goto(resolve('/(app)/print/[queryId]', { queryId: encodeURIComponent(id) }));
   }
@@ -35,12 +44,12 @@
 <svelte:head>
   <title>{entry.neighborhood}: Riprap gallery</title>
   <!-- A question entry is described by its question: a refusal is not a
-       flood-exposure briefing for the address. -->
+       briefing for the address. -->
   <meta
     name="description"
     content={entry.question
       ? `Precomputed Riprap gallery entry: ${entry.question}`
-      : `Precomputed Riprap flood-exposure briefing for ${entry.address}.`}
+      : `Precomputed Riprap ${hazardLabel(run.plan).toLowerCase()} for ${entry.address}.`}
   />
 </svelte:head>
 
@@ -50,6 +59,11 @@
       <p class="snapshot-sibling">
         Riprap's evidence briefing for this address:
         <a href="{resolve('/(app)/gallery/[slug]', { slug: sibling.slug })}/">{sibling.neighborhood}</a>
+      </p>
+    {/if}
+    {#if other}
+      <p class="snapshot-sibling">
+        <a href="{resolve('/(app)/gallery/[slug]', { slug: other.slug })}/">{heat ? 'Flood' : 'Heat'} briefing for this place</a>
       </p>
     {/if}
     <button type="button" class="snapshot-print" onclick={print}>Print this briefing</button>

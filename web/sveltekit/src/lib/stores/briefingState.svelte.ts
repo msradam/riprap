@@ -28,6 +28,8 @@ export interface PrintSnapshot {
    *  with its NTA name). Optional: older snapshots lack it. */
   resolvedPlace?: string | null;
   /** The fields below are optional for the same reason. */
+  /** The planner's hazard ("heat"); missing or null on a flood briefing. */
+  hazard?: string | null;
   question?: string | null;
   /** The reader-facing mode line, e.g. "Evidence briefing (no LLM)". */
   mode?: string | null;
@@ -120,8 +122,13 @@ class BriefingState {
   activeStep = $state<string | null>(null);
   /** Last error message — shown in the header status when phase = error. */
   errorMessage = $state<string | null>(null);
+  /** The header's context line on a briefing page: "Briefing" until the
+   *  plan arrives, then "Heat briefing" for a heat run. Null on a flood
+   *  run, which keeps the deployment's own hazard line. */
+  hazard = $state<string | null>(null);
 
   reset() {
+    this.hazard = null;
     this.ready = false;
     this.phase = 'idle';
     this.activeStep = null;

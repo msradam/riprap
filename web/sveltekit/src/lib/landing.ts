@@ -6,8 +6,8 @@
  */
 
 /** A question chip: the label is shortened, the live query is the
- *  entry's own question (or address), so the live app answers what the
- *  gallery shows. */
+ *  entry's own question (or its place, after "heat" for a bare heat
+ *  entry: `liveQuery`), so the live app answers what the gallery shows. */
 export interface Chip {
   label: string;
   slug: string;
@@ -17,7 +17,9 @@ export const CHIPS: Chip[] = [
   { label: 'Has 90-01 183rd Street, Queens flooded since Ida?', slug: 'hollis-since-ida' },
   { label: 'How many street flooding complaints has QN12 had?', slug: 'qn12-complaints' },
   { label: 'Which NYCHA developments in BK06 lie in the Sandy extent?', slug: 'bk06-nycha' },
-  { label: 'A whole district: QN12', slug: 'qn12' }
+  { label: 'A whole district: QN12', slug: 'qn12' },
+  { label: 'Will it be dangerously hot this week at 90-01 183rd Street, Queens?', slug: 'hollis-heat-week' },
+  { label: 'Heat in a whole district: QN12', slug: 'qn12-heat' }
 ];
 
 /** A figure set large on a card, with the snapshot text it is read from:
@@ -36,7 +38,9 @@ export interface Proof {
   figure?: ProofFigure;
 }
 
-/** The proof cards, the district card first. */
+/** The proof cards, the district card first. The heat quotes are
+ *  sentences a gallery rebuild keeps: figures from fixed files (the
+ *  Landsat images, the 2023 index) and phrases set by code. */
 export const PROOF: Proof[] = [
   {
     slug: 'qn12',
@@ -76,6 +80,27 @@ export const PROOF: Proof[] = [
     slug: 'brooklyn-heights-sensors',
     kind: 'When the record is empty',
     quotes: ['No FloodNet sensors deployed within 600 m of this address.']
+  },
+  {
+    slug: 'hunts-point-heat',
+    kind: 'Heat at an address',
+    figure: {
+      text: '12.2°F',
+      label: "warmer than the city's land average: the surface of the ground, not the air",
+      from: "The surface of the ground within 150 m of this address ran 12.2°F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature)."
+    },
+    quotes: [
+      "The surface of the ground within 150 m of this address ran 12.2°F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature).",
+      "Its neighbourhood, Hunts Point, scores 5 out of 5 on the Health Department's Heat Vulnerability Index, a rank among neighbourhoods and not a measurement."
+    ]
+  },
+  {
+    slug: 'hollis-heat-week',
+    kind: "A forecast, quoted as the Weather Service's",
+    quotes: [
+      'From the National Weather Service, as issued for the next 7 days; Riprap predicts nothing itself',
+      'The Weather Service wrote this for an area; it is not a prediction for a building.'
+    ]
   }
 ];
 
