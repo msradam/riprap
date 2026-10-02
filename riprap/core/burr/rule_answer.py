@@ -73,13 +73,13 @@ TOPICS = (
 _PONDING_RE = re.compile(r"\blinger|standing water|\bponding|slow to drain|water (that )?(sits?|stays?|pools?|collects?)", re.I)
 # What the three experimental models can answer (app/experimental.py,
 # docs/MODELS.md): question words, the model's documents, and the official
-# sources quoted before them.
+# sources quoted before them (for land cover, the city's own 2017 map).
 EXPERIMENTAL = (
     (re.compile(r"satellite|sentinel|from space|imagery", re.I), ("prithvi_water", "prithvi_water_nta"), ("ida_hwm",)),
     # ("Green" alone is a street, a park and a cemetery: "100 Green Street", "Bowling Green".)
     (re.compile(r"\bpaved|\bpaving|pavement|impervious|\bgreen(ery|er| spaces?| cover| areas?)\b|\b(how|is|are) green\b(?!-| (st|street|ave|avenue|pl|place|rd|road|ln|lane|point)\b)"
                 r"|much (of (it|this|the \w+) )?is green|\bland.?cover|built.?(over|up)|tree (cover|canopy)|vegetat|\brunoff",
-                re.I), ("landcover", "landcover_nta"), ()),
+                re.I), ("landcover", "landcover_nta"), ("city_landcover", "city_landcover_nta")),
     # ("The Sandy surge zone" is a map, and a surge that happened is the record's to answer.)
     (re.compile(r"(?<!sandy )(?<!sandy's )\bsurge\b(?! (zone|area|extent|line|map))|predicted tide"
                 r"|(above|higher than|over) the (predicted |normal |astronomical )?tide"

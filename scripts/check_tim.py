@@ -9,7 +9,7 @@ cover tokens the encoder then reads, is a second encoder and decoder
 checkpoint holds those weights, and TerraTorch's own `checkpoint_filter_fn_tim`
 copies them in. This script runs three models on the same box, date and key:
 
-  * `lulc_nyc` as the app runs it (app.eo.terramind);
+  * `lulc_nyc` as the app runs it (scripts/lulc_adapter.py);
   * `tim_nyc` with a random sampler, as first checked;
   * `tim_nyc` with the sampler loaded from the pinned base checkpoint,
     over three generation seeds (TiM samples its land cover tokens).
@@ -45,6 +45,7 @@ OUT = ROOT / "data" / "experimental" / "tim_check.json"
 def build_tim(load_sampler: bool):
     """`tim_nyc` on the TerraMind base: encoder from the pinned checkpoint,
     the sampler too when `load_sampler`, then the adapter's decoder and LoRA."""
+    import lulc_adapter as tm
     import torch
     from huggingface_hub import hf_hub_download
     from safetensors.torch import load_file
@@ -52,8 +53,6 @@ def build_tim(load_sampler: bool):
         checkpoint_filter_fn_tim,
     )
     from terratorch.tasks import SemanticSegmentationTask
-
-    from app.eo import terramind as tm
 
     task = SemanticSegmentationTask(model_factory="EncoderDecoderFactory", model_args={
         "backbone": "terramind_v1_base_tim", "backbone_pretrained": False, "backbone_tim_modalities": ["LULC"],
@@ -116,11 +115,11 @@ def score(pred, truth, clear, n: int) -> dict:
 
 
 def main() -> int:
+    import lulc_adapter as tm
     import run_landcover_batch as lb
     import torch
 
     from app.eo import prithvi
-    from app.eo import terramind as tm
 
     t0 = time.time()
     ref = prithvi.grid(BBOX)

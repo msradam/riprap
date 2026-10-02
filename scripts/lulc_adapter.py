@@ -3,8 +3,8 @@
 The app's land-cover layer was made with this adapter until 2026-10-02; it is
 now made by the NYC land-cover model (app/eo/cover.py), which beat it on the
 city's own 2021 map (docs/MODELS.md). This module is used only by the
-comparison scripts (scripts/eval_cover.py --run-adapter, scripts/check_tim.py)
-and for TerraMind's Sentinel-2 statistics. Needs the `eo` extra.
+comparison scripts (scripts/eval_cover.py --run-adapter, scripts/check_tim.py).
+Needs the `eo` extra.
 
 The model is the owner's LoRA adapter `lulc_nyc` from
 `msradam/TerraMind-NYC-Adapters` on IBM and ESA's TerraMind 1.0 base. The
@@ -35,6 +35,12 @@ import re
 import threading
 from dataclasses import dataclass
 
+from app.eo.cover import (  # noqa: F401 - TerraMind's Sentinel-2 bands and statistics
+    S2_BANDS,
+    S2_MEAN,
+    S2_STD,
+)
+
 
 @dataclass(frozen=True)
 class _Adapter:
@@ -49,14 +55,8 @@ ADAPTER = "lulc_nyc"
 # 0 water and wetland, 1 built-up (paved or roofed), 2 trees and shrubs,
 # 3 grass and crops, 4 bare ground and other.
 CLASSES = ("water", "built", "trees", "grass", "bare")
-S2_BANDS = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B11", "B12"]
 CHIP, TIMESTEPS = 224, 4  # trained on one scene repeated four times
-# TerraMind's pretraining statistics: Sentinel-2 digital numbers, Sentinel-1
-# backscatter in dB, elevation in metres (zeros are fed for the last two).
-S2_MEAN = [1390.458, 1503.317, 1718.197, 1853.91, 2199.1, 2779.975, 2987.011, 3083.234, 3132.22, 3162.988, 2424.884,
-           1857.648]
-S2_STD = [2106.761, 2141.107, 2038.973, 2134.138, 2085.321, 1889.926, 1820.257, 1871.918, 1753.829, 1797.379, 1434.261,
-          1334.311]
+# TerraMind's pretraining statistics for radar (dB) and elevation (m); zeros are fed for both.
 S1_MEAN, S1_STD = [-10.93, -17.329], [4.391, 4.459]
 DEM_MEAN, DEM_STD = 670.665, 951.272
 

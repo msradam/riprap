@@ -85,5 +85,7 @@
  "paved_r2_30m": 0.9,
  "tree_canopy_mae_points_30m": 8.4,
  "tree_canopy_r2_30m": 0.77,
- "district_paved_vs_city_map": "1.7 points above"
+ "district_paved_vs_city_map": "1.7 points above",
+ "model_test_mae_points": 4.8,
+ "city_map_2017_as_2021_mae_points": 3.0
 }

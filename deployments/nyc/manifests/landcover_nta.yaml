@@ -1,7 +1,7 @@
 id: landcover_nta
 type: baked
 title: Land cover from satellite, NYC land-cover model (experimental)
-answers: "experimental estimate of how much of a place is paved or built over, how much is green and how much is tree canopy, and whether that changed between the years mapped"
+answers: "experimental estimate, from the latest satellite imagery, of how much of a place is paved or built over, how much is green and how much is tree canopy; it reads no change between years, and the city's 2017 map (city_landcover) is the measured source"
 stone: cornerstone
 maturity: experimental
 tier: modeled
@@ -23,8 +23,8 @@ provenance:
   date_modified: "2026"
   retrieved_at: 2026-10-02
   source_name: NYC land-cover model (Riprap, experimental) on Copernicus Sentinel-2, trained on NYC Land Cover 2017
-  source_url: https://github.com/msradam/riprap/blob/main/docs/MODELS.md
-  license: Copernicus Sentinel data terms (imagery); NYC Open Data terms of use (2017 training labels)
+  source_url: https://github.com/msradam/riprap/blob/main/docs/MODELS.md#nyc-land-cover-model
+  license: Apache-2.0 (TerraMind 1.0 base); Copernicus Sentinel data terms (imagery); NYC Open Data Terms of Use (2017 training labels)
   doc_id: landcover_nta
   citation: >-
     Riprap's NYC land-cover model, trained by scripts/train_cover.py on NYC

@@ -34,15 +34,14 @@ def test_a_model_with_no_saved_evaluation_says_so(saved_evaluations):
     assert "it has no saved evaluation" in experimental.hedge("landcover", "x")
 
 
-def test_models_are_pinned_to_a_commit_of_the_owners_repositories():
-    # A published model is pinned to a commit; the unpublished land-cover model to its weights' SHA-256.
+def test_models_are_pinned_to_a_commit_or_a_weights_hash():
+    # A published model is pinned to a commit; the unpublished land-cover model (no repository) to its weights' SHA-256.
     for m in experimental.MODELS.values():
         assert m.extra in ("ml", "eo")
-        if m.repo.startswith("msradam/"):
-            assert len(m.revision) == 40
+        if m.repo:
+            assert m.repo.startswith("msradam/") and len(m.revision) == 40
         else:
-            assert m.repo.startswith("unpublished:") and len(m.revision) == 64
-            assert all(c in "0123456789abcdef" for c in m.revision)
+            assert len(m.revision) == 64 and all(c in "0123456789abcdef" for c in m.revision)
 
 
 def test_every_experimental_nyc_source_reads_one_of_the_three_models():
@@ -121,6 +120,18 @@ def test_a_question_about_the_future_gets_the_models_hedged_answer(question, lea
     area = any(f.endswith("_nta") for f in facts)
     texts = {k: v for k, v in T.items() if k.endswith("_nta") == area or k in ("nws_water_forecast", "noaa_tides")}
     assert ra.answer(question, texts, V) == (lead, facts)
+
+
+def test_a_land_cover_question_quotes_the_citys_map_before_the_model():
+    # The measured record comes first: the city's 2017 map is the source of the sentence, the model follows it,
+    # and the lead is the neutral one, not "From an experimental model".
+    city = "New York City's 2017 land cover map (6 inch, from LiDAR and aerial imagery) shows that 67.1% of this area is paved."
+    area = {**{k: v for k, v in T.items() if k.endswith("_nta")}, "city_landcover_nta": city}
+    assert ra.answer("How much of QN12 is paved over and how much is tree canopy?", area, V) == (
+        "facts", ["city_landcover_nta", "landcover_nta"])
+    # The model's saved maps missing on a server: the map still answers.
+    del area["landcover_nta"]
+    assert ra.answer("How much tree canopy does QN12 have?", area, V) == ("facts", ["city_landcover_nta"])
 
 
 def test_water_that_lingers_is_answered_by_the_citys_stormwater_model_not_the_satellite():

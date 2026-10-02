@@ -247,6 +247,10 @@ _QUIET_UNLESS = {
     "prithvi_water_nta": lambda v: v.get("new_water_m2"),
     "landcover": lambda v: False,
     "landcover_nta": lambda v: False,
+    # The city's land cover map: a question about paving or canopy gets it;
+    # a flood briefing does not open with it.
+    "city_landcover": lambda v: False,
+    "city_landcover_nta": lambda v: False,
 }
 
 

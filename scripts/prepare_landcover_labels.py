@@ -196,7 +196,7 @@ def imagery(year: int, ref, land, n: int = 2) -> list[dict]:
     import numpy as np
     import rasterio
 
-    from app.eo import terramind
+    from app.eo import cover
     from scripts.run_landcover_batch import NYC_BBOX, read_s2, scene_dates
 
     saved = sorted(OUT.glob(f"s2_{year}-*.tif"))
@@ -234,7 +234,7 @@ def imagery(year: int, ref, land, n: int = 2) -> list[dict]:
                            predictor=2, nodata=0) as dst:
             dst.write(np.clip(s2, 0, 65535).astype("uint16"), list(range(1, 13)))
             dst.write(clear.astype("uint16"), 13)
-            dst.descriptions = (*terramind.S2_BANDS, "clear")
+            dst.descriptions = (*cover.S2_BANDS, "clear")
             dst.update_tags(source="Microsoft Planetary Computer sentinel-2-l2a", info=json.dumps(info),
                             scale="digital numbers; +1000 added to scenes before processing baseline 04.00")
         used.append(info)
@@ -356,9 +356,34 @@ def fix_registration(registration: dict) -> dict:
     return moved
 
 
+CITY_MAP = ROOT / "data" / "landcover_nyc_2017.tif"
+
+
+def bake_city_map(ref) -> Path:
+    """The city's 2017 map as the app reads it (app/eo/landcover.py): the
+    same five group bands of percent at 30 m as the model's yearly maps, so
+    one reader serves both. A 10 m cell counts where at least half of it is
+    labelled, and its shares are of the labelled part."""
+    import numpy as np
+    import rasterio
+
+    from scripts.run_landcover_batch import write_map
+
+    with rasterio.open(OUT / "labels_2017_10m.tif") as src:
+        a = src.read()
+    labelled = a[-1]
+    with np.errstate(invalid="ignore", divide="ignore"):
+        frac = np.where(labelled >= 0.5, a[:-1] / labelled, np.nan)
+    write_map(CITY_MAP, frac, ref, maturity="production", year="2017", source=LABELS[2017]["url"],
+              method="6 inch classes counted into 10 m cells, then averaged to 30 m")
+    return CITY_MAP
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--skip-imagery", action="store_true")
+    ap.add_argument("--bake-city-map", action="store_true",
+                    help="only write data/landcover_nyc_2017.tif from the saved 2017 labels")
     args = ap.parse_args()
 
     from app.eo import prithvi
@@ -366,6 +391,9 @@ def main() -> int:
 
     OUT.mkdir(parents=True, exist_ok=True)
     ref = prithvi.grid(NYC_BBOX)
+    if args.bake_city_map:
+        print(bake_city_map(ref))
+        return 0
     land = land_mask(ref)
     timings = {}
     for year in LABELS:

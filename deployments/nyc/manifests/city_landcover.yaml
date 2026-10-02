@@ -1,0 +1,46 @@
+id: city_landcover
+type: baked
+title: NYC Land Cover 2017 (6 inch), tree canopy and paved share
+answers: "how much of a place is paved or built over, how much is green and how much is under tree canopy, measured by the city's 2017 land cover map"
+stone: cornerstone
+tier: empirical
+adapter: python_call
+
+# Reads data/landcover_nyc_2017.tif, the city's map aggregated to 30 m by
+# scripts/prepare_landcover_labels.py --bake-city-map. A survey, not a model.
+spatial:
+  scope: point
+
+config:
+  module: app.eo.landcover
+  function: city_map_for_point
+  args:
+    - {source: lat}
+    - {source: lon}
+  on_none: offline
+
+provenance:
+  date_modified: "2017"
+  retrieved_at: 2026-10-01
+  source_name: NYC Land Cover 2017, 6 inch (NYC Office of Technology and Innovation; University of Vermont Spatial Analysis Lab)
+  source_url: https://data.cityofnewyork.us/Environment/Land-Cover-Raster-Data-2017-6in-Resolution/he6d-2qns
+  license: NYC Open Data Terms of Use
+  doc_id: city_landcover
+  citation: >-
+    Land Cover Raster Data (2017), 6 inch resolution, NYC Open Data he6d-2qns:
+    eight classes mapped from 2017 LiDAR and aerial imagery. Riprap counts the
+    6 inch pixels of each class into 30 m cells and reports the shares
+    within 500 m of the address; a tree over a street counts as canopy.
+
+narration:
+  short: Tree canopy, green and paved shares near this address, from the city's 2017 land cover map.
+  template: "{narrative}"
+
+fallback:
+  on_offline: skip
+  message: The city's 2017 land cover map was not found on this server.
+
+display:
+  variant: raster
+  order: 55
+  kind: text

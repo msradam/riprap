@@ -36,7 +36,7 @@ def for_briefing(final: dict) -> list[dict]:
             continue
         key, where, how = SOURCES[step]
         m = experimental.MODELS[key]
-        out.setdefault(m.repo, {"name": f"{m.name} (experimental)", "repo": m.repo, "where": where, "how": how,
+        out.setdefault(m.repo or m.name, {"name": f"{m.name} (experimental)", "repo": m.repo, "where": where, "how": how,
                                 "latency_s": t.get("elapsed_s") if how == "loaded" else None})
     calls = [*((final.get("plan") or {}).get("llm_calls") or []),
              *((final.get("grounding") or {}).get("llm_calls") or [])]
@@ -75,7 +75,7 @@ def loaded() -> dict:
     return {
         "in_process": {m["surge"].repo: bool(surge and surge._MODEL is not None)},
         "precomputed": {m["water"].repo: bool(prithvi_water.events()),
-                        m["landcover"].repo: bool(landcover.years())},
+                        m["landcover"].name: bool(landcover.years())},
         "installed": {"ml": bool(importlib.util.find_spec("tsfm_public")),
                       "eo": bool(importlib.util.find_spec("terratorch"))},
         "llm_endpoints": [{"model": e.model, "base_url": e.base_url} for e in llm.endpoints()],

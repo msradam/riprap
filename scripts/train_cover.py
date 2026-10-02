@@ -54,7 +54,6 @@ from app.eo.cover import (  # noqa: E402, F401 - shared with the batch
 )
 
 DATA = ROOT / "outputs" / "terramind_nyc"
-TRAIN_DATES = ("2017",)  # label year; the scene files are found by prefix
 
 
 def scenes(year: str) -> list[Path]:

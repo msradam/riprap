@@ -23,7 +23,6 @@ missing, says so in one sentence (`not_installed`).
 from __future__ import annotations
 
 import json
-import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -36,8 +35,8 @@ COVER_SHA256 = "15dc40f93277f456537d2705e538c7f333e561b40784b2aabfda1eec67c50116
 @dataclass(frozen=True)
 class Model:
     name: str  # in words, for a sentence
-    repo: str  # the owner's Hugging Face repository
-    revision: str  # pinned commit: weights never change under a running app
+    repo: str | None  # the owner's Hugging Face repository; None when the weights are not published
+    revision: str  # the pin: a commit of `repo`, or the SHA-256 of the local weights when `repo` is None
     extra: str  # the optional dependency group that runs it
     limits: str  # what it cannot see, as a clause
     evaluation: str  # a clause with {fields} filled from data/experimental/<key>.json
@@ -74,17 +73,22 @@ MODELS = {
     ),
     "landcover": Model(
         name="NYC land-cover model",
-        repo="unpublished: trained by scripts/train_cover.py",
-        revision=os.environ.get("RIPRAP_COVER_SHA256", COVER_SHA256),  # SHA-256 of the weights, not a commit
+        repo=None,  # trained by scripts/train_cover.py; the weights are not published
+        revision=COVER_SHA256,
         extra="eo",
         limits="it estimates the share of each 10 m satellite pixel that is canopy, grass, paving, roof, water or "
                "bare ground, learned from the city's 2017 six-inch map, so detail finer than about 30 m is blurred "
                "and a tree over a street counts as canopy",
         evaluation="against the city's own 2021 six-inch map, on squares it never trained on, it read a typical "
                    "district's paved share {district_paved_vs_city_map} the map's (at most "
-                   "{district_paved_gap_points_max} points off), and two images of one year differ by under "
-                   "{noise_points} points in a district's paved share 19 times in 20 ({noise_points_small} in a "
-                   "neighbourhood's)",
+                   "{district_paved_gap_points_max} points off in the {n_districts} districts with enough test "
+                   "ground) and its mean error per land-cover group was "
+                   "{model_test_mae_points} points at best, more than the {city_map_2017_as_2021_mae_points} points of the "
+                   "city's 2017 map read as if it were 2021, so the 2017 map is the more accurate source for its "
+                   "year; two images of one summer differ by under {noise_points} points in a district's paved share "
+                   "19 times in 20, but between {between_years_worst} the shares of {between_years_beyond_noise} of "
+                   "{between_years_districts} districts differ by more, so its maps of different years are not "
+                   "compared",
         official="NYC's own land cover maps (2017 and 2021, 6 inch) and building footprints for a survey",
     ),
 }

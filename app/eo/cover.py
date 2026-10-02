@@ -15,7 +15,6 @@ pinned here by its SHA-256.
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 from app import experimental
@@ -23,8 +22,13 @@ from app import experimental
 ROOT = Path(__file__).resolve().parents[2]
 CLASSES = ("tree_canopy", "grass_shrub", "bare_soil", "water", "building", "road", "other_paved", "railroad")
 PAVED = (4, 5, 6, 7)  # building, road, other paved, railroad: paved or built over
-GREEN = (0, 1)
 CHIP = 224
+S2_BANDS = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B11", "B12"]
+# TerraMind's pretraining statistics for Sentinel-2 digital numbers.
+S2_MEAN = [1390.458, 1503.317, 1718.197, 1853.91, 2199.1, 2779.975, 2987.011, 3083.234, 3132.22, 3162.988, 2424.884,
+           1857.648]
+S2_STD = [2106.761, 2141.107, 2038.973, 2134.138, 2085.321, 1889.926, 1820.257, 1871.918, 1753.829, 1797.379, 1434.261,
+          1334.311]
 TERRAMIND = {  # official repositories, pinned; read with weights_only=True
     "tiny": ("ibm-esa-geospatial/TerraMind-1.0-tiny", "TerraMind_v1_tiny.pt", "2b5ac0a3ed7dd7e922ccfd595b56607f342df343"),
     "small": ("ibm-esa-geospatial/TerraMind-1.0-small", "TerraMind_v1_small.pt",
@@ -32,8 +36,8 @@ TERRAMIND = {  # official repositories, pinned; read with weights_only=True
     "base": ("ibm-esa-geospatial/TerraMind-1.0-base", "TerraMind_v1_base.pt", "fb96c70d0a5f68dcc44030b89cbfd8ec3fb0c67a"),
 }
 # The model the batch job runs, and the SHA-256 of its trained weights.
-ARCH = os.environ.get("RIPRAP_COVER_ARCH", "terramind_base_px")
-WEIGHTS = Path(os.environ.get("RIPRAP_COVER_WEIGHTS", ROOT / "outputs" / "terramind_nyc" / "models" / f"{ARCH}.safetensors"))
+ARCH = "terramind_base_px"
+WEIGHTS = ROOT / "outputs" / "terramind_nyc" / "models" / f"{ARCH}.safetensors"
 SHA256 = experimental.MODELS["landcover"].revision  # pinned in app/experimental.py
 
 
@@ -57,9 +61,7 @@ def normalise(s2):
     lifted by 1000) -> standardised with TerraMind's pretraining statistics."""
     import numpy as np
 
-    from app.eo import terramind as tm
-
-    m, s = (np.array(v, "float32").reshape(-1, 1, 1) for v in (tm.S2_MEAN, tm.S2_STD))
+    m, s = (np.array(v, "float32").reshape(-1, 1, 1) for v in (S2_MEAN, S2_STD))
     return (s2 - m) / s
 
 
@@ -123,7 +125,7 @@ def load(name: str = ARCH, weights: Path = WEIGHTS, sha256: str = SHA256):
         raise FileNotFoundError(f"{weights}: the land-cover weights are local and not published; "
                                 "train them with scripts/train_cover.py")
     digest = hashlib.sha256(weights.read_bytes()).hexdigest()
-    if sha256 and digest != sha256:
+    if digest != sha256:
         raise RuntimeError(f"{weights}: SHA-256 {digest}, expected {sha256}")
     net = build(name, pretrained=False)
     net.load_state_dict(load_file(weights), strict=True)

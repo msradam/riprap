@@ -48,6 +48,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+# The bands saved, in order; the reader checks them.
+from app.eo.landcover import GROUPS  # noqa: E402
+
 NYC_BBOX = [-74.26, 40.49, -73.69, 40.92]
 # ESA WorldCover classes -> the old adapter's five, for scripts/check_tim.py.
 WORLDCOVER = {80: 0, 90: 0, 95: 0, 50: 1, 10: 2, 20: 2, 30: 3, 40: 3, 60: 4, 70: 4, 100: 4}
@@ -81,20 +84,19 @@ def read_s2(items: list, ref, lift_old: bool):
     that later scenes (and the model's statistics) carry."""
     import numpy as np
 
-    from app.eo import prithvi, terramind
+    from app.eo import cover, prithvi
 
-    s2 = np.zeros((len(terramind.S2_BANDS), *ref.shape), dtype="float32")
+    s2 = np.zeros((len(cover.S2_BANDS), *ref.shape), dtype="float32")
     clear = np.zeros(ref.shape, dtype=bool)
     for it in items:
         lift = 1000 if lift_old and not prithvi.boa_offset(it) else 0
-        for b, band in enumerate(terramind.S2_BANDS):
+        for b, band in enumerate(cover.S2_BANDS):
             dn = prithvi.read_band(it, band, ref, resampling="nearest").astype("float32")
             s2[b] = np.where((s2[b] == 0) & (dn > 0), dn + lift, s2[b])
         clear |= prithvi.clear_mask(it, ref)
     return s2, clear & (s2[1] > 0)
 
 
-GROUPS = ("tree_canopy", "grass_shrub", "bare_soil", "water", "paved")  # the bands saved, in order
 
 
 def write_map(path: Path, frac, ref, **tags) -> None:
@@ -120,7 +122,7 @@ def write_map(path: Path, frac, ref, **tags) -> None:
                        crs=ref.rio.crs, transform=t * Affine.scale(3), compress="deflate", nodata=255) as dst:
         dst.write(a)
         dst.descriptions = GROUPS
-        dst.update_tags(maturity="experimental", batch_run=str(date.today()), units="percent of the cell", **tags)
+        dst.update_tags(**{"maturity": "experimental", "batch_run": str(date.today()), "units": "percent of the cell", **tags})
 
 
 def land_mask(ref):
@@ -290,17 +292,42 @@ def evaluate(results: dict[int, dict], ref, out_dir: Path, land) -> dict:
         out[f"{name}_r2_30m"] = round(float(1 - ((p - t) ** 2).sum() / ((t - t.mean()) ** 2).sum()), 2)
     bias = out["district_paved_minus_city_map_points_median"]
     out["district_paved_vs_city_map"] = f"{abs(bias)} points {'above' if bias > 0 else 'below'}"  # for the hedge
-    return out
+    return {**out, **test_scores()}
+
+
+TEST_SCORES = ROOT / "data" / "experimental" / "landcover_nyc_eval.json"  # written by scripts/eval_cover.py
+
+
+def test_scores() -> dict:
+    """For the hedge, from the test on the 2021 squares (eval_cover.py): this
+    model's mean error per group on the better of the two 2021 images, and
+    the error of the city's 2017 map read as if it were 2021, on the worse.
+    The map wins even so."""
+    from app.eo import cover
+
+    methods = json.loads(TEST_SCORES.read_text())["methods"]
+
+    def mae(name: str) -> list[float]:
+        return [v["test_squares"]["mean_mae_pts"] for v in methods[name].values()
+                if "mean_mae_pts" in v.get("test_squares", {})]
+
+    return {"model_test_mae_points": round(min(mae(cover.ARCH)), 1),
+            "city_map_2017_as_2021_mae_points": round(max(mae("persistence_2017_map")), 1)}
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="NYC land cover by year (experimental).")
-    ap.add_argument("--years", nargs="+", type=int, required=True)
+    ap.add_argument("--years", nargs="+", type=int, default=[])
     ap.add_argument("--dates", type=int, default=2, help="clear dates per year")
     ap.add_argument("--bbox", nargs=4, type=float, default=NYC_BBOX)
     ap.add_argument("--out", type=Path, default=ROOT / "data" / "eo")
     ap.add_argument("--eval-out", type=Path, default=ROOT / "data" / "experimental" / "landcover.json")
+    ap.add_argument("--merge-test-scores", action="store_true",
+                    help="only copy the test scores of eval_cover.py into the saved evaluation; no model runs")
     args = ap.parse_args()
+    if args.merge_test_scores:
+        args.eval_out.write_text(json.dumps({**json.loads(args.eval_out.read_text()), **test_scores()}, indent=1) + "\n")
+        return 0
 
     from app.eo import cover, prithvi
 
@@ -317,9 +344,14 @@ def main() -> int:
         return 1
     if bbox == NYC_BBOX:
         report = evaluate(results, ref, args.out, land)
-        args.eval_out.parent.mkdir(parents=True, exist_ok=True)
-        args.eval_out.write_text(json.dumps(report, indent=1) + "\n")
         print(json.dumps(report, indent=1))
+        if "eval_year" in report or not args.eval_out.exists():
+            args.eval_out.parent.mkdir(parents=True, exist_ok=True)
+            args.eval_out.write_text(json.dumps(report, indent=1) + "\n")
+        else:
+            # A run without 2021 or without the 2021 key rescored no accuracy: the
+            # saved evaluation, which every land-cover sentence quotes, stays.
+            print(f"{args.eval_out} left as it was: this run did not rescore accuracy", flush=True)
     return 0
 
 

@@ -5,7 +5,7 @@ outputs/).
 Methods, all on the same Sentinel-2 scenes and the same pixels:
   * each model trained by scripts/train_cover.py (TerraMind, UNet, MLP), from
     its saved predictions;
-  * the app's current adapter (`lulc_nyc`, app.eo.terramind), run here on the
+  * the app's current adapter (`lulc_nyc`, scripts/lulc_adapter.py), run here on the
     same scenes (`--run-adapter`, under the GPU lock), its one label per pixel
     counted as a fraction of 1;
   * persistence: the 2017 map itself, as a prediction of 2021.
@@ -46,10 +46,12 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from app.eo.landcover import GROUPS  # noqa: E402
+
 DATA = ROOT / "outputs" / "terramind_nyc"
 MODELS = DATA / "models"
 OUT = ROOT / "data" / "experimental" / "landcover_nyc_eval.json"
-GROUPS = ("tree_canopy", "grass_shrub", "bare_soil", "water", "paved")
+
 # 8 label classes -> 5 groups (train_cover.CLASSES order)
 FROM8 = [0, 1, 2, 3, 4, 4, 4, 4]
 # adapter classes (water, built, trees, grass, bare) -> groups
@@ -91,10 +93,9 @@ def scene_paths(year: str) -> list[Path]:
 
 
 def run_adapter() -> None:
+    import lulc_adapter as tm
     import numpy as np
     from train_cover import read_scene
-
-    from app.eo import terramind as tm
 
     for p in scene_paths("2017") + scene_paths("2021"):
         s2, clear = read_scene(p)
