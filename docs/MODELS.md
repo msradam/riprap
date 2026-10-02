@@ -148,6 +148,7 @@ hours; a model that gives quantiles is scored on its median.
 | Granite FlowState r1.1 | 0.113 m | 0.212 m | 0.177 m | 2, 2 | -0.6 to +0.3 cm |
 | Granite PatchTST-FM r2 | 0.109 m | 0.209 m | 0.174 m | 3, 2 | -1.0 to -0.3 cm |
 | Chronos-2 | 0.110 m | 0.210 m | 0.178 m | 3, 2 | -0.9 to -0.1 cm |
+| Chronos-2 fine-tuned on the Battery (2015 to mid 2024) | 0.106 m | 0.205 m | 0.158 m | 2, 0 | -1.2 to -0.5 cm |
 | Last day's mean held | 0.133 m | 0.241 m | 0.240 m | 6, 5 | +1.1 to +2.6 cm |
 
 The interval comes from resampling the windows in runs of 14 days, since
@@ -156,8 +157,22 @@ Chronos-2 beat the current model's mean error by about half a centimetre,
 which is real but small. Every one of them misses the peak by more, and the
 peak is what a surge sentence quotes. Their 90th percentiles reach the
 minor flood stage in 7 to 10 of the 23 windows, at the cost of 32 to 60
-false alarms in 612 windows that stayed below it. None replaces the current
-model.
+false alarms in 612 windows that stayed below it. None of them, zero-shot,
+replaces the current model.
+
+Because two came close, one was fine-tuned (`scripts/finetune_chronos2_surge.py`):
+a LoRA adapter on Chronos-2, trained on the Battery residual before
+2024-07-01, with the checkpoint chosen on the second half of 2024 (step 200
+of 700; the loss rose after). It beats the current model on mean error by
+0.9 cm, with the interval clear of zero, is level on the peak, and foresees
+2 of the 23 flood windows with no false alarm. That is better on every
+measure, by a small margin, and it still misses 21 of the 23 floods, so the
+sentence's real weakness stays. It is not in the app: the surge forecast
+runs per request, so the server needs the weights, and these are on the
+owner's machine only (`outputs/surge_models/chronos2_battery/`, 478 MB of
+safetensors). Switching needs the owner to publish them, and adds the
+`chronos-forecasting` package to the `ml` extra. A forecast takes about
+0.03 s on CPU.
 
 Not built: the list of assets below the forecast peak. On the days that
 matter the model's peak is too low (1 of 23), so the list would be empty
@@ -376,7 +391,7 @@ git-ignored `outputs/` folder, and the owner decides what to publish.
 | Granite TTM r3 | `ibm-granite/granite-timeseries-ttm-r3`, branch `1024-96-r3` at `c6da085` | safetensors | safetensors | not needed | `backtest_surge_candidates.py` |
 | Granite FlowState r1.1 | `ibm-granite/granite-timeseries-flowstate-r1`, branch `r1.1` at `b80e0f1` | safetensors | safetensors | not needed | `backtest_surge_candidates.py` |
 | Granite PatchTST-FM r2 | `ibm-granite/granite-timeseries-patchtst-fm-r2` at `b125275` | safetensors | safetensors | not needed | `backtest_surge_candidates.py` |
-| Chronos-2 | `amazon/chronos-2` at `29ec376` | safetensors | safetensors | not needed | `backtest_surge_candidates.py` |
+| Chronos-2 | `amazon/chronos-2` at `29ec376` | safetensors | safetensors | not needed | `backtest_surge_candidates.py`, `finetune_chronos2_surge.py` |
 
 All are Apache-2.0 except PatchTST-FM r2, which its card offers under
 OpenMDW 1.0 or Apache 2.0 at the user's choice.
