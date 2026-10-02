@@ -307,10 +307,22 @@ Conservancy and UVM, built from 2021 LiDAR and imagery), so the key is a
 different year, method and sensor from the training labels. That map is
 CC BY-NC-SA: it is used on this machine as a key only, and nothing drawn
 from it is in this repository except scores. Cells are 30 m (3 by 3 pixels),
-because Sentinel-2 is located to about a pixel. The model was chosen on the
-validation squares before the test was read. Two 2021 images were scored,
-16 June and 29 September (`scripts/eval_cover.py`,
+because Sentinel-2 is located to about a pixel. Training chips can include
+test-square imagery as context, never its labels. Two 2021 images were
+scored, 16 June and 29 September (`scripts/eval_cover.py`,
 `data/experimental/landcover_nyc_eval.json`).
+
+The work ran in two rounds, and the test was read after the first. In the
+first round every model kept its last weights and TerraMind trained at one
+learning rate; TerraMind lost to the UNet (test error 6.2 and 5.3 points for
+the UNet, 8.8 and 8.2 for TerraMind base, which overfit). The per-pixel
+branch, the slower encoder rate and keeping the best weights on validation
+came from that. In the second round, below, every model was retrained under
+those rules and the model was chosen on the validation squares (0.086
+against 0.089 for TerraMind small with the branch). That rule was set before
+the chosen model's test scores were read, though the small model's had been,
+and the two are level on the test. So the design was not blind to the test;
+the final choice was made on validation.
 
 | Model, 2021 test squares | Mean error per group (points), June / Sept | Canopy R² | Paved R² | A district's paved share against the map (median gap, points) | Two images of 2021, district paved share (19 in 20 under) |
 |---|---|---|---|---|---|
@@ -328,8 +340,13 @@ validation squares before the test was read. Two 2021 images were scored,
 
 So TerraMind earns its place only with the per-pixel branch: alone, every
 size is worse than a UNet with no pretraining; with it, it beats every other
-model on pixels, canopy and paving, and it is the steadiest between two
-images of one year. The old adapter read a district's paved share 16 to 18
+model on mean error and on paving, and on canopy every model but the
+TESSERA probe, and it is the steadiest between two images of one year. (The
+UNet's first-round weights, its last rather than its best on validation,
+scored 6.2 and 5.3, a little better than the 6.4 and 5.5 above; either way
+it trails.) The adapter's "trees and shrubs" class is counted as canopy
+here, while the city map counts shrub as grass and shrub; that costs it on
+canopy but does not touch its paved bias. The old adapter read a district's paved share 16 to 18
 points high against the city's own map, more than twice the 7.7 points it
 showed against WorldCover, and it had no skill on tree canopy. The 2017 map
 read as 2021 is better than any model for 2021, which is expected (most
@@ -349,7 +366,7 @@ manage 0.59 on the same sites, so a permit point is a weak marker of change
 at 30 m, and the model sees about as much of it as the maps do.
 
 **In the app.** `scripts/run_landcover_batch.py` maps each summer since 2018
-with the clearest full-city dates, writes eight percent bands per pixel to
+with the clearest full-city dates, writes five percent bands at 30 m to
 `data/eo/landcover_<year>.tif`, and scores the 2021 map against the city's
 2021 map on the test squares. For 2021 it
 reads a typical district's paved share 1.7 points above the city map's on
@@ -359,7 +376,9 @@ share is off by 6.6 points on average (R² 0.90) and its canopy share by 8.4
 paved share 19 times in 20 (2.7 in a neighbourhood's).
 
 Maps of different summers differ by much more. Every pair of years mapped
-is compared the same way, district by district:
+is compared the same way, district by district, on the 10 m maps in the
+batch (the saved 30 m maps, rounded to whole percents, give slightly lower
+counts with the same order):
 
 | Years | Districts whose paved shares differ by more than 2.0 points |
 |---|---|

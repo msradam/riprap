@@ -131,7 +131,8 @@ def main() -> int:
           f"train pixels {int((ok & (split == 0)).sum())}, val {int((ok & (split == 1)).sum())}, "
           f"test {int((ok & (split == 2)).sum())}", flush=True)
 
-    # Chip corners whose centre is a training square with labelled land.
+    # Chip corners with at least 30% labelled training land. A chip can reach
+    # into a test square, whose imagery is then context; its labels never count.
     h, w = ref.shape
     cand = [(i, j) for i in range(0, h - CHIP, 32) for j in range(0, w - CHIP, 32)
             if (ok & (split == 0))[i:i + CHIP, j:j + CHIP].mean() > 0.3]
