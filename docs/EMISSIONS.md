@@ -36,9 +36,11 @@ Every result carries an `emissions` block (`riprap/core/burr/app.py`,
 | `tokens` | Prompt, completion and total tokens |
 | `calls` | The per-call records, each with `energy_status`, `wh` and an `energy_note` |
 
-The ledger covers the LLM. The experimental surge model also runs in a
-briefing when it is installed: 1.5 million parameters on CPU, about a tenth
-of a second, and not metered. The land-cover model runs in a batch job, not
+The ledger covers the LLM. The experimental surge model is out of default
+briefings since 2026-10-05 (damped persistence beat it on held-out data,
+[MODELS.md](MODELS.md#granite-ttm-r2-battery-surge)). On a server that opts
+in, it runs in a briefing: 2,964,960 parameters on CPU, about a tenth of a
+second, and not metered. The land-cover model runs in a batch job, not
 in a briefing.
 
 ## Measured on this laptop (2026-09-30)

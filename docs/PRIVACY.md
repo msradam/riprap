@@ -45,7 +45,7 @@ page against `web/main.py`, the logging calls and the frontend on
 - **An LLM, only if you configure one.** With `RIPRAP_LLM_BASE_URL` set,
   the question and the evidence text are sent to that endpoint. Without
   it, no model service is contacted.
-- **Hugging Face, only with the `ml` extra.** The experimental surge
+- **Hugging Face, only with the `ml` extra on a server that opts in to the surge forecast.** The experimental surge
   model's weights are downloaded once from Hugging Face. Nothing about a
   query is sent there. The model reads NOAA's public gauge at The Battery,
   the same for every query.

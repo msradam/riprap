@@ -27,8 +27,8 @@ source and date.
 
 ## What it does
 
-- Joins FloodNet street sensors, 311 flood complaints, two FEMA flood maps, three
-  city stormwater scenarios, the Sandy extent and USGS Ida high-water marks for
+- Joins FloodNet street sensors, 311 flood complaints, two FEMA flood maps, the
+  city's four stormwater flood maps, the Sandy extent and USGS Ida high-water marks for
   one address or community district.
 - Cites every sentence with its source and the date of its data, ready to quote.
 - Names the schools, subway entrances, public housing and hospitals inside the
@@ -41,36 +41,57 @@ source and date.
 - Returns the same evidence to code and AI agents, as JSON over HTTP and as seven
   MCP tools. Open source, open data, no GPU and no API keys.
 
-Two open models fine-tuned for New York (a Battery surge forecast, and paved
-and green land from the latest satellite imagery) are labelled experimental
-with their tested accuracy: [help improve them](#experimental-models). A
-third, a satellite water layer, was tested twice and retired. Riprap reports
-evidence, not advice.
+One open model fine-tuned for New York (paved and green land from the latest
+satellite imagery) adds sentences labelled experimental with their tested
+accuracy. A second, a Battery surge forecast, lost to a one-line rule on
+held-out data and is out of default briefings; a third, a satellite water
+layer, was tested twice and retired. The results are
+[below](#experimental-models). Riprap reports evidence, not advice.
 
 A real answer, from the gallery entry
 [Hollis, "since Ida"](https://msradam.github.io/riprap/gallery/hollis-since-ida/):
 
 > **Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?**
 >
-> Yes. 2 FloodNet community sensors within 600 m have logged 14 above-curb
-> flood events in the last 3 years, the most recent starting 2026-09-01 05:39
-> UTC [floodnet]. Peak depth recorded by the sensors in good working order: 815
-> mm (32.1 in) on 2026-05-20 [floodnet]. 1 sensor that logged 11 of these
-> events is flagged by FloodNet for maintenance, so its depths are not used for
-> the peak [floodnet]. The highest depth a flagged sensor recorded was 1172 mm (46.1 in)
-> on 2026-05-20 [floodnet]. USGS surveyed 2 Hurricane Ida high-water marks
-> within 800 m of this address; the highest stood 0.76 ft above ground; the
-> highest water surface elevation was 48.2 ft NAVD88 [ida_hwm]. Nearest mark:
-> Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174 m away)
-> [ida_hwm]. 89 NYC 311 flood-related complaints filed within 200 m of this
-> location in the last 5 years: 48 sewer backup, 28 catch basin, 10 street
-> flooding, 3 manhole overflow [nyc311].
+> Yes. 2 FloodNet sensors within 600 m have recorded 6 flood events (each a
+> series of depth readings above 10 mm at the sensor, FloodNet's definition)
+> since they were installed on 2023-10-26, the most recent starting 2026-08-20
+> 22:57 UTC [floodnet]. FloodNet's API lists 8 more events labelled flood here
+> that are still to be verified by a person; Riprap counts verified events
+> only [floodnet]. The highest depth in FloodNet's record for these sensors in
+> that period is 1172 mm (46.1 in) on 2026-05-20, at a sensor listed as
+> "noisy" in FloodNet's API when this was read (2026-10-05); that is the
+> sensor's status now, which the API does not give for the day of the event
+> [floodnet]. Among the sensors listed as good, the highest depth is 815 mm
+> (32.1 in) on 2026-05-20 [floodnet]. 1 sensor with a status other than good
+> recorded 3 of the 6 events; Riprap, not FloodNet, chooses to rest a yes or
+> no answer only on events from sensors listed as good [floodnet]. USGS
+> surveyed 2 Hurricane Ida high-water marks within 800 m of this address; the
+> highest stood 0.76 ft above ground [ida_hwm]. Nearest mark: Intersection of
+> 182nd St. and 90th Ave., Jamaica, Queens (174 m away, 0.7 ft above ground)
+> [ida_hwm]. 88 NYC 311 flood-related complaints filed within 200 m of this
+> location in the last 5 years: 48 sewer backup, 27 catch basin, 10 street
+> flooding, 3 manhole overflow [nyc311]. A count of complaints is a count of
+> reports filed, not of floods: a low count can mean under-reporting and not
+> the absence of flooding, because the propensity to file a 311 request
+> varies with income, language and demographics (Kontokosta, Hong and
+> Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill, Annals of
+> Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003) [nyc311].
+
+(Read from the app on 5 October 2026. The gallery page shows the answer as it
+stood when the gallery was last built.)
 
 The "Yes." is set by a rule: at least one observed source reports flooding
 since Ida, on 1 September 2021. This answer, like every gallery entry, was
-made by the rules alone: no language model ran.
-The two depths are the same storm at two sensors: FloodNet flags the one that
-read 46.1 in, so Riprap takes the peak from the other and says so.
+made by the rules alone: no language model ran. The two depths are the same
+storm at two sensors. FloodNet's API lists the sensor that read 46.1 in as
+"noisy" today and does not say what its status was on the day, so Riprap
+gives both readings, says which sensor each is from, and rests its yes or no
+only on sensors listed as good. That last choice is Riprap's, not FloodNet's.
+Riprap counts only the events FloodNet's API marks as verified by a person
+(6 here) and says how many more the API labels flood but has not verified (8
+here), which is why its count can sit below a count of everything the API
+returns.
 
 A heat answer, from
 [Brighton Beach, "heat score"](https://msradam.github.io/riprap/gallery/brighton-heat-score/):
@@ -107,7 +128,7 @@ Riprap's part is to do these four things together for one New York City
 place:
 
 - reads the observed record (311, FloodNet events, Ida high-water marks) and
-  the mapped one (two FEMA maps, three city stormwater scenarios, the Sandy
+  the mapped one (two FEMA maps, the city's four stormwater flood maps, the Sandy
   extent) for the same address in one step, and for a district its 311
   requests, its Sandy and stormwater shares and the city's floodplain counts;
 - puts a source and a data date on every sentence, so a figure can be quoted
@@ -185,17 +206,21 @@ is sourced in [docs/METHODOLOGY.md](docs/METHODOLOGY.md#10-what-the-data-cannot-
 The distances, time windows and complaint types behind each count are in one
 table a count can be rerun from
 ([docs/METHODOLOGY.md](docs/METHODOLOGY.md#11-distances-time-windows-and-filters)).
-Found an error? [Open an issue](https://github.com/msradam/riprap/issues/new/choose);
-corrections are recorded in the [changelog](CHANGELOG.md).
+Riprap is built by one person. No community group, agency or resident has yet
+shaped or tested it. If a sentence is wrong, or you know of flooding or heat
+the records miss, [open an issue](https://github.com/msradam/riprap/issues/new/choose):
+corrections are recorded in the [changelog](CHANGELOG.md), and an account of
+what the records miss is kept on the tracker, since Riprap has no way yet to
+put it into a briefing.
 
 ## Status
 
 | Area | Status |
 |---|---|
-| New York City flood | Production: 24 public sources (21 read for an address, 19 for a neighbourhood or district), questions, and all 59 community districts |
+| New York City flood | Production: 25 public sources (22 read for an address, 20 for a neighbourhood or district), questions, and all 59 community districts |
 | New York City heat | New in October 2026: 10 public sources for an address and 11 for a district or borough, questions, comparisons of two places, and all 59 community districts. No model: the forecast is the National Weather Service's |
 | Chicago, Seattle, Albany | Experimental: federal sources plus a reviewed 311 flood filter and a water-level gauge ([docs/multi-city.md](docs/multi-city.md)) |
-| Models | None required, and none runs by default. An optional open LLM (Granite) routes questions the rules do not recognise and chooses among existing sentences; it writes none, and no yes or no stands on its word. Two experimental models (a surge forecast, paved and green land) add sentences, always labelled ([below](#experimental-models)) |
+| Models | None required, and none runs by default. An optional open LLM (Granite) routes questions the rules do not recognise and chooses among existing sentences; it writes none, and no yes or no stands on its word. One experimental model (paved and green land) adds sentences, always labelled; a second (a surge forecast) is off unless a server opts in, because a simple rule beat it ([below](#experimental-models)) |
 | Checks | Citations and numbers on every claim, rules on answer leads, 13 disclosure checks. They are patterns and rules: they do not read meaning and can miss a wrong inference ([docs/GROUNDING.md](docs/GROUNDING.md)) |
 
 ## Quickstart
@@ -216,8 +241,7 @@ A question is answered by rules, with no model (the JSON reports
 `grounding.answer_mode` as `rules`); one the rules do not recognise gets the
 cited evidence for its place, and the page says it was not answered. The first
 district query on a cold server takes about half a
-minute while the layers load. `uv sync --extra ml` adds the
-[experimental](#experimental-models) surge forecast. The same briefing from the command line:
+minute while the layers load. The same briefing from the command line:
 
 ```bash
 curl -s "http://localhost:7860/api/agent?q=QN12" | python3 -c "import json, sys; print(json.load(sys.stdin)['paragraph'])"
@@ -241,7 +265,11 @@ RIPRAP_LLM_MODEL=hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M \
 tool works without an LLM. Each evidence item carries its sentence, the
 source's own figures (`value`), its `source_url` and `vintage`. Every result
 carries a `record` block (query, time, version, commit, SHA-256 of the body)
-and a `failed` list naming sources that did not answer.
+and a `failed` list naming sources that did not answer. FloodNet items carry
+their own licence (`license_notices`), and `place_note` says which area a
+neighbourhood name was answered for. Over HTTP the same note is
+`geocode.note`, `answer_path` says whether rules or the LLM answered, and
+`not_checked` lists the sources that were not read.
 Try one from the command line with the MCP Inspector (needs Node):
 
 ```bash
@@ -304,8 +332,9 @@ developer setting, off by default (`RIPRAP_LLM_BARE=1`), restores an older
 mode in which the model rewrites the evidence as claims that code checks
 number by number ([docs/GROUNDING.md](docs/GROUNDING.md#llm-mode)).
 
-**Experimental models.** Two fine-tuned open models add labelled sentences
-([below](#experimental-models)); a third was tested and retired.
+**Experimental models.** One fine-tuned open model adds labelled sentences;
+a second is off by default after losing to a simple rule, and a third was
+tested and retired ([below](#experimental-models)).
 
 **In building Riprap.** AI coding agents wrote most of Riprap's code, tests
 and documents, working from prompts written by the maintainer, and agent
@@ -320,42 +349,51 @@ sentences from the sources with separate code: 475 were confirmed, 10 were
 wrong and 2 sat on a raster edge. The 10 came from three defects (an address
 elevation read from a neighbouring cell, hospitals counted twice, a
 construction permits count); the first two are corrected and the permits
-sentence was taken out of plain briefings. The repository records no audit by
-a person outside the project.
+sentence was taken out of plain briefings. The check was itself run by AI
+coding agents, working read-only and independently of the agents that wrote
+the code, under the maintainer's direction. Its method, its figures and what
+was done about each of its 31 problems are in
+[docs/history/SANITY-CHECK-2026-10-05.md](docs/history/SANITY-CHECK-2026-10-05.md).
+The repository records no audit by a person outside the project.
 
 ## Experimental models
 
-Riprap is an app in development, and two models its author fine-tuned are
-part of it (the land-cover one in this repository, with its weights kept
-local). Neither has been shown to beat an official product, so their output
-is never a measurement: every sentence from one opens with "Experimental" or
-"Experimental forecast", states the model's limits and its tested accuracy, and
-names the official source to rely on. For a question about the past or the
-present they never set the answer's yes or no. One rule in
-[`app/experimental.py`](app/experimental.py) writes all of it.
+Riprap is an app in development, and its author fine-tuned three open models
+for it. None has been shown to beat an official product, so their output is
+never a measurement: every sentence from one opens with "Experimental" or
+"Experimental forecast", states the model's limits and its tested accuracy,
+and names the official source to rely on. For a question about the past or
+the present they never set the answer's yes or no. One rule in
+[`app/experimental.py`](app/experimental.py) writes all of it. Two of the
+three are now out of default briefings, and the tests that put them there are
+published with them.
 
-| Model | What it answers | What the tests say |
+| Model | Status | What the tests say |
 |---|---|---|
-| [Granite TTM r2 Battery Surge](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge) | How far above the predicted tide the water at the Battery may run in the next four days, and whether the total reaches the gauge's flood stage | On 635 four-day windows since January 2025 its mean error was 11.5 cm, against 13.3 cm for holding the last day's mean. It foresaw 1 of the 23 windows in which the water reached the minor flood stage |
-| [NYC land-cover model](docs/MODELS.md#nyc-land-cover-model) (TerraMind 1.0 base, fine-tuned here) | How much of a place is paved or built over, how much is green and how much is tree canopy, from the latest summer's satellite scenes, after the sentence from the city's own 2017 land cover map | Trained on the city's 2017 six-inch land cover map and tested against its 2021 map on squares it never trained on: a typical district's paved share reads 1.7 points above the map's, and two images of one year differ by under 2.0 points 19 times in 20. The adapter it replaced read 16 to 18 points high against the same map. Maps of different summers differ by more than that, so it is not used to read change between years. The city's 2017 map, read as 2021, is still closer to the 2021 map (3.0 points mean error per group) than the model (4.8 at best), so the map is quoted first |
+| [NYC land-cover model](docs/MODELS.md#nyc-land-cover-model) (TerraMind 1.0 base, fine-tuned here) | In briefings, after the sentence from the city's 2017 land cover map | Trained on the city's 2017 six-inch land cover map and tested against The Nature Conservancy's 2021 map on squares it never trained on: a typical district's paved share reads 1.7 points above the map's, and two images of one year differ by under 2.0 points 19 times in 20. Its citywide tree canopy reads 4.2 to 5.0 points below the city's 2017 map in three of its four yearly maps and 3.2 above in one. Maps of different summers differ by more than the model's error, so it is not used to read change between years. The city's 2017 map, read as 2021, is still closer to the 2021 map (3.0 points mean error per group) than the model (4.8 at best), so the map is quoted first |
+| [Granite TTM r2 Battery Surge](docs/model-cards/Granite-TTM-r2-Battery-Surge.md) | Out of default briefings since 2026-10-05; a server opts in | A negative result. On 639 held-out four-day windows (January 2025 to October 2026, none overlapping its training data) its mean error was 0.115 m. Damped persistence, a one-line rule, scored 0.108 m and beats it (difference 0.0065 m, 95% interval 0.0032 to 0.0096). The month's usual value scored 0.116 m, the mean of the input 0.119 m, the last value held 0.133 m and the tide table alone 0.167 m. It foresaw 1 of the 23 windows that reached flood stage, which are 5 distinct events |
+| Satellite water layer (Prithvi-EO 2.0 NYC Pluvial) | Retired 2026-10-02 | On Hurricane Ida and on 44 coastal and tidal flood moments that FloodNet sensors recorded at the instant of a satellite pass, it and IBM and ESA's official flood model found flooding no more often than chance ([docs/MODELS.md](docs/MODELS.md#the-satellite-water-layer-retired-2026-10-02)) |
 
-The surge model runs on CPU when the `ml` extra is installed
-(`uv sync --extra ml`); without it the app says the model is not installed.
+The surge forecast adds little to the tide table and the Weather Service's
+own water-level forecast, which Riprap already quotes, so it no longer runs
+unless a server sets `RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional` and
+installs the `ml` extra (`uv sync --extra ml`); it never runs inland. The
+[model card hosted on Hugging Face](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge)
+is out of date: it claims a larger improvement than the held-out test shows
+and gives the model's size as 1.5 million parameters where the published file
+holds 2,964,960. The corrected card is
+[docs/model-cards/Granite-TTM-r2-Battery-Surge.md](docs/model-cards/Granite-TTM-r2-Battery-Surge.md).
+
 The land-cover model runs in a batch job with the `eo` extra, and the app
-reads its saved maps with no extra. A third model, a satellite water layer
-(Prithvi-EO 2.0 NYC Pluvial), was retired on 2026-10-02: on Hurricane Ida and
-on 44 coastal and tidal flood moments that FloodNet sensors recorded at the
-instant of a satellite pass, it and IBM and ESA's official flood model found
-flooding no more often than chance
-([docs/MODELS.md](docs/MODELS.md#the-satellite-water-layer-retired-2026-10-02)). What each can and cannot answer, the
-backtests and how to rerun them are in [docs/MODELS.md](docs/MODELS.md). The
-surge and water models are reproduced independently at
+reads its saved maps with no extra. What each model can and cannot answer,
+the backtests and how to rerun them are in [docs/MODELS.md](docs/MODELS.md).
+The surge and water models are reproduced independently at
 [github.com/msradam/riprap-models](https://github.com/msradam/riprap-models).
 
 ## Data sources
 
-A New York City flood briefing reads 24 public sources (a source read for a
-point and for an area is counted once): 20 from the NYC deployment and 4 federal
+A New York City flood briefing reads 25 public sources (a source read for a
+point and for an area is counted once): 21 from the NYC deployment and 4 federal
 ones (FEMA flood zones, NWS observations and alerts, USGS stream gauges). A
 heat briefing reads 10 for an address and 11 for a district; two of them, the
 city's land cover map and the area outlines, are shared with flood. All are
@@ -401,14 +439,28 @@ FloodNet, New York University, the City University of New York, FEMA, NOAA,
 USGS, the City of New York or any agency, and it is not a City product. The
 City publishes its open data for information only and does not warrant its
 completeness, accuracy, content or fitness for any use (Local Law 11 of 2012).
-FloodNet data and the sentences derived from it are licensed CC BY-NC-SA 4.0,
-not Apache 2.0.
+
+**FloodNet data.** Sensor data: FloodNet (New York University and The City
+University of New York), licensed
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). The
+FloodNet sentences and figures in a briefing, in the JSON and in the MCP
+results are derived from that data and carry the same licence, for
+non-commercial use with attribution and under the same terms. They are not
+covered by Riprap's Apache-2.0 licence ([NOTICE](NOTICE)), and each carries the
+time it was read. References: Mydlarz, C., et al. (2024), "FloodNet: Low-cost
+ultrasonic sensors for real-time measurement of hyperlocal, street-level
+floods in New York City", *Water Resources Research* 60, e2023WR036806,
+<https://doi.org/10.1029/2023WR036806>; Silverman et al. (2022), "Making
+Waves", *Water Research*, 118648,
+<https://doi.org/10.1016/j.watres.2022.118648>. Riprap reads FloodNet's Data
+API (an early-access beta) and counts only the events it marks as verified by
+a person. Questions about a reading belong to FloodNet.
 
 Thanks, which imply no backing by anyone named: to AMD Developer Cloud and
 the AMD x lablab.ai Developer Hackathon, where Riprap began and where its
 first three models were trained; to IBM Research for publishing Granite; to
-NYU's Center for Urban Science and Progress; to the FloodNet project for building the sensor network and opening its data;
-and to Andrew Hicks for the introduction to the ASCE network.
+NYU's Center for Urban Science and Progress; and to Andrew Hicks for the
+introduction to the ASCE network.
 
 The experimental models are fine-tunes of other people's work: NASA and IBM's
 [Prithvi-EO 2.0](https://huggingface.co/ibm-nasa-geospatial), IBM and ESA's

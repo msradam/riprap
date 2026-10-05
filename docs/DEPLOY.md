@@ -82,9 +82,12 @@ LitServe) is not used: Riprap calls no remote model but the LLM.
 
 ## 5. The experimental models
 
-`uv sync --extra ml` adds the Battery surge forecast, which then runs on
-CPU inside the server (it downloads 12 MB of weights from Hugging Face on
-first use). The Docker image and the Modal host install the core
-dependencies only, so there the surge source says it is not installed. The
+The Battery surge forecast is out of default briefings since 2026-10-05:
+on held-out data damped persistence beat it ([MODELS.md](MODELS.md)). To
+run it anyway, install the `ml` extra (`uv sync --extra ml`) and start the
+server with `RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional`; it then runs
+on CPU inside the server and downloads 12 MB of weights from Hugging Face
+on first use. The Docker image and the Modal host install the core
+dependencies only. The
 land-cover maps need nothing: they are saved files under `data/eo/`, made
 by a batch job that needs the `eo` extra ([MODELS.md](MODELS.md)).

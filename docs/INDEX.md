@@ -8,7 +8,7 @@ you're new; jump directly if you know what you need.
 | [BACKGROUND.md](BACKGROUND.md) | Why Riprap exists, who it is for and not for, related work and how Riprap differs from or defers to it, the Five Stones in full and how they generalise beyond NYC. |
 | [DATA-SOURCES.md](DATA-SOURCES.md) | The public sources behind the NYC deployment and what each is used for; every NYC Open Data dataset by name and ID, with what Riprap does to it. |
 | [ACCESSIBILITY.md](ACCESSIBILITY.md) | The accessibility statement: the standard (WCAG 2.2 AA), how it was tested, what the code review found, known limitations and how to report a barrier. |
-| [MODELS.md](MODELS.md) | The optional LLM, the two experimental models (what each can and cannot answer, with their backtests), the retired satellite water layer and its two tests, and how energy is recorded. |
+| [MODELS.md](MODELS.md) | The optional LLM, the experimental land-cover model, the surge forecast that is out of default briefings (with its backtest against six baselines), the retired satellite water layer and its two tests, and how energy is recorded. The corrected surge model card is in [model-cards/](model-cards/Granite-TTM-r2-Battery-Surge.md). |
 | [REPOSITORY.md](REPOSITORY.md) | Code map: the pipeline at a glance, source-of-truth paths and the repository tree. |
 | [PRIVACY.md](PRIVACY.md) | What Riprap stores and sends, 311 redaction, and a do-no-harm note. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Full system shape: the one Burr app, Five-Stone taxonomy, evidence and LLM claims checked in code for citations and numbers, SvelteKit + FastAPI + MCP surface. Start here. |
@@ -29,6 +29,7 @@ Records of earlier states of the project, kept for reference. None of them descr
 |---|---|
 | [history/BENCHMARKS.md](history/BENCHMARKS.md) | Latency and energy on four addresses from the retired Modal/L4 stack (2026-05-09). |
 | [history/RESEARCH.md](history/RESEARCH.md) | A May 2026 research note on existing flood-risk tools and how Riprap differed then. |
+| [history/SANITY-CHECK-2026-10-05.md](history/SANITY-CHECK-2026-10-05.md) | The independent sanity check of 5 October 2026: its method, the 680, 487, 475, 10 and 2 figures, every problem it found and what was done about each. |
 | [history/VERIFICATION.md](history/VERIFICATION.md) | A deterministic verification pass on 2026-05-16: sweep results, pytest, lint, BYOD evidence. |
 | [history/demo.md](history/demo.md) | The May 2026 flood, heat and air demo script. The heat and air scaffolds it describes were removed in October 2026. |
 

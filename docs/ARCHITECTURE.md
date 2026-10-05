@@ -72,7 +72,7 @@ distinction matters for how much weight to give it:
   flood happened here.
 - **Modeled scenarios**. Hydraulic models simulate "what if" cases.
   FEMA's regulatory floodplains (1 % and 0.2 % annual chance). NYC
-  DEP's Stormwater Maps (modeled water depth under three rainfall
+  DEP's Stormwater Maps (modeled water depth under four rainfall
   scenarios with varying sea-level-rise assumptions). **Useful but
   scenario-bounded**: this could happen here under those conditions.
 - **Proxy signals**. Indirect indicators of flooding. NYC 311
@@ -111,7 +111,7 @@ For a query in any of the intents in [§4](#4-intents), Riprap returns:
 1. **A briefing** with one section per Stone that has evidence. It is the
    evidence sentences themselves, opened for a bare address by an "In
    brief" lead (Sandy, FEMA zone, DEP scenarios, 311 count, each part
-   passed through the claim verifier), with the three point DEP scenarios
+   passed through the claim verifier), with the four point DEP scenarios
    merged into one sentence. A question gets an answer first: a fixed lead
    and the sources' sentences word for word, chosen by rules or, when an
    LLM is configured, by the model, and checked in code. Every sentence
@@ -201,15 +201,16 @@ short result summary) that streams to the UI as `step` events on
 
 ### 3.1 NYC pebbles, plain language
 
-The NYC deployment has 59 pebbles: 55 in `deployments/nyc/manifests/` and
+The NYC deployment has 60 pebbles: 56 in `deployments/nyc/manifests/` and
 4 federal ones from `deployments/federal/` (`fema_nfhl`, `nws_alerts`,
 `nws_obs`, `usgs_gauges`) that are merged into every deployment. Each names
-its briefing in a `hazard` field: 36 are flood sources, 18 are heat sources
-([§4.1](#41-heat)) and 5 run in both. Of the flood and shared sources, 20
-run for a point, 18 for a neighbourhood or district, and 3 for both
-(`noaa_tides`, `nws_water_forecast` and the experimental
-`ttm_battery_surge`, which read a harbour gauge). Three are experimental
-model layers ([MODELS.md](MODELS.md)); the rest are public records. Other deployments
+its briefing in a `hazard` field: 37 are flood sources, 18 are heat sources
+([§4.1](#41-heat)) and 5 run in both. Of the flood and shared sources, 21
+run for a point, 19 for a neighbourhood or district, and 2 for both
+(`noaa_tides` and `nws_water_forecast`, which read a harbour gauge). Two are
+experimental model layers (the land-cover model, for a point and for an
+area); the experimental surge forecast, `ttm_battery_surge`, is in
+`deployments/nyc/optional/` and runs only on a server that opts in ([MODELS.md](MODELS.md)); the rest are public records. Other deployments
 have their own, smaller, experimental sets (see
 [`docs/multi-city.md`](multi-city.md)).
 
@@ -232,12 +233,12 @@ Point pebbles:
 | **nws_alerts** *(live, federal)* | Active NWS alerts intersecting this address. | modeled |
 | **nws_obs** *(live, federal)* | Latest NWS hourly observation at the nearest station. | empirical |
 | **usgs_gauges** *(live, federal)* | Live stage at the nearest USGS stream gauge (OGC API). | empirical |
-| **ttm_battery_surge** *(live, experimental)* | A 96-hour forecast of the surge at the Battery from the author's Granite TTM fine-tune, hedged. Says it is not installed without the `ml` extra. | modeled |
+| **ttm_battery_surge** *(optional, experimental, off by default)* | A 96-hour forecast of the surge at the Battery from the author's Granite TTM fine-tune, hedged. Out of default briefings since 2026-10-05: on 639 held-out windows damped persistence beat it (0.108 m against 0.115 m). A server opts in with `RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional`. | modeled |
 | **city_landcover** | Paved, green and tree canopy shares near this address, from the city's 2017 land cover map (6 inch). Quoted when a question asks. | empirical |
 | **landcover** *(experimental)* | The same shares from the latest satellite imagery, a land-cover model's saved output, after the city map's sentence. | modeled |
 
 Polygon pebbles, for a neighbourhood or a community district: `sandy_nta`,
-the three `dep_*_nta` scenarios, `microtopo_nta`, `nyc311_nta`,
+the four `dep_*_nta` scenarios, `microtopo_nta`, `nyc311_nta`,
 `floodnet_nta` (the sensors inside the area), `nws_alerts_nta`,
 `npcc4_slr_nta`, `city_landcover_nta` and the experimental
 `landcover_nta` are area versions of the point pebbles. The harbour gauge
@@ -268,7 +269,7 @@ The briefing opens with an "In brief" lead (the Sandy
 footprint, the FEMA zone, the DEP scenarios and the 311 count, each part
 cited and passed through the claim verifier). Then each value becomes one
 sentence from its manifest template, cited to its `doc_id` and grouped
-under its Stone; the three point DEP scenarios are merged into one
+under its Stone; the four point DEP scenarios are merged into one
 sentence. A pebble whose template names a field its value lacks prints
 nothing, and a plain place briefing leaves out live readings that are not
 notable ([§8](#8-live-signals)).
@@ -345,8 +346,9 @@ MCP server (`riprap/mcp/server.py`) exposes `list_sources`,
 ## 5. Asset registers
 
 Riprap has no scoring rubric. An asset is in a register when its point is
-inside the 2012 Sandy inundation zone or inside any of the three DEP
-stormwater scenarios ([`METHODOLOGY.md`](METHODOLOGY.md)).
+inside the 2012 Sandy inundation zone or inside a modelled DEP stormwater
+scenario; a public housing development counts for Sandy at 10% or more of
+its outline ([`METHODOLOGY.md`](METHODOLOGY.md)).
 
 - `riprap-register --asset-class {schools,nycha,mta_entrances}` writes a
   CSV with one row per asset and a 0 or 1 per layer.
@@ -396,10 +398,11 @@ check work with any model and any endpoint.
 
 A briefing needs no model. An LLM at any OpenAI-compatible endpoint is
 optional (for example Granite 4.1 8B over Ollama), used as the planner and
-to choose a question's lead and facts. Two experimental models, the
-author's fine-tunes, add labelled sentences: a surge forecast that runs on
-CPU in the server when the `ml` extra is installed, and a land-cover model
-whose saved maps the app reads after the city's own map. Every sentence
+to choose a question's lead and facts. One experimental model, the
+author's fine-tune, adds labelled sentences: a land-cover model whose saved
+maps the app reads after the city's own map. A second, a surge forecast, is
+off unless a server opts in, because damped persistence beat it on held-out
+data. Every sentence
 from them goes through one hedging function. The heat briefing uses no
 model. See
 [MODELS.md](MODELS.md).
@@ -409,8 +412,8 @@ model. See
 ## 8. Live signals
 
 Live pebbles (`noaa_tides`, `nws_alerts`, `nws_obs`, `usgs_gauges`,
-`floodnet`, `nyc311`, `nws_water_forecast` and the experimental
-`ttm_battery_surge`) are handled apart from the
+`floodnet`, `nyc311`, `nws_water_forecast` and, where a server opts in, the
+experimental `ttm_battery_surge`) are handled apart from the
 static Cornerstone layers:
 
 - They appear as evidence cards and a "Right now" section in the UI.

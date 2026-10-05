@@ -420,8 +420,9 @@ ordinary tides, and two sensors hold 23 of the 44 flooded moments.
 **Decision.** No skill, on Ida or on the floods a satellite can see. The
 layer was retired from the app on 2026-10-02 (owner's rule, set before the
 test: keep it only if a model shows skill there). The result file is
-`data/experimental/water_coastal_floodnet.json`, with every moment, its
-scenes and its depth.
+`data/experimental/water_coastal_floodnet_summary.json`, an aggregate: the
+per-event rows were taken out of the tree because FloodNet's licence does
+not allow republishing them.
 
 ### NYC land-cover model
 

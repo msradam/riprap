@@ -132,7 +132,7 @@ answer, it says so instead of guessing.
 
 ## Accessibility & Inclusion
 
-WCAG 2.2 AA and Section 508 are stated commitments. Evidence tier is
+WCAG 2.2 AA is the stated target ([ACCESSIBILITY.md](ACCESSIBILITY.md)). Evidence tier is
 carried by shape as well as colour (grayscale-safe), contrast is measured
 by the handoff gates, and every interactive control must be keyboard
 reachable with a visible focus.

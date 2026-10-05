@@ -24,7 +24,7 @@ With no LLM endpoint configured, the briefing is the evidence itself, built by
 brief" lead: the Sandy footprint, the FEMA zone, the DEP scenarios and the 311
 count, each cited and each passed through the claim verifier below (a part
 that fails is left out). Then comes one section per Stone with evidence, one
-cited sentence per pebble, with the three point DEP scenarios merged into one
+cited sentence per pebble, with the four point DEP scenarios merged into one
 sentence. A plain place briefing leaves out a live reading that is not notable
 (an observation with no rain, a tide less than a foot above prediction, a
 water-level forecast below flood stage); a right-now question quotes them all. When no source produces evidence, the briefing says Riprap could not
@@ -51,7 +51,9 @@ sources' sentences word for word. They are tried in a fixed order:
 3. "will it flood" at a place or on a day: no yes or no and no refusal. The
    lead says no source or model here predicts that, and the alerts, the
    Weather Service's water-level forecast, the current stormwater scenario and
-   the Sandy extent follow, then the experimental surge forecast, labelled;
+   the Sandy extent follow (and, only on a server that opts in to it, the
+   experimental surge forecast, labelled; it is out of default briefings
+   because damped persistence beat it on held-out data);
 4. a question an experimental model answers (a surge at the Battery, land
    cover): the official source
    for the same thing first when there is one, then the model's hedged
@@ -282,7 +284,7 @@ lead and the facts in this order:
 | The question asks for | Lead | Facts |
 |---|---|---|
 | A score, a rating, a grade or a ranking | "Riprap computes no score or rating of its own ..." | The Health Department's index, as the department's |
-| The hottest or worst part of a place | "Riprap does not rank places against each other or pick out the worst part of one ..." | The record for the whole place named |
+| The hottest or worst part of a place | "Riprap does not rank places against each other or single out one part of a place ..." | The record for the whole place named |
 | One apartment, one block or a calendar date in the future | "Riprap cannot predict what will happen in one building, on one block or on a named day ..." | The Weather Service's forecast and alerts, the surface measurement; for a day the 7-day forecast cannot reach (next July, next summer), what was measured here and the station record instead |
 | Now, today | Neutral | The latest observation, any active heat alert, the forecast; what the question names comes first |
 | The coming days | "From the National Weather Service, as issued for the next 7 days; Riprap predicts nothing itself:" | The forecast and alerts |

@@ -55,9 +55,11 @@ nothing is weighted.
 
 For a community district a briefing names the schools, subway entrances,
 public housing developments and hospitals inside the mapped flood extents.
-An asset is in a register when its point is inside the 2012 Sandy
-inundation zone or inside any of the three DEP stormwater scenarios. There
-is no other rule.
+A school, subway entrance or hospital is in a register when its point is
+inside the 2012 Sandy inundation zone or inside a modelled DEP stormwater
+scenario. A public housing development counts as inside the Sandy zone when
+10% or more of its outline is, and is tested against a stormwater scenario
+by its centre point; the sentence says which. There is no other rule.
 
 - `riprap-register --asset-class {schools,nycha,mta_entrances}` writes a
   CSV with one row per asset and a 0 or 1 per layer
@@ -175,7 +177,7 @@ traces back to the Stone that produced it.
 | Stone | Role | Flood sources | Heat sources |
 |---|---|---|---|
 | Cornerstone | The hazard reader | FEMA flood maps, DEP stormwater scenarios, the Sandy extent, Ida high-water marks, terrain | Landsat surface temperature, the Heat Vulnerability Index, heat illness visits, the city's land cover map |
-| Keystone | The asset register | Schools, subway entrances, public housing, hospitals, construction permits, floodplain counts | NYC Parks spray showers and pools |
+| Keystone | The asset register | Public schools, subway entrances, public housing, hospitals, floodplain counts (construction permits only when a question asks) | NYC Parks spray showers and pools |
 | Touchstone | The live observer | FloodNet sensors, 311 flood complaints, tide and stream gauges, weather observations | The station record of 90 F days, the latest air temperature |
 | Lodestone | The projector | NWS alerts and water-level forecasts, NPCC4 sea-level projections | The NWS forecast and heat alerts, NPCC4 heat projections |
 | Capstone | The synthesizer | Writes one cited sentence per record, and answers a question by rules over its words | The same |
@@ -229,9 +231,12 @@ The same text says the map "shall not be used for the design, modification,
 or construction of improvements to real property or for flood plain
 determination". Riprap reads the map at a point, one 10 ft cell with no
 margin, so "inside" or "outside" a scenario at an address is a reading of
-that cell and not a finding about a lot. Riprap reads three of the four
-published maps; the Limited Flood map (1.77 inches an hour, current sea
-levels) is not read.
+that cell and not a finding about a lot; near a mapped edge the sentence
+gives the distance to it. Riprap reads all four published maps under the
+city's own names. Three come from the Open Data geodatabases. The fourth,
+"Limited Flood (1.77 inches/hr) with Current Sea Levels", is read from the
+vector tiles of DEP's own viewer, because its geodatabase on the portal is
+compressed in a way open GDAL cannot read; its citation says so.
 
 **Outside a mapped area is not safe.** NYC Emergency Management's hazard
 profile says of Hurricane Ida: "The most heavily impacted areas, representing
@@ -247,7 +252,13 @@ defines a flood event as "a series of water depth measurements greater than
 ([NYC Open Data `aq7i-eu5q`](https://data.cityofnewyork.us/Environment/FloodNet-Street-Flooding-Events-Measured-by-FloodN/aq7i-eu5q)).
 A depth is the water under that sensor, not the depth along the street or at
 a building, and a sensor records nothing before it was installed or while it
-is down. No sensor nearby is silence, not a dry record. Questions about the
+is down. No sensor nearby is silence, not a dry record. Riprap counts only
+the events FloodNet's API marks as verified by a person and says how many
+more are labelled flood but unverified. The API gives a sensor's status as
+it is today, not as it was on the day of an event, and does not publish what
+a status such as "noisy" means for a reading, so Riprap quotes the status
+and does not interpret it. Resting a yes or no only on sensors listed as
+good is Riprap's choice, not FloodNet's. Questions about the
 readings themselves belong to FloodNet's own
 [dashboard](https://dataviz.floodnet.nyc/) and data pages.
 
@@ -280,14 +291,14 @@ table is enough to rerun a count against the source.
 | Source | Where | When | Which records | Why this choice |
 |---|---|---|---|---|
 | 311 complaints at an address (`erm2-nwe9`) | Within 200 m of the geocoded point (`within_circle`) | The last 5 years, from midnight UTC | `complaint_type` "Sewer" or "Sewer Maintenance" and one of eleven flood descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow, rain garden flooding, under the coded names and the plain names of 2026); a complaint filed twice within ten minutes at one address counts once (`app/context/nyc311.py`) | About the blocks around an address; wider circles mix in other streets' drains |
-| 311 complaints in a district or neighbourhood | A community district by the record's own `community_board` field; a neighbourhood by its outline | The last 3 years | The same filter | The district is the unit the city files the complaint under |
-| FloodNet sensors at an address | Sensors within 600 m | Flood events in the last 3 years, or since a sensor was installed if later | Flood events from FloodNet's Data API (the sentence says which are counted); the peak is taken only from sensors FloodNet reports in good order | Sensors are sparse (a few hundred citywide), so a block-sized circle would usually hold none |
+| 311 complaints in a district or neighbourhood | A community district by the record's own `community_board` field; a neighbourhood by its exact outline | The last 3 years | The same filter; the lead gives the breakdown by descriptor group, and every count ends with the under-reporting caveat | The district is the unit the city files the complaint under |
+| FloodNet sensors at an address | Sensors within 600 m | The period since the sensors were installed, stated with the install date, within the last 3 years | Events the API labels `flood` and marks `annotated_by: human` (verified by a person); a flood event is a series of depth readings above 10 mm at the sensor, FloodNet's definition. The sentence gives the highest depth on record with that sensor's status as the API lists it when read, then the highest among sensors listed as good | Sensors are sparse (a few hundred citywide), so a block-sized circle would usually hold none |
 | FloodNet sensors in an area | Sensors inside the outline | The same | The same | |
 | Hurricane Ida high-water marks | USGS marks within 800 m; a mark counts toward "the block flooded" only within 250 m | 1 to 2 September 2021 | All 159 New York marks in the USGS file | The marks are few and were surveyed where crews went; 800 m finds the nearest ones, 250 m keeps a "Yes." local |
 | Sandy inundation zone (`5xsi-dfpx`) | The cell under the point; the distance to the edge is stated within 50 m of it | 2012 | | The mapped outline is not exact to a building |
-| Stormwater scenarios (`9i7c-xyvv`) | The 10 ft cell under the point; for an area, the share of its land inside | Scenario years as published | Three of the four maps | See section 10 |
-| Subway entrances, hospitals, schools, public housing near an address | 800 m, 3,000 m, 1,500 m and 2,000 m | The file dates in [DATA-SOURCES.md](DATA-SOURCES.md) | Each asset's point against the Sandy zone and the extreme 2080 scenario | Rough walking and service distances; a development or campus is one point, so one that is partly inside a zone can be missed |
-| Terrain at an address | The elevation cell under the point, compared with the ground within 200 m | USGS 3DEP | | |
+| Stormwater scenarios (`9i7c-xyvv`) | The 10 ft cell under the point, with the distance to the mapped edge when near it; for an area, the share of its land inside | Scenario years as published | All four maps | See section 10 |
+| Subway entrances, hospitals, schools, public housing near an address | 800 m, 3,000 m, 1,500 m and 2,000 m | The file dates in [DATA-SOURCES.md](DATA-SOURCES.md) | Each asset's point against the Sandy zone and the extreme 2080 scenario; a public housing development by 10% or more of its outline for Sandy | Rough walking and service distances; a campus is one point, so one that is partly inside a zone can be missed |
+| Terrain at an address | The elevation cell that contains the point, in metres NAVD88, compared with the ground within 200 m | USGS 3DEP | | |
 | Surface temperature at an address | A 150 m circle of 90 m cells | 18 clear summer images, 2023 to 2026 | Land cells only | The thermal sensor samples at about 100 m (`app/heat/surface_temp.py`) |
 | Spray showers and pools | Within 800 m | As published | | About a ten minute walk (`app/heat/cooling.py`) |
 
@@ -295,7 +306,12 @@ A community district in an area briefing is drawn as the union of City
 Planning's neighbourhood tabulation areas, which approximates the official
 district. Counts of points (subway entrances, schools) can differ from a
 count inside the official boundary, and the 311 count in the same briefing
-uses the official district.
+uses the official district. The page's place line, `geocode.note` in the
+JSON and `place_note` over MCP say so, and say which tabulation area a
+neighbourhood name was answered for when the name covers only part of one
+or more than one (Roosevelt Island, East Harlem, Murray Hill). A question
+that names two areas gets the two briefings side by side under a note that
+nothing is scored or ranked.
 
 ## 12. Corrections
 
@@ -307,7 +323,9 @@ dataset, the issue says so and points to the publisher (FloodNet asks for
 data problems at
 [floodnet-nyc/floodnet-data](https://github.com/floodnet-nyc/floodnet-data/issues)).
 An independent check on 5 October 2026 re-derived 487 briefing sentences from
-the sources: 475 were confirmed, 10 were wrong and 2 sat on a raster edge.
+the sources: 475 were confirmed, 10 were wrong and 2 sat on a raster edge
+([history/SANITY-CHECK-2026-10-05.md](history/SANITY-CHECK-2026-10-05.md)
+lists every problem it found and what was done about each).
 
 ## References
 

@@ -4,6 +4,138 @@ All notable changes to Riprap. The hackathon submission tag is
 `v0.5.0` (build 2026-05-07); subsequent dates record polish work
 that landed on the hackathon-period production deploys.
 
+## [Unreleased] (the review fix pass) - 2026-10-05
+
+An independent sanity check re-derived 487 briefing sentences from the
+public sources: 475 were confirmed, 10 were wrong and 2 sat on a raster edge
+([docs/history/SANITY-CHECK-2026-10-05.md](docs/history/SANITY-CHECK-2026-10-05.md)).
+This pass fixes what it found and says in the documents what it could not
+fix. Branch `review/fix-pass`; not tagged, and the version is unchanged.
+
+### Fixed
+
+- **Place.** Rockaway Park, Broad Channel, Belle Harbor and City Island
+  resolve by name, for flood and heat. A house number and a name is an
+  address whatever the street type ("1 Bowling Green", "15 Central Park
+  West"). An address with no borough is looked up in the city's address file
+  first, and a note says which borough was chosen when several have it.
+- **Address elevation** reads the cell that contains the point and states
+  NAVD88 (400 Carroll Street: 1.07 m, was 0.0 m).
+- **Hospitals** are counted once each (61, where the file's 67 rows had
+  doubled some counts).
+- **Public housing** counts as inside the Sandy extent when 10% or more of
+  its outline is (39 of 218 developments, was 20 by centre point).
+- **Neighbourhood 311 counts** use the exact outline.
+- **Answers.** A question that names two areas compares both, side by side,
+  under a note that nothing is scored or ranked. An insurance, price or
+  advice question opens with an out-of-scope statement, then the FEMA zone
+  and a pointer to FloodHelpNY. "Here is what they show." is never followed
+  by nothing. A failed FEMA query is listed under "Not checked."
+- NYC Planning floodplain zeros that the source does not support are no
+  longer printed.
+- Accessibility barriers found by reading the code: a focused control could
+  sit under the sticky header (WCAG 2.4.11), the landing's moving preview
+  had no stop control (2.2.2), the map could be panned only by dragging
+  (2.5.7), and the header's query button had a name without its visible text
+  (2.5.3).
+
+### Changed
+
+- **FloodNet sentences use FloodNet's terms.** No "above-curb", no
+  "community sensors", no "flagged by FloodNet for maintenance". A sentence
+  gives FloodNet's definition of a flood event (depth readings above 10 mm at
+  the sensor), the period from the sensors' install dates, the highest depth
+  on record with the sensor's status as the API lists it today, and the
+  highest among sensors listed as good. Only events the API marks as verified
+  by a person are counted, and the sentence says how many more are labelled
+  flood but unverified (Hollis: 6 events, was 14; QN12: 40, was 54). Resting
+  a yes or no on sensors listed as good is named as Riprap's choice.
+- **FloodNet-derived output carries its licence.** Citations, JSON, MCP
+  results (`license_notices`), the page's source list and NOTICE say the
+  FloodNet sentences and figures are CC BY-NC-SA 4.0 and not under
+  Apache-2.0, with the credit "FloodNet (New York University and The City
+  University of New York)", Mydlarz et al. (2024) and Silverman et al.
+  (2022), and a retrieval time.
+- **The surge forecast is out of default briefings.** On 639 held-out
+  four-day windows its mean error was 0.115 m; damped persistence scored
+  0.108 m and beats it (difference 0.0065 m, 95% interval 0.0032 to 0.0096).
+  It foresaw 1 of 23 flood-stage windows, which are 5 distinct events. Its
+  manifest moved to `deployments/nyc/optional/`; a server opts in with
+  `RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional`. The hosted model card is
+  out of date; a corrected card is at
+  `docs/model-cards/Granite-TTM-r2-Battery-Surge.md`.
+- **Four stormwater maps, in the city's own words.** The fourth, "Limited
+  Flood (1.77 inches/hr) with Current Sea Levels", is read from the vector
+  tiles of DEP's viewer. Sentences use the city's map names, call them
+  modelled scenarios and not forecasts, carry the city's disclaimer and an
+  edge distance near a boundary, and say "Outside a mapped extent does not
+  mean safe" with NYC Emergency Management's Ida finding.
+- **311.** Every count ends with an under-reporting caveat, a lead says "a
+  count of reports", and a district lead carries the breakdown by descriptor
+  group.
+- **Construction permits** are out of plain briefings. A construction
+  question gets a sentence that names the older DOB file, tests expiry and
+  says DOB NOW is not counted.
+- Schools are "public schools" from the 2019 to 2020 locations file
+  (`a3nt-yts4`), charter schools included. Lists say "inside a mapped flood
+  extent", not "flood-exposed".
+- "wind alerts" is "flood, coastal or tropical storm alerts". The FEMA
+  sentence names the effective map as the one in force for the National Flood
+  Insurance Program.
+- No stream gauge is quoted beyond 5 km; the tide sentence gives its
+  station's distance and water body; the Ida sentence gives heights above
+  ground; the Sandy sentence gives the flooded area beside the area's total.
+- The land-cover sentence states how far its canopy reading sits from the
+  city's map, and a change-over-time question is told first that the two
+  figures are from different methods.
+- The fixed disclaimer adds that a briefing is about records of a place, not
+  an assessment of a property or of the people who live there.
+- The landing's hero line: "Rules or an open Granite model read your question
+  and choose the evidence. Every sentence you read comes word for word from a
+  public record, with its source and date." The footer says "built to meet"
+  WCAG 2.2 AA and no longer names Section 508 or the Plain Writing Act.
+- The README's lead example is the live answer of 2026-10-05, and its claim
+  that no other tool does these things together is gone.
+
+### Added
+
+- `geocode.note` (JSON), `place_note` (MCP) and the page's place line say
+  which tabulation area a neighbourhood name was answered for, and that a
+  district's shape is City Planning's approximation.
+- `answer_path` ("rules" or "llm") on every response; the `models` block
+  lists only models a sentence quotes.
+- An accessibility statement (`/accessibility/` and
+  `docs/ACCESSIBILITY.md`) and an about page (`/about/`) with the AI
+  disclosure, linked from the footer of every page; pan buttons on the map
+  and a pause button on the landing's preview.
+- The README says where a language model can run, how Riprap was built and
+  checked, and that it is built by one person with no community group,
+  agency or resident yet involved.
+- `docs/METHODOLOGY.md`: what the data cannot say (with sources), the
+  distances, time windows and filters behind each count, and how to report
+  an error. `docs/DATA-SOURCES.md`: every NYC Open Data dataset by name and
+  ID with what Riprap does to it. `docs/BACKGROUND.md`: related work.
+- The footer and README say Riprap is not an alert or emergency service
+  (Notify NYC, 311, FloodHelpNY) and name every publisher it is independent
+  of, FloodNet, New York University and the City University of New York
+  among them.
+
+### Removed
+
+- `data/experimental/water_coastal_floodnet.json` (per-event FloodNet rows);
+  an aggregate summary replaces it. History was not rewritten.
+- The district clause on land "less than 1 m above the nearest drainage
+  channel".
+- The README's thanks to FloodNet by name; a data credit in the form FloodNet
+  asks for replaces it.
+
+### Still open
+
+- The hosted surge model card is unchanged. The Health Department's heat
+  illness count and rate still disagree in its file, and Riprap prints both.
+  The cooling sentence counts wading pools as pools. The gallery pages keep
+  their old sentences until the gallery is rebuilt.
+
 ## [Unreleased] (a heat briefing, and the models settled) - 2026-10-02
 
 Riprap becomes a climate briefing: the same method, proved on a second
