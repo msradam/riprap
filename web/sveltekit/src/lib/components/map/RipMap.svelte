@@ -384,6 +384,24 @@
     });
 
     map.addControl(new maplibre.NavigationControl({ visualizePitch: false }), 'top-right');
+    // Pan buttons: the map can be moved with single clicks, without
+    // dragging (WCAG 2.5.7). Each moves the view a quarter of its size.
+    const pan = document.createElement('div');
+    pan.className = 'maplibregl-ctrl maplibregl-ctrl-group rip-map-pan';
+    const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    for (const [dir, label, dx, dy] of [['up', 'Pan north', 0, -1], ['down', 'Pan south', 0, 1], ['left', 'Pan west', -1, 0], ['right', 'Pan east', 1, 0]] as const) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = `rip-map-pan-${dir}`;
+      b.title = label;
+      b.setAttribute('aria-label', label);
+      b.onclick = () => {
+        if (!map || !container) return;
+        map.panBy([(dx * container.clientWidth) / 4, (dy * container.clientHeight) / 4], { animate: !reduced() });
+      };
+      pan.append(b);
+    }
+    map.addControl({ onAdd: () => pan, onRemove: () => pan.remove() }, 'top-left');
     map.addControl(new maplibre.ScaleControl({ maxWidth: 100, unit: 'imperial' }), 'bottom-left');
     // On narrow screens the attribution starts folded into its (i)
     // button, so it does not cover the 300px map. MapLibre opens a compact
@@ -560,6 +578,17 @@
     outline: 3px solid var(--riprap-focus) !important;
     outline-offset: -3px;
   }
+  /* The pan buttons' arrows are drawn here, not in the markup, like the
+     header's search glyph: axe cannot measure a symbol-only text node. */
+  .map-frame :global(.rip-map-pan button) {
+    font-size: 16px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .map-frame :global(.rip-map-pan-up::before) { content: '↑'; }
+  .map-frame :global(.rip-map-pan-down::before) { content: '↓'; }
+  .map-frame :global(.rip-map-pan-left::before) { content: '←'; }
+  .map-frame :global(.rip-map-pan-right::before) { content: '→'; }
   /* The attribution toggle had no hover; match MapLibre's other buttons. */
   .map-frame :global(.maplibregl-ctrl-attrib-button:hover) {
     background-color: rgb(0 0 0 / 5%);

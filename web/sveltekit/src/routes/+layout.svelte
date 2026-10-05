@@ -30,13 +30,15 @@
   // repeat it.
   let isBriefing = $derived(routeId.startsWith('/(app)/q/') || routeId === '/(app)/gallery/[slug]');
   let isGallery = $derived(routeId.startsWith('/(app)/gallery'));
+  // The about and accessibility pages: static, and about New York City.
+  let isSitePage = $derived(routeId.startsWith('/(site)/'));
 
   // The run status lives in a module store that outlives the /q/ page, so
   // a refused run's "stopped" pill followed the reader into the gallery.
   // Pages that show no live run start from idle.
   afterNavigate(({ to }) => {
     const id = to?.route.id ?? '';
-    if (id === '/' || id.startsWith('/(app)/gallery')) briefingState.reset();
+    if (id === '/' || id.startsWith('/(app)/gallery') || id.startsWith('/(site)/')) briefingState.reset();
   });
 </script>
 
@@ -49,11 +51,11 @@
 {#if !chromeFree}
   <!-- USWDS skip link: hidden until focused, never display:none. -->
   <a class="skip-link" href="#main-content">Skip to main content</a>
-  <AppHeader {query} offline={isGallery || isLanding} onResetCold={() => (window.location.href = query ? `${resolve('/')}?q=${encodeURIComponent(query)}` : resolve('/'))} />
+  <AppHeader {query} offline={isGallery || isLanding || isSitePage} onResetCold={() => (window.location.href = query ? `${resolve('/')}?q=${encodeURIComponent(query)}` : resolve('/'))} />
 {/if}
 <main id={chromeFree ? undefined : 'main-content'} tabindex="-1">{@render children()}</main>
 {#if !chromeFree}
-  <AppFooter disclaimer={!isBriefing && !isLanding} />
+  <AppFooter disclaimer={!isBriefing && !isLanding} nycPage={isLanding || isGallery || isSitePage} />
 {/if}
 
 <style>

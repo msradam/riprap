@@ -2,6 +2,13 @@
    root layout renders them on every route except print,
    including error pages that sit outside the (app) route group. */
 
+/* Focus not obscured (WCAG 2.4.11): the header is sticky, so a control
+   that takes keyboard focus is scrolled clear of it. The briefing sets
+   --scroll-offset for its own taller header rows. */
+:root { --header-clear: 72px; }
+@media (max-width: 479px) { :root { --header-clear: 104px; } }
+:focus-visible { scroll-margin-top: var(--scroll-offset, var(--header-clear)); }
+
 /* ── App header ────────────────────────────────────────── */
 .app-header {
   position: sticky;
@@ -66,12 +73,22 @@
    page (DESIGN.md, depth from paper tones). */
 .app-footer { background: var(--paper-deep); color: var(--ink); border-top: 1px solid var(--rule-soft); }
 .app-footer-inner { max-width: 1600px; margin: 0 auto; padding: 32px 28px; display: flex; flex-direction: column; gap: 12px; }
-.app-footer-guard { font-size: 14px; line-height: 1.5; margin: 0; }
+.app-footer-guard,
+.app-footer-help,
+.app-footer-independent { font-size: 14px; line-height: 1.5; margin: 0; }
+.app-footer-independent { color: var(--ink-secondary); }
+/* The site's own pages, as a short list of links at least 24px tall (2.5.8). */
+.app-footer-nav ul { display: flex; flex-wrap: wrap; gap: 4px 24px; margin: 0; padding: 0; list-style: none; font-size: 14px; }
+.app-footer-nav a { display: inline-flex; align-items: center; min-height: 24px; }
 .app-footer-guard a,
+.app-footer-help a,
+.app-footer-nav a,
 .app-footer-beta a,
 .app-footer-author a,
 .app-footer-credits a { color: var(--riprap-text-link); text-decoration: underline; text-underline-offset: 2px; }
 .app-footer-guard a:hover,
+.app-footer-help a:hover,
+.app-footer-nav a:hover,
 .app-footer-beta a:hover,
 .app-footer-author a:hover,
 .app-footer-credits a:hover { text-decoration-thickness: 2px; }

@@ -31,7 +31,10 @@
   let t = $state(0);
   let hovered = $state(false);
   let focused = $state(false);
-  let paused = $derived(hovered || focused);
+  // The loop runs for longer than five seconds beside other content, so it
+  // has a control that stops it (WCAG 2.2.2); hover and focus only hold it.
+  let stopped = $state(false);
+  let paused = $derived(stopped || hovered || focused);
 
   let marks = $derived.by(() => {
     const keys: number[] = [];
@@ -106,6 +109,11 @@
   </a>
   <figcaption class="specimen-caption">
     <a class="land-link" {href}>Read the full briefing</a>
+    {#if !still}
+      <button type="button" class="specimen-pause" onclick={() => (stopped = !stopped)}>
+        {stopped ? 'Play the preview' : 'Pause the preview'}
+      </button>
+    {/if}
   </figcaption>
 </figure>
 
@@ -286,7 +294,27 @@
   }
 
   .specimen-caption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 24px;
     margin-top: 16px;
+  }
+  /* A text button in the link colour, at least 24px tall (2.5.8). */
+  .specimen-pause {
+    min-height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 14px;
+    color: var(--riprap-text-link);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+  .specimen-pause:hover {
+    text-decoration-thickness: 2px;
   }
 
   /* Phone: a shorter window, so the actions stay near the fold. */

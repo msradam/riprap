@@ -121,6 +121,16 @@ test.describe('journeys', () => {
     await noAxeViolations(page, 'gallery entry');
   });
 
+  test('3b. the about page and the accessibility statement, reached from the footer', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('contentinfo').getByRole('link', { name: 'Accessibility statement' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Accessibility statement' })).toBeVisible();
+    await noAxeViolations(page, 'accessibility statement');
+    await page.getByRole('contentinfo').getByRole('link', { name: 'About, method and AI disclosure' }).click();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('About Riprap');
+    await noAxeViolations(page, 'about');
+  });
+
   test('4. out-of-scope question gets the refusal', async ({ page }) => {
     await ask(page, 'Should I buy the house at 2017 East 17th Street, Brooklyn?');
     // The lead sentence; the live region announces the same words to screen readers.

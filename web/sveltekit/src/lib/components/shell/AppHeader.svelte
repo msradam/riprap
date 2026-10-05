@@ -62,11 +62,12 @@
     </div>
     <div class="app-header-mid">
       {#if query && !offline}
+        <!-- The name starts with the words on the button (2.5.3, label in name). -->
         <button
           type="button"
           class="app-header-query"
           onclick={onResetCold}
-          aria-label="Edit query"
+          aria-label="{query} edit query"
         >
           <span class="app-header-query-icon" aria-hidden="true"></span>
           <span class="app-header-query-text">{query}</span>

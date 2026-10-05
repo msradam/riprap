@@ -75,6 +75,47 @@ describe('AppFooter site lines (the landing uses this footer too)', () => {
   });
 });
 
+describe('AppFooter help, independence and site links (on every page)', () => {
+  it('says Riprap is no alert service and links the accessibility statement and the about page, with or without the disclaimer', () => {
+    for (const props of [{}, { disclaimer: false }]) {
+      const { container, getByRole, unmount } = render(AppFooter, { props });
+      expect(container.querySelector('.app-footer-help strong')?.textContent).toBe('Riprap is not an alert or emergency service.');
+      expect(getByRole('link', { name: 'Accessibility statement' })).toHaveAttribute('href', '/accessibility/');
+      expect(getByRole('link', { name: 'About, method and AI disclosure' })).toHaveAttribute('href', '/about/');
+      expect((container.textContent ?? '').replace(/\s+/g, ' ')).toContain('Riprap is an independent project and not a government product.');
+      unmount();
+    }
+  });
+
+  it('on a New York City page names where to get alerts, city help and insurance help, and every publisher it is independent of', () => {
+    const { container } = render(AppFooter, { props: { nycPage: true } });
+    expect([...container.querySelectorAll('.app-footer-help a')].map((a) => [a.textContent, a.getAttribute('href')])).toEqual([
+      ['Notify NYC', 'https://a858-nycnotify.nyc.gov/'],
+      ['311', 'https://portal.311.nyc.gov/'],
+      ['FloodHelpNY', 'https://www.floodhelpny.org/']
+    ]);
+    const text = (container.textContent ?? '').replace(/\s+/g, ' ');
+    expect(text).toContain(
+      'It is not endorsed by or affiliated with FloodNet, New York University, the City University of New York, FEMA, NOAA, USGS or the City of New York.'
+    );
+    expect(text).toContain('does not warrant its completeness, accuracy, content or fitness for any use');
+  });
+
+  it('under another city names no New York City service or publisher', () => {
+    seedForCity(CHICAGO);
+    const { container } = render(AppFooter);
+    const text = container.textContent ?? '';
+    expect(text).toContain('Riprap is not an alert or emergency service.');
+    expect(text).not.toMatch(/\bNYC\b|Notify|New York University|FloodNet/);
+  });
+
+  it('says "built to meet", not a claim of conformance', () => {
+    const text = (render(AppFooter).container.textContent ?? '').replace(/\s+/g, ' ');
+    expect(text).toContain('Built to meet WCAG 2.2 AA');
+    expect(text).not.toMatch(/Section 508|conforms|compliant/);
+  });
+});
+
 describe('AppFooter names the author', () => {
   it('links "Adam Munawar Rahman" to his GitHub profile', () => {
     const { container } = render(AppFooter);

@@ -1,8 +1,10 @@
 <script lang="ts">
   /** Evidence, not advice: one compact line with the official sources
    *  Riprap works alongside (for heat, the ones its own briefings name),
-   *  and the independence line. It sits just above "Build it with us";
-   *  the footer drops its own disclaimer on the landing. */
+   *  then where to go for alerts and help, then the independence line
+   *  (the warranty sentence follows Local Law 11 of 2012, section 23-504).
+   *  It sits just above "Build it with us"; the footer drops its own
+   *  disclaimer on the landing. */
   const SOURCES = [
     {
       need: 'flooding right now',
@@ -43,20 +45,40 @@
   <p>
     <strong>Riprap reports evidence, not advice.</strong> For {#each SOURCES as s, i (s.need)}{s.need},
       {#each s.links as l, j (l.href)}<a href={l.href}>{l.name}</a>{j < s.links.length - 1 ? ', ' : ''}{/each}{i < SOURCES.length - 1 ? '; ' : '.'}{/each}
-    Independent and open source. Not affiliated with FEMA, NOAA, USGS or the City of New York.
+  </p>
+  <p>
+    <strong>Riprap is not an alert or emergency service.</strong> For emergency alerts, sign up with
+    <a href="https://a858-nycnotify.nyc.gov/">Notify NYC</a>; to report flooding or ask the city for
+    help, use <a href="https://portal.311.nyc.gov/">311</a>; for flood insurance questions, see
+    <a href="https://www.floodhelpny.org/">FloodHelpNY</a>.
+  </p>
+  <p>
+    Riprap is independent and open source, and it is not a City product. It is not endorsed by or
+    affiliated with FloodNet, New York University, the City University of New York, FEMA, NOAA, USGS
+    or the City of New York. The City publishes its open data for information only and does not
+    warrant its completeness, accuracy, content or fitness for any use.
   </p>
 </div>
 
 <style>
+  /* One ruled block of three paragraphs. */
   .use-line p {
     margin: 0;
-    padding: 24px 0;
     max-width: 96ch;
-    border-top: 1px solid var(--riprap-rule-hairline);
-    border-bottom: 1px solid var(--riprap-rule-hairline);
     font-size: 14px;
     line-height: 1.6;
     color: var(--ink-secondary);
+  }
+  .use-line p + p {
+    margin-top: 8px;
+  }
+  .use-line p:first-child {
+    padding-top: 24px;
+    border-top: 1px solid var(--riprap-rule-hairline);
+  }
+  .use-line p:last-child {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--riprap-rule-hairline);
   }
   .use-line strong {
     color: var(--ink);

@@ -66,11 +66,30 @@ describe('Landing smoke', () => {
     expect(search.querySelector('a, button, input, [tabindex]')).toBeNull();
     const link = getByRole('link', { name: new RegExp(`^${data.specimen.question.replace(/[?.]/g, '\\$&')} The Riprap briefing for this question`) });
     expect(link).toBe(win);
-    // The caption is the link alone.
+    // The caption is the link and the control that stops the loop (WCAG 2.2.2).
     const caption = figure.querySelector('figcaption')!;
-    expect([...caption.children].map((c) => [c.tagName, c.classList.contains('land-link'), c.getAttribute('href'), c.textContent])).toEqual([
-      ['A', true, '/gallery/hollis-since-ida/', 'Read the full briefing']
+    expect([...caption.children].map((c) => [c.tagName, c.classList.contains('land-link'), c.getAttribute('href'), c.textContent?.trim()])).toEqual([
+      ['A', true, '/gallery/hollis-since-ida/', 'Read the full briefing'],
+      ['BUTTON', false, null, 'Pause the preview']
     ]);
+  });
+
+  it('LandHero lets a reader stop the moving preview and start it again', async () => {
+    const { getByRole } = render(LandHero, heroProps);
+    const pause = getByRole('button', { name: 'Pause the preview' });
+    await fireEvent.click(pause);
+    expect(pause.textContent?.trim()).toBe('Play the preview');
+    expect(document.querySelector('a.window')?.classList).toContain('paused');
+    await fireEvent.click(pause);
+    expect(document.querySelector('a.window')?.classList).not.toContain('paused');
+  });
+
+  it('LandHero states who reads the question and where every sentence comes from', () => {
+    const { container } = render(LandHero, heroProps);
+    expect(text(container.querySelector('.hero-sub')!)).toContain(
+      'Rules or an open Granite model read your question and choose the evidence. Every sentence you read comes word for word from a public record, with its source and date.'
+    );
+    expect(text(container)).not.toMatch(/no language model writes/i);
   });
 
   it('LandProof sets the district card first, then each question as a linked h3 with its quote and date', () => {
@@ -126,9 +145,8 @@ describe('Landing smoke', () => {
 
   it('UseBand says evidence, not advice, in one line that links the official sources it works alongside', () => {
     const { container } = render(UseBand);
-    expect(container.querySelectorAll('p')).toHaveLength(1);
     expect(container.querySelector('p strong')?.textContent).toBe('Riprap reports evidence, not advice.');
-    expect([...container.querySelectorAll('p a')].map((a) => a.getAttribute('href'))).toEqual([
+    expect([...container.querySelectorAll('p:first-child a')].map((a) => a.getAttribute('href'))).toEqual([
       'https://dataviz.floodnet.nyc/',
       'https://www.weather.gov/okx/',
       'https://a858-nycnotify.nyc.gov/',
@@ -140,7 +158,22 @@ describe('Landing smoke', () => {
       'https://finder.nyc.gov/coolingcenters',
       'https://rebuildbydesign.org/rainproof-nyc-map/'
     ]);
-    expect(text(container)).toContain('Not affiliated with FEMA, NOAA, USGS or the City of New York.');
+  });
+
+  it('UseBand says Riprap is no alert service, where to go instead, and that it is independent of every publisher it reads', () => {
+    const { container } = render(UseBand);
+    const [, help, independent] = [...container.querySelectorAll('p')];
+    expect(help.querySelector('strong')?.textContent).toBe('Riprap is not an alert or emergency service.');
+    expect([...help.querySelectorAll('a')].map((a) => [a.textContent, a.getAttribute('href')])).toEqual([
+      ['Notify NYC', 'https://a858-nycnotify.nyc.gov/'],
+      ['311', 'https://portal.311.nyc.gov/'],
+      ['FloodHelpNY', 'https://www.floodhelpny.org/']
+    ]);
+    expect(text(independent)).toContain(
+      'It is not endorsed by or affiliated with FloodNet, New York University, the City University of New York, FEMA, NOAA, USGS or the City of New York.'
+    );
+    expect(text(independent)).toContain('it is not a City product');
+    expect(text(independent)).toContain('does not warrant its completeness, accuracy, content or fitness for any use');
   });
 
   it('says the two experimental models are there, labelled experimental, each with a baseline, and that the satellite water layer was retired', () => {
