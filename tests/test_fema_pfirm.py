@@ -156,3 +156,13 @@ def test_a_failed_reply_is_not_served_again_from_the_cache(monkeypatch, tmp_path
     finally:
         http.client.cache_clear()
         http._STORAGE.clear()
+
+
+def test_an_unmapped_point_is_not_a_failed_source_on_the_effective_map_either(monkeypatch):
+    """The federal effective-map source treated "no map covers this point"
+    as offline, so open water outside New York read as a failed step."""
+    from riprap.core.pebbles.bridge import fetch_pebble
+
+    monkeypatch.setattr(fema_nfhl, "_point_query", lambda *a, **k: [])
+    value, _, err = fetch_pebble("fema_nfhl", 40.0, -70.0, deployment="federal")
+    assert value is None and not err

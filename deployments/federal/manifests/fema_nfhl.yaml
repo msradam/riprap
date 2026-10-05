@@ -9,8 +9,8 @@ adapter: python_call
 # Federal pebble — FEMA's NFHL ArcGIS point query returns the effective
 # regulatory flood zone for any mapped US point, plus the FIRM panel
 # effective date (the map vintage FEMA 1.5 requires in citations).
-# Unmapped points (open water, no effective FIRM) return None and the
-# pebble skips cleanly.
+# An unmapped point (open water, no effective FIRM) returns None and the
+# pebble says nothing; a failed query raises and is listed as not checked.
 coverage:
   region: us_conus
 
@@ -24,7 +24,10 @@ config:
   args:
     - {source: lat}
     - {source: lon}
-  on_none: offline
+  # None means the service answered and no effective map covers the
+  # point: that is not a failure. A failed query raises (app/context/fema_nfhl.py)
+  # and the run records the source as failed, as for the NYC preliminary map.
+  on_none: passthrough
 
 trace_summary:
   zone: fld_zone
@@ -55,4 +58,4 @@ display:
 
 fallback:
   on_offline: skip
-  message: FEMA NFHL ArcGIS endpoint unreachable or point unmapped.
+  message: FEMA's NFHL service did not answer when this briefing ran.
