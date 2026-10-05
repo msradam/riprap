@@ -1,7 +1,7 @@
 """Experimental: a 96-hour forecast of the surge residual at The Battery.
 
 The model is the owner's fine-tune of IBM's Granite TTM r2
-(`msradam/Granite-TTM-r2-Battery-Surge`, Apache-2.0, 1.5 M parameters,
+(`msradam/Granite-TTM-r2-Battery-Surge`, Apache-2.0, 2.96 M parameters,
 CPU). It reads the last 1,024 hourly values of the residual (observed
 water level minus NOAA's predicted tide) at NOAA station 8518750 and
 writes the next 96. Added to NOAA's tide predictions that gives a total
@@ -17,8 +17,10 @@ What it cannot: anything a storm brings that the gauge has not felt yet
 The Weather Service's own forecast for the gauge is the `nws_water_forecast`
 source, and an answer quotes it beside this one.
 
-Needs the `ml` extra; without it `fetch` returns the not-installed sentence.
-`scripts/backtest_surge.py` scores it against the gauge.
+Not in a default briefing since 2026-10-05 (docs/MODELS.md): a server opts
+in with RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional. Needs the `ml`
+extra; without it `fetch` returns the not-installed sentence.
+`scripts/backtest_surge.py` scores it against the gauge and six baselines.
 """
 from __future__ import annotations
 

@@ -87,5 +87,12 @@
  "tree_canopy_r2_30m": 0.77,
  "district_paved_vs_city_map": "1.7 points above",
  "model_test_mae_points": 4.8,
- "city_map_2017_as_2021_mae_points": 3.0
+ "city_map_2017_as_2021_mae_points": 3.0,
+ "canopy_minus_city_map_2017_points": {
+  "2018": -4.2,
+  "2021": -4.2,
+  "2024": 3.2,
+  "2026": -5.0
+ },
+ "canopy_vs_city_map_2017_words": "4.2 to 5.0 points less tree canopy than the city's 2017 map in 3 of its 4 yearly maps (2018, 2021, 2026) and 3.2 points more in 1 of its 4 yearly maps (2024)"
 }

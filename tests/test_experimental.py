@@ -3,6 +3,7 @@ read as a measurement, and no experimental lead on a question about the
 past. Offline: no model is loaded and no network is used."""
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -16,8 +17,9 @@ from riprap.core.burr.intake import heuristic_plan
 @pytest.fixture
 def saved_evaluations(tmp_path, monkeypatch):
     (tmp_path / "surge.json").write_text(json.dumps({
-        "n_windows": 635, "first": "2025-01-01", "last": "2026-09-27", "mae_cm": 11.5, "baseline_mae_cm": 13.3,
-        "n_flood_windows": 23, "n_flood_foreseen": 1}))
+        "n_windows": 639, "first": "2025-01-01", "last": "2026-10-01", "mae_cm": 11.5, "best_baseline_mae_cm": 10.8,
+        "best_baseline_words": "the last value fading toward the mean of the hours it reads",
+        "n_flood_windows": 23, "n_flood_foreseen": 1, "n_flood_events": 5, "n_flood_events_foreseen": 1}))
     monkeypatch.setattr(experimental, "EVAL_DIR", tmp_path)
 
 
@@ -25,7 +27,8 @@ def test_every_model_sentence_is_labelled_limited_scored_and_pointed_elsewhere(s
     s = experimental.hedge("surge", "the water may run 0.2 m above the tide", forecast=True)
     assert s.startswith("Experimental forecast: the water may run 0.2 m above the tide. Limits: ")
     assert "no wind or pressure input" in s
-    assert "its mean error was 11.5 cm, against 13.3 cm" in s and "foresaw 1 of the 23 windows" in s
+    assert "its mean error was 11.5 cm, against 10.8 cm for the best rule tested that needs no model" in s
+    assert "foresaw 1 of the 23 windows, 1 of 5 distinct events" in s
     assert "Rely on the National Weather Service (weather.gov/okx) and Notify NYC" in s
     assert experimental.hedge("surge", "x.").startswith("Experimental: x. Limits:")  # not about the future
 
@@ -44,12 +47,50 @@ def test_models_are_pinned_to_a_commit_or_a_weights_hash():
             assert len(m.revision) == 64 and all(c in "0123456789abcdef" for c in m.revision)
 
 
-def test_every_experimental_nyc_source_reads_one_of_the_three_models():
-    from app.models_info import SOURCES
-    from riprap.core.pebbles.bridge import get_registry
+OPTIONAL = Path(__file__).resolve().parents[1] / "deployments" / "nyc" / "optional"
 
-    marked = {p.id for p in get_registry("nyc").all() if p.manifest.maturity == "experimental"}
+
+def test_every_experimental_nyc_source_reads_one_of_the_models(monkeypatch):
+    from app.models_info import SOURCES
+    from riprap.core.pebbles.deployments import deployment_root
+    from riprap.core.pebbles.registry import load_registry
+
+    monkeypatch.setenv("RIPRAP_EXTRA_MANIFESTS", str(OPTIONAL))  # the surge forecast is opt-in
+    marked = {p.id for p in load_registry(deployment_root("nyc")).all() if p.manifest.maturity == "experimental"}
     assert marked == set(SOURCES)
+
+
+def test_a_default_briefing_carries_no_surge_forecast(monkeypatch):
+    # The forecast lost to damped persistence on held-out windows and foresaw 1 of 5 flood events
+    # (data/experimental/surge.json), so no default address or area briefing runs or quotes it.
+    from app.models_info import for_briefing, loaded
+    from riprap.core.burr.stones import pebbles_for, select_pebbles
+    from riprap.core.pebbles.deployments import deployment_root
+    from riprap.core.pebbles.registry import load_registry
+
+    result = json.loads((experimental.EVAL_DIR / "surge.json").read_text())
+    assert result["rule"]["in_default_briefings"] is False and result["held_out"]["overlap_hours"] == 0
+    assert result["model_minus_baseline"]["damped"]["ci95_m"][0] > 0  # worse than damped persistence
+
+    monkeypatch.delenv("RIPRAP_EXTRA_MANIFESTS", raising=False)
+    nyc = load_registry(deployment_root("nyc"))
+    assert "ttm_battery_surge" not in nyc
+    battery, hollis = (40.7033, -74.0170), (40.7128, -73.778)
+    for intent in ("single_address", "neighborhood"):
+        assert "ttm_battery_surge" not in pebbles_for("nyc", *battery, intent)
+        for question in ("", "What is the surge forecast at the Battery?"):
+            assert "ttm_battery_surge" not in select_pebbles({"intent": intent, "question": question}, nyc)
+    # With no surge sentence among the sources, a surge question is answered by the official ones.
+    texts = {k: v for k, v in T.items() if k != "ttm_battery_surge"}
+    assert ra.answer("What is the surge forecast at the Battery?", texts, V)[1] == ["nws_water_forecast", "noaa_tides"]
+    assert for_briefing({"trace": [{"step": "noaa_tides", "ok": True}], "noaa_tides": {"available": True}}) == []
+    surge_row = next(m for m in loaded()["experimental"] if m["repo"] == surge.MODEL.repo)
+    assert surge_row["enabled_on_this_server"] is False and "not in default briefings" in surge_row["status"]
+
+    # Opted in, it fires near the gauge and never at an inland place.
+    monkeypatch.setenv("RIPRAP_EXTRA_MANIFESTS", str(OPTIONAL))
+    pebble = load_registry(deployment_root("nyc")).get("ttm_battery_surge")
+    assert pebble.fires_at(*battery) and not pebble.fires_at(*hollis)
 
 
 STAGES = {"minor": 7.0, "moderate": 8.3, "major": 9.4}
@@ -92,7 +133,7 @@ T = {
     "ttm_battery_surge": "Experimental forecast: the water at The Battery may run up to 0.20 m above the tide.",
     "dep_moderate_current_nta": "NYC DEP stormwater scenario: 7.2% of this area is modeled to flood from rainfall.",
     "landcover_nta": "Experimental: a satellite land-cover model labels 71.0% of this area as paved or built over.",
-    "floodnet": "2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years.",
+    "floodnet": "2 FloodNet sensors within 600 m have recorded 14 flood events in the last 3 years.",
     "nyc311": "7 NYC 311 flood-related complaints filed within 200 m in the last 5 years.",
     "sandy_inundation": "This address sits within the empirical 2012 Hurricane Sandy inundation footprint.",
     "dep_moderate_current": "This address is outside the modeled flooding in the NYC DEP stormwater scenario.",

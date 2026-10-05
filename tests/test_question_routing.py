@@ -18,7 +18,7 @@ AREA = [p.id for p in FLOOD if p.manifest.spatial.scope in ("polygon", "any")]
 
 def test_a_district_runs_the_area_sources_and_the_harbour_gauges():
     got = set(select_pebbles({"intent": "neighborhood", "question": ""}, NYC))
-    assert got == set(AREA) and {"noaa_tides", "nws_water_forecast", "ttm_battery_surge"} <= got
+    assert got == set(AREA) and {"noaa_tides", "nws_water_forecast"} <= got
 
 
 def test_bare_address_runs_every_point_pebble():

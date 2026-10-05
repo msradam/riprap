@@ -7,10 +7,21 @@ maturity: experimental
 tier: modeled
 adapter: python_call
 
-# The one model that runs per request, on CPU, when the ml extra is
-# installed. Without it the value is the not-installed sentence.
+# Not in a default briefing since 2026-10-05: on held-out windows the model
+# lost to a one-line damped persistence rule and foresaw 1 of 5 flood-stage
+# events (docs/MODELS.md, data/experimental/surge.json). A server opts in with
+#   RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional
+# It then runs per request, on CPU, when the ml extra is installed; without
+# it the value is the not-installed sentence.
 spatial:
   scope: any
+
+# The Battery gauge says nothing about an inland place, so the source fires
+# only near it.
+# ponytail: a box about 5 km around the gauge; a harbour shoreline polygon if
+# the forecast ever earns its way back into a default briefing.
+coverage:
+  bbox: [-74.073, 40.656, -73.955, 40.746]
 
 config:
   module: app.live.ttm_battery_surge

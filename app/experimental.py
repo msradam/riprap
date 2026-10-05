@@ -5,7 +5,14 @@ reproduced at github.com/msradam/riprap-models; the land-cover model is
 trained in this repository (scripts/train_cover.py) and its weights are not
 published. (A third, a satellite water layer, was retired on 2026-10-02
 after two fair tests showed no skill: docs/MODELS.md.) Neither has been shown to
-beat an official product, so nothing they produce is ever a measurement:
+beat an official product, so nothing they produce is ever a measurement.
+
+The surge forecast is not in a default briefing since 2026-10-05: on held-out
+windows it lost to a one-line damped persistence rule and foresaw 1 of 5
+flood-stage events (scripts/backtest_surge.py, data/experimental/surge.json).
+Its manifest is in deployments/nyc/optional/, and a server that wants it sets
+RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional. `STATUS` says so for
+/api/models. The rules for both:
 
   * every sentence from a model goes through `hedge`, which opens it with
     "Experimental" (or "Experimental forecast" for the future), states the
@@ -52,9 +59,11 @@ MODELS = {
         extra="ml",
         limits="it reads only the last 1,024 hours of the Battery gauge, with no wind or pressure input, so it "
                "cannot see a storm that has not yet reached the gauge",
-        evaluation="on {n_windows} past 96-hour windows ({first} to {last}) its mean error was {mae_cm} cm, against "
-                   "{baseline_mae_cm} cm for assuming the last day's mean continues, and it foresaw {n_flood_foreseen} "
-                   "of the {n_flood_windows} windows in which the water reached the minor flood stage",
+        evaluation="on {n_windows} past 96-hour windows after its training data ({first} to {last}) its mean error was "
+                   "{mae_cm} cm, against {best_baseline_mae_cm} cm for the best rule tested that needs no model "
+                   "({best_baseline_words}), and it foresaw {n_flood_foreseen} of the {n_flood_windows} windows, "
+                   "{n_flood_events_foreseen} of {n_flood_events} distinct events, in which the water reached the minor "
+                   "flood stage",
         official="the National Weather Service (weather.gov/okx) and Notify NYC; NOAA's ETSS and the Stevens Flood "
                  "Advisory System model surge from the weather",
     ),
@@ -66,19 +75,39 @@ MODELS = {
         limits="it estimates the share of each 10 m satellite pixel that is canopy, grass, paving, roof, water or "
                "bare ground, learned from the city's 2017 six-inch map, so detail finer than about 30 m is blurred "
                "and a tree over a street counts as canopy",
-        evaluation="against the city's own 2021 six-inch map, on squares it never trained on, it read a typical "
+        evaluation="against The Nature Conservancy's 2021 six-inch map of the city, on squares it never trained on, "
+                   "it read a typical "
                    "district's paved share {district_paved_vs_city_map} the map's (at most "
                    "{district_paved_gap_points_max} points off in the {n_districts} districts with enough test "
                    "ground) and its mean error per land-cover group was "
                    "{model_test_mae_points} points at best, more than the {city_map_2017_as_2021_mae_points} points of the "
                    "city's 2017 map read as if it were 2021, so the 2017 map is the more accurate source for its "
-                   "year; two images of one summer differ by under {noise_points} points in a district's paved share "
+                   "year; citywide its maps show {canopy_vs_city_map_2017_words}, "
+                   "which is the model and its images and not the trees, so its canopy share can be several points "
+                   "off; two images of one summer differ by under {noise_points} points in a district's paved share "
                    "19 times in 20, but between {between_years_worst} the shares of {between_years_beyond_noise} of "
                    "{between_years_districts} districts differ by more, so its maps of different years are not "
                    "compared",
-        official="NYC's own land cover maps (2017 and 2021, 6 inch) and building footprints for a survey",
+        official="the city's 2017 land cover map and The Nature Conservancy's 2021 map (both 6 inch) and the city's "
+                 "building footprints for a survey",
     ),
 }
+
+# Where each model stands after its test, for /api/models (app/models_info.py).
+STATUS = {
+    "surge": "not in default briefings since 2026-10-05; a server opts in with "
+             "RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional and the ml extra",
+    "landcover": "in land-cover answers, after the city's 2017 map; quiet in a plain briefing",
+}
+
+
+def tested(key: str) -> str:
+    """The model's tested result as a clause, from its saved evaluation."""
+    result = evaluation(key)
+    try:
+        return MODELS[key].evaluation.format(**result) if result else "it has no saved evaluation"
+    except KeyError:  # a result file from an older backtest, without a field the sentence quotes
+        return "its saved evaluation is out of date"
 
 
 def evaluation(key: str) -> dict | None:
@@ -97,13 +126,8 @@ def hedge(key: str, statement: str, *, forecast: bool = False) -> str:
     limits and tested accuracy in one sentence, then the official source.
     `forecast` marks a statement about the future."""
     m = MODELS[key]
-    result = evaluation(key)
-    try:
-        tested = m.evaluation.format(**result) if result else "it has no saved evaluation"
-    except KeyError:  # a result file from an older backtest, without a field the sentence quotes
-        tested = "its saved evaluation is out of date"
     label = "Experimental forecast" if forecast else "Experimental"
-    return (f"{label}: {statement.rstrip('. ')}. Limits: {m.limits}; {tested}. "
+    return (f"{label}: {statement.rstrip('. ')}. Limits: {m.limits}; {tested(key)}. "
             f"Rely on {m.official}.")
 
 

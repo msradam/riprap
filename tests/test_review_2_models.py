@@ -21,7 +21,7 @@ T = {
     "nws_alerts": "No active NWS flood, coastal or tropical storm alerts at this point.",
     "ttm_battery_surge": "Experimental forecast: the water at The Battery may run up to 0.20 m above the tide.",
     "landcover": "Experimental: a satellite land-cover model labels 71.0% of the ground here as paved or built over.",
-    "floodnet": "2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years.",
+    "floodnet": "2 FloodNet sensors within 600 m have recorded 14 flood events in the last 3 years.",
     "nyc311": "7 NYC 311 flood-related complaints filed within 200 m in the last 5 years.",
     "sandy_inundation": "This address sits within the empirical 2012 Hurricane Sandy inundation footprint.",
     "fema_nfhl": "This address sits in FEMA flood zone AE.",
@@ -120,8 +120,9 @@ def test_a_missing_model_says_so_only_where_it_would_have_answered(monkeypatch):
 
 def test_the_hedged_sentences_pass_the_disclosure_checks(tmp_path, monkeypatch):
     (tmp_path / "surge.json").write_text(json.dumps({
-        "n_windows": 635, "first": "2025-01-01", "last": "2026-09-27", "mae_cm": 11.5, "baseline_mae_cm": 13.3,
-        "n_flood_windows": 23, "n_flood_foreseen": 1}))
+        "n_windows": 639, "first": "2025-01-01", "last": "2026-10-01", "mae_cm": 11.5, "best_baseline_mae_cm": 10.8,
+        "best_baseline_words": "the last value fading toward the mean of the hours it reads",
+        "n_flood_windows": 23, "n_flood_foreseen": 1, "n_flood_events": 5, "n_flood_events_foreseen": 1}))
     monkeypatch.setattr(experimental, "EVAL_DIR", tmp_path)
     tide = {f"2026-10-{d:02d} {h:02d}:00": 5.0 * surge.M_PER_FT for d in range(1, 7) for h in range(24)}
     text = surge.summarize("2026-10-01 12:00", [0.05] * 95 + [0.21], tide, {"minor": 7.0})["narrative"]
@@ -275,7 +276,7 @@ def test_a_preamble_about_heat_does_not_refuse_the_flood_question():
 def test_a_district_sensor_sentence_is_cited():
     from riprap.core.burr.evidence import cite
 
-    text = ("13 FloodNet community sensors inside this area have logged 358 above-curb flood events in the last 3 years. "
+    text = ("13 FloodNet sensors inside this area have recorded 358 flood events in the last 3 years. "
             "Most events: Russell Street (98); Davenport Court (66).")
     assert cite(text, "floodnet") == text.replace("3 years.", "3 years [floodnet].").replace("(66).", "(66) [floodnet].")
 

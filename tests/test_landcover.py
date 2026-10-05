@@ -46,7 +46,9 @@ def maps(tmp_path, monkeypatch):
         "noise_points": 2.0, "noise_points_small": 2.7, "eval_year": 2021,
         "district_paved_vs_city_map": "1.7 points above", "district_paved_gap_points_max": 7.8, "n_districts": 46,
         "model_test_mae_points": 4.8, "city_map_2017_as_2021_mae_points": 3.0,
-        "between_years_worst": "2018 and 2024", "between_years_beyond_noise": 49, "between_years_districts": 59}))
+        "between_years_worst": "2018 and 2024", "between_years_beyond_noise": 49, "between_years_districts": 59,
+        "canopy_vs_city_map_2017_words": "4.2 to 5.0 points less tree canopy than the city's 2017 map in 3 of its 4 "
+                                         "yearly maps (2018, 2021, 2026)"}))
     monkeypatch.setattr(lc, "EO_DIR", tmp_path)
     monkeypatch.setattr(lc, "CITY_MAP", tmp_path / "landcover_2017.tif")  # the same format, written by `write(2017)`
     monkeypatch.setattr(experimental, "EVAL_DIR", tmp_path)
@@ -62,8 +64,10 @@ def test_shares_of_the_latest_year_with_the_hedge(maps):
     assert v["tree_canopy_pct"] == v["green_pct"]
     n = v["narrative"]
     assert n.startswith("Experimental: a satellite land-cover model estimates that") and "is paved or built over" in n
-    assert "against the city's own 2021 six-inch map, on squares it never trained on" in n
-    assert "district's paved share 1.7 points above the map's" in n and "Rely on NYC's own land cover maps" in n
+    assert "against The Nature Conservancy's 2021 six-inch map of the city, on squares it never trained on" in n
+    assert "district's paved share 1.7 points above the map's" in n and "Rely on the city's 2017 land cover map" in n
+    # The canopy share reads low in most years, and the sentence says by how much.
+    assert "its maps show 4.2 to 5.0 points less tree canopy than the city's 2017 map in 3 of its 4 yearly maps" in n
     # The owner's rule: the model is labelled with its error and with the fact that the city's map is more accurate.
     assert "4.8 points at best, more than the 3.0 points of the city's 2017 map read as if it were 2021" in n
     assert "so the 2017 map is the more accurate source for its year" in n

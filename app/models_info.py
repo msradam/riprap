@@ -1,11 +1,16 @@
 """Which models took part in a briefing.
 
 `for_briefing(final)` lists each model behind one result: the experimental
-models whose sources returned a value (the surge forecast runs in this
-process; the satellite models ran earlier, in a batch, and their saved
-output is read), then the LLM endpoint with its calls and latency. A
-briefing made with none of them lists nothing. `loaded()` backs
-/api/models; `warm()` pings the LLM at startup when RIPRAP_WARM=1.
+models whose output is quoted in a sentence of the result (the surge
+forecast runs in this process; the satellite models ran earlier, in a
+batch, and their saved output is read), then the LLM endpoint with its
+calls and latency. A model whose source returned a value that no sentence
+uses is not listed. A
+briefing made with none of them lists nothing. The surge forecast is opt-in
+(app/experimental.py), so a default server never lists it. `loaded()` backs
+/api/models and says, for each experimental model, its tested result and
+whether it is in a default briefing; `warm()` pings the LLM at startup when
+RIPRAP_WARM=1.
 """
 
 from __future__ import annotations
@@ -28,10 +33,13 @@ def for_briefing(final: dict) -> list[dict]:
     """The models behind one result: experimental models in trace order,
     each once, then the LLM endpoints that answered."""
     out: dict[str, dict] = {}
+    paragraph = final.get("paragraph") or ""
     for t in final.get("trace") or []:
         step, value = t.get("step"), final.get(t.get("step"))
         if step not in SOURCES or not isinstance(value, dict) or value.get("available") is False:
             continue
+        if f"[{step}]" not in paragraph:
+            continue  # it ran, and no sentence of this result quotes it (the source id is its citation mark)
         key, where, how = SOURCES[step]
         m = experimental.MODELS[key]
         out.setdefault(m.repo or m.name, {"name": f"{m.name} (experimental)", "repo": m.repo, "where": where, "how": how,
@@ -58,18 +66,26 @@ def _where(endpoint: str) -> str:
 
 def loaded() -> dict:
     """The experimental models this server can use, and the LLM endpoint
-    configured. `in_process`: the surge model, true once loaded.
-    `precomputed`: whether each batch model's saved output is on disk.
-    `installed`: whether the optional extras are."""
+    configured. `experimental`: each model with its status after testing,
+    its tested result, and whether this server's briefings can carry it.
+    `in_process`: the surge model, true once loaded. `precomputed`: whether
+    each batch model's saved output is on disk. `installed`: whether the
+    optional extras are."""
     import importlib.util
     import sys
 
     from app.eo import landcover
     from riprap.core import llm
+    from riprap.core.pebbles.bridge import get_registry
 
     surge = sys.modules.get("app.live.ttm_battery_surge")
     m = experimental.MODELS
+    sources = set(get_registry().ids())
     return {
+        "experimental": [{"name": m[k].name, "repo": m[k].repo, "status": experimental.STATUS[k],
+                          "tested": experimental.tested(k),
+                          "enabled_on_this_server": any(s in sources for s, v in SOURCES.items() if v[0] == k)}
+                         for k in m],
         "in_process": {m["surge"].repo: bool(surge and surge._MODEL is not None)},
         "precomputed": {m["landcover"].name: bool(landcover.years())},
         "installed": {"ml": bool(importlib.util.find_spec("tsfm_public")),

@@ -2,7 +2,7 @@
 when a question went through one, and nothing otherwise (no other model
 runs)."""
 
-from app.models_info import for_briefing
+from app.models_info import for_briefing, loaded
 
 
 def test_the_llm_is_listed_with_where_calls_and_latency():
@@ -20,3 +20,11 @@ def test_the_llm_is_listed_with_where_calls_and_latency():
 
 def test_no_models_for_a_briefing_made_without_the_llm():
     assert for_briefing({"trace": [{"step": "fema_nfhl", "ok": True}], "grounding": {"tier": "no_llm"}}) == []
+
+
+def test_api_models_gives_each_experimental_model_its_tested_result_and_status():
+    surge, cover = loaded()["experimental"]
+    assert surge["repo"] == "msradam/Granite-TTM-r2-Battery-Surge" and surge["status"].startswith("not in default briefings")
+    assert "for the best rule tested that needs no model" in surge["tested"] and "distinct events" in surge["tested"]
+    assert cover["name"] == "NYC land-cover model" and "less tree canopy than the city's 2017 map" in cover["tested"]
+    assert cover["status"].startswith("in land-cover answers")
