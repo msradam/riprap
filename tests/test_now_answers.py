@@ -55,7 +55,7 @@ def test_floodnet_dates_its_newest_event_and_flags_one_still_open(monkeypatch):
 
 
 def test_a_now_answer_points_to_the_live_tools(monkeypatch):
-    docs = [Doc("nws_alerts", "Projector", "No active NWS flood, coastal or wind alerts at this point.", False),
+    docs = [Doc("nws_alerts", "Projector", "No active NWS flood, coastal or tropical storm alerts at this point.", False),
             Doc("floodnet", "Live Observer", "2 FloodNet community sensors within 600 m have logged 14 events.", False)]
     monkeypatch.setattr(syn, "_documents", lambda state: (docs, [], None))
     monkeypatch.setattr(syn.evidence, "citations", lambda items: {})

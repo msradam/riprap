@@ -25,7 +25,9 @@ _FLOOD_EVENT_KEYWORDS = (
 
 # Heat Advisory, Extreme Heat Watch and Warning (Excessive Heat until 2025).
 _KEYWORDS = {"flood": _FLOOD_EVENT_KEYWORDS, "heat": ("heat",)}
-_NONE = {"flood": "No active NWS flood, coastal or wind alerts at this point",
+# The "none" sentence names only kinds of alert the keywords match: no wind
+# alert (Wind Advisory, High Wind Warning) is checked, so none is claimed.
+_NONE = {"flood": "No active NWS flood, coastal or tropical storm alerts at this point",
          "heat": "No active NWS heat advisory, watch or warning at this point"}
 
 

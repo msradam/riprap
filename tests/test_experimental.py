@@ -88,7 +88,7 @@ def test_without_the_ml_extra_the_source_says_it_is_not_installed(monkeypatch):
 T = {
     "nws_water_forecast": "The National Weather Service forecasts a peak water level of 6.0 ft above MLLW at The Battery.",
     "noaa_tides": "Latest reading at The Battery, NY: 4.1 ft above MLLW.",
-    "nws_alerts": "No active NWS flood, coastal or wind alerts at this point.",
+    "nws_alerts": "No active NWS flood, coastal or tropical storm alerts at this point.",
     "ttm_battery_surge": "Experimental forecast: the water at The Battery may run up to 0.20 m above the tide.",
     "dep_moderate_current_nta": "NYC DEP stormwater scenario: 7.2% of this area is modeled to flood from rainfall.",
     "landcover_nta": "Experimental: a satellite land-cover model labels 71.0% of this area as paved or built over.",

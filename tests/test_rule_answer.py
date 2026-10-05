@@ -14,7 +14,7 @@ T = {
     "nyc311": "7 flood-related 311 service requests within 200 m in the last 5 years.",
     "fema_nfhl": "This address sits in FEMA flood zone AE.",
     "floodnet": "2 FloodNet community sensors within 600 m have logged 14 flood events in the last 3 years.",
-    "nws_alerts": "No active NWS flood, coastal or wind alerts at this point, checked 2026-10-01 03:40 UTC.",
+    "nws_alerts": "No active NWS flood, coastal or tropical storm alerts at this point, checked 2026-10-01 03:40 UTC.",
     "noaa_tides": "The Battery tide gauge reads 4.1 ft above MLLW.",
     "usgs_gauges": "The nearest stream gauge reads 1.2 ft.",
     "nws_obs": "JFK: clear, 18.0°C, no precipitation reported.",

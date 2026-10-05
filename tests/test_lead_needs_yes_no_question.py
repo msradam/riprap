@@ -6,7 +6,7 @@ from riprap.core.burr import answer_checks
 from riprap.core.burr.synthesis import _extract
 
 TEXTS = {"fema_nfhl": "This address sits in FEMA flood zone AE (a Special Flood Hazard Area), per NFHL FIRM panel 3604970353F, effective 2007.",
-         "nws_alerts": "No active NWS flood, coastal or wind alerts at this point, checked 2026-09-30 15:12 UTC."}
+         "nws_alerts": "No active NWS flood, coastal or tropical storm alerts at this point, checked 2026-09-30 15:12 UTC."}
 
 
 def test_yes_no_questions_open_with_a_verb():

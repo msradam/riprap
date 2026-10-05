@@ -1,7 +1,7 @@
 id: nws_alerts_nta
 type: live
-title: NWS active alerts for the area (flood/coastal/wind)
-answers: "active National Weather Service flood, coastal and wind alerts for the area, right now"
+title: NWS active alerts for the area (flood/coastal/tropical storm)
+answers: "active National Weather Service flood, coastal and tropical storm alerts for the area, right now"
 stone: lodestone
 tier: modeled
 adapter: python_call
@@ -30,7 +30,7 @@ provenance:
   source_url: https://api.weather.gov/
   license: U.S. Public Domain
   doc_id: nws_alerts
-  citation: NWS active alerts for the area (flood / coastal / wind).
+  citation: NWS active alerts for the area (flood / coastal / tropical storm).
 
 narration:
   short: Currently active NWS alerts for this area.

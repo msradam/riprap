@@ -103,3 +103,13 @@ def test_the_shipped_hospital_file_has_one_row_per_facility():
     with open(exposure.CLASSES["doh_hospitals"].geojson) as f:
         ids = [x["properties"]["fac_id"] for x in json.load(f)["features"]]
     assert len(ids) == len(set(ids)) == 61
+
+
+def test_no_alerts_sentence_claims_only_the_alerts_it_checks():
+    from app.context import nws_alerts
+
+    none = nws_alerts._NONE["flood"]
+    assert "wind" not in none
+    assert not nws_alerts._relevant("Wind Advisory", "flood") and not nws_alerts._relevant("High Wind Warning", "flood")
+    for event in ("Flood Warning", "Coastal Flood Advisory", "Tropical Storm Warning"):  # the three the sentence names
+        assert nws_alerts._relevant(event, "flood")
