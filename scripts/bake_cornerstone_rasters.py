@@ -13,7 +13,7 @@ is ~7 MB total versus ~46 MB GDBs + 87 MB Sandy GeoJSON.
 The bench that chose this is in history (experiments/22_cornerstone_optim at 8b87165).
 
 Run:
-    uv run python scripts/bake_cornerstone_rasters.py
+    uv run python scripts/bake_cornerstone_rasters.py [layer ...]
 """
 from __future__ import annotations
 
@@ -98,10 +98,13 @@ def main():
     transform, width, height = nyc_grid(RES_FT)
     print(f"Grid: {width}x{height} px @ {RES_FT} ft/px")
     print(f"Output: {OUT_DIR}\n")
-    bake_dep("dep_extreme_2080", transform, width, height)
-    bake_dep("dep_moderate_2050", transform, width, height)
-    bake_dep("dep_moderate_current", transform, width, height)
-    bake_sandy(transform, width, height)
+    # Name layers on the command line to bake only those ("dep_limited_current", "sandy").
+    only = sys.argv[1:]
+    for scenario in dep_stormwater.SCENARIOS:
+        if not only or scenario in only:
+            bake_dep(scenario, transform, width, height)
+    if not only or "sandy" in only:
+        bake_sandy(transform, width, height)
     total = sum(p.stat().st_size for p in OUT_DIR.glob("*.tif")) / 1e6
     print(f"\nTotal: {total:.1f} MB")
 

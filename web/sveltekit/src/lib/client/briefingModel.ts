@@ -257,7 +257,7 @@ export function splitSentence(parts: ClaimPart[]): { sentence: string; parts: Cl
 }
 
 /** The DEP stormwater scenarios in reading order (district pages add `_nta`). */
-const DEP_SCENARIOS = ['dep_moderate_current', 'dep_moderate_2050', 'dep_extreme_2080'];
+const DEP_SCENARIOS = ['dep_limited_current', 'dep_moderate_current', 'dep_moderate_2050', 'dep_extreme_2080'];
 const baseDoc = (docId: string) => docId.replace(/_nta$/, '');
 const scenario = (c: Card) => DEP_SCENARIOS.indexOf(baseDoc(c.docId));
 
@@ -267,8 +267,8 @@ export function citationOf(c: Pick<Card, 'citeId' | 'docId'>, citations: Record<
 }
 
 /** Two or more DEP stormwater scenario cards become one row where the
- *  first of them stood, its findings in scenario order (current, 2050,
- *  2080), each keeping its own citation and date. */
+ *  first of them stood, its findings in scenario order (the two current
+ *  sea level maps, 2050, 2080), each keeping its own citation and date. */
 export function mergeDepScenarios(cards: Card[]): EvidenceRow[] {
   const dep = cards.filter((c) => scenario(c) >= 0);
   if (dep.length < 2) return cards;

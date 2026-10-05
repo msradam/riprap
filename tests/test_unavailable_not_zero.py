@@ -176,3 +176,55 @@ def test_a_briefing_with_no_evidence_names_the_failed_sources():
     assert "Riprap could not build this briefing" in paragraph and cites == {}
     assert "Failed to respond: FEMA National Flood Hazard Layer; NYC 311 flood-related complaints (5y)." in paragraph
     assert "No grounded data available" not in paragraph
+
+
+# A failed FEMA query is a failed step, and a source zero the table cannot support is not printed.
+
+@pytest.mark.parametrize("pebble,deployment", [("fema_pfirm", "nyc"), ("fema_nfhl", "federal")])
+def test_a_failed_fema_map_is_a_failed_step_not_a_silence(monkeypatch, pebble, deployment):
+    import httpx
+
+    from riprap.core.pebbles import _http
+    from riprap.core.pebbles.bridge import fetch_pebble
+
+    def reset(*a, **k):
+        raise httpx.ReadError("connection reset by peer")
+
+    monkeypatch.setattr(_http.http, "get", reset)
+    value, _, err = fetch_pebble(pebble, 40.5795, -73.8375, deployment=deployment)
+    assert value is None and "connection reset by peer" in err
+
+
+def test_no_preliminary_study_at_a_point_does_not_apply_and_is_no_failure(monkeypatch):
+    from app.context import fema_nfhl
+    from riprap.core.pebbles.bridge import fetch_pebble
+
+    monkeypatch.setattr(fema_nfhl, "_point_query", lambda *a, **k: [])
+    assert fetch_pebble("fema_pfirm", 40.30, -73.50, deployment="nyc") == (None, {}, None)
+
+
+@pytest.mark.parametrize("row,said,missing", [
+    # QN06: 448 residential units and "0" residents.
+    ({"fp_100_bldg": 19, "fp_100_resunits": 448, "fp_100_pop": 0}, "counts 19 buildings and 448 residential units in",
+     "The profile gives no resident count for this district."),
+    # QN12: buildings, and "0" for both.
+    ({"fp_100_bldg": 5, "fp_100_resunits": 0, "fp_100_pop": 0}, "counts 5 buildings in",
+     "The profile gives no residential unit or resident count for this district."),
+])
+def test_floodplain_zero_the_table_cannot_support_is_not_printed(monkeypatch, row, said, missing):
+    from types import SimpleNamespace
+
+    from app.areas import nta_evidence
+    from riprap.core import http
+
+    class R:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"rows": [{**row, "fp_100_area": 0.01}]}
+
+    monkeypatch.setattr(http, "get", lambda *a, **k: R())
+    v = nta_evidence.floodplain(None, SimpleNamespace(extras={"area_code": "QN12"}))
+    assert said in v["narrative"] and v["narrative"].endswith(missing)
+    assert "0 resident" not in v["narrative"] and v["n_residents_2010"] is None

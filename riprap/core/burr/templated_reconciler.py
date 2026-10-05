@@ -95,25 +95,55 @@ HEAT_NON_SCOPE_FOOTER = (
 )
 
 
-# The three point DEP scenarios, in time order, and the words for each.
-# "2050 sea-level rise" (not "2050 sea level") is the phrase the disclosure
-# check reads as a time horizon.
-_DEP_POINT = {"dep_moderate_current": "current sea level with 2.13 in/hr of rain",
-              "dep_moderate_2050": "2050 sea-level rise with 2.13 in/hr",
-              "dep_extreme_2080": "2080 sea-level rise with 3.66 in/hr"}
-_DEP_HORIZON = {"dep_moderate_current": "current", "dep_moderate_2050": "2050", "dep_extreme_2080": "2080"}
+# The four point stormwater maps, smallest storm first, and the sea level
+# each is paired with. "2050 sea-level rise" (not "2050 sea level") is the
+# phrase the disclosure check reads as a time horizon.
+_DEP_HORIZON = {"dep_limited_current": "current", "dep_moderate_current": "current", "dep_moderate_2050": "2050",
+                "dep_extreme_2080": "2080"}
+_DEP_POINT = tuple(_DEP_HORIZON)
+NOT_CHECKED = ("**Not checked.** These sources were consulted{when} and did not answer, so nothing above is a reading "
+               "of them and their silence is not an absence:")
 
 
 def _dep_sentence(state, items) -> str | None:
-    """The DEP scenario sentences as one sentence naming each scenario's
-    result, each part cited. None unless two or more scenarios ran."""
-    parts = []
-    for pid, words in _DEP_POINT.items():
+    """The stormwater map sentences as one statement: that the maps are
+    modelled scenarios and not forecasts, what each shows at the mapped
+    point by the city's own names (each part cited), what the maps do not
+    give, and, when any reads outside, that outside does not mean safe.
+    None unless two or more maps ran."""
+    from app.flood_layers.dep_stormwater import OUTSIDE_CAVEAT, named
+
+    parts, outside = [], []
+    for pid in _DEP_POINT:
         e = next((e for e in items if e.pebble_id == pid), None)
         v = state.get(pid) if e else None
         if isinstance(v, dict) and "depth_class" in v:
-            parts.append(f"{words}, {dep_result(v['depth_class'], pid)} [{e.doc_id}]")
-    return f"NYC DEP stormwater scenarios at this address: {'; '.join(parts)}." if len(parts) >= 2 else None
+            parts.append(f"{named(pid)}, {dep_result(v, pid)} [{e.doc_id}]")
+            if not v["depth_class"]:
+                outside.append(e.doc_id)
+    if len(parts) < 2:
+        return None
+    out = ("The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), "
+           f"not forecasts; at the point mapped for this address they show: {'; '.join(parts)}. Their rainfall "
+           "flooding categories cover public areas and rain only, and the city says the map \"does not provide the "
+           "exact depth of flooding at any location\"; it is not a flood plain determination.")
+    return f"{out} {OUTSIDE_CAVEAT[:-1]} {''.join(f'[{i}]' for i in outside)}." if outside else out
+
+
+def _not_checked(state) -> str | None:
+    """The sources that were consulted and failed (a timeout, an HTTP
+    error, an unreadable reply), by name. A failed FEMA preliminary map
+    once left a briefing saying zone X with no word that the map which
+    reads AE there had not answered."""
+    from datetime import UTC, datetime
+
+    down = {t.get("step"): t for t in state.get("trace") or [] if t.get("ok") is False}
+    failed = [e["title"] for e in state.get("consulted") or [] if e["id"] in down]
+    if not failed:
+        return None
+    tried = [t["started_at"] for t in down.values() if t.get("started_at")]
+    when = f" at {datetime.fromtimestamp(min(tried), UTC):%Y-%m-%d %H:%M} UTC" if tried else ""
+    return f"{NOT_CHECKED.format(when=when)} {'; '.join(failed)}."
 
 
 def _lead(state, items) -> str | None:
@@ -155,64 +185,81 @@ def _lead(state, items) -> str | None:
 
         def horizons(ps) -> str:
             """'current, 2050 and 2080 sea-level rise': the disclosure check needs a horizon."""
-            h = [_DEP_HORIZON[p] for p in ps]
+            h = list(dict.fromkeys(_DEP_HORIZON[p] for p in ps))  # two maps share the current sea level
             if h == ["current"]:
                 return "current sea level (the near term)"
             return (h[0] if len(h) == 1 else f"{', '.join(h[:-1])} and {h[-1]}") + " sea-level rise"
 
+        # What the city's map shows at the mapped point, never a finding for the lot.
+        maps = "the city's stormwater flood maps (modelled scenarios, not forecasts)"
         if not wet:
-            add("", f"outside the modeled flooding in the DEP stormwater scenarios for {horizons(dep)}", ids)
+            add("", f"outside every flooding category on {maps} for {horizons(dep)}", ids)
         if rain:
-            add("", f"inside the modeled stormwater flooding in the DEP scenario{'s' if len(rain) > 1 else ''} "
-                    f"for {horizons(rain)}", [by_pebble[p].doc_id for p in rain])
+            add("", f"inside a rainfall flooding category on {maps} for {horizons(rain)}",
+                [by_pebble[p].doc_id for p in rain])
         if tide:
-            add("", f"inside the future high tide area (coastal tidal inundation, not rainfall flooding) of the "
-                    f"DEP scenario{'s' if len(tide) > 1 else ''} for {horizons(tide)}",
-                [by_pebble[p].doc_id for p in tide])
+            add("", "inside the future high tide category (coastal tidal inundation, not rainfall flooding) of "
+                    f"{maps} for {horizons(tide)}", [by_pebble[p].doc_id for p in tide])
+        if not wet and not (state.get("sandy") or {}).get("inside") and not (fema or {}).get("sfha"):
+            # Outside every mapped extent: the reading that most needs "outside is not safe".
+            from app.flood_layers.dep_stormwater import OUTSIDE_CAVEAT
+
+            claims.append({"section": "lead", "text": OUTSIDE_CAVEAT[:-1], "doc_ids": ids, "own_sentence": True})
     n311 = state.get("nyc311")
     if "nyc311" in by_pebble and isinstance(n311, dict) and "n" in n311:
         n = f"{'At least ' if n311.get('capped') else ''}{n311['n']}"
+        # A count of reports, said so where the count is: a low one is not an absence of flooding.
         add("nyc311", f"{n} flood-related 311 complaint{'s were' if n311['n'] != 1 else ' was'} filed within "
-                      f"{n311['radius_m']:.0f} m in the last {n311['years']} years")
+                      f"{n311['radius_m']:.0f} m in the last {n311['years']} years (a count of reports; a low count "
+                      "can mean under-reporting, not the absence of flooding)")
     docs = [Doc(e.doc_id, "lead", e.text, False) for e in items]
+    own = {c["text"] for c in claims if c.get("own_sentence")}
     kept, _ = verify(claims, docs)
-    cited = [(c["doc_ids"], f"{c['text']} {''.join(f'[{i}]' for i in c['doc_ids'])}") for c in kept]
-    where = [t for ids, t in cited if "nyc311" not in ids]
-    count = [t for ids, t in cited if "nyc311" in ids]
+    cited = [(c["doc_ids"], c["text"], f"{c['text']} {''.join(f'[{i}]' for i in c['doc_ids'])}") for c in kept]
+    where = [t for ids, text, t in cited if "nyc311" not in ids and text not in own]
+    after = [t for ids, text, t in cited if "nyc311" in ids or text in own]
     out = []
     if where:
         where = where if len(where) < 2 else [*where[:-1], f"and {where[-1]}"]
         out.append(f"This address is {(', ' if len(where) > 2 else ' ').join(where)}.")
-    out += [f"{t}." for t in count]
+    out += [f"{t}." for t in after]
     return " ".join(out) or None
 
 
 def _area_lead(state, items) -> str | None:
     """A community district or neighbourhood briefing's opening, cited and
-    checked like the address lead: what was reported first (the 311 count),
-    then what is mapped (the DEP rainfall shares, the Sandy share). The Sandy
-    share led once, and for an inland district it is the smallest number."""
+    checked like the address lead: what was reported first (the 311 count,
+    with what the complaints were about), then what is mapped (the stormwater
+    map shares, the Sandy share). The Sandy share led once, and for an
+    inland district it is the smallest number."""
+    from app.flood_layers.dep_stormwater import named
     from riprap.core.burr.synthesis import Doc, verify
 
     by_pebble = {e.pebble_id: e for e in items}
     claims = []
     n311 = state.get("nyc311_nta")
     if "nyc311_nta" in by_pebble and isinstance(n311, dict) and "n" in n311:
+        # The total alone read as a count of floods: in QN12, 61% of it is sewer backups and 12% street
+        # flooding. So the kinds come with it (311's descriptors, each kind's old and new name together).
+        kinds = ", ".join(f"{k} {kind}" for kind, k in (n311.get("by_kind") or {}).items())
         claims.append({"section": "lead", "doc_ids": [by_pebble["nyc311_nta"].doc_id],
                        "text": f"{'At least ' if n311.get('capped') else ''}{n311['n']} flood-related 311 "
                                f"complaint{'s were' if n311['n'] != 1 else ' was'} filed "
-                               f"{n311.get('where') or 'inside this area'} in the last {n311['years']} years"})
+                               f"{n311.get('where') or 'inside this area'} in the last {n311['years']} years"
+                               + (f", by 311 descriptor group: {kinds}" if kinds else "")
+                               + " (a count of reports; a low count can mean under-reporting, not the absence of "
+                                 "flooding)"})
     shares = []
-    for pid, label in (("dep_extreme_2080_nta", "the DEP extreme scenario for 2080 sea-level rise"),
-                       ("dep_moderate_2050_nta", "the moderate scenario for 2050")):
+    for pid in ("dep_extreme_2080_nta", "dep_moderate_2050_nta"):
         v = state.get(pid)
         if pid in by_pebble and isinstance(v, dict) and v.get("fraction_class") is not None:
             # Classes 1 and 2 are rainfall flooding, the share the cited
-            # sentence states; class 3 is the scenario's future high tide.
+            # sentence states; class 3 is the map's future high tide category.
             rain = sum(f for k, f in v["fraction_class"].items() if str(k) in ("1", "2"))
             tide = round(float(v["fraction_class"].get("3", v["fraction_class"].get(3, 0)) or 0) * 100, 1)
-            shares.append((pid, f"{round(rain * 100, 1)}% of this area is modeled to flood from rainfall in {label}"
-                           + (f" and {tide}% is in its future high tide area" if tide else "")))
+            shares.append((pid, f"{round(rain * 100, 1)}% of this area is in a rainfall flooding category of the "
+                                f"city's modelled stormwater scenario {named(pid.removesuffix('_nta'))}"
+                           + (f" and {tide}% is in its future high tide category" if tide else "")))
     if shares:
         claims.append({"section": "lead", "doc_ids": [by_pebble[p].doc_id for p, _ in shares],
                        "text": ", ".join(t for _, t in shares)})
@@ -382,6 +429,8 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
             sections.append(f"**{evidence.stone_heading(stone)}**\n{body}")
     if len(sections) == 1:
         return nothing_built(state), {}
+    if failed := _not_checked(state):
+        sections.append(failed)
     sections.append(HEAT_NON_SCOPE_FOOTER if hazard_of(state.get("plan")) == "heat" else NON_SCOPE_FOOTER)
     return "\n\n".join(sections), evidence.citations(items)
 
@@ -406,6 +455,8 @@ def reconcile_templated(state: State) -> State:
 
             out = synthesize(state, use_llm=False)
             paragraph, cites, grounding = out["paragraph"], out["citations"], out["grounding"]
+            if (failed := _not_checked(state)) and failed not in paragraph:
+                paragraph = f"{paragraph}\n\n{failed}"
         else:
             paragraph, cites = compose_briefing(state)
         rec["result"] = {"n_chars": len(paragraph), "n_citations": len(cites), "tier": "no_llm"}

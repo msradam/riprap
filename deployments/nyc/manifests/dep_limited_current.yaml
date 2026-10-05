@@ -1,8 +1,8 @@
-id: dep_moderate_current
+id: dep_limited_current
 type: baked
-title: NYC Stormwater Flood Map - Moderate Flood (2.13 inches/hr) with Current Sea Levels
+title: NYC Stormwater Flood Map - Limited Flood (1.77 inches/hr) with Current Sea Levels
 answers: >-
-  what the city's stormwater flood map "Moderate Flood (2.13 inches/hr) with Current Sea Levels" shows
+  what the city's stormwater flood map "Limited Flood (1.77 inches/hr) with Current Sea Levels" shows
   at the point: a rainfall flooding category, or none. A modelled scenario (a design storm paired with
   a sea level), not a forecast
 stone: cornerstone
@@ -19,7 +19,7 @@ config:
   function: at_point
   args:
     - {source: pt_2263}
-    - {const: dep_moderate_current}
+    - {const: dep_limited_current}
   on_none: passthrough
 
 trace_summary:
@@ -29,14 +29,21 @@ trace_summary:
 
 provenance:
   date_modified: 2024-07-03
-  retrieved_at: 2026-07-11
-  source_name: NYC Stormwater Flood Maps, Moderate Flood (2.13 inches/hr) with Current Sea Levels
+  retrieved_at: 2026-10-05
+  source_name: NYC Stormwater Flood Maps, Limited Flood (1.77 inches/hr) with Current Sea Levels
   source_url: https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv
   license: NYC Open Data Terms of Use
-  doc_id: dep_moderate_current
+  doc_id: dep_limited_current
   citation: >-
     NYC Stormwater Flood Maps (NYC Open Data 9i7c-xyvv, Department of Environmental Protection), map
-    "Moderate Flood (2.13 inches/hr) with Current Sea Levels". Map disclaimer, from DEP's own map items
+    "Limited Flood (1.77 inches/hr) with Current Sea Levels". Riprap reads this map from the vector
+    tiles of DEP's own map viewer (nyc.gov/stormwater-map, tile service
+    Moderate_5yearMHHW_updateOB_VTile1_61424), because the NYC Open Data file for it is a compressed
+    geodatabase that open tools cannot read; the other three maps are read from the NYC Open Data files.
+    The viewer's tiles and the Open Data files are not identical where both can be read (for the
+    Moderate map with current sea levels the deep and contiguous category matches and the nuisance
+    category differs by about a tenth of its area), so this reading may differ from the Open Data file
+    for the Limited map. Map disclaimer, from DEP's own map items
     (arcgis.com/home/item.html?id=5b82c08be55d4f30bf28d265ab8e4a49): the map "is intended to be an
     informational tool and does not provide the exact depth of flooding at any location", shows "the
     relative risk of flooding in public areas from stormwater runoff due to rain only", and "shall not
@@ -46,16 +53,16 @@ provenance:
     (https://nychazardmitigation.com/documentation/hazard-profiles/flooding/).
 
 narration:
-  short: What the city's stormwater flood map "Moderate Flood (2.13 inches/hr) with Current Sea Levels" shows at this address, a modelled scenario and not a forecast.
+  short: What the city's stormwater flood map "Limited Flood (1.77 inches/hr) with Current Sea Levels" shows at this address, a modelled scenario and not a forecast.
   template: "{narrative}"
 
 fallback:
   on_offline: skip
-  message: The city's stormwater flood map "Moderate Flood (2.13 inches/hr) with Current Sea Levels" was not available when this briefing ran.
+  message: The city's stormwater flood map "Limited Flood (1.77 inches/hr) with Current Sea Levels" was not available when this briefing ran.
 
 display:
   variant: headline
-  order: 23
+  order: 24
   kind: text
   map_layer: true
   icon: "💧"

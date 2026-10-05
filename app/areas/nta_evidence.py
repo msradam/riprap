@@ -32,20 +32,13 @@ def dep(polygon, scenario: str) -> dict:
     v = dep_stormwater.coverage_for_polygon(polygon, scenario)
     c = v["fraction_class"]
     rain = _pct(c.get(1, 0) + c.get(2, 0))
-    label = dep_stormwater.class_label
-    v["narrative"] = (
-        f"{v['label']}: {rain}% of this area is modeled to flood from rainfall, "
-        f"{_pct(c.get(1, 0))}% as {label(1, scenario)} and {_pct(c.get(2, 0))}% as {label(2, scenario)}"
-    )
+    # The sentence is worded once, beside the city's map and category names.
+    v["narrative"] = dep_stormwater.share_sentence(c, scenario)
     v["headline_value"] = f"{rain}% modeled to flood from rainfall"
     # Class 3 is the scenario's future high tide area, not deeper rainfall
     # flooding; the current-sea-level file has none.
     if dep_stormwater.SCENARIOS[scenario]["year"]:
-        tide = _pct(c.get(3, 0))
-        v["narrative"] += (f"; {tide}% is in the future high tide area "
-                           f"({dep_stormwater.tide_words(scenario)})")
-        v["headline_value"] += f", {tide}% future high tide"
-    v["narrative"] += "."
+        v["headline_value"] += f", {_pct(c.get(3, 0))}% future high tide"
     v["fraction_class"] = {str(k): val for k, val in c.items()}  # JSON-safe keys
     return v
 
@@ -136,14 +129,19 @@ def floodplain(polygon, query=None) -> dict | None:  # noqa: ARG001 - polygon ke
     v = {k: rows[0].get(k) for k in ("fp_100_bldg", "fp_100_resunits", "fp_100_pop", "fp_100_area")}
     # A null field is "not published" (12 districts have no resident count), never a zero.
     bldg, units, pop = (None if v[k] is None else int(v[k]) for k in ("fp_100_bldg", "fp_100_resunits", "fp_100_pop"))
+    if bldg:
+        # A zero beside buildings is one the table cannot support: 11 districts read 0 residents with buildings
+        # in the floodplain (QN06 with 448 residential units), so such a zero is not printed.
+        units, pop = units or None, pop or None
     counts = [f"{n:,} {one if n == 1 else many}" for n, one, many in (
         (bldg, "building", "buildings"), (units, "residential unit", "residential units"), (pop, "resident", "residents"))
         if n is not None]
     if not counts:
         return None
     listed = counts[0] if len(counts) == 1 else f"{', '.join(counts[:-1])} and {counts[-1]}"
-    basis = ("; residents from the 2010 census, by census block)." if pop is not None
-             else "). The profile gives no resident count for this district.")
+    missing = " or ".join(w for w, n in (("residential unit", units), ("resident", pop)) if n is None)
+    basis = ("; residents from the 2010 census, by census block)." if pop is not None else ").") + (
+        f" The profile gives no {missing} count for this district." if missing else "")
     return {"community_district": code, "n_buildings": bldg, "n_residential_units": units, "n_residents_2010": pop,
             "floodplain_sq_mi": v["fp_100_area"],
             "narrative": (f"NYC Planning's Community District Profile counts {listed} "

@@ -1,7 +1,10 @@
 id: dep_moderate_2050_nta
 type: baked
-title: DEP Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood
-answers: "share of the area modeled to flood from rainfall, and share in the future high tide area, in the DEP moderate rainstorm with 2050 sea level"
+title: NYC Stormwater Flood Maps, Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise, share of the area
+answers: >-
+  the share of the area in each category of the city's stormwater flood map "Moderate Flood (2.13
+  inches/hr) with 2050 Sea Level Rise": rainfall flooding, and the future high tide category. A
+  modelled scenario (a design storm paired with a sea level), not a forecast
 stone: cornerstone
 tier: modeled
 adapter: python_call
@@ -23,14 +26,26 @@ config:
 provenance:
   date_modified: 2024-07-03
   retrieved_at: 2026-07-11
-  source_name: NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level)
+  source_name: NYC Stormwater Flood Maps, Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise
   source_url: https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv
   license: NYC Open Data Terms of Use
   doc_id: dep_moderate_2050_nta
-  citation: NYC DEP Stormwater Flood Map, Moderate (2.13 in/hr, 2050 sea level), share of the neighborhood by flooding category
+  citation: >-
+    NYC Stormwater Flood Maps (NYC Open Data 9i7c-xyvv, Department of Environmental Protection), map
+    "Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise", share of the area by the map's flooding
+    categories. The Stormwater Resiliency Plan (2021) describes its moderate scenario as "approximately
+    two inches of rain falling in one hour (also referred to as the 10-year storm, with approximately 10
+    percent chance of occurrence in any given year) combined with 2.5 feet of SLR". Map disclaimer, from
+    DEP's own map items (arcgis.com/home/item.html?id=5b82c08be55d4f30bf28d265ab8e4a49): the map "is
+    intended to be an informational tool and does not provide the exact depth of flooding at any
+    location", shows "the relative risk of flooding in public areas from stormwater runoff due to rain
+    only", and "shall not be used for the design, modification, or construction of improvements to real
+    property or for flood plain determination". The caveat on an outside reading quotes NYC Emergency
+    Management, Hazard Mitigation Plan, flooding profile
+    (https://nychazardmitigation.com/documentation/hazard-profiles/flooding/).
 
 narration:
-  short: Share of this neighborhood in the DEP Moderate (2.13 in/hr, 2050 sea level) scenario.
+  short: Share of this area in each category of the city's stormwater flood map "Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise".
   template: "{narrative}"
 
 display:
