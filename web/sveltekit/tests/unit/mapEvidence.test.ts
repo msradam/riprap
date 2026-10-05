@@ -42,7 +42,7 @@ describe('evidence point builders', () => {
   it('builds FloodNet sensors and 311 complaints', () => {
     expect(buildFloodnetFc(final)!.features[0].properties).toMatchObject({
       pid: 'floodnet-0', name: 'Q - 184th St/91st Ave',
-      detail: 'FloodNet flood sensor, on 184th Street, in good working order'
+      detail: 'FloodNet flood sensor, on 184th Street, listed as "good" in FloodNet\'s API when this was read'
     });
     expect(build311Fc(final)!.features[0].properties).toMatchObject({
       pid: 'nyc311-0', name: '91-11 184 STREET', detail: '311 complaint, Sewer backup, 2026-05-25'

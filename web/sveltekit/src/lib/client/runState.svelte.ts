@@ -211,12 +211,13 @@ export function compactAddress(a: string): string {
   return out || a;
 }
 
-/** A FloodNet status code in words: "good" and its variants are in good
- *  working order; every other code is a maintenance flag. */
+/** A sensor's status as FloodNet's API lists it, quoted and not
+ *  interpreted: what a value such as "signal" or "noisy" means for a
+ *  reading is not published. It is the status when the API was read. */
 export function sensorStatusWords(status: unknown): string | null {
-  const s = typeof status === 'string' ? status.trim().toLowerCase() : '';
+  const s = typeof status === 'string' ? status.trim() : '';
   if (!s) return null;
-  return s.startsWith('good') ? 'in good working order' : 'flagged by FloodNet for maintenance';
+  return `listed as "${s}" in FloodNet's API when this was read`;
 }
 
 /** A 311 descriptor without its internal codes: "Sewer Backup (Use
@@ -231,7 +232,7 @@ export function plainDescriptor(d: unknown): string | null {
 /** FloodNet street sensors (`final.floodnet.sensors`). */
 export function buildFloodnetFc(fr: Rec): FeatureCollection | undefined {
   return pointsFc(block(fr, 'floodnet')?.sensors, 'floodnet', (e) => String(e.name ?? 'FloodNet sensor'), (e) =>
-    ['FloodNet flood sensor', e.street && `on ${e.street}`, e.status_words ?? sensorStatusWords(e.status)]
+    ['FloodNet flood sensor', e.street && `on ${e.street}`, sensorStatusWords(e.status) ?? e.status_words]
       .filter(Boolean).join(', '));
 }
 
@@ -386,6 +387,11 @@ export class RunState {
     const addr = raw ? compactAddress(raw) : null;
     const nta = this.finalResult?.nta?.nta_name;
     const place = addr && nta && !addr.includes(nta) ? `${addr} (${nta})` : (addr ?? nta ?? null);
+    // The backend's own sentence about the place it chose (which tabulation
+    // area, which borough, a district's approximate shape) says more than
+    // the closest-match suffix, and is the same in the JSON and MCP output.
+    const note = this.finalResult?.geocode?.note;
+    if (place && note) return `${place}. ${note}`;
     if (place && this.finalResult?.geocode?.match === 'closest')
       return `${place} (closest match; check this is the place you meant)`;
     return place;

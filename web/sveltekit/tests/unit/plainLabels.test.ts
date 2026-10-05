@@ -10,8 +10,9 @@ describe('plain map labels', () => {
     expect(plainDescriptor('')).toBeNull();
   });
   it('says FloodNet statuses in words', () => {
-    expect(sensorStatusWords('good - fs')).toBe('in good working order');
-    expect(sensorStatusWords('needs_driverail')).toBe('flagged by FloodNet for maintenance');
+    expect(sensorStatusWords('good - fs')).toBe('listed as "good - fs" in FloodNet\'s API when this was read');
+    expect(sensorStatusWords('needs_driverail')).toBe('listed as "needs_driverail" in FloodNet\'s API when this was read');
+    expect(sensorStatusWords('noisy')).not.toMatch(/flagged|maintenance/);
     expect(sensorStatusWords(undefined)).toBeNull();
   });
 });

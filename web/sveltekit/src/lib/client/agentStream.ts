@@ -155,7 +155,7 @@ export interface FinalResult {
   plan?: PlanInfo;
   nta?: { nta_code: string; nta_name: string; borough: string; bbox: number[] } | null;
   /** The place the backend resolved the query to; null when it could not. */
-  geocode?: { address?: string; borough?: string; lat?: number; lon?: number; match?: "exact" | "closest" } | null;
+  geocode?: { address?: string; borough?: string; lat?: number; lon?: number; match?: "exact" | "closest"; note?: string | null } | null;
   trace?: StepEvent[];
   /** Present when intent === "compare". `state` is the place's own
    *  result, keyed by source id as a single run's `final` is. */
