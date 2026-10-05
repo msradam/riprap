@@ -41,8 +41,7 @@
 <h1>About Riprap: method, AI disclosure and limits</h1>
 <p class="site-lead">
   Riprap answers flood and heat questions about New York City places from public records. Rules or
-  an open Granite model read your question and choose the evidence. Every sentence you read comes
-  word for word from a public record, with its source and date.
+  an open Granite model read your question and choose the evidence. Every sentence of evidence is written by code from a public record and cites its source and date.
 </p>
 
 <h2 id="method">How an answer is made</h2>
@@ -96,8 +95,8 @@
   briefings since 5 October 2026: on 639 held-out four-day windows its mean error was 0.115 m,
   and damped persistence, a one-line rule, scored 0.108 m and beats it. It foresaw 1 of the 23
   windows that reached flood stage. A person running their own copy can switch it back on. The
-  model card hosted on Hugging Face is out of date; the
-  <a href="{DOCS}/model-cards/Granite-TTM-r2-Battery-Surge.md">corrected card</a> is in the
+  model card hosted on Hugging Face was corrected to say so; its
+  <a href="{DOCS}/model-cards/Granite-TTM-r2-Battery-Surge.md">source</a> is in the
   repository. A satellite water layer was tested twice and retired. The heat briefing uses no
   model: its forecast is the National Weather Service's.
   <a href="{DOCS}/MODELS.md">What each model was tested against, and the results</a>.

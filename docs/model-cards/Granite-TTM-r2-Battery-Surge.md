@@ -15,10 +15,8 @@ tags:
 
 # Granite-TTM-r2-Battery-Surge
 
-<!-- Corrected card, written 2026-10-05 in the Riprap repository. The card
-hosted at huggingface.co/msradam/Granite-TTM-r2-Battery-Surge is older and
-still carries the figures this one withdraws. Publishing this file there is
-the owner's decision. -->
+<!-- Corrected card, written 2026-10-05. Its source is
+docs/model-cards/Granite-TTM-r2-Battery-Surge.md in the Riprap repository. -->
 
 A fine-tune of IBM Granite TimeSeries TTM r2 (2.96 million parameters) on
 the surge residual at NOAA tide gauge 8518750 (The Battery, lower

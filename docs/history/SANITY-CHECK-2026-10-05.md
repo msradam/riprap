@@ -74,7 +74,8 @@ date holds for the factual sentences, but "the sentences are written by
 Riprap's code from records, and 'word for word' in the app means only that
 the answer repeats those sentences unchanged." Many sentences are Riprap's
 own computation over a record, and the date is in the citation list, not in
-the sentence.
+the sentence. The landing line was reworded the same day to say that code
+writes each sentence of evidence from a public record.
 
 ## Every problem, and what was done
 

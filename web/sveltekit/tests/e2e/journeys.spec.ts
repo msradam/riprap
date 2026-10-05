@@ -131,10 +131,10 @@ test.describe('journeys', () => {
     await noAxeViolations(page, 'about');
   });
 
-  test('4. out-of-scope question gets the refusal', async ({ page }) => {
+  test('4. an advice question is declined, then given the records', async ({ page }) => {
     await ask(page, 'Should I buy the house at 2017 East 17th Street, Brooklyn?');
-    // The lead sentence; the live region announces the same words to screen readers.
-    await expect(page.locator('.brief-lead', { hasText: 'Riprap does not answer this question' })).toBeVisible({ timeout: 60_000 });
+    // The decline opens the answer; the records for the place follow it.
+    await expect(page.getByText('It does not price flood insurance, value property or give advice').first()).toBeVisible({ timeout: 60_000 });
     await noAxeViolations(page, 'refusal');
   });
 

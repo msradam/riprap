@@ -31,7 +31,7 @@ from hishel.httpx import SyncCacheTransport
 # A product token and nothing that names a person: no repository URL (it carries the owner's handle), no
 # email. The Weather Service asks for "a string that is unique to your application", and OSM's Nominatim
 # policy for an identifying application name; a product name meets both.
-USER_AGENT = "Riprap/0.8 (civic flood-evidence tool)"
+USER_AGENT = "Riprap/0.9 (civic flood-evidence tool)"
 DEFAULT_TTL_S = float(os.environ.get("RIPRAP_HTTP_CACHE_TTL_S", "600"))
 TIMEOUT = httpx.Timeout(20.0, connect=5.0)
 

@@ -39,7 +39,7 @@ page against `web/main.py`, the logging calls and the frontend on
 - **Public data APIs.** Coordinates or an area outline are sent to the
   city, state and federal APIs each manifest names (NYC Open Data, NOAA,
   NWS, USGS, FEMA, FloodNet and the city portals). Every request, the
-  geocoders' included, carries the User-Agent `Riprap/0.8 (civic
+  geocoders' included, carries the User-Agent `Riprap/0.9 (civic
   flood-evidence tool)`: a product name, with no contact address or
   personal identifier (`riprap/core/http.py`).
 - **Map tiles.** The browser loads basemap tiles from CARTO

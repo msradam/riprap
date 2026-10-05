@@ -12,8 +12,7 @@ reads 25 public data sources and a heat briefing 10 or 11
 > sentence, and the reader weighs them.
 
 Rules or an open Granite model read your question and choose the evidence.
-Every sentence you read comes word for word from a public record, with its
-source and date. In full: code writes one sentence from each record, and
+Every sentence of evidence is written by code from a public record and cites its source and date. In full: code writes one sentence from each record, and
 those sentences are shown unchanged. Rules answer a question first. An
 optional open Granite model, off by default, is called only when no rule
 handles the query. In planning it may set the intent among six (code

@@ -49,8 +49,8 @@ keywords:
 # Riprap derives from it are CC BY-NC-SA 4.0 and are not covered by it:
 # see "FloodNet-derived content" in NOTICE.
 license: Apache-2.0
-version: 0.8.0
-date-released: "2026-10-01"
+version: 0.9.0
+date-released: "2026-10-05"
 
 # How Riprap depends on prior work. We cite the data sources Riprap
 # composes in each per-pebble manifest's `provenance` block (see

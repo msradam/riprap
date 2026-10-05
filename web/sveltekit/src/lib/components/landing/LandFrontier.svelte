@@ -37,7 +37,7 @@
       badge: 'Negative result, off by default',
       does: 'Forecasts how far the water may run above the predicted tide over the next four days. A Granite TTM r2 fine-tune. It is out of default briefings since 2026-10-05.',
       measured: 'On 639 held-out four-day windows from January 2025 to October 2026, its mean error was 0.115 m. Damped persistence, a one-line rule, scored 0.108 m and beats it. The tide table alone scored 0.167 m.',
-      problem: 'It foresaw 1 of the 23 windows that reached flood stage, which are 5 distinct events. A forecast that a simple rule beats adds nothing to the Weather Service forecast a briefing already quotes. The model card on Hugging Face is out of date; the corrected card is the one linked here.',
+      problem: 'It foresaw 1 of the 23 windows that reached flood stage, which are 5 distinct events. A forecast that a simple rule beats adds nothing to the Weather Service forecast a briefing already quotes. The model card on Hugging Face was corrected to say so on 2026-10-05.',
       card: `${DOCS}/model-cards/Granite-TTM-r2-Battery-Surge.md`,
       cardLabel: 'Corrected model card'
     }

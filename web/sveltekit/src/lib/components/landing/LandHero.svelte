@@ -65,8 +65,7 @@
         Riprap joins street sensors, 311 complaints, flood maps and storm records for an address or
         community district into one page. For heat it reads satellite surface temperature, tree
         canopy, the Health Department's Heat Vulnerability Index and the Weather Service forecast.
-        Rules or an open Granite model read your question and choose the evidence. Every sentence
-        you read comes word for word from a public record, with its source and date.
+        Rules or an open Granite model read your question and choose the evidence. Every sentence of evidence is written by code from a public record and cites its source and date.
       </p>
 
       {#if STATIC_SITE}

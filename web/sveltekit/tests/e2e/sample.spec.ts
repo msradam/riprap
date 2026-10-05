@@ -20,7 +20,8 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
     // Four report sections in one closed disclosure after the evidence
     // table, each headed with its plain label, unnumbered.
     const heads = page.locator('.brief-written .brief-section h3');
-    await expect(heads).toHaveCount(4);
+    // A fifth, "Not checked", follows when a source did not answer at the bake.
+    expect(await heads.count()).toBeGreaterThanOrEqual(4);
     await expect(heads.nth(0)).toHaveText('Mapped hazards');
 
     // Tier marks moved out of the prose into the evidence table.
@@ -69,9 +70,10 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
     await page.locator('#brief-map').scrollIntoViewIfNeeded();
     await expect(page.locator('.maplibregl-canvas')).toBeVisible({ timeout: 15_000 });
     // The gallery fetches no live layers; only the evidence points in the
-    // snapshot (Ida marks and FloodNet sensors, 311 complaints) get a switch.
+    // snapshot (Ida marks, 311 complaints) get a switch. FloodNet's sensors
+    // are not drawn: its licence forbids reposting their records.
     await expect(page.locator('.map-layers label')).toHaveCount(2);
-    await expect(page.locator('.map-layers label').first()).toContainText('Measured (empirical), 4');
+    await expect(page.locator('.map-layers label').first()).toContainText('Measured (empirical), 2');
     await expect(page.getByText(/\b(EMP|MOD|PRX|SYN) ON\b/)).toHaveCount(0);
   });
 

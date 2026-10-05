@@ -84,7 +84,7 @@ describe('Landing smoke', () => {
   it('LandHero states who reads the question and where every sentence comes from', () => {
     const { container } = render(LandHero, heroProps);
     expect(text(container.querySelector('.hero-sub')!)).toContain(
-      'Rules or an open Granite model read your question and choose the evidence. Every sentence you read comes word for word from a public record, with its source and date.'
+      'Rules or an open Granite model read your question and choose the evidence. Every sentence of evidence is written by code from a public record and cites its source and date.'
     );
     expect(text(container)).not.toMatch(/no language model writes/i);
   });

@@ -12,8 +12,12 @@ or "Is Hunts Point hotter than the rest of the city?" Riprap answers in seconds
 with a one-page briefing, and every sentence cites a public record and its date.
 
 Rules or an open Granite model read your question and choose the evidence.
-Every sentence you read comes word for word from a public record, with its
-source and date.
+Every sentence of evidence is written by code from a public record and cites
+its source and date.
+
+![Riprap answering "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?" with a cited "Yes."](assets/screenshots/hero.png)
+
+(Screenshot of the saved briefing of 5 October 2026.)
 
 [![Code license: Apache 2.0](https://img.shields.io/badge/Code_license-Apache_2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/msradam/riprap/actions/workflows/check.yml/badge.svg)](https://github.com/msradam/riprap/actions/workflows/check.yml)
@@ -329,8 +333,9 @@ community districts and 10 questions; for heat 3 places and 7 questions),
 with no model. FloodNet's per-sensor and per-event records are served by
 nothing (the page, the JSON, MCP) and saved in no file, since its licence
 forbids reposting them. The landing's scrolling preview is the text of the Hollis "since Ida"
-entry, read from its saved file at build time, so it follows a rebuild with
-no screenshot to retake. Docker and the Modal host are in
+entry, read from its saved file at build time, so it follows a rebuild. The
+README's screenshots are retaken with the app running
+(`cd web/sveltekit && node scripts/hero.mjs http://127.0.0.1:7860`). Docker and the Modal host are in
 [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## How it works
@@ -436,9 +441,9 @@ own water-level forecast, which Riprap already quotes, so it no longer runs
 unless a server sets `RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional` and
 installs the `ml` extra (`uv sync --extra ml`); it never runs inland. The
 [model card hosted on Hugging Face](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge)
-is out of date: it claims a larger improvement than the held-out test shows
-and gives the model's size as 1.5 million parameters where the published file
-holds 2,964,960. The corrected card is
+was corrected on 2026-10-05: the earlier card claimed a larger improvement
+than the held-out test shows and gave the model's size as 1.5 million
+parameters where the published file holds 2,964,960. Its source is
 [docs/model-cards/Granite-TTM-r2-Battery-Surge.md](docs/model-cards/Granite-TTM-r2-Battery-Surge.md).
 
 The land-cover model runs in a batch job with the `eo` extra, and the app

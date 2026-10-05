@@ -4,7 +4,7 @@ All notable changes to Riprap. The hackathon submission tag is
 `v0.5.0` (build 2026-05-07); subsequent dates record polish work
 that landed on the hackathon-period production deploys.
 
-## [Unreleased] (the review fix pass) - 2026-10-05
+## [0.9.0] - 2026-10-05 (the review fix pass)
 
 A sanity check, run by AI agents separate from those that wrote the code,
 re-derived 487 briefing sentences from the
@@ -96,9 +96,8 @@ and the version is unchanged.
   0.108 m and beats it (difference 0.0065 m, 95% interval 0.0032 to 0.0096).
   It foresaw 1 of 23 flood-stage windows, which are 5 distinct events. Its
   manifest moved to `deployments/nyc/optional/`; a server opts in with
-  `RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional`. The hosted model card is
-  out of date; a corrected card is at
-  `docs/model-cards/Granite-TTM-r2-Battery-Surge.md`.
+  `RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional`. The hosted model card was
+  corrected from `docs/model-cards/Granite-TTM-r2-Battery-Surge.md`.
 - **Four stormwater maps, in the city's own words.** The fourth, "Limited
   Flood (1.77 inches/hr) with Current Sea Levels", is read from the vector
   tiles of DEP's viewer. Sentences use the city's map names, call them
@@ -146,8 +145,10 @@ and the version is unchanged.
 - The fixed disclaimer adds that a briefing is about records of a place, not
   an assessment of a property or of the people who live there.
 - The landing's hero line: "Rules or an open Granite model read your question
-  and choose the evidence. Every sentence you read comes word for word from a
-  public record, with its source and date." The footer says "built to meet"
+  and choose the evidence. Every sentence of evidence is written by code from
+  a public record and cites its source and date." An earlier wording of this
+  pass said "word for word from a public record", which the about page
+  contradicted; seven reviewers raised it and it was changed. The footer says "built to meet"
   WCAG 2.2 AA and no longer names Section 508 or the Plain Writing Act.
 - The README's lead example is the live answer of 2026-10-05, and its claim
   that no other tool does these things together is gone.
@@ -283,18 +284,13 @@ and the version is unchanged.
 - The landing's preview image and the README screenshot showed the Hollis
   answer's earlier sentences and a map of sensor points. Both were removed,
   with the scripts that captured them; a new screenshot needs a browser.
-- The public site still serves the earlier build.
 - The USGS stream gauge did not answer during the last gallery build, so
   no saved address briefing quotes a gauge.
-- The hero line says every sentence comes word for word from a public
-  record, and the about page says the sentences are written by Riprap's
-  code from records. Seven reviewers read the two as in conflict; the
-  wording is the owner's to settle.
 - Nothing tests the joined evidence against observed flooding.
 - FloodNet has not been asked about Riprap's use of its data. Event rows
   removed from the tree on 2026-10-05 remain in git history.
 
-## [Unreleased] (a heat briefing, and the models settled) - 2026-10-02
+## [0.9.0] (a heat briefing, and the models settled) - 2026-10-02
 
 Riprap becomes a climate briefing: the same method, proved on a second
 hazard. Branches `models/terramind-nyc` and `climate/heat`; not tagged.

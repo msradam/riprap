@@ -46,8 +46,8 @@ as claims (the mode now behind `RIPRAP_LLM_BARE=1`). `granite4:micro` kept
 
 The gallery answers one question with the land-cover model:
 [paved, green and tree-covered land in QN12](https://msradam.github.io/riprap/gallery/qn12-paved/).
-Its Battery surge entry was baked before the forecast left default
-briefings and is out of date until the gallery is rebuilt.
+The gallery's Battery surge entry was removed when the forecast left default
+briefings.
 
 Riprap is an app in development, and these two models are part of it.
 Neither has been shown to beat an official product. So their output is never
@@ -261,20 +261,18 @@ when a flood came, and a 30 m elevation model cannot place a subway entrance
 within the half metre that separates an ordinary high tide from a minor
 flood.
 
-**The hosted model card is out of date.** The card at
+**The hosted model card was corrected on 2026-10-05.** The earlier card at
 [huggingface.co/msradam/Granite-TTM-r2-Battery-Surge](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge)
-still claims a 41.4% improvement over persistence. That figure is from the
+claimed a 41.4% improvement over persistence. That figure is from the
 training run's own split of 2015 to 2024, against the last value held and
 no other baseline; on held-out data the margin over the last value is about
-14% and the model loses to damped persistence. The card also says Hurricane
+14% and the model loses to damped persistence. The card also said Hurricane
 Ida "falls within the test window": with a 70/15/15 split of 2015 to 2024
 the test part starts in mid 2023, so Ida (September 2021) is in the
-training part, and Ida in New York was a rainfall flood. It gives the size
+training part, and Ida in New York was a rainfall flood. It gave the size
 as 1.5 million parameters; the published safetensors file holds 2,964,960
-(2.96 million). A corrected card is in this repository at
+(2.96 million). The card now hosted is the one in this repository at
 [`docs/model-cards/Granite-TTM-r2-Battery-Surge.md`](model-cards/Granite-TTM-r2-Battery-Surge.md).
-Publishing it is the owner's decision, and until then the hosted card
-should not be relied on.
 
 ### The satellite water layer, retired 2026-10-02
 
