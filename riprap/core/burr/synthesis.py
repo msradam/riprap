@@ -394,17 +394,6 @@ def _change_lead(facts: list[str], values: dict | None) -> str:
     return f"{lead} The difference between them is not a measured change:"
 
 
-def _canopy_note(question: str, facts: list[str], texts: dict[str, str]) -> str:
-    """For a question about trees or green cover answered with the model's
-    canopy share: what that share has read against the city's map, said
-    before the figure (the model's own sentence says it about 80 words in)."""
-    from app import experimental
-
-    words = (experimental.evaluation("landcover") or {}).get("canopy_vs_city_map_2017_words")
-    quoted = any(f in ("landcover", "landcover_nta") and "tree canopy" in texts.get(f, "") for f in facts)
-    if not words or not quoted or not re.search(r"canopy|\btrees?\b|\bgreen|\bshad", question or "", re.I):
-        return ""
-    return f"The experimental model's maps show {words}, so its canopy share can be several points off."
 HEAT_LIVE_POINTER = ("Riprap reads records, not the street. Official heat warnings come from the National Weather "
                      "Service (weather.gov/okx) and Notify NYC; during a heat emergency the city lists its cooling "
                      "centers at finder.nyc.gov/coolingcenters.")
@@ -431,7 +420,7 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
                 and set(numbers_in(c["text"])) <= answer_nums)
 
     def sentences(sec: str) -> str:
-        out = []
+        out: list = []  # a finished sentence, or a (text, doc_id, every) fact still to cite
         for c in kept:
             if c["section"] != sec or restates(c):
                 continue
@@ -439,10 +428,12 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
             if any(i in experimental for i in c["doc_ids"]) and "experimental" not in text.lower():
                 text = f"Experimental: {text}"
             if len(c["doc_ids"]) == 1:  # a multi-sentence template fact: cite each numeric sentence
-                out.append(evidence.cite(f"{text}.", c["doc_ids"][0], every=c["doc_ids"][0] in experimental))
+                out.append((f"{text}.", c["doc_ids"][0], c["doc_ids"][0] in experimental))
             else:
                 out.append(f"{text} {''.join(f'[{i}]' for i in c['doc_ids'])}.")
-        return " ".join(out)
+        # Cited together, so a closing sentence several facts share is printed once, after the last of them.
+        cited = iter(evidence.cite_each([f for f in out if not isinstance(f, str)]))
+        return " ".join(filter(None, (f if isinstance(f, str) else next(cited) for f in out)))
 
     parts = [_scope_header()]
     if brief:
@@ -628,8 +619,6 @@ def synthesize(state, use_llm: bool = True) -> dict:
             lead_phrase = NO_ADVICE  # no FEMA reading for this place: the statement alone, and the pointer below
         if lead == "no_change_record":
             lead_phrase = _change_lead(facts, values)
-        if lead in ("facts", "experimental", "no_change_record") and (note := _canopy_note(question, facts, texts)):
-            lead_phrase = f"{note} {lead_phrase}"
         if lead == "count" and rel in facts:
             sentence, undetermined = answer_checks.count_lead(question, texts, values)
             if undetermined:  # the period asked is not the source's window: no count as the answer

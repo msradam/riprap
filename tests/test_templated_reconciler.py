@@ -164,3 +164,32 @@ def test_a_source_that_failed_is_listed_as_not_checked():
             "flood zone at this point.\n\n**Out of scope.**") in paragraph
     assert [r.name for r in check_briefing(paragraph).failed] == []
     assert "**Not checked.**" not in compose_briefing(_state(consulted=consulted, trace=trace[1:]))[0]
+
+
+def test_a_sentence_shared_by_several_facts_is_printed_once_with_every_mark():
+    """Four stormwater maps printed the city's disclaimer four times and
+    "does not mean safe" once per map. Any sentence several quoted facts
+    share is printed once, after the last of them, with all their marks."""
+    from riprap.core.burr.evidence import cite_each
+
+    out = cite_each([("Map A shows 3 ft. It is a scenario. Outside is not safe.", "a", False),
+                     ("Map B shows 1 ft. It is a scenario.", "b", False),
+                     ("Outside is not safe. It is a scenario.", "c", False),
+                     ("12 complaints. A count is a count of reports.", "d", False)])
+    assert out == ["Map A shows 3 ft [a].", "Map B shows 1 ft [b].",
+                   "It is a scenario [a][b][c]. Outside is not safe [a][c].",
+                   "12 complaints [d]. A count is a count of reports."]
+
+
+def test_a_district_briefing_prints_the_stormwater_disclaimer_once():
+    from app.flood_layers.dep_stormwater import share_sentence
+
+    state = {"intent": "neighborhood", "deployment": "nyc", "plan": {},
+             **{f"{s}_nta": {"fraction_class": {1: 0.02, 2: 0.01}, "narrative": share_sentence({1: 0.02, 2: 0.01}, s)}
+                for s in ("dep_limited_current", "dep_moderate_current", "dep_moderate_2050", "dep_extreme_2080")}}
+    from riprap.core.burr.templated_reconciler import compose_briefing
+
+    paragraph, _ = compose_briefing(state)
+    assert paragraph.count("does not provide the exact depth of flooding at any location") == 1
+    assert ("flood plain determination [dep_extreme_2080_nta][dep_moderate_2050_nta][dep_moderate_current_nta]"
+            "[dep_limited_current_nta].") in paragraph

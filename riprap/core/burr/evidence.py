@@ -97,10 +97,10 @@ def sentence_for(value: Any, manifest) -> str | None:
 def cite(text: str, doc_id: str, every: bool = False) -> str:
     """Append [doc_id] to every sentence with a figure in it, and to the
     last sentence in any case. (The audit `every_numeric_claim_cited` looks
-    for a number with a unit; a district's "13 FloodNet community sensors
-    ... 358 above-curb flood events" has none next to its numbers and once
-    went uncited.) With `every`, to every sentence: an experimental
-    source's statement, limits and pointer each carry it."""
+    for a number with a unit; a district's "21 FloodNet sensors ... have
+    recorded 40 flood events" has none next to its numbers and once went
+    uncited.) With `every`, to every sentence: an experimental source's
+    statement, limits and pointer each carry it."""
     marker = f"[{doc_id}]"
     out = []
     for s in _sentences(text):
@@ -111,6 +111,31 @@ def cite(text: str, doc_id: str, every: bool = False) -> str:
     if marker not in body:
         body = f"{body[:-1].rstrip()} {marker}{body[-1]}" if body[-1] in ".!?" else f"{body} {marker}"
     return body
+
+
+def cite_each(facts: list[tuple[str, str, bool]]) -> list[str]:
+    """`cite` for each (text, doc_id, every) fact quoted together, with a
+    sentence that several of them share word for word printed once, after
+    the last fact that has it, carrying the marks of all of them. (Four
+    stormwater maps once printed the city's disclaimer four times, and
+    "Outside a mapped extent does not mean safe" once per map.) One string
+    per fact, empty for a fact whose every sentence is printed later."""
+    split = [(_sentences(text), doc_id, every) for text, doc_id, every in facts]
+    owners: dict[str, list[int]] = {}
+    for i, (sentences, _, _) in enumerate(split):
+        for s in dict.fromkeys(sentences):
+            owners.setdefault(s, []).append(i)
+    shared = {s: at for s, at in owners.items() if len(at) > 1}
+    out = []
+    for i, (sentences, doc_id, every) in enumerate(split):
+        own = " ".join(s for s in sentences if s not in shared)
+        parts = [cite(own, doc_id, every)] if own else []
+        for s, at in shared.items():
+            if at[-1] == i:
+                marks = "".join(dict.fromkeys(f"[{split[j][1]}]" for j in at))
+                parts.append(f"{s[:-1].rstrip()} {marks}{s[-1]}" if s[-1] in ".!?" else f"{s} {marks}")
+        out.append(" ".join(parts))
+    return out
 
 
 def collect(state, stones: StoneRegistry, registry: Registry) -> list[Evidence]:

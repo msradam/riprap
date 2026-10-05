@@ -83,7 +83,7 @@ def test_every_sentence_is_a_scenario_at_the_mapped_point_and_no_determination(s
     v = shape({"depth_class": cls, "edge_m": None}, _manifest(scenario))
     text = v["narrative"]
     assert f'"{CITY_NAMES[scenario]}"' in text
-    assert "is a modelled scenario (a design storm paired with " in text and "not a forecast" in text
+    assert "are modelled scenarios (each a design storm paired with a sea level), not forecasts" in text
     assert "at the point mapped for this address" in text and "This address is" not in text
     assert "public areas and rain only" in text
     assert '"does not provide the exact depth of flooding at any location"' in text

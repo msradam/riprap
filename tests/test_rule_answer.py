@@ -295,10 +295,12 @@ def test_a_change_question_about_paving_is_told_first_that_the_two_figures_are_n
     values["landcover_nta"]["built_pct"] = 80.0
     wide = _synthesize(monkeypatch, docs, q, values, intent="neighborhood")["paragraph"]
     assert "within what the model" not in wide and "is not a measured change" in wide
-    # A question about canopy that quotes the model's share is told first how that share has read.
+    # How the model's canopy share has read against the city's map is said once, in the model's own cited
+    # sentence (app/experimental.py), not a second time in the lead.
+    docs[1] = Doc("landcover_nta", "Cornerstone",
+                  f"{model} Its maps show 4.2 to 5.0 points less tree canopy than the city's 2017 map.", True)
     trees = _synthesize(monkeypatch, docs, "How much tree canopy is there in QN12?", values, intent="neighborhood")["paragraph"]
-    said = "The experimental model's maps show 4.2 to 5.0 points less tree canopy than the city's 2017 map in 3 of its 4"
-    assert said in trees and trees.index(said) < trees.index("13.4% tree canopy")
+    assert trees.count("less tree canopy than the city's 2017 map") == 1
 
 
 def test_the_models_block_lists_only_a_model_a_sentence_quotes():

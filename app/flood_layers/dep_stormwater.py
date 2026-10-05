@@ -102,16 +102,18 @@ def named(scenario: str) -> str:
     return f'"{s["name"]}"' + ("" if s["year"] else " (the near term)")
 
 
-def limits(scenario: str) -> str:
-    """What the map is and is not, in the words of the city's disclaimer
+def limits(scenario: str) -> str:  # noqa: ARG001 - the same for every map
+    """What the maps are and are not, in the words of the city's disclaimer
     (the licence text of DEP's own map items, arcgis.com item
     5b82c08be55d4f30bf28d265ab8e4a49). The second sentence of every
-    stormwater statement: a "not" in the first would read as an absence."""
-    year = SCENARIOS[scenario]["year"]
-    sea = f"{year} sea level rise" if year else "current sea levels, the near term"
-    return (f"This map is a modelled scenario (a design storm paired with {sea}), not a forecast: its rainfall "
-            "flooding categories cover public areas and rain only, it \"does not provide the exact depth of flooding "
-            "at any location\", and it is not a flood plain determination.")
+    stormwater statement: a "not" in the first would read as an absence.
+    It is the same sentence for every map (the map's own name already gives
+    its storm and sea level), so a briefing that quotes several maps prints
+    it once (evidence.cite_each)."""
+    return ("The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), "
+            "not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the "
+            "map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain "
+            "determination.")
 
 
 def share_sentence(fraction_class: dict, scenario: str) -> str:

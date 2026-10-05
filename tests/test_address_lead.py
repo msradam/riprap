@@ -68,7 +68,7 @@ def test_question_briefings_have_no_lead():
 
 def test_dep_scenarios_are_one_sentence_naming_each_result():
     paragraph, _ = compose_briefing(STATE)
-    assert "This map is a modelled scenario" not in paragraph  # the template sentences are gone
+    assert "are modelled scenarios (each a design storm paired with a sea level), not forecasts:" not in paragraph  # the template sentences are gone
     assert ("at the point mapped for this address they show: "
             '"Moderate Flood (2.13 inches/hr) with Current Sea Levels" (the near term), no flooding category '
             '[dep_moderate_current]; "Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise", no flooding category '
@@ -93,9 +93,10 @@ def test_dep_scenario_narration_per_class():
     from riprap.core.pebbles.shapers.dep_scenario import shape
 
     m50, m80 = _manifest("dep_moderate_2050"), _manifest("dep_extreme_2080")
-    limits = (" This map is a modelled scenario (a design storm paired with {year} sea level rise), not a forecast: its "
-              'rainfall flooding categories cover public areas and rain only, it "does not provide the exact depth of '
-              'flooding at any location", and it is not a flood plain determination.')
+    limits = (" The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), "
+              "not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the "
+              'map "does not provide the exact depth of flooding at any location", and it is not a flood plain '
+              "determination.")
     stem = 'The city\'s stormwater flood map "Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise" shows the category '
     assert shape(1, m50)["narrative"] == (stem + '"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)" at '
                                           "the point mapped for this address." + limits.format(year=2050))

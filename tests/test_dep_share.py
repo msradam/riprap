@@ -5,8 +5,10 @@ flooding by the city's own category names, the future high tide category
 from app.areas import nta_evidence
 from app.flood_layers import dep_stormwater
 
-LIMITS = ('not a forecast: its rainfall flooding categories cover public areas and rain only, it "does not provide the '
-          'exact depth of flooding at any location", and it is not a flood plain determination.')
+# One sentence for every map, so a briefing that quotes several prints it once.
+LIMITS = ("The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not "
+          'forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map "does '
+          'not provide the exact depth of flooding at any location", and it is not a flood plain determination.')
 
 
 def _share(monkeypatch, scenario, fractions):
@@ -22,8 +24,7 @@ def test_2050_share_names_the_future_high_tide_category(monkeypatch):
         'On the city\'s stormwater flood map "Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise", 1.5% of this '
         'area is in a rainfall flooding category: 1.5% in "Nuisance Flooding (greater or equal to 4 in. and less than '
         '1 ft.)" and 0.0% in "Deep and Contiguous Flooding (1 ft. and greater)"; 20.0% is in its "Future High Tides '
-        '2050" category, which is coastal tidal inundation projected for 2050. This map is a modelled scenario (a '
-        f"design storm paired with 2050 sea level rise), {LIMITS}")
+        f'2050" category, which is coastal tidal inundation projected for 2050. {LIMITS}')
     assert v["headline_value"] == "1.5% modeled to flood from rainfall, 20.0% future high tide"
 
 
@@ -39,8 +40,7 @@ def test_current_share_has_no_tide_clause_and_names_a_horizon(monkeypatch):
     assert v["narrative"] == (
         'On the city\'s stormwater flood map "Moderate Flood (2.13 inches/hr) with Current Sea Levels" (the near '
         'term), 3.0% of this area is in a rainfall flooding category: 2.0% in "Nuisance Flooding (greater or equal '
-        'to 4 in. and less than 1 ft.)" and 1.0% in "Deep and Contiguous Flooding (1 ft. and greater)". This map is '
-        f"a modelled scenario (a design storm paired with current sea levels, the near term), {LIMITS}")
+        f'to 4 in. and less than 1 ft.)" and 1.0% in "Deep and Contiguous Flooding (1 ft. and greater)". {LIMITS}')
     assert "tid" not in v["narrative"].lower()
 
 

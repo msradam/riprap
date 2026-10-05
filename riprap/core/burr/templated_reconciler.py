@@ -413,7 +413,7 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
     for stone in stones.all():
         if stone.id == "capstone":
             continue  # Capstone is the synthesis output, not a data stone
-        out = []
+        out: list = []  # a finished sentence, or a (text, doc_id, every) fact still to cite
         for e in items:
             # An experimental source stays quiet under an unanswered question too.
             if e.stone_id != stone.id or ((not question or e.maturity == "experimental") and _quiet(state, e)):
@@ -423,8 +423,10 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
                     out.append(dep)
                     dep_done = True
                 continue
-            out.append(evidence.cite(e.text, e.doc_id, every=e.maturity == "experimental"))
-        body = " ".join(out)
+            out.append((e.text, e.doc_id, e.maturity == "experimental"))
+        # Cited together, so a closing sentence several sources share is printed once.
+        cited = iter(evidence.cite_each([f for f in out if not isinstance(f, str)]))
+        body = " ".join(filter(None, (f if isinstance(f, str) else next(cited) for f in out)))
         if body:
             sections.append(f"**{evidence.stone_heading(stone)}**\n{body}")
     if len(sections) == 1:
