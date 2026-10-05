@@ -119,7 +119,7 @@ def _warm_caches():
         return
     print("[startup] warming flood layers...", flush=True)
     sandy_inundation.load()
-    for scen in ["dep_extreme_2080", "dep_moderate_2050", "dep_moderate_current"]:
+    for scen in dep_stormwater.SCENARIOS:
         dep_stormwater.load(scen)
     print("[startup] flood layers ready", flush=True)
     if os.environ.get("RIPRAP_WARM", "").lower() in ("1", "true", "yes"):

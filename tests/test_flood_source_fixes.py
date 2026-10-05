@@ -164,7 +164,7 @@ def test_the_housing_register_counts_hammel_and_states_its_rule():
     assert not rows["GOWANUS"]["snap"]["sandy"]  # 0.7% of its outline: named, not counted
     s = exposure.summary_for_point(40.6787, -73.9897, "nycha")  # 400 Carroll Street
     assert "10% or more of their mapped outline inside the 2012 Sandy extent" in s["narrative"]
-    assert "centre point inside a modeled DEP stormwater scenario" in s["narrative"]
+    assert "centre point inside one of three modeled DEP stormwater scenarios" in s["narrative"] and "the Limited Flood map is not tested" in s["narrative"]
     assert "Under 10% of the outline inside the 2012 Sandy extent (not counted): GOWANUS" in s["narrative"]
     assert s["n_inside_sandy_2012"] == 2 and s["n_near_sandy_edge"] == 1
 

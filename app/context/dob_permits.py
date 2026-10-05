@@ -198,7 +198,7 @@ def cross_reference_flood(permits: list[Permit]) -> list[dict[str, Any]]:
     sandy_flags = sandy_inundation.join(pts).reset_index(drop=True).tolist()
 
     dep_hits = {scen: dep_stormwater.join(pts, scen)["depth_class"].astype(int).tolist()
-                for scen in ("dep_extreme_2080", "dep_moderate_2050", "dep_moderate_current")}
+                for scen in dep_stormwater.SCENARIOS}
 
     out = []
     for i, p in enumerate(permits):

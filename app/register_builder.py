@@ -28,6 +28,8 @@ from app.flood_layers import dep_stormwater, sandy_inundation
 
 ROOT = Path(__file__).resolve().parent.parent
 REGISTERS_DIR = ROOT / "data" / "registers"
+# The Limited Flood map (dep_limited_current) is not tested: adding it means rebuilding both registers from
+# their source files, and the register sentence (app/registers/exposure.py, `scope`) names the three that are.
 SCENARIOS = ("dep_extreme_2080", "dep_moderate_2050", "dep_moderate_current")
 
 

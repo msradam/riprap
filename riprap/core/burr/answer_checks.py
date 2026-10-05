@@ -128,9 +128,13 @@ def count_numbers(doc: str, near: str = "") -> list[str]:
     return out
 
 
-# A DEP stormwater scenario named in a question, by its year, and the words
-# that mark a stormwater question (not a sea-level one).
+# A DEP stormwater scenario named in a question, by its year or its storm,
+# and the words that mark a stormwater question (not a sea-level one). Two
+# maps use current sea levels: "limited" names the smaller storm, and
+# "current" alone still means the Moderate Flood map, as before the Limited
+# map was read.
 _DEP_YEAR = ((re.compile(r"\b2080\b|\bextre+m", re.I), "dep_extreme_2080"), (re.compile(r"\b2050\b"), "dep_moderate_2050"),
+             (re.compile(r"\blimited\b|\b1\.77\b", re.I), "dep_limited_current"),
              (re.compile(r"\bcurrent\b", re.I), "dep_moderate_current"))
 _STORMWATER_RE = re.compile(r"stormwater|\bdep\b|\bscenario\b", re.I)
 _NOT_STORMWATER_RE = re.compile(r"sea.level|surge|\btide", re.I)
@@ -144,6 +148,8 @@ def dep_scenario_asked(question: str) -> str | None:
     if not _STORMWATER_RE.search(q) or _NOT_STORMWATER_RE.search(q):
         return None
     named = [pid for pat, pid in _DEP_YEAR if pat.search(q)]
+    if "dep_limited_current" in named and not re.search(r"\bmoderate\b", q, re.I):
+        named = [n for n in named if n != "dep_moderate_current"]  # "the limited scenario under current conditions"
     return named[0] if len(named) == 1 else None
 
 

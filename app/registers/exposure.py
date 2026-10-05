@@ -137,7 +137,8 @@ CLASSES: dict[str, Spec] = {
         head=_school, name=lambda f: f["loc_name"], register="schools", buffer_m=BUFFER_DOE_SCHOOL_M,
         scope=" (from the NYC Department of Education's school locations for the 2019 to 2020 school year, charter "
               "schools included; the register lists only schools whose location point is inside the 2012 Sandy "
-              "extent or a modeled DEP stormwater scenario, not every school)"),
+              "extent or one of three modeled DEP stormwater scenarios (Moderate Flood with current and with 2050 sea "
+              "levels, Extreme Flood with 2080; the Limited Flood map is not tested), not every school)"),
     "nycha": Spec(
         singular="NYCHA development inside a mapped flood extent",
         plural="NYCHA developments inside a mapped flood extent", radius_m=2000, max_n=5,
@@ -149,7 +150,9 @@ CLASSES: dict[str, Spec] = {
         scenarios=SCENARIOS + ("dep_moderate_current",),
         elev_key="rep_elevation_m", hand_key="rep_hand_m",
         scope=f" (the register lists only developments with {SANDY_MIN_SHARE:.0%} or more of their mapped outline inside the "
-              "2012 Sandy extent, or their centre point inside a modeled DEP stormwater scenario, not every development)"),
+              "2012 Sandy extent, or their centre point inside one of three modeled DEP stormwater scenarios (Moderate "
+              "Flood with current and with 2050 sea levels, Extreme Flood with 2080; the Limited Flood map is not "
+              "tested), not every development)"),
 }
 
 

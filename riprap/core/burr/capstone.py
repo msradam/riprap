@@ -1,6 +1,6 @@
 """Capstone input: the DEP fan-in.
 
-  assemble_legacy_state -> fold the three DEP scenario pebbles into one
+  assemble_legacy_state -> fold the four DEP scenario pebbles into one
                            `dep` dict (part of the public result).
 
 The terminal `reconcile` action is `synthesis.reconcile_claims` (LLM)
@@ -16,12 +16,15 @@ from burr.core import State, action
 from riprap.core.burr.pebble import trace_rec_for
 
 
+_DEP = ("dep_extreme_2080", "dep_moderate_2050", "dep_moderate_current", "dep_limited_current")
+
+
 @action(
-    reads=["dep_extreme_2080", "dep_moderate_2050", "dep_moderate_current"],
+    reads=list(_DEP),
     writes=["dep", "trace"],
 )
 def assemble_legacy_state(state: State) -> State:
-    """Compose the three DEP scenario pebble values into the legacy `dep`
+    """Compose the four DEP scenario pebble values into the legacy `dep`
     compound dict the public result carries.
 
     All other pebbles (sandy, ida_hwm, floodnet, etc.) already write the
@@ -31,7 +34,7 @@ def assemble_legacy_state(state: State) -> State:
     trace = list(state.get("trace", []))
     rec = trace_rec_for("assemble_legacy_state")
     dep: dict[str, Any] = {}
-    for scen in ("dep_extreme_2080", "dep_moderate_2050", "dep_moderate_current"):
+    for scen in _DEP:
         v = state.get(scen)
         if v is not None:
             dep[scen] = v

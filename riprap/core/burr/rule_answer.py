@@ -57,8 +57,9 @@ LIVE_FACTS = ("nws_alerts", "floodnet", "noaa_tides", "nws_water_forecast", "usg
 FORECAST_FACTS = ("nws_water_forecast", "npcc4_slr",
                   "dep_moderate_2050", "dep_extreme_2080", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
 OBSERVED = ("floodnet", "nyc311", "nyc311_nta", "ida_hwm", "sandy_inundation", "sandy_nta")
-DEP = ("dep_moderate_current", "dep_moderate_2050", "dep_extreme_2080",
-       "dep_moderate_current_nta", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
+# The city's four stormwater maps, smallest storm first, for an address and for an area.
+DEP = ("dep_limited_current", "dep_moderate_current", "dep_moderate_2050", "dep_extreme_2080",
+       "dep_limited_current_nta", "dep_moderate_current_nta", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
 # Sources a question can name beyond answer_checks.RELEVANT, most specific first.
 TOPICS = (
     (re.compile(r"\bfema\b|flood ?zones?\b|flood ?plain|\bfirm\b|flood insurance rate", re.I),

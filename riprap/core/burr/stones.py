@@ -71,8 +71,8 @@ FOCUS_FLOOR = {
 
 # A question about the DEP stormwater scenarios runs all of them.
 _DEP_RE = re.compile(r"\b(dep|stormwater)\b", re.IGNORECASE)
-DEP_FLOOR = ("dep_moderate_current", "dep_moderate_2050", "dep_extreme_2080",
-             "dep_moderate_current_nta", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
+DEP_FLOOR = ("dep_limited_current", "dep_moderate_current", "dep_moderate_2050", "dep_extreme_2080",
+             "dep_limited_current_nta", "dep_moderate_current_nta", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
 
 
 def hazard_of(plan: dict | None) -> str:

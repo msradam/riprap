@@ -106,6 +106,9 @@ def test_dep_scenario_asked():
     assert dep_scenario_asked(Q_2050) == "dep_moderate_2050"
     assert dep_scenario_asked("What does the DEP 2080 scenario show here?") == "dep_extreme_2080"
     assert dep_scenario_asked("What does the current stormwater scenario show?") == "dep_moderate_current"
+    # The fourth map, by its storm; "current" beside it does not name the Moderate map too.
+    assert dep_scenario_asked("What does the limited stormwater scenario show under current conditions?") == "dep_limited_current"
+    assert dep_scenario_asked("How do the limited and moderate current stormwater scenarios compare?") is None
     assert dep_scenario_asked("How do the 2050 and 2080 stormwater scenarios compare?") is None
     assert dep_scenario_asked("What sea level does the 2050 scenario project?") is None
     assert dep_scenario_asked("Will this block flood in 2050?") is None
@@ -141,3 +144,14 @@ def test_since_ida_needs_a_window_that_starts_on_or_before_ida():
     # "since 2022" starts inside the window: every source answered none, so the answer is no.
     q22 = q.replace("since Hurricane Ida", "since 2022")
     assert past_event_lead(q22, PAST, [], {"nyc311": "0 complaints."}, zero, 2026)[0] == "no"
+
+
+def test_a_stormwater_question_selects_and_quotes_all_four_maps():
+    from riprap.core.burr import rule_answer, stones
+
+    ids = ("dep_limited_current", "dep_moderate_current", "dep_moderate_2050", "dep_extreme_2080")
+    assert set(ids) | {f"{i}_nta" for i in ids} == set(stones.DEP_FLOOR) == set(rule_answer.DEP)
+    floor = stones.floor_for({"intent": "single_address", "question": "What do the stormwater scenarios show here?"})
+    assert set(ids) <= floor
+    texts = {i: f"The city's stormwater flood map {i} shows no flooding category." for i in ids}
+    assert rule_answer.answer("What do the stormwater scenarios show here?", texts, {})[1] == list(ids)
