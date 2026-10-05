@@ -25,7 +25,6 @@ config:
     - webintakeservicerequests
     - servicerequeststatusname
     - createddate
-    - location
   count_by_field: webintakeservicerequests
   order: createddate DESC
   cache_ttl_s: 1800
@@ -48,7 +47,7 @@ narration:
   short: Flood-related Seattle service requests within 300 m of this address.
   template: >-
     {n_kept} of {n_before_phrase} Seattle service requests within {radius_m} m of this
-    address {filter_note}.
+    address{window_phrase} {filter_note}.
 
 display:
   order: 20

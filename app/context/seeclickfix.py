@@ -65,7 +65,7 @@ def records_near(
             "summary": r.get("summary"),
             "status": r.get("status"),
             "created_at": r.get("created_at"),
-            "address": r.get("address"),
+            # (No address: a dated request at a house number is not served, as for NYC 311.)
         }
         for r in records[:sample_cap]
     ]

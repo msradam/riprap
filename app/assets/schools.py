@@ -20,15 +20,12 @@ def load() -> gpd.GeoDataFrame:
         "loc_code": "loc_code",
         "loc_name": "name",
         "address": "address",
-        "bbl": "bbl",
-        "bin": "bin",
         "boronum": "boro_num",
         "geodistric": "geo_district",
         "adimindist": "admin_district",
     })
     g["borough"] = g["boro_num"].astype(str).map(BORO)
     g["managed_by"] = g["managed_by"].astype(str).map(MANAGED_BY)
-    g["bbl"] = g["bbl"].astype(str).str.replace(r"\.0$", "", regex=True)
-    keep = ["loc_code", "name", "address", "borough", "bbl", "bin", "managed_by",
+    keep = ["loc_code", "name", "address", "borough", "managed_by",
             "geo_district", "admin_district", "geometry"]
     return g[keep].copy()

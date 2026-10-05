@@ -19,7 +19,9 @@ Each file carries the full result (the same shape as the SSE `final`
 event, trace included), the deployment's stones and pebbles as
 /api/pebbles serves them, and how and when it was generated. FloodNet's
 per-sensor and per-event records are taken out before a file is written
-(`strip_floodnet`): its licence forbids reposting the data in part.
+(`strip_records`): its licence forbids reposting the data in part. So is
+any house number or per-house coordinate of a 311 complaint: a dated
+complaint is baked at its block, with coordinates rounded to about 100 m.
 
 The landing's briefing preview is a screenshot of hollis-since-ida. After
 rebuilding that entry, rebuild the frontend, serve it, and retake it:
@@ -48,10 +50,11 @@ def _quant(model: str | None) -> str | None:
 
 
 FLOODNET_STRIPPED = "floodnet_records_stripped"  # set on every file baked since the strip step exists
+HOUSES_STRIPPED = "house_numbers_stripped"  # set on every file baked since 311 complaints are placed at the block
 _EVENTS = ("highest_event", "peak_event", "other_status_peak_event", "flagged_peak_event")
 
 
-def strip_floodnet(node):
+def strip_records(node):
     """A result with FloodNet's records taken out, in place and at any depth
     (a comparison nests each place's result). FloodNet's Data Access
     License Agreement forbids reposting its data in part, and a baked
@@ -60,10 +63,17 @@ def strip_floodnet(node):
     goes: the list of sensors (deployment id, name, street, status, install
     date, coordinates, event count) and every field of an event row but its
     depth and date. The page then draws no sensor points and points to
-    FloodNet's own dashboard (MapFigure.svelte)."""
+    FloodNet's own dashboard (MapFigure.svelte).
+
+    The same pass takes the house number out of every 311 complaint and
+    rounds its coordinates (app.context.nyc311 serves neither; this holds
+    for a result built before that, and if the source ever regresses), and
+    drops a geocoded place's tax lot and building numbers."""
+    from app.context.nyc311 import COORD_DECIMALS
+
     if isinstance(node, list):
         for x in node:
-            strip_floodnet(x)
+            strip_records(x)
     elif isinstance(node, dict):
         for key, v in node.items():
             if key in ("floodnet", "floodnet_nta") and isinstance(v, dict) and "n_sensors" in v:
@@ -72,8 +82,18 @@ def strip_floodnet(node):
                 for k in _EVENTS:
                     if isinstance(v.get(k), dict):
                         v[k] = {"max_depth_mm": v[k].get("max_depth_mm"), "date": (v[k].get("start_time") or "")[:10] or None}
+            elif key in ("nyc311", "nyc311_nta") and isinstance(v, dict):
+                for row in [*(v.get("points") or []), *(v.get("most_recent") or [])]:
+                    for k in ("address", "incident_address"):
+                        row.pop(k, None)
+                    for k in ("lat", "lon"):
+                        if isinstance(row.get(k), float):
+                            row[k] = round(row[k], COORD_DECIMALS)
+            elif key == "geocode" and isinstance(v, dict):
+                for k in ("bbl", "bin"):
+                    v.pop(k, None)
             else:
-                strip_floodnet(v)
+                strip_records(v)
     return node
 
 
@@ -117,8 +137,9 @@ def main() -> int:
             "quantization": _quant((final.get("grounding") or {}).get("model")),
             "deployment": {"name": dep.name, "city": stones.city, "hazard": stones.hazard},
             "pebbles": describe_deployment(stones, load_registry(dep.root)),
-            "final": strip_floodnet(to_json_safe(final)),
+            "final": strip_records(to_json_safe(final)),
             FLOODNET_STRIPPED: True,
+            HOUSES_STRIPPED: True,
         }
         (OUT / f"{a['slug']}.json").write_text(json.dumps(entry, indent=1) + "\n")
         g = final.get("grounding") or {}

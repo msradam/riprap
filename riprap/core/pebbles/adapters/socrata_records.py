@@ -126,6 +126,12 @@ class SocrataRecordsPebble(BasePebble):
             "sample": sample,
         }
 
+        # The window the count covers, for the sentence: the feed is read newest first with
+        # no date filter, so it runs from the oldest record fetched to the read.
+        date_field = (order or "").split()[0] if order else None
+        dates = sorted(str(r[date_field])[:10] for r in data if date_field and r.get(date_field))
+        value["window_phrase"] = f" created since {dates[0]}" if dates else ""
+
         if count_by:
             counter = Counter(str(r.get(count_by) or "?") for r in records)
             top = [{"value": v, "count": c} for v, c in counter.most_common(5)]

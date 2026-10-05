@@ -181,7 +181,7 @@ def test_build_documents_covers_non_nyc_deployment_pebbles():
             "n_records": 3, "n_truncated": True, "radius_m": 200,
             "top_by_sr_type": [{"value": "Water On Street Complaint", "count": 2}],
             "filter": "category_table", "n_before": 200, "n_kept": 3, "n_before_phrase": "the latest 200",
-            "filter_note": "are in categories reviewed as flood-related",
+            "filter_note": "are in categories reviewed as flood-related", "window_phrase": " created since 2026-03-01",
         },
     }
     docs, _, _ = build_documents(state)

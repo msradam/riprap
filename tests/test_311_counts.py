@@ -20,7 +20,7 @@ Q = "How many street flooding complaints has Queens CB 12 had?"
 
 def test_summary_splits_by_kind_and_merges_the_two_street_descriptors():
     assert V["n"] == 6 and V["by_kind"] == {"street flooding": 4, "sewer backup": 2}
-    assert "in the last 3 years: 4 street flooding, 2 sewer backup. " in V["narrative"]
+    assert f"in the last 3 years (since {V['since']}): 4 street flooding, 2 sewer backup. " in V["narrative"]
 
 
 def test_every_count_carries_the_under_reporting_caveat():
@@ -124,8 +124,11 @@ def test_district_counts_by_community_board_and_says_so(monkeypatch):
     out = nta_evidence.complaints(None, query=q, years=3)
     assert seen["clause"] == "community_board='12 QUEENS'"
     assert out["n"] == 2 and out["where"] == "in Community District QN12 (by the record's community board field)"
-    assert out["narrative"].startswith("2 NYC 311 flood-related complaints filed in Community District QN12 "
-                                       "(by the record's community board field) in the last 3 years")
+    assert out["narrative"].startswith("2 NYC 311 flood and sewer complaints filed in Community District QN12 "
+                                       f"(by the record's community board field) in the last 3 years (since {out['since']}): ")
+    # The exact query the count was read from travels with it.
+    assert out["query_url"].startswith("https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=")
+    assert "community_board%3D%2712+QUEENS%27" in out["query_url"] and "created_date+%3E%3D" in out["query_url"]
     # An NTA code is not a district: the polygon path is unchanged.
     called = {}
     monkeypatch.setattr(nyc311, "summary_for_polygon", lambda polygon, years: called.setdefault("polygon", years))
@@ -153,3 +156,58 @@ def test_a_request_logged_under_both_names_counts_once():
           at("Backup", 1)]                                                       # another kind
     v = _summarize(cs, years=5, radius_m=200)
     assert v["n"] == 4 and v["by_kind"] == {"street flooding": 3, "sewer backup": 1}
+
+
+def test_no_house_number_or_house_coordinate_is_served(monkeypatch):
+    """A dated complaint at a house number is a record about a household
+    (one house had fifteen sewer backups listed). Each complaint is served at
+    its block, with coordinates rounded to three decimal places (about 100 m);
+    the count is unchanged. The briefing value, the 311 tool and route, and
+    the gallery bake's strip step all hold to it."""
+    import json
+    import sys
+    from pathlib import Path
+
+    from app.context import nyc311
+
+    rows = [{"unique_key": str(i), "descriptor": "Sewer Backup (Use Comments) (SA)", "created_date": f"2026-05-{i + 1:02d}T10:00:00",
+             "incident_address": "90-12 183 STREET", "street_name": "183 STREET", "cross_street_1": "90 AVE",
+             "cross_street_2": "91 AVE", "status": "Closed", "latitude": "40.71089296427826", "longitude": "-73.77792504589425"}
+            for i in range(15)]
+    rows.append({"unique_key": "x", "descriptor": "Catch Basin Clogged", "created_date": "2026-04-01T10:00:00",
+                 "incident_address": "90 AVENUE", "street_name": "90 AVENUE", "cross_street_1": "90 AVENUE",
+                 "cross_street_2": "184 STREET", "latitude": "40.71125090957996", "longitude": "-73.77708701255543"})
+
+    class Reply:
+        def raise_for_status(self): pass
+        def json(self): return rows
+
+    monkeypatch.setattr(nyc311.http, "get", lambda *a, **k: Reply())
+    v = nyc311.summary_for_point(40.7105, -73.7772)
+    tool = nyc311.flood_requests(lat=40.7105, lon=-73.7772)
+    assert v["n"] == tool["n"] == 16 and len(v["points"]) == 16  # every record is still counted and shown
+    assert v["points"][0] == {"date": "2026-05-01", "descriptor": "Sewer Backup (Use Comments) (SA)",
+                              "block": "183 STREET between 90 AVE and 91 AVE", "lat": 40.711, "lon": -73.778}
+    assert v["points"][-1]["block"] == "90 AVENUE and 184 STREET"  # an intersection request
+    assert v["most_recent"][0] == {"date": "2026-05-01", "descriptor": "Sewer Backup (Use Comments) (SA)",
+                                   "block": "183 STREET between 90 AVE and 91 AVE"}
+    for served in (v, tool):
+        text = json.dumps({k: x for k, x in served.items() if k != "query_url"})
+        assert "90-12" not in text and "address" not in text and "40.7108929" not in text, text
+    assert "flood and sewer complaints" in v["narrative"] and "studies of other 311 complaint types" in v["caveat"]
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    from build_gallery import HOUSES_STRIPPED, strip_records
+
+    old = {"nyc311": {"n": 1, "points": [{"lat": 40.71089296427826, "lon": -73.77792504589425, "address": "90-12 183 STREET"}],
+                      "most_recent": [{"date": "2026-05-24", "address": "90-12 183 STREET"}]},
+           "geocode": {"address": "90-01 183 STREET", "bbl": "4099040046", "bin": "4211957"}}
+    assert strip_records(old) == {"nyc311": {"n": 1, "points": [{"lat": 40.711, "lon": -73.778}], "most_recent": [{"date": "2026-05-24"}]},
+                                  "geocode": {"address": "90-01 183 STREET"}}
+    # Every snapshot baked since the rule holds no complaint address (older ones have no mark, until rebuilt).
+    gallery = Path(__file__).resolve().parent.parent / "web" / "sveltekit" / "src" / "lib" / "gallery"
+    for f in sorted(gallery.glob("*.json")):
+        d = json.loads(f.read_text()) if f.name != "index.json" else {}
+        for key in ("nyc311", "nyc311_nta"):
+            block = ((d.get("final") or {}).get(key) or {}) if d.get(HOUSES_STRIPPED) else {}
+            assert not any("address" in row for row in [*(block.get("points") or []), *(block.get("most_recent") or [])]), f.name

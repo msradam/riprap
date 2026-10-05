@@ -1,7 +1,14 @@
-"""NYC 311 — flood-related complaints around a point.
+"""NYC 311: flood and sewer complaints around a point or inside an area.
 
 Live dataset: erm2-nwe9. Filter by descriptor (the flood signal is in
 descriptor, not complaint_type) within a buffer.
+
+A dated complaint at a house number is a record about a household (fifteen
+sewer backups at one house is a list for an insurer or a buyer), so no
+house number and no per-house coordinate leaves this module: a complaint
+is placed at its block (`block_of`) and its coordinates are rounded to
+three decimal places, about 100 m (`COORD_DECIMALS`). Counts are of the
+records themselves and do not change.
 """
 from __future__ import annotations
 
@@ -24,8 +31,8 @@ CITATION = "NYC 311 service requests (Socrata erm2-nwe9, 2020 to present)"
 # The Annals of Applied Statistics 19(2), 2025.
 CAVEAT = ("A count of complaints is a count of reports filed, not of floods: a low count can mean under-reporting "
           "and not the absence of flooding, because the propensity to file a 311 request varies with income, language "
-          "and demographics (Kontokosta, Hong and Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill, "
-          "Annals of Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003).")
+          "and demographics (studies of other 311 complaint types: Kontokosta, Hong and Korsberg, arXiv:1710.02452; "
+          "Boxer, Hong, Kontokosta and Neill, Annals of Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003).")
 
 # The kind of complaint each descriptor records, in the words a question
 # uses ("street flooding"). NYC renamed the descriptors: complaint type
@@ -62,6 +69,34 @@ class Complaint:
     status: str | None
     lat: float | None = None
     lon: float | None = None
+    block: str | None = None  # the only place name that is served: see block_of
+
+
+# Three decimal places of a degree: about 111 m north to south and 84 m east
+# to west in New York, so two houses on a block share a point.
+COORD_DECIMALS = 3
+
+
+def block_of(row: dict) -> str | None:
+    """Where a complaint is shown: its street between its cross streets
+    ("183 STREET between 90 AVE and 91 AVE"), or its intersection ("90
+    AVENUE and 184 STREET"), from the record's own street_name and
+    cross_street fields. Never the house number (incident_address)."""
+    street, a, b = (" ".join((row.get(k) or "").split()) or None for k in ("street_name", "cross_street_1", "cross_street_2"))
+    if not street:
+        return None
+    if a and b and street in (a, b):  # an intersection lists its own street as a cross street
+        return f"{street} and {b if a == street else a}"
+    return f"{street} between {a} and {b}" if a and b else street
+
+
+def _point(c: Complaint) -> dict:
+    """A complaint as it is served: date, descriptor, block, and (when it has
+    them) coordinates rounded so the house is not told apart."""
+    out = {"date": c.created_date[:10], "descriptor": c.descriptor, "block": c.block}
+    if c.lat is not None and c.lon is not None:
+        out |= {"lat": round(c.lat, COORD_DECIMALS), "lon": round(c.lon, COORD_DECIMALS)}
+    return out
 
 
 def complaints_near(lat: float, lon: float, radius_m: float = 200,
@@ -76,7 +111,8 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 200,
     # cache key) stays the same all day, so a repeat query is served from cache.
     since = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=365 * years)
     cs = complaints_near(lat, lon, radius_m, since=since, limit=2000)
-    return _summarize(cs, years=years, radius_m=radius_m, limit=2000)
+    return _summarize(cs, years=years, radius_m=radius_m, limit=2000,
+                      query_url=query_url(f"within_circle(location, {lat}, {lon}, {radius_m})", since, 2000))
 
 
 def complaints_in_polygon(polygon, polygon_crs: str = "EPSG:4326",
@@ -114,20 +150,34 @@ def _num(v) -> float | None:
         return None
 
 
-def _complaints_where(clause: str, since: datetime | None, limit: int, timeout: int = 60) -> list[Complaint]:
-    """Flood-related complaints matching `clause`, newest first, each with
-    its coordinates (one_per_incident needs them for intersection requests)."""
+def _params(clause: str, since: datetime | None, limit: int) -> dict[str, str]:
     where = f"{_DESC_CLAUSE} AND {clause}"
     if since:
         # Socrata floating-timestamp: drop tz suffix
         ts = since.replace(tzinfo=None).isoformat(timespec="seconds")
         where += f" AND created_date >= '{ts}'"
-    r = http.get(URL, params={
-        "$select": "unique_key, descriptor, created_date, incident_address, status, latitude, longitude",
+    return {
+        "$select": "unique_key, descriptor, created_date, incident_address, status, latitude, longitude, "
+                   "street_name, cross_street_1, cross_street_2",
         "$where": where,
         "$order": "created_date desc",
         "$limit": str(limit),
-    }, timeout=timeout)
+    }
+
+
+def query_url(clause: str, since: datetime | None, limit: int) -> str:
+    """The exact Socrata query a count was read from, for its citation: a
+    reader opens it and gets the rows (a request filed under both descriptor
+    names within ten minutes at one place is then counted once)."""
+    from urllib.parse import urlencode
+
+    return f"{URL}?{urlencode(_params(clause, since, limit))}"
+
+
+def _complaints_where(clause: str, since: datetime | None, limit: int, timeout: int = 60) -> list[Complaint]:
+    """Flood-related complaints matching `clause`, newest first, each with
+    its coordinates (one_per_incident needs them for intersection requests)."""
+    r = http.get(URL, params=_params(clause, since, limit), timeout=timeout)
     r.raise_for_status()
     return [
         Complaint(
@@ -137,6 +187,7 @@ def _complaints_where(clause: str, since: datetime | None, limit: int, timeout: 
             address=row.get("incident_address"),
             status=row.get("status"),
             lat=_num(row.get("latitude")), lon=_num(row.get("longitude")),
+            block=block_of(row),
         )
         for row in r.json()
     ]
@@ -153,6 +204,7 @@ def summary_for_polygon(polygon, polygon_crs: str = "EPSG:4326",
     """Polygon-mode aggregation: counts of flood-related 311 complaints
     inside the polygon over the trailing window."""
     cs = complaints_in_polygon(polygon, polygon_crs=polygon_crs, since=_since(years))
+    # (No query_url: the service is asked for the outline's bounding box and the rows are tested here.)
     return _summarize(cs, years=years, radius_m=None)
 
 
@@ -165,7 +217,8 @@ def summary_for_district(code: str, years: int = 3) -> dict:
     # QN12 holds about 4,500 rows in three years; the limit leaves room.
     cs = complaints_in_board(board, since=_since(years), limit=20000)
     where = f"in Community District {code.upper().replace(' ', '')} (by the record's community board field)"
-    return _summarize(cs, years=years, radius_m=None, limit=20000, where=where)
+    return _summarize(cs, years=years, radius_m=None, limit=20000, where=where,
+                      query_url=query_url(f"community_board='{board}'", _since(years), 20000))
 
 
 def one_per_incident(cs: list[Complaint]) -> list[Complaint]:
@@ -212,7 +265,7 @@ def one_per_incident(cs: list[Complaint]) -> list[Complaint]:
 
 
 def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: int | None = None,
-               where: str | None = None) -> dict:
+               where: str | None = None, query_url: str | None = None) -> dict:
     # At the fetch limit the count is a floor; decide that before twins are dropped.
     capped = limit is not None and len(cs) >= limit
     cs = one_per_incident(cs)
@@ -221,23 +274,19 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: i
     by_kind: Counter = Counter(KIND.get(c.descriptor, c.descriptor) for c in cs)
     # Cap at 60 most-recent points for the map layer — keeps the SSE
     # payload small while still showing meaningful clustering.
-    points = [
-        {"lat": c.lat, "lon": c.lon,
-         "descriptor": c.descriptor,
-         "date": c.created_date[:10],
-         "address": c.address}
-        for c in cs[:60]
-        if c.lat is not None and c.lon is not None
-    ]
+    points = [_point(c) for c in cs[:60] if c.lat is not None and c.lon is not None]
     n = len(cs)
     by_year_sorted = dict(sorted(by_year.items()))
     kinds = dict(by_kind.most_common())
     where = where or (f"within {radius_m:.0f} m of this location" if radius_m else "inside this area")
     # The source answered: 0 here is a true zero, and the sentence says so.
-    narrative = (f"{'At least ' if capped else ''}{n} NYC 311 flood-related complaint{'s' if n != 1 else ''} filed {where} "
-                 f"in the last {years} years")
-    narrative += (": " + ", ".join(f"{k} {kind}" for kind, k in kinds.items()) + "." if n
-                  else " (the 311 service answered and none matched).")
+    # "Flood and sewer": DEP's sewer backup complaints are in the total, and the breakdown says how many.
+    # The window is 365 days a year back from midnight UTC, so its first day is said.
+    start = _since(years).date().isoformat()
+    narrative = (f"{'At least ' if capped else ''}{n} NYC 311 flood and sewer complaint{'s' if n != 1 else ''} filed {where} "
+                 f"in the last {years} years (since {start}")
+    narrative += ("): " + ", ".join(f"{k} {kind}" for kind, k in kinds.items()) + "." if n
+                  else "; the 311 service answered and none matched).")
     narrative += f" {CAVEAT}"
     return {
         "n": n,
@@ -245,21 +294,19 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: i
         "radius_m": radius_m,
         "where": where,
         "years": years,
+        "since": start,
         "by_year": by_year_sorted,
         "by_descriptor": dict(by_descriptor.most_common()),
         "by_kind": kinds,
-        "most_recent": [
-            {"date": c.created_date[:10],
-             "descriptor": c.descriptor,
-             "address": c.address}
-            for c in cs[:5]
-        ],
+        # Each at its block with rounded coordinates, never a house number (see _point).
+        "most_recent": [{k: v for k, v in _point(c).items() if k not in ("lat", "lon")} for c in cs[:5]],
         "points": points,
+        **({"query_url": query_url} if query_url else {}),
         # Normalized rendering fields the type-keyed histogram renderer
         # reads. `histogram` is the array the chart draws; `headline_value`
         # is the bold figure; `subhead_text` is the descriptor caption.
         "headline_value": f"{n} complaint{'s' if n != 1 else ''}",
-        "subhead_text": ", ".join(f"{k} {kind}" for kind, k in kinds.items()) or "no flood-related complaints",
+        "subhead_text": ", ".join(f"{k} {kind}" for kind, k in kinds.items()) or "no flood or sewer complaints",
         "narrative": narrative,
         "caveat": CAVEAT,
         "histogram": list(by_year_sorted.values()) or [],
@@ -322,7 +369,8 @@ def flood_requests(*, lat: float | None = None, lon: float | None = None,
         "by_kind": dict(Counter(KIND.get(c.descriptor, c.descriptor) for c in cs).most_common()),
         "by_month": dict(sorted(by_month.items())),
         "most_recent": [{"date": c.created_date[:10], "descriptor": c.descriptor,
-                         "address": c.address, "status": c.status} for c in cs[:10]],
+                         "block": c.block, "status": c.status} for c in cs[:10]],
+        "query_url": query_url(where_place, since, 50000),
         "caveat": CAVEAT,
         "source": CITATION,
         "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",

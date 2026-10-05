@@ -283,7 +283,8 @@ def test_a_baked_gallery_snapshot_holds_no_floodnet_sensor_or_event_record():
     import sys
 
     sys.path.insert(0, str(ROOT / "scripts"))
-    from build_gallery import FLOODNET_STRIPPED, strip_floodnet
+    from build_gallery import FLOODNET_STRIPPED
+    from build_gallery import strip_records as strip_floodnet
 
     event = {"deployment_id": "frank", "start_time": "2026-05-20T19:02:11", "end_time": "2026-05-20T20:00:00",
              "max_depth_mm": 1172, "label": "flood", "annotated_by": "human"}

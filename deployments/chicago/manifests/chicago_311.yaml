@@ -54,7 +54,7 @@ narration:
   short: Flood-related Chicago 311 service requests within 200 m of this address.
   template: >-
     {n_kept} of {n_before_phrase} Chicago 311 service requests within {radius_m} m of this
-    address {filter_note}.
+    address{window_phrase} {filter_note}.
 
 display:
   order: 20

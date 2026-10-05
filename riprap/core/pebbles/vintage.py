@@ -93,6 +93,8 @@ def citation(manifest, *, fetched: bool = True, doc_id: str | None = None,
         "retrieved_at": v["retrieved_at"],
         "vintage": vintage,
         "maturity": manifest.maturity,
+        # The exact query a count was read from, when the value carries one (NYC 311).
+        **({"query_url": value["query_url"]} if isinstance(value, dict) and value.get("query_url") else {}),
         # Only for a source that declares them (see Provenance).
         **{k: v for k in ("license_url", "attribution", "references", "license_notice") if (v := getattr(prov, k))},
     }

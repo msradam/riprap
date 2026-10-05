@@ -613,8 +613,7 @@ def geocode_target(state: State) -> State:
             "borough": h.borough,
             "lat": h.lat,
             "lon": h.lon,
-            "bbl": h.bbl,
-            "bin": h.bin,
+            # (No tax lot or building number: nothing a reader sees needs them, and they name one property.)
             # "exact" when the geocoder returned the house number and street
             # asked for; "closest" for a landmark or a nearby or similar match.
             "match": "exact" if geocode_matches(target, h.address) else "closest",
@@ -687,7 +686,7 @@ def resolve_area(state: State) -> State:
         else:
             note = None if district or half else nta.resolution_note(name, t, boro or None)
         geocode = {"address": f"{t['nta_name']}, {t['borough']}", "borough": t["borough"],
-                   "lat": c.y, "lon": c.x, "bbl": None, "bin": None,
+                   "lat": c.y, "lon": c.x,
                    "match": "exact" if exact else "closest", "note": note}
         return state.update(geocode=geocode, lat=c.y, lon=c.x, nta=info,
                             polygon_wkt=t["geometry"].wkt, trace=trace)
