@@ -636,6 +636,8 @@ def synthesize(state, use_llm: bool = True) -> dict:
             record_lead = True
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
                                focus, texts, values, experimental)
+        if period := answer_checks.no_period(lead, (lead_fact or {}).get("doc_id"), question, values):
+            lead_phrase = f"{lead_phrase} {period}"  # a "No." says the period the sensors could have recorded
     elif question:
         lead, facts, lead_hits = answer
         rel = answer_checks.relevant_doc(question, texts)
@@ -685,6 +687,8 @@ def synthesize(state, use_llm: bool = True) -> dict:
                 lead_phrase = f"{sentence} {lead_phrase}"
         lead_fact = _lead_fact(lead, facts, lead_phrase != LEAD_PHRASES.get(lead, ""), rel, question,
                                focus, texts, values, experimental)
+        if period := answer_checks.no_period(lead, (lead_fact or {}).get("doc_id"), question, values):
+            lead_phrase = f"{lead_phrase} {period}"  # a "No." says the period the sensors could have recorded
     checks = ["citations and numbers on every claim"]
     if question:
         quoted = any(c["section"] == ANSWER_SECTION for c in kept)  # an answer with no fact quotes nothing

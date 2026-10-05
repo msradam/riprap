@@ -76,8 +76,8 @@ def reports_result(doc: str) -> bool:
     if share:
         return float(share.group(1)) > 0  # "0.0% of this area lies inside" is an absence
     # The finding is the first sentence; a later sentence may qualify it
-    # ("1 sensor ... is flagged ..., so its depths are not used for the peak")
-    # without turning 28 events into an absence.
+    # ("FloodNet's record showed no flood event under way at them when this
+    # was read") without turning 8 events into an absence.
     first = re.split(r"(?<=\.)\s+(?=[A-Z0-9])", doc.strip(), maxsplit=1)[0] if doc else ""
     return bool(first) and not _DOC_ABSENCE_RE.search(first)
 
@@ -411,6 +411,27 @@ def _period_start(question: str) -> int | None:
     return _STORM_YEAR.get(w) or int(w)
 
 
+def _iso_date(text):
+    import datetime
+
+    try:
+        return datetime.date.fromisoformat(str(text)[:10])
+    except ValueError:
+        return None
+
+
+def no_period(lead: str, source: str | None, question: str, values: dict | None) -> str:
+    """What follows a "No." that rests on FloodNet when the question names
+    no period: the day the sensors' record starts, so the no is not read as
+    "never". Empty for any other lead, source or question."""
+    v = (values or {}).get(source or "")
+    if lead != "no" or source != "floodnet" or not isinstance(v, dict) or _period_start(question) is not None:
+        return ""
+    start = _iso_date(v.get("period_start"))
+    return (f"The sensors' record quoted here starts on {start.isoformat()}, so this is a no for the time since then "
+            "only.") if start else ""
+
+
 def _event(doc_id: str, v: dict, start: int | None, this_year: int, start_date=None, today=None) -> bool | None:
     """True: the source reports a flood event in the asked period. False: it
     answered and reports none in the period. None: it cannot say (no value,
@@ -440,14 +461,24 @@ def _event(doc_id: str, v: dict, start: int | None, this_year: int, start_date=N
     if doc_id == "floodnet" and "n_flood_events_3y" in v:
         if v.get("n_sensors") == 0:
             return None  # no sensor in range: silence, not "no flooding"
-        window_start = this_year - _FLOODNET_WINDOW_YEARS
+        # The record starts on the value's period_start: the 3-year window's
+        # first day, or the earliest install date when every sensor is younger
+        # (a sensor installed last month with no events once answered "since
+        # Ida?" with "No."). Compared as dates when the question names a day.
+        recorded_from = _iso_date(v.get("period_start"))
+        if recorded_from and start_date:
+            covers, within = recorded_from <= start_date, recorded_from >= start_date
+        else:
+            window_start = recorded_from.year if recorded_from else this_year - _FLOODNET_WINDOW_YEARS
+            covers, within = start is None or window_start <= start, start is None or window_start >= start
         if v["n_flood_events_3y"] > 0:
-            # Events only at sensors FloodNet flags for maintenance do not
-            # settle it: the sentence quotes them with the flag, and no yes.
+            # Events only at sensors whose status in FloodNet's API is not
+            # "good" do not settle it: the sentence quotes them with that
+            # status, and no yes (Riprap's rule, not FloodNet's).
             if not v.get("n_flood_events_good_3y", v["n_flood_events_3y"]):
                 return None
-            return True if start is None or window_start >= start else None
-        return False if start is None or window_start <= start else None
+            return True if within else None
+        return False if covers else None
     if doc_id == "ida_hwm" and "n_within_radius" in v:
         # USGS surveyed marks at selected sites only: none nearby does not
         # show the area stayed dry. A mark says the block flooded only when it

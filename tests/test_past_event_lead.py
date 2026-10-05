@@ -199,3 +199,31 @@ def test_since_ida_with_no_mark_nearby_keeps_the_rules_yes():
     # A question about the storm itself keeps the marks as its subject.
     during = "Did Hurricane Ida flood the block around 41-17 Main Street, Queens?"
     assert [k for k, _ in check_lead("yes", ["floodnet", "ida_hwm"], during, texts, values)] == ["absence"]
+
+
+def test_a_no_from_the_sensors_covers_only_the_period_they_could_record(monkeypatch):
+    """A sensor installed last month with no events said "No." to "has it
+    flooded since 2025?". The value's period_start is the day its record
+    starts: a no is given only for a period that starts on or after it, and
+    a no to a question that names no period says the day."""
+    from riprap.core.burr.answer_checks import no_period
+
+    q = "Have street flood sensors recorded flooding near 1 East 161st Street, Bronx"
+    new = {"floodnet": {"n_sensors": 1, "n_flood_events_3y": 0, "period_start": "2026-09-03"}}
+    assert past_event_lead(f"{q} since 2025?", PAST, [], TEXTS, new, 2026) == ("cannot_answer", ["floodnet"])
+    old = {"floodnet": {"n_sensors": 1, "n_flood_events_3y": 0, "period_start": "2024-06-01"}}
+    assert past_event_lead(f"{q} since 2025?", PAST, [], TEXTS, old, 2026) == ("no", ["floodnet"])
+    # Events in a record that starts before the asked period may predate it: no yes.
+    events = {"floodnet": {"n_sensors": 1, "n_flood_events_3y": 3, "period_start": "2024-06-01"}}
+    assert past_event_lead(f"{q} since 2025?", PAST, [], TEXTS, events, 2026)[0] == "cannot_answer"
+    assert past_event_lead(f"{q}?", PAST, [], TEXTS, new, 2026) == ("no", ["floodnet"])
+    assert no_period("no", "floodnet", f"{q}?", new) == (
+        "The sensors' record quoted here starts on 2026-09-03, so this is a no for the time since then only.")
+    assert no_period("no", "floodnet", f"{q} since 2025?", old) == ""  # the question's own period is covered
+    assert no_period("yes", "floodnet", f"{q}?", new) == "" and no_period("no", "nyc311", f"{q}?", new) == ""
+    docs = [Doc("floodnet", "Live Observer", "1 FloodNet sensor within 600 m has recorded 0 flood events.", False)]
+    items = [SimpleNamespace(doc_id="floodnet", pebble_id="floodnet")]
+    monkeypatch.setattr(syn, "_documents", lambda s: (docs, items, None))
+    monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
+    out = syn.synthesize({"intent": "single_address", **new, "plan": {"question": f"{q}?"}}, use_llm=False)
+    assert "**Answer.**\nNo. The sensors' record quoted here starts on 2026-09-03" in out["paragraph"]
