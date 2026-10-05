@@ -238,7 +238,7 @@ def count_lead(question: str, docs: dict[str, str], values: dict | None, today=N
         if (since.month, since.day) != (1, 1) or window_start > since or kind_asked(rel, q, v):
             return None, True
         n = sum(int(k) for y, k in (v.get("by_year") or {}).items() if int(y) >= since.year)
-        return (f"{n} flood-related 311 complaint{'s' if n != 1 else ''} filed since the start of {since.year}, "
+        return (f"{n} flood and sewer 311 complaint{'s' if n != 1 else ''} filed since the start of {since.year}, "
                 "by the year each was filed."), False
     if year is None:
         return (None, True) if _OTHER_PERIOD_RE.search(q) else (kind_lead(q, docs, values), False)
@@ -250,7 +250,7 @@ def count_lead(question: str, docs: dict[str, str], values: dict | None, today=N
     if not covered or kind_asked(rel, q, v):
         return None, True
     n = int((v.get("by_year") or {}).get(str(year), 0))
-    return (f"{n} flood-related 311 complaint{'s' if n != 1 else ''} filed in {year}"
+    return (f"{n} flood and sewer 311 complaint{'s' if n != 1 else ''} filed in {year}"
             f"{' so far' if year == today.year else ''}, by the year each was filed."), False
 
 

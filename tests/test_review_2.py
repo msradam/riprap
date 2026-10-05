@@ -151,7 +151,7 @@ def test_a_count_since_a_storm_is_not_the_windows_total():
 
 def test_a_count_since_a_year_sums_the_years_from_then():
     sentence, undetermined = ac.count_lead("How many 311 flood complaints near here since 2024?", T311, V311, TODAY)
-    assert not undetermined and sentence.startswith("20 flood-related 311 complaints filed since the start of 2024")
+    assert not undetermined and sentence.startswith("20 flood and sewer 311 complaints filed since the start of 2024")
     # A year the window does not reach back to cannot be summed.
     assert ac.count_lead("How many 311 flood complaints near here since 2019?", T311, V311, TODAY) == (None, True)
 

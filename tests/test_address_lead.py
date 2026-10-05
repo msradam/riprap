@@ -41,8 +41,9 @@ def test_bare_address_opens_with_a_cited_lead():
     assert lead == ("This address is outside the 2012 Sandy inundation footprint [sandy_inundation], "
                     "in FEMA flood zone X on the 2007 effective map [fema_nfhl], and inside the future high tide category "
                     "(coastal tidal inundation, not rainfall flooding) of the city's stormwater flood maps (modelled "
-                    "scenarios, not forecasts) for 2080 sea-level rise [dep_extreme_2080]. 82 flood-related 311 "
-                    "complaints were filed within 200 m in the last 5 years (a count of reports; a low count can mean "
+                    "scenarios, not forecasts) for 2080 sea-level rise [dep_extreme_2080]. 82 flood and sewer 311 "
+                    f"complaints were filed within 200 m in the last 5 years, since {STATE['nyc311']['since']} (a count "
+                    "of reports; a low count can mean "
                     "under-reporting, not the absence of flooding) [nyc311].")
     assert every_numeric_claim_cited(paragraph)
     assert [r.name for r in check_briefing(paragraph).failed] == []

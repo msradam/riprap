@@ -417,7 +417,7 @@ def test_the_fixed_disclaimers_say_what_the_briefing_is_not_in_plain_words():
     assert firm_citation_has_vintage(NON_SCOPE_FOOTER).passed and firm_citation_has_vintage(ra.FEMA_POINTER).passed
     assert not firm_citation_has_vintage("This address sits in FEMA flood zone X.").passed
     assert ("Air temperature and an outdoor heat exposure index are mapped on the NYC Urban Heat Portal "
-            "(https://urbanheat.nyc), by BetaNYC with Dr. Mehdi Heris.") in HEAT_NON_SCOPE_FOOTER
+            "(https://urbanheat.nyc), by BetaNYC.") in HEAT_NON_SCOPE_FOOTER
 
 
 def test_no_sentence_these_rules_write_ranks_or_judges_a_place():

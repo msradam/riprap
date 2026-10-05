@@ -135,12 +135,12 @@ NON_SCOPE_FOOTER = (
     "**Out of scope.** This briefing is not a flood zone determination, an engineering assessment or advice. "
     "Where a probe was offline at run time, the relevant section omits that signal."
 )
-# The portal's makers as BetaNYC's announcement of it names them (beta.nyc, 2025-05-28: "led by Dr. Mehdi Heris
-# and BetaNYC"); its layers include "the new Outdoor Heat Exposure Index" and "Air Temperature".
+# The portal's layers, as BetaNYC's announcement of it (beta.nyc, 2025-05-28) lists them, include "the new
+# Outdoor Heat Exposure Index" and "Air Temperature". The line names the portal and BetaNYC, no individual.
 HEAT_NON_SCOPE_FOOTER = (
     "**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or "
     "predict the heat on a given day at a given address. Air temperature and an outdoor heat exposure index are "
-    "mapped on the NYC Urban Heat Portal (https://urbanheat.nyc), by BetaNYC with Dr. Mehdi Heris. Where a source "
+    "mapped on the NYC Urban Heat Portal (https://urbanheat.nyc), by BetaNYC. Where a source "
     "was offline at run time, the relevant section omits that signal."
 )
 
@@ -271,9 +271,9 @@ def _lead(state, items) -> str | None:
     if "nyc311" in by_pebble and isinstance(n311, dict) and "n" in n311:
         n = f"{'At least ' if n311.get('capped') else ''}{n311['n']}"
         # A count of reports, said so where the count is: a low one is not an absence of flooding.
-        add("nyc311", f"{n} flood-related 311 complaint{'s were' if n311['n'] != 1 else ' was'} filed within "
-                      f"{n311['radius_m']:.0f} m in the last {n311['years']} years (a count of reports; a low count "
-                      "can mean under-reporting, not the absence of flooding)")
+        add("nyc311", f"{n} flood and sewer 311 complaint{'s were' if n311['n'] != 1 else ' was'} filed within "
+                      f"{n311['radius_m']:.0f} m in the last {n311['years']} years{_since(n311)} (a count of reports; "
+                      "a low count can mean under-reporting, not the absence of flooding)")
     docs = [Doc(e.doc_id, "lead", e.text, False) for e in items]
     own = {c["text"] for c in claims if c.get("own_sentence")}
     kept, _ = verify(claims, docs)
@@ -286,6 +286,11 @@ def _lead(state, items) -> str | None:
         out.append(f"This address is {(', ' if len(where) > 2 else ' ').join(where)}.")
     out += [f"{t}." for t in after]
     return " ".join(out) or None
+
+
+def _since(n311: dict) -> str:
+    """', since 2021-10-06': the window's first day, as the 311 source sentence states it."""
+    return f", since {n311['since']}" if n311.get("since") else ""
 
 
 def _area_lead(state, items) -> str | None:
@@ -305,9 +310,10 @@ def _area_lead(state, items) -> str | None:
         # flooding. So the kinds come with it (311's descriptors, each kind's old and new name together).
         kinds = ", ".join(f"{k} {kind}" for kind, k in (n311.get("by_kind") or {}).items())
         claims.append({"section": "lead", "doc_ids": [by_pebble["nyc311_nta"].doc_id],
-                       "text": f"{'At least ' if n311.get('capped') else ''}{n311['n']} flood-related 311 "
+                       "text": f"{'At least ' if n311.get('capped') else ''}{n311['n']} flood and sewer 311 "
                                f"complaint{'s were' if n311['n'] != 1 else ' was'} filed "
                                f"{n311.get('where') or 'inside this area'} in the last {n311['years']} years"
+                               f"{_since(n311)}"
                                + (f", by 311 descriptor group: {kinds}" if kinds else "")
                                + " (a count of reports; a low count can mean under-reporting, not the absence of "
                                  "flooding)"})

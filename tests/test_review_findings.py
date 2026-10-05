@@ -280,9 +280,9 @@ def test_a_count_for_one_year_comes_from_that_year_not_the_window():
                         "by_year": {"2023": 92, "2024": 360, "2025": 203, "2026": 216}}}
     day = datetime.date(2026, 10, 1)
     last, undetermined = ac.count_lead("How many flood complaints did Bronx CD 10 get last year?", docs, v, day)
-    assert last == "203 flood-related 311 complaints filed in 2025, by the year each was filed." and not undetermined
+    assert last == "203 flood and sewer 311 complaints filed in 2025, by the year each was filed." and not undetermined
     assert ac.count_lead("How many flood complaints in 2024 in BX10?", docs, v, day)[0].startswith("360 ")
-    assert ac.count_lead("How many flood complaints this year in BX10?", docs, v, day)[0].startswith("216 flood-related 311 complaints filed in 2026 so far")
+    assert ac.count_lead("How many flood complaints this year in BX10?", docs, v, day)[0].startswith("216 flood and sewer 311 complaints filed in 2026 so far")
     # The window starts in October 2023, so 2023 is partly outside it; a month is not in the value at all.
     assert ac.count_lead("How many flood complaints in 2023 in BX10?", docs, v, day) == (None, True)
     assert ac.count_lead("How many flood complaints last month in BX10?", docs, v, day) == (None, True)

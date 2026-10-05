@@ -122,9 +122,12 @@ def test_an_address_outside_every_mapped_extent_is_not_called_safe():
 def test_the_address_lead_says_the_311_count_is_a_count_of_reports():
     from riprap.core.burr.templated_reconciler import compose_briefing
 
-    lead = compose_briefing(_state())[0].split("**In brief.**\n", 1)[1].split("\n\n", 1)[0]
-    assert ("3 flood-related 311 complaints were filed within 200 m in the last 5 years (a count of reports; a low "
-            "count can mean under-reporting, not the absence of flooding) [nyc311].") in lead
+    state = _state()
+    lead = compose_briefing(state)[0].split("**In brief.**\n", 1)[1].split("\n\n", 1)[0]
+    # The source sentence's own words: "flood and sewer complaints", and the window's first day.
+    assert (f"3 flood and sewer 311 complaints were filed within 200 m in the last 5 years, since "
+            f"{state['nyc311']['since']} (a count of reports; a low count can mean under-reporting, not the absence "
+            "of flooding) [nyc311].") in lead
 
 
 def test_a_district_lead_carries_the_311_breakdown():
@@ -141,8 +144,8 @@ def test_a_district_lead_carries_the_311_breakdown():
     paragraph, _ = compose_briefing({"intent": "neighborhood", "deployment": "nyc", "plan": {"question": ""},
                                      "nyc311_nta": v})
     lead = paragraph.split("**In brief.**\n", 1)[1].split("\n\n", 1)[0]
-    assert lead == ("10 flood-related 311 complaints were filed in Community District QN12 (by the record's community "
-                    "board field) in the last 3 years, by 311 descriptor group: 6 sewer backup, 3 catch basin, 1 street "
+    assert lead == ("10 flood and sewer 311 complaints were filed in Community District QN12 (by the record's community "
+                    f"board field) in the last 3 years, since {v['since']}, by 311 descriptor group: 6 sewer backup, 3 catch basin, 1 street "
                     "flooding (a count of reports; a low count can mean under-reporting, not the absence of flooding) "
                     "[nyc311_nta].")
 
