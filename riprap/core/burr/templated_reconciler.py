@@ -34,9 +34,13 @@ OUTSIDE_COVERAGE = ("This place is outside the cities Riprap covers. Only federa
 def _scope_header(state=None) -> str:
     """The scope declaration every briefing opens with, and for a place
     outside every deployment, what was not read."""
+    # The second and third sentences travel with every briefing, in the JSON and MCP output as on the page:
+    # a briefing about a block is not a judgement on the people who live there.
     head = ("This is an automated hazard-exposure briefing produced by Riprap from "
             "live and precomputed data sources. It is informational only and not a "
-            "substitute for a professional risk assessment.")
+            "substitute for a professional risk assessment. These are public records about a place, not an "
+            "assessment of any property or of the people who live there. Riprap computes no score or rating, "
+            "and records can be missing where people report less.")
     return f"{head} {OUTSIDE_COVERAGE}" if state is not None and state.get("deployment") == "__none__" else head
 
 
