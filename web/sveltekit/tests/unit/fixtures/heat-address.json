@@ -473,7 +473,7 @@
    "n": 79,
    "age_adjusted_rate": 7.6,
    "citywide_age_adjusted_rate": 6,
-   "narrative": "Residents of Queens community district 12 made 79 emergency department visits for heat illness in May to September of 2018 to 2022, an age-adjusted rate of 7.6 per 100,000 a year against 6.0 citywide (NYC Health Department, from state hospital records). Visits are counted by where the patient lives, and only when diagnosed as heat illness.",
+   "narrative": "Residents of Queens community district 12 made 79 emergency department visits for heat illness in May to September of 2018 to 2022 (the five-year total), and the NYC Health Department gives an average annual age-adjusted rate of 7.6 per 100,000 residents against 6.0 citywide (from state hospital records). The count and the rate are separate figures in the department's file: for most community districts the count divided by residents and years does not give the printed rate, the file does not say why, and both are printed here as published. Visits are counted by where the patient lives, and only when diagnosed as heat illness.",
    "headline_value": "79 visits, 7.6 per 100,000 a year"
   },
   "city_landcover": {
@@ -567,13 +567,14 @@
    "n_spray_shower_sites": 2,
    "n_outdoor_pools": 0,
    "n_indoor_pools": 0,
+   "n_wading_pools": 0,
    "n_sites": 2,
    "spray_shower_sites": [
     "Harvard Playground",
     "Peters Field"
    ],
    "pools": [],
-   "narrative": "NYC Parks lists spray showers at 2 parks or playgrounds within 800 m of this address (lists updated 2026-09-03 and 2026-09-15); the nearest is the spray shower at Harvard Playground, 386 m away. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311).",
+   "narrative": "NYC Parks lists spray showers at 2 parks or playgrounds within 800 m of this address (lists updated 2026-09-03 and 2026-09-15, copied 2026-10-02); the nearest is the spray shower at Harvard Playground, 386 m away. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311).",
    "headline_value": "2 spray shower sites, 0 pools",
    "radius_m": 800
   },

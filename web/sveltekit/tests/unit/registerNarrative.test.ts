@@ -30,8 +30,8 @@ describe('register rows', () => {
     expect(mta?.sub).not.toMatch(/exposed MTA/);
   });
 
-  it('says the school register lists only flood-exposed schools', () => {
-    expect(cards.some((c) => /flood-exposed NYC DOE schools/.test(c.sub ?? ''))).toBe(true);
+  it('says the school register lists only schools inside a mapped flood extent', () => {
+    expect(cards.some((c) => /public schools? inside a mapped flood extent/.test(c.sub ?? '') && /not every school/.test(c.sub ?? ''))).toBe(true);
   });
 
   it('closes each register sentence', () => {

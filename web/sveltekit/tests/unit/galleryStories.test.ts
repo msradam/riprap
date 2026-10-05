@@ -150,8 +150,10 @@ describe('a rules-mode question entry', () => {
   it('reads the refusal in the shipped gallery as refused', async () => {
     const stories = await galleryStories();
     const refused = (slug: string) => stories.find((s) => s.slug === slug)?.refused;
-    expect(refused('red-hook-buy')).toBe(true);
+    expect(refused('astoria-heat-advice')).toBe(true);
     expect(refused('hollis-since-ida')).toBe(false);
+    // An advice question about a named place is declined inside an answer that still quotes the FEMA zone.
+    expect(stories.find((s) => s.slug === 'red-hook-buy')).toMatchObject({ refused: false, answerLead: 'no_advice' });
   });
 
   it('says a language model planned the query when the saved plan lists a model call', () => {

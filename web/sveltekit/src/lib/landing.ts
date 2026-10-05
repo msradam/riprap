@@ -53,7 +53,7 @@ export const PROOF: Proof[] = [
     quotes: [
       '36 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 17 inside the DEP extreme stormwater scenario (2080 sea-level rise).',
       'Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z)',
-      'Inside the DEP extreme scenario (2080 sea-level rise): I.S. 059 Springfield Gardens'
+      'Inside the modeled DEP extreme scenario (2080 sea-level rise): I.S. 059 Springfield Gardens'
     ]
   },
   {
@@ -73,7 +73,7 @@ export const PROOF: Proof[] = [
     slug: 'gowanus-2050',
     kind: 'A city scenario for 2050',
     quotes: [
-      "This address is inside the future high tide area of the NYC DEP stormwater scenario (2.13 in/hr, 2050 SLR): coastal tidal inundation projected for 2050, not the scenario's rainfall flooding."
+      'The city\'s stormwater flood map "Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise" shows the category "Future High Tides 2050" (coastal tidal inundation, not rainfall flooding; about 3 m from the edge of the mapped flooding) at the point mapped for this address.'
     ]
   },
   {

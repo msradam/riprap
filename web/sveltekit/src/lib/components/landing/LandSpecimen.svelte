@@ -103,7 +103,7 @@
         width="712"
         height="1400"
         decoding="async"
-        alt="The Riprap briefing for this question: the answer Yes. over its cited sentences on FloodNet sensor events, Hurricane Ida high-water marks and 311 flood complaints, then a map of those points around the address."
+        alt="The Riprap briefing for this question: the answer Yes. over its cited sentences on FloodNet sensor events, Hurricane Ida high-water marks and 311 flood complaints, then a map of those points around the address. Captured on 1 October 2026, before those sentences were reworded."
       />
     </span>
   </a>

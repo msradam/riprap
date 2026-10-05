@@ -40,9 +40,9 @@ describe('the Hollis address briefing', () => {
   const m = briefingModel(RunState.fromFinal(e.final, e.address), e.address);
 
   it('reads 1, 2, 3 ... in its In brief (was 1 2 5 4 3 11)', () => {
-    const n = marks(m.answer, m.citationsById);
-    expect(n).toEqual([...n].sort((a, b) => a - b));
-    expect([...new Set(n)]).toEqual(n.map((_, i) => i + 1));
+    // A later sentence may cite the stormwater maps again, so the test is on each number's first appearance.
+    const first = [...new Set(marks(m.answer, m.citationsById))];
+    expect(first).toEqual(first.map((_, i) => i + 1));
   });
 
   it('numbers the open evidence table in ascending order, the same numbers as the text', () => {

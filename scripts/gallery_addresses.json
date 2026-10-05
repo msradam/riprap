@@ -3,7 +3,7 @@
   "slug": "brooklyn-heights",
   "neighborhood": "Brooklyn Heights, Brooklyn",
   "address": "189 Atlantic Avenue, Brooklyn, NY",
-  "reason": "Dry on the maps: outside the Sandy extent, in FEMA zone X and outside all three DEP scenarios, yet 311 flood complaints were filed within 200 m.",
+  "reason": "Dry on the maps: outside the Sandy extent, in FEMA zone X and outside every flooding category on the city's four stormwater flood maps, yet 311 flood complaints were filed within 200 m.",
   "feature_doc": "nyc311"
  },
  {
@@ -24,7 +24,7 @@
   "slug": "broad-channel",
   "neighborhood": "Broad Channel, Queens",
   "address": "20 West 12th Road, Queens, NY",
-  "reason": "An island community inside the Sandy extent and zone AE, where FloodNet sensors log street flooding.",
+  "reason": "An island community inside the Sandy extent and zone AE, where FloodNet sensors log flood events.",
   "feature_doc": "floodnet"
  },
  {
@@ -59,7 +59,7 @@
   "slug": "lower-east-side",
   "neighborhood": "Lower East Side, Manhattan",
   "address": "560 Grand Street, Manhattan, NY",
-  "reason": "Public housing: 4 of the 6 flood-exposed NYCHA developments within 2 km are inside the Sandy extent.",
+  "reason": "Public housing: 11 of the 13 NYCHA developments listed inside a mapped flood extent within 2 km are inside the Sandy extent.",
   "feature_doc": "nycha_development_exposure"
  },
  {
@@ -148,7 +148,7 @@
   "neighborhood": "Red Hook, Brooklyn",
   "address": "80 Pioneer Street, Brooklyn, NY",
   "question": "Should I buy the house at 80 Pioneer Street, Brooklyn?",
-  "reason": "A refusal: Riprap does not give property advice."
+  "reason": "An advice question: Riprap says it gives no advice on buying a home, then quotes the FEMA flood zone on the effective and the preliminary map."
  },
  {
   "slug": "bk06-nycha",
@@ -201,7 +201,7 @@
   "address": "East Harlem",
   "hazard": "heat",
   "question": "Is East Harlem hotter than the rest of the city?",
-  "reason": "A yes or no the record does not give: across 18 summer images East Harlem's surface ran within half a degree of the city's average, cooler in some and warmer in others, so the answer quotes the measurement with no yes or no, and says it is the surface, not the air.",
+  "reason": "A yes or no the answer does not give, because the record is of the surface and not the air: across 18 summer images the surface of East Harlem (North), the tabulation area the name was answered for, ran 1.0°F warmer than the city's land average, from 0.0 to 3.1°F warmer image by image. The answer quotes that measurement and says what it is.",
   "feature_doc": "heat_surface_nta"
  },
  {
@@ -245,7 +245,7 @@
   "address": "1520 Sedgwick Avenue, Bronx, NY",
   "hazard": "heat",
   "question": "Where can people cool off near 1520 Sedgwick Avenue, Bronx?",
-  "reason": "Places to cool off: NYC Parks spray showers and pools nearby, with the plain statement that cooling centers open only in a heat emergency and where the city lists them.",
+  "reason": "Places to cool off: the NYC Parks spray showers nearby, by name and distance, with the plain statement that cooling centers open only in a heat emergency and where the city lists them.",
   "feature_doc": "cool_features"
  },
  {
