@@ -137,8 +137,10 @@ _FLOODNET = "https://api.floodnet.nyc/v1/graphql"
 
 @lru_cache(maxsize=1)
 def _floodnet_deployments() -> list[dict]:
-    q = "{ deployments(limit: 5000) { deployment_id sensor_status location } }"
-    return _post_json(_FLOODNET, {"query": q})["data"]["deployments"]
+    q = "{ deployments(limit: 5000) { deployment_id sensor_status deploy_type location } }"
+    rows = _post_json(_FLOODNET, {"query": q})["data"]["deployments"]
+    # The table also lists NOAA and USGS tide gauges (deploy_type "tidal"): not FloodNet sensors.
+    return [d for d in rows if (d.get("deploy_type") or "").strip().lower() != "tidal"]
 
 
 def _floodnet_summary(near: list[dict], years: int) -> dict:
