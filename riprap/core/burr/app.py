@@ -39,7 +39,7 @@ from riprap.core.burr.intake import (
     select_sources,
 )
 from riprap.core.burr.stones import POLYGON_INTENTS, StonesAction, hazard_of
-from riprap.core.burr.templated_reconciler import reconcile_templated
+from riprap.core.burr.templated_reconciler import failed_sources, reconcile_templated
 
 log = logging.getLogger("riprap.burr.app")
 _REPO = Path(__file__).resolve().parent.parent.parent.parent
@@ -236,6 +236,8 @@ def _final(state) -> dict:
             if v is not None and not k.startswith("__"):
                 out[k] = v
     out["trace"] = list(state.get("trace") or [])
+    # The sources that were consulted and did not answer, as the "Not checked." section names them.
+    out["failed"] = failed_sources(out)
     from app.models_info import for_briefing
 
     out["models"] = for_briefing(out)  # which models took part, where they ran, how long
@@ -404,6 +406,7 @@ def run_compare(query: str, plan: dict, runner=None) -> dict:
         intent="compare",
         plan=plan,
         models=list(models.values()),  # of both places, not the first alone
+        failed=[{**f, "place": lab} for lab, _, res in results for f in res.get("failed") or []],
         # The note sits in place A's half, above its heading: the page splits the halves at the rule.
         paragraph="**Comparison.**\n" + " ".join(note) + "\n\n" + "\n\n---\n\n".join(
             f"## {lab}: {addr}\n\n{(res.get('paragraph') or '').strip()}" for lab, addr, res in results),

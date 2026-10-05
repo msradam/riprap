@@ -164,6 +164,17 @@ def test_a_source_that_failed_is_listed_as_not_checked():
             "flood zone at this point.\n\n**Out of scope.**") in paragraph
     assert [r.name for r in check_briefing(paragraph).failed] == []
     assert "**Not checked.**" not in compose_briefing(_state(consulted=consulted, trace=trace[1:]))[0]
+    # The JSON result lists the same sources under `failed`, and a comparison lists both places'.
+    from riprap.core.burr import app
+
+    out = app._final({**_state(consulted=consulted, trace=trace), "paragraph": paragraph})
+    assert out["failed"] == [{"id": "fema_pfirm", "title": consulted[0]["title"], "started_at": 1791212460.0,
+                              "reason": "python_call: preliminary_for_point raised: timed out"}]
+    assert app._final({**_state(consulted=consulted, trace=trace[1:]), "paragraph": paragraph})["failed"] == []
+    plan = {"intent": "compare", "targets": [{"type": "address", "text": "A"}, {"type": "address", "text": "B"}]}
+    both = app.run_compare("A vs B", plan, lambda q, p: {"paragraph": q, "lat": 40.7, "deployment": "nyc",
+                                                         "failed": out["failed"] if q == "B" else []})
+    assert both["failed"] == [{**out["failed"][0], "place": "PLACE B"}]
 
 
 def test_a_sentence_shared_by_several_facts_is_printed_once_with_every_mark():

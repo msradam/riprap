@@ -130,20 +130,29 @@ def _dep_sentence(state, items) -> str | None:
     return f"{out} {OUTSIDE_CAVEAT[:-1]} {''.join(f'[{i}]' for i in outside)}." if outside else out
 
 
+def failed_sources(state) -> list[dict]:
+    """The sources a run consulted that did not answer (a timeout, an HTTP
+    error, an unreadable reply), each with its id, title, reason and the
+    time it was tried. The briefing's "Not checked." section, the JSON
+    result's `failed` and the MCP tools' `failed` all read this."""
+    down = {t.get("step"): t for t in state.get("trace") or [] if t.get("ok") is False}
+    return [{"id": e["id"], "title": e.get("title"), "reason": down[e["id"]].get("err"),
+             "started_at": down[e["id"]].get("started_at")}
+            for e in state.get("consulted") or [] if e["id"] in down]
+
+
 def _not_checked(state) -> str | None:
-    """The sources that were consulted and failed (a timeout, an HTTP
-    error, an unreadable reply), by name. A failed FEMA preliminary map
-    once left a briefing saying zone X with no word that the map which
-    reads AE there had not answered."""
+    """The failed sources by name. A failed FEMA preliminary map once left
+    a briefing saying zone X with no word that the map which reads AE
+    there had not answered."""
     from datetime import UTC, datetime
 
-    down = {t.get("step"): t for t in state.get("trace") or [] if t.get("ok") is False}
-    failed = [e["title"] for e in state.get("consulted") or [] if e["id"] in down]
+    failed = failed_sources(state)
     if not failed:
         return None
-    tried = [t["started_at"] for t in down.values() if t.get("started_at")]
+    tried = [f["started_at"] for f in failed if f["started_at"]]
     when = f" at {datetime.fromtimestamp(min(tried), UTC):%Y-%m-%d %H:%M} UTC" if tried else ""
-    return f"{NOT_CHECKED.format(when=when)} {'; '.join(failed)}."
+    return f"{NOT_CHECKED.format(when=when)} {'; '.join(f['title'] for f in failed)}."
 
 
 def _lead(state, items) -> str | None:

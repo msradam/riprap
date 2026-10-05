@@ -87,10 +87,11 @@ def _record(out: dict, body: dict) -> dict:
 
 
 def _failed(out: dict) -> list[dict]:
-    """Sources the run consulted that did not answer, by name and reason."""
-    trace = {t.get("step"): t for t in out.get("trace") or []}
-    return [{"id": c["id"], "title": c.get("title"), "reason": trace[c["id"]].get("err")}
-            for c in out.get("consulted") or [] if trace.get(c["id"], {}).get("ok") is False]
+    """Sources the run consulted that did not answer, by name and reason
+    (the HTTP result's `failed`; computed here for a result that has none)."""
+    from riprap.core.burr.templated_reconciler import failed_sources
+
+    return out["failed"] if "failed" in out else failed_sources(out)
 
 
 def _place_match(out: dict) -> str | None:
