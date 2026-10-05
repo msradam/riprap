@@ -13,7 +13,7 @@
     cornerstone:
       "FEMA's effective and preliminary flood maps, the city's four modelled stormwater flood maps for today, 2050 and 2080, the 2012 Sandy inundation extent, USGS Hurricane Ida high-water marks, USGS terrain",
     touchstone:
-      'FloodNet street sensors, NYC 311 flood complaints, NOAA tide gauges, USGS stream gauges, National Weather Service observations',
+      'FloodNet street sensors, NYC 311 complaints about flooding and sewer backups, NOAA tide gauges, USGS stream gauges, National Weather Service observations',
     keystone:
       "NYC public schools, MTA subway entrances, NYCHA developments, hospitals, NYC Planning's floodplain counts; DOB construction permits only when a question asks",
     lodestone: 'National Weather Service alerts and water-level forecasts, NPCC4 sea-level projections',

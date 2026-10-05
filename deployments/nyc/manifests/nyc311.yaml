@@ -1,7 +1,7 @@
 id: nyc311
 type: live
-title: NYC 311 flood and sewer complaints (5y)
-answers: "flood and sewer 311 complaints (street flooding, sewer backup, catch basins) within 200 m over 5 years"
+title: NYC 311 complaints about flooding and sewer backups (5y)
+answers: "311 complaints about flooding and sewer backups (street flooding, sewer backup, catch basins) within 200 m over 5 years"
 stone: touchstone
 tier: proxy
 adapter: python_call
@@ -33,7 +33,8 @@ provenance:
   doc_id: nyc311
   citation: >-
     NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset
-    erm2-nwe9), flood and sewer complaints within 200 m of the point.
+    erm2-nwe9), complaints about flooding and sewer backups within 200 m of
+    the point.
     Counted: requests of complaint type "Sewer" or "Sewer Maintenance" whose
     descriptor is one of eleven flood and sewer descriptors (street flooding,
     sewer backup, catch basin, highway flooding, manhole overflow and rain
@@ -41,11 +42,12 @@ provenance:
     app/context/nyc311.py), created on or after the start date the sentence
     gives (midnight UTC, 365 days for each year of the window). A request
     filed under both descriptor names at the same place within ten minutes
-    is counted once. The exact Socrata query is this citation's query_url.
+    is counted once. This citation's query_url is the Socrata query for the
+    counted rows, with no house number or coordinate selected.
     Complaints are shown at the block, never the house number.
 
 narration:
-  short: NYC 311 flood and sewer complaints filed near this address over the past 5 years.
+  short: NYC 311 complaints about flooding and sewer backups filed near this address over the past 5 years.
   template: "{narrative}"
 
 fallback:

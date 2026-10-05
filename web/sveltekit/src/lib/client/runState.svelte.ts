@@ -225,7 +225,7 @@ export function plainDescriptor(d: unknown): string | null {
   return t ? t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() : null;
 }
 
-/** NYC 311 flood and sewer complaints (`final.nyc311.points`), each at its
+/** NYC 311 complaints about flooding and sewer backups (`final.nyc311.points`), each at its
  *  block: the server sends the street and cross streets with coordinates
  *  rounded to about 100 m, never a house number. */
 export function build311Fc(fr: Rec): FeatureCollection | undefined {

@@ -89,7 +89,6 @@ const FIELD_LABELS: Record<string, string> = {
   // hvi
   hvi: 'Heat Vulnerability Index (of 5)',
   ac_pct: 'Households with air conditioning (%)',
-  median_income: 'Median household income ($)',
   // heat_visits
   age_adjusted_rate: 'Age-adjusted rate (per 100,000 a year)',
   citywide_age_adjusted_rate: 'Citywide age-adjusted rate (per 100,000 a year)',

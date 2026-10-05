@@ -16,7 +16,7 @@
    *  and four-by-four ID, as docs/DATA-SOURCES.md lists them. FloodNet's
    *  table is listed there as not read directly: Riprap reads FloodNet's API. */
   const OPEN_DATA: { id: string; name: string; use: string }[] = [
-    { id: 'erm2-nwe9', name: '311 Service Requests from 2020 to Present', use: 'flood and sewer complaints' },
+    { id: 'erm2-nwe9', name: '311 Service Requests from 2020 to Present', use: 'complaints about flooding and sewer backups' },
     { id: '5xsi-dfpx', name: 'Sandy Inundation Zone', use: 'the 2012 Sandy extent' },
     { id: '9i7c-xyvv', name: 'NYC Stormwater Flood Maps', use: 'the four modelled stormwater scenarios' },
     { id: 'phvi-damg', name: 'NYCHA Public Housing Developments', use: 'public housing' },

@@ -1,4 +1,4 @@
-"""NYC 311: flood and sewer complaints around a point or inside an area.
+"""NYC 311: complaints about flooding and sewer backups around a point or inside an area.
 
 Live dataset: erm2-nwe9. Filter by descriptor (the flood signal is in
 descriptor, not complaint_type) within a buffer.

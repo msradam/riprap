@@ -91,6 +91,23 @@ describe('splitBriefing', () => {
     expect(text(s.outOfScope)).toBe('Title. | Checks run: citations.');
   });
 
+  it('keeps "Where to turn" as a section of its own, between the Answer and Out of scope', () => {
+    // The backend's text for a declined safety question (synthesis.py WHERE_TO_TURN).
+    const { blocks } = parseBriefing(
+      'Scope line.\n\n**Answer.**\nRiprap gives no advice. This address sits in FEMA flood zone X [fema_nfhl].\n\n' +
+        "**Where to turn.**\nNotify NYC (https://a858-nycnotify.nyc.gov) is the city's emergency notification program; " +
+        'one of its notification types is Basement Alerts, for people who live in basement apartments.\n\n' +
+        '**Out of scope.** This briefing is not a flood zone determination.\n\nChecks run: citations.'
+    );
+    const heads = blocks.filter((b) => b.kind === 'head').map((h) => (h.kind === 'head' ? h.label : ''));
+    expect(heads).toEqual(['Answer', 'Where to turn', 'Out of scope']);
+    const s = splitBriefing(blocks);
+    expect(text(s.lead)).toMatch(/^#Answer \| Riprap gives no advice/);
+    expect(text(s.body)).toMatch(/^#Where to turn \| Notify NYC \(https:\/\/a858-nycnotify\.nyc\.gov\) is the city's/);
+    expect(text(s.body)).toContain('Basement Alerts');
+    expect(text(s.outOfScope)).toBe('This briefing is not a flood zone determination. | Checks run: citations.');
+  });
+
   it('keeps everything in the body when there is no preamble or Out of scope', () => {
     const { blocks } = parseBriefing('**Hazard Reader.**\nZone X [fema_nfhl].');
     const s = splitBriefing(blocks);

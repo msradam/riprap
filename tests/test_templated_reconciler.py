@@ -124,7 +124,7 @@ def test_the_address_lead_says_the_311_count_is_a_count_of_reports():
 
     state = _state()
     lead = compose_briefing(state)[0].split("**In brief.**\n", 1)[1].split("\n\n", 1)[0]
-    # The source sentence's own words: "flood and sewer complaints", and the window's first day.
+    # The source sentence's own words, and the window's first day.
     assert (f"3 complaints to 311 about flooding and sewer backups were filed within 200 m in the last 5 years, since "
             f"{state['nyc311']['since']} (a count of reports; a low count can mean under-reporting, not the absence "
             "of flooding) [nyc311].") in lead
