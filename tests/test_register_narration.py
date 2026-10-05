@@ -25,8 +25,8 @@ def test_exposed_only_register_names_its_scope():
 
     s = exposure.summary_for_point(*BROOKLYN_HEIGHTS, "doe_schools")
     assert s["n_schools"] == 0
-    assert s["narrative"].startswith("0 flood-exposed NYC DOE schools within 1500 m of this address "
-                                     "(the register lists only schools found inside the 2012 Sandy")
+    assert s["narrative"].startswith("0 public schools inside a mapped flood extent within 1500 m of this address "
+                                     "(from the NYC Department of Education's school locations for the 2019 to 2020")
     assert "not every school" in s["narrative"]
     assert _register_counts(s["narrative"] + ".") == (0, 0, 0)
     n = exposure.summary_for_point(*ROCKAWAY, "nycha")
@@ -38,7 +38,7 @@ def test_exposed_register_counts_every_row_in_range_and_lists_the_nearest():
 
     s = exposure.summary_for_point(*ROCKAWAY, "doe_schools", radius_m=3000, max_n=2)
     assert s["n_schools"] > 2 and len(s["schools"]) == 2
-    assert s["narrative"].startswith(f"{s['n_schools']} flood-exposed NYC DOE schools")
+    assert s["narrative"].startswith(f"{s['n_schools']} public schools inside a mapped flood extent within")
 
 
 def test_full_layer_count_is_every_entrance_in_range():

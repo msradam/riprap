@@ -95,7 +95,7 @@ def _hospital(r: dict, lat: float, lon: float, distance_m: float) -> dict:
 def _school(r: dict, lat: float, lon: float, distance_m: float) -> dict:
     return {"loc_code": str(r.get("loc_code", "")), "loc_name": str(r.get("name", "")),
             "address": str(r.get("address", "")).strip(), "borough": str(r.get("borough", "")),
-            "bin": str(r.get("bin", "")), "bbl": str(r.get("bbl", "")), "managed_by": "DOE-managed",
+            "bin": str(r.get("bin", "")), "bbl": str(r.get("bbl", "")), "managed_by": str(r.get("managed_by") or ""),
             "school_lat": round(lat, 5), "school_lon": round(lon, 5), "distance_m": distance_m}
 
 
@@ -127,13 +127,16 @@ CLASSES: dict[str, Spec] = {
         head=_hospital, name=lambda f: f["facility_name"],
         geojson=DATA / "hospitals.geojson", buffer_m=BUFFER_DOH_HOSPITAL_M, raster=True, unique="fac_id"),
     "doe_schools": Spec(
-        singular="flood-exposed NYC DOE school", plural="flood-exposed NYC DOE schools", radius_m=1500, max_n=6,
+        singular="public school inside a mapped flood extent", plural="public schools inside a mapped flood extent",
+        radius_m=1500, max_n=6,
         count_key="n_schools", list_key="schools",
-        citation="Pre-computed from NYC DOE Locations Points joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + "
+        citation="Pre-computed from NYC DOE 2019 - 2020 School Point Locations (a3nt-yts4; public schools, charter "
+                 "schools included) joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + "
                  "NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. See data/registers/schools.json.",
         head=_school, name=lambda f: f["loc_name"], register="schools", buffer_m=BUFFER_DOE_SCHOOL_M,
-        scope=" (the register lists only schools found inside the 2012 Sandy extent or a DEP "
-              "stormwater scenario, not every school)"),
+        scope=" (from the NYC Department of Education's school locations for the 2019 to 2020 school year, charter "
+              "schools included; the register lists only schools whose location point is inside the 2012 Sandy "
+              "extent or a modeled DEP stormwater scenario, not every school)"),
     "nycha": Spec(
         singular="flood-exposed NYCHA development", plural="flood-exposed NYCHA developments", radius_m=2000, max_n=5,
         count_key="n_developments", list_key="developments",

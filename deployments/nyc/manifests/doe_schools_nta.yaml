@@ -1,7 +1,7 @@
 id: doe_schools_nta
 type: baked
-title: NYC DOE schools exposed in the area
-answers: "flood-exposed public schools in the area (the register lists only exposed schools) and how many sit in the Sandy extent or the DEP 2080 scenario"
+title: Public schools in mapped flood extents in the area
+answers: "public schools in the area, charter schools included, from the 2019 to 2020 school locations (only schools inside an extent are listed), and how many sit in the Sandy extent or the modeled DEP 2080 scenario"
 stone: keystone
 tier: empirical
 adapter: python_call
@@ -26,17 +26,17 @@ trace_summary:
   n_in_dep_extreme_2080: n_in_dep_extreme_2080
 
 provenance:
-  date_modified: 2019-09-11
+  date_modified: 2019-09-04
   retrieved_at: 2026-05-01
-  source_name: NYC DOE, schools register
-  source_url: https://data.cityofnewyork.us/Education/2019-2020-School-Locations/wg9x-4ke6
+  source_name: NYC Department of Education, 2019 - 2020 School Point Locations (public schools, charter schools included)
+  source_url: https://data.cityofnewyork.us/Education/2019-2020-School-Point-Locations/a3nt-yts4
   license: NYC Open Data Terms of Use
   doc_id: doe_school_exposure
-  citation: NYC DOE schools, cross-referenced with Sandy 2012 + DEP extreme 2080.
+  citation: NYC public schools, charter schools included (2019 to 2020 school locations), cross-referenced with Sandy 2012 + DEP extreme 2080.
 
 narration:
   template: "{narrative}"
-  short: Flood-exposed NYC DOE schools inside this area, from a register that lists only exposed schools.
+  short: Public schools (2019 to 2020 school locations, charter schools included) inside this area that are inside a mapped flood extent.
 
 display:
   variant: register
@@ -46,4 +46,4 @@ display:
 
 fallback:
   on_offline: skip
-  message: The DOE schools list was not available when this briefing ran.
+  message: The public schools list was not available when this briefing ran.

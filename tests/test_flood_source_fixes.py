@@ -146,3 +146,23 @@ def test_the_housing_register_counts_hammel_and_states_its_rule():
     assert "centre point inside a modeled DEP stormwater scenario" in s["narrative"]
     assert "Under 10% of the outline inside the 2012 Sandy extent (not counted): GOWANUS" in s["narrative"]
     assert s["n_inside_sandy_2012"] == 2 and s["n_near_sandy_edge"] == 1
+
+
+def test_schools_are_public_schools_with_their_vintage_and_the_right_link():
+    """The file is the 2019 to 2020 school year's and 263 of its 1,992 rows
+    are charter schools, so "NYC DOE school" was the wrong label."""
+    from app.registers import exposure
+    from riprap.core.pebbles.bridge import get_registry
+
+    s = exposure.summary_for_point(40.677, -74.0105, "doe_schools")  # Red Hook
+    assert "NYC DOE school" not in s["narrative"]
+    assert s["narrative"].startswith(f"{s['n_schools']} public schools inside a mapped flood extent within 1500 m")
+    assert "2019 to 2020 school year, charter schools included" in s["narrative"]
+    assert "location point is inside" in s["narrative"]  # the rule for a point asset
+    by_name = {f["loc_name"]: f for f in s["schools"]}
+    assert by_name["PAVE Academy Charter School"]["managed_by"] == "Charter"
+    assert by_name["P.S. 015 Patrick F. Daly"]["managed_by"] == "DOE"
+    for pebble_id in ("doe_schools", "doe_schools_nta"):
+        m = get_registry("nyc").get(pebble_id).manifest
+        assert m.provenance.source_url.endswith("/2019-2020-School-Point-Locations/a3nt-yts4")
+        assert "DOE school" not in m.title
