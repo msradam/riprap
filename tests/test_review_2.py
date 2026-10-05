@@ -208,7 +208,7 @@ def test_a_district_reads_the_sensors_inside_it(monkeypatch):
     v = floodnet.summary_for_polygon(box(-74.0, 40.55, -73.9, 40.65))
     assert v["n_sensors"] == 1 and v["n_flood_events_3y"] == 1
     assert v["narrative"].startswith("1 FloodNet sensor inside this area has recorded 1 flood event")
-    assert v["narrative"].endswith("Most events: Dover Street (1).")
+    assert "Most events" not in v["narrative"] and "Dover Street" not in v["narrative"]  # no street beside a count
     empty = floodnet.summary_for_polygon(box(0, 0, 1, 1))
     assert empty["n_sensors"] == 0 and empty["narrative"] == "No FloodNet sensors are deployed inside this area."
 

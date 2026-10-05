@@ -226,6 +226,8 @@ _PIPELINE_KEYS = ("query", "intent", "plan", "geocode", "lat", "lon", "nta",
 def _final(state) -> dict:
     """The public result: pipeline fields, every pebble value the routed
     deployment produced, and the disclosure-check report."""
+    from riprap.core.pebbles.bridge import public_value
+
     out = {k: state.get(k) for k in _PIPELINE_KEYS}
     dep = state.get("deployment")
     out["deployment"] = None if dep == "__none__" else dep
@@ -234,7 +236,7 @@ def _final(state) -> dict:
                                       "selected_pebbles"):
             v = state.get(k)
             if v is not None and not k.startswith("__"):
-                out[k] = v
+                out[k] = public_value(v)  # without private keys (FloodNet's per-sensor `_rows`)
     out["trace"] = list(state.get("trace") or [])
     # The sources that were consulted and did not answer, as the "Not checked." section names them.
     out["failed"] = failed_sources(out)

@@ -48,7 +48,7 @@ def _quant(model: str | None) -> str | None:
 
 
 FLOODNET_STRIPPED = "floodnet_records_stripped"  # set on every file baked since the strip step exists
-_EVENTS = ("highest_event", "peak_event", "flagged_peak_event")
+_EVENTS = ("highest_event", "peak_event", "other_status_peak_event", "flagged_peak_event")
 
 
 def strip_floodnet(node):
@@ -67,7 +67,8 @@ def strip_floodnet(node):
     elif isinstance(node, dict):
         for key, v in node.items():
             if key in ("floodnet", "floodnet_nta") and isinstance(v, dict) and "n_sensors" in v:
-                v.pop("sensors", None)
+                for k in [k for k in v if k == "sensors" or k.startswith("_")]:
+                    del v[k]
                 for k in _EVENTS:
                     if isinstance(v.get(k), dict):
                         v[k] = {"max_depth_mm": v[k].get("max_depth_mm"), "date": (v[k].get("start_time") or "")[:10] or None}

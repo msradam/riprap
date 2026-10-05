@@ -60,6 +60,16 @@ provenance:
     greater than 10 mm at the sensor (FloodNet's definition); a depth is
     measured at one point and does not show the depth on every part of the
     street. Riprap counts the events the API marks as verified by a person.
+    FloodNet's published cautions about a depth: "most FloodNet sensors are
+    mounted over sidewalks and are thus unable to measure floods in the
+    roadbed until the water rises above the height of the curb"; the depth at
+    the street's lowest point differs from the reading by the sensor's height
+    above that point; "a single anomalous data point, measured during a
+    flood event" may exaggerate a maximum depth; and a sensor may miss a
+    flood "if it was offline and awaiting repair or had not been deployed
+    yet or retired" (FloodNet's NYC Open Data description, dataset aq7i-eu5q).
+    Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges
+    (deploy_type "tidal"); Riprap does not count them as FloodNet sensors.
     Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806,
     https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water
     Research, 118648, https://doi.org/10.1016/j.watres.2022.118648.

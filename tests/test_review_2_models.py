@@ -210,7 +210,7 @@ def test_no_event_under_way_is_said_only_when_the_record_supports_it(monkeypatch
         monkeypatch.setattr(floodnet, "flood_events_for", lambda ids: [FloodEvent("a", "2026-05-20T23:21:49", end, 300, "flood")])
         return floodnet.summary_for_point(40.71, -73.78)["narrative"]
 
-    said = "FloodNet's record showed no flood event under way at it when this was read ("
+    said = "No event that FloodNet's API labels a flood was open at it when this was read ("
     assert said in narrative("good", "2026-05-21T01:00:00")
     assert said not in narrative("dead", "2026-05-21T01:00:00")  # a sensor out of order cannot say
     assert said not in narrative("good", None)                   # an event with no end is still open in the record
@@ -453,7 +453,7 @@ def test_the_real_sensor_sentence_still_reports_a_result(monkeypatch):
     monkeypatch.setattr(floodnet, "flood_events_for", lambda ids: [
         FloodEvent("a", f"2026-05-{d:02d}T10:00:00", f"2026-05-{d:02d}T11:00:00", 300, "flood") for d in range(1, 9)])
     v = floodnet.summary_for_point(40.71, -73.78)
-    assert "no flood event under way" in v["narrative"] and reports_result(v["narrative"])
+    assert "No event that FloodNet's API labels a flood was open" in v["narrative"] and reports_result(v["narrative"])
     q = "Have the FloodNet sensors near 80 Pioneer Street, Brooklyn recorded any flooding?"
     lead, facts = ra.answer(q, {"floodnet": v["narrative"]}, {"floodnet": v})
     assert lead == "yes" and not check_lead(lead, facts, q, {"floodnet": v["narrative"]}, {"floodnet": v})

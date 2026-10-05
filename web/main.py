@@ -22,7 +22,6 @@ from fastapi.responses import (  # noqa: E402
 )
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 
-from app.context import floodnet  # noqa: E402
 from app.flood_layers import dep_stormwater, sandy_inundation  # noqa: E402
 from riprap.core.json_safe import to_json_safe as _to_json_safe  # noqa: E402
 from riprap.core.pebbles import load_registry as _load_pebbles  # noqa: E402
@@ -528,44 +527,10 @@ def layer_ida_hwm(lat: float, lon: float, r: float = 1500):
     )
 
 
-@app.get("/api/floodnet_near")
-def floodnet_near(lat: float, lon: float, r: float = 1000):
-    sensors = floodnet.sensors_near(lat, lon, r)
-    ids = [s.deployment_id for s in sensors]
-    # Verified events only, as in the briefing's count.
-    events = [e for e in floodnet.flood_events_for(ids) if floodnet.is_reviewed(e)]
-    by_dep: dict = {}
-    for e in events:
-        by_dep.setdefault(e.deployment_id, []).append(e)
-
-    features = []
-    for s in sensors:
-        if s.lat is None or s.lon is None:
-            continue
-        evs = by_dep.get(s.deployment_id, [])
-        peak = max((e.max_depth_mm or 0 for e in evs), default=0)
-        features.append(
-            {
-                "type": "Feature",
-                "geometry": {"type": "Point", "coordinates": [s.lon, s.lat]},
-                "properties": {
-                    "deployment_id": s.deployment_id,
-                    "name": s.name,
-                    "street": s.street,
-                    "borough": s.borough,
-                    "n_events_3y": len(evs),
-                    "peak_depth_mm": peak,
-                },
-            }
-        )
-    # FloodNet-derived, so the response carries FloodNet's licence and credit
-    # (the same record the briefing's citation carries).
-    from riprap.core.pebbles.vintage import citation
-
-    cite = citation(_stones_pebbles_for_deployment("nyc")[1].get("floodnet").manifest)
-    return JSONResponse({"type": "FeatureCollection", "features": features,
-                         **{k: cite[k] for k in ("license", "license_url", "attribution", "references",
-                                                 "license_notice", "retrieved_at") if k in cite}})
+# There is no FloodNet map layer: FloodNet's Data Access License Agreement
+# forbids reposting its data in part, and a list of sensors with their
+# coordinates and event counts is that. The page points to FloodNet's own
+# dashboard (MapFigure.svelte), and a briefing carries counts and sentences only.
 
 
 # The SvelteKit build (adapter-static): index.html at /, the prerendered

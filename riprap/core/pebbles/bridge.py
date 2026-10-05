@@ -30,6 +30,18 @@ def get_registry(deployment: str | None = None) -> Registry:
     return _registry_at(deployment_root(deployment))
 
 
+def public_value(value: Any) -> Any:
+    """A pebble value as it may leave the process: without its private keys
+    (those starting with an underscore). FloodNet's value keeps per-sensor
+    rows under `_rows` for the answer rules, and FloodNet's licence does not
+    let Riprap repost them; `riprap.core.burr.app._final` passes every value
+    through here, so the JSON API, the stream, the MCP tools and the gallery
+    bake never hold one."""
+    if isinstance(value, dict):
+        return {k: v for k, v in value.items() if not str(k).startswith("_")}
+    return value
+
+
 def fetch_pebble(pebble_id: str, lat: float, lon: float,
                  extras: dict | None = None,
                  deployment: str | None = None,
