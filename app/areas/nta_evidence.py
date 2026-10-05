@@ -140,9 +140,14 @@ def floodplain(polygon, query=None) -> dict | None:  # noqa: ARG001 - polygon ke
     if not counts:
         return None
     listed = counts[0] if len(counts) == 1 else f"{', '.join(counts[:-1])} and {counts[-1]}"
-    missing = " or ".join(w for w, n in (("residential unit", units), ("resident", pop)) if n is None)
+    # Not published (null) and a printed zero that cannot be right are said apart: BX02's table
+    # prints 0 residential units beside 848 residents, and "gives no count" was not what a reader saw there.
+    zero = [w for w, k in (("residential units", "fp_100_resunits"), ("residents", "fp_100_pop")) if bldg and v[k] == 0]
+    missing = " or ".join(w for w, k in (("residential unit", "fp_100_resunits"), ("resident", "fp_100_pop")) if v[k] is None)
     basis = ("; residents from the 2010 census, by census block)." if pop is not None else ").") + (
-        f" The profile gives no {missing} count for this district." if missing else "")
+        f" The profile gives no {missing} count for this district." if missing else "") + (
+        f" The profile prints 0 {' and 0 '.join(zero)} for this district, a zero that does not fit its own count of "
+        f"{listed}, so it is not repeated here as a count." if zero else "")
     return {"community_district": code, "n_buildings": bldg, "n_residential_units": units, "n_residents_2010": pop,
             "floodplain_sq_mi": v["fp_100_area"],
             "narrative": (f"NYC Planning's Community District Profile counts {listed} "

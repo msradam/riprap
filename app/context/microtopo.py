@@ -132,6 +132,9 @@ def _row_col(transform, lat: float, lon: float) -> tuple[int, int]:
     return int(row), int(col)
 
 
+LOWEST_PCT = 5  # at or under this percentile a point is "among the lowest", with no figure
+
+
 def _ordinal(n: int) -> str:
     """29 -> '29th', 1 -> '1st', 12 -> '12th'."""
     suffix = "th" if 10 <= n % 100 <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
@@ -195,13 +198,25 @@ def microtopo_at(lat: float, lon: float, radius_m: int = 750) -> Microtopo | Non
         v = float(hand_arr[row, col])
         hand_v = round(v, 2) if np.isfinite(v) else None
 
-    elev = round(point_elev, 2)
+    # One cell of the model is about 22 m east to west and 29 m north to south and holds one value
+    # for all the ground in it: the USGS point service read 0.7 to 1.5 m away from it at two addresses
+    # (370 Jay Street 15.44 against 13.96, 400 Carroll Street 1.07 against 2.10). So the sentence gives
+    # whole metres with "about" and the cell's size, and the value one decimal.
+    res = int(round(res_m))
+    elev = round(point_elev, 1)
     pct_200_r = round(pct_200, 1)
     relief = round(aoi_max - point_elev, 2)
-    bits = [f"Elevation {elev} m ({VERTICAL_DATUM})"]
+    bits = [f"Elevation about {round(point_elev)} m ({VERTICAL_DATUM}), read from one cell about {res} m across of the "
+            "USGS 3DEP elevation model (a cell holds one value for all the ground in it, and a survey point can "
+            "differ from it by a metre or more)"]
     pct = round(pct_200)
-    bits.append(f"; this point is higher than {pct}% of the ground within 200 m (the {_ordinal(pct)} "
-                f"percentile; a low percentile means a local low spot where water collects)")
+    if pct <= LOWEST_PCT:
+        # "Higher than 0% of the ground (the 0th percentile)" was printed from 0.3.
+        bits.append(f"; this point is among the lowest ground within 200 m (below the {_ordinal(LOWEST_PCT)} percentile; "
+                    "a local low spot where water collects)")
+    else:
+        bits.append(f"; this point is higher than {pct}% of the ground within 200 m (the {_ordinal(pct)} "
+                    f"percentile; a low percentile means a local low spot where water collects)")
     # Basin relief stays in the value (the evidence table): two decimals
     # from a 30 m raster read as precision the data lacks. The wetness index
     # is not returned at all: it rests on synthetic channels and nothing read it.
@@ -214,7 +229,7 @@ def microtopo_at(lat: float, lon: float, radius_m: int = 750) -> Microtopo | Non
         aoi_min_m=round(aoi_min, 2),
         aoi_max_m=round(aoi_max, 2),
         aoi_radius_m=radius_m,
-        resolution_m=int(round(res_m)),
+        resolution_m=res,
         hand_m=hand_v,
         narrative=narrative,
     )

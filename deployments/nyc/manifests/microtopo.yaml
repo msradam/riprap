@@ -30,7 +30,12 @@ provenance:
   source_url: https://www.usgs.gov/3d-elevation-program
   license: USGS, public domain
   doc_id: microtopo
-  citation: USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)
+  citation: >-
+    USGS 3DEP DEM: the 3D Elevation Program's elevation model, read from the 3DEP elevation service
+    (scripts/fetch_nyc_dem.py) and stored in WGS84, where a cell is about 22 m east to west and 29 m
+    north to south; heights are NAVD88. The service mosaics the best available surveys and the file
+    carries no survey date, so the date shown is when Riprap's copy was made. One cell holds one
+    value for all the ground in it: a survey point can differ from it by a metre or more.
 
 narration:
   short: LiDAR / DEM-derived micro-topography (elevation percentile, basin relief) at this address.

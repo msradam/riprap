@@ -85,7 +85,10 @@ def _sentences(text: str) -> list[str]:
                      or (re.search(r"\b[NSEW]\.$", prev) and re.match(r"\d+(st|nd|rd|th)\b", s))
                      # An initial or a title inside a name ("P.S. 042 R. Vernam", "P.S. 183 Dr. Richard R. Green").
                      or (re.search(r"(?:\b[A-Z]|\b(?:Dr|Jr|Sr|Mr|Mrs|Ms|Rev|Msgr))\.$", prev)
-                         and re.match(r"[A-Z][a-z]", s) and not _STARTS_SENTENCE_RE.match(s))):
+                         and re.match(r"[A-Z][a-z]", s) and not _STARTS_SENTENCE_RE.match(s))
+                     # An initial inside a name in capitals ("JUDITH S. KAYE SCHOOL"): the citation
+                     # mark once landed after the S. A lone capital after a lower-case word ("zone X.") still ends.
+                     or (re.search(r"\b[A-Z]{2,} [A-Z]\.$", prev) and re.match(r"[A-Z]{2,}\b", s))):
             out[-1] = f"{prev} {s}"
         else:
             out.append(s)

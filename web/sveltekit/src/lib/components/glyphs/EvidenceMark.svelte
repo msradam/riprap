@@ -20,10 +20,14 @@
     title?: string;
   }
 
+  // The modeled tier holds scenario maps, mapped zones, forecasts and an
+  // index: "scenario-based prediction" called a scenario a prediction, and
+  // fitted none of the others. A proxy here is mostly reports people filed.
   const TIER_DESC: Record<Tier, string> = {
     empirical: 'Empirical: directly measured or observed',
-    modeled: 'Modeled: scenario-based prediction',
-    proxy: 'Proxy: indirect indicator'
+    modeled:
+      'Modeled: from a model, not a measurement. The row says which kind: a simulated scenario (not a forecast), a mapped zone, a forecast, or an index (a rank from a statistical model)',
+    proxy: 'Proxy: an indirect indicator, such as reports people filed with 311; not a measurement of flooding'
   };
 
   let { tier, size = 12, color = 'currentColor', title = TIER_DESC[tier] }: Props = $props();
