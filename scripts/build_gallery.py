@@ -17,7 +17,9 @@ every other file and index entry as it is.
 
 Each file carries the full result (the same shape as the SSE `final`
 event, trace included), the deployment's stones and pebbles as
-/api/pebbles serves them, and how and when it was generated.
+/api/pebbles serves them, and how and when it was generated. FloodNet's
+per-sensor and per-event records are taken out before a file is written
+(`strip_floodnet`): its licence forbids reposting the data in part.
 
 The landing's briefing preview is a screenshot of hollis-since-ida. After
 rebuilding that entry, rebuild the frontend, serve it, and retake it:
@@ -43,6 +45,35 @@ OUT = ROOT / "web" / "sveltekit" / "src" / "lib" / "gallery"
 def _quant(model: str | None) -> str | None:
     """'hf.co/ibm-granite/granite-4.1-8b-GGUF:Q4_K_M' -> 'Q4_K_M'."""
     return model.rsplit(":", 1)[1] if model and ":" in model else None
+
+
+FLOODNET_STRIPPED = "floodnet_records_stripped"  # set on every file baked since the strip step exists
+_EVENTS = ("highest_event", "peak_event", "flagged_peak_event")
+
+
+def strip_floodnet(node):
+    """A result with FloodNet's records taken out, in place and at any depth
+    (a comparison nests each place's result). FloodNet's Data Access
+    License Agreement forbids reposting its data in part, and a baked
+    snapshot is a repost. What stays: the sentences, the counts, each
+    highest depth with its date, the licence fields and the citation. What
+    goes: the list of sensors (deployment id, name, street, status, install
+    date, coordinates, event count) and every field of an event row but its
+    depth and date. The page then draws no sensor points and points to
+    FloodNet's own dashboard (MapFigure.svelte)."""
+    if isinstance(node, list):
+        for x in node:
+            strip_floodnet(x)
+    elif isinstance(node, dict):
+        for key, v in node.items():
+            if key in ("floodnet", "floodnet_nta") and isinstance(v, dict) and "n_sensors" in v:
+                v.pop("sensors", None)
+                for k in _EVENTS:
+                    if isinstance(v.get(k), dict):
+                        v[k] = {"max_depth_mm": v[k].get("max_depth_mm"), "date": (v[k].get("start_time") or "")[:10] or None}
+            else:
+                strip_floodnet(v)
+    return node
 
 
 def main() -> int:
@@ -85,7 +116,8 @@ def main() -> int:
             "quantization": _quant((final.get("grounding") or {}).get("model")),
             "deployment": {"name": dep.name, "city": stones.city, "hazard": stones.hazard},
             "pebbles": describe_deployment(stones, load_registry(dep.root)),
-            "final": to_json_safe(final),
+            "final": strip_floodnet(to_json_safe(final)),
+            FLOODNET_STRIPPED: True,
         }
         (OUT / f"{a['slug']}.json").write_text(json.dumps(entry, indent=1) + "\n")
         g = final.get("grounding") or {}

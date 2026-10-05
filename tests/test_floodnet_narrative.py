@@ -185,6 +185,47 @@ def test_no_tracked_data_file_holds_floodnet_event_rows():
     assert ignored.returncode == 0
 
 
+def test_a_baked_gallery_snapshot_holds_no_floodnet_sensor_or_event_record():
+    """A baked snapshot is a repost. The gallery build strips FloodNet's
+    per-sensor and per-event records and marks each file it writes; every
+    marked snapshot is checked. A snapshot baked before the strip step has
+    no mark and is skipped until it is rebuilt (scripts/build_gallery.py)."""
+    import json
+    import sys
+
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from build_gallery import FLOODNET_STRIPPED, strip_floodnet
+
+    event = {"deployment_id": "frank", "start_time": "2026-05-20T19:02:11", "end_time": "2026-05-20T20:00:00",
+             "max_depth_mm": 1172, "label": "flood", "annotated_by": "human"}
+    value = {"n_sensors": 1, "n_flood_events_3y": 6, "period_start": "2023-10-06", "narrative": "1 FloodNet sensor ...",
+             "license": "CC BY-NC-SA 4.0", "highest_event": dict(event), "peak_event": None, "flagged_peak_event": dict(event),
+             "sensors": [{"deployment_id": "frank", "name": "QN - 183 St", "street": "183rd Street", "status": "noisy",
+                          "deployed_at": "2022-01-01", "lat": 40.71, "lon": -73.77, "n_events": 6}]}
+    final = {"floodnet": json.loads(json.dumps(value)), "citations": {"floodnet": {"license": "CC BY-NC-SA 4.0"}},
+             "targets": [{"state": {"floodnet_nta": json.loads(json.dumps(value))}}]}
+    for v in (strip_floodnet(final)["floodnet"], final["targets"][0]["state"]["floodnet_nta"]):
+        assert v == {"n_sensors": 1, "n_flood_events_3y": 6, "period_start": "2023-10-06", "narrative": value["narrative"],
+                     "license": "CC BY-NC-SA 4.0", "highest_event": {"max_depth_mm": 1172, "date": "2026-05-20"},
+                     "peak_event": None, "flagged_peak_event": {"max_depth_mm": 1172, "date": "2026-05-20"}}
+    assert final["citations"] == {"floodnet": {"license": "CC BY-NC-SA 4.0"}}
+
+    def records(node) -> bool:
+        """A sensor list or an event row left in a FloodNet value, at any depth."""
+        if isinstance(node, list):
+            return any(records(x) for x in node)
+        if not isinstance(node, dict):
+            return False
+        return any(("sensors" in v or bool(re.search(r'"(deployment_id|start_time|lat|lon)"', json.dumps(v))))
+                   if k in ("floodnet", "floodnet_nta") and isinstance(v, dict) else records(v) for k, v in node.items())
+
+    assert records({"floodnet": value}) and not records(final)
+    gallery = ROOT / "web" / "sveltekit" / "src" / "lib" / "gallery"
+    baked = [(f, json.loads(f.read_text())) for f in sorted(gallery.glob("*.json")) if f.name != "index.json"]
+    held = [f.name for f, d in baked if d.get(FLOODNET_STRIPPED) and records(d.get("final"))]
+    assert not held, held
+
+
 def test_events_are_asked_for_up_to_now(monkeypatch):
     """FloodNet's table holds events stamped 2080; the window closes at now."""
     seen = {}

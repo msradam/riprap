@@ -40,6 +40,14 @@
       : null
   );
 
+  // A saved gallery page keeps FloodNet's counts and sentences but no
+  // per-sensor record (scripts/build_gallery.py: the licence forbids
+  // reposting the data in part), so its map has no sensor points to draw.
+  let sensorsNotDrawn = $derived.by(() => {
+    const f = (run.finalResult as { floodnet?: { n_sensors?: unknown } } | null)?.floodnet;
+    return typeof f?.n_sensors === 'number' && f.n_sensors > 0 && !(run.floodnetFc?.features.length);
+  });
+
   const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
   /** What is plotted, in counts from the data. */
   let plotted = $derived.by(() => {
@@ -82,7 +90,7 @@
       />
     </div>
     <figcaption>
-      Figure 1. {heatCaption ?? (plotted.length ? `Plotted: ${plotted.join('; ')}.` : 'The place.')}{#if run.areaBoundary}{` The outline is the ${AREA_BOUNDARY_LEGEND.label}.`}{/if}{#if run.radii.length}{` Search radii (rings): ${run.radii.map((r) => `${r.label} ${r.radius_m} m`).join(', ')}.`}{/if}
+      Figure 1. {heatCaption ?? (plotted.length ? `Plotted: ${plotted.join('; ')}.` : 'The place.')}{#if run.areaBoundary}{` The outline is the ${AREA_BOUNDARY_LEGEND.label}.`}{/if}{#if run.radii.length}{` Search radii (rings): ${run.radii.map((r) => `${r.label} ${r.radius_m} m`).join(', ')}.`}{/if}{#if sensorsNotDrawn}{' '}FloodNet's sensors are not drawn on this saved page; they are shown on <a href="https://dataviz.floodnet.nyc/">FloodNet's own dashboard</a>.{/if}
     </figcaption>
   </figure>
   {#if heat && surface}

@@ -158,14 +158,6 @@
   "reason": "Exposed assets by name: the public housing developments of a district inside the Sandy extent."
  },
  {
-  "slug": "battery-surge",
-  "neighborhood": "The Battery, Manhattan",
-  "address": "The Battery, Manhattan, NY",
-  "question": "Will the water at the Battery run above the predicted tide in the next four days, and by how much?",
-  "reason": "A forecast question: the Weather Service's forecast for the gauge first, then an experimental model's, hedged, with its tested accuracy.",
-  "feature_doc": "ttm_battery_surge"
- },
- {
   "slug": "waterside-next-week",
   "neighborhood": "Kips Bay, Manhattan",
   "address": "30 Waterside Plaza, Manhattan, NY",
