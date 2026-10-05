@@ -301,7 +301,9 @@ def test_311_complaints_alone_do_not_make_has_it_flooded_a_yes():
     # A prediction, not a past date: declined in the answer, with what is forecast there (test_experimental.py).
     ("Will 90-01 183rd Street, Queens flood on October 15?", "single_address"),
     ("Will it flood on October 15?", "out_of_scope"),
-    ("Is it safe to rent a basement apartment at 153-10 Peck Avenue, Queens?", "out_of_scope"),
+    # Advice at a place that is named: the rules say Riprap gives none and quote the FEMA zone (test_rule_answer.py).
+    ("Is it safe to rent a basement apartment at 153-10 Peck Avenue, Queens?", "single_address"),
+    ("Is it safe to rent a basement apartment?", "out_of_scope"),
     ("what is flooding right now", "not_implemented"),                              # no place: point to the live tools
 ])
 def test_declines(query, intent):
@@ -331,7 +333,7 @@ def test_register_name_lists_carry_the_scenario_year():
     from riprap.core.compliance.predicates import projection_has_horizon
 
     v = exposure.summary_for_point(40.5757, -73.986, "mta_entrances")
-    assert "Inside the DEP extreme scenario (2080 sea-level rise), by station:" in v["narrative"]
+    assert "Inside the modeled DEP extreme scenario (2080 sea-level rise), by station:" in v["narrative"]
     assert projection_has_horizon(v["narrative"]).passed
 
 

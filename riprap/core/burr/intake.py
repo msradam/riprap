@@ -39,6 +39,7 @@ from riprap.core.burr.place import (
 )
 from riprap.core.burr.rule_answer import (  # one definition of "now"
     _clauses,
+    asks_advice,
     asks_now,
     recognised,
 )
@@ -175,7 +176,8 @@ _HEAT_COMPARE_RE = re.compile(
     # "which is hotter, mott haven or riverdale", "brownsville or the upper east side, where is heat worse"
     r"|^\W*(.+?)\s+compared\s+(?:to|with)\s+(.+?)(?:\s+(?:for|on|in terms of)\s+[\w ]+)?\s*(?:[?.,]|$)"
     r"|^\W*(?:what(?:'s| is) the\s+)?differences?\s+(?:in\s+[\w ]+?\s+)?between\s+(.+?)\s+and\s+(.+?)\s*(?:[?.,]|$)"
-    r"|^\W*which\s+(?:is|gets|runs|one is)\s+(?:hott?er|warmer|cooler|worse|more [\w ]+?)\s*,?\s*(.+?)\s+or\s+(.+?)\s*(?:[?.,]|$)"
+    r"|^\W*which\s+(?:is|gets|runs|one is|floods?|flooded|has)\s+(?:hott?er|warmer|cooler|worse|more(?: [\w ]+?)?)\s*,\s*(.+?)\s+or\s+(.+?)\s*(?:[?.,]|$)"
+    r"|^\W*which\s+(?:is|gets|runs|one is)\s+(?:hott?er|warmer|cooler|worse|more [\w ]+?)\s+(.+?)\s+or\s+(.+?)\s*(?:[?.,]|$)"
     r"|^\W*(.+?)\s+or\s+(.+?)\s*,\s*(?:where|which)\b"
     # "how does heat in BX02 compare with MN08"
     r"|^\W*how (?:does|do|did)\s+(?:the\s+)?(?:heat\s+)?(?:(?:in|at)\s+)?(.+?)\s+compare[sd]?\s+(?:with|to)\s+(.+?)\s*(?:[?.,]|$)"
@@ -335,14 +337,21 @@ def _plan_for(q: str, hazard: str) -> dict:
     # A prediction for a named day with no place has nothing to answer with;
     # with a place, the rules decline the prediction and quote what is
     # forecast and mapped there (rule_answer: no_prediction).
-    if _OUT_OF_SCOPE_RE.search(q) or (heat and _HEAT_ADVICE_RE.search(q)) or (
-            not heat and _FUTURE_DAY_RE.search(q) and not _names_a_place(q)):
+    # Insurance, price, buying, renting or safety at a place that is named: the rules say Riprap does none of
+    # that and quote the FEMA zone (rule_answer: no_advice). With no place there is nothing to quote.
+    advice = not heat and asks_advice(q)
+    if ((_OUT_OF_SCOPE_RE.search(q) or advice) and not (advice and _names_a_place(q))) or (
+            heat and _HEAT_ADVICE_RE.search(q)) or (not heat and _FUTURE_DAY_RE.search(q) and not _names_a_place(q)):
         return {"intent": "out_of_scope", "rationale": "Heuristic match: out of scope.",
                 "focus": {"hazard": hazard, "time_frame": "any", "assets": []},
                 "targets": [{"type": "address", "text": _address_from_query(q)}]}
-    if heat and (pair := _heat_compare(q)):
-        return {"intent": "compare", "rationale": "Heuristic match: compare.", "targets": pair}
     m = None if heat else _COMPARE_RE.match(q)
+    # Two named areas are set side by side in a flood question too ("Which is more flood prone, Red Hook or
+    # Hollis?" once kept Red Hook and never mentioned Hollis). Two street addresses keep the rule below.
+    # Two scenarios at one place are not two places ("gowanus stormwater flooding 2050 vs 2080 scenario").
+    scenarios = not heat and re.search(r"\b(?:2050|2080)s?\b|\bscenarios?\b", q)
+    if not scenarios and not (m and all(extract_address(g) for g in m.groups() if g)) and (pair := _heat_compare(q)):
+        return {"intent": "compare", "rationale": "Heuristic match: compare.", "targets": pair}
     # A comparison of two addresses. "Compare the current and 2080 flood maps
     # at 89-11 Merrick Boulevard" names one place and was once briefed as a
     # building called The Current in New Jersey.

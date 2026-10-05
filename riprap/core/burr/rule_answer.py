@@ -101,8 +101,38 @@ _WILL_FLOOD_RE = re.compile(r"\b(will|going to|gonna|likely to|expected to|about
                             r"\bflood(?!net|[- ]?(zone|plain|insurance|map))"
                             r"|\bflood\w*\s+(?:(?:is|are)\s+(?:expected|likely|forecast|predicted)|expected|likely|predicted)\b",
                             re.I)  # ("the flood forecast" is a noun, and the forecast answers it)
+# Insurance, price, property value, buying, renting, or whether a home is safe: Riprap reports records and
+# does none of these. The FEMA zone is the record that bears on insurance, the effective map first. ("The flood
+# insurance rate map" is a map, and "is the school safe" is answered from the school register, below.)
+_ADVICE_RE = re.compile(
+    r"\binsur(?:ance|ed?|ing|ers?)\b(?! rate maps?)|\bpremiums?\b|\bmortgages?\b"
+    r"|\b(?:property|home|house|resale|market|real estate) (?:values?|prices?)\b|\bworth (?:buying|renting|it)\b"
+    r"|\bhow much (?:is|are|does|do|would|will)\b[^.?!]*\b(?:worth|costs?)\b"
+    r"|\bshould (?:i|we) (?:buy|rent|sell|move|live|stay|sign|lease)\b"
+    r"|\b(?:good|bad|smart|wise) (?:idea|place|time) to (?:buy|rent|live|move|sign)\b"
+    r"|\b(?:is|would) it (?:be )?safe\b|\bsafe to (?:buy|rent|live|stay|move)\b"
+    r"|\b(?:is|are|will|would)\b[^.?!]*\b(?:homes?|houses?|apartments?|basements?|buildings?|blocks?|street|st|avenue|ave)\b[^.?!]*\bsafe\b",
+    re.I)
+ADVICE_FACTS = ("fema_nfhl", "fema_pfirm", "dcp_floodplain_nta")
+# Records read around a street address only, by what the question calls them.
+ADDRESS_ONLY = ("ida_hwm",)
+# A change over time in land cover: the city's map is one year and the model is not compared across years.
+_CHANGE_RE = re.compile(r"\bsince (?:19|20)\d\d\b|\bover (?:the )?(?:time|years|decades?|last|past)\b|\bchang(?:e|es|ed|ing)\b"
+                        r"|\b(?:become|became|becoming|gotten|getting|grown|growing|got)\b[^.?!]*\b(?:more|less|fewer)\b"
+                        r"|\b(?:more|less|fewer)\b[^.?!]*\bthan (?:it (?:was|used)|before|in (?:19|20)\d\d|\d+ years)\b"
+                        r"|\b(?:increas|decreas|declin|shr[iu]nk|expand)\w*|\bused to\b|\btrend|\b(?:lost|losing|gained|gaining)\b",
+                        re.I)
 NO_PREDICTION_FACTS = ("nws_alerts", "nws_water_forecast", "fema_nfhl", "dcp_floodplain_nta",
                        "dep_moderate_current", "dep_moderate_current_nta", "sandy_inundation", "sandy_nta")
+
+
+def asks_advice(question: str) -> bool:
+    """A question about insurance, price, buying, renting or whether a home
+    is safe. A statement before a question is a preamble ("I am buying a
+    house on Pioneer Street. Has the block flooded?"), and a question about a
+    school, a hospital, a subway entrance or public housing is the register's."""
+    return any(_ADVICE_RE.search(c) and not (c.rstrip().endswith((".", "!")) and not ac.is_yes_no_question(c))
+               and not any(i in ASSET_DOCS for i in _named_ids(c)) for c in _clauses(question or ""))
 
 
 def experimental(question: str, texts: dict[str, str]) -> tuple[list[str], list[str]]:
@@ -311,7 +341,7 @@ def recognised(question: str) -> bool:
     """True when a rule knows what kind of question this is, from its words alone."""
     q = question or ""
     return bool(asks_now(q) or _FUTURE_RE.search(q) or _named_ids(q) or _FLOOD_RE.search(q) or _SATELLITE_RE.search(q)
-                or any(p.search(q) for p, _, _ in EXPERIMENTAL) or heat_answer.hazard_of(q) == "heat")
+                or any(p.search(q) for p, _, _ in EXPERIMENTAL) or heat_answer.hazard_of(q) == "heat" or asks_advice(q))
 
 
 _SAFE_RE = re.compile(r"\b(safe|dry|high(er)? ground|spared|protected|outside|not (in|inside|exposed|at risk))\b", re.I)
@@ -391,6 +421,9 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     if heat_answer.hazard_of(question) == "heat":
         return heat_answer.answer(question, texts, values)
     question = _HOUSE_YEAR_RE.sub("", question)
+    if asks_advice(question):
+        # Out of scope, said first; then the FEMA zone, the effective map before the preliminary one.
+        return "no_advice", [d for d in ADVICE_FACTS if texts.get(d)]
     parts = [(c, _answer_one(c, texts, values, generic=False)) for c in _clauses(question)]
     parts = [(c, a) for c, a in parts if a and a[1]]
     if len(_clauses(question)) > 1 and parts and time_frame(question) != "now":
@@ -469,6 +502,10 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
     if (models or official) and not happened:
         # The model's hedged sentence is the answer, after the official source
         # for the same thing when one answered.
+        if EXPERIMENTAL[0][0].search(question) and _CHANGE_RE.search(question):
+            # "Has it become more paved since 2018?": the map's figure and the model's are two methods, and
+            # printed one after the other they read as a rise. The lead says so before either figure.
+            return "no_change_record", [*official, *models]
         return ("facts" if official else "experimental"), [*official, *models]
     past = ac.past_event_lead(happened, {"time_frame": "past"}, list(texts), texts, values) if happened else None
     if past:
@@ -530,6 +567,11 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
         # neighbourhood, which has no FEMA reading of its own, still gets
         # the two maps the area does have, under the cannot-answer line.
         mapped = [d for d in ("sandy_nta", "dep_moderate_current_nta") if texts.get(d)] if TOPICS[0][0].search(question) else []
+        if not mapped and any(d.endswith("_nta") for d in texts) and any(i in ADDRESS_ONLY for i in _named_ids(question)):
+            # "How deep did the water get on 183rd Street in Hollis during Ida?": no house number, so the
+            # question was read for the neighbourhood, and the marks are read around an address. Say that
+            # and what to type (it once ended "Here is what they show." and showed nothing).
+            return "needs_address", []
         return "cannot_answer", mapped
     if generic and _FLOOD_RE.search(question):
         seen = [i for i in OBSERVED if texts.get(i)]

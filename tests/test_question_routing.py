@@ -5,7 +5,7 @@ from __future__ import annotations
 from app.planner import _validate, plan_schema
 from riprap.core.burr.intake import heuristic_plan
 from riprap.core.burr.stones import FLOOR, select_pebbles
-from riprap.core.burr.synthesis import CANNOT_ANSWER, Doc, _render, verify
+from riprap.core.burr.synthesis import NOTHING_TO_SHOW, Doc, _render, verify
 from riprap.core.burr.templated_reconciler import HEAT_REFUSAL, SCOPE_REFUSAL, refusal
 from riprap.core.pebbles.bridge import get_registry
 
@@ -78,13 +78,15 @@ def test_render_opens_with_answer_or_cannot_answer_line():
                      "doc_ids": ["sandy_inundation"], "numbers": []}]
     text = _render(kept2, docs, ["Hazard reader", "Live observer"], question="How many complaints?")
     assert text.index("**Answer.**\n82 flood complaints") < text.index("**Hazard reader.**")
+    # With no fact to quote, the line never ends "Here is what they show." (it once did, and showed nothing).
     empty = _render([], DOCS, ["Live observer"], question="How many complaints?")
-    assert f"**Answer.**\n{CANNOT_ANSWER}" in empty
+    assert f"**Answer.**\n{NOTHING_TO_SHOW}" in empty and "Here is what they show" not in empty
     assert "**Answer.**" not in _render([], DOCS, ["Live observer"])
 
 
 def test_out_of_scope_gets_fixed_text():
-    assert heuristic_plan("Should I buy the house at 2017 East 17th Street?")["intent"] == "out_of_scope"
+    assert heuristic_plan("Should I sue my landlord over the flooding at 2017 East 17th Street?")["intent"] == "out_of_scope"
+    assert heuristic_plan("How much is flood insurance in a flood zone?")["intent"] == "out_of_scope"  # no place to quote
     # Heat is a briefing now (tests/test_heat.py); air quality is still another hazard.
     air = heuristic_plan("How bad is the air quality at 560 Grand Street?")
     assert air["intent"] == "out_of_scope" and air["focus"]["hazard"] == "air"
@@ -131,7 +133,7 @@ def test_out_of_scope_rules_override_the_llm_planner(monkeypatch):
 
     monkeypatch.setattr(burr_app, "_tier", lambda: "llm")
     monkeypatch.setattr("app.planner.plan", lambda q, ledger=None: P)
-    assert burr_app.plan_for("Should I buy the house at 2017 East 17th Street?")["intent"] == "out_of_scope"
+    assert burr_app.plan_for("Should I sue my landlord over the flooding at 2017 East 17th Street?")["intent"] == "out_of_scope"
     assert burr_app.plan_for("Has 2017 East 17th Street flooded?")["intent"] == "single_address"
 
 

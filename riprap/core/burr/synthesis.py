@@ -45,6 +45,14 @@ NO_EVIDENCE_LINE = "No grounded evidence for this section."
 ANSWER_SECTION = "answer"
 CANNOT_ANSWER = ("The sources consulted do not answer this question directly. "
                  "Here is what they show.")
+# With nothing to show, the line must not promise it ("Here is what they show." once ended an answer).
+NOTHING_TO_SHOW = ("The sources consulted do not answer this question directly, and none of them returned a record "
+                   "that bears on it for this place.")
+# Insurance, price, buying, renting, safety: said first, before the one record that bears on insurance.
+NO_ADVICE = ("Riprap reports public records about a place. It does not price flood insurance, value property or give "
+             "advice on buying, renting or whether a home is safe.")
+ADVICE_POINTER = ("For flood insurance questions, NYC Emergency Management points to FloodHelpNY "
+                  "(https://www.floodhelpny.org).")
 
 # A number is not preceded by a letter, digit or '.', so 'Extreme-2080'
 # gives 2080 and a FIRM panel '3604970203F' gives 3604970203.
@@ -299,7 +307,14 @@ LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From
                 "no_prediction_heat": "Riprap cannot predict what will happen in one building, on one block or on a "
                                       "named day: no source here does that. What the Weather Service expects for the "
                                       "area over the next 7 days, and what has been measured here:",
-                "no_ranking": "Riprap does not rank places against each other or pick out the worst part of one. The "
+                "no_advice": f"{NO_ADVICE} The FEMA flood zone here, from the effective map (the one FEMA uses "
+                             "for the National Flood Insurance Program) first:",
+                "needs_address": "Riprap read this question for the neighbourhood or district as a whole, because it "
+                                 "names no house number, and the USGS high-water marks surveyed after Hurricane Ida "
+                                 "are read around a street address. Type the address with its house number, such as "
+                                 "90-01 183rd Street, Queens, to get the marks near it.",
+                "no_change_record": "Riprap has no like-for-like record of change in land cover here.",
+                "no_ranking": "Riprap does not rank places against each other or single out one part of a place. The "
                               "record below is for the whole of the place named; ask about one neighbourhood or "
                               "community district for its own:",
                 "no_prediction_far": "Riprap cannot predict what will happen in one building, on one block or on a "
@@ -350,7 +365,46 @@ LIVE_POINTER = ("Riprap reads records, not the street. For a live depth reading 
 BOTH_HAZARDS = ("This question names flooding and heat. Riprap keeps them as separate briefings and does not weigh one "
                 "against the other: this is the flood record, and asking about heat alone at this place gives the heat record.")
 MORE_PLACES = ("This question names more than one place ({names}). Riprap reads one place at a time, and this answer is "
-               "for the place named at the top; ask about each on its own, or set two side by side with \"heat A vs B\".")
+               "for {answered}; ask about each on its own, or set two side by side with \"{how}\".")
+NOT_PLACED = ("This question also names {names}, which Riprap could not match to a place in New York City, so this "
+              "answer is for {answered} alone.")
+
+
+def _change_lead(facts: list[str], values: dict | None) -> str:
+    """The lead of a change-over-time question about land cover: the two
+    figures are two methods, said before either is printed, and whether
+    their difference is inside what the model was off by when tested (the
+    gap figures come from the model's own result file)."""
+    from app import experimental
+
+    lead = LEAD_PHRASES["no_change_record"]
+    city = next(((values or {}).get(f) for f in facts if f.startswith("city_landcover")), None)
+    model = next(((values or {}).get(f) for f in facts if f.startswith("landcover")), None)
+    if not (isinstance(city, dict) and isinstance(model, dict) and model.get("built_pct") is not None
+            and city.get("built_pct") is not None):
+        return f"{lead} What the sources below show is one year each, not a change:"
+    lead += (f" The two figures below come from different methods: the city's {city.get('year', 2017)} map, surveyed "
+             f"from LiDAR and aerial imagery, and an experimental model reading {model.get('year')} satellite images.")
+    gap, tested = abs(model["built_pct"] - city["built_pct"]), experimental.evaluation("landcover") or {}
+    typical, most = tested.get("district_paved_gap_points_median_abs"), tested.get("district_paved_gap_points_max")
+    if typical is not None and most is not None and gap <= most:
+        return (f"{lead} Their paved shares differ by {gap:.1f} points, which is within what the model was off by "
+                f"when tested against the city's 2021 map (typically {typical} points for a district, at most {most}), "
+                "so the difference is not a measured change:")
+    return f"{lead} The difference between them is not a measured change:"
+
+
+def _canopy_note(question: str, facts: list[str], texts: dict[str, str]) -> str:
+    """For a question about trees or green cover answered with the model's
+    canopy share: what that share has read against the city's map, said
+    before the figure (the model's own sentence says it about 80 words in)."""
+    from app import experimental
+
+    words = (experimental.evaluation("landcover") or {}).get("canopy_vs_city_map_2017_words")
+    quoted = any(f in ("landcover", "landcover_nta") and "tree canopy" in texts.get(f, "") for f in facts)
+    if not words or not quoted or not re.search(r"canopy|\btrees?\b|\bgreen|\bshad", question or "", re.I):
+        return ""
+    return f"The experimental model's maps show {words}, so its canopy share can be several points off."
 HEAT_LIVE_POINTER = ("Riprap reads records, not the street. Official heat warnings come from the National Weather "
                      "Service (weather.gov/okx) and Notify NYC; during a heat emergency the city lists its cooling "
                      "centers at finder.nyc.gov/coolingcenters.")
@@ -358,7 +412,7 @@ HEAT_LIVE_POINTER = ("Riprap reads records, not the street. Official heat warnin
 
 def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: str = "",
             lead: str = "", empty: dict[str, list[str]] | None = None, brief: str | None = None,
-            now: bool = False) -> str:
+            now: bool = False, place: str = "", advice: bool = False) -> str:
     """Scope header, then the answer (when a question was asked), then one
     section per Stone that ran, then the footer. Only verified claims.
 
@@ -395,7 +449,8 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
         parts.append(f"**In brief.**\n{brief}")
     if question:
         body = sentences(ANSWER_SECTION)
-        parts.append("**Answer.**\n" + ((f"{lead} " if lead else "") + body if body else CANNOT_ANSWER))
+        # With no fact to quote, the lead's own statement stands alone, or the line that says nothing is shown.
+        parts.append("**Answer.**\n" + ((f"{lead} " if lead else "") + body if body else lead or NOTHING_TO_SHOW))
     for sec in sections:
         body = sentences(sec)
         if not body and question and sec in (empty or {}):
@@ -416,8 +471,16 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
     pointer = HEAT_LIVE_POINTER if heat else LIVE_POINTER
     footer = HEAT_NON_SCOPE_FOOTER if heat else NON_SCOPE_FOOTER
     footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {pointer} ", 1) if now else footer
-    if heat and (others := heat_answer.places_named(question)):
-        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {MORE_PLACES.format(names=_and(others))} ", 1)
+    if advice:
+        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {ADVICE_POINTER} ", 1)
+    answered = place or "the place named at the top"
+    if others := heat_answer.places_named(question):
+        note = MORE_PLACES.format(names=_and(others), answered=answered, how="heat A vs B" if heat else "A vs B")
+        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {note} ", 1)
+    if unknown := heat_answer.not_placed(question):
+        # "Is East Harlem hotter than Phoenix?" once dropped Phoenix without a word.
+        note = NOT_PLACED.format(names=_and(unknown), answered=answered)
+        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {note} ", 1)
     if question and re.search(r"\bflood", question, re.I) and re.search(r"\bheat\b|\bhott?(?:er|est)?\b", question, re.I) \
             and not heat_answer.INDOOR_HEATING_RE.search(question):
         # "Which is the bigger problem here, flooding or heat?" got the flood record and no word about heat.
@@ -561,6 +624,12 @@ def synthesize(state, use_llm: bool = True) -> dict:
         facts = sorted(facts, key=lambda f: f in experimental)  # the rule's order, experimental sources last
         kept = [{"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts]
         lead_phrase = CANNOT_ANSWER if lead == "cannot_answer" and facts else LEAD_PHRASES.get(lead, "")
+        if lead == "no_advice" and not facts:
+            lead_phrase = NO_ADVICE  # no FEMA reading for this place: the statement alone, and the pointer below
+        if lead == "no_change_record":
+            lead_phrase = _change_lead(facts, values)
+        if lead in ("facts", "experimental", "no_change_record") and (note := _canopy_note(question, facts, texts)):
+            lead_phrase = f"{note} {lead_phrase}"
         if lead == "count" and rel in facts:
             sentence, undetermined = answer_checks.count_lead(question, texts, values)
             if undetermined:  # the period asked is not the source's window: no count as the answer
@@ -629,7 +698,8 @@ def synthesize(state, use_llm: bool = True) -> dict:
                                focus, texts, values, experimental)
     checks = ["citations and numbers on every claim"]
     if question:
-        checks.append("lead rules on the answer, which is the cited text word for word"
+        quoted = any(c["section"] == ANSWER_SECTION for c in kept)  # an answer with no fact quotes nothing
+        checks.append("lead rules on the answer" + (", which is the cited text word for word" if quoted else "")
                       + ("; its first sentence is read from the same station's yearly record" if record_lead else ""))
     # A bare address opens with the same verified "In brief" lead as no-LLM mode.
     from riprap.core.burr.stones import hazard_of
@@ -639,7 +709,8 @@ def synthesize(state, use_llm: bool = True) -> dict:
     if not question and state.get("intent") == "single_address":
         brief = _heat_lead(state, items, area=False) if hazard_of(plan) == "heat" else _lead(state, items)
     paragraph = _render(kept, docs, sections, question, lead_phrase, empty, brief,
-                        now=bool(question) and (focus or {}).get("time_frame") == "now")
+                        now=bool(question) and (focus or {}).get("time_frame") == "now",
+                        place=(state.get("geocode") or {}).get("address") or "", advice=lead == "no_advice")
     paragraph = paragraph.replace(_scope_header(), _scope_header(state), 1)  # outside every city: say what was not read
     # Every consulted source with a value is citable (its evidence row gets a
     # number), the ones the text cites first, in order of appearance, so the

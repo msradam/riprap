@@ -150,8 +150,9 @@ V = {"floodnet": {"n_sensors": 2, "n_flood_events_3y": 14, "n_flood_events_good_
      "facts", ["nws_water_forecast", "noaa_tides", "ttm_battery_surge"]),
     # No official source here answers these: the model's hedged sentence is the answer.
     ("How much of BX02 is paved over and how much is green?", "experimental", ["landcover_nta"]),
-    ("Has the land cover in SI03 changed much in the last few years?", "experimental", ["landcover_nta"]),
-    ("If this paving trend continues, is runoff likely to rise in QN12?", "experimental", ["landcover_nta"]),
+    # A change over time: the lead says there is no like-for-like record of change (test_rule_answer.py).
+    ("Has the land cover in SI03 changed much in the last few years?", "no_change_record", ["landcover_nta"]),
+    ("If this paving trend continues, is runoff likely to rise in QN12?", "no_change_record", ["landcover_nta"]),
 ])
 def test_a_question_about_the_future_gets_the_models_hedged_answer(question, lead, facts):
     # A run has the point sources or the area ones, never both.

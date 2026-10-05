@@ -298,6 +298,9 @@ def get_briefing(address: str, question: str | None = None) -> dict:
         "answered": g.get("answered"),
         "answer_mode": g.get("answer_mode"),
         "answer_lead": g.get("answer_lead"),
+        # Which path produced this result, refusals and bare briefings included: "rules" (no language model
+        # was called) or "llm" (a model planned the query or chose the answer's sentences).
+        "answer_path": out.get("answer_path"),
         "dropped_claims": g.get("dropped_claims") or [],
         "citations": out.get("citations") or {},
         "license_notices": license_notices(out.get("citations")),

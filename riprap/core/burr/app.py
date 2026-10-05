@@ -87,7 +87,9 @@ def plan_for(query: str, *, no_llm: bool = False) -> dict:
             from riprap.core.burr.synthesis import llm_bare
 
             guard = heuristic_plan(query)
-            if guard["intent"] in ("out_of_scope", "not_implemented"):  # the same fixed rules in both modes
+            # The same fixed rules in both modes. Two places the rules found are set side by side: the model
+            # planner is told to compare street addresses only, and made two named areas one.
+            if guard["intent"] in ("out_of_scope", "not_implemented", "compare"):
                 return guard
             if not llm_bare() and is_bare_place(query, guard["targets"]):
                 return guard  # a bare place: the resolver finds it, and there is no question to plan
@@ -150,7 +152,7 @@ def _rules_can_plan(query: str, guard: dict) -> bool:
         return rule_answer.recognised(query)
     kind = (guard.get("place") or {}).get("kind")
     placed = kind in ("address", "district") or (kind == "neighborhood" and guard["intent"] in POLYGON_INTENTS)
-    return placed and guard["intent"] != "compare" and rule_answer.recognised(query)
+    return placed and rule_answer.recognised(query)
 
 
 def _with_question(plan: dict, query: str) -> dict:
@@ -237,7 +239,18 @@ def _final(state) -> dict:
     from app.models_info import for_briefing
 
     out["models"] = for_briefing(out)  # which models took part, where they ran, how long
+    out["answer_path"] = answer_path(out)
     return attach_disclosure_checks(out)
+
+
+def answer_path(out: dict) -> str:
+    """Which path produced a result, for every kind of result (a briefing,
+    an answer, a refusal, a comparison): "llm" when a language model planned
+    the query or chose the answer's lead and sentences, "rules" when no
+    language model was called. `grounding.answer_mode` and `plan.llm_calls`
+    hold the detail."""
+    g = out.get("grounding") or {}
+    return "llm" if (out.get("plan") or {}).get("llm_calls") or g.get("llm_calls") or g.get("tier") == "llm" else "rules"
 
 
 def attach_disclosure_checks(out: dict) -> dict:
@@ -320,29 +333,80 @@ def run(query: str, plan: dict | None = None, *, no_llm: bool = False) -> dict:
     return out
 
 
+# What opens every comparison: the two records are set side by side and nothing is scored or ranked, whatever
+# word the question used ("more flood prone", "worse").
+COMPARE_NOTE = ("Riprap computes no score and does not rank places against each other. The public records for "
+                "{a} and {b} are set side by side below, each from its own sources.")
+SURFACE_TRAP = ("This compares the surface of roofs, pavement and treetops on clear late mornings, not the air "
+                "temperature a person feels.")
+MIN_SHARED_IMAGES = 5  # as app.heat.surface_temp.MIN_IMAGES: fewer images are not a record to compare on
+
+
+def surface_comparison(a: str, b: str, va, vb, doc_id: str) -> str | None:
+    """One comparing sentence for two places' Landsat surface readings,
+    from the record both share: the images that saw both, and in how many
+    each surface read warmer. None when fewer than MIN_SHARED_IMAGES images
+    saw both, so no sentence is made where the shared record is too thin."""
+    xs, ys = (va or {}).get("by_image") or {}, (vb or {}).get("by_image") or {}
+    shared = sorted(set(xs) & set(ys))
+    if len(shared) < MIN_SHARED_IMAGES:
+        return None
+    a_warmer, b_warmer = sum(xs[t] > ys[t] for t in shared), sum(ys[t] > xs[t] for t in shared)
+    (first, n), (second, k) = sorted(((a, a_warmer), (b, b_warmer)), key=lambda x: -x[1])
+    rest = "" if n == len(shared) else f", and the surface of {second} read warmer in {k}" if k else ""
+    return (f"In {n} of the {len(shared)} clear summer Landsat images that saw both places ({shared[0][:10]} to "
+            f"{shared[-1][:10]}), the surface of {first} read warmer than the surface of {second}{rest} [{doc_id}]. "
+            f"{SURFACE_TRAP}")
+
+
+def _not_briefed(name: str, res: dict) -> str | None:
+    """The sentence for a compared place that got no local record, by name."""
+    if res.get("lat") is None:
+        return f"Riprap could not match \"{name}\" to a place, so no record of it is shown."
+    if res.get("deployment") is None:
+        return (f"{name} is outside the cities Riprap covers, so it has no local record of it to set beside the "
+                "other place.")
+    return None
+
+
 def run_compare(query: str, plan: dict, runner=None) -> dict:
-    """Two single_address briefings, merged into one result labelled
-    PLACE A and PLACE B. Falls back to one briefing when the plan has
-    fewer than two targets. `runner(query, plan)` defaults to `run`."""
+    """Two briefings (an address as a point, a neighbourhood or district as
+    an area), merged into one result labelled PLACE A and PLACE B under a
+    note that nothing is scored or ranked. A heat comparison adds one
+    comparing sentence from the Landsat images both places share. Falls
+    back to one briefing when the plan has fewer than two targets.
+    `runner(query, plan)` defaults to `run`."""
     runner = runner or (lambda q, p: run(q, p))
     targets = [t for t in plan.get("targets") or [] if t.get("text")][:2]
     if len(targets) < 2:
         return runner(query, {**plan, "intent": "single_address"})
     results = []
     for label, t in zip(("PLACE A", "PLACE B"), targets, strict=False):
-        sub = {"intent": "single_address", "targets": [t], "rationale": plan.get("rationale")}
+        # A district or neighbourhood is read as an area, in a flood comparison as in a heat one.
+        sub = {"intent": "neighborhood" if t.get("type") in ("nta", "district") else "single_address",
+               "targets": [t], "rationale": plan.get("rationale")}
         if hazard_of(plan) == "heat":
             # A heat comparison: each place answers the question asked (its rules quote the
-            # sources the question names), and a district or neighbourhood is read as an area.
-            sub.update(focus=plan.get("focus"), question=plan.get("question") or query.strip(),
-                       intent="neighborhood" if t.get("type") in ("nta", "district") else "single_address")
+            # sources the question names).
+            sub.update(focus=plan.get("focus"), question=plan.get("question") or query.strip())
         results.append((label, t["text"], runner(t["text"], sub)))
+    (_, a, res_a), (_, b, res_b) = results
+    note = [COMPARE_NOTE.format(a=a, b=b), *filter(None, (_not_briefed(a, res_a), _not_briefed(b, res_b)))]
+    if hazard_of(plan) == "heat":
+        doc = next((d for d in ("heat_surface_nta", "heat_surface") if d in (res_a.get("citations") or {})), "heat_surface")
+        va, vb = (res_a.get("heat_surface_nta") or res_a.get("heat_surface"),
+                  res_b.get("heat_surface_nta") or res_b.get("heat_surface"))
+        if sentence := surface_comparison(a, b, va, vb, doc):
+            note.append(sentence)
     out = {**results[0][2]}
+    models = {m["name"]: m for _, _, res in results for m in res.get("models") or []}
     out.update(
         intent="compare",
         plan=plan,
-        paragraph="\n\n---\n\n".join(f"## {lab}: {addr}\n\n{(res.get('paragraph') or '').strip()}"
-                                     for lab, addr, res in results),
+        models=list(models.values()),  # of both places, not the first alone
+        # The note sits in place A's half, above its heading: the page splits the halves at the rule.
+        paragraph="**Comparison.**\n" + " ".join(note) + "\n\n" + "\n\n---\n\n".join(
+            f"## {lab}: {addr}\n\n{(res.get('paragraph') or '').strip()}" for lab, addr, res in results),
         citations={k: v for _, _, res in results for k, v in (res.get("citations") or {}).items()},
         grounding={
             "tier": results[0][2].get("grounding", {}).get("tier"),
@@ -355,4 +419,5 @@ def run_compare(query: str, plan: dict, runner=None) -> dict:
         },
         targets=[{"label": lab, "address": addr, "state": res} for lab, addr, res in results],
     )
+    out["answer_path"] = answer_path(out)
     return attach_disclosure_checks(out)

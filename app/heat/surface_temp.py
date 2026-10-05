@@ -117,6 +117,8 @@ def _summary(geom_4326, where: str) -> dict | None:
     return {"mean_diff_f": mean, "min_diff_f": lo, "max_diff_f": hi, "n_images": len(diffs), "first": first, "last": last,
             "latest_surface_f": latest_f, "latest_city_mean_f": last_img["city_land_mean_f"],
             "warmer_in_every_image": lo > 0, "cooler_in_every_image": hi < 0,
+            # Each image's difference by its time, so two places are compared on the images that saw both.
+            "by_image": {img["time_utc"]: round(d, 1) for img, d in diffs},
             "narrative": narrative, "headline_value": f"{mean:+.1f}°F against the city's land average"}
 
 

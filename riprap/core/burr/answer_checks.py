@@ -54,7 +54,7 @@ RELEVANT = (
 # Leads only code sets, never a model: honest silence, a neutral lead, or (for heat) a yes or no "at the
 # surface" read from the measurement's own value, which the word patterns below do not understand.
 CODE_LEADS = ("cannot_answer", "experimental", "no_prediction", "no_satellite", "heat_forecast", "no_prediction_heat", "no_prediction_far", "no_score", "no_ranking", "no_deaths", "cooling_centers",
-              "surface_yes", "surface_no")
+              "surface_yes", "surface_no", "no_advice", "needs_address", "no_change_record")
 _AREA_SHARE_RE = re.compile(r"([\d.]+)% of this area lies inside")
 # "Is there any ...", "are there ...": a yes needs only one.
 ANY_RE = re.compile(r"\b(any|is there an?|are there|was there an?|were there)\b", re.I)

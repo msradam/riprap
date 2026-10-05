@@ -309,6 +309,25 @@ def places_named(question: str) -> list[str]:
     return names if len(names) > 1 else []
 
 
+def not_placed(question: str) -> list[str]:
+    """The names on one side of a comparison that match no place Riprap
+    reads ("Is East Harlem hotter than Phoenix?"), when the other side does:
+    capitalised names only, so "than usual" and "than last year" are not
+    places. The answer covers the place that matched, and says so."""
+    from riprap.core.burr.intake import _HEAT_COMPARE_RE  # noqa: PLC0415
+    from riprap.core.burr.place import _NOT_PLACE, resolve_query  # noqa: PLC0415
+
+    q = (question or "").strip()
+    m = _HEAT_COMPARE_RE.match(q + ("" if q.endswith(("?", ".", ",")) else "?"))
+    sides = [g.strip() for g in m.groups() if g] if m else []
+    if len(sides) != 2:
+        return []
+    unknown = [re.sub(r"^the\s+", "", w, flags=re.I) for w in sides if resolve_query(w)["kind"] is None]
+    named = [w for w in unknown if re.fullmatch(r"[A-Z][\w.'-]*(?:,? [A-Z][\w.'-]*){0,3}", w)
+             and not any(x.lower().strip(".,") in _NOT_PLACE for x in w.split())]
+    return named if len(unknown) == 1 else []
+
+
 def neighbourhoods_in(question: str) -> list[str]:
     """The distinct tabulation areas a question names, by the name it uses, in order."""
     from app.areas import nta  # noqa: PLC0415

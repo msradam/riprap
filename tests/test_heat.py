@@ -860,3 +860,32 @@ def test_what_the_closing_blind_run_failed():
     assert ha.answer("NPCC projections for mean temperature in the 2050s here", T)[0] == "cannot_answer"
     # Going to the hospital is a visit.
     assert ha.answer("how many people go to the hospital for heat here", T)[1][0] == "heat_visits"
+
+
+def test_a_heat_comparison_gets_one_comparing_sentence_from_the_images_both_places_share():
+    from riprap.core.burr import app
+
+    days = [f"2024-07-{d:02d}T15:35:00Z" for d in range(1, 19)]
+    hunts = {"by_image": {t: 6.0 + i / 10 for i, t in enumerate(days)}}
+    river = {"by_image": {t: -6.6 for t in days}}
+    s = app.surface_comparison("Hunts Point", "Riverdale", hunts, river, "heat_surface_nta")
+    assert s.startswith("In 18 of the 18 clear summer Landsat images that saw both places (2024-07-01 to 2024-07-18), "
+                        "the surface of Hunts Point read warmer than the surface of Riverdale [heat_surface_nta].")
+    assert "not the air temperature a person feels" in s
+    # Named in the order the record gives, whichever was typed first; a mixed record is a count, not a verdict.
+    assert "the surface of Hunts Point read warmer than the surface of Riverdale" in app.surface_comparison(
+        "Riverdale", "Hunts Point", river, hunts, "heat_surface_nta")
+    mixed = {"by_image": {t: (7.0 if i < 12 else -8.0) for i, t in enumerate(days)}}
+    assert "In 12 of the 18" in (m := app.surface_comparison("A", "B", mixed, river, "d")) and "the surface of B read warmer in 6" in m
+    # Too few shared images, or a place with no reading: no comparing sentence.
+    assert app.surface_comparison("A", "B", {"by_image": dict(list(hunts["by_image"].items())[:4])}, river, "d") is None
+    assert app.surface_comparison("A", "B", hunts, None, "d") is None and app.surface_comparison("A", "B", {}, river, "d") is None
+    plan = heuristic_plan("Is Hunts Point hotter than Riverdale?")
+
+    def runner(query, sub):
+        v = hunts if query == "Hunts Point" else river
+        return {"paragraph": f"The record for {query}.", "lat": 40.8, "deployment": "nyc", "heat_surface_nta": v,
+                "citations": {"heat_surface_nta": {}}}
+
+    p = app.run_compare("Is Hunts Point hotter than Riverdale?", plan, runner)["paragraph"]
+    assert p.index("does not rank places") < p.index("In 18 of the 18") < p.index("## PLACE A: Hunts Point")

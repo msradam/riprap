@@ -4,7 +4,7 @@ q18, q19). The LLM is scripted."""
 import pytest
 
 from riprap.core.burr import synthesis as syn
-from riprap.core.burr.synthesis import CANNOT_ANSWER, Doc
+from riprap.core.burr.synthesis import NOTHING_TO_SHOW, Doc
 
 ALERTS = "There are 3 active NWS alerts at this point: Coastal Flood Warning (Severe), High Surf Advisory (Minor)."
 OBS = "The latest METAR observation at JFK Airport reports a temperature of 15.0°C."
@@ -51,7 +51,7 @@ def test_q12_no_with_a_positive_fact_falls_back(run):
     out = run("Is it raining hard here?", bad, bad)
     g = out["grounding"]
     assert g["answer_lead"] == "cannot_answer" and "reports a result" in g["dropped_claims"][0]["reason"]
-    assert CANNOT_ANSWER in out["paragraph"]
+    assert NOTHING_TO_SHOW in out["paragraph"] and "Here is what they show" not in out["paragraph"]
 
 
 def test_q19_yes_over_a_partial_count_is_retried_to_partly(run):
