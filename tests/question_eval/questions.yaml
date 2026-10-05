@@ -4,8 +4,8 @@
 # gallery targets and the NYC pebble registry, not collected from users.
 #
 # Fields:
-#   kind                   one of eight kinds: bare_address, flood_history, right_now, asset,
-#                          future, district, out_of_scope, not_covered
+#   kind                   one of nine kinds: bare_address, flood_history, right_now, asset,
+#                          future, district, heat, out_of_scope, not_covered
 #   expected_intent        single_address | neighborhood | live_now | out_of_scope
 #   must_run               pebbles a competent analyst would need; missing one is a failure
 #   irrelevant             pebbles that are waste for this question (not a failure)
@@ -296,15 +296,17 @@
   irrelevant: []
   answer_should_mention: [["cannot", "can't", "not able", "outside", "does not", "not a substitute"]]
 
+# Heat was not covered when this set was written, and the key asked for a refusal. Riprap has had a heat
+# briefing for New York City since 2026-10-02, so the key now asks for the measured surface temperature.
 - id: q29
-  kind: not_covered
+  kind: heat
   author: author-written
   target: lower-east-side
   question: "Is 560 Grand Street, Manhattan a heat island in the summer?"
-  expected_intent: out_of_scope
-  must_run: []
-  irrelevant: []
-  answer_should_mention: [["heat"], ["not cover", "does not cover", "not available", "cannot", "only covers", "flood"]]
+  expected_intent: single_address
+  must_run: [heat_surface]
+  irrelevant: [sandy, fema_nfhl, nyc311]
+  answer_should_mention: [["surface"], ["Landsat"]]
 
 - id: q30
   kind: not_covered

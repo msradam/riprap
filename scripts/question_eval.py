@@ -162,7 +162,9 @@ def score_arm(outdir: Path, questions: list[dict]) -> tuple[dict, list[dict]]:
         answer = _answer_text(rec)
         mentions = [(_mention_hits(item, answer + " " + body), item) for item in q["answer_should_mention"]]
         answer_mentions = sum(_mention_hits(item, answer) for item in q["answer_should_mention"])
-        refused = rec.get("intent") in ("out_of_scope", "not_implemented")
+        # An advice question about a named place is declined inside the answer (the no_advice lead: an
+        # out-of-scope statement, then the FEMA zone), not by the plan. That is a correct refusal too.
+        refused = rec.get("intent") in ("out_of_scope", "not_implemented") or rec.get("answer_lead") == "no_advice"
         rows.append({
             "id": q["id"], "kind": q["kind"],
             "must_run": len(q["must_run"]), "must_run_hit": len(set(q["must_run"]) & ran),
