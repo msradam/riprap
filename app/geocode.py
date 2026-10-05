@@ -81,6 +81,7 @@ class GeocodeHit:
     bbl: str | None
     bin: str | None
     raw: dict
+    note: str | None = None  # what a reader must be told about the choice of this place
 
 
 def geocode(text: str, limit: int = 5) -> list[GeocodeHit]:
@@ -319,7 +320,7 @@ def geocode_one(text: str, *, scope_hint: str | None = None) -> GeocodeHit | Non
     Confirm the mismatch with one unrestricted lookup and return None
     (honest "not covered") instead of a confident wrong-country hit.
     """
-    exact = _geosearch_exact(text)
+    exact = _geosearch_exact(text) or _geosearch_in_city(text, scope_hint)
     if exact is not None:
         return exact
     if _looks_non_us(text) or (scope_hint and _looks_non_us(scope_hint)):
@@ -433,18 +434,47 @@ def _geosearch_exact(text: str) -> GeocodeHit | None:
     names (if any). Anything else falls through to Nominatim."""
     if not _NYC_PLACE_RE.search(text) or _looks_non_nyc(text):
         return None
-    hits = geocode(text, limit=1)
-    if not hits or hits[0].lat is None:
+    # Several hits, not the first alone: the first hit for "100 Broadway, Brooklyn" is in Manhattan, and the
+    # address was refused. '560 Grand St, Manhattan' must still not land in Brooklyn.
+    named = _detect_borough(text)
+    hits = [h for h in _exact_hits(text) if not (named and h.borough and h.borough.lower() != named.lower())]
+    return hits[0] if hits else None
+
+
+def _exact_hits(text: str) -> list[GeocodeHit]:
+    """Geosearch hits whose house number and street both appear in the
+    query, in its order."""
+    # ponytail: the first 10 hits; ask borough by borough if an address in a second borough is ever missed.
+    query = f" {_norm_street(text)} "
+    out = []
+    for hit in geocode(text, limit=10):
+        number = str(hit.raw.get("housenumber") or "")
+        street = _norm_street(str(hit.raw.get("street") or ""))
+        if hit.lat is not None and number and street and f" {number} {street} " in query:
+            out.append(hit)
+    return out
+
+
+def _geosearch_in_city(text: str, scope_hint: str | None = None) -> GeocodeHit | None:
+    """A house number and street with no borough, city or ZIP ("45 Main
+    Street"), on a server whose city is New York: the city's own address
+    file before the national lookup, which once placed it in St. Lawrence
+    County, 472 km away. When the address exists in more than one borough
+    the first is taken and the hit's note says so, with the others."""
+    import os  # noqa: PLC0415
+
+    if not re.match(r"\s*\d", text) or _NYC_PLACE_RE.search(text) or _looks_non_nyc(text) or (
+            scope_hint and (_looks_non_nyc(scope_hint) or _looks_non_us(scope_hint))) or "," in text or not os.environ.get(
+            "RIPRAP_DEPLOYMENT", "nyc").rstrip("/").endswith("nyc"):
+        return None
+    hits = _exact_hits(text)
+    if not hits:
         return None
     hit = hits[0]
-    number = str(hit.raw.get("housenumber") or "")
-    street = _norm_street(str(hit.raw.get("street") or ""))
-    query = f" {_norm_street(text)} "
-    if not number or not street or f" {number} {street} " not in query:
-        return None
-    named = _detect_borough(text)
-    if named and hit.borough and hit.borough.lower() != named.lower():
-        return None  # '560 Grand St, Manhattan' must not land in Brooklyn
+    boroughs = list(dict.fromkeys(h.borough for h in hits if h.borough))
+    if len(boroughs) > 1:
+        hit.note = (f"{text.strip()} is an address in more than one borough ({', '.join(boroughs)}). This briefing is "
+                    f"for the one in {hit.borough}. Add the borough to the address to choose another.")
     return hit
 
 
