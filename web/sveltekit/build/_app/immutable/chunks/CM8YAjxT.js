@@ -1,1 +1,0 @@
-import{p as r}from"./BFDNsaDQ.js";import{s as t}from"./BFvnBo9x.js";const e={get data(){return r.data},get error(){return r.error},get params(){return r.params},get route(){return r.route},get status(){return r.status},get url(){return r.url}};t.updated.check;const u=e;export{u as p};
