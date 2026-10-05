@@ -538,6 +538,10 @@ def test_an_ida_question_gets_the_311_sentence_for_the_storms_days(monkeypatch, 
     monkeypatch.setattr(nyc311, "days_sentence", lambda lat, lon, r, first, last, what: f"For {what}: 12 complaints {first} to {last}.")
     values = {**V, "_point": (40.74, -73.81)}
     assert synthesis._days_311(question, ADDRESS, values) == "For the days of Hurricane Ida: 12 complaints 2021-09-01 to 2021-09-03 [nyc311]."
+    # The real sentence is a count and its caveat: each is cited, so the count is never an uncited number.
+    monkeypatch.setattr(nyc311, "days_sentence", lambda *a: "For the days: 5 complaints were filed: 4 sewer backup. A count is of reports.")
+    assert synthesis._days_311(question, ADDRESS, values) == (
+        "For the days: 5 complaints were filed: 4 sewer backup [nyc311]. A count is of reports [nyc311].")
     # The fetch failed, or the place is an area: the count quoted is said to start after the storm.
     monkeypatch.setattr(nyc311, "days_sentence", lambda *a: (_ for _ in ()).throw(OSError("timed out")))
     assert synthesis._days_311(question, ADDRESS, values) == (

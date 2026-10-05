@@ -537,7 +537,10 @@ def _days_311(question: str, texts: dict[str, str], values: dict) -> str:
     point = values.get("_point")
     if doc == "nyc311" and point:
         try:
-            return f"{nyc311.days_sentence(point[0], point[1], values[doc].get('radius_m') or 200, first, last, what)[:-1]} [{doc}]."
+            text = nyc311.days_sentence(point[0], point[1], values[doc].get('radius_m') or 200, first, last, what)
+            # Its count and its caveat are two sentences, and each carries the citation (the count's had none,
+            # so a since-Ida answer failed the every-number-cited check).
+            return re.sub(r"\.(?= [A-Z]|$)", f" [{doc}].", text)
         except Exception as e:  # noqa: BLE001 - the fallback sentence says what is missing
             log.warning("311 for %s to %s could not be read: %s", first, last, e)
     return (f"The 311 count quoted here starts on {since.isoformat()}, after {what} ({first}"
