@@ -116,12 +116,19 @@ export interface DroppedClaim extends GroundedClaim {
  *  asked whether a place will flood), "no_advice" (insurance, price,
  *  buying, renting or safety: out of scope, then the FEMA zone),
  *  "needs_address" (Ida's marks need a house number), "no_change_record"
- *  (land cover over time), and the others below. */
+ *  (land cover over time), and the others below. Three say the question
+ *  was not answered, in the answer's first sentence, before the place's
+ *  records: "not_held" (it asks for something Riprap does not hold; which
+ *  is in `grounding.not_held`), "not_english" and "not_recognised" (no
+ *  rule read what it asks). "near" is flooding recorded near an address
+ *  and not on its block; "day" is a named past day. */
 export type AnswerLead =
   | 'yes' | 'no' | 'partly' | 'count' | 'facts' | 'cannot_answer' | 'experimental' | 'no_prediction'
   | 'no_advice' | 'needs_address' | 'no_change_record'
   | 'no_satellite' | 'no_ranking' | 'no_score' | 'no_deaths' | 'cooling_centers'
-  | 'heat_forecast' | 'no_prediction_heat' | 'no_prediction_far' | 'surface_yes' | 'surface_no';
+  | 'heat_forecast' | 'no_prediction_heat' | 'no_prediction_far' | 'surface_yes' | 'surface_no'
+  | 'not_held' | 'not_english' | 'not_recognised' | 'near' | 'day' | 'no_prediction_register'
+  | 'no_advice_heat' | 'no_air_temp';
 
 /** How the briefing was produced. `llm`: model-written claims checked
  *  against their cited sources (failures land in dropped_claims).

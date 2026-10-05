@@ -58,6 +58,18 @@ describe('mode line', () => {
     expect(modeLine({ tier: 'no_llm', answer_mode: null, question: 'Is the roof sound?', answered: false }))
       .toBe('No rule and no language model answered the question, so the evidence briefing is shown.');
   });
+  it('says an unanswered question was not answered, whichever unanswered lead the backend set', () => {
+    const base = { tier: 'no_llm', question: 'What is the median income in Hunts Point?', answered: false };
+    expect(modeLine({ ...base, answer_mode: null, answer_lead: 'not_recognised' }))
+      .toBe('No rule and no language model answered the question, so the evidence briefing is shown.');
+    expect(modeLine({ ...base, answer_mode: 'rules', answer_lead: 'not_held' }))
+      .toBe('The rules read the question as asking for something Riprap does not hold, so it is not answered; no language model was used.');
+    expect(modeLine({ ...base, answer_mode: 'rules', answer_lead: 'not_english' }))
+      .toBe('The question was not read as English, so it is not answered; no language model was used.');
+    for (const lead of ['not_recognised', 'not_held', 'not_english']) {
+      expect(modeLine({ ...base, answer_mode: 'rules', answer_lead: lead })).not.toMatch(/^Answered/);
+    }
+  });
   it('does not say the rules answered when they found no source that answers', () => {
     const g = { tier: 'no_llm', answer_mode: 'rules', answer_lead: 'cannot_answer', question: 'Have the sensors recorded flooding?', answered: false };
     expect(modeLine(g)).toBe('The rules found no source that answers the question; no language model was used.');

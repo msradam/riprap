@@ -242,7 +242,7 @@ export function sharedStem(sentences: string[]): { stem: string; tails: string[]
 
 /** Hosts a sentence may name in passing ("FEMA's Flood Map Service Center
  *  (msc.fema.gov)"), linked without changing the words. */
-const LINK_HOSTS = /\b(msc\.fema\.gov|floodhelpny\.org)\b/g;
+const LINK_HOSTS = /\b(msc\.fema\.gov|(?:www\.)?floodhelpny\.org|a858-nycnotify\.nyc\.gov|portal\.311\.nyc\.gov|urbanheat\.nyc)\b/g;
 
 /** Text split into plain pieces and linked host names, in order. */
 export function linkHosts(text: string): { text: string; href?: string }[] {

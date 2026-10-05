@@ -783,7 +783,9 @@ export function adaptFinalToFindings(
 }
 
 /** Said above the evidence when a question got the place's evidence and
- *  no answer (no rule named what it asks and no model answered). */
+ *  no answer (no rule named what it asks and no model answered). The
+ *  backend now says so itself in an Answer section, so this line is for
+ *  results saved before it did. */
 export const UNANSWERED = 'This question was not answered. The evidence for the place is shown below.';
 
 /** What produced the briefing, in words: the mode line on screen and in
@@ -803,11 +805,19 @@ export function modeLine(g: { tier: string; model?: string; answer_mode?: string
     if (g.note) return 'Evidence briefing: no question was asked, so no LLM was needed';
     const unavailable = g.fallback_reason ? ` The LLM was unavailable (${g.fallback_reason}).` : '';
     // No answer lead at all: the evidence briefing stands in for an answer.
-    if (g.question && g.answered === false && !g.answer_lead) {
+    if (g.question && g.answered === false && (!g.answer_lead || g.answer_lead === 'not_recognised')) {
       return `No rule and no language model answered the question, so the evidence briefing is shown.${unavailable}`;
     }
     // The rules ran and found nothing that answers: the answer says so, and
     // this line must not say the question was answered.
+    // The rules read the question and what it asks for is not in the records
+    // (or it is not in English): the answer's first sentence says which.
+    if (g.question && g.answer_mode === 'rules' && (g.answer_lead === 'not_held' || g.answer_lead === 'not_english')) {
+      return (g.answer_lead === 'not_held'
+        ? 'The rules read the question as asking for something Riprap does not hold, so it is not answered'
+        : 'The question was not read as English, so it is not answered')
+        + (planned ? '; a language model was used only to read the place and choose the sources.' : '; no language model was used.');
+    }
     if (g.question && g.answer_mode === 'rules' && g.answer_lead === 'cannot_answer') {
       return (planned
         ? 'The rules found no source that answers the question; a language model was used only to read the place and choose the sources.'

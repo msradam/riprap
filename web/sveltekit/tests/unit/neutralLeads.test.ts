@@ -98,6 +98,35 @@ describe('the leads added for advice, a missing house number and land cover over
   });
 });
 
+describe('the leads added by the first audience review', () => {
+  const NOT_HELD = 'Riprap reports no income or poverty figures for a place. The public records for this place follow; none of them is an answer to the question.';
+  const NOT_RECOGNISED = "Riprap's rules did not recognise what this question asks, so it is not answered. The public records for this place follow; none of them is an answer to the question.";
+  const NEAR = 'Flooding was recorded near this address, not at it: the nearest FloodNet sensor with a verified flood event is 413 m away. Riprap gives a plain yes about an address only when such a record is within 100 m of it.';
+
+  it.each([
+    ['not_held', NOT_HELD],
+    ['not_recognised', NOT_RECOGNISED]
+  ] as const)('%s: the backend text says the question is not answered, so the page adds no line of its own', (lead, phrase) => {
+    const m = model(`${phrase}\n\n**Mapped hazards.**\n${NWS}`, { answer_lead: lead, answered: false, lead_fact: null });
+    expect(m.hasAnswer).toBe(true);
+    expect(m.unanswered).toBe(false);
+    expect(m.leadWord).toBeNull();
+    expect(words(m).startsWith(phrase.slice(0, 40))).toBe(true);
+  });
+
+  it('near sets no Yes large, and the distance leads the answer', () => {
+    const m = model(`${NEAR} ${NWS}`, { answer_lead: 'near', lead_fact: null });
+    expect(m.leadWord).toBeNull();
+    expect(words(m)).toContain('413 m away');
+  });
+
+  it('a yes about an area names the area and is not cut down to the word', () => {
+    const m = model(`Yes, in Carroll Gardens-Cobble Hill-Gowanus-Red Hook: ${NWS}`, { answer_lead: 'yes', lead_fact: null });
+    expect(m.leadWord).toBeNull();
+    expect(words(m).startsWith('Yes, in Carroll Gardens-Cobble Hill-Gowanus-Red Hook:')).toBe(true);
+  });
+});
+
 describe('the paragraph that names the place', () => {
   it('is left to the page place line, which already carries it', () => {
     const final = {
