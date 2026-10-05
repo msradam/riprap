@@ -74,3 +74,32 @@ def test_a_plain_district_briefing_leaves_permits_out():
     nyc = get_registry("nyc")
     assert "dob_permits_nta" not in select_pebbles({"intent": "neighborhood", "pebbles": None}, nyc)
     assert "dob_permits_nta" in select_pebbles({"intent": "development_check", "pebbles": None}, nyc)
+
+
+def test_a_hospital_repeated_in_the_state_file_is_counted_once(monkeypatch, tmp_path):
+    import json
+    from dataclasses import replace
+
+    from app.registers import exposure
+
+    feat = {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-74.087, 40.584]},
+            "properties": {"fac_id": "1740", "facility_name": "Staten Island University Hosp-North"}}
+    other = {**feat, "properties": {"fac_id": "1737", "facility_name": "Prince's Bay"}}
+    p = tmp_path / "hospitals.geojson"
+    p.write_text(json.dumps({"features": [feat, other, feat]}))
+    monkeypatch.setitem(exposure.CLASSES, "doh_hospitals", replace(exposure.CLASSES["doh_hospitals"], geojson=p))
+    exposure.geojson_rows.cache_clear()
+    try:
+        assert [r["fac_id"] for r in exposure.geojson_rows("doh_hospitals")] == ["1740", "1737"]
+    finally:
+        exposure.geojson_rows.cache_clear()
+
+
+def test_the_shipped_hospital_file_has_one_row_per_facility():
+    import json
+
+    from app.registers import exposure
+
+    with open(exposure.CLASSES["doh_hospitals"].geojson) as f:
+        ids = [x["properties"]["fac_id"] for x in json.load(f)["features"]]
+    assert len(ids) == len(set(ids)) == 61

@@ -72,6 +72,7 @@ class Spec:
     elev_key: str = "elevation_m"
     hand_key: str = "hand_m"
     rollups: dict[str, str] = field(default_factory=dict)  # extra count key: finding flag
+    unique: str | None = None     # a live layer's facility key: a repeated row is one asset
 
 
 def _entrance(r: dict, lat: float, lon: float, distance_m: float) -> dict:
@@ -123,7 +124,7 @@ CLASSES: dict[str, Spec] = {
         citation="NYS DOH Health Facility Certification (vn5v-hh5r) + NYC Sandy 2012 Inundation "
                  "Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
         head=_hospital, name=lambda f: f["facility_name"],
-        geojson=DATA / "hospitals.geojson", buffer_m=BUFFER_DOH_HOSPITAL_M, raster=True),
+        geojson=DATA / "hospitals.geojson", buffer_m=BUFFER_DOH_HOSPITAL_M, raster=True, unique="fac_id"),
     "doe_schools": Spec(
         singular="flood-exposed NYC DOE school", plural="flood-exposed NYC DOE schools", radius_m=1500, max_n=6,
         count_key="n_schools", list_key="schools",
@@ -153,12 +154,19 @@ def geojson_rows(asset_class: str) -> list[dict]:
     spec = CLASSES[asset_class]
     with open(spec.geojson) as f:
         feats = json.load(f)["features"]
-    rows = []
+    rows, seen = [], set()
     for feat in feats:
         try:
             lat, lon = spec.lat_lon(feat)
         except (KeyError, TypeError, ValueError):
             continue
+        # The state file repeats a facility (67 rows for 61 hospitals in one
+        # download), which printed one hospital as two.
+        key = feat["properties"].get(spec.unique) if spec.unique else None
+        if key is not None:
+            if key in seen:
+                continue
+            seen.add(key)
         rows.append({**feat["properties"], "lat": lat, "lon": lon})
     return rows
 
