@@ -386,7 +386,7 @@ def _cool(near_point, near_shape) -> dict:
     return {"n_spray_shower_sites": len({_site(r) for r in showers}),
             "n_spray_shower_rows": len(showers), "n_spray_shower_properties": len({r.get("propid") for r in showers}),
             "spray_shower_sites": sorted({_site(r) for r in showers}),
-            "n_outdoor_pools": sum(r.get("location") == "Outdoor" for r in pools),
+            "n_outdoor_pools": sum(r.get("location") == "Outdoor" and r.get("pooltype") != "Wading" for r in pools),
             "n_indoor_pools": sum(r.get("location") == "Indoor" for r in pools),
             "pools": sorted(r.get("name", "") for r in pools)}
 

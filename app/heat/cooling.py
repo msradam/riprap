@@ -42,15 +42,18 @@ def _summary(sites: list[tuple[str, str, float]], where: str, d: dict) -> dict:
     showers = sorted({park for kind, park, _ in sites if kind == "spray shower"})
     outdoor = sorted({park for kind, park, _ in sites if kind == "outdoor pool"})
     indoor = sorted({park for kind, park, _ in sites if kind == "indoor pool"})
+    wading = sorted({park for kind, park, _ in sites if kind == "wading pool"})
     dates = d["sources"]
-    listed = f"(lists updated {dates['spray shower']['date_modified']} and {dates['pool']['date_modified']})"
+    listed = (f"(lists updated {dates['spray shower']['date_modified']} and {dates['pool']['date_modified']}, "
+              f"copied {d['retrieved_at']})")
     if not sites:
         narrative = f"NYC Parks lists no spray shower or public pool {where} {listed}. {CENTERS}"
     else:
         parts = [p for p in (showers and f"spray showers at {len(showers)} park{'' if len(showers) == 1 else 's'} or "
                                          f"playground{'' if len(showers) == 1 else 's'}",
                              outdoor and _plural(len(outdoor), "outdoor pool"),
-                             indoor and _plural(len(indoor), "indoor pool")) if p]
+                             indoor and _plural(len(indoor), "indoor pool"),
+                             wading and _plural(len(wading), "wading pool")) if p]
         narrative = f"NYC Parks lists {', '.join(parts[:-1]) + ' and ' + parts[-1] if len(parts) > 1 else parts[0]} {where} {listed}"
         # The nearest of each park or playground, by name, so the list can be used.
         best: dict[str, tuple[str, str, float]] = {}
@@ -59,14 +62,17 @@ def _summary(sites: list[tuple[str, str, float]], where: str, d: dict) -> dict:
         near = list(best.values())[:6]
         if near:
             narrative += ("; the six nearest: " if len(best) > 6 else "; nearest first: ") + ", ".join(f"{park} ({kind}, {m:.0f} m)" for kind, park, m in near)
-        elif outdoor or indoor:
-            pools = [*outdoor, *indoor]
+        elif outdoor or indoor or wading:
+            pools = [*outdoor, *indoor, *wading]
             narrative += f"; {'among the pools are' if len(pools) > 6 else 'the pools are'} {', '.join(pools[:6])}"
         narrative += f". {SEASON} {CENTERS}"
+    # A wading pool is counted and named apart: it is not a pool to swim in.
     return {"n_spray_shower_sites": len(showers), "n_outdoor_pools": len(outdoor), "n_indoor_pools": len(indoor),
-            "n_sites": len(showers) + len(outdoor) + len(indoor), "spray_shower_sites": showers[:40],
-            "pools": [*outdoor, *indoor], "narrative": narrative,
-            "headline_value": f"{len(showers)} spray shower sites, {len(outdoor) + len(indoor)} pools"}
+            "n_wading_pools": len(wading),
+            "n_sites": len(showers) + len(outdoor) + len(indoor) + len(wading), "spray_shower_sites": showers[:40],
+            "pools": [*outdoor, *indoor], "wading_pools": wading, "narrative": narrative,
+            "headline_value": f"{len(showers)} spray shower sites, {len(outdoor) + len(indoor)} pools"
+                              + (f", {_plural(len(wading), 'wading pool')}" if wading else "")}
 
 
 def for_point(lat: float, lon: float, radius_m: float = RADIUS_M) -> dict | None:

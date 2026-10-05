@@ -116,6 +116,7 @@ const FIELD_LABELS: Record<string, string> = {
   n_spray_shower_sites: 'Parks or playgrounds with spray showers',
   n_outdoor_pools: 'Outdoor pools',
   n_indoor_pools: 'Indoor pools',
+  n_wading_pools: 'Wading pools',
 };
 
 /**

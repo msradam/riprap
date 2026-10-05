@@ -426,6 +426,10 @@ def test_heat_visits_state_the_period_and_a_suppressed_count_is_not_a_zero():
     assert v["n"] == 79 and v["age_adjusted_rate"] == 7.6 and v["citywide_age_adjusted_rate"] == 6.0
     assert "79 emergency department visits for heat illness in May to September of 2018 to 2022" in v["narrative"]
     assert "counted by where the patient lives" in v["narrative"]
+    # Finding 21: the file's district count and rate do not reconcile, so the sentence says what each is.
+    assert "(the five-year total)" in v["narrative"] and "an average annual age-adjusted rate of 7.6 per 100,000 residents" in v["narrative"]
+    assert "does not give the printed rate" in v["narrative"] and "printed here as published" in v["narrative"]
+    assert "printed here as published" not in dohmh.visits_for_area(NS(extras={"area_code": "QN"}))["narrative"]  # boroughs reconcile
     hidden = dohmh.visits_for_area(NS(extras={"area_code": "MN01"}))
     assert hidden["suppressed"] and hidden["n"] is None and "A withheld count is not a zero." in hidden["narrative"]
     assert not re.search(r"\b0 emergency|\bno emergency", hidden["narrative"])
@@ -465,14 +469,18 @@ def test_the_heat_projection_quotes_the_published_table():
 def test_parks_cooling_counts_playgrounds_and_points_to_the_citys_cooling_center_list(monkeypatch):
     from app.heat import cooling
 
-    data = {"sources": {"spray shower": {"date_modified": "2026-09-03"}, "pool": {"date_modified": "2026-09-15"}},
+    data = {"retrieved_at": "2026-10-05",
+            "sources": {"spray shower": {"date_modified": "2026-09-03"}, "pool": {"date_modified": "2026-09-15"}},
             "sites": [["spray shower", "A Playground", 40.7000, -73.8000], ["spray shower", "A Playground", 40.7001, -73.8000],
-                      ["outdoor pool", "B Pool", 40.7030, -73.8000], ["spray shower", "Far Park", 40.8000, -73.8000]]}
+                      ["outdoor pool", "B Pool", 40.7030, -73.8000], ["wading pool", "C Pool", 40.7031, -73.8000],
+                      ["spray shower", "Far Park", 40.8000, -73.8000]]}
     monkeypatch.setattr(cooling, "_data", lambda: data)
     v = cooling.for_point(40.7, -73.8)
     assert v["n_spray_shower_sites"] == 1 and v["n_outdoor_pools"] == 1  # two spray features in one playground
     n = v["narrative"]
-    assert "spray showers at 1 park or playground and 1 outdoor pool within 800 m" in n and "A Playground" in n
+    assert "spray showers at 1 park or playground, 1 outdoor pool and 1 wading pool within 800 m" in n and "A Playground" in n
+    assert v["n_wading_pools"] == 1 and "C Pool (wading pool, " in n  # finding 26: a wading pool is not counted as a pool
+    assert "copied 2026-10-05)" in n  # the day the list was copied, beside the lists' own dates
     assert "run in summer only" in n and "finder.nyc.gov/coolingcenters" in n and "only during a heat emergency" in n
     assert "nearest first: A Playground (spray shower, " in n and "B Pool (outdoor pool, " in n  # names, usable as a list
     none = cooling.for_point(40.6, -73.9)
@@ -732,7 +740,8 @@ def test_what_a_blind_judge_found_in_the_second_round(monkeypatch):
 def test_a_capped_list_of_cooling_places_says_it_is_capped():
     from app.heat import cooling
 
-    d = {"sources": {"spray shower": {"date_modified": "2026-09-03"}, "pool": {"date_modified": "2026-09-15"}}}
+    d = {"retrieved_at": "2026-10-05",
+         "sources": {"spray shower": {"date_modified": "2026-09-03"}, "pool": {"date_modified": "2026-09-15"}}}
     many = cooling._summary([("spray shower", f"Park {i}", 100.0 + i) for i in range(8)], "within 800 m of this address", d)
     few = cooling._summary([("spray shower", f"Park {i}", 100.0 + i) for i in range(3)], "within 800 m of this address", d)
     assert "at 8 parks or playgrounds" in many["narrative"] and "the six nearest: Park 0" in many["narrative"]

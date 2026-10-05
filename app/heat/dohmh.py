@@ -33,6 +33,9 @@ RANK_TRAP = ("The index ranks neighbourhoods against each other by a model of he
              "green space, air conditioning, income and the share of Black residents; it is not a measurement of heat "
              "at an address, and the department notes that every neighbourhood has residents at risk, whatever its score.")
 GROUP = {1: "the lowest risk group", 5: "the highest risk group"}
+DISTRICT_MISMATCH = ("The count and the rate are separate figures in the department's file: for most community "
+                     "districts the count divided by residents and years does not give the printed rate, the file "
+                     "does not say why, and both are printed here as published.")
 
 
 @lru_cache(maxsize=1)
@@ -127,11 +130,17 @@ def _visits(code: str) -> dict | None:
                              f"illness by residents of {where} in {when}. {v.get('n_note', 'The count is suppressed.')} "
                              "A withheld count is not a zero."}
     city = e["citywide"]
-    narrative = (f"Residents of {where} made {v['n']} emergency department visits for heat illness in {when}, an "
-                 f"age-adjusted rate of {v['age_adjusted_rate']:.1f} per 100,000 a year"
+    # The count is the file's five-year total and the rate its average annual
+    # age-adjusted rate. For most community districts the two do not
+    # reconcile and the portal's metadata does not say why, so the sentence
+    # says what each is and that they are printed as published.
+    narrative = (f"Residents of {where} made {v['n']} emergency department visits for heat illness in {when} (the "
+                 f"five-year total), and the NYC Health Department gives an average annual age-adjusted rate of "
+                 f"{v['age_adjusted_rate']:.1f} per 100,000 residents"
                  + ("" if code == "NYC" else f" against {city['age_adjusted_rate']:.1f} citywide")
-                 + " (NYC Health Department, from state hospital records). Visits are counted by where the "
-                 "patient lives, and only when diagnosed as heat illness.")
+                 + " (from state hospital records). "
+                 + (DISTRICT_MISMATCH + " " if len(code) == 4 else "")
+                 + "Visits are counted by where the patient lives, and only when diagnosed as heat illness.")
     return {"available": True, "suppressed": False, "district": code, "period": e["period"], "n": v["n"],
             "age_adjusted_rate": v["age_adjusted_rate"], "citywide_age_adjusted_rate": city["age_adjusted_rate"],
             "narrative": narrative, "headline_value": f"{v['n']} visits, {v['age_adjusted_rate']:.1f} per 100,000 a year"}

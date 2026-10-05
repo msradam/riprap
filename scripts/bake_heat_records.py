@@ -90,7 +90,9 @@ def parks_cooling() -> dict:
             if kind == "pool":
                 ring = r["polygon"]["coordinates"][0]
                 lon, lat = (sum(c[i] for c in ring) / len(ring) for i in (0, 1))
-                sites.append([f"{r['location'].lower()} pool", r["name"], round(lat, 6), round(lon, 6)])
+                # A wading pool is not a place to swim, so it is its own kind.
+                kind_ = "wading pool" if r.get("pooltype") == "Wading" else f"{r['location'].lower()} pool"
+                sites.append([kind_, r["name"], round(lat, 6), round(lon, 6)])
             elif r.get("point"):
                 lon, lat = r["point"]["coordinates"]
                 sites.append([kind, r.get("sitename") or r.get("propname") or "", round(lat, 6), round(lon, 6)])
