@@ -79,7 +79,7 @@ from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[2]
 CACHE = ROOT / "outputs" / "golden_heat_cache"
-UA = "Mozilla/5.0 (compatible; Riprap golden keys; +https://github.com/msradam/riprap)"
+UA = "Riprap-golden-keys/0.8 (civic flood-evidence tool)"
 _last_call: dict[str, float] = {}
 
 

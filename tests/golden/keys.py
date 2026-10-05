@@ -20,7 +20,7 @@ from functools import lru_cache
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-UA = "Mozilla/5.0 (compatible; Riprap golden keys; +https://github.com/msradam/riprap)"
+UA = "Riprap-golden-keys/0.8 (civic flood-evidence tool)"
 
 # Which 311 requests record flooding: a pattern over the two sewer complaint
 # types, read from the live descriptor column, not a list. Until 2026-10-01
