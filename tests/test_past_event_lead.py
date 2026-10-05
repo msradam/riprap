@@ -30,7 +30,8 @@ def test_yes_when_an_observed_source_reports_an_event_in_the_period():
 def test_yes_adds_the_positive_source_when_the_model_left_it_out():
     # The model's only fact (Sandy, not the storm asked about) is not evidence for "since Ida": the
     # answer is the source the rule relied on.
-    assert past_event_lead(Q_IDA, PAST, ["sandy_inundation"], TEXTS, HOLLIS, 2026) == ("yes", ["floodnet"])
+    # (Review round 2: "since Ida" carries the Ida mark sentence whenever a mark is in range.)
+    assert past_event_lead(Q_IDA, PAST, ["sandy_inundation"], TEXTS, HOLLIS, 2026) == ("yes", ["floodnet", "ida_hwm"])
 
 
 def test_no_only_when_every_relevant_source_answered_none():
@@ -131,7 +132,7 @@ COUNTER = {**TEXTS, "fema_nfhl": "This address sits in FEMA flood zone X (an are
 
 def test_yes_keeps_only_event_sources_with_the_relied_on_source_first():
     chosen = ["fema_nfhl", "nyc311", "dep_moderate_2050", "floodnet", "microtopo"]
-    assert past_event_lead(Q_IDA, PAST, chosen, COUNTER, HOLLIS, 2026) == ("yes", ["floodnet", "nyc311"])
+    assert past_event_lead(Q_IDA, PAST, chosen, COUNTER, HOLLIS, 2026) == ("yes", ["floodnet", "nyc311", "ida_hwm"])
 
 
 def test_yes_keeps_the_storm_record_when_it_reports_marks_nearby():
@@ -143,7 +144,7 @@ def test_yes_keeps_the_storm_record_when_it_reports_marks_nearby():
 
 def test_yes_with_no_event_source_chosen_adds_the_relied_on_one():
     chosen = ["fema_nfhl", "dep_moderate_2050", "microtopo"]
-    assert past_event_lead(Q_IDA, PAST, chosen, COUNTER, HOLLIS, 2026) == ("yes", ["floodnet"])
+    assert past_event_lead(Q_IDA, PAST, chosen, COUNTER, HOLLIS, 2026) == ("yes", ["floodnet", "ida_hwm"])
 
 
 def test_count_answer_quotes_only_the_counted_source(monkeypatch):

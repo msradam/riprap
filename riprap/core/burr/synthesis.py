@@ -61,6 +61,10 @@ SAFETY_POINTER = ("Notify NYC (https://a858-nycnotify.nyc.gov) is the city's eme
                   "its notification types is Basement Alerts, for people who live in basement apartments.")
 # An unanswered question says so in the text itself, where the answer would be: the text is what people print
 # and what the MCP tools return, and only the page used to say it.
+# Where help is, apart from the "Out of scope" note: a life-safety line does not belong under that heading.
+WHERE_TO_TURN = "**Where to turn.**"
+NO_PREDICTION = "Riprap cannot predict whether a particular place floods on a given day: no source or model here does that."
+_BASEMENT_RE = re.compile(r"\bbasements?\b|\bcellars?\b", re.I)
 NOT_RECOGNISED = "Riprap's rules did not recognise what this question asks, so it is not answered."
 RECORDS_FOLLOW = "The public records for this place follow; none of them is an answer to the question."
 _STORM_NAMES = {"ida": "Hurricane Ida", "sandy": "Hurricane Sandy"}
@@ -307,8 +311,7 @@ def _extract(out: dict, question: str, texts: dict[str, str], values: dict | Non
 LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From the sources consulted:",
                 "facts": "From the sources consulted:",
                 "experimental": "From an experimental model, not a measurement:",
-                "no_prediction": "Riprap cannot predict whether a particular place floods on a given day: no source "
-                                 "or model here does that. What the Weather Service expects, and what the maps show:",
+                "no_prediction": f"{NO_PREDICTION} What the Weather Service expects, and what the maps show:",
                 "no_satellite": "Riprap quotes no satellite imagery of flooding: the satellite water layer it carried was "
                                 "retired after two tests in which it found recorded floods no more often than chance. "
                                 "What was surveyed and recorded here:",
@@ -344,6 +347,19 @@ LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From
                                           "flood extent:",
                 "no_advice_heat": f"{NO_ADVICE} No source here measures the temperature inside a building. What was "
                                   "measured outdoors and published for this place:",
+                "no_depth": "Riprap gives no flood depth for a place: no source here predicts one, and the city says "
+                            "its stormwater flood map \"does not provide the exact depth of flooding at any "
+                            "location\". What the maps show at the point mapped:",
+                "area_zone": "FEMA flood zones are read at a street address, not for an area as a whole: type an "
+                             "address to get its zone. What is counted and mapped for this area:",
+                "no_area_zone": "FEMA flood zones are read at a street address, not for an area as a whole, so this "
+                                "is not answered for the area: type an address to get its zone. What is mapped for "
+                                "this area:",
+                "no_rating_heat": "Riprap gives no rating of a place and does not say whether one is safe in the "
+                                  "heat. The Health Department's "
+                                  "index is a rank among neighbourhoods and not a measurement, and the department "
+                                  "says \"All neighborhoods have residents at risk for heat illness and death\". "
+                                  "What was measured and published for this place:",
                 "no_air_temp": "Riprap has no air temperature at an address: the air readings it quotes come from "
                                "the weather stations named below, and Landsat measures the temperature of surfaces, "
                                "not of the air. What those show:"}
@@ -483,8 +499,8 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
     pointer = HEAT_LIVE_POINTER if heat else LIVE_POINTER
     footer = HEAT_NON_SCOPE_FOOTER if heat else NON_SCOPE_FOOTER
     footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {pointer} ", 1) if now else footer
-    if advice:  # the pointers a declined question gets, as plain links
-        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {advice} ", 1)
+    if advice:  # the pointers a declined question gets, as plain links, under their own heading
+        parts.append(f"{WHERE_TO_TURN}\n{advice}")
     footer = with_place_notes(footer, question, place, heat)
     if question and re.search(r"\bflood", question, re.I) and re.search(r"\bheat\b|\bhott?(?:er|est)?\b", question, re.I) \
             and not heat_answer.INDOOR_HEATING_RE.search(question):
@@ -494,12 +510,50 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
     return "\n\n".join(parts)
 
 
+def _days_311(question: str, texts: dict[str, str], values: dict) -> str:
+    """What a question about Hurricane Ida, the time since it, or a named
+    day older than the 311 window is told about 311: the complaints filed
+    near the address on those days, fetched for them alone (the address
+    count covers the last 5 years, which now begins five weeks after Ida),
+    or, for an area or when that fetch fails, that the count quoted starts
+    after the days asked about. Empty for any other question."""
+    import datetime
+
+    from app.context import nyc311
+
+    doc = next((d for d in ("nyc311", "nyc311_nta") if texts.get(d) and isinstance(values.get(d), dict)), None)
+    since = answer_checks._iso_date(values[doc].get("since")) if doc else None
+    if not since or heat_answer.hazard_of(question) == "heat":
+        return ""
+    day = answer_checks.named_day(question)
+    if re.search(r"\bida\b", question, re.I) or answer_checks.storm_of_day(question) == "ida":
+        first, last, what = *nyc311.IDA_DAYS, "the days of Hurricane Ida"
+    elif day and day < since:
+        first, last, what = day.isoformat(), day.isoformat(), "the day asked about"
+    else:
+        return ""
+    if datetime.date.fromisoformat(first) >= since:
+        return ""  # the window quoted already holds those days
+    point = values.get("_point")
+    if doc == "nyc311" and point:
+        try:
+            return f"{nyc311.days_sentence(point[0], point[1], values[doc].get('radius_m') or 200, first, last, what)[:-1]} [{doc}]."
+        except Exception as e:  # noqa: BLE001 - the fallback sentence says what is missing
+            log.warning("311 for %s to %s could not be read: %s", first, last, e)
+    return (f"The 311 count quoted here starts on {since.isoformat()}, after {what} ({first}"
+            f"{'' if first == last else ' to ' + last}), so it holds no complaint from then [{doc}].")
+
+
 def _unanswered(state, statement: str, grounding: dict) -> dict:
     """The result for a question that is not answered: the statement of
     why where the answer would be, then the evidence briefing for the place.
-    `grounding.answered` is False, and the text says so itself."""
+    `grounding.answered` is False, and the text says so itself. A question
+    that mentions a basement gets the city's basement alerts under "Where
+    to turn"."""
     paragraph, cites = compose_briefing(state)
     head, block = _scope_header(state), f"**Answer.**\n{statement} {RECORDS_FOLLOW}"
+    if _BASEMENT_RE.search((state.get("plan") or {}).get("question") or ""):
+        block = f"{block}\n\n{WHERE_TO_TURN}\n{SAFETY_POINTER}"
     paragraph = paragraph.replace(head, f"{head}\n\n{block}", 1) if head in paragraph else f"{block}\n\n{paragraph}"
     return {"paragraph": paragraph, "citations": cites,
             "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": 0, "llm_calls": [],
@@ -526,7 +580,7 @@ def synthesize(state, use_llm: bool = True) -> dict:
         return {"paragraph": nothing_built(state), "citations": {},
                 "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": 0}}
     plan = state.get("plan") or {}
-    question, focus = plan.get("question") or "", plan.get("focus")
+    question, focus = rule_answer.spelled(plan.get("question") or ""), plan.get("focus")
     if not question and not (use_llm and llm_bare()):
         paragraph, cites = compose_briefing(state)
         return {"paragraph": paragraph, "citations": cites,
@@ -626,6 +680,8 @@ def synthesize(state, use_llm: bool = True) -> dict:
         topic, statement = rule_answer.not_held(question) or ("language", rule_answer.ENGLISH_ONLY)
         if ruled[0] == "not_english":
             topic, statement = "language", rule_answer.ENGLISH_ONLY
+        elif rule_answer._WILL_FLOOD_RE.search(question) and heat_answer.hazard_of(question) != "heat":
+            statement = f"{statement} {NO_PREDICTION}"  # "Will my basement flood?": that too is not said
         return _unanswered(state, statement, {"attempts": attempts, "llm_calls": calls, "answer_mode": "rules",
                                               "answer_lead": ruled[0], "not_held": topic})
     if ruled is not None:
@@ -656,10 +712,20 @@ def synthesize(state, use_llm: bool = True) -> dict:
         if lead == "no_advice":
             # With no record for this place: the statement alone, and the pointers below.
             lead_phrase = f"{NO_ADVICE} {ADVICE_THEN[facts[0] not in rule_answer.ADVICE_FACTS]}" if facts else NO_ADVICE
+        since = answer_checks._period_start_date(question)
         if lead == "near":
-            lead_phrase = answer_checks.near_lead(facts[0], values) if facts else ""
+            # The nearest record of any kind among the sources that put flooding near the address.
+            verdict = answer_checks._past_event_verdict(question, texts, values)[1]
+            nearby = [f for f in facts if verdict.get(f) == answer_checks.NEAR] or facts[:1]
+            mark = (values.get("ida_hwm") or {}).get("nearest_dist_m") if "ida_hwm" in facts else None
+            if mark is not None and mark > answer_checks.BLOCK_M and "ida_hwm" not in nearby:
+                nearby = [*nearby, "ida_hwm"]  # "since Ida": a mark nearer than the sensor is the nearest record
+            lead_phrase = answer_checks.near_lead(nearby, values, since) if facts else ""
         if lead == "day":
             lead_phrase = (answer_checks.day_lead(question, texts, values) or ("", "", []))[1]
+        if period := answer_checks.period_lead(question, texts, values) if rule_answer._happened_clause(question) else None:
+            if lead in ("period", "cannot_answer") and facts == period[2]:
+                lead_phrase = period[1]  # a named year, season or month: what the records dated in it hold
         if lead == "yes" and state.get("nta"):
             # A yes about an area names the area: "Has Gowanus flooded?" is answered for a tabulation
             # area four neighbourhoods wide, and a bare "Yes." read as a yes about Gowanus alone.
@@ -694,6 +760,30 @@ def synthesize(state, use_llm: bool = True) -> dict:
                                focus, texts, values, experimental)
         if period := answer_checks.no_period(lead, (lead_fact or {}).get("doc_id"), question, values):
             lead_phrase = f"{lead_phrase} {period}"  # a "No." says the period the sensors could have recorded
+        if lead == "yes" and not state.get("nta") and (rests := answer_checks.yes_lead((lead_fact or {}).get("doc_id"), values, since)):
+            lead_phrase = f"{lead_phrase} {rests}"  # a "Yes." about an address says how far its record is
+        deepest = (values.get("floodnet") or {}).get("highest_event") if "floodnet" in facts else None
+        if lead == "facts" and deepest and deepest.get("max_depth_mm") is not None and re.search(
+                r"\bhow deep\b|\bdeepest\b|\bhighest depth\b", question, re.I):
+            # "How deep was the worst flood FloodNet measured in Hollis?": the reading itself, before the counts.
+            mm = deepest["max_depth_mm"]
+            lead_phrase = (f"The highest depth in FloodNet's verified record for the sensors read here is {mm} mm "
+                           f"({mm / 25.4:.1f} in), on {deepest['date']} (UTC) [floodnet]. {lead_phrase}")
+        hvi = next((values[f] for f in facts if f in heat_answer.HVI and isinstance(values.get(f), dict)), None)
+        if lead in ("count", "facts") and hvi and hvi.get("ac_pct") is not None and re.search(r"\bair[- ]?condition|\ba/c\b", question, re.I):
+            # "How many households in East Harlem have air conditioning?": the share itself, before the index
+            # sentence that holds it (the department publishes a share, not a count of households).
+            doc = next(f for f in facts if f in heat_answer.HVI)
+            lead_phrase = (f"The Health Department's file gives {hvi['ac_pct']}% of households with air conditioning in "
+                           f"{hvi.get('area') or 'this neighbourhood'}, a survey estimate and a share, not a count of "
+                           f"households [{doc}]. {lead_phrase}")
+        if (unplaced := (state.get("geocode") or {}).get("unplaced")) and state.get("nta"):
+            # "Has the block around La Marqueta, East Harlem flooded?": the landmark was not found, so no yes or
+            # no about its block; what follows is the wider area's record, said first.
+            lead = "facts" if lead in ("yes", "no", "partly", "near") else lead
+            lead_phrase = (f"Riprap could not locate \"{unplaced}\", so it gives no yes or no about that spot: what "
+                           f"follows is the record for the wider area, {state['nta'].get('nta_name') or 'named above'}."
+                           + ("" if lead == "facts" else f" {lead_phrase}"))
     elif question:
         lead, facts, lead_hits = answer
         rel = answer_checks.relevant_doc(question, texts)
@@ -758,10 +848,12 @@ def synthesize(state, use_llm: bool = True) -> dict:
     if not question and state.get("intent") == "single_address":
         brief = _heat_lead(state, items, area=False) if hazard_of(plan) == "heat" else _lead(state, items)
     pointers = ADVICE_POINTER if lead == "no_advice" else ""
-    if lead in ("no_advice", "no_advice_heat") and rule_answer._SAFETY_RE.search(question):
-        pointers = f"{SAFETY_POINTER} {pointers}".strip()
+    if (lead in ("no_advice", "no_advice_heat") and rule_answer._SAFETY_RE.search(question)) or _BASEMENT_RE.search(question):
+        pointers = f"{SAFETY_POINTER} {pointers}".strip()  # every question that mentions a basement carries it
     closing = rule_answer.closing(question, lead or "", [c["doc_ids"][0] for c in kept if c["section"] == ANSWER_SECTION
                                                          and len(c["doc_ids"]) == 1], values, texts) if question else ""
+    if question and ruled is not None and (days := _days_311(question, texts, values)):
+        closing = f"{closing} {days}".strip()
     paragraph = _render(kept, docs, sections, question, lead_phrase, empty, brief,
                         now=bool(question) and (focus or {}).get("time_frame") == "now",
                         place=(state.get("geocode") or {}).get("address") or "", advice=pointers, closing=closing)

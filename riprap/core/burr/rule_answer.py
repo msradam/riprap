@@ -77,11 +77,12 @@ DEP = ("dep_limited_current", "dep_moderate_current", "dep_moderate_2050", "dep_
        "dep_limited_current_nta", "dep_moderate_current_nta", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
 # Sources a question can name beyond answer_checks.RELEVANT, most specific first.
 TOPICS = (
-    (re.compile(r"\bfema\b|flood ?zones?\b|flood ?plain|\bfirm\b|flood insurance rate|\b[15]00[- ]year\b", re.I),
+    (re.compile(r"\bfema\b|flood ?zones?\b|flood ?plain|\bfirm\b|flood insurance rate"
+                r"|\b[15]00[- ]year\b(?! (?:storm|rain))", re.I),
      ("fema_nfhl", "fema_pfirm", "dcp_floodplain_nta")),
     (re.compile(r"\bsandy\b", re.I), ("sandy_inundation", "sandy_nta")),
     (re.compile(r"stormwater|storm water|\bdep\b|scenarios?\b|(extreme|moderate) (rain|flood)|rain(fall)? (flood )?maps?"
-                r"|flood maps?", re.I), DEP),
+                r"|flood maps?|\b100[- ]year (?:storm|rain)", re.I), DEP),
     (re.compile(r"elevation|low spot|low.lying|terrain|topograph|how high (is|above)(?! (the |tomorrow's |tonight's |today's )?((predicted|storm|high|next) )*(surge|tides?|water)\b)"
                 r"|above sea level", re.I),
      ("microtopo", "microtopo_nta")),
@@ -123,6 +124,7 @@ _WILL_FLOOD_RE = re.compile(r"\b(will|going to|gonna|likely to|expected to|about
 _ADVICE_RE = re.compile(
     r"\binsur(?:ance|ed?|ing|ers?)\b(?! rate maps?)|\bpremiums?\b|\bmortgages?\b"
     r"|\b(?:property|home|house|resale|market|real estate) (?:values?|prices?)\b|\bworth (?:buying|renting|it)\b"
+    r"|\b(?:homes?|houses?|property|apartments?|condos?|buildings?)\b[^.?!]*\bworth\b"
     r"|\bhow much (?:is|are|does|do|would|will)\b[^.?!]*\b(?:worth|costs?)\b"
     r"|\bshould (?:i|we) (?:buy|rent|sell|move|live|stay|sign|lease)\b"
     r"|\b(?:good|bad|smart|wise) (?:idea|place|time) to (?:buy|rent|live|move|sign)\b"
@@ -161,17 +163,61 @@ _PEOPLE = (r"(?:people|persons?|residents?|households?|famil(?:y|ies)|adults?|se
            r"|tenants?|renters?|owners?|homeowners?|immigrants?|speakers?|workers?|new yorkers)")
 _OTHER_311 = (r"(?:noise|rodents?|rats?|mice|potholes?|parking|graffiti|garbage|trash|litter|dumping|homeless\w*"
               r"|street ?lights?|mold|bed ?bugs?|pests?|heat(?:ing)?|hot water|sidewalks?|taxis?|vendors?|construction)")
+# Who lives at a place: asked for by these words, whatever is counted.
+_DEMOGRAPHIC_RE = re.compile(
+    r"\bwho (?:lives?|lived|resides?|owns?|rents?|floods|gets? flooded|(?:is|are) (?:most|more|at|affected|vulnerable|exposed|hit))\b"
+    r"|\bpopulation\b|\bdemographic|\bcensus\b|\bby (?:age|race|ethnicity)\b|\bhow old\b"
+    r"|\bage (?:groups?|of (?:the )?(?:residents|people))\b|\blanguages?\b|\b(?:speak|speaks|spoken)\b"
+    r"|\b(?:black|latino|latina|hispanic|asian|white) (?:residents|people|households|new yorkers|population)\b"
+    r"|\bliv(?:e|es|ing) alone\b", re.I)
+# A count of people that a source here does publish: complaints filed, heat illness visits, deaths (the heat
+# rules say they are citywide only), the share of households with air conditioning. The bare nouns "people",
+# "residents" and "households" once refused "How many people went to the emergency room for heat in BX01?".
+_PEOPLE_HELD_RE = re.compile(
+    r"\b311\b|\bcomplain\w*|\breport(?:ed|ing|s)?\b|\bemergency (?:rooms?|departments?|visits?)\b|\bhospital\w*|\bvisit(?:s|ed)?\b"
+    r"|\bheat (?:illness|stroke|exhaustion)\b|\bair[- ]?condition\w*|\ba/?c\b|\bdied\b|\bdeaths?\b|\bmortality\b", re.I)
+SENSORS_NOT_NAMED = (
+    "Riprap names and places no FloodNet sensor, because FloodNet's licence forbids reposting its records. Each "
+    "verified event can be found by its date and depth in FloodNet's own table on NYC Open Data, \"FloodNet: Street "
+    "Flooding Events Measured by FloodNet Sensors\" (https://data.cityofnewyork.us/d/aq7i-eu5q), and the sensors "
+    "are on FloodNet's dashboard (https://dataviz.floodnet.nyc).")
 NOT_HELD = (
+    ("houses", re.compile(
+        r"\b(?:which|what|whose) (?:houses?|homes?|buildings?|address(?:es)?|households?|neighbou?rs?|residents?|people)\b"
+        r"[^.?!]*\b(?:complain\w*|report\w*|call\w*|filed|flood\w*)\b|\bwho (?:complained|reported|called|filed)\b", re.I),
+     "Riprap names no house, building or person: a 311 complaint is counted at its block and never at its house "
+     "number, and no record here says which home flooded.", False),
     ("people", re.compile(
         # (Not "how many complaints have people filed": the thing counted there is complaints.)
-        rf"{_COUNT_OF}(?:(?!\b(?:complaints?|reports?|requests?|calls?|sensors?|events?|marks?|floods?)\b)[^.?!])*\b{_PEOPLE}\b|\bwho (?:lives?|lived|resides?|owns?|rents?|floods|gets? flooded|(?:is|are) (?:most|more|at|affected|vulnerable|exposed|hit))\b"
-        r"|\bpopulation\b|\bdemographic|\bcensus\b|\bby (?:age|race|ethnicity)\b|\bhow old\b"
-        r"|\bage (?:groups?|of (?:the )?(?:residents|people))\b|\blanguages?\b|\b(?:speak|speaks|spoken)\b"
-        r"|\b(?:black|latino|latina|hispanic|asian|white) (?:residents|people|households|new yorkers|population)\b"
-        r"|\bliv(?:e|es|ing) alone\b", re.I),
+        rf"{_COUNT_OF}(?:(?!\b(?:complaints?|reports?|requests?|calls?|sensors?|events?|marks?|floods?)\b)[^.?!])*\b{_PEOPLE}\b"
+        rf"|{_DEMOGRAPHIC_RE.pattern}", re.I),
      "Riprap holds no records about the people or households at a place: not who lives there, how many, their "
-     "age, race or language, or whether they rent or own. The one count of residents it quotes is City Planning's "
-     "for a community district's floodplain.", False),
+     "age, race or language, or whether they rent or own. The figures about residents it quotes are published "
+     "totals: City Planning's count of residents in a community district's floodplain, the Health Department's "
+     "count of emergency visits for heat illness by a district's residents, and its share of households with air "
+     "conditioning in a neighbourhood.", False),
+    ("environmental_justice", re.compile(r"\benvironmental[- ]justice\b|\bej (?:areas?|communit\w+|neighbou?rhoods?|designation)\b"
+                                         r"|\bdisadvantaged communit\w+", re.I),
+     "Riprap holds no environmental justice designation for a place and applies none. The city maps its "
+     "environmental justice areas in the EJNYC Mapping Tool "
+     "(https://experience.arcgis.com/experience/6a3da7b920f248af961554bdf01d668b).", False),
+    ("sensor_identity", re.compile(
+        r"\b(?:which|what) (?:floodnet )?sensors?\b|\bwhere\b[^.?!]*\bsensors?\b"
+        r"|\bsensors?\b[^.?!]*\b(?:located|locations?|names?|ids?|address(?:es)?|coordinates)\b"
+        r"|\b(?:names?|ids?|locations?|address(?:es)?|coordinates) of\b[^.?!]*\bsensors?\b", re.I),
+     SENSORS_NOT_NAMED, True),
+    ("citywide_record", re.compile(
+        r"\b(?:deepest|highest|worst|biggest|largest|most severe)\b[^.?!]*\b(?:ever|on record|citywide|anywhere|all[- ]time"
+        r"|in (?:the (?:whole |entire )?city|nyc|new york(?: city)?))\b", re.I),
+     "Riprap reads the records near one place over the period each sentence states, so it cannot say whether a "
+     "flood was the deepest FloodNet or any other source has recorded, there before that period or anywhere in "
+     "the city.", True),
+    ("sewer_311", re.compile(r"(?<!flood and )(?<!flooding and )\bsewer (?:complaints?|requests?|problems?|issues?)\b"
+                             r"|\bcomplaints? about (?:the )?sewers?\b", re.I),
+     "Riprap holds no total of sewer complaints: it counts eleven 311 descriptors about flooding and sewer backups "
+     "(sewer backups, clogged catch basins, street and highway flooding, manhole overflows, rain garden flooding), "
+     "and other complaints filed under 311's Sewer types, such as odors, missing or damaged covers and blocked "
+     "culverts, are not counted.", False),
     ("income", re.compile(r"\bincomes?\b|\bpoverty\b|\brent[- ]burden|\bwealth\w*\b|\bearnings?\b|\bwages?\b", re.I),
      "Riprap reports no income or poverty figures for a place.", False),
     ("basements", re.compile(r"\bbasements?\b|\bcellars?\b|\bbelow[- ]grade\b", re.I),
@@ -194,12 +240,16 @@ NOT_HELD = (
      "Riprap computes no flood score or rating of its own, and quotes none.", True),
     ("ranking", re.compile(
         r"\b(?:which|what)\s+(?:community\s+)?(?:parts?|areas?|neighbou?rhoods?|blocks?|districts?|streets?|places?|boroughs?)\b"
-        r"|\brank(?:ed|ing|s)?\b|\btop (?:five|ten|\d+)\b|\b(?:most|worst|least)[- ]flood\w*|\bfloods? (?:the )?(?:most|worst|least)\b"
+        r"|\brank(?:ed|ing|s)?\b|\btop (?:five|ten|\d+)\b|\b(?:most|worst|least)[- ]flood(?:ed|[- ]prone)\b|\bfloods? (?:the )?(?:most|worst|least)\b"
         r"|\b(?:most|worst|least) (?:flooding|floods|flooded)\b|\bwhere\b[^?.]*\b(?:worst|most)\b"
         r"|\b(?:worst|best|safest|driest|wettest)\s+(?:blocks?|streets?|areas?|parts?|places?|neighbou?rhoods?)\b", re.I),
      "Riprap does not rank places against each other or single out one block, street or part of a place.", True),
-    ("trend", re.compile(r"\bgetting (?:worse|better|more|less)\b|\bgot(?:ten)? (?:worse|better)\b|\bworsen\w*|\btrend\w*"
+    ("trend", re.compile(r"\bgetting (?:worse|better|more|less|wetter|deeper|drier)\b|\bgot(?:ten)? (?:worse|better)\b|\bworsen\w*|\btrend\w*"
                          r"|\b(?:increas|decreas|declin)\w+|\bmore (?:often|frequent\w*|common)\b"
+                         # ("Sea level rise" is a projection, and "last fall" a season.)
+                         r"|\b(?:rising|risen|falling|fallen|dropping|dropped|improv(?:ed|ing))\b|\b(?:going|gone|went) (?:up|down)\b"
+                         r"|\b(?:worse|better) (?:now|lately|these days|than (?:it was|last year))\b"
+                         r"|\bchang(?:e|ed|es|ing)\b[^.?!]*\bover (?:the )?(?:time|years|decades?)\b"
                          r"|\bover (?:the )?(?:time|years|decades?)\b"
                          r"|\bthan (?:it )?(?:used to|before|in the past|(?:\d+|a few|ten|five) years ago)\b", re.I),
      "Riprap holds no record that shows a trend in flooding at a place: FloodNet's sensors were installed at "
@@ -243,10 +293,20 @@ def not_held(question: str) -> tuple[str, str] | None:
                 continue
             if topic == "people" and TOPICS[0][0].search(c):
                 continue  # "how many people live in the floodplain": City Planning's district profile counts them
+            if topic == "people" and _PEOPLE_HELD_RE.search(c) and not _DEMOGRAPHIC_RE.search(c):
+                continue  # "how many people went to the emergency room for heat": a count a source here publishes
+            if topic == "law" and TOPICS[0][0].search(c) and all(m.group(0).lower() in ("legal", "legally")
+                                                                 for m in pattern.finditer(c)):
+                continue  # "is it legally in a flood zone": the FEMA zone, which says it is no determination
             if topic == "advice" and asks_now(q):
                 continue  # "is the street passable right now, or should I move my car": the live readings
-            if topic == "trend" and EXPERIMENTAL[0][0].search(c):
-                continue  # paving over time has its own lead (no_change_record)
+            if topic == "trend" and (EXPERIMENTAL[0][0].search(c) or re.search(r"sea.?levels?|\btides?\b", c, re.I)):
+                continue  # paving over time has its own lead (no_change_record); sea level has a projection
+            if topic == "ranking" and re.search(r"\bhow (?:deep|high|bad)\b", c, re.I) and not re.search(
+                    r"\b(?:which|what|where)\b", c, re.I):
+                continue  # "how deep was the worst flood measured in Hollis": one place's highest reading
+            if topic == "citywide_record" and not _FLOOD_RE.search(c) and not re.search(r"sensor|water|depth|deep", c, re.I):
+                continue
             if topic == "rain_on_a_day" and (asks_now(q) or _RAIN_SO_FAR_RE.search(c)):
                 continue  # "how much rain has fallen today": the latest observation
             if topic == "ranking" and any(i in ASSET_DOCS for i in _named_ids(c)):
@@ -257,8 +317,8 @@ def not_held(question: str) -> tuple[str, str] | None:
 
 # A question Riprap cannot read: it reads English only. Another script anywhere in the text, inverted Spanish
 # punctuation, or two Spanish words that English place names do not use ("El Barrio" and "La Guardia" are places).
-# ponytail: a word list for Spanish and script ranges for the rest; a language-identification model is the
-# upgrade if questions in other Latin-script languages (Haitian Creole, Polish) keep passing as bare addresses.
+# ponytail: short word lists for Spanish, Haitian Creole, French and Polish and script ranges for the rest; a
+# language-identification model is the upgrade if questions in other languages keep passing as bare addresses.
 _OTHER_SCRIPT_RE = re.compile(r"[Ѐ-ӿ֐-ۿऀ-෿฀-໿ᄀ-ᇿ぀-ヿ"
                               r"㐀-鿿가-힯]|[¿¡]")
 # One word that only Spanish has, or two that a place name could hold one of. (No "se", "mi", "es", "ha" or
@@ -273,11 +333,20 @@ ENGLISH_ONLY = ("Riprap reads questions in English only, and this one was not re
                 "বাংলা: Riprap শুধু ইংরেজি প্রশ্ন পড়ে। FloodHelpNY এবং 311 অন্যান্য ভাষায় সেবা দেয়।")
 
 
+# The other Latin-script languages among the city's ten designated ones (Local Law 30: Spanish, Chinese,
+# Russian, Bengali, Haitian Creole, Korean, Arabic, Urdu, French, Polish; the rest are caught by script):
+# asking words and flood words that English, its misspellings and the city's place names do not use.
+_OTHER_LATIN_RE = re.compile(
+    r"\b(?:[eè]ske|inonde|inondasyon|lapli|konbyen|kijan|katye|anba dlo"  # Haitian Creole
+    r"|est-ce|qu'est-ce|inond(?:é|ée|és|ées|ations?)|pluie|combien|pourquoi|où"  # French
+    r"|czy|pow[oó]d[zź]\w*|zalan\w+|zala[lł][aoy]|ulicy|deszcz\w*|gdzie)\b|[ąęłńśźż]", re.I)  # Polish
+
+
 def not_english(text: str) -> bool:
     """True when the text holds a question in a language Riprap does not
     read. A bare address stays a bare address whatever script surrounds it."""
     t = text or ""
-    return bool(_OTHER_SCRIPT_RE.search(t) or _SPANISH_RE.search(t)
+    return bool(_OTHER_SCRIPT_RE.search(t) or _SPANISH_RE.search(t) or _OTHER_LATIN_RE.search(t)
                 or len({m.group(0).lower() for m in _SPANISH_WEAK_RE.finditer(t)}) >= 2)
 
 
@@ -301,6 +370,33 @@ what when where whether with would year years you your
 """.split())
 _PLACE_WORD_RE = re.compile(r"\b(?:new york|nyc|ny|manhattan|brooklyn|queens|bronx|staten island|street|st|avenue|ave"
                             r"|boulevard|blvd|road|rd|place|pl|drive|dr|lane|ln|parkway|pkwy|court|ct|terrace)\b", re.I)
+
+
+_FLOOD_WORDS = ("flooded", "flooding", "floods", "flood")  # the longer first: "flooed" is "flooded"
+# English words and names one edit from a flood word, which stay as typed.
+_NOT_FLOOD = frozenset("blood bloods blooded blooding floor floors floored flooring food foods flooder floyd".split())
+
+
+def _one_edit(a: str, b: str) -> bool:
+    """True when `a` is one insertion, deletion or substitution from `b`."""
+    if a == b or abs(len(a) - len(b)) > 1:
+        return False
+    i = next((k for k, (x, y) in enumerate(zip(a, b, strict=False)) if x != y), min(len(a), len(b)))
+    return a[i + 1:] == b[i + 1:] or a[i:] == b[i + 1:] or a[i + 1:] == b[i:]
+
+
+def spelled(question: str) -> str:
+    """The question with a word one letter off "flood", "floods", "flooded"
+    or "flooding" set right ("has 80 pioneer st bklyn floded b4"): every
+    rule here looks for the word itself. Nothing else is corrected.
+    ponytail: one word family, by one edit; no spelling correction beyond it."""
+    def fix(m: re.Match) -> str:
+        w = m.group(0).lower()
+        if w in _FLOOD_WORDS or w in _NOT_FLOOD or m.group(0)[0].isupper():
+            return m.group(0)  # (a capitalised word is a name: "Floyd", "Flood Street" is spelled right already)
+        return next((t for t in _FLOOD_WORDS if _one_edit(w, t)), m.group(0))
+
+    return re.sub(r"\b[A-Za-z]{5,9}\b", fix, question or "")
 
 
 def plain_flood_question(question: str) -> bool:
@@ -520,12 +616,21 @@ _FAR_RE = re.compile(r"\b20[3-9]\ds?\b|\b2100\b|decades?|century|sea.level", re.
 _CAUSE_RE = re.compile(r"\b(?:rain\w*|downpours?|cloudbursts?|tid(?:e|es|al)|storm ?water|surges?)\b[^.?!]*\bflood"
                        r"|\bflood\w*\b[^.?!]*\b(?:from|by|because of|due to|caused by) "
                        r"(?:the |a |heavy |high |hard )*(?:rain\w*|tid(?:e|es|al)|surges?|downpours?)\b", re.I)
-CAUSE_NOTE = ("FloodNet's API does not label a flood event by its cause, so the sensor record above does not say "
+CAUSE_NOTE = ("FloodNet's API does not label a flood event by its cause, so its sensor record does not say "
               "whether the water came from rain, a tide or a surge.")
+# How deep the water will get: no source gives a depth for a place, and the city says so of its own maps.
+_DEPTH_AHEAD_RE = re.compile(r"\bhow (?:deep|high|much water|many (?:feet|inches))\b[^.?!]*\b(?:will|would|could|can|might|going to|expected)\b"
+                             r"|\b(?:will|would|could)\b[^.?!]*\bhow deep\b", re.I)
+_STORM_100_RE = re.compile(r"\b100[- ]year (?:storm|rain)", re.I)
+# Risk, asked with no source named: the record, the maps and FEMA, as a safety question gets, and no label.
+_RISK_RE = re.compile(r"\brisks?\b|\brisky\b|\bprone\b|\bvulnerable\b|\bexposed\b|\bexposure\b|\bhazards?\b", re.I)
 
 
 def asks_cause(question: str) -> bool:
-    return bool(_CAUSE_RE.search(question or ""))
+    """A cause asked about. Not a question that names the maps ("is it in
+    any of the stormwater flood scenarios"): the maps answer that."""
+    q = question or ""
+    return bool(_CAUSE_RE.search(q)) and not re.search(r"\b(?:maps?|scenarios?)\b", q, re.I)
 
 
 FEMA_POINTER = ("This is a reading of FEMA's maps at one point, not a flood zone determination. For a regulatory "
@@ -543,13 +648,15 @@ def closing(question: str, lead: str, facts: list[str], values: dict | None, tex
     from app.flood_layers.dep_stormwater import OUTSIDE_CAVEAT
 
     out = []
-    if asks_cause(question) and "floodnet" in facts:
+    if asks_cause(question) and ("floodnet" in facts or lead == "cannot_answer"):
         out.append(CAUSE_NOTE)
     fema = (values or {}).get("fema_nfhl") if "fema_nfhl" in facts else None
     asked = lead == "no_advice" or bool(TOPICS[0][0].search(question or ""))
     if isinstance(fema, dict) and asked:
         out.append(FEMA_POINTER)
-    safety = lead == "no_advice" and bool(_SAFETY_RE.search(question or ""))
+    safety = (lead == "no_advice" and bool(_SAFETY_RE.search(question or ""))) or (
+        lead == "facts" and bool(_RISK_RE.search(question or "")) and not _named_ids(question or "")
+        and any(f in DEP or f in ADVICE_FACTS for f in facts))
     said = any(OUTSIDE_CAVEAT[:42] in texts.get(f, "") for f in facts)  # an outside stormwater reading carries it
     if (safety or (isinstance(fema, dict) and asked and not fema.get("sfha"))) and not said:
         out.append(OUTSIDE_CAVEAT)
@@ -737,10 +844,20 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
             lead = "no_prediction_register"
         return lead, assets
     happened = _happened_clause(question) if tf == "past" else None
-    if happened and not ac.storm_of_day(question) and (day := ac.day_lead(question, texts, values)):
-        # "Did it flood on May 20, 2026?": the sensor events dated that day. (A day of Ida or Sandy is
-        # the storm's own record's to answer, below.)
+    deep = tf != "future" and re.search(r"\bhow deep\b|\bdeepest\b|\bhow (?:much|high) (?:was|did) (?:the )?water\b", question, re.I)
+    if (happened or deep) and not ac.storm_of_day(question) and (day := ac.day_lead(question, texts, values)):
+        # "Did it flood on May 20, 2026?", "How deep was the water on May 20, 2026?": the sensor events dated
+        # that day. (A day of Ida or Sandy is the storm's own record's to answer, below.)
         return day[0], day[2]
+    if happened and not ac._storm_record(question) and (period := ac.period_lead(question, texts, values)):
+        # "Did it flood in 2024?": only the records dated in 2024 (synthesis prints the sentence; ac.period_lead).
+        return period[0], period[2]
+    if _DEPTH_AHEAD_RE.search(question) and (maps := [d for d in DEP if texts.get(d)]):
+        # "How deep will the water get in a 100-year storm?": no depth is given for a place. The maps follow,
+        # the one the question names first, then FEMA's zone.
+        asked = ac.dep_scenario_asked(question) or ""
+        maps.sort(key=lambda d: not (asked and d.startswith(asked)))
+        return "no_depth", [*maps, *(d for d in ADVICE_FACTS if texts.get(d))][:7]
     if _SATELLITE_RE.search(question) and not models and not official and tf != "future":
         # "What did satellite imagery show after Ida": no source here says. The
         # storm's own surveyed record first, then the rest of the observed record.
@@ -794,6 +911,14 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
     if subjects[:1] == ["sandy_nta"] and isinstance(share, dict) and share.get("fraction") is not None \
             and ac.is_yes_no_question(question):
         return with_named(_share_lead(share["fraction"], question), ["sandy_nta"])  # "was any part of QN12 inside"
+    if asks_cause(question) and tf != "future" and not [d for d in subjects if d not in (*DEP, "nws_obs", "noaa_tides")]:
+        # "Does rain flood 20 West 12th Road?", "Is the flooding in Broad Channel from the tide?", "How much rain
+        # would flood ...?": no record here gives a cause or a threshold, so the question is not answered (one
+        # live rain or tide reading once stood as the whole answer). The city's stormwater maps say which
+        # category is mapped, rainfall or tidal, and the sensors' events carry no cause (closing says so).
+        seen = [i for i in (*DEP, "floodnet") if texts.get(i)]
+        if seen:
+            return "cannot_answer", seen
     rel = ac.relevant_doc(question, texts)
     if ac.is_count_question(question) and rel:
         return with_named("count", [rel])
@@ -811,13 +936,15 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
                 or [d for d in subjects if d in DEP]
                 or [i for i in FORECAST_FACTS if texts.get(i) and not (far and i == "nws_water_forecast")
                     and not (near and not far and i != "nws_water_forecast")][:4])
+        if docs and _STORM_100_RE.search(question):
+            docs = [*docs, *(d for d in ADVICE_FACTS if texts.get(d) and d not in docs)]
         return with_named("facts", docs) if docs else None
-    if asks_cause(question) and not [d for d in subjects if d not in DEP]:
-        # "Does rain flood 20 West 12th Road?": the sensors' events carry no cause (synthesis says so after
-        # them), and the city's stormwater maps say which category is mapped there, rainfall or tidal.
-        seen = [i for i in (*OBSERVED, *DEP) if texts.get(i)]
-        if seen:
-            return "facts", seen
+    area_maps = [d for d in ("dcp_floodplain_nta", "sandy_nta", *(m for m in DEP if m.endswith("_nta"))) if texts.get(d)]
+    if TOPICS[0][0].search(question) and area_maps and not ac.is_count_question(question) and not any(
+            d in ("fema_nfhl", "fema_pfirm") for d in subjects) and not ac.dep_scenario_asked(question):
+        # "Is Rockaway Park in a flood zone?": a FEMA zone is read at an address. An area gets City Planning's
+        # floodplain counts where it holds them (community districts), then every map read for the area.
+        return ("area_zone" if "dcp_floodplain_nta" in area_maps else "no_area_zone"), area_maps
     n = _count_of(subjects[0], question, (values or {}).get(subjects[0])) if subjects else None
     if (isinstance(n, int) and ac.is_yes_no_question(question) and _ANY_RE.search(question)
             and _COUNTED[subjects[0]].search(question)):
@@ -840,6 +967,6 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
             return "needs_address", []
         return "cannot_answer", mapped
     if generic and _FLOOD_RE.search(question) and plain_flood_question(question):
-        seen = [i for i in OBSERVED if texts.get(i)]
+        seen = [i for i in (SAFETY_FACTS if _RISK_RE.search(question) else OBSERVED) if texts.get(i)]
         return ("facts", seen) if seen else None
     return None

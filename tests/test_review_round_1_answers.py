@@ -156,8 +156,10 @@ def test_a_safety_question_gets_the_observed_record_before_the_maps_and_never_fe
     answer = out["paragraph"].split("**Answer.**\n", 1)[1].split("\n\n", 1)[0]
     assert answer.startswith("Riprap reports public records about a place.") and "the observed record first:" in answer
     assert answer.count(OUTSIDE) == 1 and "not a flood zone determination" in answer
-    footer = out["paragraph"].split("**Out of scope.** ", 1)[1]
-    assert "https://a858-nycnotify.nyc.gov" in footer and "Basement Alerts" in footer and "https://www.floodhelpny.org" in footer
+    # Review round 2: the pointers have their own heading, before the "Out of scope" note.
+    turn, footer = out["paragraph"].split("**Where to turn.**\n", 1)[1].split("\n\n**Out of scope.** ", 1)
+    assert "https://a858-nycnotify.nyc.gov" in turn and "Basement Alerts" in turn and "https://www.floodhelpny.org" in turn
+    assert "nycnotify" not in footer
 
 
 def test_an_insurance_question_keeps_fema_first_and_says_outside_is_not_safe(monkeypatch):
@@ -198,7 +200,7 @@ def test_a_yes_about_an_address_needs_a_record_within_the_block_distance():
     assert far == ("near", ["floodnet"])
     assert ac.near_lead("floodnet", {"floodnet": FLOODNET}).startswith(
         "Flooding was recorded near this address, not at it: the nearest FloodNet sensor with a verified flood event is "
-        "413 m away.")
+        "413 m away [floodnet].")
     on_block = {**FLOODNET, "_rows": [{**ROWS[0], "distance_m": 60.0}]}
     assert ac.past_event_lead(q, focus, ["floodnet"], texts, {"floodnet": on_block})[0] == "yes"
     # The same distance for an Ida mark: 174 m is near, not at.
@@ -276,13 +278,14 @@ def test_a_named_day_is_answered_from_the_sensor_events_dated_that_day():
     lead, sentence, facts = ac.day_lead(q.format("May 20, 2026"), texts, values)
     assert (lead, facts) == ("day", ["floodnet"])
     assert sentence == ("Flooding was recorded near this address on 2026-05-20 (UTC), not at it: FloodNet's verified record "
-                        "has 2 flood events that day, at sensors the nearest of which is 413 m away, the deepest 1172 mm.")
+                        "has 2 flood events that day, at sensors the nearest of which is 413 m away, the deepest 1172 mm "
+                        "[floodnet].")
     assert ra.answer(q.format("May 20, 2026"), texts, values) == ("day", ["floodnet"])
     assert "no flood event dated 2026-05-21" in ac.day_lead(q.format("May 21, 2026"), texts, values)[1]
     # Before the sensors' record starts: said so, never a no.
     before = ac.day_lead(q.format("June 3, 2022"), texts, values)[1]
     assert before == ("The FloodNet record quoted here starts on 2023-10-26, after 2022-06-03, so the sensors say nothing "
-                      "about that day.")
+                      "about that day [floodnet].")
     # A value that does not date every event cannot say "none that day".
     undated = {"floodnet": {k: v for k, v in FLOODNET.items() if k != "_rows"}}
     assert ac.day_lead(q.format("May 21, 2026"), texts, undated)[0] == "cannot_answer"
@@ -322,7 +325,8 @@ def test_which_schools_will_flood_gets_the_forecast_refusal_before_the_register(
 def test_a_question_that_names_rain_or_tide_gets_the_stormwater_maps_and_the_note_on_cause(monkeypatch):
     q = "Does rain flood 20 West 12th Road, Broad Channel?"
     lead, facts = ra.answer(q, T, {})
-    assert lead == "facts" and facts[0] == "floodnet" and {"dep_moderate_current", "dep_extreme_2080"} <= set(facts)
+    # Review round 2: no record gives a cause, so the question is not answered; the maps, then the sensors.
+    assert lead == "cannot_answer" and facts[-1] == "floodnet" and facts[:2] == ["dep_moderate_current", "dep_extreme_2080"]
     out = _synthesize(monkeypatch, q)
     assert ra.CAUSE_NOTE in out["paragraph"] and "does not label a flood event by its cause" in ra.CAUSE_NOTE
     assert "Future High Tides 2080" in out["paragraph"]

@@ -241,10 +241,10 @@ def test_an_insurance_or_advice_question_is_declined_first_then_given_the_fema_z
     docs = [Doc("floodnet", "Live Observer", T["floodnet"], False), Doc("fema_pfirm", "Hazard Reader", FEMA["fema_pfirm"], False),
             Doc("fema_nfhl", "Hazard Reader", FEMA["fema_nfhl"], False)]
     out = _synthesize(monkeypatch, docs, q)
-    answer, footer = out["paragraph"].split("**Answer.**\n")[1].split("\n\n")[:2]
+    answer, footer = out["paragraph"].split("**Answer.**\n")[1].split("\n\n")[:2]  # the pointers follow the answer
     assert answer.startswith(NO_ADVICE) and "does not price flood insurance" in NO_ADVICE
     assert answer.index("effective 2007") < answer.index("preliminary flood map") and "FloodNet" not in answer
-    assert footer.startswith(f"**Out of scope.** {ADVICE_POINTER}") and "https://www.floodhelpny.org" in ADVICE_POINTER
+    assert footer == f"**Where to turn.**\n{ADVICE_POINTER}" and "https://www.floodhelpny.org" in ADVICE_POINTER
     assert out["grounding"]["answer_lead"] == "no_advice" and out["grounding"]["answer_mode"] == "rules"
     # With no FEMA reading the statement stands alone: it does not announce a zone and show none.
     bare = _synthesize(monkeypatch, docs[:1], q)["paragraph"].split("**Answer.**\n")[1].split("\n\n")[0]

@@ -377,7 +377,11 @@ def test_a_since_question_in_any_wording_gets_the_record(question):
 def test_a_flood_zone_question_about_a_neighbourhood_shows_the_maps_it_has():
     area = {"sandy_nta": "40.6% of this area lies inside the 2012 Hurricane Sandy inundation extent.",
             "dep_moderate_current_nta": "DEP Moderate Stormwater: 1.2% of this area is modeled to flood from rainfall."}
-    assert ra.answer("Is Red Hook in a flood zone?", area, {}) == ("cannot_answer", ["sandy_nta", "dep_moderate_current_nta"])
+    # (Review round 2: its own unanswered lead, which says a FEMA zone is read at an address.)
+    assert ra.answer("Is Red Hook in a flood zone?", area, {}) == ("no_area_zone", ["sandy_nta", "dep_moderate_current_nta"])
+    from riprap.core.burr.answer_checks import UNANSWERED_LEADS
+
+    assert "no_area_zone" in UNANSWERED_LEADS
 
 
 @pytest.mark.parametrize("question", [

@@ -88,7 +88,8 @@ TOPICS = (
      COOLING),
     (re.compile(r"emergency (?:room|department|visits?)|\b(?:go|goes|went|going|sent|end(?:s|ed)? up) (?:to|in|at) (?:the |a )?(?:hospital|er|emergency)\b|\bhospital visits?\b|\b(?:er|ed) visits?\b|hospitali[sz]|heat (?:illness|stroke|exhaustion|stress)"
                 r"|\bsick\b|\bhealth\b(?! department)", re.I), VISITS),
-    (re.compile(r"vulnerab|\bhvi\b|(?<!heat )\bindex\b|\bat risk\b", re.I), HVI),
+    # (The department's file gives the share of households with air conditioning beside the index.)
+    (re.compile(r"vulnerab|\bhvi\b|(?<!heat )\bindex\b|\bat risk\b|\bair[- ]?condition\w*|\ba/c\b", re.I), HVI),
     (re.compile(r"\bheat index\b|\bfeels? like\b|\bhumid", re.I), OBS),
     (re.compile(r"\btrees?\b|canopy|\bshade|\bpaved|\bpaving|pavement|impervious|green (?:space|cover)|vegetat", re.I), COVER),
     (re.compile(r"advisor(?:y|ies)|\bwarnings?\b|\balerts?\b|\bwatch\b", re.I), ALERTS),
@@ -224,8 +225,15 @@ def record_sentence(question: str, facts: list[str], values: dict | None) -> str
             f"{v['record_since']}).")
 
 
-_TREND_RE = re.compile(r"\bover the years\b|\b(?:gone|going|went) up\b|\btrend|\bincreas|\bmore\b[^.?!]*\b(?:than|now)\b"
-                       r"|\bused to\b|\bthe records\b|\b(?:gotten|getting|got) (?:worse|hotter|warmer)\b|\bsince (?:19|20)\d\d\b", re.I)
+_TREND_RE = re.compile(r"\bover the years\b|\b(?:gone|going|went) (?:up|down)\b|\btrend|\bincreas|\bmore\b[^.?!]*\b(?:than|now)\b"
+                       r"|\bused to\b|\bthe records\b|\b(?:gotten|getting|got) (?:worse|hotter|warmer|cooler)\b|\bsince (?:19|20)\d\d\b"
+                       r"|\b(?:rising|risen|falling|fallen)\b|\bthan (?:before|it used to|in the past)\b|\bover time\b", re.I)
+
+
+# A change over the years asked in other words than "trend" (rule_answer.NOT_HELD's trend row is the flood half).
+_CHANGING_RE = re.compile(r"\bgetting (?:hotter|warmer|cooler|worse|better)\b|\b(?:rising|risen|falling|fallen)\b|\bover time\b"
+                          r"|\b(?:hott?er|warmer|cooler|worse|more)\b[^.?!]*\bthan (?:before|it (?:was|used to be)|in the past)\b"
+                          r"|\bchang(?:ed|ing)\b", re.I)
 
 
 def trend_sentence(question: str, facts: list[str], values: dict | None) -> str | None:
@@ -364,7 +372,10 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     tf = time_frame(q)
     if re.search(r"\b(?:un)?safe\b|\bdangerous\b", q, re.I) and (docs := have(SURFACE, HVI, STATION)):
         # "Is my apartment too hot to be safe?": the same decline a flood "is it safe" gets, then what was measured.
-        return "no_advice_heat", docs
+        # "Is East Harlem a dangerous place in a heat wave?" asks for a rating of an area, and is told there is
+        # none (it once opened with the decline to price flood insurance).
+        area = any(d.endswith("_nta") for d in docs) and not _INDOORS_RE.search(q)
+        return ("no_rating_heat" if area else "no_advice_heat"), docs
     if re.search(r"\bair temp(?:erature)?s?\b", q, re.I) and tf != "future" and (docs := have(OBS, SURFACE)):
         return "no_air_temp", docs  # no source here holds an air temperature at an address
     if _SCORE_RE.search(q):
@@ -428,6 +439,11 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
         # The record counts days at 90°F: a question about 95 or 100 is told it is not answered, then given that.
         other = any(t != "90" for t in _DEGREES_RE.findall(_YEAR_RE.sub(" ", q)))
         return (("cannot_answer" if other else "count"), docs) if docs else None
+    if _CHANGING_RE.search(q) and not subjects and (docs := have(STATION)):
+        # "Is Brownsville getting hotter?": a trend. The one record here that runs over years is the weather
+        # station's count of hot days, whose decade averages lead the answer (trend_sentence); the surface
+        # measurement that once answered alone is three summers.
+        return "facts", [*docs, *have(SURFACE)][:4]
     if _COMPARE_CITY_RE.search(q) and not any(d in COVER or d in HVI for d in subjects):
         docs = have(SURFACE)
         v = (values or {}).get(docs[0]) if docs else None

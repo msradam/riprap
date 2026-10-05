@@ -151,7 +151,7 @@ def test_a_count_since_a_storm_is_not_the_windows_total():
 
 def test_a_count_since_a_year_sums_the_years_from_then():
     sentence, undetermined = ac.count_lead("How many 311 flood complaints near here since 2024?", T311, V311, TODAY)
-    assert not undetermined and sentence.startswith("20 flood and sewer 311 complaints filed since the start of 2024")
+    assert not undetermined and sentence.startswith("20 complaints to 311 about flooding and sewer backups filed since the start of 2024")
     # A year the window does not reach back to cannot be summed.
     assert ac.count_lead("How many 311 flood complaints near here since 2019?", T311, V311, TODAY) == (None, True)
 
@@ -240,6 +240,6 @@ def test_a_floodnet_count_for_one_year_comes_from_that_year():
                       "period_start": "2023-10-05"}}
     q = "How many flood events did the FloodNet sensors near 400 Carroll Street, Brooklyn record in {}?"
     assert ac.count_lead(q.format(2024), docs, v, TODAY) == (
-        "9 flood events recorded in 2024, by the UTC year each event started.", False)
+        "9 flood events recorded in 2024, by the UTC year each event started [floodnet].", False)
     assert ac.count_lead(q.format(2026), docs, v, TODAY)[0].startswith("4 flood events recorded in 2026 so far")
     assert ac.count_lead(q.format(2023), docs, v, TODAY) == (None, True)  # the period starts inside 2023

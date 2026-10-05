@@ -59,9 +59,12 @@ CODE_LEADS = ("cannot_answer", "experimental", "no_prediction", "no_satellite", 
               # does not hold, a question not read as English, a register under "will it flood", a cause asked
               # of records that give none, and the two heat leads for "safe" and for air temperature.
               "near", "day", "not_held", "not_english", "no_prediction_register", "no_cause", "no_advice_heat",
-              "no_air_temp")
+              "no_air_temp",
+              # Review round 2: a named year, season or month (read from the records dated in it), a depth
+              # asked of maps that give none, a flood zone asked of an area, and a named place that was not found.
+              "period", "no_depth", "area_zone", "no_area_zone", "not_located", "no_rating_heat")
 # Leads that say the question was not answered (`grounding.answered` is False under them).
-UNANSWERED_LEADS = ("cannot_answer", "not_held", "not_english")
+UNANSWERED_LEADS = ("cannot_answer", "not_held", "not_english", "no_depth", "no_area_zone")
 _AREA_SHARE_RE = re.compile(r"([\d.]+)% of this area lies inside")
 # "Is there any ...", "are there ...": a yes needs only one.
 ANY_RE = re.compile(r"\b(any|is there an?|are there|was there an?|were there)\b", re.I)
@@ -140,10 +143,10 @@ def count_numbers(doc: str, near: str = "") -> list[str]:
 # maps use current sea levels: "limited" names the smaller storm, and
 # "current" alone still means the Moderate Flood map, as before the Limited
 # map was read.
-_DEP_YEAR = ((re.compile(r"\b2080\b|\bextre+m", re.I), "dep_extreme_2080"), (re.compile(r"\b2050\b"), "dep_moderate_2050"),
+_DEP_YEAR = ((re.compile(r"\b2080\b|\bextre+m|\b100[- ]year (?:storm|rain)", re.I), "dep_extreme_2080"), (re.compile(r"\b2050\b"), "dep_moderate_2050"),
              (re.compile(r"\blimited\b|\b1\.77\b", re.I), "dep_limited_current"),
              (re.compile(r"\bcurrent\b", re.I), "dep_moderate_current"))
-_STORMWATER_RE = re.compile(r"stormwater|\bdep\b|\bscenario\b", re.I)
+_STORMWATER_RE = re.compile(r"stormwater|\bdep\b|\bscenario\b|\b100[- ]year (?:storm|rain)", re.I)
 _NOT_STORMWATER_RE = re.compile(r"sea.level|surge|\btide", re.I)
 
 
@@ -228,9 +231,18 @@ def count_lead(question: str, docs: dict[str, str], values: dict | None, today=N
         year, start = int(m.group(1)), str(v.get("period_start") or "9999")[:10]
         if year > today.year or (year < today.year and start > f"{year}-01-01"):
             return None, True
+        so_far = " so far" if year == today.year else ""
+        rows, complete = floodnet_rows(v)
+        if complete:
+            # Days before events: two sensors a block apart log one storm as two events ("4 flood events"
+            # in 2026 at Hollis was two storms at two sensors).
+            dated = [_local(e) for r in rows for e in r.get("events") or [] if str(_local(e))[:4] == str(year)]
+            n, d = len(dated), len(set(dated))
+            return (f"Flooding was recorded on {d} {'day' if d == 1 else 'separate days'} in {year}{so_far} ({n} sensor "
+                    f"event{'' if n == 1 else 's'}), by the {_basis(rows)} day each event started [floodnet]."), False
         n = int(v["by_year"].get(str(year), 0))
-        return (f"{n} flood event{'s' if n != 1 else ''} recorded in {year}{' so far' if year == today.year else ''}, "
-                "by the UTC year each event started."), False
+        return (f"{n} flood event{'s' if n != 1 else ''} recorded in {year}{so_far}, "
+                "by the UTC year each event started [floodnet]."), False
     if rel not in ("nyc311", "nyc311_nta") or not isinstance(v, dict) or "by_year" not in v:
         return kind_lead(q, docs, values), False
     year = (today.year - 1 if re.search(r"\blast year\b", q, re.I) else today.year if re.search(r"\bthis year\b", q, re.I)
@@ -247,8 +259,8 @@ def count_lead(question: str, docs: dict[str, str], values: dict | None, today=N
         if (since.month, since.day) != (1, 1) or window_start > since or kind_asked(rel, q, v):
             return None, True
         n = sum(int(k) for y, k in (v.get("by_year") or {}).items() if int(y) >= since.year)
-        return (f"{n} flood and sewer 311 complaint{'s' if n != 1 else ''} filed since the start of {since.year}, "
-                "by the year each was filed."), False
+        return (f"{n} complaint{'s' if n != 1 else ''} to 311 about flooding and sewer backups filed since the start of "
+                f"{since.year}, by the year each was filed [{rel}]."), False
     if year is None:
         return (None, True) if _OTHER_PERIOD_RE.search(q) else (kind_lead(q, docs, values), False)
     try:
@@ -259,8 +271,8 @@ def count_lead(question: str, docs: dict[str, str], values: dict | None, today=N
     if not covered or kind_asked(rel, q, v):
         return None, True
     n = int((v.get("by_year") or {}).get(str(year), 0))
-    return (f"{n} flood and sewer 311 complaint{'s' if n != 1 else ''} filed in {year}"
-            f"{' so far' if year == today.year else ''}, by the year each was filed."), False
+    return (f"{n} complaint{'s' if n != 1 else ''} to 311 about flooding and sewer backups filed in {year}"
+            f"{' so far' if year == today.year else ''}, by the year each was filed [{rel}]."), False
 
 
 def kind_lead(question: str, docs: dict[str, str], values: dict | None) -> str | None:
@@ -279,7 +291,7 @@ def kind_lead(question: str, docs: dict[str, str], values: dict | None) -> str |
     years = value.get("years")  # type: ignore[union-attr]
     window = f" in the last {years} year{'s' if years != 1 else ''}" if isinstance(years, int) else ""
     return (f"{k} {kind} complaint{'s' if k != 1 else ''}{window}, counting the 311 "
-            f"descriptor{'s' if ' and ' in names else ''} {names}.")
+            f"descriptor{'s' if ' and ' in names else ''} {names} [{rel}].")
 
 
 def relevant_figure(rel: str, docs: dict[str, str], values: dict | None = None,
@@ -392,7 +404,9 @@ _SHORT_PERIOD_RE = re.compile(
     r"|\b(\d+|a|a few|a couple of|two|three|four|five|six) (days?|weeks?|months?) ago\b"
     r"|\b(last|past) (few|couple of|\d+|two|three|four|five|six) (days|weeks|months)\b"
     r"|\b(in|last|this) (january|february|march|april|may|june|july|august|september|october|november|december)\b"
-    r"|\b(last|this) (spring|summer|fall|autumn|winter)\b",
+    r"|\b(last|this) (spring|summer|fall|autumn|winter)\b"
+    # A period no rule here turns into dates: it must not be answered as if the question named none.
+    r"|\b(years?|decades?) (ago|back)\b|\b(earlier|early|late|later) (this|last) year\b|\bthe other (day|week)\b",
     re.IGNORECASE)
 _STORM_YEAR = {"ida": 2021, "sandy": 2012}
 # The day each named storm struck NYC, so "since Ida" starts on its date,
@@ -483,26 +497,55 @@ def floodnet_rows(v: dict, point=None) -> tuple[list[dict], bool]:
     return sorted(rows, key=lambda r: (r["distance_m"] is None, r["distance_m"] or 0)), False
 
 
-def nearest_m(doc_id: str, v: dict, point=None) -> float | None:
+def _local(e: dict) -> str:
+    """The day an event is matched on: its New York date when the row
+    carries one (app/context/floodnet.py), else its UTC date."""
+    return e.get("local_date") or e.get("date") or ""
+
+
+def _basis(rows: list[dict]) -> str:
+    """"New York" or "UTC": which calendar the rows' days are in."""
+    return "New York" if any("local_date" in e for r in rows for e in r.get("events") or []) else "UTC"
+
+
+def nearest_m(doc_id: str, v: dict, point=None, since=None, until=None) -> float | None:
     """Metres from the queried address to the nearest record of flooding the
-    source holds: a FloodNet sensor with a verified event, or an Ida
-    high-water mark. None for an area, or when the value gives no distance."""
+    source holds: a FloodNet sensor with a verified event (dated from
+    `since` to `until` when given), or an Ida high-water mark. None for an
+    area, or when the value gives no distance."""
     if doc_id == "ida_hwm":
         return v.get("nearest_dist_m")
-    return next((r["distance_m"] for r in floodnet_rows(v, point)[0] if r.get("distance_m") is not None), None)
+    lo, hi = (since.isoformat() if since else ""), (until.isoformat() if until else "9999")
+    return next((r["distance_m"] for r in floodnet_rows(v, point)[0] if r.get("distance_m") is not None
+                 and (not (since or until) or any(lo <= _local(e) <= hi for e in r.get("events") or []))), None)
 
 
 _NEAREST = {"floodnet": "FloodNet sensor with a verified flood event", "ida_hwm": "USGS high-water mark from Hurricane Ida"}
 
 
-def near_lead(source: str, values: dict | None) -> str:
+def nearest_record(sources: list[str], values: dict | None, since=None) -> tuple[str, float] | None:
+    """(source, metres) for the nearest observed record among `sources`: a
+    sensor with a verified event since `since`, or an Ida mark."""
+    found = [(d, s) for s in sources if isinstance(v := (values or {}).get(s), dict) and s in _NEAREST
+             and (d := nearest_m(s, v, (values or {}).get("_point"), since)) is not None]
+    return (min(found)[1], min(found)[0]) if found else None
+
+
+def near_lead(sources: list[str] | str, values: dict | None, since=None) -> str:
     """The lead for flooding recorded near an address and not on its block,
-    with the distance to the nearest record in it."""
-    v = (values or {}).get(source)
-    d = nearest_m(source, v, (values or {}).get("_point")) if isinstance(v, dict) else None
-    how_far = f": the nearest {_NEAREST.get(source, 'record')} is {d:.0f} m away" if d is not None else ""
+    with the distance to the nearest record of any kind in it (a sensor
+    211 m off once led while an Ida mark stood 130 m away), cited."""
+    hit = nearest_record([sources] if isinstance(sources, str) else sources, values, since)
+    how_far = f": the nearest {_NEAREST[hit[0]]} is {hit[1]:.0f} m away [{hit[0]}]" if hit else ""
     return (f"Flooding was recorded near this address, not at it{how_far}. Riprap gives a plain yes about an address "
             f"only when such a record is within {BLOCK_M} m of it.")
+
+
+def yes_lead(source: str | None, values: dict | None, since=None) -> str:
+    """What follows a "Yes." about an address: the record it rests on and
+    how far that is. Empty for an area or a source with no distance."""
+    hit = nearest_record([source], values, since) if source else None
+    return f"The record this rests on is a {_NEAREST[hit[0]]} {hit[1]:.0f} m from this address [{hit[0]}]." if hit else ""
 
 
 _MONTH_NAMES = ("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec")
@@ -551,27 +594,177 @@ def day_lead(question: str, docs: dict[str, str], values: dict | None) -> tuple[
     start = _iso_date(v.get("period_start"))
     if start and day < start:
         return "day", (f"The FloodNet record quoted here starts on {start.isoformat()}, after {day.isoformat()}, so the "
-                       "sensors say nothing about that day."), ["floodnet"]
-    hits = [(r, e) for r in rows for e in r.get("events") or [] if e.get("date") == day.isoformat()]
+                       "sensors say nothing about that day [floodnet]."), ["floodnet"]
+    # A resident asks in local dates: an event that began at 9:59 pm on 11 June in New York is dated 12 June
+    # in UTC, and the question about 11 June was once told no event was dated that day.
+    hits = [(r, e) for r in rows for e in r.get("events") or [] if _local(e) == day.isoformat()]
+    tz = f"({_basis(rows)} time)" if _basis(rows) == "New York" else "(UTC)"
     if not hits:
         if not complete:
             return "cannot_answer", "", ["floodnet"]
         n = v["n_sensors"]
-        return "day", (f"FloodNet's verified record has no flood event dated {day.isoformat()} (UTC) at the {n} "
-                       f"sensor{'' if n == 1 else 's'} read for this place. That is not a record that the street stayed "
-                       "dry: a sensor reads one spot, and events still to be verified are not counted."), ["floodnet"]
+        return "day", (f"FloodNet's verified record has no flood event dated {day.isoformat()} {tz} at the {n} "
+                       f"sensor{'' if n == 1 else 's'} read for this place [floodnet]. That is not a record that the "
+                       "street stayed dry: a sensor reads one spot, and events still to be verified are not counted."), ["floodnet"]
     n, deepest = len(hits), max((e.get("max_depth_mm") or 0) for _, e in hits)
     count = f"{n} flood event{'' if n == 1 else 's'}"
     near = min((r["distance_m"] for r, _ in hits if r.get("distance_m") is not None), default=None)
     if near is None:
-        return "day", (f"FloodNet's verified record has {count} dated {day.isoformat()} (UTC) at the sensors read for "
-                       f"this place, the deepest {deepest:.0f} mm."), ["floodnet"]
+        return "day", (f"FloodNet's verified record has {count} dated {day.isoformat()} {tz} at the sensors read for "
+                       f"this place, the deepest {deepest:.0f} mm [floodnet]."), ["floodnet"]
     if near <= BLOCK_M:
-        return "day", (f"FloodNet's verified record has {count} dated {day.isoformat()} (UTC) at sensors within 600 m, "
-                       f"the nearest of them {near:.0f} m from this address, the deepest {deepest:.0f} mm."), ["floodnet"]
-    return "day", (f"Flooding was recorded near this address on {day.isoformat()} (UTC), not at it: FloodNet's verified "
+        return "day", (f"FloodNet's verified record has {count} dated {day.isoformat()} {tz} at sensors within 600 m, "
+                       f"the nearest of them {near:.0f} m from this address, the deepest {deepest:.0f} mm [floodnet]."), ["floodnet"]
+    return "day", (f"Flooding was recorded near this address on {day.isoformat()} {tz}, not at it: FloodNet's verified "
                    f"record has {count} that day, at sensors the nearest of which is {near:.0f} m away, the deepest "
-                   f"{deepest:.0f} mm."), ["floodnet"]
+                   f"{deepest:.0f} mm [floodnet]."), ["floodnet"]
+
+
+_SEASONS = {"spring": (3, 5), "summer": (6, 8), "fall": (9, 11), "autumn": (9, 11)}
+_PERIOD_YEAR_RE = re.compile(r"(?<![-/\d])\b(20[012]\d)\b(?![-/]\d)")
+_SEASON_YEAR_RE = re.compile(r"\b(spring|summer|fall|autumn) (?:of )?(20[012]\d)\b", re.I)
+_MONTH_YEAR_RE = re.compile(r"\b(" + "|".join(_MONTH_NAMES) + r")[a-z]*\.? (?:of )?(20[012]\d)\b", re.I)
+_LAST_N_RE = re.compile(r"\b(?:in|over|during|within) the (?:last|past) (?:(\d+|two|three|four|five|six|twelve|eighteen) )?"
+                        r"(days?|weeks?|months?|years?)\b", re.I)
+_UNIT_DAYS = {"day": 1, "week": 7, "month": 30, "year": 365}
+
+
+def asked_period(question: str, today=None):
+    """(first day, last day, words for it) of the past period a question
+    names: a year ("in 2024", "last year"), a season or a month of a year
+    ("the summer of 2025", "June 2025"), a span of years, or "in the last
+    N months". None when it names none, names a full day (named_day), or
+    asks about the time since or before something (_SINCE_RE, _BEFORE_RE).
+    A house number is not a year, and a clause without a past period it can
+    date is left to _SHORT_PERIOD_RE."""
+    import calendar
+    import datetime
+
+    q = question or ""
+    today = today or datetime.date.today()
+    if named_day(q) or _SINCE_RE.search(q) or _BEFORE_RE.search(q):
+        return None
+    if m := _SEASON_YEAR_RE.search(q):
+        (a, b), y = _SEASONS[m.group(1).lower()], int(m.group(2))
+        return (datetime.date(y, a, 1), datetime.date(y, b, calendar.monthrange(y, b)[1]),
+                f"the {m.group(1).lower()} of {y} ({calendar.month_name[a]} to {calendar.month_name[b]})")
+    if m := _MONTH_YEAR_RE.search(q):
+        mon, y = _MONTH_NAMES.index(m.group(1).lower()[:3]) + 1, int(m.group(2))
+        return datetime.date(y, mon, 1), datetime.date(y, mon, calendar.monthrange(y, mon)[1]), f"{calendar.month_name[mon]} {y}"
+    if m := _LAST_N_RE.search(q):
+        n = int(_WORDS.get((m.group(1) or "one").lower(), 1) if not (m.group(1) or "").isdigit() else m.group(1))
+        unit = m.group(2).lower().rstrip("s")
+        first = today - datetime.timedelta(days=n * _UNIT_DAYS[unit])
+        return first, today, f"the last {f'{n} {unit}s' if n != 1 else unit} (since {first.isoformat()})"
+    if re.search(r"\b(last|this) year\b", q, re.I):
+        y = today.year - (1 if re.search(r"\blast year\b", q, re.I) else 0)
+        return datetime.date(y, 1, 1), datetime.date(y, 12, 31), str(y)
+    # A year that is not a house number ("2024 Grand Concourse") or part of an address ("20-24 ...").
+    from riprap.core.burr.place import extract_address
+
+    span = extract_address(q) or ""
+    years = sorted({int(y) for y in _PERIOD_YEAR_RE.findall(q.replace(span, " ") if span else q)})
+    if not years:
+        return None
+    label = str(years[0]) if len(years) == 1 else f"{years[0]} to {years[-1]}"
+    return datetime.date(years[0], 1, 1), datetime.date(years[-1], 12, 31), label
+
+
+def period_lead(question: str, docs: dict[str, str], values: dict | None, today=None) -> tuple[str, str, list[str]] | None:
+    """(lead, sentence, facts) for "did it flood in <a year, a season, a
+    month>", read only from the records dated in that period: FloodNet's
+    verified events by their day, 311 by its calendar years, and Ida's
+    marks when the period holds 1 September 2021. A yes or no about 2024
+    once rested on events of 2025 and 2026. The lead is "period" with a
+    sentence that carries its own yes or no (a no is worded for the
+    sensors' record, never for the place), or "cannot_answer" with a
+    sentence that says what period each record covers when none of them
+    reaches the one asked. None when the question names no period."""
+    import datetime
+
+    today = today or datetime.date.today()
+    period = asked_period(question, today)
+    if not period:
+        return None
+    first, last, label = period
+    if first > today:
+        return "cannot_answer", f"The period asked about, {label}, has not begun, so no record here holds anything for it.", []
+    last, q = min(last, today), (question or "").lower()
+    complaints = "nyc311" if "nyc311" in docs else "nyc311_nta"
+    names_sensors, names_311 = re.search(r"\bsensors?\b|floodnet", q), re.search(r"\b311\b|complaint", q)
+    verdict, said, facts = None, [], []
+    v = (values or {}).get("floodnet")
+    if not (names_311 and not names_sensors) and isinstance(v, dict) and docs.get("floodnet") and v.get("n_sensors"):
+        rows, complete = floodnet_rows(v, (values or {}).get("_point"))
+        start, n = _iso_date(v.get("period_start")), v["n_sensors"]
+        if not complete and (not start or first <= start):
+            return None  # the whole record lies inside the period asked: the general rule reads its total
+        facts.append("floodnet")
+        if not start or last < start or not complete:
+            said.append(f"The FloodNet record quoted here starts on {start.isoformat() if start else 'a date it does not give'}"
+                        f"{', after ' + label if start and last < start else ''}, so it holds nothing for that period and "
+                        "gives no yes or no about it [floodnet].")
+        else:
+            hits = [(r, e) for r in rows for e in r.get("events") or [] if first.isoformat() <= _local(e) <= last.isoformat()]
+            days, tz = len({_local(e) for _, e in hits}), f" (by {_basis(rows)} date)"
+            count = f"{len(hits)} flood event{'' if len(hits) == 1 else 's'} on {days} day{'' if days == 1 else 's'}"
+            near = min((r["distance_m"] for r, _ in hits if r.get("distance_m") is not None), default=None)
+            if hits and near is None:
+                verdict = "yes"
+                said.append(f"Yes, in {label}, at the sensors read for this area: FloodNet's verified record has {count} "
+                            f"in that period{tz} [floodnet].")
+            elif hits and near <= BLOCK_M:
+                verdict = "yes"
+                said.append(f"Yes, in {label}: FloodNet's verified record has {count} in that period{tz} at sensors "
+                            f"within 600 m, the nearest of them {near:.0f} m from this address [floodnet].")
+            elif hits:
+                verdict = "near"
+                said.append(f"Flooding was recorded near this address in {label}, not at it: FloodNet's verified record "
+                            f"has {count} in that period{tz}, at sensors the nearest of which is {near:.0f} m away "
+                            f"[floodnet]. Riprap gives a plain yes about an address only when such a record is within "
+                            f"{BLOCK_M} m of it.")
+            elif start <= first:
+                verdict = "no"
+                said.append(f"No, not in the sensors' record for {label}: FloodNet's verified record has no flood event "
+                            f"in that period{tz} at the {n} sensor{'' if n == 1 else 's'} read for this place [floodnet]. "
+                            "That is a no for those sensors only, not for the place: a sensor reads one spot, and events "
+                            "still to be verified are not counted.")
+            else:
+                said.append(f"The FloodNet record quoted here starts on {start.isoformat()}, inside {label}, and has no "
+                            "flood event from then to the end of that period; it does not cover the whole period, so "
+                            "it gives no yes or no about it [floodnet].")
+    elif isinstance(v, dict) and docs.get("floodnet") and not (names_311 and not names_sensors):
+        facts.append("floodnet")  # its sentence says no sensor is in range
+    marks = (values or {}).get("ida_hwm")
+    if first <= datetime.date(*_STORM_DATE["ida"]) <= last and isinstance(marks, dict) and marks.get("n_within_radius") \
+            and docs.get("ida_hwm") and not (names_sensors or names_311):
+        d = marks.get("nearest_dist_m")
+        facts.append("ida_hwm")
+        if verdict != "yes":
+            verdict = "yes" if d is None or d <= BLOCK_M else verdict or "near"
+        said.append("USGS surveyed a high-water mark from Hurricane Ida (1 September 2021)"
+                    + (f" {d:.0f} m from this address" if d is not None else " near this address") + " [ida_hwm].")
+    c = (values or {}).get(complaints)
+    if not (names_sensors and not names_311) and isinstance(c, dict) and docs.get(complaints) and "by_year" in c:
+        facts.append(complaints)
+        since = _iso_date(c.get("since"))
+        whole = first.year == last.year and (first.month, first.day) == (1, 1) and (
+            (last.month, last.day) == (12, 31) or last == today)
+        if whole and since and since <= first:
+            k = int((c.get("by_year") or {}).get(str(first.year), 0))
+            if names_311 and verdict is None:
+                verdict = "yes" if k else "no"
+            said.append(f"{k} complaint{'' if k == 1 else 's'} to 311 about flooding and sewer backups {'was' if k == 1 else 'were'} "
+                        f"filed in {first.year}{' so far' if last == today and first.year == today.year else ''}, by the "
+                        f"year each was filed; a count of reports, not of floods [{complaints}].")
+        else:
+            said.append(f"The 311 count quoted here {'starts on ' + since.isoformat() if since else 'covers its own window'} "
+                        f"and is split by calendar year only, so it gives no count for {label} [{complaints}].")
+    if not said and not facts:
+        return None
+    if not said:
+        said.append(f"No record here is dated within {label}.")
+    return ("period" if verdict else "cannot_answer"), " ".join(said), facts
 
 
 def _event(doc_id: str, v: dict, start: int | None, this_year: int, start_date=None, today=None,
@@ -621,8 +814,14 @@ def _event(doc_id: str, v: dict, start: int | None, this_year: int, start_date=N
             # sensor's status is today: the status is of the sensor now, not of the event then, and
             # the sentence still quotes it. (Events at sensors not listed "good" once gave no yes.)
             if not within:
-                return None
-            near = nearest_m(doc_id, v, point)
+                # "Since 2025", asked of a record that starts in 2023: the events dated from then on, when
+                # every event is in hand; the period's total is not all in the period asked.
+                rows, complete = floodnet_rows(v, point)
+                if not (complete and start_date):
+                    return None
+                if not any(_local(e) >= start_date.isoformat() for r in rows for e in r.get("events") or []):
+                    return False
+            near = nearest_m(doc_id, v, point, None if within else start_date)
             return NEAR if near is not None and near > BLOCK_M else True
         return False if covers else None
     if doc_id == "ida_hwm" and "n_within_radius" in v:
@@ -699,6 +898,21 @@ def _storm_reports(doc_id: str, values: dict | None) -> bool:
 
 def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: dict[str, str],
                     values: dict | None, this_year: int | None = None) -> tuple[str, list[str]] | None:
+    """`_past_event_lead`, and for "since Ida" the Ida mark sentence with
+    it whenever a mark is in range: the marks do not set the yes or no
+    ("since" is read as the time after the storm), but an answer about the
+    time since Ida once left out a mark 130 m from the address. Never under
+    a "No."."""
+    out = _past_event_lead(question, focus, facts, docs, values, this_year)
+    marks = (values or {}).get("ida_hwm")
+    if (out and out[0] != "no" and _storm_record(question) == "ida_hwm" and _period_start(question) is not None
+            and isinstance(marks, dict) and marks.get("n_within_radius") and docs.get("ida_hwm") and "ida_hwm" not in out[1]):
+        return out[0], [*out[1], "ida_hwm"]
+    return out
+
+
+def _past_event_lead(question: str, focus: dict | None, facts: list[str], docs: dict[str, str],
+                     values: dict | None, this_year: int | None = None) -> tuple[str, list[str]] | None:
     """(lead, facts) for a yes or no question about past flooding, or None
     for any other question. `yes` when a relevant observed source reports an
     event in the asked period; `no` only when every relevant source answered
@@ -710,7 +924,9 @@ def past_event_lead(question: str, focus: dict | None, facts: list[str], docs: d
     if not is_past_event_question(question, focus):
         return None
     relevant, verdict = _past_event_verdict(question, docs, values, this_year)
-    if (_SHORT_PERIOD_RE.search(question or "") and _period_start(question) is None) or _BEFORE_RE.search(question or ""):
+    if ((_SHORT_PERIOD_RE.search(question or "") or (not _storm_record(question) and period_lead(question, docs, values)))
+            and _period_start(question) is None) \
+            or _BEFORE_RE.search(question or ""):
         # "Did it flood this weekend?", "on Monday?": the sources count over
         # years, and a total over three years says neither yes nor no about a
         # few days. "Before Sandy?": no source here reaches back before it.
