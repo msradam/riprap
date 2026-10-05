@@ -37,6 +37,7 @@ from riprap.core.burr.templated_reconciler import (
     NON_SCOPE_FOOTER,
     _scope_header,
     compose_briefing,
+    with_place_notes,
 )
 
 log = logging.getLogger("riprap.synthesis")
@@ -364,10 +365,6 @@ LIVE_POINTER = ("Riprap reads records, not the street. For a live depth reading 
                 "(weather.gov) and Notify NYC.")
 BOTH_HAZARDS = ("This question names flooding and heat. Riprap keeps them as separate briefings and does not weigh one "
                 "against the other: this is the flood record, and asking about heat alone at this place gives the heat record.")
-MORE_PLACES = ("This question names more than one place ({names}). Riprap reads one place at a time, and this answer is "
-               "for {answered}; ask about each on its own, or set two side by side with \"{how}\".")
-NOT_PLACED = ("This question also names {names}, which Riprap could not match to a place in New York City, so this "
-              "answer is for {answered} alone.")
 
 
 def _change_lead(facts: list[str], values: dict | None) -> str:
@@ -464,14 +461,7 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
     footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {pointer} ", 1) if now else footer
     if advice:
         footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {ADVICE_POINTER} ", 1)
-    answered = place or "the place named at the top"
-    if others := heat_answer.places_named(question):
-        note = MORE_PLACES.format(names=_and(others), answered=answered, how="heat A vs B" if heat else "A vs B")
-        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {note} ", 1)
-    if unknown := heat_answer.not_placed(question):
-        # "Is East Harlem hotter than Phoenix?" once dropped Phoenix without a word.
-        note = NOT_PLACED.format(names=_and(unknown), answered=answered)
-        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {note} ", 1)
+    footer = with_place_notes(footer, question, place, heat)
     if question and re.search(r"\bflood", question, re.I) and re.search(r"\bheat\b|\bhott?(?:er|est)?\b", question, re.I) \
             and not heat_answer.INDOOR_HEATING_RE.search(question):
         # "Which is the bigger problem here, flooding or heat?" got the flood record and no word about heat.

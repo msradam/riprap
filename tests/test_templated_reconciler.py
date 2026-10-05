@@ -204,3 +204,53 @@ def test_a_district_briefing_prints_the_stormwater_disclaimer_once():
     assert paragraph.count("does not provide the exact depth of flooding at any location") == 1
     assert ("flood plain determination [dep_extreme_2080_nta][dep_moderate_2050_nta][dep_moderate_current_nta]"
             "[dep_limited_current_nta].") in paragraph
+
+
+def test_the_briefing_text_itself_says_which_place_it_describes(monkeypatch):
+    """The note that says which tabulation area or borough was chosen
+    travelled beside the text (geocode.note, MCP place_note, the page's
+    place line). Someone who copied the paragraph had only "this area"."""
+    from types import SimpleNamespace
+
+    from riprap.core.burr import synthesis as syn
+    from riprap.core.burr.synthesis import Doc
+    from riprap.core.burr.templated_reconciler import compose_briefing
+
+    note = ("This briefing describes City Planning's 2020 Neighborhood Tabulation Area Upper East Side-Lenox "
+            "Hill-Roosevelt Island (Manhattan), the area Riprap matched to the name Roosevelt Island.")
+    geocode = {"address": "Upper East Side-Lenox Hill-Roosevelt Island, Manhattan", "note": note}
+    paragraph, _ = compose_briefing(_state(geocode=geocode, query="Roosevelt Island"))
+    top = paragraph.split("\n\n")
+    assert top[1] == f"Place described: Upper East Side-Lenox Hill-Roosevelt Island, Manhattan. {note}"
+    assert paragraph.count(note) == 1 and top[2].startswith("**In brief.**")
+    # A place with no note is still named, and a rule answer and a heat answer open the same way.
+    plain = compose_briefing(_state(geocode={"address": "80 PIONEER STREET, Brooklyn, NY, USA", "note": None}))[0]
+    assert plain.split("\n\n")[1] == "Place described: 80 PIONEER STREET, Brooklyn, NY, USA."
+    assert "Place described" not in compose_briefing(_state())[0]  # no place resolved: no line
+    docs = [Doc("sandy_inundation", "Hazard Reader", "This address sits outside the 2012 Sandy footprint.", False),
+            Doc("heat_surface", "Hazard Reader", "The surface here ran 2.0°F warmer than the city's land average.", False)]
+    items = [SimpleNamespace(doc_id=d.doc_id, pebble_id=d.doc_id) for d in docs]
+    monkeypatch.setattr(syn, "_documents", lambda s: (docs, items, None))
+    monkeypatch.setattr(syn.evidence, "citations", lambda items: {})
+    for question, hazard in (("Was this inside the area Hurricane Sandy flooded?", "flood"),
+                             ("Is this block hotter than the rest of the city?", "heat")):
+        out = syn.synthesize({"intent": "single_address", "geocode": geocode, "sandy_inundation": {"inside": False},
+                              "heat_surface": {"mean_diff_f": 2.0, "n_images": 9},
+                              "plan": {"question": question, "focus": {"hazard": hazard}}}, use_llm=False)
+        assert out["paragraph"].split("\n\n")[1].startswith("Place described: Upper East Side"), question
+        assert out["paragraph"].count(note) == 1 and "**Answer.**" in out["paragraph"]
+
+
+def test_a_bare_query_naming_three_places_says_which_one_was_briefed():
+    """"Red Hook vs Hollis vs Coney Island" briefed Red Hook without a word
+    about the other two."""
+    from riprap.core.burr.templated_reconciler import compose_briefing
+
+    state = _state(intent="neighborhood", query="Red Hook vs Hollis vs Coney Island", plan={},
+                   geocode={"address": "Carroll Gardens-Cobble Hill-Gowanus-Red Hook, Brooklyn", "note": None},
+                   sandy_nta={"fraction": 0.3, "narrative": "30.0% of this area lies inside the 2012 Sandy extent."})
+    paragraph, _ = compose_briefing(state)
+    assert ("**Out of scope.** This query names more than one place (Red Hook, Hollis and Coney Island). Riprap reads "
+            "one place at a time, and this briefing is for Carroll Gardens-Cobble Hill-Gowanus-Red Hook, Brooklyn; ask "
+            'about each on its own, or set two side by side with "A vs B".') in paragraph
+    assert "names more than one place" not in compose_briefing({**state, "query": "Red Hook"})[0]

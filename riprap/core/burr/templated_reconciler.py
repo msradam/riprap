@@ -31,9 +31,50 @@ OUTSIDE_COVERAGE = ("This place is outside the cities Riprap covers. Only federa
                     "sensors is included.")
 
 
+def place_line(state) -> str | None:
+    """Which place the briefing describes, in the text itself, with the
+    note that says which tabulation area, borough or approximate district
+    shape was used (`geocode.note`). The page and the JSON carry both
+    beside the text; someone who copies the text alone has only "this
+    area" and "this address"."""
+    g = state.get("geocode") or {}
+    if not g.get("address"):
+        return None
+    return f"Place described: {g['address']}." + (f" {g['note']}" if g.get("note") else "")
+
+
+MORE_PLACES = ("This {asked} names more than one place ({names}). Riprap reads one place at a time, and this {given} is "
+               "for {answered}; ask about each on its own, or set two side by side with \"{how}\".")
+NOT_PLACED = ("This {asked} also names {names}, which Riprap could not match to a place in New York City, so this "
+              "{given} is for {answered} alone.")
+
+
+def with_place_notes(footer: str, text: str, answered: str, heat: bool, bare: bool = False) -> str:
+    """The Out of scope footer with what a question or a bare query that
+    names several places is told: which place was answered, and which
+    were not read or not matched. ("Red Hook vs Hollis vs Coney Island"
+    once briefed Red Hook without a word about the other two.)"""
+    from riprap.core.burr import heat_answer
+
+    def listed(items: list[str]) -> str:
+        return items[0] if len(items) == 1 else f"{', '.join(items[:-1])} and {items[-1]}"
+
+    words = {"asked": "query" if bare else "question", "given": "briefing" if bare else "answer",
+             "answered": answered or "the place named at the top"}
+    if others := heat_answer.places_named(text):
+        note = MORE_PLACES.format(names=listed(others), how="heat A vs B" if heat else "A vs B", **words)
+        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {note} ", 1)
+    if unknown := heat_answer.not_placed(text):
+        # "Is East Harlem hotter than Phoenix?" once dropped Phoenix without a word.
+        note = NOT_PLACED.format(names=listed(unknown), **words)
+        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {note} ", 1)
+    return footer
+
+
 def _scope_header(state=None) -> str:
-    """The scope declaration every briefing opens with, and for a place
-    outside every deployment, what was not read."""
+    """The scope declaration every briefing opens with, for a place
+    outside every deployment what was not read, and then the place the
+    briefing describes (place_line)."""
     # The second and third sentences travel with every briefing, in the JSON and MCP output as on the page:
     # a briefing about a block is not a judgement on the people who live there.
     head = ("This is an automated hazard-exposure briefing produced by Riprap from "
@@ -41,7 +82,10 @@ def _scope_header(state=None) -> str:
             "substitute for a professional risk assessment. These are public records about a place, not an "
             "assessment of any property or of the people who live there. Riprap computes no score or rating, "
             "and records can be missing where people report less.")
-    return f"{head} {OUTSIDE_COVERAGE}" if state is not None and state.get("deployment") == "__none__" else head
+    if state is None:
+        return head
+    head = f"{head} {OUTSIDE_COVERAGE}" if state.get("deployment") == "__none__" else head
+    return f"{head}\n\n{place}" if (place := place_line(state)) else head
 
 
 SCOPE_REFUSAL = (
@@ -442,7 +486,11 @@ def compose_briefing(state) -> tuple[str, dict[str, dict]]:
         return nothing_built(state), {}
     if failed := _not_checked(state):
         sections.append(failed)
-    sections.append(HEAT_NON_SCOPE_FOOTER if hazard_of(state.get("plan")) == "heat" else NON_SCOPE_FOOTER)
+    heat = hazard_of(state.get("plan")) == "heat"
+    # A bare query (or a question nothing answered) that names several places says which one this is.
+    sections.append(with_place_notes(HEAT_NON_SCOPE_FOOTER if heat else NON_SCOPE_FOOTER,
+                                     question or state.get("query") or "",
+                                     (state.get("geocode") or {}).get("address") or "", heat, bare=not question))
     return "\n\n".join(sections), evidence.citations(items)
 
 
