@@ -1,9 +1,10 @@
 import { error } from '@sveltejs/kit';
 import { galleryIndex, liveQuery, loadGalleryEntry } from '$lib/client/gallery';
-import { CHIPS, PROOF, SPECIMEN_SLUG } from '$lib/landing';
+import { CHIPS, PROOF, SPECIMEN_SLUG, specimenAnswer } from '$lib/landing';
 
 // Read at build time: the landing ships the gallery count, the specimen's
-// question and the quoted entries' index fields, not the snapshots.
+// question and answer text and the quoted entries' index fields, not the
+// snapshots.
 export async function load() {
   const bySlug = (slug: string) => {
     const s = galleryIndex.find((e) => e.slug === slug);
@@ -11,10 +12,13 @@ export async function load() {
     return s;
   };
 
-  // The hero types the specimen's question, so the entry must have one.
+  // The hero types the specimen's question and sets its answer as text,
+  // so the entry must have both.
   const entry = await loadGalleryEntry(SPECIMEN_SLUG);
   if (!entry?.question) error(500, `Gallery entry "${SPECIMEN_SLUG}" is not a question`);
-  const specimen = { slug: SPECIMEN_SLUG, question: entry.question };
+  const answer = specimenAnswer(entry.final.paragraph);
+  if (!answer.paras.length) error(500, `Gallery entry "${SPECIMEN_SLUG}" has no Answer section`);
+  const specimen = { slug: SPECIMEN_SLUG, question: entry.question, ...answer, date: entry.generated_at.slice(0, 10) };
 
   const chips = CHIPS.map((c) => {
     const s = bySlug(c.slug);

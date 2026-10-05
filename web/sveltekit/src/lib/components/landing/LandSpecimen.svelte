@@ -1,15 +1,22 @@
 <script lang="ts">
   import { MediaQuery } from 'svelte/reactivity';
-  import { asset, resolve } from '$app/paths';
+  import { resolve } from '$app/paths';
 
   /** A real gallery briefing beside the headline, as a short loop: the
    *  question is typed into a picture of the search box, the search is
-   *  sent, and the briefing's screenshot fades in and scrolls. The image
-   *  comes from scripts/capture-hero-preview.mjs; the question comes from
-   *  the snapshot at build time. */
+   *  sent, and the briefing's answer fades in and scrolls. The question
+   *  and the answer are the snapshot's own text, read at build time, so a
+   *  gallery rebuild changes them and nothing here can go stale. No map
+   *  and no sensor points are drawn. */
   export interface Specimen {
     slug: string;
     question: string;
+    /** "Yes.", "No." or "Partly." when the answer opens with one. */
+    lead: string | null;
+    /** The answer's sentences, one paragraph per source. */
+    paras: string[];
+    /** The day the snapshot was saved, YYYY-MM-DD. */
+    date: string;
   }
   let { specimen }: { specimen: Specimen } = $props();
 
@@ -30,11 +37,10 @@
   const reduce = 'matchMedia' in globalThis ? new MediaQuery('prefers-reduced-motion: reduce') : undefined;
   let t = $state(0);
   let hovered = $state(false);
-  let focused = $state(false);
   // The loop runs for longer than five seconds beside other content, so it
-  // has a control that stops it (WCAG 2.2.2); hover and focus only hold it.
+  // has a control that stops it (WCAG 2.2.2); hover only holds it.
   let stopped = $state(false);
-  let paused = $derived(stopped || hovered || focused);
+  let paused = $derived(stopped || hovered);
 
   let marks = $derived.by(() => {
     const keys: number[] = [];
@@ -70,16 +76,15 @@
 </script>
 
 <figure class="specimen">
-  <a
+  <!-- Not a link: the answer is text to read. The caption links to the page. -->
+  <div
     class="window"
     class:paused
-    {href}
+    role="group"
+    aria-label="A saved briefing"
     onpointerenter={() => (hovered = true)}
     onpointerleave={() => (hovered = false)}
-    onfocusin={() => (focused = true)}
-    onfocusout={() => (focused = false)}
   >
-    <span class="visually-hidden">{specimen.question}</span>
     <span class="window-bar" aria-hidden="true">{sent ? `riprap / gallery / ${specimen.slug}` : 'riprap'}</span>
     <!-- A picture of the hero's search row: spans only, nothing focusable. -->
     <span class="search" class:still={phase === 'still'} aria-hidden="true">
@@ -92,21 +97,18 @@
       </span>
       <span class="go" class:pressed={phase === 'press'}>Get the briefing</span>
     </span>
-    <span class="window-view">
-      <!-- The size matches CLIP in scripts/capture-hero-preview.mjs (the 1x file). The window spans the frame below 1100px and is about 455px wide above. -->
-      <img
-        class:on={phase === 'show' || phase === 'still'}
-        class:scroll={phase === 'show' || phase === 'out'}
-        src={asset('/landing/hero-briefing.webp')}
-        srcset="{asset('/landing/hero-briefing-712.webp')} 712w, {asset('/landing/hero-briefing.webp')} 1424w"
-        sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1099px) calc(100vw - 64px), 455px"
-        width="712"
-        height="1400"
-        decoding="async"
-        alt="The Riprap briefing for this question: the answer Yes. over its cited sentences on FloodNet sensor events, Hurricane Ida high-water marks and 311 flood complaints, then a map of those points around the address. Captured on 1 October 2026, before those sentences were reworded."
-      />
-    </span>
-  </a>
+    <div class="window-view" class:still={phase === 'still'}>
+      <div class="sheet" class:on={phase === 'show' || phase === 'still'} class:scroll={phase === 'show' || phase === 'out'}>
+        <p class="sheet-q">{specimen.question}</p>
+        {#if specimen.lead}<p class="sheet-lead">{specimen.lead}</p>{/if}
+        {#each specimen.paras as p (p)}<p>{p}</p>{/each}
+        <p class="sheet-note">
+          Saved briefing of <time class="data" datetime={specimen.date}>{specimen.date}</time>. Each sentence has its
+          source and date on the full page.
+        </p>
+      </div>
+    </div>
+  </div>
   <figcaption class="specimen-caption">
     <a class="land-link" {href}>Read the full briefing</a>
     {#if !still}
@@ -122,14 +124,9 @@
     margin: 0;
   }
   .window {
-    display: block;
     border: 1px solid var(--rule-soft);
     background: var(--riprap-white);
     color: var(--ink-secondary);
-    text-decoration: none;
-  }
-  .window:focus-visible {
-    outline-offset: 3px;
   }
   .window-bar {
     display: block;
@@ -239,8 +236,8 @@
     transform: translateY(1px);
   }
 
-  /* A fixed shape, so the image cannot shift the layout as it loads.
-     Size containment lets the scroll end be written as 100cqh. */
+  /* A fixed shape, whatever the length of the answer. Size containment
+     lets the scroll end be written as 100cqh. */
   .window-view {
     display: block;
     aspect-ratio: 4 / 5;
@@ -250,27 +247,56 @@
     container-type: size;
     background: var(--paper);
   }
-  /* Hidden, not removed, so the image loads during the typing. */
-  img {
-    display: block;
-    width: 100%;
+  /* Reduced motion: nothing scrolls, so the window grows to show it all. */
+  .window-view.still {
+    aspect-ratio: auto;
     height: auto;
+    max-height: none;
+    container-type: normal;
+  }
+  /* The answer as the briefing page sets it: the question, the lead word
+     large, then one paragraph per source. */
+  .sheet {
+    padding: 16px;
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.5;
     opacity: 0;
     translate: 0 6px;
     transition:
       opacity 0.4s ease-out,
       translate 0.4s ease-out;
   }
-  img.on {
+  .sheet.on {
     opacity: 1;
     translate: 0 0;
   }
+  .sheet p {
+    margin: 0 0 12px;
+  }
+  .sheet .sheet-q {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .sheet .sheet-lead {
+    margin-bottom: 8px;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .sheet .sheet-note {
+    margin-bottom: 0;
+    font-size: 13px;
+    color: var(--ink-secondary);
+  }
   /* Holds 1.5s at the top, scrolls for 10s, holds 2s at the foot, and
      stays there while it fades out. */
-  img.scroll {
+  .sheet.scroll {
     animation: specimen-scroll 13.5s ease-in-out forwards;
   }
-  .window.paused img {
+  .window.paused .sheet {
     animation-play-state: paused;
   }
   @keyframes specimen-scroll {
@@ -280,11 +306,12 @@
     }
     85.2%,
     100% {
-      transform: translateY(calc(100cqh - 100%));
+      /* An answer shorter than the window stays where it is. */
+      transform: translateY(min(0px, calc(100cqh - 100%)));
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    img,
+    .sheet,
     .go {
       transition: none;
     }

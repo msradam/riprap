@@ -45,6 +45,7 @@
           <blockquote class="proof-quote">
             {#each c.quotes as q (q)}<p>{q}</p>{/each}
           </blockquote>
+          {#if c.note}<p class="proof-note">{c.note}</p>{/if}
           <p class="proof-byline">
             <span>{c.place}</span>
             <time class="data" datetime={c.date}>{c.date}</time>
@@ -102,6 +103,12 @@
     flex-direction: column;
     gap: 8px;
     margin: 0;
+  }
+  .proof-note {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-secondary);
   }
   .proof-byline {
     display: flex;

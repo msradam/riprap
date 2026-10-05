@@ -36,6 +36,9 @@ export interface Proof {
   kind: string;
   quotes: string[];
   figure?: ProofFigure;
+  /** Riprap's own words about the entry, set under the quotes and outside
+   *  the quotation: what the place is, when the figure could mislead. */
+  note?: string;
 }
 
 /** The proof cards, the district card first. The heat quotes are
@@ -58,16 +61,30 @@ export const PROOF: Proof[] = [
   },
   {
     slug: 'bk06-nycha',
-    kind: 'Public housing, by name',
-    quotes: ['Inside the 2012 Sandy extent: RED HOOK EAST, RED HOOK WEST']
+    kind: 'Public housing in a district',
+    figure: {
+      text: '2',
+      label: 'BK06 public housing developments inside the 2012 Sandy inundation extent',
+      from: '2 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)'
+    },
+    quotes: [
+      '2 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)',
+      'Inside the 2012 Sandy extent: RED HOOK EAST, RED HOOK WEST'
+    ]
   },
   {
     slug: 'hunts-point-311',
-    kind: 'A yes or no, from the record',
-    figure: { text: 'No.', from: 'No. 0 NYC 311 flood-related complaints' },
+    kind: 'A No about reports, not about flooding',
+    figure: {
+      text: 'No.',
+      label: 'No complaint was filed. That is not a finding that the place stays dry.',
+      from: 'No. 0 NYC 311 flood-related complaints'
+    },
     quotes: [
-      '0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched).'
-    ]
+      '0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched).',
+      'A count of complaints is a count of reports filed, not of floods: a low count can mean under-reporting and not the absence of flooding, because the propensity to file a 311 request varies with income, language and demographics'
+    ],
+    note: 'The address is in the Hunts Point wholesale food markets, not on a residential block.'
   },
   {
     slug: 'gowanus-2050',
@@ -83,16 +100,17 @@ export const PROOF: Proof[] = [
   },
   {
     slug: 'hunts-point-heat',
-    kind: 'Heat at an address',
+    kind: 'Heat at a wholesale market address',
     figure: {
       text: '12.4°F',
-      label: "warmer than the city's land average: the surface of the ground, not the air",
+      label: "warmer than the city's land average within 150 m of 355 Food Center Drive: the surface of the ground, not the air",
       from: "The surface of the ground within 150 m of this address ran 12.4°F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature)."
     },
     quotes: [
       "The surface of the ground within 150 m of this address ran 12.4°F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature).",
       "Its neighbourhood, Hunts Point, scores 5 out of 5 on the Health Department's Heat Vulnerability Index, a rank among neighbourhoods and not a measurement."
-    ]
+    ],
+    note: 'The address is in the Hunts Point wholesale food markets, where most of the ground is paved or roofed. The figure is for that ground, not for the neighbourhood where people live.'
   },
   {
     slug: 'hollis-heat-week',
@@ -106,3 +124,25 @@ export const PROOF: Proof[] = [
 
 /** The gallery entry the hero sets as its specimen answer. */
 export const SPECIMEN_SLUG = 'hollis-since-ida';
+
+/** A briefing's Answer section as the hero shows it: `lead` is a yes, no
+ *  or partly that opens it (or null), and `paras` holds the sentences with
+ *  their `[doc_id]` markers removed, one paragraph per run of sentences
+ *  from one source. Words after the last marker are kept. */
+export function specimenAnswer(paragraph: string): { lead: string | null; paras: string[] } {
+  const answer = /\*\*Answer\.\*\*\s*([^]*?)(?:\n\n|$)/.exec(paragraph)?.[1] ?? '';
+  const lead = /^(Yes|No|Partly)\.\s+/.exec(answer);
+  const bits = answer.slice(lead?.[0].length ?? 0).split(/ \[([a-z][a-z0-9_, ]*)\]\./);
+  const paras: string[] = [];
+  let last: string | undefined;
+  for (let i = 0; i < bits.length; i += 2) {
+    const text = bits[i].trim();
+    if (!text) continue;
+    const id = bits[i + 1];
+    const sentence = id ? `${text}.` : text;
+    if (paras.length && (id ?? last) === last) paras[paras.length - 1] += ` ${sentence}`;
+    else paras.push(sentence);
+    last = id ?? last;
+  }
+  return { lead: lead?.[1] ? `${lead[1]}.` : null, paras };
+}

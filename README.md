@@ -19,12 +19,6 @@ source and date.
 [![CI](https://github.com/msradam/riprap/actions/workflows/check.yml/badge.svg)](https://github.com/msradam/riprap/actions/workflows/check.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
 
-![Riprap answering "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?" with a cited "Yes."](assets/screenshots/hero.png)
-
-(Screenshot taken 1 October 2026. The sentences under the "Yes." have been
-reworded since and now count only the events FloodNet marks as verified; the
-current text is quoted below.)
-
 **[Browse the briefings](https://msradam.github.io/riprap/)** ·
 **[Run it on your laptop](#quickstart)** ·
 **[Build with us](#get-involved)**
@@ -290,10 +284,9 @@ community districts and 10 questions; for heat 3 places and 7 questions),
 with no model. FloodNet's per-sensor and per-event records are taken out of
 each saved file, since its licence forbids reposting them. To see them in the app, rebuild the frontend (needs
 Node and [pnpm](https://pnpm.io)): `cd web/sveltekit && pnpm install && pnpm
-build`. The landing's scrolling preview is a screenshot of the Hollis "since
-Ida" entry: after rebuilding that entry, retake it with the app running
-(`cd web/sveltekit && node scripts/capture-hero-preview.mjs
-http://127.0.0.1:7860`), then build again. Docker and the Modal host are in
+build`. The landing's scrolling preview is the text of the Hollis "since Ida"
+entry, read from its saved file at build time, so it follows a rebuild with
+no screenshot to retake. Docker and the Modal host are in
 [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## How it works

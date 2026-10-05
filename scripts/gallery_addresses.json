@@ -133,15 +133,15 @@
   "slug": "hunts-point-311",
   "neighborhood": "Hunts Point, Bronx",
   "address": "355 Food Center Drive, Bronx, NY",
-  "question": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 since 2022?",
-  "reason": "An honest No: the 311 service answered and reported no flood complaints within 200 m since 2022."
+  "question": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 in the last five years?",
+  "reason": "A No about reports, not about flooding: the 311 service answered with no flood complaint within 200 m in the last 5 years. The address is in the Hunts Point wholesale food markets, not on a residential block, and a low count can mean under-reporting."
  },
  {
   "slug": "brooklyn-heights-sensors",
   "neighborhood": "Brooklyn Heights, Brooklyn",
   "address": "189 Atlantic Avenue, Brooklyn, NY",
   "question": "Have the FloodNet sensors near 189 Atlantic Avenue, Brooklyn recorded flooding?",
-  "reason": "Honest silence: no FloodNet sensor is deployed within 600 m, so the sources cannot answer."
+  "reason": "An empty record, said plainly: no FloodNet sensor is deployed within 600 m, so the sources cannot answer."
  },
  {
   "slug": "red-hook-buy",
@@ -177,7 +177,7 @@
   "neighborhood": "Hunts Point, Bronx",
   "address": "355 Food Center Drive, Bronx, NY",
   "hazard": "heat",
-  "reason": "A heat briefing for an address: the surface around the food market ran warmer than the city's average in every clear summer Landsat image, with the neighbourhood's vulnerability index, tree canopy and the station record beside it.",
+  "reason": "A heat briefing for an address: the surface around an address in the Hunts Point wholesale food markets (not a residential block) ran warmer than the city's average in every clear summer Landsat image, with the neighbourhood's vulnerability index, tree canopy and the station record beside it.",
   "feature_doc": "heat_surface"
  },
  {

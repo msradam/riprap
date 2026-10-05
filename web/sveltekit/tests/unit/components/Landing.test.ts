@@ -36,8 +36,8 @@ describe('Landing smoke', () => {
     ]);
   });
 
-  it('LandHero has one h1, and sets the specimen as a figure after the form: one link to the briefing, its question as text', () => {
-    const { container, getByRole } = render(LandHero, heroProps);
+  it('LandHero has one h1, and sets the specimen as a figure after the form: the saved answer as text, with no image', () => {
+    const { container } = render(LandHero, heroProps);
     expect([...container.querySelectorAll('h1')].map((h) => h.textContent)).toEqual([
       'The flood and heat record for any New York City block, cited line by line.'
     ]);
@@ -46,26 +46,23 @@ describe('Landing smoke', () => {
     expect(form.compareDocumentPosition(figure) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     // The question is text, not a heading.
     expect(figure.querySelector('h1, h2, h3')).toBeNull();
-    // The window is one link to the briefing; its image has a fixed size and no fetch priority,
-    // so on phones, where it sits below the actions, it does not jump ahead of the fonts.
-    const win = figure.querySelector('a.window')!;
-    expect(win.getAttribute('href')).toBe('/gallery/hollis-since-ida/');
-    const img = win.querySelector('img')!;
-    expect(img.getAttribute('src')).toBe('/landing/hero-briefing.webp');
-    expect(img.getAttribute('srcset')).toBe('/landing/hero-briefing-712.webp 712w, /landing/hero-briefing.webp 1424w');
-    expect(img.getAttribute('alt')).toMatch(/^The Riprap briefing for this question: the answer Yes\./);
-    expect([img.getAttribute('width'), img.getAttribute('height')]).toEqual(['712', '1400']);
-    expect(img.hasAttribute('fetchpriority')).toBe(false);
-    expect(img.getAttribute('decoding')).toBe('async');
+    // The window is the snapshot's own answer as text: no screenshot that can go stale, and
+    // no map of sensor or complaint points.
+    const win = figure.querySelector('.window')!;
+    expect(win.tagName).toBe('DIV');
+    expect(figure.querySelector('img, canvas, svg')).toBeNull();
+    const sheet = [...win.querySelectorAll('.sheet p')].map((p) => text(p).trim());
+    expect(sheet[0]).toBe(data.specimen.question);
+    expect(sheet.slice(-1)[0]).toMatch(new RegExp(`^Saved briefing of ${data.specimen.date}\\.`));
+    for (const p of data.specimen.paras) expect(sheet).toContain(p);
+    if (data.specimen.lead) expect(sheet[1]).toBe(data.specimen.lead);
     // The first frame, as prerendered: the bar reads riprap and the box is empty.
     expect(text(win.querySelector('.window-bar')!)).toBe('riprap');
-    // The typed question is a picture; the link's name carries the question and the image alt.
+    // The typed question is a picture, hidden from assistive technology; the sheet holds it as text.
     const search = win.querySelector('.search')!;
     expect(search).toHaveAttribute('aria-hidden', 'true');
     expect(text(search.querySelector('.typed')!)).toBe('');
-    expect(search.querySelector('a, button, input, [tabindex]')).toBeNull();
-    const link = getByRole('link', { name: new RegExp(`^${data.specimen.question.replace(/[?.]/g, '\\$&')} The Riprap briefing for this question`) });
-    expect(link).toBe(win);
+    expect(win.querySelector('a, button, input, [tabindex]')).toBeNull();
     // The caption is the link and the control that stops the loop (WCAG 2.2.2).
     const caption = figure.querySelector('figcaption')!;
     expect([...caption.children].map((c) => [c.tagName, c.classList.contains('land-link'), c.getAttribute('href'), c.textContent?.trim()])).toEqual([
@@ -79,9 +76,9 @@ describe('Landing smoke', () => {
     const pause = getByRole('button', { name: 'Pause the preview' });
     await fireEvent.click(pause);
     expect(pause.textContent?.trim()).toBe('Play the preview');
-    expect(document.querySelector('a.window')?.classList).toContain('paused');
+    expect(document.querySelector('.window')?.classList).toContain('paused');
     await fireEvent.click(pause);
-    expect(document.querySelector('a.window')?.classList).not.toContain('paused');
+    expect(document.querySelector('.window')?.classList).not.toContain('paused');
   });
 
   it('LandHero states who reads the question and where every sentence comes from', () => {
@@ -116,7 +113,16 @@ describe('Landing smoke', () => {
     expect(text(heads[1])).toBe(
       'Which NYCHA developments in Brooklyn Community District 6 lie inside the 2012 Sandy inundation area?'
     );
-    expect(text(cards[1])).toContain('Inside the 2012 Sandy extent: RED HOOK EAST, RED HOOK WEST');
+    // A card leads with its count and extent; the names of facilities come below it.
+    const figure1 = cards[1].querySelector('.proof-figure')!;
+    expect(text(figure1)).toMatch(/^ ?2 ?BK06 public housing developments inside the 2012 Sandy inundation extent/);
+    const names = [...cards[1].querySelectorAll('.proof-quote p')].find((p) => text(p).includes('RED HOOK EAST'))!;
+    expect(figure1.compareDocumentPosition(names) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // The No is about reports: the card carries the under-reporting caveat and says what the address is.
+    expect(text(cards[2].querySelector('.land-kind')!)).toBe('A No about reports, not about flooding');
+    expect(text(cards[2])).toContain('a low count can mean under-reporting and not the absence of flooding');
+    expect(text(cards[2].querySelector('.proof-note')!)).toContain('wholesale food markets');
+    expect(text(cards[5].querySelector('.proof-note')!)).toContain('not for the neighbourhood where people live');
     for (const c of cards) expect(c.querySelector('time')?.getAttribute('datetime')).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(text(container)).toContain(`See all ${data.count} briefings in the gallery`);
     // Who it is for: one sentence, no second link to a proof briefing.

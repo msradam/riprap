@@ -4,7 +4,7 @@
  * src/lib/landing.ts is updated from the new snapshot instead of going stale.
  */
 import { describe, it, expect } from 'vitest';
-import { CHIPS, PROOF, SPECIMEN_SLUG } from '$lib/landing';
+import { CHIPS, PROOF, SPECIMEN_SLUG, specimenAnswer } from '$lib/landing';
 import { galleryIndex, liveQuery, loadGalleryEntry } from '$lib/client/gallery';
 import { load } from '../../src/routes/+page.server';
 
@@ -87,13 +87,31 @@ describe('landing load', () => {
     expect(data.count).toBe(galleryIndex.length);
   });
 
-  it("sets the specimen from the snapshot: the entry's own question, whose briefing answers Yes as the image alt says", async () => {
+  it("sets the specimen from the snapshot: the entry's own question and every sentence of its answer, word for word", async () => {
     const { specimen } = await load();
     const entry = await loadGalleryEntry(SPECIMEN_SLUG);
     expect(specimen.slug).toBe(SPECIMEN_SLUG);
     expect(specimen.question).toBe(entry!.question);
     expect(specimen.question).toBe('Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?');
-    // The briefing's answer opens with the lead word, then its key sentence.
-    expect(await plainBriefing(SPECIMEN_SLUG)).toMatch(/\*\*Answer\.\*\* Yes\. \d+ FloodNet (community )?sensors? /);
+    expect(specimen.date).toBe(entry!.generated_at.slice(0, 10));
+    const snapshot = await plainBriefing(SPECIMEN_SLUG);
+    expect(specimen.paras.length).toBeGreaterThan(0);
+    for (const p of specimen.paras) expect(snapshot, 'specimen text missing from the snapshot').toContain(p);
+    // Nothing of the answer is left out: lead and paragraphs together are the Answer section.
+    const answer = snapshot.split('**Answer.** ')[1].split(' **Out of scope.**')[0];
+    expect([specimen.lead, ...specimen.paras].filter(Boolean).join(' ')).toBe(answer);
+  });
+});
+
+describe('specimenAnswer', () => {
+  it('takes the lead word off, groups sentences by source and keeps words after the last marker', () => {
+    const text = 'Scope.\n\n**Answer.**\nYes. A [a]. B [a]. C [b]. D [a, c]. Tail words.\n\n**Out of scope.** X [a].';
+    expect(specimenAnswer(text)).toEqual({ lead: 'Yes.', paras: ['A. B.', 'C.', 'D. Tail words.'] });
+  });
+  it('has no lead when the answer opens with a sentence, and nothing without an Answer section', () => {
+    expect(specimenAnswer('**Answer.**\nFlooding was recorded near this address [a].')).toEqual({
+      lead: null, paras: ['Flooding was recorded near this address.']
+    });
+    expect(specimenAnswer('**In brief.**\nA [a].')).toEqual({ lead: null, paras: [] });
   });
 });
