@@ -317,9 +317,7 @@ npx @modelcontextprotocol/inspector --cli uv run riprap-mcp \
 community districts and 10 questions; for heat 3 places and 7 questions),
 with no model. FloodNet's per-sensor and per-event records are served by
 nothing (the page, the JSON, MCP) and saved in no file, since its licence
-forbids reposting them. To see them in the app, rebuild the frontend (needs
-Node and [pnpm](https://pnpm.io)): `cd web/sveltekit && pnpm install && pnpm
-build`. The landing's scrolling preview is the text of the Hollis "since Ida"
+forbids reposting them. The landing's scrolling preview is the text of the Hollis "since Ida"
 entry, read from its saved file at build time, so it follows a rebuild with
 no screenshot to retake. Docker and the Modal host are in
 [docs/DEPLOY.md](docs/DEPLOY.md).

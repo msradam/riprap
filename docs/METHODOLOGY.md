@@ -374,9 +374,10 @@ The briefing says 88. Someone who counts five calendar years, or who does
 not apply the duplicate rule, gets 89 or 90 from the same data.
 
 A FloodNet count is rerun against FloodNet's Data API, by distance from
-the point, and not against the Open Data table `aq7i-eu5q`: the API names a
-sensor by `deployment_id` and the portal table by `sensor_id` and
-`sensor_name`, and Riprap knows of no published key that joins the two.
+the point, and not against the Open Data table `aq7i-eu5q`: the API's sensor
+`name` is the portal table's `sensor_name` for most sensors (290 of the
+table's 315 names on 5 October 2026), so a recount needs the sensor names,
+from FloodNet's dashboard or API, and the portal table, and Riprap repeats neither.
 The portal table is also updated every two weeks, so it can hold fewer
 verified events than the API on a given day.
 

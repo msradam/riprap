@@ -33,11 +33,11 @@ Three rules hold for every source block:
 | `query` | string | The text that was asked, unchanged |
 | `intent` | string | How the query was read: `single_address`, `neighborhood` (a neighbourhood, community district or borough), or one of the question and refusal intents |
 | `plan` | object | The reading of the query: `intent`, `targets` (each a `type` and `text`), `place` (`kind`, `text`, `certain`, `message`), `question` when there is one, `focus` (for heat: `hazard`, `time_frame`, `assets`), and `rationale` (a fixed phrase when rules planned the query; a model's note of at most 300 characters when a model did) |
-| `geocode` | object | The place the briefing describes: `address` (the matched name), `borough`, `lat`, `lon` (WGS84 degrees), `match` (`exact` or an approximate match) and `note`, which says which tabulation area a neighbourhood name was answered for, or that a district's shape is an approximation. From NYC Planning Labs' GeoSearch, then Nominatim |
+| `geocode` | object | The place the briefing describes: `address` (the matched name), `borough`, `lat`, `lon` (WGS84 degrees), `match` (`exact` or an approximate match) and `note`, which says which tabulation area a neighbourhood name was answered for, or that a district's shape is an approximation, that a name with no house number was matched to one building or point, or that a named spot could not be located (then `unplaced` holds its name and the briefing is for the wider area). From NYC Planning Labs' GeoSearch, then Nominatim |
 | `lat`, `lon` | number | The same point, WGS84 degrees. For an area, a point inside it |
 | `nta` | object or null | For an area: `nta_code`, `nta_name`, `borough`, `bbox` (west, south, east, north, WGS84 degrees) and `n_matches`, from the 2020 Neighborhood Tabulation Areas (NYC Open Data `9nt8-h7nd`). Null for an address |
 | `deployment` | string | Which city's sources ran: `nyc`, `chicago`, `seattle`, `albany` or `federal` |
-| `paragraph` | string | The whole briefing as text, in Markdown: the scope statement, "Place described: ...", the answer or "In brief", the sections, "Out of scope" and "Not checked". This is the text to print or quote |
+| `paragraph` | string | The whole briefing as text, in Markdown: the scope statement, "Place described: ...", the answer or "In brief", the sections, "Where to turn" (help pointers, when a question calls for them), "Out of scope" and "Not checked". This is the text to print or quote |
 | `answer_path` | string | Which path ran: `rules` or `llm`. With no model configured it is always `rules`, also when the question was not answered |
 | `answered` | boolean or null | On a question: `false` when the records cannot answer it. The text then opens with what Riprap does not hold and gives the evidence for the place. Null on a bare place and on a comparison |
 | `targets` | list | On a comparison only (`intent` is `compare`): one item per place with `label` ("PLACE A", "PLACE B"), `address` (the name as asked) and `state`, that place's own result with the fields of this table. The top-level source blocks are the first place's |
@@ -60,8 +60,8 @@ Three rules hold for every source block:
 | `tier` | `no_llm` when no model wrote or chose anything |
 | `model` | The model's name, or null |
 | `answer_mode` | `rules` or `extractive` (a model chose among existing sentences) |
-| `answer_lead` | The kind of opening: `yes`, `no`, `partly`, `count`, `facts`, `near` (a record was found, farther than 100 m from the address; the lead gives the distance), `day` (a question about a named past day, read from the records dated that day), `cannot_answer`, `not_held`, `not_english`, `not_recognised`, or the kind of a fixed phrase: `no_prediction`, `no_prediction_register` (which places will flood, before an asset list), `no_advice`, `no_score`, `no_ranking`, `needs_address`, `no_satellite`, `no_change_record`, `experimental`, and for heat `heat_forecast`, `no_prediction_heat`, `no_prediction_far`, `no_advice_heat` (whether a home is safe in the heat), `no_air_temp` (no air temperature at an address), `no_deaths`, `cooling_centers`, `surface_yes`, `surface_no` |
-| `not_held` | With the `not_held` lead: the topic the question asked for that Riprap does not hold, one of `people`, `income`, `basements`, `law`, `benefits`, `advice`, `score`, `ranking`, `trend`, `rain_on_a_day`, `other_311`. With the `not_english` lead it is `language` |
+| `answer_lead` | The kind of opening: `yes`, `no`, `partly`, `count`, `facts`, `near` (a record was found, farther than 100 m from the address; the lead gives the distance), `day` (a question about a named past day, read from the records dated that day in New York time), `period` (a question about a named year, season or month, read only from the records dated in it; the sentence carries its own yes or no, and a no is worded for the sensors' record only), `cannot_answer`, `not_held`, `not_english`, `not_recognised`, or the kind of a fixed phrase: `no_prediction`, `no_prediction_register` (which places will flood, before an asset list), `no_advice`, `no_score`, `no_ranking`, `needs_address`, `no_satellite`, `no_change_record`, `no_depth` (how deep the water will get; unanswered), `area_zone` and `no_area_zone` (a flood zone asked of an area; the second is unanswered), `experimental`, and for heat `heat_forecast`, `no_prediction_heat`, `no_prediction_far`, `no_advice_heat` (whether a home is safe in the heat), `no_rating_heat` (whether an area is dangerous in the heat), `no_air_temp` (no air temperature at an address), `no_deaths`, `cooling_centers`, `surface_yes`, `surface_no` |
+| `not_held` | With the `not_held` lead: the topic the question asked for that Riprap does not hold, one of `houses`, `people`, `environmental_justice`, `sensor_identity`, `citywide_record`, `sewer_311`, `income`, `basements`, `law`, `benefits`, `advice`, `score`, `ranking`, `trend`, `rain_on_a_day`, `other_311`. With the `not_english` lead it is `language` |
 | `answered` | Whether the question was answered. `false` means the briefing gives the evidence for the place and says it does not answer the question |
 | `lead_fact` | The source and figure the opening rests on |
 | `claims` | Each sentence kept: `section`, `text`, `doc_ids`, `numbers` |
@@ -79,8 +79,9 @@ For a bare place, which asks nothing, `grounding` holds only `tier`,
 `date_modified` (the date of the data, from the publisher where it gives
 one), `retrieved_at` (when Riprap read it), `vintage` (the date shown beside
 the sentence) and `maturity` (`production` or `experimental`). The 311
-record for an address or a community district adds `query_url`, the exact
-Socrata request the count came from. The FloodNet
+record for an address or a community district adds `query_url`, the
+Socrata request the count can be redone from: the same filter, with no house
+number and no coordinates among its columns. The FloodNet
 record adds `license_url`, `attribution`, `references` and `license_notice`:
 FloodNet content is CC BY-NC-SA 4.0 and is not under Riprap's Apache-2.0
 licence.
@@ -143,7 +144,7 @@ A heat briefing for an area has the same blocks with `_nta` on the name:
 | Block | Source and dataset | Fields |
 |---|---|---|
 | `heat_surface` | Landsat 8 and 9 Collection 2 Level 2 surface temperature (USGS) | `mean_diff_f`, `min_diff_f`, `max_diff_f` (degrees Fahrenheit warmer than the city's land average; surface, not air), `n_images`, `first`, `last`, `latest_surface_f`, `latest_city_mean_f`, `warmer_in_every_image`, `cooler_in_every_image`, `by_image`, `radius_m` (150) |
-| `hvi` | Heat Vulnerability Index 2023, NYC Health Department, Environment and Health Data Portal | `hvi` (1 to 5, a rank among neighbourhoods), `area`, `area_code`, `year`, `ac_pct` (households with air conditioning, a survey estimate), `green_pct`, `median_income` (dollars); for a district, `neighbourhoods` |
+| `hvi` | Heat Vulnerability Index 2023, NYC Health Department, Environment and Health Data Portal | `hvi` (1 to 5, a rank among neighbourhoods), `area`, `area_code`, `year`, `ac_pct` (households with air conditioning, a survey estimate), `green_pct`; for a district, `neighbourhoods` |
 | `heat_visits` | Heat stress emergency department visits 2018 to 2022, NYC Health Department from New York State SPARCS | `district`, `period`, `n` (a five-year total), `age_adjusted_rate` and `citywide_age_adjusted_rate` (average annual, per 100,000 residents), `suppressed` (true when the department withholds a small count) |
 | `heat_station` | NOAA Regional Climate Centers, ACIS daily records | `station`, `station_id`, `distance_km`, `year`, `through`, `days_ge_90` and `days_ge_90_last_year` (days at or above 90°F), `normal_days_ge_90` (1991 to 2020 average), `max_f`, `max_date`, `record_f`, `record_date`, `record_since`, `by_year`, `max_by_year` |
 | `heat_obs` | National Weather Service, latest observation | `station`, `station_id`, `distance_km`, `observed`, `temp_f`, `heat_index_f`, `humidity_pct` |

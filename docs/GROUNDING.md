@@ -228,11 +228,21 @@ FloodNet query with no sensor in range, or no Ida mark nearby, cannot say the
 place stayed dry. The source the rule relies on is added to the facts when
 the model left it out, so the lead is always cited.
 
+A yes or no about a named year, season or month ("in 2024", "the summer of
+2025", "last year") rests only on the records dated in it
+(`answer_checks.period_lead`): FloodNet's events by their New York date, 311
+by its calendar years, Ida's marks only when the period holds 1 September
+2021. A period before the sensors' record gets the date the record starts and
+no yes or no; a period inside it with no event gets a "No" worded for the
+sensors' record, never for the place.
+
 A question the records cannot answer is not given the neutral lead. When
-it asks for something Riprap does not hold (figures about people or
-households, income, basements, law, aid and benefits, advice to an agency or
-a resident, a flood score, a ranking of places, a trend, rainfall on a past
-day, another 311 topic; the table is `rule_answer.NOT_HELD`, and the topic
+it asks for something Riprap does not hold (which house complained, figures
+about people or households, an environmental justice designation, the name
+or place of a FloodNet sensor, a citywide or all-time record, a total of
+sewer complaints, income, basements, law, aid and benefits, advice to an
+agency or a resident, a flood score, a ranking of places, a trend, rainfall
+on a past day, another 311 topic; the table is `rule_answer.NOT_HELD`, and the topic
 is returned as `grounding.not_held`), the
 answer's first sentence says what is not held, the lead is `not_held` and
 `answered` is `false`, in `grounding` and at the top of the result. A
