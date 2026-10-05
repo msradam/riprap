@@ -1,93 +1,71 @@
 # Background
 
-Why Riprap exists, who it is for, and how the Five Stones generalise beyond NYC. Moved from the README in refactor 7.
+Why Riprap exists, who it is for, and how the Five Stones generalise beyond NYC.
 
 ## The problem Riprap solves
 
-Cities publish the hazard-exposure inputs an engineer needs. NYC alone has
-decades of it: Sandy 2012 inundation, NYC DEP stormwater scenarios,
-FloodNet sensors, NOAA tide gauges, USGS 3DEP LiDAR, 311 complaints, MTA,
-NYCHA, schools, hospitals. Other cities publish their own equivalents. The
-data is public. None of it composes itself.
+The flood and heat records for a New York City block are public, and they
+sit in separate places: FEMA's flood maps, the city's stormwater scenarios,
+the Sandy inundation extent, Ida high-water marks, 311 requests, street
+sensors, the Health Department's heat index, satellite surface temperature.
+Each has its own portal, its own vocabulary and its own traps.
 
-Every engineer doing a drainage review, every resilience office siting a
-capital project, every climate-adaptation team prioritising blocks
-reassembles the same evidence by hand, per address, from a dozen agencies. A
-briefing that should be a tool call ends up as a half-day of manual joins.
-Existing tools either return opaque vendor risk scores or skip the audit
-trail a stamped engineering memo actually requires.
+A reporter on deadline, a community board member preparing for a meeting,
+a council staffer answering a constituent, or a student starting a project
+has to open each of them, learn what each field means, and write down
+where every number came from. That is half a day for one address, and the
+citation trail is the first thing to go.
 
-The flood records for a New York City block are public, and they sit in
-separate places: FEMA's flood maps, the city's stormwater scenarios, the
-Sandy inundation extent, Ida high-water marks, 311 requests, street sensors.
-Riprap reads them for one address or one community district and quotes each
-with its source and date, so a sentence can go into a story or a board memo
-with its citation.
-
-Riprap composes it. Type an address in any deployed city and get a
-citation-grounded briefing with one section per Stone that has evidence,
-every claim pointing back to a `[doc_id]` in public-record data.
-
+Riprap reads the records for one address or one community district and
+quotes each with its source and date, so a sentence can go into a story, a
+board resolution or a memo with its citation. It adds nothing of its own:
+no score, no model of flooding, no advice.
 
 ## What this is. What this isn't.
 
-Riprap is a **reference dossier generator** for analysts who already
-work with public-record climate data. It is **not** a stamped
-engineering memo, a risk score, a real-estate disclosure, or a
-substitute for a licensed professional.
+Riprap is a reference tool for people who need source-linked numbers
+about a place. It is not a risk score, a real-estate disclosure, an
+engineering study or a substitute for a professional.
 
-**Use Riprap if you are:**
+**Riprap is for:**
 
-- A climate-adaptation or resilience consultant who currently opens
-  six tabs (NFHL, NOAA SLR, NPCC4 PDF, 311 portal, FloodNet, NWS),
-  screenshots them into a Word memo, and cites manually. Riprap
-  collapses that into one URL with a citation trail you can hand to
-  a client.
-- A Phase I ESA preparer adding a **Business Environmental Risk
-  addendum** under ASTM E1527-21. The disclosure checks look for the
-  caveat phrases that scope expects.
-- An investigative journalist or civic researcher who needs
-  *defensible*, primary-source-linked numbers about flood-zone
-  exposure, asset proximity, or 311 patterns.
-- A resilience-office analyst (NYC MOCEJ, Chicago CDOT, etc.) who
-  needs to turn agency data into something a deputy commissioner
-  reads in five minutes.
+- A data journalist or civic researcher who needs primary-source numbers
+  about flooding, heat, and the schools, subway entrances and public
+  housing inside a mapped flood extent, each with a citation that can be
+  checked.
+- Community board members and staff, and council offices, who want a
+  district's record on one printable page for a meeting or a budget
+  request.
+- A resilience or climate analyst, in an agency or outside one, who would
+  otherwise open six tabs and cite by hand.
+- A civic technologist or researcher who wants the same evidence as JSON
+  or over MCP, and the code that produced it.
 
-**Don't use Riprap for:**
+Residents can read a briefing, and the page is written to be read without
+training. But no resident or community group has yet shaped or tested it,
+it is in English only, and it holds nothing a neighbour would know that
+the records miss.
 
-- **Drainage / hydraulic design.** Use HEC-RAS, SWMM, or a licensed
-  civil engineer's full hydraulic model. Riprap is triage, not design.
-- **Resident-facing flood guidance.** For NYC, defer to
+**Do not use Riprap for:**
+
+- **A decision about your home or your safety.** For New York City, use
   [FloodHelpNY](https://www.floodhelpny.org) (Center for NYC
-  Neighborhoods, HUD CDBG-DR funded) and
-  [FloodNet NYC](https://www.floodnet.nyc) for sensor data.
-- **Mortgage / insurance underwriting.** Closed-model risk scores
-  have regulatory acceptance Riprap doesn't claim and doesn't seek.
-- **Personal property decisions or real-estate transactions.** The
-  briefing format is engineering-shaped, not consumer-shaped. Using a
-  Riprap citation as evidence in a transaction is outside the design
-  scope of this tool and outside the support scope of its
-  contributors.
+  Neighborhoods) for flood zones, insurance and what to do at home, and
+  [FloodNet](https://www.floodnet.nyc) for what its sensors read.
+- **Buying, selling, lending or insuring.** A briefing describes public
+  records about a place. It is not an assessment of a property and should
+  not be used as one.
+- **Drainage or hydraulic design.** That needs a hydraulic model and a
+  licensed engineer.
 
 Riprap is not an alert or emergency service. For emergency alerts in New
 York City use [Notify NYC](https://a858-nycnotify.nyc.gov/), and to report
 flooding or ask the city for help use [311](https://portal.311.nyc.gov/).
 
-**Scope.** Riprap composes public-record data into a written briefing. It
-does not predict damage to specific properties or substitute for
-professional engineering judgment. For personal property decisions, contact
-your local resilience office or hazard-mitigation program.
-
-**On FEMA determinations specifically:** when FEMA proposes a change to
-a flood hazard determination, a Base Flood Elevation, an SFHA
-boundary, a floodway, federal regulation gives the affected community
-a 90-day appeal window, and an appeal must rest solely on scientific or
-technical evidence, not policy or economic argument (44 CFR Part 67).
-Riprap does not issue, contest, or substitute for a determination made
-through that process. If a decision turns on the official flood zone
-at a parcel, use FEMA's [Flood Map Service Center](https://msc.fema.gov)
-or the community's Flood Zone Determination process, not a Riprap
-citation.
+**On FEMA determinations.** Riprap quotes the flood zone FEMA's map shows
+at a point. That is not a flood zone determination. If a decision turns on
+the official flood zone of a parcel, use FEMA's
+[Flood Map Service Center](https://msc.fema.gov).
 
 
 ## Related work
@@ -117,8 +95,9 @@ the source of the Heat Vulnerability Index.
 
 ## How Riprap works: the Five Stones
 
-Behind every briefing, up to twenty atomic data probes (**pebbles**)
-fan out across public datasets, sensors and forecasts. Each pebble is one
+Behind every briefing, a set of small data readers (**pebbles**) run in
+parallel across public datasets, sensors and forecasts: 22 sources for a
+New York City address, 20 for a neighbourhood or district. Each pebble is one
 YAML manifest plus a small adapter; the framework loads them from a
 deployment directory and groups them into five roles, the **Five Stones**:
 
@@ -128,10 +107,10 @@ deployment directory and groups them into five roles, the **Five Stones**:
 
 | Stone | Role | NYC pebbles |
 |---|---|---|
-| **Cornerstone** | What the ground remembers | Sandy 2012 inundation extent, NYC DEP stormwater scenarios, FEMA effective and preliminary flood zones, 2021 Ida USGS high-water marks, USGS 3DEP elevation |
-| **Keystone** | What is exposed | MTA subway entrances, NYCHA developments, public schools, NYS DOH hospitals, named when inside a mapped flood extent; for a district, NYC Planning's floodplain counts (DOB permits only when a question asks about construction) |
-| **Touchstone** | Current state of the city | FloodNet depth sensors, NYC 311 flood complaints, NWS hourly observations, NOAA tide-gauge water levels, USGS stream gauges |
-| **Lodestone** | What is coming | NWS flood alerts, the NWS water-level forecast at the nearest harbor gauge, NPCC4 sea-level projections |
+| **Cornerstone** (Mapped hazards) | What the ground remembers | Sandy 2012 inundation extent, NYC DEP stormwater scenarios, FEMA effective and preliminary flood zones, 2021 Ida USGS high-water marks, USGS 3DEP elevation |
+| **Keystone** (Places and facilities) | What is exposed | MTA subway entrances, NYCHA developments, public schools, NYS DOH hospitals, named when inside a mapped flood extent; for a district, NYC Planning's floodplain counts (DOB permits only when a question asks about construction) |
+| **Touchstone** (Live readings) | Current state of the city | FloodNet depth sensors, NYC 311 flood complaints, NWS hourly observations, NOAA tide-gauge water levels, USGS stream gauges |
+| **Lodestone** (Projections) | What is coming | NWS flood alerts, the NWS water-level forecast at the nearest harbor gauge, NPCC4 sea-level projections |
 | **Capstone** | The briefing | An "In brief" lead and the evidence sentences as written, with the point DEP scenarios merged into one sentence. A question is answered from those sentences, by rules or by any OpenAI-compatible model whose choice of lead and facts is checked in code |
 
 One Burr application runs every intent. All pebbles for the intent fan out

@@ -260,7 +260,7 @@ Values from a May 2026 run, to show what the pebbles return:
 | geocode | `(40.5780, -73.9617)`, BBL `3-08660-0001`, Brooklyn |
 | sandy | Inside the 2012 Sandy Inundation Zone |
 | dep_moderate_2050, dep_extreme_2080 | depth 0.4 to 0.8 ft; depth 0.8 to 2.0 ft |
-| floodnet | 2 sensors within 600 m; 1 event in the last 3 years (peak 14 cm) |
+| floodnet | 2 sensors within 600 m, with their count of flood events and the highest depth (since October 2026 only events FloodNet marks as verified by a person are counted) |
 | nyc311 | 11 flood-related complaints within 200 m, 5-year window |
 | noaa_tides | +0.49 ft residual at the time of the run |
 | nws_alerts | 0 active alerts |

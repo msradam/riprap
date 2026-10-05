@@ -15,9 +15,13 @@ Rules or an open Granite model read your question and choose the evidence.
 Every sentence you read comes word for word from a public record, with its
 source and date.
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Code license: Apache 2.0](https://img.shields.io/badge/Code_license-Apache_2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/msradam/riprap/actions/workflows/check.yml/badge.svg)](https://github.com/msradam/riprap/actions/workflows/check.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
+
+(The Apache licence covers the code. FloodNet data and the sentences and
+counts made from it are CC BY-NC-SA 4.0, non-commercial:
+[FloodNet data](#cite-licence-acknowledgments).)
 
 **[Browse the briefings](https://msradam.github.io/riprap/)** ·
 **[Run it on your laptop](#quickstart)** ·
@@ -112,9 +116,13 @@ A heat answer, from
 A query about outdoor heat gets the heat briefing; a bare address or district
 gets its flood briefing, with a link to the heat one. The heat briefing was
 added in October 2026. It is built by the same method and tested against
-independent keys and questions written without sight of the code
+answer keys and questions written without sight of the code
 ([docs/GROUNDING.md](docs/GROUNDING.md#heat-questions)); it has not been
-through the head-to-head comparison the flood briefing has.
+through the head-to-head comparison the flood briefing has. That comparison
+set the rule path against the model path on 130 pairs of answers to
+questions written and judged by AI agents
+([docs/GROUNDING.md](docs/GROUNDING.md#llm-mode)). It was not a comparison
+with observed flooding or with another tool.
 
 ## What it does in one step
 
@@ -139,9 +147,10 @@ place:
   with its trace.
 
 It also carries rules for the traps in these sources: which 311 descriptors
-record flooding (the city renamed them in 2026), which sensor readings FloodNet
-flags, which datum a base flood elevation is in, and when a zero means "the
-source failed" and not "none".
+record flooding (the city renamed them in 2026), which FloodNet events a
+person has verified and what status the API lists for a sensor, which datum
+a base flood elevation is in, and when a zero means "the source failed" and
+not "none".
 
 ## Works alongside the official sources
 
@@ -155,6 +164,7 @@ where they are the authority.
 | Insurance and what to do at home | [FloodHelpNY](https://www.floodhelpny.org) |
 | A district's people and housing in the floodplain, on a city-made page | NYC Planning's [Community District Profiles](https://communityprofiles.planning.nyc.gov/) (Riprap quotes their counts) |
 | Heat warnings, and where to cool off in a heat emergency | The [National Weather Service](https://www.weather.gov/okx/) issues heat advisories and [Notify NYC](https://a858-nycnotify.nyc.gov/) sends them; the city lists its cooling centers at [Cool Options](https://finder.nyc.gov/coolingcenters/) only while a heat emergency is on. Riprap quotes the forecast and alerts as the Weather Service's and points to the finder |
+| Air temperature across the city, and an outdoor heat exposure index | BetaNYC's [NYC Urban Heat Portal](https://urbanheat.nyc), built with Dr. Mehdi Heris with NASA support. Riprap has neither: its heat briefing quotes the temperature of the ground's surface, not of the air |
 | Heat and health, by neighbourhood | The NYC Health Department's [Environment and Health Data Portal](https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/hvi/) (Riprap quotes its Heat Vulnerability Index and heat illness visits) |
 | Maps to explore | Rebuild by Design's [Rainproof NYC Flood Map](https://rebuildbydesign.org/rainproof-nyc-map/) for 311 reports, sensors and green infrastructure near an address; the [EJNYC Mapping Tool](https://experience.arcgis.com/experience/6a3da7b920f248af961554bdf01d668b) for citywide layers |
 
@@ -199,14 +209,20 @@ is sourced in [docs/METHODOLOGY.md](docs/METHODOLOGY.md#10-what-the-data-cannot-
 - Surface temperature is not air temperature, and the Heat Vulnerability
   Index is a rank: the Health Department says "a neighborhood with low
   vulnerability does not mean no risk".
+- No one has tested the joined evidence against observed flooding. The
+  checks confirm that each sentence matches its source, not that the
+  sources together describe what happened on a block.
 - Riprap is in English only.
 
-The distances, time windows and complaint types behind each count are in one
-table a count can be rerun from
-([docs/METHODOLOGY.md](docs/METHODOLOGY.md#11-distances-time-windows-and-filters)).
+The distances, time windows and exact complaint types behind each count,
+with a worked recount of the 88 complaints in the example above, are in
+[docs/METHODOLOGY.md](docs/METHODOLOGY.md#11-distances-time-windows-and-filters).
 Riprap is built by one person. No community group, agency or resident has yet
 shaped or tested it. If a sentence is wrong, or you know of flooding or heat
-the records miss, [open an issue](https://github.com/msradam/riprap/issues/new/choose):
+the records miss, use the
+[correction form](https://github.com/msradam/riprap/issues/new?template=correction.yml),
+which asks for a place and what you know and nothing technical (it needs a
+GitHub account, and is public):
 corrections are recorded in the [changelog](CHANGELOG.md), and an account of
 what the records miss is kept on the tracker, since Riprap has no way yet to
 put it into a briefing.
@@ -301,13 +317,13 @@ sentences and code checks its choice.
 Each data source is a YAML manifest (a "pebble"). For every query they run in
 parallel, grouped into five roles:
 
-| Stone | Role | Examples |
-|---|---|---|
-| Cornerstone | What the ground remembers | Sandy extent, DEP and FEMA maps, Ida high-water marks, terrain |
-| Keystone | What is exposed | Subway entrances, public housing, schools, hospitals |
-| Touchstone | What has been observed | FloodNet sensors, 311 requests, weather, tide and stream gauges |
-| Lodestone | What is coming | NWS alerts, the NWS water-level forecast, sea-level projections |
-| Capstone | The briefing | The cited sentences, and the answer chosen from them |
+| Stone | Heading on the page | Role | Examples |
+|---|---|---|---|
+| Cornerstone | Mapped hazards | What the ground remembers | Sandy extent, DEP and FEMA maps, Ida high-water marks, terrain |
+| Keystone | Places and facilities | What is exposed | Subway entrances, public housing, schools, hospitals |
+| Touchstone | Live readings | What has been observed | FloodNet sensors, 311 requests, weather, tide and stream gauges |
+| Lodestone | Projections | What is coming | NWS alerts, the NWS water-level forecast, sea-level projections |
+| Capstone | (the answer itself) | The briefing | The cited sentences, and the answer chosen from them |
 
 More in [docs/METHODOLOGY.md](docs/METHODOLOGY.md),
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and
@@ -348,19 +364,26 @@ sessions also reviewed that work. The maintainer, Adam Munawar Rahman,
 directed it, decides what Riprap claims, and is accountable for all of it.
 The output was checked by automated tests, by sets of test questions with
 answer keys (some written without sight of the code,
-[docs/GROUNDING.md](docs/GROUNDING.md)), and by an independent sanity check on
-5 October 2026 that worked from the code, the public sources and the app's
-output before reading any project document. It re-derived 487 briefing
+[docs/GROUNDING.md](docs/GROUNDING.md)), and by a sanity check on
+5 October 2026, run by separate AI agents under the maintainer's direction,
+that worked from the code, the public sources and the app's output before
+reading any project document. It re-derived 487 briefing
 sentences from the sources with separate code: 475 were confirmed, 10 were
 wrong and 2 sat on a raster edge. The 10 came from three defects (an address
 elevation read from a neighbouring cell, hospitals counted twice, a
 construction permits count); the first two are corrected and the permits
-sentence was taken out of plain briefings. The check was itself run by AI
-coding agents, working read-only and independently of the agents that wrote
-the code, under the maintainer's direction. Its method, its figures and what
-was done about each of its 31 problems are in
+sentence was taken out of plain briefings. The agents that ran the check
+worked read-only and were not the agents that wrote the code; "independent"
+means no more than that. Its method, its figures and what was done about
+each of its 31 problems are in
 [docs/history/SANITY-CHECK-2026-10-05.md](docs/history/SANITY-CHECK-2026-10-05.md).
 The repository records no audit by a person outside the project.
+
+The check confirms that sentences match their sources. Nothing yet tests
+the joined evidence against flooding that was observed: Riprap has no
+ground-truth validation, so a briefing can agree with every record it reads
+and still miss what happened on a block
+([docs/METHODOLOGY.md](docs/METHODOLOGY.md#12-corrections)).
 
 ## Experimental models
 
@@ -429,6 +452,8 @@ limits (the map, the print view, English only) and how to report a barrier:
 
 ## Get involved
 
+- Tell us where a briefing is wrong or what the records miss:
+  [the correction form](https://github.com/msradam/riprap/issues/new?template=correction.yml)
 - Add your city: [docs/PORT-YOUR-CITY.md](docs/PORT-YOUR-CITY.md)
 - [Contributing](.github/CONTRIBUTING.md) ·
   [Code of conduct](.github/CODE_OF_CONDUCT.md) ·
@@ -437,8 +462,10 @@ limits (the map, the print view, English only) and how to report a barrier:
 
 ## Cite, licence, acknowledgments
 
-Cite with [CITATION.cff](CITATION.cff). Apache 2.0: see [LICENSE](LICENSE) and
-[NOTICE](NOTICE). Data sources keep their own terms, recorded in each manifest.
+Cite with [CITATION.cff](CITATION.cff). The code is Apache 2.0: see
+[LICENSE](LICENSE) and [NOTICE](NOTICE). Data sources keep their own terms,
+recorded in each manifest, and FloodNet's are stricter than the code's
+(below).
 
 Riprap is an independent project. It is not endorsed by or affiliated with
 FloodNet, New York University, the City University of New York, FEMA, NOAA,
@@ -461,6 +488,12 @@ Waves", *Water Research*, 118648,
 <https://doi.org/10.1016/j.watres.2022.118648>. Riprap reads FloodNet's Data
 API (an early-access beta) and counts only the events it marks as verified by
 a person. Questions about a reading belong to FloodNet.
+
+FloodNet's [Data Access License Agreement](https://docs.google.com/document/d/1jd5Q2UYj_0PwMRplFISmhT6LswpS08D9/edit)
+binds anyone who accesses its data. FloodNet has not been asked about
+Riprap's use and has not approved it. The clauses Riprap acts on, quoted,
+and what it does about each are in
+[docs/DATA-SOURCES.md](docs/DATA-SOURCES.md#floodnets-licence-and-what-riprap-does-about-it).
 
 Thanks, which imply no backing by anyone named: to AMD Developer Cloud and
 the AMD x lablab.ai Developer Hackathon, where Riprap began and where its

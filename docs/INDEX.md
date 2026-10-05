@@ -29,7 +29,7 @@ Records of earlier states of the project, kept for reference. None of them descr
 |---|---|
 | [history/BENCHMARKS.md](history/BENCHMARKS.md) | Latency and energy on four addresses from the retired Modal/L4 stack (2026-05-09). |
 | [history/RESEARCH.md](history/RESEARCH.md) | A May 2026 research note on existing flood-risk tools and how Riprap differed then. |
-| [history/SANITY-CHECK-2026-10-05.md](history/SANITY-CHECK-2026-10-05.md) | The independent sanity check of 5 October 2026: its method, the 680, 487, 475, 10 and 2 figures, every problem it found and what was done about each. |
+| [history/SANITY-CHECK-2026-10-05.md](history/SANITY-CHECK-2026-10-05.md) | The sanity check of 5 October 2026, run by separate AI agents under the maintainer's direction: its method, the 680, 487, 475, 10 and 2 figures, every problem it found and what was done about each. |
 | [history/VERIFICATION.md](history/VERIFICATION.md) | A deterministic verification pass on 2026-05-16: sweep results, pytest, lint, BYOD evidence. |
 | [history/demo.md](history/demo.md) | The May 2026 flood, heat and air demo script. The heat and air scaffolds it describes were removed in October 2026. |
 

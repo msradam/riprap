@@ -1,4 +1,4 @@
-# Independent sanity check, 5 October 2026
+# Sanity check by separate AI agents, 5 October 2026
 
 A summary of a check of whether what Riprap tells people is right and
 meaningful, and of what was done about each problem it found. The full report
@@ -15,7 +15,12 @@ that wrote the code, and they were told to form their own view first: to work
 from the code, the public sources and the app's output, and to read no
 project document or earlier report until afterwards. The check was read-only.
 Nothing in the repository was changed by it. No person outside the project
-took part.
+took part. "Independent", where other documents use the word for this
+check, means only that: separate agents, working read-only.
+
+The check confirms that sentences match their sources. It did not test the
+joined evidence against observed flooding, and nothing else in the project
+does yet.
 
 It ran against branch `main` at commit `abb1c4e`, with the app started
 locally and no language model configured. Every finding had to rest on a

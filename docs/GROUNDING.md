@@ -33,8 +33,9 @@ build it and names the sources that failed to respond. No language model is
 involved. (The experimental models are sources like any other here: their
 sentences are written by code, labelled and hedged, and stay out of a plain
 briefing unless they show something; see [MODELS.md](MODELS.md).) This
-is the mode the MCP evidence tools use. The static gallery is built in this mode: 12
-addresses, 3 community districts and 8 questions.
+is the mode the MCP evidence tools use. The static gallery is built in this mode: 35
+entries (for flood 12 addresses, 3 community districts and 10 questions; for
+heat 3 places and 7 questions).
 
 A question is answered in this mode too, by rules over its words
 (`riprap/core/burr/rule_answer.py`). The rules pick the lead and the facts
@@ -65,8 +66,8 @@ sources' sentences word for word. They are tried in a fixed order:
 5. "has it flooded": the past-event rule described below sets yes, no or
    cannot say. An Ida high-water mark says the block flooded only when it is
    within 250 m; a point within 50 m of the mapped Sandy edge gets no flat
-   yes or no; events only at a sensor FloodNet flags for maintenance do not
-   make a yes;
+   yes or no; events only at sensors whose status in FloodNet's API is other
+   than good do not make a yes (the choice is Riprap's, not FloodNet's);
 6. "how many": the counted source, and the count of the 311 kind the question
    names. "Since 2024" sums the years from then; "since Ida" starts mid-year
    and gets the source's own window, stated, with no count as the lead;
@@ -97,7 +98,7 @@ answered.
 
 Set `RIPRAP_LLM_BASE_URL` and `RIPRAP_LLM_MODEL` to any OpenAI-compatible
 endpoint (for example local Ollama at `http://localhost:11434/v1`). The model
-is used only where there is a question (refactor 8):
+is used only where there is a question:
 
 - A bare address or district has no question, so neither the planner nor the
   synthesis calls the LLM: the page is the no-LLM evidence briefing, and the
@@ -144,7 +145,10 @@ or `llm`) at the top of the result says which one answered;
 `grounding.answer_mode` (`rules` or `extractive`) records the same.
 `RIPRAP_RULES_FIRST=0` puts the model first.
 
-The order was set by measurement. An agent that could not read the repository
+The order was set by measurement, in what the README calls the head-to-head
+comparison. It compared Riprap's rule path with Riprap's model path. It did
+not compare Riprap with observed flooding or with any other tool, and both
+the questions and the judgements were made by AI agents, not by people. An agent that could not read the repository
 wrote questions the way users type them; both paths answered each one in the
 same process; a second agent judged the pairs blind. Over 130 judged pairs
 (four sets, 2026-10-01) the rule answers were preferred on 54, the model's on

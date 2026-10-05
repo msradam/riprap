@@ -285,8 +285,8 @@ the full source list.
   the 2012 Sandy extent"), the dataset name after it in secondary ink. A
   dataset name is never set as if it were the result.
 - **Order:** a first group "Behind the answer" holds the rows the answer
-  cites, experimental or not; then one group per Stone, headed with the
-  Stone name and its role ("Cornerstone, the hazard reader"); then the
+  cites, experimental or not; then one group per Stone, headed with a
+  plain label and the Stone name ("Mapped hazards (Cornerstone)"); then the
   experimental and forecast sources the answer does not cite, in one closed
   disclosure after the table titled with its count ("Experimental and
   forecast sources (4)"), each row keeping its Experimental badge. NPCC4 and
@@ -348,8 +348,9 @@ map legend and the tier key only.
 A Persuade page inside the report system. The hero pairs the h1 (52px, 34px
 on phones), one subhead and the query box (or, on the static site, "Browse
 briefings" and "Run it yourself") with a real gallery answer set as a
-specimen: the question, the lead word at Lead size, the key sentence, the
-briefing's own flagged-sensor sentence and its source notes. Real questions
+specimen: the question, the lead word at Lead size and the answer's
+sentences, one paragraph per source, as text read from the saved briefing
+at build time (no screenshot and no map). Real questions
 follow as chips. On a phone (480px and under) the specimen sits right under
 the subhead, before the actions and chips; the DOM keeps the form first.
 The sections then run in this order: proof, as gallery answers on Card White

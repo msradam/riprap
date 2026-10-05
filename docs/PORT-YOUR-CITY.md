@@ -29,7 +29,13 @@ in `deployments/federal/manifests/` (`fema_nfhl`, `nws_alerts`,
 automatically, so do not copy them.
 
 Two city manifests plus the four federal pebbles is what Chicago, Seattle
-and Albany ship. Add more for your local hazard signals (historical
+and Albany ship. That is what a city gets on day one: six sources (its 311
+feed, one water-level gauge, FEMA's flood zone, the Weather Service's
+observations and alerts, and USGS stream gauges), with no local flood map,
+sensor network or list of facilities. New York's deployment has 60
+manifests, 56 of them written for the city's own records, and each of those
+took work on that one dataset: its fields, its traps and the sentence it
+can support. Expect the same for yours. Add more for your local hazard signals (historical
 inundation, regulatory floodplain, asset registers); those depend on what
 your jurisdiction publishes.
 
@@ -91,12 +97,12 @@ coverage:
 stones:
   - id: cornerstone
     name: Cornerstone
-    tagline: The Hazard Reader
+    tagline: Mapped hazards
     description: Reads what <your city> remembers about flooding.
     order: 1
   - id: touchstone
     name: Touchstone
-    tagline: The Live Observer
+    tagline: Live readings
     description: Watches current flood signals in <your city>.
     order: 2
   ...
@@ -199,8 +205,8 @@ print('compliance:', r['compliance'])
 
 The query routes to your deployment only if the geocoded address falls
 inside your `coverage:` bbox. Expected: your deployment's name, then a
-Markdown briefing with **Hazard Reader.**, **Live Observer.** and
-**Projector.** sections and citations like `[<city>_311]` and
+Markdown briefing with **Mapped hazards.**, **Live readings.** and
+**Projections.** sections and citations like `[<city>_311]` and
 `[fema_nfhl]`. The `compliance` key holds the 13 disclosure checks; the
 name is kept for API compatibility and it is not a quality score.
 

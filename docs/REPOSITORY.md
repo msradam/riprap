@@ -1,6 +1,6 @@
 # Code map
 
-The pipeline at a glance, the source-of-truth paths and the repository tree. Moved from the README in refactor 7; the long form is [ARCHITECTURE.md](ARCHITECTURE.md).
+The pipeline at a glance, the source-of-truth paths and the repository tree. The long form is [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Architecture
 

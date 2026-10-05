@@ -3,7 +3,7 @@
 Every claim cites its source: a public record from FEMA, NOAA, USGS, NASA
 and USGS Landsat, the city's Health Department or city open data, or, where
 it is labelled experimental, a model. For New York City a flood briefing
-reads 24 public data sources and a heat briefing 10 or 11
+reads 25 public data sources and a heat briefing 10 or 11
 ([DATA-SOURCES.md](DATA-SOURCES.md)). This methodology was last updated
 2026-10-05.
 
@@ -191,11 +191,11 @@ traces back to the Stone that produced it.
 
 | Stone | Role | Flood sources | Heat sources |
 |---|---|---|---|
-| Cornerstone | The hazard reader | FEMA flood maps, DEP stormwater scenarios, the Sandy extent, Ida high-water marks, terrain | Landsat surface temperature, the Heat Vulnerability Index, heat illness visits, the city's land cover map |
-| Keystone | The asset register | Public schools, subway entrances, public housing, hospitals, floodplain counts (construction permits only when a question asks) | NYC Parks spray showers and pools |
-| Touchstone | The live observer | FloodNet sensors, 311 flood complaints, tide and stream gauges, weather observations | The station record of 90 F days, the latest air temperature |
-| Lodestone | The projector | NWS alerts and water-level forecasts, NPCC4 sea-level projections | The NWS forecast and heat alerts, NPCC4 heat projections |
-| Capstone | The synthesizer | Writes one cited sentence per record, and answers a question by rules over its words | The same |
+| Cornerstone | Mapped hazards | FEMA flood maps, DEP stormwater scenarios, the Sandy extent, Ida high-water marks, terrain | Landsat surface temperature, the Heat Vulnerability Index, heat illness visits, the city's land cover map |
+| Keystone | Places and facilities | Public schools, subway entrances, public housing, hospitals, floodplain counts (construction permits only when a question asks) | NYC Parks spray showers and pools |
+| Touchstone | Live readings | FloodNet sensors, 311 flood complaints, tide and stream gauges, weather observations | The station record of 90 F days, the latest air temperature |
+| Lodestone | Projections | NWS alerts and water-level forecasts, NPCC4 sea-level projections | The NWS forecast and heat alerts, NPCC4 heat projections |
+| Capstone | The briefing | Writes one cited sentence per record, and answers a question by rules over its words | The same |
 
 ## 10. What the data cannot say
 
@@ -301,12 +301,13 @@ Every count in a briefing depends on these choices. They are judgement calls
 made for this tool, not standards, and the code records no calibration for
 them: a different radius gives a different count. Each sentence states its
 own radius and window, and "within 600 m" does not mean "on this block". The
-table is enough to rerun a count against the source.
+table gives each choice; the exact 311 filter and a worked recount follow
+it.
 
 | Source | Where | When | Which records | Why this choice |
 |---|---|---|---|---|
-| 311 complaints at an address (`erm2-nwe9`) | Within 200 m of the geocoded point (`within_circle`) | The last 5 years, from midnight UTC | `complaint_type` "Sewer" or "Sewer Maintenance" and one of eleven flood descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow, rain garden flooding, under the coded names and the plain names of 2026); a complaint filed twice within ten minutes at one address counts once (`app/context/nyc311.py`) | About the blocks around an address; wider circles mix in other streets' drains |
-| 311 complaints in a district or neighbourhood | A community district by the record's own `community_board` field; a neighbourhood by its exact outline | The last 3 years | The same filter; the lead gives the breakdown by descriptor group, and every count ends with the under-reporting caveat | The district is the unit the city files the complaint under |
+| 311 complaints at an address (`erm2-nwe9`) | Within 200 m of the geocoded point (`within_circle`) | The last 1,825 days (5 times 365, so leap days are not added), counted back from midnight UTC of the day of the query | `complaint_type` "Sewer" or "Sewer Maintenance" and one of eleven flood descriptors, listed below the table; a complaint filed under both names within ten minutes at one place counts once (`app/context/nyc311.py`) | About the blocks around an address; wider circles mix in other streets' drains |
+| 311 complaints in a district or neighbourhood | A community district by the record's own `community_board` field; a neighbourhood by its exact outline | The last 1,095 days, by the same rule | The same filter; the lead gives the breakdown by descriptor group, and every count ends with the under-reporting caveat | The district is the unit the city files the complaint under |
 | FloodNet sensors at an address | Sensors within 600 m | The period since the sensors were installed, stated with the install date, within the last 3 years | Events the API labels `flood` and marks `annotated_by: human` (verified by a person); a flood event is a series of depth readings above 10 mm at the sensor, FloodNet's definition. The sentence gives the highest depth on record with that sensor's status as the API lists it when read, then the highest among sensors listed as good | Sensors are sparse (a few hundred citywide), so a block-sized circle would usually hold none |
 | FloodNet sensors in an area | Sensors inside the outline | The same | The same | |
 | Hurricane Ida high-water marks | USGS marks within 800 m; a mark counts toward "the block flooded" only within 250 m | 1 to 2 September 2021 | All 159 New York marks in the USGS file | The marks are few and were surveyed where crews went; 800 m finds the nearest ones, 250 m keeps a "Yes." local |
@@ -316,6 +317,65 @@ table is enough to rerun a count against the source.
 | Terrain at an address | The elevation cell that contains the point, in metres NAVD88, compared with the ground within 200 m | USGS 3DEP | | |
 | Surface temperature at an address | A 150 m circle of 90 m cells | 18 clear summer images, 2023 to 2026 | Land cells only | The thermal sensor samples at about 100 m (`app/heat/surface_temp.py`) |
 | Spray showers and pools | Within 800 m | As published | | About a ten minute walk (`app/heat/cooling.py`) |
+
+### The 311 filter, exactly
+
+The dataset is `erm2-nwe9`. A row counts when its `complaint_type` is
+`Sewer` or `Sewer Maintenance` and its `descriptor` is one of these eleven
+strings, spelled as the portal spells them:
+
+| Kind named in the sentence | Coded descriptor (`complaint_type` "Sewer") | Plain descriptor (`complaint_type` "Sewer Maintenance") |
+|---|---|---|
+| street flooding | `Street Flooding (SJ)` | `Flooding on Street` |
+| sewer backup | `Sewer Backup (Use Comments) (SA)` | `Backup` |
+| catch basin | `Catch Basin Clogged/Flooding (Use Comments) (SC)` | `Catch Basin Clogged` |
+| highway flooding | `Highway Flooding (SH)` | `Flooding on Highway` |
+| manhole overflow | `Manhole Overflow (Use Comments) (SA1)` | `Manhole Overflow` |
+| rain garden flooding | `RAIN GARDEN FLOODING (SRGFLD)` | none |
+
+The plain names are not new in 2026. A count by year on the portal
+(5 October 2026) finds them on 2,791 rows of 2023, nearly all from the storm
+of 29 September 2023 and the days after, when 311 logged many requests once
+under each name, and on a few dozen rows of 2020 to 2025 otherwise. In 2026
+they replaced the coded names. Three rules follow from that:
+
+- **The window.** `created_date` on or after midnight UTC of the query day
+  less 1,825 days for an address (1,095 for a district or neighbourhood).
+  "The last 5 years" in a sentence means that, which is one or two days
+  short of five calendar years.
+- **Where.** `within_circle(location, <lat>, <lon>, 200)` for an address;
+  the row's `community_board` for a district; the tabulation area's exact
+  outline for a neighbourhood.
+- **Duplicates.** A row with a plain descriptor is dropped when a row with
+  the coded descriptor of the same kind, at the same `incident_address` or
+  the same coordinates, was created within ten minutes of it.
+
+A worked recount, for the README's Hollis example (90-01 183rd Street,
+Queens, geocoded to 40.711001, -73.777712), run against the portal on
+5 October 2026:
+
+| Step | Rows |
+|---|---|
+| The filter above within 200 m, `created_date >= '2021-10-05T00:00:00'` (five calendar years back) | 90 |
+| The same with Riprap's window, `created_date >= '2021-10-06T00:00:00'` (1,825 days back); one request of 5 October 2021 falls out | 89 |
+| After the duplicate rule: one `Backup` row of 29 September 2023, filed a second time under the plain name, is dropped | 88 |
+
+The briefing says 88. Someone who counts five calendar years, or who does
+not apply the duplicate rule, gets 89 or 90 from the same data.
+
+A FloodNet count is rerun against FloodNet's Data API, by distance from
+the point, and not against the Open Data table `aq7i-eu5q`: the API names a
+sensor by `deployment_id` and the portal table by `sensor_id` and
+`sensor_name`, and Riprap knows of no published key that joins the two.
+The portal table is also updated every two weeks, so it can hold fewer
+verified events than the API on a given day.
+
+Other tools count differently and are not wrong. Rebuild by Design's
+Rainproof NYC page says of the same Hollis intersection: "Within half a
+mile, there have been 609 reports to 311 for flooding". Its circle is half a
+mile (about 800 m) where Riprap's is 200 m, its period is "the five years
+since Hurricane Ida", and its categories are its own (its page counts
+"water in basements" among them, which Riprap's filter does not).
 
 A community district in an area briefing is drawn as the union of City
 Planning's neighbourhood tabulation areas, which approximates the official
@@ -330,17 +390,29 @@ nothing is scored or ranked.
 
 ## 12. Corrections
 
-If a sentence is wrong, or says more than its record does, open an issue at
-<https://github.com/msradam/riprap/issues/new/choose> with the address or
-question and the sentence. Corrections are made in the code, with a test, and
+If a sentence is wrong, or says more than its record does, or the records
+miss flooding or heat you know of, use the
+[correction form](https://github.com/msradam/riprap/issues/new?template=correction.yml)
+with the place and the sentence. It asks nothing technical. Corrections are made in the code, with a test, and
 recorded in the [changelog](../CHANGELOG.md). When the error is in a source
 dataset, the issue says so and points to the publisher (FloodNet asks for
 data problems at
 [floodnet-nyc/floodnet-data](https://github.com/floodnet-nyc/floodnet-data/issues)).
-An independent check on 5 October 2026 re-derived 487 briefing sentences from
+A sanity check on 5 October 2026 re-derived 487 briefing sentences from
 the sources: 475 were confirmed, 10 were wrong and 2 sat on a raster edge
 ([history/SANITY-CHECK-2026-10-05.md](history/SANITY-CHECK-2026-10-05.md)
-lists every problem it found and what was done about each).
+lists every problem it found and what was done about each). It was run by
+AI coding agents, separate from the agents that wrote the code, under the
+maintainer's direction; no person outside the project took part.
+
+**What has not been tested.** That check, and the automated checks, confirm
+that a sentence matches its source. Nothing yet tests the joined evidence
+against flooding that was observed: no one has compared what a briefing
+says about a set of places with an independent record of where water stood
+in a given storm. A briefing can match every source and still mislead about
+a block that the sources miss. Riprap has no ground-truth validation of
+that kind, and until it does, a briefing is a faithful reading of the
+records and no more.
 
 ## References
 

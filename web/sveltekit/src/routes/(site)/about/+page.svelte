@@ -9,6 +9,24 @@
 
   const REPO = 'https://github.com/msradam/riprap';
   const DOCS = `${REPO}/blob/main/docs`;
+  const CORRECTION = `${REPO}/issues/new?template=correction.yml`;
+  const FLOODNET_LICENCE = 'https://docs.google.com/document/d/1jd5Q2UYj_0PwMRplFISmhT6LswpS08D9/edit';
+
+  /** The NYC Open Data datasets a briefing reads, by the portal's own name
+   *  and four-by-four ID, as docs/DATA-SOURCES.md lists them. FloodNet's
+   *  table is listed there as not read directly: Riprap reads FloodNet's API. */
+  const OPEN_DATA: { id: string; name: string; use: string }[] = [
+    { id: 'erm2-nwe9', name: '311 Service Requests from 2020 to Present', use: 'flood and sewer complaints' },
+    { id: '5xsi-dfpx', name: 'Sandy Inundation Zone', use: 'the 2012 Sandy extent' },
+    { id: '9i7c-xyvv', name: 'NYC Stormwater Flood Maps', use: 'the four modelled stormwater scenarios' },
+    { id: 'phvi-damg', name: 'NYCHA Public Housing Developments', use: 'public housing' },
+    { id: 'a3nt-yts4', name: '2019 - 2020 School Point Locations', use: 'public schools' },
+    { id: 'ipu4-2q9a', name: 'DOB Permit Issuance', use: 'only when a question asks about construction' },
+    { id: '9nt8-h7nd', name: '2020 Neighborhood Tabulation Areas (NTAs)', use: 'area outlines' },
+    { id: 'he6d-2qns', name: 'Land Cover Raster Data (2017), 6in Resolution', use: 'tree canopy and paved ground' },
+    { id: 'ckaz-6gaa', name: 'NYC Parks Spray Showers', use: 'places to cool off' },
+    { id: 'y5rm-wagw', name: 'NYC Parks Pools', use: 'places to cool off' }
+  ];
 </script>
 
 <svelte:head>
@@ -95,19 +113,24 @@
 <ul>
   <li>automated tests of the code and of the wording of answers;</li>
   <li>sets of test questions with answer keys, some written without sight of the code (<a href="{DOCS}/GROUNDING.md">docs/GROUNDING.md</a>);</li>
-  <li>an independent sanity check on 5 October 2026, which worked from the code, the public sources and the app's output before reading any project document. It re-derived 487 briefing sentences from the public sources with separate code: 475 were confirmed, 10 were wrong and 2 sat on the edge of a map cell. The 10 wrong sentences came from three defects (an address elevation read from a neighbouring map cell, hospitals counted twice, and a construction permits count). The first two have since been corrected in the code, and the permits sentence was taken out of plain briefings.</li>
+  <li>a sanity check on 5 October 2026, run by AI agents separate from those that wrote the code, which worked from the code, the public sources and the app's output before reading any project document. It re-derived 487 briefing sentences from the public sources with separate code: 475 were confirmed, 10 were wrong and 2 sat on the edge of a map cell. The 10 wrong sentences came from three defects (an address elevation read from a neighbouring map cell, hospitals counted twice, and a construction permits count). The first two have since been corrected in the code, and the permits sentence was taken out of plain briefings.</li>
 </ul>
 <p>
-  That check was itself run by AI coding agents, working read-only and independently of the agents
-  that wrote the code, under the maintainer's direction.
+  The agents that ran that check worked read-only, under the maintainer's direction, and were
+  not the agents that wrote the code.
   <a href="{DOCS}/history/SANITY-CHECK-2026-10-05.md">Its method, its figures, and what was done about each problem it found</a>.
   The repository records no audit by a person outside the project. Riprap's checks are patterns
   and rules: they do not read meaning, and they can miss a wrong inference.
 </p>
 <p>
+  These checks confirm that a sentence matches its source. Nothing yet tests the joined evidence
+  against flooding that was observed, so a briefing can agree with every record it reads and
+  still miss what happened on a block.
+</p>
+<p>
   Riprap is built by one person. No community group, agency or resident has yet shaped or tested
-  it. To send a correction, or an account of flooding or heat that the records miss, use
-  <a href="#corrections">the issue tracker</a>.
+  it. To send a correction, or an account of flooding or heat that the records miss, see
+  <a href="#corrections">Corrections</a>.
 </p>
 
 <h2 id="limits">What the data cannot say</h2>
@@ -117,7 +140,8 @@
   <li>Outside a mapped area is not safe. NYC Emergency Management reports that during Hurricane Ida the most heavily impacted areas, "representing over half of all damaged buildings, were also outside of any flood risk scenario".</li>
   <li>A FloodNet depth is a measurement at one point under one sensor. It is not the depth across a street or at a building. Riprap counts only the events FloodNet has verified, and it quotes a sensor's status as FloodNet lists it today without interpreting it.</li>
   <li>A neighbourhood name can be answered for a larger official area, or for part of one. The line under the briefing's title says which area was used.</li>
-  <li>Surface temperature is not air temperature, and the Heat Vulnerability Index is a rank among neighbourhoods. The Health Department says "a neighborhood with low vulnerability does not mean no risk".</li>
+  <li>Surface temperature is not air temperature, and the Heat Vulnerability Index is a rank among neighbourhoods. The Health Department says "a neighborhood with low vulnerability does not mean no risk". For air temperature across the city, see BetaNYC's <a href="https://urbanheat.nyc">NYC Urban Heat Portal</a>.</li>
+  <li>No one has compared briefings with an independent record of where water stood in a storm.</li>
   <li>A briefing describes public records about a place. It is not a judgement on a property or on the people who live there, and it is not advice.</li>
   <li>Riprap is in English only.</li>
 </ul>
@@ -133,18 +157,35 @@
   York, FEMA, NOAA, USGS or the City. The City publishes its open data for information only and
   does not warrant its completeness, accuracy, content or fitness for any use (Local Law 11 of
   2012). FloodNet's data, and the sentences and figures made from it, are licensed CC BY-NC-SA
-  4.0 and are not under Riprap's Apache-2.0 licence. Every NYC Open Data dataset Riprap reads is listed with its ID and what Riprap does to it
-  in <a href="{DOCS}/DATA-SOURCES.md">docs/DATA-SOURCES.md</a>, and other tools for the same
-  records are credited in <a href="{DOCS}/BACKGROUND.md#related-work">Related work</a>.
+  4.0 and are not under Riprap's Apache-2.0 licence. FloodNet's
+  <a href={FLOODNET_LICENCE}>Data Access License Agreement</a> binds anyone who uses its data;
+  FloodNet has not been asked about Riprap's use and has not approved it
+  (<a href="{DOCS}/DATA-SOURCES.md#floodnets-licence-and-what-riprap-does-about-it">what Riprap does about each clause</a>).
+  Other tools for the same records are credited in
+  <a href="{DOCS}/BACKGROUND.md#related-work">Related work</a>.
 </p>
+
+<h2 id="open-data">NYC Open Data used</h2>
+<p>
+  Each dataset by the name NYC Open Data gives it, with its ID. What Riprap does to each before a
+  sentence is written, the copy dates and the sources published elsewhere (federal, state, the
+  Health Department, FloodNet) are in <a href="{DOCS}/DATA-SOURCES.md">docs/DATA-SOURCES.md</a>.
+</p>
+<ul>
+  {#each OPEN_DATA as d (d.id)}
+    <li>
+      <a href="https://data.cityofnewyork.us/d/{d.id}">{d.name}</a> (<code>{d.id}</code>): {d.use}
+    </li>
+  {/each}
+</ul>
 
 <h2 id="corrections">Corrections</h2>
 <p>
   If a sentence is wrong, or reads as saying more than its record does,
-  <a href="{REPO}/issues/new/choose">open an issue on the project's tracker</a> with the address or
-  question and the sentence. Corrections are made in the code and recorded in the
+  <a href={CORRECTION}>fill in the correction form</a> with the place and the sentence. The form
+  asks nothing technical; it is public and needs a free GitHub account. Corrections are made in the code and recorded in the
   <a href="{REPO}/blob/main/CHANGELOG.md">changelog</a>. If the error is in a source dataset, the
   issue will say so and point to the publisher. An account of flooding or heat that the records
-  miss is welcome on the same tracker; Riprap has no way yet to put one into a briefing, so it is
+  miss is welcome on the same form; Riprap has no way yet to put one into a briefing, so it is
   kept there.
 </p>
