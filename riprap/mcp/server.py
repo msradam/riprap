@@ -6,16 +6,25 @@ the well-designed ones expose a median of ~19% of the wrapped API's
 operations through curation, not mirroring (arxiv.org/html/2507.16044).
 
   list_sources(deployment)            the stones and pebbles a deployment runs
-  get_evidence(address, hazard)       cited evidence for an address, no LLM (flood, or heat in NYC)
+  get_evidence(address, hazard)       cited evidence for an address, no model called (flood, or heat in NYC)
   get_district_summary(code, hazard)  the same for an NYC community district
   get_citation(deployment, doc_id)    provenance and vintage for one source
   nyc311_flood_requests(...)          311 flood requests near a point or in a district
   plan_query(question, address)       how a question would be routed, without running it
   get_briefing(address, question)     the briefing, answering the question when given
 
-Every tool works without an LLM. Without one, get_briefing answers a
-question by rules over its words; with one, the model chooses the lead and
-the facts and code checks them. Run over stdio (for a local MCP client config) or
+Every tool works with no language model, and that is the default. Rules
+answer first: every sentence is a source's template filled from the
+fetched record, and a question is answered by fixed rules over its words.
+A server may configure an optional open model (IBM Granite by default).
+It is then asked only about a question the rules do not match: it may
+route the question (intent, time frame, which extra sources run) and
+propose a lead (yes, no, partly, count, cannot answer) with up to four of
+the existing cited sentences. Rules check the lead against those sentences
+and drop it if it fails. The model writes no sentence of a briefing or an
+answer. (The one exception is a server started with RIPRAP_LLM_BARE=1, off
+by default, which has the model restate a bare place's evidence as claims
+checked for their citations and numbers.) Run over stdio (for a local MCP client config) or
 streamable HTTP:
 
     uv run riprap-mcp                     # or: uv run python -m riprap.mcp.server
@@ -47,11 +56,16 @@ mcp = MCPServer(
         "a professional engineering opinion, or a substitute for the NFIP "
         "appeal process. Start with get_evidence (an address) or "
         "get_district_summary (an NYC community district): both return cited "
-        "sentences without a language model. plan_query shows how a question "
+        "sentences and never call a language model. plan_query shows how a question "
         "would be routed without running the sources. get_briefing returns the "
-        "same evidence as a briefing and answers a question: by code rules over "
-        "the question's words, or by an LLM when the server has one configured, "
-        "with every claim checked against its cited source. Evidence and briefing results carry "
+        "same evidence as a briefing and answers a question by fixed rules over "
+        "the question's words. Rules answer first. If the server has an optional "
+        "open language model configured, it is asked only about a question the "
+        "rules do not match: it may route the question and propose a lead (yes, "
+        "no, partly, count, cannot answer) with up to four of the existing cited "
+        "sentences; rules check that lead against the sentences and drop it if it "
+        "fails. By default the model never writes a sentence. answer_path says which path "
+        "produced a result (rules or llm). Evidence and briefing results carry "
         "a record block (query, time, code version, digest) and name the "
         "sources that failed to respond."
     ),
@@ -162,8 +176,8 @@ def _heat_plan(place: str) -> dict:
 
 @mcp.tool()
 def get_evidence(address: str, hazard: str = "flood") -> dict:
-    """Cited flood evidence for a US street address, without an LLM; with
-    hazard="heat", the heat evidence for a New York City address (measured
+    """Cited flood evidence for a US street address. No language model is
+    called, whatever the server has configured. With hazard="heat", the heat evidence for a New York City address (measured
     surface temperature, the Health Department's vulnerability index and
     heat illness visits, the station record, the Weather Service's forecast
     and alerts, NPCC4 projections, NYC Parks cooling features).
@@ -192,8 +206,8 @@ def get_district_summary(community_district: str, hazard: str = "flood") -> dict
     (Jamaica, St. Albans, Hollis) or BK15 (Sheepshead Bay, Homecrest):
     shares of the district in the Sandy and DEP extents, terrain, 311 flood
     complaints, the exposed subway entrances, schools, NYCHA developments
-    and hospitals, NYC Planning's floodplain counts and DOB permits, without
-    an LLM. With hazard="heat": the district's surface temperature against
+    and hospitals and NYC Planning's floodplain counts. No language model
+    is called, whatever the server has configured. With hazard="heat": the district's surface temperature against
     the city's, its Heat Vulnerability Index and heat illness visits, tree
     canopy, the station record, the forecast and NYC Parks cooling features."""
     from riprap.core.burr.app import district_summary
@@ -237,9 +251,14 @@ def plan_query(question: str, address: str | None = None) -> dict:
     (it geocodes the place): intent, targets, the question and its focus,
     the pebbles the planner chose, the always-run floor, and the final
     selection for the deployment the place routes to. `planner` says
-    which planner ran: "llm" when the server has an LLM endpoint, else
-    "regex", the no-LLM router, which chooses no pebbles (`chosen` is
-    null) so `selected` is every pebble for the intent."""
+    which planner ran: "regex", the fixed rules, which choose no pebbles
+    (`chosen` is null) so `selected` is every pebble for the intent; or
+    "llm" when the server has the optional model configured and the rules
+    did not match the question. The rules route first: a bare place, a
+    refusal, a comparison and any question the answer rules recognise never
+    reach the model. When it is asked, the model may set the intent, the
+    time frame and assets of the focus, and which sources run beyond the
+    fixed floor; the hazard and the question text are set in code."""
     from app.geocode import geocode_one
     from riprap.core.burr.app import plan_for
     from riprap.core.burr.stones import floor_for, select_pebbles
@@ -269,15 +288,26 @@ def get_briefing(address: str, question: str | None = None) -> dict:
     A question about outdoor heat ("Is this block hotter than the rest of
     the city?", "Will it be dangerously hot this week?") gets the heat
     briefing's answer instead, for New York City addresses.
-    Works without an LLM: the briefing is then the cited evidence, a
-    question is answered by rules over its words, and `mode` is "no_llm"
-    (the HTTP API calls the same value `grounding.tier`).
-    With an LLM endpoint configured on the server
-    (RIPRAP_LLM_BASE_URL and RIPRAP_LLM_MODEL), the planner picks the
-    sources the question needs and the answer is the lead plus cited
-    sentences the model chose, each checked in code (failed claims are
-    listed under dropped_claims, not shown). `consulted`, `not_checked`
-    and `failed` list the sources."""
+    Rules answer first, and with no model configured they are the only
+    path: the briefing is the cited evidence, a question is answered by
+    fixed rules over its words, and `mode` is "no_llm" (the HTTP API calls
+    the same value `grounding.tier`).
+    A server may configure an optional open language model
+    (RIPRAP_LLM_BASE_URL and RIPRAP_LLM_MODEL; IBM Granite by default). It
+    is asked only about a question the rules do not match. It may route
+    the question (intent, time frame, which extra sources run) and propose
+    a lead (yes, no, partly, count or cannot answer) with up to four of the
+    existing cited sentences. The lead is printed as a fixed phrase and is
+    checked by rules against those sentences: one that fails is sent back
+    once, then dropped, and the answer says the sources do not answer
+    (the dropped choice is listed under dropped_claims, not shown). The
+    model never writes a sentence, unless the server was started with
+    RIPRAP_LLM_BARE=1 (off by default), which has it restate the evidence
+    for a bare place as claims checked for their citations and numbers.
+    `answer_path` is "llm" when a model was
+    called for the result and "rules" when none was; `answer_mode` is
+    "rules" or "extractive" (the model's choice). `consulted`,
+    `not_checked` and `failed` list the sources."""
     from riprap.core.burr.app import run
     from riprap.core.pebbles.vintage import license_notices
 

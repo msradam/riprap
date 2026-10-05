@@ -9,7 +9,7 @@
 #   2. Touchstone  — what's happening right now (live)
 #   3. Keystone    — what's exposed (assets)
 #   4. Lodestone   — what's coming (forecasts)
-#   5. Capstone    — the reconciled briefing (LLM synthesis)
+#   5. Capstone    — the briefing assembled from the cited sentences (rules first)
 #
 # `coverage` is the bbox a query must land in for this deployment to be
 # chosen by per-query auto-routing. If a geocode resolves outside every
@@ -47,5 +47,5 @@ stones:
   - id: capstone
     name: Capstone
     tagline: The Synthesiser
-    description: Writes the cited briefing from the evidence, with or without an LLM.
+    description: Assembles the cited briefing from the evidence by fixed rules; an optional language model may only choose among the cited sentences.
     order: 5

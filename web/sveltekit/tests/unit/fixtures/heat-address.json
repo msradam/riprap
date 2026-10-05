@@ -33,7 +33,7 @@
     "id": "capstone",
     "name": "Capstone",
     "tagline": "The Synthesiser",
-    "description": "Writes the cited briefing from the evidence, with or without an LLM.",
+    "description": "Assembles the cited briefing from the evidence by fixed rules; an optional language model may only choose among the cited sentences.",
     "order": 5
    }
   ],
