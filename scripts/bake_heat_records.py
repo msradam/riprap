@@ -46,7 +46,7 @@ ED_MEASURES = {1403: "n", 1404: "annual_rate", 1405: "age_adjusted_rate"}
 
 
 def _get(url: str) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": "Riprap heat bake (+https://github.com/msradam/riprap)"})
+    req = urllib.request.Request(url, headers={"User-Agent": "riprap-heat-bake/1.0"})
     with urllib.request.urlopen(req, timeout=60) as r:
         body = r.read()
     time.sleep(1)

@@ -31,7 +31,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 _URL = re.compile(r"https?://[^\s\"'<>)]+")
-UA = "Riprap link check (+https://github.com/msradam/riprap)"
+UA = "riprap-link-check/1.0"
 
 
 def links(deployments: list[str]) -> list[tuple[str, str, str]]:

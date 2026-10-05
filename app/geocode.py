@@ -34,9 +34,7 @@ log = logging.getLogger("riprap.geocode")
 
 URL = "https://geosearch.planninglabs.nyc/v2/search"
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
-NOMINATIM_UA = (
-    "Riprap/0.8 (civic flood-evidence tool; +https://github.com/msradam/riprap)"
-)
+NOMINATIM_UA = http.USER_AGENT  # the application's name; no personal identifier is sent to any service
 
 # NYC-bbox guard: lat 40.49–40.92, lon -74.27 to -73.69.
 NYC_BBOX = (40.49, -74.27, 40.92, -73.69)

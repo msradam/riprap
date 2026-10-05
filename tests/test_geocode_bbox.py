@@ -231,3 +231,13 @@ def test_a_geocoder_failure_logs_no_typed_text(monkeypatch, caplog):
         assert gc.geocode(typed) == [] and gc.geocode_nominatim(typed) is None
     assert [r.getMessage() for r in caplog.records] == ["Geosearch failed: ConnectTimeout",
                                                          "Nominatim fetch failed: ConnectTimeout"]
+
+
+def test_no_user_agent_names_a_person():
+    """No personal identifier goes to any service: the User-Agent is a
+    product token, with no repository URL (it holds a GitHub handle), no
+    email address and no contact parameter."""
+    import re
+
+    for ua in (gc.http.USER_AGENT, gc.NOMINATIM_UA):
+        assert ua.startswith("Riprap/") and not re.search(r"https?:|github|@|mailto|msradam", ua, re.I), ua
