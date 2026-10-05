@@ -88,7 +88,8 @@ _NOT_PLACE = {"is", "are", "was", "were", "what", "how", "has", "have", "does", 
               "can", "could", "will", "would", "which", "where", "when", "why", "who", "the", "a", "an", "i",
               "nyc", "new", "york", "city", "fema", "dep", "nws", "noaa", "usgs", "mta", "nycha", "doe", "sandy",
               "ida", "hurricane", "floodnet", "npcc4", "ny", "in", "we're", "i'm", "it's", "its",
-              "national", "weather", "service", "health", "department", "council", "npcc", "heat", "landsat"}
+              "national", "weather", "service", "health", "department", "council", "npcc", "heat", "landsat",
+              "riprap"}
 
 
 def _district(prefix: str, n: int) -> tuple[str | None, str | None]:
@@ -308,6 +309,33 @@ def _close_name(phrase: str) -> str | None:
         return None  # a typo keeps its first letter and its number of words ("is coney island" is no typo)
     full = names[hit[0]]
     return re.sub(r"\s*\(.*?\)", "", full).strip().title() if full != hit[0] else hit[0].title()
+
+
+# A building, a market or a corner named after a preposition ("the block around La Marqueta, East Harlem").
+_AT_NAME_RE = re.compile(r"\b(?:around|near|at|outside|beside|behind|by|in front of|next to|across from)\s+(?:the\s+)?"
+                         r"((?-i:[A-Z])[\w.'-]*(?:\s+(?-i:[A-Z])[\w.'-]*){0,3})", re.IGNORECASE)
+_NOT_A_SPOT = {"january", "february", "march", "april", "may", "june", "july", "august", "september", "october",
+               "november", "december", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+               "hurricane", "superstorm", "tropical", "community", "board", "district"}
+
+
+def unplaced_name(text: str, area: str) -> str | None:
+    """The named spot a question asks about ("La Marqueta") when the
+    answer is for the area beside it ("East Harlem") because the spot was
+    never looked up: a capitalised name after "around", "near" or "at" that
+    is no neighbourhood, borough, district, storm or agency. The answer then
+    says the spot could not be located and gives no yes or no about it."""
+    from app.areas import nta  # noqa: PLC0415
+
+    for m in _AT_NAME_RE.finditer(text or ""):
+        name = m.group(1).strip(" ,.")
+        low = name.lower()
+        if (low in _known_neighbourhoods() or low in _BOROUGH or low in area.lower() or area.lower() in low
+                or any(re.sub(r"'s$", "", w).strip(".,") in _NOT_PLACE | _NOT_A_SPOT for w in low.split()) or parse_district(name)[0]
+                or nta.resolve(name)):
+            continue
+        return name
+    return None
 
 
 def landmark_phrase(text: str) -> str | None:

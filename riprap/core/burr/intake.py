@@ -36,6 +36,7 @@ from riprap.core.burr.place import (
     geocode_matches,
     landmark_phrase,
     resolve_query,
+    unplaced_name,
 )
 from riprap.core.burr.rule_answer import (  # one definition of "now"
     _clauses,
@@ -111,6 +112,17 @@ NO_PLACE_NOW = ("Riprap reads the records for one place at a time, and this ques
                 "flooding across the city right now, use the FloodNet sensor dashboard (dataviz.floodnet.nyc); "
                 "official warnings come from the National Weather Service (weather.gov/okx) and Notify NYC. "
                 "Add an address or a neighbourhood to get the readings near it.")
+# A question about Riprap itself ("Who made Riprap and who pays for it?") names no place: it once went to
+# the geocoder as a place called Riprap.
+_ABOUT_RE = re.compile(r"\b(?:who|what|how|why|where)\b[^.?!]*\briprap\b|\briprap\b[^.?!]*\b(?:made|built|funded|pays?|paid|owns?|"
+                       r"runs?|open[- ]source|licen[cs]ed?)\b", re.I)
+ABOUT = ("This is a question about Riprap itself, not about a place, so there is no briefing for it. What Riprap is, "
+         "who makes it, how it is paid for and what it reads are on its about page (/about).")
+NAMED_POINT = ("The name typed, {typed}, was matched by the geocoder to one building or point, {found}, and not to a "
+               "neighbourhood: this briefing is read around that point. For an area, name a community district such "
+               "as MN11; for a block, give a street address with its house number.")
+NOT_LOCATED = ("Riprap could not locate \"{name}\", which this query names: this briefing is for the wider area and "
+               "not for that spot.")
 ONE_PLACE = ("Riprap reads the records for one place at a time, and this question names none: ask about a street "
              "address, a neighbourhood or a community district such as QN12.")
 NO_PLACE_HEAT = ("Riprap reads the records for one place at a time, and this question names none it could find. "
@@ -371,9 +383,20 @@ def _plan_for(q: str, hazard: str) -> dict:
     # phrase. Never the whole question: that is how "... Queens ..." once
     # resolved to Astoria.
     place = resolve_query(q)
+    if _ABOUT_RE.search(q) and place["kind"] not in ("address", "district", "invalid") and not (
+            place["text"] and nta.resolve(place["text"])):
+        return {"intent": "not_implemented", "rationale": ABOUT, "targets": [], "place": place}
     if place["kind"] == "invalid":
-        return {"intent": "not_implemented", "rationale": place["message"], "targets": [], "place": place}
-    if not heat and place["kind"] is None and not landmark_phrase(q) and (held := not_held(q)):
+        # "Should Community Board 11 prioritize ...": what Riprap does not do is said first, then why the
+        # district could not be read (the borough note once stood alone).
+        held = None if heat else not_held(q)
+        return {"intent": "not_implemented", "rationale": f"{held[1]} {place['message']}" if held else place["message"],
+                "targets": [], "place": place}
+    # Words taken for a place that are the not-held topic's own ("Local Law" in "What does Local Law 188 of 2025
+    # say?") name no place: the geocoder is not asked about them.
+    no_place = place["kind"] is None or (place["kind"] == "neighborhood" and not nta.resolve(place["text"])
+                                         and bool(not_held(f"{place['text']}?")))
+    if not heat and no_place and not landmark_phrase(q) and (held := not_held(q)):
         # "Which community district has the most flooding?": no place, and a thing Riprap does not hold. It was
         # once told only that "Which community district has the most" matched no place.
         return {"intent": "not_implemented", "rationale": f"{held[1]} {ONE_PLACE}", "targets": [], "place": place}
@@ -629,6 +652,9 @@ def geocode_target(state: State) -> State:
             "match": "exact" if geocode_matches(target, h.address) else "closest",
             "note": h.note,  # an address that exists in more than one borough: which was chosen
         }
+        if gdict["match"] == "closest" and not h.note and resolve_query(target)["kind"] != "address":
+            # "Has El Barrio flooded?" once became El Museo del Barrio, 1230 5th Avenue, with no word of it.
+            gdict["note"] = NAMED_POINT.format(typed=target.split(",")[0].strip(), found=h.address)
         rec["ok"] = True
         # The UI reads lat/lon out of this trace `result` to drive its
         # `geocodeSucceeded` flag (without them the /q/[queryId] page
@@ -700,6 +726,11 @@ def resolve_area(state: State) -> State:
         geocode = {"address": f"{t['nta_name']}, {t['borough']}", "borough": t["borough"],
                    "lat": c.y, "lon": c.x,
                    "match": "exact" if exact else "closest", "note": note}
+        if not district and (spot := unplaced_name(state.get("query") or "", name)):
+            # A building, market or corner named beside the area was never looked up: said in the place note,
+            # and the answer gives no yes or no about it (synthesis).
+            geocode["unplaced"] = spot
+            geocode["note"] = " ".join(filter(None, (NOT_LOCATED.format(name=spot), note)))
         return state.update(geocode=geocode, lat=c.y, lon=c.x, nta=info,
                             polygon_wkt=t["geometry"].wkt, trace=trace)
     finally:

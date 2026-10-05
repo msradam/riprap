@@ -55,6 +55,7 @@ ALIASES = {
     "flushing":         "Flushing-Willets Point",
     "harlem":           "Central Harlem (North)",
     "east harlem":      "East Harlem (North)",
+    "el barrio":        "East Harlem (North)",
     "washington heights":"Washington Heights (North)",
     "midtown":          "Midtown South-Flatiron-Union Square",
     "upper east side":  "Upper East Side-Carnegie Hill",
@@ -222,7 +223,9 @@ def resolution_note(typed: str, area: dict, borough: str | None = None) -> str |
     if _normalize(typed) == _normalize(name):
         return None
     g = load()
-    others = g[_holds(g["ntaname"], typed) & (g["nta2020"] != area["nta_code"])]
+    # An alias that is not in the area's own name ("El Barrio" for East Harlem): the others of the area's name.
+    held = typed if typed.lower() in name.lower() else re.sub(r"\s*\(.*?\)", "", name).strip()
+    others = g[_holds(g["ntaname"], held) & (g["nta2020"] != area["nta_code"])]
     if borough:
         others = others[others["boroname"] == borough]
     listed = [f"{r.ntaname} ({r.boroname})" for r in others.itertuples()]
