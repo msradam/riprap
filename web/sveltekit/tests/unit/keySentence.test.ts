@@ -18,7 +18,7 @@ const QN12 =
   'From the sources consulted: 4273 NYC 311 flood-related complaints filed inside this area in the last 3 years: 2663 sewer backup, 932 catch basin, 533 street flooding, 145 manhole overflow [nyc311_nta].';
 const IDA =
   'Yes. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this address [ida_hwm]. ' +
-  'Nearest mark: 174 m away [ida_hwm]. 2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years [floodnet]. ' +
+  'Nearest mark: 174 m away [ida_hwm]. 2 FloodNet sensors within 600 m have recorded 14 flood events in the last 3 years [floodnet]. ' +
   '82 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years [nyc311]. Peak depth: 1172 mm [floodnet].';
 
 describe('keySentence', () => {
@@ -46,7 +46,7 @@ describe('keySentence', () => {
 
   it('picks the first of several sentences citing the doc', () => {
     const k = keySentence(answerOf(IDA), { doc_id: 'floodnet', in_lead: false })!;
-    expect(words(k.key)).toMatch(/^2 FloodNet community sensors/);
+    expect(words(k.key)).toMatch(/^2 FloodNet sensors/);
   });
 
   it('singles out nothing without a lead fact, or when the sentence is not there', () => {

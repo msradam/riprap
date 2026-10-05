@@ -66,7 +66,7 @@ const FIELD_LABELS: Record<string, string> = {
   forecast_peak_ft_mllw: 'Forecast peak water level (ft above MLLW)',
   // floodnet
   n_sensors: 'Sensors nearby',
-  n_flood_events_3y: 'Flood events, last 3 years',
+  n_flood_events_3y: 'Verified flood events, up to 3 years',
   n_sensors_with_events: 'Sensors with flood events',
   // nws_obs, noaa_tides, usgs_gauges
   distance_km: 'Distance to station (km)',

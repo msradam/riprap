@@ -94,6 +94,6 @@ describe('landing load', () => {
     expect(specimen.question).toBe(entry!.question);
     expect(specimen.question).toBe('Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?');
     // The briefing's answer opens with the lead word, then its key sentence.
-    expect(await plainBriefing(SPECIMEN_SLUG)).toMatch(/\*\*Answer\.\*\* Yes\. \d+ FloodNet community sensors? /);
+    expect(await plainBriefing(SPECIMEN_SLUG)).toMatch(/\*\*Answer\.\*\* Yes\. \d+ FloodNet (community )?sensors? /);
   });
 });

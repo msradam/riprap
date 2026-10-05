@@ -184,10 +184,10 @@ export const GLOSSARY: { term: string; re: RegExp; reading: string }[] = [
     reading: "mean lower low water, the average of each day's lower low tide; NOAA tide readings are measured against it."
   },
   {
-    term: 'above-curb flood event',
-    re: /above-curb/i,
+    term: 'flood event (FloodNet)',
+    re: /FloodNet[^.]*flood event|above-curb/i,
     reading:
-      "a flood event logged by a FloodNet street sensor, which measures the depth of water on the street; the count uses FloodNet's own event records."
+      "in FloodNet's record, a series of depth measurements greater than 10 mm at the sensor. The depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events FloodNet's data marks as verified by a person."
   }
 ];
 

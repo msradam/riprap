@@ -9,7 +9,7 @@ PAST = {"hazard": "flood", "time_frame": "past", "assets": []}
 Q_IDA = "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?"
 Q_SENSOR = "Have the FloodNet sensors near 80 Pioneer Street recorded flooding?"
 TEXTS = {"nyc311": "82 NYC 311 flood-related complaints filed within 200 m in the last 5 years.",
-         "floodnet": "2 FloodNet community sensors within 600 m have logged 14 above-curb flood events.",
+         "floodnet": "2 FloodNet sensors within 600 m have recorded 14 flood events.",
          "ida_hwm": "USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this address.",
          "nyc311_nta": "4273 NYC 311 flood-related complaints filed inside this area in the last 3 years."}
 HOLLIS = {"nyc311": {"n": 82, "years": 5, "by_year": {"2021": 7, "2022": 6, "2025": 28}},

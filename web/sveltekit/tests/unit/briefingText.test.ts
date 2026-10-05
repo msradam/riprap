@@ -119,8 +119,8 @@ describe('dates', () => {
 describe('termsIn', () => {
   it('shows only the terms the page uses, plus the tier words with a table', () => {
     expect(termsIn('elevation 48.2 ft NAVD88', false).map((t) => t.term)).toEqual(['NAVD88']);
-    expect(termsIn('2050 SLR; 14 above-curb flood events', true).map((t) => t.term))
-      .toEqual(['SLR', 'above-curb flood event', 'Measured, Modeled, Proxy']);
+    expect(termsIn('2050 SLR; 2 FloodNet sensors within 600 m have recorded 14 flood events', true).map((t) => t.term))
+      .toEqual(['SLR', 'flood event (FloodNet)', 'Measured, Modeled, Proxy']);
     expect(termsIn('SLRs and slurry', false)).toEqual([]);
     expect(termsIn('water level 1.2 ft above MLLW', false).map((t) => t.term)).toEqual(['MLLW']);
   });

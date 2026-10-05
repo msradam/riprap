@@ -56,7 +56,7 @@ def test_two_maps_that_agree_cannot_make_a_partly():
 
 
 def test_a_question_about_now_quotes_the_live_sources_in_code():
-    texts = {**TEXTS, "floodnet": "2 FloodNet community sensors within 600 m have logged 14 above-curb flood events in the last 3 years.",
+    texts = {**TEXTS, "floodnet": "2 FloodNet sensors within 600 m have recorded 14 flood events in the last 3 years.",
              "noaa_tides": "Latest reading at Kings Point, NY: 6.6 ft above MLLW, observed 2026-09-30 15:48 UTC."}
     out = {"answer": {"lead": "no", "facts": ["nws_alerts"]}}
     lead, facts, _ = _extract(out, "Is it flooding right now near 90-01 183rd Street, Queens?", texts,

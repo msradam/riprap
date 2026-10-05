@@ -166,15 +166,16 @@ def test_count_answer_quotes_only_the_counted_source(monkeypatch):
 
 def test_a_qualifying_sentence_does_not_turn_events_into_an_absence():
     """'Have street flood sensors recorded flooding near 214 3rd Street?' got
-    cannot_answer: the FloodNet sentence's 'not used for the peak' read as
-    an absence and the rule's 'yes' was thrown out."""
+    cannot_answer: a 'not' in a later FloodNet sentence read as an absence
+    and the rule's 'yes' was thrown out."""
     from riprap.core.burr.answer_checks import reports_result
 
-    doc = ("5 FloodNet community sensors within 600 m have logged 28 above-curb flood events in the last "
-           "3 years. Peak depth recorded by the sensors in good working order: 715 mm on 2026-08-23. 1 sensor "
-           "that logged 3 of these events is flagged by FloodNet for maintenance, so its depths are not used for the peak.")
+    doc = ("5 FloodNet sensors within 600 m have recorded 28 flood events in the last "
+           "3 years. Among the sensors listed as good, the highest depth is 715 mm on 2026-08-23. 1 sensor "
+           "with a status other than good recorded 3 of the 28 events; Riprap, not FloodNet, chooses to rest a yes "
+           "or no answer only on events from sensors listed as good.")
     assert reports_result(doc)
-    assert not reports_result("1 FloodNet community sensor within 600 m has logged 0 above-curb flood events "
+    assert not reports_result("1 FloodNet sensor within 600 m has recorded 0 flood events "
                               "in the last 3 years.")
     assert not reports_result("No FloodNet sensors deployed within 600 m of this address.")
 
@@ -188,7 +189,7 @@ def test_since_ida_with_no_mark_nearby_keeps_the_rules_yes():
     from riprap.core.burr.answer_checks import check_lead
 
     q = "Has the block around 41-17 Main Street, Queens flooded since Hurricane Ida?"
-    texts = {"floodnet": "1 FloodNet community sensor within 600 m has logged 8 above-curb flood events in the last 3 years.",
+    texts = {"floodnet": "1 FloodNet sensor within 600 m has recorded 8 flood events in the last 3 years.",
              "nyc311": "18 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years.",
              "ida_hwm": "No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address."}
     values = {"ida_hwm": {"n_within_radius": 0}}

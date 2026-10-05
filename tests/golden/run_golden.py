@@ -154,8 +154,8 @@ def expected_lead(question: str, k: dict) -> str:
         if k.get("sandy_edge_m") is not None and k["sandy_edge_m"] <= 50:
             return "other"
         return "yes" if k["sandy_inside"] else "no"
-    # A yes rests on a sensor in good working order: events only at sensors
-    # FloodNet flags for maintenance are quoted with the flag and no yes.
+    # A yes rests on a sensor FloodNet's API lists as good (the app's rule):
+    # events only at sensors with another status are quoted with it and no yes.
     if "sensor" in q:
         if fn["n_sensors"] == 0 or (fn["n_events"] and not fn["n_events_good"]):
             return "other"
@@ -205,7 +205,7 @@ def score_question(base: str, question: str) -> dict:
         got = "yes" if lead == "yes" else "no" if lead == "no" else "other"
         check(res["facts"], "answer lead", got, want)
     # Every number the answer quotes must be a key number for this point.
-    quoted = {int(n) for n in re.findall(r"\b(\d+) (?:NYC 311|FloodNet|above-curb|Hurricane Ida high)", ans)}
+    quoted = {int(n) for n in re.findall(r"\b(\d+) (?:NYC 311|FloodNet|flood events?|Hurricane Ida high)", ans)}
     known = {k["nyc311"]["n"], k["floodnet"]["n_sensors"], k["floodnet"]["n_events"], k["ida_hwm"]["n"]}
     check(res["facts"], "numbers quoted are key numbers", sorted(quoted), sorted(known & quoted),
           ok=quoted <= known)

@@ -66,7 +66,7 @@ def test_are_there_any_counts_the_kind_the_question_names():
     v = {"nyc311": {"n": 12, "years": 5, "by_kind": {"street flooding": 12}}}
     assert ra.answer("Are there any sewer backup complaints near here?", texts, v)[0] == "no"
     assert ra.answer("Are there any street flooding complaints near here?", texts, v)[0] == "yes"
-    sensors = {"floodnet": "2 FloodNet community sensors within 600 m have logged 0 flood events."}
+    sensors = {"floodnet": "2 FloodNet sensors within 600 m have recorded 0 flood events."}
     v = {"floodnet": {"n_sensors": 2, "n_flood_events_3y": 0}}
     assert ra.answer("Do the sensors show any flooding?", sensors, v)[0] != "yes"
     assert ra.answer("Is there a FloodNet sensor near here?", sensors, v)[0] == "yes"
@@ -292,7 +292,7 @@ def test_311_complaints_alone_do_not_make_has_it_flooded_a_yes():
     v = {"nyc311": {"n": 29, "years": 5, "by_year": {"2022": 9, "2023": 10, "2024": 10}}}
     assert ra.answer("Has 350 Fifth Avenue, Manhattan flooded since Hurricane Ida?", texts, v) == ("facts", ["nyc311"])
     assert ra.answer("Have people near 350 Fifth Avenue reported flooding to 311 since 2022?", texts, v)[0] == "yes"
-    sensors = {**texts, "floodnet": "2 FloodNet community sensors within 600 m have logged 14 flood events."}
+    sensors = {**texts, "floodnet": "2 FloodNet sensors within 600 m have recorded 14 flood events."}
     v2 = {**v, "floodnet": {"n_sensors": 2, "n_flood_events_3y": 14}}
     assert ra.answer("Has this block flooded since Hurricane Ida?", sensors, v2)[0] == "yes"
 

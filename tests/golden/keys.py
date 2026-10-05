@@ -148,7 +148,8 @@ def _floodnet_summary(near: list[dict], years: int) -> dict:
     events: list[dict] = []
     if ids:
         q = ("query($ids:[String!],$since:timestamp!){ sensor_events(where:{deployment_id:{_in:$ids},"
-             "start_time:{_gte:$since},label:{_eq:\"flood\"}}, limit: 10000)"
+             # (the events a person verified, as the app counts them)
+             "start_time:{_gte:$since},label:{_eq:\"flood\"},annotated_by:{_eq:\"human\"}}, limit: 10000)"
              "{ deployment_id start_time max_depth_proc_mm } }")
         events = _post_json(_FLOODNET, {"query": q, "variables": {"ids": ids, "since": since}})["data"]["sensor_events"]
         # The table holds events stamped 2080 (a sensor clock fault): none of those is in "the last 3 years".

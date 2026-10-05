@@ -11,7 +11,7 @@ from riprap.core.burr import rule_answer as ra
 from riprap.core.burr.intake import heuristic_plan
 from riprap.core.burr.place import resolve_query
 
-FLOODNET_QUIET = {"floodnet": "2 FloodNet community sensors within 600 m have logged 0 above-curb flood events in the "
+FLOODNET_QUIET = {"floodnet": "2 FloodNet sensors within 600 m have recorded 0 flood events in the "
                               "last 3 years.",
                   "nyc311": "0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years."}
 QUIET_VALUES = {"floodnet": {"n_sensors": 2, "n_flood_events_3y": 0, "n_flood_events_good_3y": 0},
@@ -65,9 +65,9 @@ def test_a_register_gives_no_yes_or_no_about_fema_zones(question):
     assert ra.answer(question, texts, v)[0] == "facts"
 
 
-def test_events_only_at_a_flagged_sensor_are_not_a_yes():
-    texts = {"floodnet": "1 FloodNet community sensor within 600 m has logged 5 above-curb flood events in the last 3 "
-                         "years. 1 sensor that logged 5 of these events is flagged by FloodNet for maintenance."}
+def test_events_only_at_a_sensor_not_listed_as_good_are_not_a_yes():
+    texts = {"floodnet": "1 FloodNet sensor within 600 m has recorded 5 flood events in the last 3 "
+                         "years. 1 sensor with a status other than good recorded 5 of the 5 events."}
     flagged = {"floodnet": {"n_sensors": 1, "n_flood_events_3y": 5, "n_flood_events_good_3y": 0}}
     focus = {"time_frame": "past"}
     assert ac.past_event_lead("Has 80 Pioneer Street flooded?", focus, ["floodnet"], texts, flagged)[0] == "cannot_answer"
@@ -207,7 +207,7 @@ def test_a_district_reads_the_sensors_inside_it(monkeypatch):
         floodnet.FloodEvent(i, "2026-05-01T00:00:00", "2026-05-01T01:00:00", 120, "flood") for i in ids])
     v = floodnet.summary_for_polygon(box(-74.0, 40.55, -73.9, 40.65))
     assert v["n_sensors"] == 1 and v["n_flood_events_3y"] == 1
-    assert v["narrative"].startswith("1 FloodNet community sensor inside this area has logged 1 above-curb flood event")
+    assert v["narrative"].startswith("1 FloodNet sensor inside this area has recorded 1 flood event")
     assert v["narrative"].endswith("Most events: Dover Street (1).")
     empty = floodnet.summary_for_polygon(box(0, 0, 1, 1))
     assert empty["n_sensors"] == 0 and empty["narrative"] == "No FloodNet sensors are deployed inside this area."
