@@ -76,3 +76,38 @@ describe('a question that asks whether a place will flood', () => {
     expect(model(`96 hours are forecast. ${NWS}`, { answer_lead: 'facts' }).lead).toBe('96');
   });
 });
+
+describe('the leads added for advice, a missing house number and land cover over time', () => {
+  const NO_ADVICE =
+    'Riprap reports public records about a place. It does not price flood insurance, value property or give advice on buying, renting or whether a home is safe. The FEMA flood zone here, from the effective map (the one FEMA uses for the National Flood Insurance Program) first:';
+  const NEEDS_ADDRESS =
+    'Riprap read this question for the neighbourhood or district as a whole, because it names no house number, and the USGS high-water marks surveyed after Hurricane Ida are read around a street address. Type the address with its house number, such as 90-01 183rd Street, Queens, to get the marks near it.';
+  const NO_CHANGE = 'Riprap has no like-for-like record of change in land cover here. What the sources below show is one year each, not a change:';
+
+  it.each([
+    ['no_advice', NO_ADVICE],
+    ['needs_address', NEEDS_ADDRESS],
+    ['no_change_record', NO_CHANGE]
+  ] as const)('%s sets no Yes, No or figure large and opens with its statement', (lead, phrase) => {
+    const m = model(`${phrase} ${NWS}`, { answer_lead: lead, lead_fact: null });
+    expect(m.lead).toBeNull();
+    expect(m.leadWord).toBeNull();
+    expect(words(m).startsWith(phrase.slice(0, 40))).toBe(true);
+    // Even a paragraph that opens with a figure sets none under these leads.
+    expect(model(`96 hours are forecast. ${NWS}`, { answer_lead: lead }).lead).toBeNull();
+  });
+});
+
+describe('the paragraph that names the place', () => {
+  it('is left to the page place line, which already carries it', () => {
+    const final = {
+      paragraph: `Scope sentence.\n\nPlace described: QN12, Queens. The shape used for QN12 is an approximation.\n\n**Answer.**\nFrom the sources consulted: ${NWS}`,
+      citations: { nws_water_forecast: { doc_id: 'nws_water_forecast', source: 'NWS', title: 'Water-level forecast', maturity: 'production' } },
+      grounding: { tier: 'no_llm', question: QUESTION, answer_mode: 'rules', answered: true, answer_lead: 'facts' }
+    } as unknown as FinalResult;
+    const m = briefingModel(RunState.fromFinal(final, 'QN12'), QUESTION);
+    const scope = m.scope.map((p) => p.map((x) => x.text).join('')).join(' ');
+    expect(scope).toContain('Scope sentence.');
+    expect(scope).not.toContain('Place described');
+  });
+});

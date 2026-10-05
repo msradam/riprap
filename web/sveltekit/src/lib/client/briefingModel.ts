@@ -29,6 +29,10 @@ export type EvidenceCard = Pick<Card, 'id' | 'source' | 'experimental' | 'title'
 const LEAD_RE = /^(Yes|No|Partly|In part|Not clear|Unclear)\.\s*/;
 const COUNT_RE = /^([\d,]+(?:\.\d+)?%?)\s+/;
 const DISTRICT_RE = /^[A-Z]{2}\s?\d{1,2}$/i;
+/** How the backend opens the paragraph that names the place (templated_reconciler.place_line). */
+const PLACE_LINE = 'Place described: ';
+/** The leads that may set a word or a figure large. */
+const WORD_LEADS = new Set<string>(['yes', 'no', 'partly', 'count', 'facts', 'cannot_answer']);
 
 function sections(blocks: BriefingBlock[]): Section[] {
   const out: Section[] = [];
@@ -488,9 +492,10 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   // which is not the headline of a district that floods from rain: a
   // district or neighbourhood briefing sets no figure large, only its text.
   const areaBrief = !question && POLYGON_INTENTS.has(f?.intent ?? run.plan?.intent ?? '');
-  // The "experimental" and "no_prediction" leads are phrases set by code,
-  // with no yes, no or count: nothing is set large.
-  const neutralLead = g?.answer_lead === 'experimental' || g?.answer_lead === 'no_prediction';
+  // Every lead but these is a phrase set by code ("experimental",
+  // "no_prediction", "no_advice", "needs_address", "no_change_record" and
+  // the heat leads), with no yes, no or count: nothing is set large.
+  const neutralLead = !!g?.answer_lead && !WORD_LEADS.has(g.answer_lead);
   const leadWord = refusal || areaBrief || neutralLead
     ? null : first.word ?? (keyed && g?.answer_lead === 'count' ? countLead(keyed) : null);
 
@@ -498,7 +503,9 @@ export function briefingModel(run: RunState, queryText: string, meta?: SnapshotM
   const outParas = sections(split.outOfScope).flatMap((s) => s.paras);
   const checks = outParas.find((p) => text(p).startsWith('Checks run'));
   const outOfScope0 = outParas.filter((p) => p !== checks);
-  const scope0 = sections(split.scope).flatMap((s) => s.paras);
+  // The backend's "Place described: ..." paragraph is for the text when it is
+  // copied on its own; the page's place line already says it (resolvedPlace).
+  const scope0 = sections(split.scope).flatMap((s) => s.paras).filter((p) => !text(p).startsWith(PLACE_LINE));
   const body0 = refusal ? [] : sections(split.body).map((s) => ({ ...s, label: stoneHead(s.label) }));
 
   const cited = citedIn(answerParas);

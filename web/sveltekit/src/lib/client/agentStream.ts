@@ -109,12 +109,19 @@ export interface DroppedClaim extends GroundedClaim {
 
 /** The kind of lead an answer takes. "yes", "no" and "partly" open it with
  *  that word and "count" with a figure. "facts" is the facts with no lead
- *  word, and "cannot_answer" says the sources do not answer. Two are set
- *  only by code and have no yes, no or count: "experimental" (the answer is
- *  formed by an experimental model alone) and "no_prediction" (the question
- *  asked whether a place will flood). */
+ *  word, and "cannot_answer" says the sources do not answer. The rest are
+ *  set only by code (synthesis.py LEAD_PHRASES) and open with a fixed
+ *  statement, never a yes, a no or a count: "experimental" (the answer is
+ *  formed by an experimental model alone), "no_prediction" (the question
+ *  asked whether a place will flood), "no_advice" (insurance, price,
+ *  buying, renting or safety: out of scope, then the FEMA zone),
+ *  "needs_address" (Ida's marks need a house number), "no_change_record"
+ *  (land cover over time), and the others below. */
 export type AnswerLead =
-  | 'yes' | 'no' | 'partly' | 'count' | 'facts' | 'cannot_answer' | 'experimental' | 'no_prediction';
+  | 'yes' | 'no' | 'partly' | 'count' | 'facts' | 'cannot_answer' | 'experimental' | 'no_prediction'
+  | 'no_advice' | 'needs_address' | 'no_change_record'
+  | 'no_satellite' | 'no_ranking' | 'no_score' | 'no_deaths' | 'cooling_centers'
+  | 'heat_forecast' | 'no_prediction_heat' | 'no_prediction_far' | 'surface_yes' | 'surface_no';
 
 /** How the briefing was produced. `llm`: model-written claims checked
  *  against their cited sources (failures land in dropped_claims).
