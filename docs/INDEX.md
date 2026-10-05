@@ -5,14 +5,15 @@ you're new; jump directly if you know what you need.
 
 | Doc | Purpose |
 |---|---|
-| [BACKGROUND.md](BACKGROUND.md) | Why Riprap exists, who it is for and not for, the Five Stones in full and how they generalise beyond NYC. |
-| [DATA-SOURCES.md](DATA-SOURCES.md) | The public sources behind the NYC deployment and what each is used for. |
+| [BACKGROUND.md](BACKGROUND.md) | Why Riprap exists, who it is for and not for, related work and how Riprap differs from or defers to it, the Five Stones in full and how they generalise beyond NYC. |
+| [DATA-SOURCES.md](DATA-SOURCES.md) | The public sources behind the NYC deployment and what each is used for; every NYC Open Data dataset by name and ID, with what Riprap does to it. |
+| [ACCESSIBILITY.md](ACCESSIBILITY.md) | The accessibility statement: the standard (WCAG 2.2 AA), how it was tested, what the code review found, known limitations and how to report a barrier. |
 | [MODELS.md](MODELS.md) | The optional LLM, the two experimental models (what each can and cannot answer, with their backtests), the retired satellite water layer and its two tests, and how energy is recorded. |
 | [REPOSITORY.md](REPOSITORY.md) | Code map: the pipeline at a glance, source-of-truth paths and the repository tree. |
 | [PRIVACY.md](PRIVACY.md) | What Riprap stores and sends, 311 redaction, and a do-no-harm note. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Full system shape: the one Burr app, Five-Stone taxonomy, evidence and LLM claims checked in code for citations and numbers, SvelteKit + FastAPI + MCP surface. Start here. |
 | [GROUNDING.md](GROUNDING.md) | How a briefing is grounded: manifest-rendered evidence, no-LLM mode and its rule answers, LLM answers checked in code, what is not checked. |
-| [METHODOLOGY.md](METHODOLOGY.md) | Why Riprap computes no score, the evidence classes, the asset-register rule, terrain indices and scope. |
+| [METHODOLOGY.md](METHODOLOGY.md) | Why Riprap computes no score, the evidence classes, the asset-register rule, terrain indices and scope; what the data cannot say, the distances, time windows and filters behind each count, and how to report an error. |
 | [DEPLOY.md](DEPLOY.md) | Running Riprap: local with no LLM, local with an LLM, Docker, and an optional GPU LLM endpoint on Modal. |
 | [briefing-standards.md](briefing-standards.md) | The FEMA, IPCC, TCFD, ASTM, AP Stylebook and SPJ rules behind the 13 disclosure checks (caveat-phrase substring tests, not a quality score). |
 | [EMISSIONS.md](EMISSIONS.md) | Per-call energy ledger in `app/emissions.py`: measured, estimated or unknown, and why hosted endpoints get no figure. |
@@ -35,7 +36,7 @@ Design records: [PRODUCT.md](PRODUCT.md) (product context) and [DESIGN.md](DESIG
 
 Top-level docs that complement these:
 
-- [`README.md`](../README.md): what Riprap does, status, quickstart, privacy, how to cite.
+- [`README.md`](../README.md): what Riprap does, what it cannot tell you, status, quickstart, where a model runs and how Riprap was built, privacy, how to cite.
 - [`CONTRIBUTING.md`](../.github/CONTRIBUTING.md): dev setup, probe scripts, PR flow.
 - [`CHANGELOG.md`](../CHANGELOG.md): version history (`v0.5.0` is the hackathon submission).
 - [`SECURITY.md`](../.github/SECURITY.md): vulnerability disclosure.

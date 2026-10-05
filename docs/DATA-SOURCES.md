@@ -19,6 +19,48 @@ for an address, 19 for a neighbourhood or district); a heat briefing reads
 land cover map and the area outline). The experimental model layers are
 listed after the tables.
 
+## NYC Open Data datasets
+
+Every dataset Riprap reads from [NYC Open Data](https://opendata.cityofnewyork.us/),
+by the name the portal gives it and its four-by-four ID. The names, agencies
+and update dates below were read from
+`https://data.cityofnewyork.us/api/views/<id>.json` on 5 October 2026.
+"Modification" is what Riprap does to the data before a sentence is written
+from it; the exact filters are in
+[METHODOLOGY.md](METHODOLOGY.md#11-distances-time-windows-and-filters).
+
+Riprap is an independent project. It is not a product of the City of New
+York, and no City agency has reviewed or endorsed it. Under the City's open
+data law, public data sets on the portal "are provided for informational
+purposes. The city does not warranty the completeness, accuracy, content or
+fitness for any particular purpose or use of any public data set made
+available on the web portal"
+([Local Law 11 of 2012, section 23-504](https://cityofnewyork.github.io/opendatatsm/LocalLaw11of2012.html)).
+Errors in a briefing are Riprap's unless the issue tracker shows otherwise.
+
+| Dataset (portal name) | ID | Agency | Version read | Modification by Riprap |
+|---|---|---|---|---|
+| [311 Service Requests from 2020 to Present](https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9) | `erm2-nwe9` | Office of Technology and Innovation (311) | Live at each query; the portal updates it daily | Filtered to complaint types "Sewer" and "Sewer Maintenance" and eleven flood descriptors; counted within 200 m of an address over 5 years, or by `community_board` or a neighbourhood outline over 3 years; a complaint filed twice within ten minutes at one address counts once. No free text is fetched |
+| [Sandy Inundation Zone](https://data.cityofnewyork.us/Environment/Sandy-Inundation-Zone/5xsi-dfpx) | `5xsi-dfpx` | Department of Small Business Services | Historical; rows last updated 2015-11-09; copied 2026-07-11 | Polygons rasterised; read at the cell under an address, with the distance to the edge when within 50 m; for an area, the share of its land inside |
+| [NYC Stormwater Flood Maps](https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv) | `9i7c-xyvv` | Department of Environmental Protection | Rows last updated 2024-07-03; copied 2026-07-11 | Three of the four maps are read (Moderate with current sea levels, Moderate with 2050 sea level rise, Extreme with 2080 sea level rise; the Limited map is not). Polygons rasterised to 10 ft cells; read at the cell under an address, or as a share of an area. No depth is stated beyond the map's own depth class |
+| [FloodNet: Street Flooding Events Measured by FloodNet Sensors](https://data.cityofnewyork.us/Environment/FloodNet-Street-Flooding-Events-Measured-by-FloodN/aq7i-eu5q) | `aq7i-eu5q` | Department of Environmental Protection, for FloodNet (New York University and The City University of New York) | The portal table updates every 2 weeks | **Not read directly.** Riprap reads the same project's Data API (`api.floodnet.nyc`, an early-access beta), so a count can differ from this table's by the events added or reviewed since its last update; the briefing sentence says which events it counts. Sensors within 600 m or inside an area, events of the last 3 years. Licensed CC BY-NC-SA 4.0, not under Riprap's Apache licence |
+| [NYCHA Public Housing Developments](https://data.cityofnewyork.us/Housing-Development/NYCHA-Public-Housing-Developments/phvi-damg) | `phvi-damg` | New York City Housing Authority | Copied 2026-05-01 | Each development reduced to one point and tested against the Sandy zone and the extreme 2080 scenario; named within 2,000 m of an address or inside an area |
+| [2019 - 2020 School Point Locations](https://data.cityofnewyork.us/d/a3nt-yts4) | `a3nt-yts4` | Department of Education | Historical: the 2019 to 2020 school year, rows last updated 2019-09-04 | Points tested against the same two extents; named within 1,500 m or inside an area. The file includes charter schools. The manifest's source link still points at the companion listing `wg9x-4ke6` |
+| [DOB Permit Issuance](https://data.cityofnewyork.us/Housing-Development/DOB-Permit-Issuance/ipu4-2q9a) | `ipu4-2q9a` | Department of Buildings | Live; the portal updates it daily | Read only for a question about construction in a neighbourhood. This is the older permit file: jobs filed in DOB NOW (`rbx6-tga4`) are not read, so it undercounts current construction |
+| [2020 Neighborhood Tabulation Areas (NTAs)](https://data.cityofnewyork.us/City-Government/2020-Neighborhood-Tabulation-Areas-NTAs-/9nt8-h7nd) | `9nt8-h7nd` | Department of City Planning | Copied 2026-07-11 | Used as area outlines; a community district is drawn as the union of its NTAs, which approximates the official district |
+| [Land Cover Raster Data (2017), 6in Resolution](https://data.cityofnewyork.us/Environment/Land-Cover-Raster-Data-2017-6in-Resolution/he6d-2qns) | `he6d-2qns` | Office of Technology and Innovation | 2017 map; rows last updated 2018-12-07; copied 2026-10-01 | Resampled to 30 m shares of tree canopy, grass, paving and roof; read within a circle or an area. Also the training data of the experimental land-cover model |
+| [NYC Parks Spray Showers](https://data.cityofnewyork.us/d/ckaz-6gaa) | `ckaz-6gaa` | Department of Parks and Recreation | Copied 2026-10-02 | Points within 800 m of an address or inside an area |
+| [NYC Parks Pools](https://data.cityofnewyork.us/d/y5rm-wagw) | `y5rm-wagw` | Department of Parks and Recreation | Copied 2026-10-02 | The same |
+
+Three more sources are city data published elsewhere than the portal: the
+Health Department's Heat Vulnerability Index and heat illness visits (its
+Environment and Health Data Portal), NYC Planning's Community District
+Profiles, and NYC Planning Labs' GeoSearch geocoder. Two are New York State
+open data: [MTA Subway Entrances and Exits: 2024](https://data.ny.gov/Transportation/MTA-Subway-Entrances-and-Exits/i9wp-a4ja)
+(`i9wp-a4ja`, data.ny.gov) and
+[Health Facility General Information](https://health.data.ny.gov/Health/Health-Facility-General-Information/vn5v-hh5r)
+(`vn5v-hh5r`, health.data.ny.gov).
+
 ## Flood
 
 | Source | Publisher | Used for |
@@ -28,7 +70,7 @@ listed after the tables.
 | National Flood Hazard Layer | FEMA | Effective flood zone (2007 FIRM) |
 | Preliminary NFHL (2015 PFIRM) | FEMA | Preliminary flood zone and base flood elevation with its datum, adopted by NYC Building Code Appendix G for flood-resistant construction |
 | Hurricane Ida 2021 high-water marks | USGS Short-Term Network | Surveyed flood marks |
-| FloodNet sensor network | FloodNet NYC | Flood-event log near an address, and for the sensors inside a neighbourhood or district |
+| FloodNet sensor network | FloodNet (New York University and The City University of New York), CC BY-NC-SA 4.0 | Flood-event log near an address, and for the sensors inside a neighbourhood or district |
 | 311 service requests | NYC Open Data (`erm2-nwe9`) | Flood requests, counted under both the coded descriptor names and the plain names the city introduced in 2026 |
 | Tide gauges | NOAA CO-OPS | Water level, predicted tide and residual at the nearest of The Battery, Kings Point and Sandy Hook |
 | Water-level forecast | National Weather Service, National Water Prediction Service | Forecast peak and the flood stage it reaches at the nearest of The Battery, Kings Point and Bergen Point |
@@ -36,7 +78,7 @@ listed after the tables.
 | Observations and alerts | National Weather Service | Precipitation, active warnings |
 | Subway entrances | MTA (`i9wp-a4ja`) | Transit assets |
 | NYCHA developments | NYC Housing Authority (`phvi-damg`) | Public housing |
-| School locations | NYC Department of Education (`wg9x-4ke6`) | Schools |
+| School locations | NYC Department of Education (`a3nt-yts4`, 2019 to 2020) | Public schools, charter schools included |
 | Health facilities | New York State Department of Health (`vn5v-hh5r`) | Hospitals |
 | 3DEP elevation model | USGS | Elevation, HAND and TWI |
 | DOB permits | NYC Department of Buildings (`ipu4-2q9a`) | `development_check` intent |

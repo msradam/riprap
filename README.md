@@ -11,6 +11,10 @@ Ask about an address, a community district such as QN12, or a question such as
 or "Is Hunts Point hotter than the rest of the city?" Riprap answers in seconds
 with a one-page briefing, and every sentence cites a public record and its date.
 
+Rules or an open Granite model read your question and choose the evidence.
+Every sentence you read comes word for word from a public record, with its
+source and date.
+
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/msradam/riprap/actions/workflows/check.yml/badge.svg)](https://github.com/msradam/riprap/actions/workflows/check.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
@@ -63,7 +67,8 @@ A real answer, from the gallery entry
 > flooding, 3 manhole overflow [nyc311].
 
 The "Yes." is set by a rule: at least one observed source reports flooding
-since Ida, on 1 September 2021. No language model wrote or chose any of it.
+since Ida, on 1 September 2021. This answer, like every gallery entry, was
+made by the rules alone: no language model ran.
 The two depths are the same storm at two sensors: FloodNet flags the one that
 read 46.1 in, so Riprap takes the peak from the other and says so.
 
@@ -92,13 +97,14 @@ independent keys and questions written without sight of the code
 ([docs/GROUNDING.md](docs/GROUNDING.md#heat-questions)); it has not been
 through the head-to-head comparison the flood briefing has.
 
-## What it does that other tools do not
+## What it does in one step
 
-(This section is about the flood briefing, where the comparison was run.)
+(This section is about the flood briefing.)
 
-The records are public and each has its own map or portal. As of October 2026
-we know of no other tool that does these four things together for New York
-City:
+The records are public and each has its own map or portal, and other tools
+read many of the same ones ([Related work](docs/BACKGROUND.md#related-work)).
+Riprap's part is to do these four things together for one New York City
+place:
 
 - reads the observed record (311, FloodNet events, Ida high-water marks) and
   the mapped one (two FEMA maps, three city stormwater scenarios, the Sandy
@@ -133,6 +139,17 @@ where they are the authority.
 | Heat and health, by neighbourhood | The NYC Health Department's [Environment and Health Data Portal](https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/hvi/) (Riprap quotes its Heat Vulnerability Index and heat illness visits) |
 | Maps to explore | Rebuild by Design's [Rainproof NYC Flood Map](https://rebuildbydesign.org/rainproof-nyc-map/) for 311 reports, sensors and green infrastructure near an address; the [EJNYC Mapping Tool](https://experience.arcgis.com/experience/6a3da7b920f248af961554bdf01d668b) for citywide layers |
 
+Riprap comes after FloodNet's own dashboard, Rebuild by Design's Rainproof NYC
+map, the City's Stormwater Flood Maps viewer and EJNYC mapping tool,
+FloodHelpNY, NYU's GeoFlood Studio, and BetaNYC's Urban Heat Portal, BoardStat
+and MCP servers for city data. What each is, and how Riprap differs from or
+defers to it, is in [Related work](docs/BACKGROUND.md#related-work).
+
+**Riprap is not an alert or emergency service.** For emergency alerts, sign up
+with [Notify NYC](https://a858-nycnotify.nyc.gov/); to report flooding or ask
+the city for help, use [311](https://portal.311.nyc.gov/); for flood insurance
+questions, see [FloodHelpNY](https://www.floodhelpny.org).
+
 ## Who it is for
 
 Data journalists, community board and council staff, resilience analysts,
@@ -144,6 +161,33 @@ particular place will flood on a particular day or how hot one building will
 get, and it gives no health or safety advice. More in
 [docs/BACKGROUND.md](docs/BACKGROUND.md).
 
+## What it cannot tell you
+
+A briefing describes public records about a place. It is not a judgement on a
+property or on the people who live there. The records have limits, and each
+is sourced in [docs/METHODOLOGY.md](docs/METHODOLOGY.md#10-what-the-data-cannot-say):
+
+- 311 counts are complaints filed, not floods measured, and research finds
+  that some neighbourhoods report less often for the same conditions. A low
+  count is not a dry block.
+- The city's stormwater maps are modelled scenarios. The city says its map
+  "does not provide the exact depth of flooding at any location".
+- Outside a mapped area is not safe: NYC Emergency Management reports that in
+  Hurricane Ida the most heavily impacted areas, "representing over half of
+  all damaged buildings, were also outside of any flood risk scenario".
+- A FloodNet depth is a point measurement under one sensor, not the depth
+  along a street. "Within 600 m" is not "on this block".
+- Surface temperature is not air temperature, and the Heat Vulnerability
+  Index is a rank: the Health Department says "a neighborhood with low
+  vulnerability does not mean no risk".
+- Riprap is in English only.
+
+The distances, time windows and complaint types behind each count are in one
+table a count can be rerun from
+([docs/METHODOLOGY.md](docs/METHODOLOGY.md#11-distances-time-windows-and-filters)).
+Found an error? [Open an issue](https://github.com/msradam/riprap/issues/new/choose);
+corrections are recorded in the [changelog](CHANGELOG.md).
+
 ## Status
 
 | Area | Status |
@@ -151,7 +195,7 @@ get, and it gives no health or safety advice. More in
 | New York City flood | Production: 24 public sources (21 read for an address, 19 for a neighbourhood or district), questions, and all 59 community districts |
 | New York City heat | New in October 2026: 10 public sources for an address and 11 for a district or borough, questions, comparisons of two places, and all 59 community districts. No model: the forecast is the National Weather Service's |
 | Chicago, Seattle, Albany | Experimental: federal sources plus a reviewed 311 flood filter and a water-level gauge ([docs/multi-city.md](docs/multi-city.md)) |
-| Models | None required, and none writes a sentence or sets a yes or no. An optional LLM routes questions the rules do not recognise. Two experimental models (a surge forecast, paved and green land) add sentences, always labelled ([below](#experimental-models)) |
+| Models | None required, and none runs by default. An optional open LLM (Granite) routes questions the rules do not recognise and chooses among existing sentences; it writes none, and no yes or no stands on its word. Two experimental models (a surge forecast, paved and green land) add sentences, always labelled ([below](#experimental-models)) |
 | Checks | Citations and numbers on every claim, rules on answer leads, 13 disclosure checks. They are patterns and rules: they do not read meaning and can miss a wrong inference ([docs/GROUNDING.md](docs/GROUNDING.md)) |
 
 ## Quickstart
@@ -239,6 +283,46 @@ More in [docs/METHODOLOGY.md](docs/METHODOLOGY.md),
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and
 [docs/GROUNDING.md](docs/GROUNDING.md).
 
+## How Riprap was built and where a model runs
+
+This section follows the City's guidance to "disclose when content is
+generated or assisted by GenAI" and BetaNYC's practice of saying which model
+was used, what for, and who checked it.
+
+**In a briefing.** By default no language model runs: the public gallery and
+a fresh install answer by rules. A person running their own copy can connect
+an open model (tested with IBM's Granite 4.1 8B on a laptop). The rules still
+answer first. The model is asked only when the rules do not match a question
+or cannot read its place, and then it may choose which sources to read, pick
+up to four of the existing sentences, and propose a lead from a fixed list
+(yes, no, partly, a count, cannot answer). It never writes a sentence and
+cannot change a number, a date or a citation. For a question about past
+flooding a rule sets the yes or no; any other yes or no the model proposes is
+kept only when code finds it supported by the cited figures. Each answer says
+which path made it (`grounding.answer_mode`, and a line on the page). One
+developer setting, off by default (`RIPRAP_LLM_BARE=1`), restores an older
+mode in which the model rewrites the evidence as claims that code checks
+number by number ([docs/GROUNDING.md](docs/GROUNDING.md#llm-mode)).
+
+**Experimental models.** Two fine-tuned open models add labelled sentences
+([below](#experimental-models)); a third was tested and retired.
+
+**In building Riprap.** AI coding agents wrote most of Riprap's code, tests
+and documents, working from prompts written by the maintainer, and agent
+sessions also reviewed that work. The maintainer, Adam Munawar Rahman,
+directed it, decides what Riprap claims, and is accountable for all of it.
+The output was checked by automated tests, by sets of test questions with
+answer keys (some written without sight of the code,
+[docs/GROUNDING.md](docs/GROUNDING.md)), and by an independent sanity check on
+5 October 2026 that worked from the code, the public sources and the app's
+output before reading any project document. It re-derived 487 briefing
+sentences from the sources with separate code: 475 were confirmed, 10 were
+wrong and 2 sat on a raster edge. The 10 came from three defects (an address
+elevation read from a neighbouring cell, hospitals counted twice, a
+construction permits count); the first two are corrected and the permits
+sentence was taken out of plain briefings. The repository records no audit by
+a person outside the project.
+
 ## Experimental models
 
 Riprap is an app in development, and two models its author fine-tuned are
@@ -290,6 +374,15 @@ redacted. Addresses are sent to geocoders, the map loads its background tiles
 from CARTO, and a configured LLM receives the question and evidence. Details and a do-no-harm note:
 [docs/PRIVACY.md](docs/PRIVACY.md).
 
+## Accessibility
+
+The web app is built to meet WCAG 2.2 Level AA, the standard the City of New
+York adopted in December 2025. It is tested with axe-core and a contrast
+gate and was reviewed in the code; no assistive technology user has tested
+it, and the statement does not claim conformance. What was tested, the known
+limits (the map, the print view, English only) and how to report a barrier:
+[docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md).
+
 ## Get involved
 
 - Add your city: [docs/PORT-YOUR-CITY.md](docs/PORT-YOUR-CITY.md)
@@ -303,13 +396,19 @@ from CARTO, and a configured LLM receives the question and evidence. Details and
 Cite with [CITATION.cff](CITATION.cff). Apache 2.0: see [LICENSE](LICENSE) and
 [NOTICE](NOTICE). Data sources keep their own terms, recorded in each manifest.
 
-Riprap is independent and not affiliated with FEMA, NOAA, USGS, the City of New
-York or any agency. Thanks to AMD Developer Cloud and the AMD x lablab.ai
-Developer Hackathon, where it began and where its first three models were trained;
-to IBM Research for Granite; to NYU's Center for Urban Science and Progress;
-to FloodNet (researchers at New York University and the City University of New
-York working with city agencies) for the sensor network and its open data; and
-to Andrew Hicks for the introduction to the ASCE network.
+Riprap is an independent project. It is not endorsed by or affiliated with
+FloodNet, New York University, the City University of New York, FEMA, NOAA,
+USGS, the City of New York or any agency, and it is not a City product. The
+City publishes its open data for information only and does not warrant its
+completeness, accuracy, content or fitness for any use (Local Law 11 of 2012).
+FloodNet data and the sentences derived from it are licensed CC BY-NC-SA 4.0,
+not Apache 2.0.
+
+Thanks, which imply no backing by anyone named: to AMD Developer Cloud and
+the AMD x lablab.ai Developer Hackathon, where Riprap began and where its
+first three models were trained; to IBM Research for publishing Granite; to
+NYU's Center for Urban Science and Progress; to the FloodNet project for building the sensor network and opening its data;
+and to Andrew Hicks for the introduction to the ASCE network.
 
 The experimental models are fine-tunes of other people's work: NASA and IBM's
 [Prithvi-EO 2.0](https://huggingface.co/ibm-nasa-geospatial), IBM and ESA's

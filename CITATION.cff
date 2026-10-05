@@ -1,7 +1,7 @@
 # Citation File Format: https://citation-file-format.github.io/
 # Run `cffconvert -i CITATION.cff -f bibtex` to get a BibTeX entry.
 cff-version: 1.2.0
-title: "Riprap: cited flood-evidence briefings for New York City places, from public data"
+title: "Riprap: cited flood and heat briefings for New York City places, from public data"
 type: software
 message: >-
   If you use Riprap in research, reporting or applied civic work, please
@@ -15,14 +15,15 @@ authors:
 repository-code: "https://github.com/msradam/riprap"
 url: "https://msradam.github.io/riprap/"
 abstract: >-
-  Riprap gathers public flood evidence for a New York City address, a
-  question about one, or a community district, and cites every sentence
-  to its source. NYC is the production deployment, with 23 public-record
-  city, state and federal sources; Chicago, Seattle and Albany are
-  experimental deployments on the same code. The briefing is built
-  directly from the data, and a question is answered by rules over its
-  words; an optional LLM can choose the answer's lead and facts instead,
-  and code checks that choice against the evidence. Two experimental
+  Riprap gathers public flood and heat evidence for a New York City
+  address, a question about one, or a community district, and cites every
+  sentence to its source. NYC is the production deployment; Chicago,
+  Seattle and Albany are experimental deployments on the same code. Code
+  writes each sentence from one public record, and a question is answered
+  by rules over its words. An optional open Granite model, off by default,
+  may route a question the rules do not match and may only choose among
+  the existing sentences; it never writes a sentence, and no yes or no
+  stands on its word. Two experimental
   models fine-tuned by the author (a surge forecast for the Battery and
   a land-cover model) add labelled sentences; their
   output is always labelled experimental, with its limits and tested

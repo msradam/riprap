@@ -6,7 +6,9 @@ type: reference
 
 What Riprap stores, what it sends to other services, and what it is not
 for. Each statement below was checked against the code on 2026-09-28,
-and the storage table and the 311 section again on 2026-10-01.
+the storage table and the 311 section again on 2026-10-01, and the whole
+page against `web/main.py`, the logging calls and the frontend on
+2026-10-05.
 
 ## What Riprap does not do
 
@@ -15,8 +17,11 @@ and the storage table and the 311 section again on 2026-10-01.
 - **No analytics or tracking.** The frontend loads no analytics, error
   reporting or tag-manager script. Fonts are served from the app itself
   (`web/sveltekit/src/lib/fonts.css`), not from a font CDN.
-- **No database of queries.** The server keeps no record of who asked
-  what.
+- **No database of queries.** The application writes no record of who
+  asked what. It does not log the addresses or questions people type. Two
+  things outside the application's own code can still hold them, and both
+  are in the table below: the web server's access log, and an error line
+  when a geocoder call fails.
 
 ## What is stored, and where
 
@@ -24,8 +29,8 @@ and the storage table and the 311 section again on 2026-10-01.
 |---|---|---|
 | HTTP cache | `~/.cache/riprap/http.sqlite` on the machine running the server (`riprap/core/http.py`; `RIPRAP_HTTP_CACHE=off` disables it) | Responses from public data APIs, kept for 10 minutes by default (`RIPRAP_HTTP_CACHE_TTL_S`). 311 records are never written to it (see below). |
 | Run logs | `.burr/`, only when `RIPRAP_BURR_TRACKING=1` | Each pipeline run, including the query, for the Burr tracking UI. Off by default. |
-| Server output | Standard output of the process | Startup messages; the web server's access log includes request URLs, which carry the address or question typed. Where these go depends on how you run the server. |
-| Print snapshot | The visitor's own browser (`localStorage`, `web/sveltekit/src/lib/stores/briefingState.svelte.ts`) | The briefing last viewed, so the print page can render it. It never leaves the browser. |
+| Server output | Standard output and standard error of the process | Startup messages. The web server (uvicorn) writes an access log by default, and its request URLs carry the address or question typed; run it with `--no-access-log` to turn that off. When a geocoder request fails, the warning that is logged (`app/geocode.py`) can include the failed request's URL, which holds the text typed. Where these lines go, and how long they are kept, depends on how you run the server. |
+| Print snapshots | The visitor's own browser (`localStorage`, one entry per query under `riprap:print:`, `web/sveltekit/src/lib/stores/briefingState.svelte.ts`) | Each briefing run in that browser, so the print page can render it. Entries stay until the visitor clears the site's data. They never leave the browser. |
 
 ## What is sent to other services
 
@@ -60,8 +65,10 @@ more than a pattern. NYC's 311 query does not fetch free text at all.
 
 ## Do no harm
 
-Riprap reports public flood evidence for a place, with every sentence
-cited. It is not advice.
+Riprap reports public flood and heat evidence for a place, with every
+sentence cited. It is not advice, and it is not an alert or emergency
+service: for alerts in New York City use
+[Notify NYC](https://a858-nycnotify.nyc.gov/).
 
 - It does not assess a person, a household or a property's value, and it
   should not be used to decide on buying, renting, lending or insuring.

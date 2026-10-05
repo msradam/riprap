@@ -18,7 +18,9 @@
 > **How it runs.** One CPU process with no GPU and no keys. By default the
 > briefing is the evidence itself, with no language model. An LLM is
 > optional and is any OpenAI-compatible endpoint you point it at, local or
-> hosted. Deployment shapes are in [`docs/DEPLOY.md`](DEPLOY.md).
+> hosted (tested with the open Granite 4.1 8B): the rules still answer
+> first, and it may only route a question they do not match and choose
+> among the existing sentences. Deployment shapes are in [`docs/DEPLOY.md`](DEPLOY.md).
 
 ---
 

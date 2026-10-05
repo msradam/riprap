@@ -5,11 +5,24 @@ and USGS Landsat, the city's Health Department or city open data, or, where
 it is labelled experimental, a model. For New York City a flood briefing
 reads 24 public data sources and a heat briefing 10 or 11
 ([DATA-SOURCES.md](DATA-SOURCES.md)). This methodology was last updated
-2026-10-02.
+2026-10-05.
 
 > Riprap reports evidence. It computes no score, tier or ranking, and no
 > language model scores anything. Each source's finding is one cited
 > sentence, and the reader weighs them.
+
+Rules or an open Granite model read your question and choose the evidence.
+Every sentence you read comes word for word from a public record, with its
+source and date. In full: code writes one sentence from each record, and
+those sentences are shown unchanged. Rules answer a question first. An
+optional open Granite model, off by default, may route a question the rules
+do not match and may only choose among the sentences that already exist; it
+never writes one, and no yes or no stands on its word
+([GROUNDING.md](GROUNDING.md), [MODELS.md](MODELS.md)). The sentences are
+Riprap's wording of a record, not a publisher's own prose, and some state a
+figure Riprap computed from a record (a share of a district, a percentile of
+terrain). Section 10 lists what the records cannot say, and section 11 the
+distances and time windows behind each count.
 
 Earlier versions built a composite exposure tier (1 to 4) for the offline
 asset registers. Nothing in a briefing showed it, and it was removed. The
@@ -100,8 +113,8 @@ A Riprap briefing is not:
 
 Caveats that travel with the evidence:
 
-- 311 counts reflect neighbourhood reporting habits and may under-count
-  flooding where fewer people call.
+- 311 counts are complaints filed and under-count flooding where fewer
+  people call (section 10).
 - Compound flooding (rain, tide and groundwater together) is not modeled
   separately by any source Riprap reads (NPCC4).
 - A source that did not answer is named as unavailable. It supports
@@ -167,7 +180,144 @@ traces back to the Stone that produced it.
 | Lodestone | The projector | NWS alerts and water-level forecasts, NPCC4 sea-level projections | The NWS forecast and heat alerts, NPCC4 heat projections |
 | Capstone | The synthesizer | Writes one cited sentence per record, and answers a question by rules over its words | The same |
 
+## 10. What the data cannot say
+
+Each statement here is the publisher's own or comes from published research,
+with its source. A briefing sentence carries the short form; this is the long
+one.
+
+**311 counts are complaints filed, not floods measured.** A complaint needs
+someone who knows 311, trusts it and has the time and the language to use it.
+Kontokosta, Hong and Korsberg write that models trained on 311 data "can
+suffer from biases in the propensity to make a request that can vary based on
+socio-economic and demographic characteristics of an area"
+([arXiv:1710.02452](https://arxiv.org/abs/1710.02452)). Boxer, Hong,
+Kontokosta and Neill, studying heating complaints in New York City, write
+that "resident-generated data suffer from reporting bias, with some
+subpopulations reporting at lower rates than others" (*Annals of Applied
+Statistics* 19(2), 2025,
+[doi:10.1214/24-AOAS2003](https://doi.org/10.1214/24-AOAS2003)). Neither
+paper measures flood complaints, but the caution carries: a low count in a
+lower-income or immigrant neighbourhood can mean fewer reports, not less
+water. The dataset also counts requests, not events: one storm on one block
+can be many complaints or none. Riprap never turns a 311 count alone into a
+"Yes." to "has it flooded".
+
+**The city's stormwater maps are modelled scenarios.** They are design storms
+paired with a sea level, not forecasts and not observations. The city's own
+geodatabase, as published on NYC Open Data
+([`9i7c-xyvv`](https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv)),
+carries this disclaimer in its metadata:
+
+> This map was developed by the City of New York and is provided solely for
+> informational purposes. The map shows areas of potential flooding of at
+> least 0.25 contiguous acres with flood depths of 4 inches or more. The map
+> is intended to be an informational tool and does not provide the exact
+> depth of flooding at any location.
+>
+> [...] The models do not account for site-specific conditions that may
+> affect flooding, e.g., private drainage infrastructure, obstructed or
+> clogged drains or future conditions such as new development and
+> construction, or deterioration and replacement of existing infrastructure.
+> The maps are intended to show the relative risk of flooding in public areas
+> from stormwater runoff due to rain only. While the hydrologic and hydraulic
+> models account for the effect of sea level rise on stormwater drainage
+> infrastructure, they do not represent flood risk from coastal inundation
+> due to sea level rise and/or storm surge.
+
+The same text says the map "shall not be used for the design, modification,
+or construction of improvements to real property or for flood plain
+determination". Riprap reads the map at a point, one 10 ft cell with no
+margin, so "inside" or "outside" a scenario at an address is a reading of
+that cell and not a finding about a lot. Riprap reads three of the four
+published maps; the Limited Flood map (1.77 inches an hour, current sea
+levels) is not read.
+
+**Outside a mapped area is not safe.** NYC Emergency Management's hazard
+profile says of Hurricane Ida: "The most heavily impacted areas, representing
+over half of all damaged buildings, were also outside of any flood risk
+scenario, including FEMA floodplain maps and the NYC Stormwater Resiliency
+Plan's Extreme and Moderate stormwater scenarios"
+([NYC Hazard Mitigation, flooding](https://nychazardmitigation.com/documentation/hazard-profiles/flooding/)).
+A sentence that says a place is outside a map says only that.
+
+**A FloodNet depth is a point measurement under one sensor.** FloodNet
+defines a flood event as "a series of water depth measurements greater than
+10 mm" at a sensor
+([NYC Open Data `aq7i-eu5q`](https://data.cityofnewyork.us/Environment/FloodNet-Street-Flooding-Events-Measured-by-FloodN/aq7i-eu5q)).
+A depth is the water under that sensor, not the depth along the street or at
+a building, and a sensor records nothing before it was installed or while it
+is down. No sensor nearby is silence, not a dry record. Questions about the
+readings themselves belong to FloodNet's own
+[dashboard](https://dataviz.floodnet.nyc/) and data pages.
+
+**Surface temperature is not air temperature.** Landsat measures roofs,
+pavement and treetops late on clear summer mornings (section 8). It is not
+what a person feels, and it says nothing about the inside of a building.
+
+**The Heat Vulnerability Index is a rank.** The Health Department scores
+neighbourhoods from 1 to 5 against each other and says: "a neighborhood with
+low vulnerability does not mean no risk. All neighborhoods have residents at
+risk for heat illness and death"
+([Environment and Health Data Portal](https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/hvi/)).
+It is not a measurement at an address.
+
+**A briefing is about records, not about people or property.** It describes
+what public records say about a place. It is not a judgement on a property,
+its value or its insurability, and it is not a judgement on the people who
+live there. Riprap gives no score, no rank of neighbourhoods and no advice.
+
+**The page is in English only.** No briefing or page is translated.
+
+## 11. Distances, time windows and filters
+
+Every count in a briefing depends on these choices. They are judgement calls
+made for this tool, not standards, and the code records no calibration for
+them: a different radius gives a different count. Each sentence states its
+own radius and window, and "within 600 m" does not mean "on this block". The
+table is enough to rerun a count against the source.
+
+| Source | Where | When | Which records | Why this choice |
+|---|---|---|---|---|
+| 311 complaints at an address (`erm2-nwe9`) | Within 200 m of the geocoded point (`within_circle`) | The last 5 years, from midnight UTC | `complaint_type` "Sewer" or "Sewer Maintenance" and one of eleven flood descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow, rain garden flooding, under the coded names and the plain names of 2026); a complaint filed twice within ten minutes at one address counts once (`app/context/nyc311.py`) | About the blocks around an address; wider circles mix in other streets' drains |
+| 311 complaints in a district or neighbourhood | A community district by the record's own `community_board` field; a neighbourhood by its outline | The last 3 years | The same filter | The district is the unit the city files the complaint under |
+| FloodNet sensors at an address | Sensors within 600 m | Flood events in the last 3 years, or since a sensor was installed if later | Flood events from FloodNet's Data API (the sentence says which are counted); the peak is taken only from sensors FloodNet reports in good order | Sensors are sparse (a few hundred citywide), so a block-sized circle would usually hold none |
+| FloodNet sensors in an area | Sensors inside the outline | The same | The same | |
+| Hurricane Ida high-water marks | USGS marks within 800 m; a mark counts toward "the block flooded" only within 250 m | 1 to 2 September 2021 | All 159 New York marks in the USGS file | The marks are few and were surveyed where crews went; 800 m finds the nearest ones, 250 m keeps a "Yes." local |
+| Sandy inundation zone (`5xsi-dfpx`) | The cell under the point; the distance to the edge is stated within 50 m of it | 2012 | | The mapped outline is not exact to a building |
+| Stormwater scenarios (`9i7c-xyvv`) | The 10 ft cell under the point; for an area, the share of its land inside | Scenario years as published | Three of the four maps | See section 10 |
+| Subway entrances, hospitals, schools, public housing near an address | 800 m, 3,000 m, 1,500 m and 2,000 m | The file dates in [DATA-SOURCES.md](DATA-SOURCES.md) | Each asset's point against the Sandy zone and the extreme 2080 scenario | Rough walking and service distances; a development or campus is one point, so one that is partly inside a zone can be missed |
+| Terrain at an address | The elevation cell under the point, compared with the ground within 200 m | USGS 3DEP | | |
+| Surface temperature at an address | A 150 m circle of 90 m cells | 18 clear summer images, 2023 to 2026 | Land cells only | The thermal sensor samples at about 100 m (`app/heat/surface_temp.py`) |
+| Spray showers and pools | Within 800 m | As published | | About a ten minute walk (`app/heat/cooling.py`) |
+
+A community district in an area briefing is drawn as the union of City
+Planning's neighbourhood tabulation areas, which approximates the official
+district. Counts of points (subway entrances, schools) can differ from a
+count inside the official boundary, and the 311 count in the same briefing
+uses the official district.
+
+## 12. Corrections
+
+If a sentence is wrong, or says more than its record does, open an issue at
+<https://github.com/msradam/riprap/issues/new/choose> with the address or
+question and the sentence. Corrections are made in the code, with a test, and
+recorded in the [changelog](../CHANGELOG.md). When the error is in a source
+dataset, the issue says so and points to the publisher (FloodNet asks for
+data problems at
+[floodnet-nyc/floodnet-data](https://github.com/floodnet-nyc/floodnet-data/issues)).
+An independent check on 5 October 2026 re-derived 487 briefing sentences from
+the sources: 475 were confirmed, 10 were wrong and 2 sat on a raster edge.
+
 ## References
+
+Boxer, K. S., Hong, B., Kontokosta, C. E., & Neill, D. B. (2025).
+"Estimating reporting bias in 311 complaint data." *The Annals of Applied
+Statistics* 19(2). doi:10.1214/24-AOAS2003.
+
+Kontokosta, C., Hong, B., & Korsberg, K. (2017). "Equity in 311 Reporting:
+Understanding Socio-Spatial Differentials in the Propensity to Complain."
+arXiv:1710.02452.
 
 Beven, K. J., & Kirkby, M. J. (1979). "A Physically Based, Variable
 Contributing Area Model of Basin Hydrology." *Hydrological Sciences
