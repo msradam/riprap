@@ -75,17 +75,10 @@ def test_the_nyc_preliminary_sentence_says_which_map_the_city_and_fema_use():
             "Insurance Program") in text
 
 
-class _Reply:
-    def __init__(self, body):
-        self.text = body
+def _Reply(body):  # noqa: N802 - an HTTP 200 with this body, as the shared client returns it
+    import httpx
 
-    def raise_for_status(self):
-        pass
-
-    def json(self):
-        import json
-
-        return json.loads(self.text)
+    return httpx.Response(200, text=body, request=httpx.Request("GET", "https://hazards.fema.gov/"))
 
 
 def _raises(exc):
