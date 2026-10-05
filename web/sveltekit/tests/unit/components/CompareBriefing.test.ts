@@ -29,6 +29,17 @@ describe('CompareBriefing rendering', () => {
     expect(text).toContain('PLACE B');
   });
 
+  it('sets the note above PLACE A over both columns, not inside the first', () => {
+    const paragraph = '**Comparison.**\nRiprap computes no score and does not rank places against each other.\n\n' +
+      '## PLACE A: Red Hook\n\nThe record for Red Hook.\n\n---\n\n## PLACE B: Hollis\n\nThe record for Hollis.';
+    const { container } = render(CompareBriefing, { props: { paragraph, citations: CITATIONS, targets: TARGETS } });
+    expect(container.querySelector('.compare-intro')?.textContent).toContain('does not rank places');
+    const cols = [...container.querySelectorAll('.compare-col')].map((c) => c.textContent ?? '');
+    expect(cols[0]).toContain('The record for Red Hook');
+    expect(cols[0]).not.toContain('does not rank');
+    expect(cols[1]).toContain('The record for Hollis');
+  });
+
   it('crash-free when targets is empty', () => {
     const { container } = render(CompareBriefing, {
       props: { paragraph: '', citations: {}, targets: [] },

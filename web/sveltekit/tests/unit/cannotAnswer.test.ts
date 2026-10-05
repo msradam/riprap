@@ -4,7 +4,8 @@ import { RunState } from '$lib/client/runState.svelte';
 import type { FinalResult } from '$lib/client/agentStream';
 
 const QUESTION = 'Have the FloodNet sensors near 189 Atlantic Avenue, Brooklyn recorded flooding?';
-const LINE = 'The sources consulted do not answer this question directly. Here is what they show.';
+// With no fact to show, the backend's line does not end "Here is what they show." (synthesis.NOTHING_TO_SHOW).
+const LINE = 'The sources consulted do not answer this question directly, and none of them returned a record that bears on it for this place.';
 
 describe('cannot-answer briefing', () => {
   const final = {

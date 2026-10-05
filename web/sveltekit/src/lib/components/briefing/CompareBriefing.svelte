@@ -30,8 +30,13 @@
   // Split the merged compare paragraph at the --- divider.
   // Each half begins with `## PLACE A/B: <address>` which we strip to get
   // clean 4-section markdown for parseBriefing.
+  // What the backend writes above PLACE A (nothing is scored or ranked, and
+  // for heat one comparing sentence) is about both places.
+  const PLACE_A = /^##\s+PLACE\s+A:/m;
+  const introMd = $derived(PLACE_A.test(paragraph) ? paragraph.split(PLACE_A, 1)[0].trim() : '');
+
   function splitParagraph(para: string): { address: string; md: string }[] {
-    const halves = para.split(/\n\s*---\s*\n/, 2);
+    const halves = para.slice(PLACE_A.test(para) ? para.search(PLACE_A) : 0).split(/\n\s*---\s*\n/, 2);
     return halves.map((half, i) => {
       const m = /^##\s+PLACE\s+[AB]:\s+(.+?)(\n|$)/m.exec(half.trim());
       const address = m?.[1]?.trim() ?? targets[i]?.address ?? `Place ${String.fromCharCode(65 + i)}`;
@@ -41,6 +46,7 @@
   }
 
   const halves = $derived(splitParagraph(paragraph));
+  const intro = $derived(parseBriefing(introMd, citations));
   const parsedA = $derived(parseBriefing(halves[0]?.md ?? '', citations));
   const parsedB = $derived(parseBriefing(halves[1]?.md ?? '', citations));
 
@@ -48,12 +54,13 @@
   // doc_id numbering stays consistent.
   const allCitations = $derived({
     ...citations,
+    ...intro.citations,
     ...parsedA.citations,
     ...parsedB.citations
   });
   // The sources both columns cite, in reading order, as one set of notes.
   const notes = $derived(
-    citedIn([parsedA, parsedB].flatMap((p) => p.blocks.flatMap((b) => (b.kind === 'prose' ? [b.parts] : [])))).flatMap(
+    citedIn([intro, parsedA, parsedB].flatMap((p) => p.blocks.flatMap((b) => (b.kind === 'prose' ? [b.parts] : [])))).flatMap(
       (id) => (allCitations[id] ? [allCitations[id]] : [])
     )
   );
@@ -123,6 +130,15 @@
 </script>
 
 <div class="compare-layout">
+  {#if introMd}
+    <section class="compare-intro" aria-label="About this comparison">
+      {#each intro.blocks as block, j (j)}
+        {#if block.kind === 'prose'}
+          <AnswerProse parts={block.parts} citations={allCitations} class="compare-para" />
+        {/if}
+      {/each}
+    </section>
+  {/if}
   {#if rows.length > 0}
     <section class="compare-delta-bar" aria-labelledby="compare-delta-h">
       <h2 id="compare-delta-h" class="compare-delta-title">{heat ? 'Heat records, side by side' : 'Key differences'}</h2>
@@ -239,6 +255,10 @@
     font-weight: 600;
     line-height: 1.3;
   }
+  .compare-intro {
+    margin-bottom: 32px;
+  }
+  .compare-intro :global(.compare-para),
   .compare-col :global(.compare-para) {
     margin: 0 0 12px;
     max-width: 60ch;
