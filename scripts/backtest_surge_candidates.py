@@ -178,7 +178,7 @@ def main() -> int:
     meta = {"current": {"repo": surge.MODEL.repo, "commit": surge.MODEL.revision, "licence": "apache-2.0",
                         "package": "granite-tsfm", "package_version": version("granite-tsfm"),
                         "context_hours": C, "point": "the model's output"},
-            **{b: {"baseline": True} for b in bt.BASELINES}}
+            **{b: {"baseline": True} for b in bt.BASELINES if b in points}}
     for name in a.only + (["chronos_2_battery_ft"] if a.finetuned else []):
         if name == "chronos_2_battery_ft":  # local weights from scripts/finetune_chronos2_surge.py
             train = json.loads((a.finetuned / "training.json").read_text())
@@ -237,16 +237,10 @@ def main() -> int:
         return {"said_so": sum(r[f"flood_{k}"] for r in floods),
                 "false_alarms": sum(r[f"flood_{k}"] for r in rows if not r["flood_obs"])}
 
-    def vs_current(k, block_len: int = 14, n: int = 2000) -> dict:
-        """MAE minus the current model's over all windows, with a 95% interval
-        from a moving-block bootstrap (windows a day apart share three of four
-        days, so they are resampled in runs of `block_len`)."""
-        d = np.array([r[f"mae_{k}"] - r["mae_current"] for r in rows])
-        rng = np.random.default_rng(0)
-        starts = rng.integers(0, len(d) - block_len + 1, size=(n, -(-len(d) // block_len)))
-        boot = np.array([d[(s[:, None] + np.arange(block_len)).ravel()[:len(d)]].mean() for s in starts])
-        lo, hi = np.percentile(boot, [2.5, 97.5])
-        return {"mae_minus_current_m": round(float(d.mean()), 4), "ci95_m": [round(float(lo), 4), round(float(hi), 4)],
+    def vs_current(k, block_len: int = 14) -> dict:
+        """MAE minus the current model's over all windows, with the block-bootstrap 95% interval."""
+        d = [r[f"mae_{k}"] - r["mae_current"] for r in rows]
+        return {"mae_minus_current_m": round(float(np.mean(d)), 4), "ci95_m": bt.block_ci(d, block_len),
                 "block_windows": block_len}
 
     models = {}

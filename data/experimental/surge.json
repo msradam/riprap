@@ -2,51 +2,191 @@
  "model": "msradam/Granite-TTM-r2-Battery-Surge",
  "revision": "181b892bf4c4693018a834d359427c279b315213",
  "station": "8518750",
- "run_date": "2026-10-01",
+ "run_date": "2026-10-05",
  "first": "2025-01-01",
- "last": "2026-09-27",
+ "last": "2026-10-01",
  "step_hours": 24,
  "context_hours": 1024,
  "horizon_hours": 96,
- "n_windows": 635,
+ "held_out": {
+  "model_training_data_ends": "2024-12-31",
+  "baselines_fitted_before": "2025-01-01",
+  "first_window_starts": "2025-01-01 00:00",
+  "overlap_hours": 0
+ },
+ "baselines": {
+  "damping_per_hour": 0.97,
+  "damping_fit_windows": 3607,
+  "damping_fit_years": "2015 to 2024",
+  "climatology_monthly_mean_m": {
+   "1": 0.151,
+   "2": 0.131,
+   "3": 0.123,
+   "4": 0.144,
+   "5": 0.122,
+   "6": 0.126,
+   "7": 0.124,
+   "8": 0.105,
+   "9": 0.136,
+   "10": 0.133,
+   "11": 0.089,
+   "12": 0.12
+  },
+  "words": {
+   "zero": "the predicted tide alone",
+   "last_value": "holding the last value",
+   "mean_24h": "holding the last day's mean",
+   "mean_input": "holding the mean of the hours it reads",
+   "damped": "the last value fading toward the mean of the hours it reads",
+   "climatology": "the month's usual value"
+  }
+ },
+ "n_windows": 639,
  "mae_m": 0.115,
- "baseline_mae_m": 0.133,
+ "baseline_mae_m": 0.134,
  "mae_cm": 11.5,
- "baseline_mae_cm": 13.3,
+ "baseline_mae_cm": 13.4,
+ "best_baseline": "damped",
+ "best_baseline_words": "the last value fading toward the mean of the hours it reads",
+ "best_baseline_mae_cm": 10.8,
  "n_flood_windows": 23,
  "n_flood_foreseen": 1,
+ "n_flood_events": 5,
+ "n_flood_events_foreseen": 1,
  "all": {
-  "n_windows": 635,
+  "n_windows": 639,
   "mae_model_m": 0.115,
   "mae_zero_m": 0.167,
   "mae_last_value_m": 0.133,
-  "mae_mean_24h_m": 0.133,
-  "peak_error_model_m": 0.157,
+  "mae_mean_24h_m": 0.134,
+  "mae_mean_input_m": 0.119,
+  "mae_damped_m": 0.108,
+  "mae_climatology_m": 0.116,
+  "peak_error_model_m": 0.156,
   "peak_error_zero_m": 0.36,
-  "peak_error_last_value_m": 0.237,
-  "peak_error_mean_24h_m": 0.24
+  "peak_error_last_value_m": 0.236,
+  "peak_error_mean_24h_m": 0.239,
+  "peak_error_mean_input_m": 0.239,
+  "peak_error_damped_m": 0.189,
+  "peak_error_climatology_m": 0.233
  },
+ "model_minus_baseline": {
+  "zero": {
+   "mae_model_minus_baseline_m": -0.0525,
+   "ci95_m": [
+    -0.066,
+    -0.0397
+   ]
+  },
+  "last_value": {
+   "mae_model_minus_baseline_m": -0.0181,
+   "ci95_m": [
+    -0.0258,
+    -0.0115
+   ]
+  },
+  "mean_24h": {
+   "mae_model_minus_baseline_m": -0.0189,
+   "ci95_m": [
+    -0.0261,
+    -0.011
+   ]
+  },
+  "mean_input": {
+   "mae_model_minus_baseline_m": -0.0041,
+   "ci95_m": [
+    -0.008,
+    0.0002
+   ]
+  },
+  "damped": {
+   "mae_model_minus_baseline_m": 0.0065,
+   "ci95_m": [
+    0.0032,
+    0.0096
+   ]
+  },
+  "climatology": {
+   "mae_model_minus_baseline_m": -0.0016,
+   "ci95_m": [
+    -0.0055,
+    0.004
+   ]
+  }
+ },
+ "mean_forecast_peak_residual_m": 0.212,
  "residual_peak_at_least_0.5_m": {
-  "n_windows": 109,
-  "mae_model_m": 0.209,
-  "mae_zero_m": 0.281,
-  "mae_last_value_m": 0.246,
-  "mae_mean_24h_m": 0.241,
-  "peak_error_model_m": 0.357,
-  "peak_error_zero_m": 0.617,
-  "peak_error_last_value_m": 0.446,
-  "peak_error_mean_24h_m": 0.463
+  "n_windows": 110,
+  "mae_model_m": 0.208,
+  "mae_zero_m": 0.28,
+  "mae_last_value_m": 0.245,
+  "mae_mean_24h_m": 0.243,
+  "mae_mean_input_m": 0.231,
+  "mae_damped_m": 0.208,
+  "mae_climatology_m": 0.231,
+  "peak_error_model_m": 0.355,
+  "peak_error_zero_m": 0.616,
+  "peak_error_last_value_m": 0.444,
+  "peak_error_mean_24h_m": 0.459,
+  "peak_error_mean_input_m": 0.493,
+  "peak_error_damped_m": 0.385,
+  "peak_error_climatology_m": 0.488
  },
  "minor_flood_stage": {
   "stage_m_mllw": 2.134,
   "windows_that_reached_it": 23,
+  "events": 5,
   "model_said_so": 1,
   "zero_said_so": 0,
   "last_value_said_so": 5,
   "mean_24h_said_so": 6,
+  "mean_input_said_so": 0,
+  "damped_said_so": 1,
+  "climatology_said_so": 0,
+  "model_events_said_so": 1,
+  "zero_events_said_so": 0,
+  "last_value_events_said_so": 3,
+  "mean_24h_events_said_so": 2,
+  "mean_input_events_said_so": 0,
+  "damped_events_said_so": 1,
+  "climatology_events_said_so": 0,
   "model_false_alarms": 1,
   "zero_false_alarms": 0,
   "last_value_false_alarms": 4,
-  "mean_24h_false_alarms": 5
+  "mean_24h_false_alarms": 7,
+  "mean_input_false_alarms": 0,
+  "damped_false_alarms": 0,
+  "climatology_false_alarms": 0
+ },
+ "residual_reached_0.5_m": {
+  "windows_that_reached_it": 92,
+  "events": 20,
+  "model_said_so": 7,
+  "zero_said_so": 0,
+  "last_value_said_so": 8,
+  "mean_24h_said_so": 6,
+  "mean_input_said_so": 0,
+  "damped_said_so": 6,
+  "climatology_said_so": 0,
+  "model_events_said_so": 5,
+  "zero_events_said_so": 0,
+  "last_value_events_said_so": 6,
+  "mean_24h_events_said_so": 5,
+  "mean_input_events_said_so": 0,
+  "damped_events_said_so": 5,
+  "climatology_events_said_so": 0,
+  "model_false_alarms": 0,
+  "zero_false_alarms": 0,
+  "last_value_false_alarms": 0,
+  "mean_24h_false_alarms": 1,
+  "mean_input_false_alarms": 0,
+  "damped_false_alarms": 0,
+  "climatology_false_alarms": 0
+ },
+ "rule": {
+  "text": "in default briefings only if the mean error is below every baseline's with a 95% interval that excludes zero and at least a third of the distinct minor-flood events are foreseen",
+  "beats_every_baseline": false,
+  "foresees_a_third_of_flood_events": false,
+  "in_default_briefings": false
  }
 }
