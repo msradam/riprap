@@ -22,14 +22,20 @@ text is the sources' own sentences ([`docs/GROUNDING.md`](GROUNDING.md)).
 The gallery is built with no LLM.
 
 **Two experimental models**, described below. They are the author's
-fine-tunes: one forecasts surge at the Battery, one maps paved, green and
-tree-covered land from the latest satellite imagery. A third, a satellite
-water layer, was retired on 2026-10-02 after two tests in which it found
-recorded floods no more often than chance; the tests are kept below. The
-heat briefing uses no model: its forecast is the National Weather Service's.
+fine-tunes: one maps paved, green and tree-covered land from the latest
+satellite imagery, and one forecasts surge at the Battery. The surge
+forecast is not in a default briefing since 2026-10-05: on held-out data it
+lost to a one-line rule and foresaw 1 of 5 flood-stage events, so a server
+has to opt in to it ([below](#granite-ttm-r2-battery-surge)). A third, a
+satellite water layer, was retired on 2026-10-02 after two tests in which it
+found recorded floods no more often than chance; the tests are kept below.
+The heat briefing uses no model: its forecast is the National Weather
+Service's.
 
 `app/models_info.py` lists the models behind each result in its `models`
-field, and `/api/models` says which this server can use.
+field. `/api/models` says which this server can use and gives, for each
+experimental model, its tested result and whether it is in a default
+briefing.
 
 An earlier probe had the LLM rewrite the evidence for ten gallery addresses
 as claims (the mode now behind `RIPRAP_LLM_BARE=1`). `granite4:micro` kept
@@ -38,9 +44,10 @@ as claims (the mode now behind `RIPRAP_LLM_BARE=1`). `granite4:micro` kept
 
 ## Experimental models
 
-The gallery answers two questions with these models:
-[the Battery surge](https://msradam.github.io/riprap/gallery/battery-surge/)
-and [paved, green and tree-covered land in QN12](https://msradam.github.io/riprap/gallery/qn12-paved/).
+The gallery answers one question with the land-cover model:
+[paved, green and tree-covered land in QN12](https://msradam.github.io/riprap/gallery/qn12-paved/).
+Its Battery surge entry was baked before the forecast left default
+briefings and is out of date until the gallery is rebuilt.
 
 Riprap is an app in development, and these two models are part of it.
 Neither has been shown to beat an official product. So their output is never
@@ -69,15 +76,16 @@ shown as a measurement:
 - "Will it flood here" is not answered yes or no by anything. The lead says
   no source or model predicts that, and what the Weather Service expects and
   the maps show follows.
-- In a plain place briefing a model's sentence appears only when it shows
-  something (a notable surge). It is always in the evidence table, under
-  "Experimental sources".
+- In a plain place briefing the land-cover sentence stays in the evidence
+  table, under "Experimental sources". The surge forecast is in no default
+  briefing; on a server that opts in, it runs only near the gauge and is
+  quoted in a plain briefing only when it shows a notable surge.
 - On screen each sentence carries an "Experimental" badge; the print packet
   prints the same text; MCP items carry `maturity: "experimental"`.
 
 | Model | Repository and pinned commit | Runs | Extra |
 |---|---|---|---|
-| Granite TTM r2 Battery Surge | [`msradam/Granite-TTM-r2-Battery-Surge`](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge) at `181b892` | per request, on CPU (about 0.1 s) | `ml` |
+| Granite TTM r2 Battery Surge (opt-in) | [`msradam/Granite-TTM-r2-Battery-Surge`](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge) at `181b892` | only on a server that opts in: per request, on CPU (about 0.1 s) | `ml` |
 | NYC land-cover model | not published; trained by `scripts/train_cover.py` on [`ibm-esa-geospatial/TerraMind-1.0-base`](https://huggingface.co/ibm-esa-geospatial/TerraMind-1.0-base) at `fb96c70`, weights pinned by SHA-256 `15dc40f` | in a batch job; the app reads the saved rasters | `eo`, for the batch only |
 
 The author's weights are loaded from safetensors files at those commits,
@@ -89,15 +97,18 @@ reproduced independently at
 [github.com/msradam/riprap-models](https://github.com/msradam/riprap-models);
 the land-cover model was trained on an Apple M5 in this repository.
 
-A default install has none of this: `uv sync` installs no torch, the surge
-source then says "the Battery surge forecast model is not available on this
-server; it needs the optional ml extra", and the land-cover maps are read
-from `data/eo/` with the core dependencies.
+A default install has none of this: `uv sync` installs no torch, no surge
+source is loaded, and the land-cover maps are read from `data/eo/` with the
+core dependencies. A server that opts in to the surge forecast without the
+`ml` extra gets the sentence "the Battery surge forecast model is not
+available on this server; it needs the optional ml extra".
 
 ```bash
 uv sync --extra ml                                    # the surge forecast
+RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional uv run uvicorn web.main:app   # opt in to it
 uv sync --extra eo                                    # to rerun the batch jobs
 uv run python scripts/backtest_surge.py               # writes data/experimental/surge.json
+uv run python scripts/check_landcover_canopy.py       # canopy against the 2017 map, into landcover.json
 # The land-cover weights are local: prepare the labels and train them first.
 uv run python scripts/prepare_landcover_labels.py     # also: --bake-city-map for data/landcover_nyc_2017.tif
 uv run python scripts/train_cover.py --model terramind_base_px
@@ -122,28 +133,83 @@ last reading is more than six hours old, the source declines and says why.
 | Anything at Kings Point, Sandy Hook or another gauge | No | Trained on the Battery only |
 | A surge from a storm that has not reached the gauge | No | It has no wind or pressure input |
 
-Backtest, `scripts/backtest_surge.py`, run 2026-10-01: 635 windows, one a
-day from 2025-01-01 to 2026-09-27, all after the training data ends
-(2024-12-31). Truth is the gauge.
+Backtest, `scripts/backtest_surge.py`, run 2026-10-05: 639 windows, one a
+day from 2025-01-01 to 2026-10-01. Truth is the gauge.
 
-| Mean absolute error over 96 hours | Model | Last day's mean held | Last value held | Predicted tide alone |
+The period is held out. The model's card gives its data as 2015-01-01 to
+2024-12-31, split 70/15/15 in time order, with the checkpoint chosen on the
+validation part. Every scored window starts on or after 2025-01-01, so no
+scored hour trained the model or chose its checkpoint (overlap: none).
+
+The same windows are scored for six baselines that need no model. Two have
+a fitted part, and both were fitted on the residual of 2015 to 2024 only:
+the damping of damped persistence (0.97 per hour, the value with the lowest
+mean error on 3,607 daily windows of those years) and the monthly means of
+the climatology.
+
+| Forecast | Mean absolute error, all 639 windows | Model minus this, 95% interval | 110 windows with a residual of 0.5 m or more either way | Error in the peak |
 |---|---|---|---|---|
-| All 635 windows | 0.115 m | 0.133 m | 0.133 m | 0.167 m |
-| 109 windows with a residual of 0.5 m or more | 0.209 m | 0.241 m | 0.246 m | 0.281 m |
-| Error in the peak, all windows | 0.157 m | 0.240 m | 0.237 m | 0.360 m |
+| The model | 0.115 m | | 0.208 m | 0.156 m |
+| Damped persistence: the last value fading toward the mean of the 1,024 input hours | 0.108 m | +0.0065 m (+0.0032 to +0.0096) | 0.208 m | 0.189 m |
+| Climatology: the 2015 to 2024 mean residual of the calendar month | 0.116 m | -0.0016 m (-0.0055 to +0.0040) | 0.231 m | 0.233 m |
+| Mean of the 1,024 input hours held | 0.119 m | -0.0041 m (-0.0080 to +0.0002) | 0.231 m | 0.239 m |
+| Last value held (persistence) | 0.133 m | -0.0181 m (-0.0258 to -0.0115) | 0.245 m | 0.236 m |
+| Last day's mean held | 0.134 m | -0.0189 m (-0.0261 to -0.0110) | 0.243 m | 0.239 m |
+| Zero residual (the tide table alone) | 0.167 m | -0.0525 m (-0.0660 to -0.0397) | 0.280 m | 0.360 m |
 
-So it beats the plain baselines by about 14% on average. It does not see
-floods coming: of the 23 windows in which the water reached the minor flood
-stage, its forecast reached it in 1, with 1 false alarm. Holding the last
-day's mean reached it in 6, with 5 false alarms. Both numbers are in every
-surge sentence.
+The interval is a paired bootstrap over the windows, resampled in runs of
+14 days because windows a day apart share three of their four days. The
+model beats holding the last value by about 14%, which is the figure this
+document used to lead with. It is worse than damped persistence, with an
+interval clear of zero, and it cannot be told apart from the month's usual
+value or the mean of its own input. Its one advantage is the error in the
+peak, 0.156 m against 0.189 m for damped persistence.
+
+Floods, counted per window and per distinct event (hours over the threshold
+less than 48 hours apart are one event):
+
+| | Windows | Events | The model | Damped persistence | Last value held | Last day's mean held |
+|---|---|---|---|---|---|---|
+| Water reached the minor flood stage (7.0 ft above MLLW) | 23 | 5 | 1 window, 1 event, 1 false alarm | 1, 1, 0 | 5, 3, 4 | 6, 2, 7 |
+| Observed residual peaked at 0.5 m or more | 92 | 20 | 7 windows, 5 events, 0 false alarms | 6, 5, 0 | 8, 6, 0 | 6, 5, 1 |
+
+The 23 flood-stage windows are not 23 floods. They hold 23 hours at the
+stage on five occasions: 21 to 23 August 2025, 13 October 2025, 30 October
+2025, 19 April 2026 and 26 to 27 September 2026. Counting the tides of 22
+and 23 August apart, as the sanity check of 5 October 2026 did, gives 6.
+The model's total reached the stage for one of them. Its highest forecast
+residual averages 0.21 m and reached 0.5 m in 7 windows, so the "highest
+total" a surge sentence prints is seldom far from the tide table plus the
+everyday offset (the monthly mean residual of 2015 to 2024 is 0.09 to
+0.15 m). The zero, input-mean and climatology baselines never call a flood
+or a 0.5 m surge.
+
+**Decision, 2026-10-05.** The rule was written before the run (it is in the
+script's docstring and in the `rule` block of `surge.json`): the forecast
+stays in default briefings only if its mean error is below every
+baseline's with a 95% interval that excludes zero, and it foresees at least
+a third of the distinct minor-flood events. It fails both parts. So the
+surge forecast is out of default briefings: its manifest moved from
+`deployments/nyc/manifests/` to `deployments/nyc/optional/`, which no
+server loads unless it sets `RIPRAP_EXTRA_MANIFESTS=deployments/nyc/optional`.
+A default address or area briefing does not run the model, has no surge
+sentence and lists no surge model in its `models` block. A surge question
+is answered with the Weather Service's forecast for the gauge and NOAA's
+latest reading. On a server that opts in, the source fires only inside a
+box about 5 km around the gauge (it used to run for every flood briefing,
+inland ones included), and its sentence gives the damped persistence figure
+and the event count. The code, the weights' pin and the backtest stay.
 
 An earlier check on 104 windows from one calm stretch (May to September
 2026) found the model level with the last day's mean (0.083 m against
-0.085 m), and the forecast was removed on that evidence. The longer record
-above, with two winters in it, is the fairer test.
+0.085 m), and the forecast was removed on that evidence. It was restored on
+2026-10-01 on a longer record that compared it with the last value and the
+last day's mean only; the table above adds the baselines that comparison
+lacked.
 
-Newer open forecasters, zero-shot, on the same 635 windows
+Newer open forecasters, zero-shot, on 635 of these windows (to 2026-09-27;
+not rerun on 2026-10-05, and not scored against damped persistence, which
+at 0.108 m is level with the best of the zero-shot ones)
 (`scripts/backtest_surge_candidates.py`, run 2026-10-02,
 `data/experimental/surge_candidates.json`). Each reads the same 1,024
 hours; a model that gives quantiles is scored on its median.
@@ -187,6 +253,7 @@ safetensors). Switching needs the owner to publish them, and adds the
 
 Decision (owner, 2026-10-02): the surge source stays as it is. The
 fine-tune's result is recorded here, and the app is not switched to it.
+The decision of 2026-10-05 above supersedes the first sentence.
 
 Not built: the list of assets below the forecast peak. On the days that
 matter the model's peak is too low (1 of 23), so the list would be empty
@@ -194,11 +261,20 @@ when a flood came, and a 30 m elevation model cannot place a subway entrance
 within the half metre that separates an ordinary high tide from a minor
 flood.
 
-For the owner: the model card says Hurricane Ida was surge-driven and that
-it "falls within the test window". Ida in New York was a rainfall flood, and
-with a 70/15/15 split of 2015 to 2024 the test window starts in mid 2023, so
-Ida (September 2021) is in the training data. The card is in another
-repository and is not edited from here.
+**The hosted model card is out of date.** The card at
+[huggingface.co/msradam/Granite-TTM-r2-Battery-Surge](https://huggingface.co/msradam/Granite-TTM-r2-Battery-Surge)
+still claims a 41.4% improvement over persistence. That figure is from the
+training run's own split of 2015 to 2024, against the last value held and
+no other baseline; on held-out data the margin over the last value is about
+14% and the model loses to damped persistence. The card also says Hurricane
+Ida "falls within the test window": with a 70/15/15 split of 2015 to 2024
+the test part starts in mid 2023, so Ida (September 2021) is in the
+training part, and Ida in New York was a rainfall flood. It gives the size
+as 1.5 million parameters; the published safetensors file holds 2,964,960
+(2.96 million). A corrected card is in this repository at
+[`docs/model-cards/Granite-TTM-r2-Battery-Surge.md`](model-cards/Granite-TTM-r2-Battery-Surge.md).
+Publishing it is the owner's decision, and until then the hosted card
+should not be relied on.
 
 ### The satellite water layer, retired 2026-10-02
 
@@ -381,9 +457,12 @@ them is the owner's decision.
 
 **The test.** The city is cut into 2 km squares; one in five is a test square
 the model never saw in training. Each model is scored on 2021 Sentinel-2
-images of those squares against the city's 2021 six-inch map (The Nature
-Conservancy and UVM, built from 2021 LiDAR and imagery), so the key is a
-different year, method and sensor from the training labels. That map is
+images of those squares against the 2021 six-inch land cover map of the city
+published by The Nature Conservancy (made under contract by the University
+of Vermont Spatial Analysis Lab from 2021 LiDAR and imagery; Zenodo record
+14053441). It is not a city product, unlike the 2017 map on NYC Open Data.
+So the key is a different year, method, publisher and sensor from the
+training labels. That map is
 CC BY-NC-SA: it is used on this machine as a key only, and nothing drawn
 from it is in this repository except scores. Cells are 30 m (3 by 3 pixels),
 because Sentinel-2 is located to about a pixel. Training chips can include
@@ -428,7 +507,7 @@ scored 6.2 and 5.3, a little better than the 6.4 and 5.5 above; either way
 it trails.) The adapter's "trees and shrubs" class is counted as canopy
 here, while the city map counts shrub as grass and shrub; that costs it on
 canopy but does not touch its paved bias. The old adapter read a district's paved share 16 to 18
-points high against the city's own map, more than twice the 7.7 points it
+points high against the 2021 map, more than twice the 7.7 points it
 showed against WorldCover, and it had no skill on tree canopy. The 2017 map
 read as 2021 is better than any model for 2021, which is expected (most
 ground does not change in four years); the model's use is the years and
@@ -448,17 +527,39 @@ at 30 m, and the model sees about as much of it as the maps do.
 
 **In the app.** `scripts/run_landcover_batch.py` maps each summer since 2018
 with the clearest full-city dates, writes five percent bands at 30 m to
-`data/eo/landcover_<year>.tif`, and scores the 2021 map against the city's
-2021 map on the test squares. A run that does not rescore (no 2021 in the
+`data/eo/landcover_<year>.tif`, and scores the 2021 map against The Nature
+Conservancy's 2021 map on the test squares. A run that does not rescore (no 2021 in the
 run, or no 2021 key on the machine) leaves the saved evaluation as it was.
 The app reads the latest year that sees at least nine tenths of the ground
 the best year sees, so a half-clouded year does not stand for a whole
 place. For 2021 it
-reads a typical district's paved share 1.7 points above the city map's on
+reads a typical district's paved share 1.7 points above the 2021 map's on
 the test squares (median gap 1.8 points, largest 7.8); a 30 m cell's paved
 share is off by 6.6 points on average (R² 0.90) and its canopy share by 8.4
 (R² 0.77). Two images of one year differ by under 2.0 points in a district's
 paved share 19 times in 20 (2.7 in a neighbourhood's).
+
+**Tree canopy reads low.** On the test squares the model's canopy share is
+5.7 points below the 2021 map's on the June 2021 image and 1.2 points above
+it on the September image (`bias_pts` in
+`data/experimental/landcover_nyc_eval.json`). The yearly maps the app reads
+show the same lean. Over every 30 m cell that both have a value for,
+`scripts/check_landcover_canopy.py` compares each with the city's 2017 map:
+
+| Yearly map | Citywide tree canopy, model minus the 2017 map |
+|---|---|
+| 2018 | -4.2 points |
+| 2021 | -4.2 points |
+| 2024 | +3.2 points |
+| 2026 | -5.0 points |
+
+Citywide canopy does not move by points between summers (the 2017 and 2021
+maps differ by about one point on the test squares), so this is the model
+and its images. The sanity check of 5 October 2026 found the same against
+the 2021 map on 60 one-kilometre squares: 5 to 6 points low in three of the
+four years. The canopy share in a land-cover sentence, most often the 2026
+map's, is therefore likely several points low, and every land-cover
+sentence now says so from `landcover.json`.
 
 Maps of different summers differ by much more. Every pair of years mapped
 is compared the same way, district by district, on the 10 m maps in the
@@ -566,10 +667,12 @@ duration and an energy status:
 
 zeus-apple-silicon 1.1.0 reads 0 mJ of CPU energy on an Apple M5; those
 readings are rejected and the call is marked unknown. The ledger is the
-`emissions` block of every result. It covers the LLM only: the surge model
-is 1.5 million parameters on CPU (about 0.2 J a call on an M3, by the
-owner's reproduction), and the satellite models run in batch jobs, not in
-a briefing.
+`emissions` block of every result. It covers the LLM only. A default
+briefing runs no other model: the satellite models run in batch jobs. On a
+server that opts in, the surge model also runs per request; it is 2.96
+million parameters on CPU (2,964,960 in the published safetensors file;
+about 0.2 J a call on an M3, by the owner's reproduction), and that energy
+is not in the ledger.
 The numbers in [`docs/history/BENCHMARKS.md`](history/BENCHMARKS.md) come from the
 retired GPU stack and are historical. Details in
 [`docs/EMISSIONS.md`](EMISSIONS.md).
