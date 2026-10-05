@@ -113,3 +113,36 @@ def test_no_alerts_sentence_claims_only_the_alerts_it_checks():
     assert not nws_alerts._relevant("Wind Advisory", "flood") and not nws_alerts._relevant("High Wind Warning", "flood")
     for event in ("Flood Warning", "Coastal Flood Advisory", "Tropical Storm Warning"):  # the three the sentence names
         assert nws_alerts._relevant(event, "flood")
+
+
+def test_a_development_is_inside_sandy_by_the_share_of_its_outline():
+    import geopandas as gpd
+    import pytest
+    from shapely.geometry import box
+
+    from app.assets import nycha
+
+    # Two buildings: the larger is wholly inside the extent, and the centre
+    # point of the pair falls in the gap between them, outside it.
+    extent = gpd.GeoDataFrame(geometry=[box(0, 0, 10, 10)], crs="EPSG:2263")
+    site = gpd.GeoDataFrame(geometry=[box(0, 0, 10, 10).union(box(30, 0, 34, 10))], crs="EPSG:2263")
+    assert not extent.geometry.iloc[0].contains(site.geometry.iloc[0].centroid)
+    assert nycha.footprint_share(site, extent) == [pytest.approx(100 / 140)]
+    assert nycha.footprint_share(gpd.GeoDataFrame(geometry=[box(50, 50, 60, 60)], crs="EPSG:2263"), extent) == [0.0]
+
+
+def test_the_housing_register_counts_hammel_and_states_its_rule():
+    """The sanity check: 20 developments by centre point, 39 with 10% or
+    more of the outline inside; Hammel (94% inside) was missed."""
+    from app.registers import exposure
+    from app.registers._loader import load_register
+
+    rows = {r["name"]: r for r in load_register("nycha")}
+    assert sum(1 for r in rows.values() if r["snap"]["sandy"]) == 39
+    assert rows["HAMMEL"]["snap"]["sandy"] and rows["HAMMEL"]["sandy_share"] > 0.9
+    assert not rows["GOWANUS"]["snap"]["sandy"]  # 0.7% of its outline: named, not counted
+    s = exposure.summary_for_point(40.6787, -73.9897, "nycha")  # 400 Carroll Street
+    assert "10% or more of their mapped outline inside the 2012 Sandy extent" in s["narrative"]
+    assert "centre point inside a modeled DEP stormwater scenario" in s["narrative"]
+    assert "Under 10% of the outline inside the 2012 Sandy extent (not counted): GOWANUS" in s["narrative"]
+    assert s["n_inside_sandy_2012"] == 2 and s["n_near_sandy_edge"] == 1

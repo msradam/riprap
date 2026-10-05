@@ -88,7 +88,8 @@ def test_district_register_names_the_exposed_assets():
     n = exposure.summary_for_polygon(bk06, "nycha")
     assert n["n_inside_sandy_2012"] == 2
     assert n["narrative"].startswith("2 flood-exposed NYCHA developments in this area (the register lists only")
-    assert n["narrative"].endswith("Inside the 2012 Sandy extent: RED HOOK EAST, RED HOOK WEST")
+    assert ("Inside the 2012 Sandy extent: RED HOOK EAST, RED HOOK WEST. Under 10% of the outline inside "
+            "the 2012 Sandy extent (not counted): GOWANUS") in n["narrative"]
     assert _register_counts(n["narrative"] + ".") == (2, 2, 0)
     m = exposure.summary_for_polygon(bk06, "mta_entrances")  # every entrance in the outline, each checked
     assert m["n_entrances"] > 20 and "(the register lists only" not in m["narrative"]

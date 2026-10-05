@@ -28,7 +28,8 @@ def flags(asset_class: str):
     g = importlib.import_module(f"app.assets.{asset_class}").load()
     if g.crs is None or g.crs.to_string() != "EPSG:2263":
         g = g.to_crs("EPSG:2263")
-    g["sandy"] = sandy_inundation.join(g).astype(int)
+    if "sandy" not in g.columns:  # NYCHA sets it from the share of each outline inside
+        g["sandy"] = sandy_inundation.join(g).astype(int)
     for scen in LAYERS[1:]:
         g[scen] = (dep_stormwater.join(g, scen)["depth_class"] > 0).astype(int)
     ll = g.geometry.to_crs("EPSG:4326")

@@ -10,6 +10,11 @@ An asset whose point is outside the Sandy outline but within 50 m of it
 is kept too (`near_sandy_edge`): the outline is not exact to a building,
 so such an asset is named as near the edge, never counted as exposed and
 never silently dropped.
+
+A loader of outlines (NYCHA developments) sets `sandy` itself, from the
+share of each outline inside the extent (`sandy_share`); a development
+with some of its outline inside but under the threshold is kept the same
+way, named and not counted.
 """
 from __future__ import annotations
 
@@ -56,17 +61,22 @@ def build_register(asset_class: str, loader: Callable, *,
     g = loader()
     if g.crs is None or g.crs.to_string() != "EPSG:2263":
         g = g.to_crs("EPSG:2263")
-    g["sandy"] = sandy_inundation.join(g).astype(int)
+    by_share = "sandy_share" in g.columns
+    if not by_share:
+        g["sandy"] = sandy_inundation.join(g).astype(int)
     for scen in SCENARIOS:
         g[f"{scen}_class"] = dep_stormwater.join(g, scen)["depth_class"].fillna(0).astype(int)
         g[scen] = (g[f"{scen}_class"] > 0).astype(int)
     ll = g.geometry.to_crs("EPSG:4326")
     g["lat"], g["lon"] = ll.y, ll.x
-    g["near_sandy_edge"] = [int(not inside and sandy_inundation.at_point(pt)["edge_m"] is not None)
-                            for inside, pt in zip(g["sandy"], g.geometry, strict=True)]
+    if by_share:
+        g["near_sandy_edge"] = ((g["sandy"] == 0) & (g["sandy_share"] > 0)).astype(int)
+    else:
+        g["near_sandy_edge"] = [int(not inside and sandy_inundation.at_point(pt)["edge_m"] is not None)
+                                for inside, pt in zip(g["sandy"], g.geometry, strict=True)]
     exposed = g[g[["sandy", "near_sandy_edge", *SCENARIOS]].sum(axis=1) > 0].sort_values("name")
     print(f"{len(exposed)} of {len(g)} {asset_class} records are inside the Sandy zone or a DEP scenario, "
-          f"or within 50 m of the Sandy edge ({int(g['near_sandy_edge'].sum())} of them only that)", file=sys.stderr)
+          f"or just outside the Sandy rule ({int(g['near_sandy_edge'].sum())} near its edge or partly inside)", file=sys.stderr)
     rows, seen = [], set()
     for _, row in exposed.iterrows():
         key = (round(float(row["lat"]), 5), round(float(row["lon"]), 5))

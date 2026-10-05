@@ -16,8 +16,9 @@
     "development": "CONEY ISLAND I (SITE 1B)",
     "distance_m": 111.2,
     "inside_sandy_2012": true,
-    "rep_elevation_m": 0.83,
-    "rep_hand_m": 0.83,
+    "rep_elevation_m": 0.72,
+    "rep_hand_m": 0.72,
+    "sandy_share": 1.0,
     "tds_num": "239"
    },
    {
@@ -33,8 +34,9 @@
     "development": "CAREY GARDENS",
     "distance_m": 352.0,
     "inside_sandy_2012": true,
-    "rep_elevation_m": 0.66,
-    "rep_hand_m": 0.66,
+    "rep_elevation_m": 0.44,
+    "rep_hand_m": 0.46,
+    "sandy_share": 1.0,
     "tds_num": "166"
    },
    {
@@ -52,6 +54,7 @@
     "inside_sandy_2012": true,
     "rep_elevation_m": 1.06,
     "rep_hand_m": 1.06,
+    "sandy_share": 1.0,
     "tds_num": "142"
    },
    {
@@ -67,8 +70,9 @@
     "development": "CONEY ISLAND I (SITES 4 & 5)",
     "distance_m": 613.0,
     "inside_sandy_2012": true,
-    "rep_elevation_m": 0.65,
-    "rep_hand_m": 0.38,
+    "rep_elevation_m": 0.61,
+    "rep_hand_m": 0.35,
+    "sandy_share": 1.0,
     "tds_num": "216"
    },
    {
@@ -84,15 +88,16 @@
     "development": "CONEY ISLAND",
     "distance_m": 956.2,
     "inside_sandy_2012": true,
-    "rep_elevation_m": 1.06,
-    "rep_hand_m": 0.8,
+    "rep_elevation_m": 1.03,
+    "rep_hand_m": 0.77,
+    "sandy_share": 1.0,
     "tds_num": "094"
    }
   ],
   "n_developments": 10,
   "n_in_dep_extreme_2080": 3,
   "n_inside_sandy_2012": 10,
-  "narrative": "10 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 10 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: CONEY ISLAND I (SITE 1B) (111 m), CAREY GARDENS (352 m), HABER (544 m), CONEY ISLAND I (SITES 4 & 5) (613 m), CONEY ISLAND (956 m), SURFSIDE GARDENS (1062 m), O'DWYER GARDENS (1148 m), GRAVESEND (1184 m), CONEY ISLAND I (SITE 8) (1283 m), MARLBORO (1847 m). Inside the DEP extreme scenario (2080 sea-level rise): CAREY GARDENS (352 m), SURFSIDE GARDENS (1062 m), O'DWYER GARDENS (1148 m)",
+  "narrative": "10 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments with 10% or more of their mapped outline inside the 2012 Sandy extent, or their centre point inside a modeled DEP stormwater scenario, not every development): 10 inside the 2012 Sandy inundation extent and 3 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: CONEY ISLAND I (SITE 1B) (111 m), CAREY GARDENS (352 m), HABER (544 m), CONEY ISLAND I (SITES 4 & 5) (613 m), CONEY ISLAND (956 m), SURFSIDE GARDENS (1062 m), O'DWYER GARDENS (1148 m), GRAVESEND (1184 m), CONEY ISLAND I (SITE 8) (1283 m), MARLBORO (1847 m). Inside the DEP extreme scenario (2080 sea-level rise): CAREY GARDENS (352 m), SURFSIDE GARDENS (1062 m), O'DWYER GARDENS (1148 m)",
   "radius_m": 2000
  },
  "40.6436,-74.0781": {
@@ -112,15 +117,16 @@
     "development": "RICHMOND TERRACE",
     "distance_m": 788.4,
     "inside_sandy_2012": false,
-    "rep_elevation_m": 16.42,
-    "rep_hand_m": 17.65,
+    "rep_elevation_m": 14.49,
+    "rep_hand_m": 15.72,
+    "sandy_share": 0.0,
     "tds_num": "117"
    }
   ],
   "n_developments": 1,
   "n_in_dep_extreme_2080": 1,
   "n_inside_sandy_2012": 0,
-  "narrative": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): RICHMOND TERRACE (788 m)",
+  "narrative": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments with 10% or more of their mapped outline inside the 2012 Sandy extent, or their centre point inside a modeled DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): RICHMOND TERRACE (788 m)",
   "radius_m": 2000
  },
  "40.677,-74.0105": {
@@ -140,8 +146,9 @@
     "development": "RED HOOK WEST",
     "distance_m": 227.9,
     "inside_sandy_2012": true,
-    "rep_elevation_m": 3.14,
-    "rep_hand_m": 4.37,
+    "rep_elevation_m": 4.16,
+    "rep_hand_m": 5.39,
+    "sandy_share": 0.845,
     "tds_num": "079"
    },
    {
@@ -159,13 +166,33 @@
     "inside_sandy_2012": true,
     "rep_elevation_m": 3.09,
     "rep_hand_m": 4.32,
+    "sandy_share": 0.598,
     "tds_num": "004"
+   },
+   {
+    "borough": "Brooklyn",
+    "centroid_lat": 40.68345,
+    "centroid_lon": -73.98855,
+    "dep_extreme_2080_class": 0,
+    "dep_extreme_2080_label": "outside",
+    "dep_moderate_2050_class": 0,
+    "dep_moderate_2050_label": "outside",
+    "dep_moderate_current_class": 0,
+    "dep_moderate_current_label": "outside",
+    "development": "GOWANUS",
+    "distance_m": 1984.9,
+    "inside_sandy_2012": false,
+    "rep_elevation_m": 4.34,
+    "rep_hand_m": 4.21,
+    "sandy_share": 0.007,
+    "tds_num": "025"
    }
   ],
   "n_developments": 2,
   "n_in_dep_extreme_2080": 0,
   "n_inside_sandy_2012": 2,
-  "narrative": "2 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 2 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: RED HOOK WEST (228 m), RED HOOK EAST (561 m)",
+  "n_near_sandy_edge": 1,
+  "narrative": "2 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments with 10% or more of their mapped outline inside the 2012 Sandy extent, or their centre point inside a modeled DEP stormwater scenario, not every development): 2 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: RED HOOK WEST (228 m), RED HOOK EAST (561 m). Under 10% of the outline inside the 2012 Sandy extent (not counted): GOWANUS (1985 m)",
   "radius_m": 2000
  },
  "40.707431,-74.00476": {
@@ -184,10 +211,10 @@
     "dep_moderate_current_label": "outside",
     "development": "SMITH",
     "distance_m": 605.5,
-    "inside_sandy_2012": false,
-    "rep_elevation_m": 3.2,
-    "rep_hand_m": 3.2,
-    "sandy_edge_m": 4,
+    "inside_sandy_2012": true,
+    "rep_elevation_m": 3.14,
+    "rep_hand_m": 3.14,
+    "sandy_share": 0.443,
     "tds_num": "027"
    },
    {
@@ -202,11 +229,29 @@
     "dep_moderate_current_label": "outside",
     "development": "LA GUARDIA ADDITION",
     "distance_m": 1441.9,
-    "inside_sandy_2012": false,
-    "rep_elevation_m": 3.64,
-    "rep_hand_m": 3.64,
-    "sandy_edge_m": 17,
+    "inside_sandy_2012": true,
+    "rep_elevation_m": 3.74,
+    "rep_hand_m": 3.74,
+    "sandy_share": 0.107,
     "tds_num": "152"
+   },
+   {
+    "borough": "Manhattan",
+    "centroid_lat": 40.71219,
+    "centroid_lon": -73.98736,
+    "dep_extreme_2080_class": 0,
+    "dep_extreme_2080_label": "outside",
+    "dep_moderate_2050_class": 0,
+    "dep_moderate_2050_label": "outside",
+    "dep_moderate_current_class": 0,
+    "dep_moderate_current_label": "outside",
+    "development": "LA GUARDIA",
+    "distance_m": 1559.0,
+    "inside_sandy_2012": false,
+    "rep_elevation_m": 5.96,
+    "rep_hand_m": 5.96,
+    "sandy_share": 0.0,
+    "tds_num": "076"
    },
    {
     "borough": "Manhattan",
@@ -220,10 +265,10 @@
     "dep_moderate_current_label": "outside",
     "development": "TWO BRIDGES URA (SITE 7)",
     "distance_m": 1609.7,
-    "inside_sandy_2012": false,
-    "rep_elevation_m": 3.5,
-    "rep_hand_m": 3.5,
-    "sandy_edge_m": 19,
+    "inside_sandy_2012": true,
+    "rep_elevation_m": 2.63,
+    "rep_hand_m": 2.63,
+    "sandy_share": 0.184,
     "tds_num": "266"
    },
    {
@@ -239,16 +284,16 @@
     "development": "SEWARD PARK EXTENSION",
     "distance_m": 1842.4,
     "inside_sandy_2012": false,
-    "rep_elevation_m": 9.53,
-    "rep_hand_m": 9.53,
+    "rep_elevation_m": 9.54,
+    "rep_hand_m": 9.54,
+    "sandy_share": 0.0,
     "tds_num": "192"
    }
   ],
-  "n_developments": 1,
+  "n_developments": 4,
   "n_in_dep_extreme_2080": 1,
-  "n_inside_sandy_2012": 0,
-  "n_near_sandy_edge": 3,
-  "narrative": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Outside the 2012 Sandy extent but within 50 m of its mapped edge (the outline is not exact to a building): SMITH (606 m), LA GUARDIA ADDITION (1442 m), TWO BRIDGES URA (SITE 7) (1610 m). Inside the DEP extreme scenario (2080 sea-level rise): SEWARD PARK EXTENSION (1842 m)",
+  "n_inside_sandy_2012": 3,
+  "narrative": "4 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments with 10% or more of their mapped outline inside the 2012 Sandy extent, or their centre point inside a modeled DEP stormwater scenario, not every development): 3 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: SMITH (606 m), LA GUARDIA ADDITION (1442 m), TWO BRIDGES URA (SITE 7) (1610 m). Inside the DEP extreme scenario (2080 sea-level rise): SEWARD PARK EXTENSION (1842 m)",
   "radius_m": 2000
  },
  "40.711001,-73.777712": {
@@ -268,21 +313,40 @@
     "development": "CONLON LIHFE TOWER",
     "distance_m": 1047.6,
     "inside_sandy_2012": false,
-    "rep_elevation_m": 17.45,
-    "rep_hand_m": 0.75,
+    "rep_elevation_m": 17.36,
+    "rep_hand_m": 0.66,
+    "sandy_share": 0.0,
     "tds_num": "232"
    }
   ],
   "n_developments": 1,
   "n_in_dep_extreme_2080": 1,
   "n_inside_sandy_2012": 0,
-  "narrative": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): CONLON LIHFE TOWER (1048 m)",
+  "narrative": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments with 10% or more of their mapped outline inside the 2012 Sandy extent, or their centre point inside a modeled DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the DEP extreme scenario (2080 sea-level rise): CONLON LIHFE TOWER (1048 m)",
   "radius_m": 2000
  },
  "40.8296,-73.9262": {
   "available": true,
   "citation": "Pre-computed from NYC Open Data NYCHA Developments (phvi-damg) joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. See data/registers/nycha.json.",
   "developments": [
+   {
+    "borough": "Manhattan",
+    "centroid_lat": 40.83321,
+    "centroid_lon": -73.93647,
+    "dep_extreme_2080_class": 0,
+    "dep_extreme_2080_label": "outside",
+    "dep_moderate_2050_class": 0,
+    "dep_moderate_2050_label": "outside",
+    "dep_moderate_current_class": 0,
+    "dep_moderate_current_label": "outside",
+    "development": "RANGEL",
+    "distance_m": 953.1,
+    "inside_sandy_2012": false,
+    "rep_elevation_m": 4.13,
+    "rep_hand_m": 4.13,
+    "sandy_share": 0.024,
+    "tds_num": "037"
+   },
    {
     "borough": "Manhattan",
     "centroid_lat": 40.83099,
@@ -295,18 +359,18 @@
     "dep_moderate_current_label": "outside",
     "development": "POLO GROUNDS TOWERS",
     "distance_m": 990.0,
-    "inside_sandy_2012": false,
-    "rep_elevation_m": 4.55,
-    "rep_hand_m": 4.55,
-    "sandy_edge_m": 25,
+    "inside_sandy_2012": true,
+    "rep_elevation_m": 4.77,
+    "rep_hand_m": 4.77,
+    "sandy_share": 0.119,
     "tds_num": "149"
    }
   ],
-  "n_developments": 0,
+  "n_developments": 1,
   "n_in_dep_extreme_2080": 0,
-  "n_inside_sandy_2012": 0,
+  "n_inside_sandy_2012": 1,
   "n_near_sandy_edge": 1,
-  "narrative": "0 flood-exposed NYCHA developments within 2000 m of this address (the register lists only developments found inside the 2012 Sandy extent or a DEP stormwater scenario, not every development): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise). Outside the 2012 Sandy extent but within 50 m of its mapped edge (the outline is not exact to a building): POLO GROUNDS TOWERS (990 m)",
+  "narrative": "1 flood-exposed NYCHA development within 2000 m of this address (the register lists only developments with 10% or more of their mapped outline inside the 2012 Sandy extent, or their centre point inside a modeled DEP stormwater scenario, not every development): 1 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: POLO GROUNDS TOWERS (990 m). Under 10% of the outline inside the 2012 Sandy extent (not counted): RANGEL (953 m)",
   "radius_m": 2000
  }
 }
