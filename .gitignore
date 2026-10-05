@@ -110,3 +110,8 @@ data/calibration/distill_pool.csv
 
 # Golden-set score files (regenerable evidence, kept out of the repo)
 tests/golden/results/
+
+# FloodNet event rows (CC BY-NC-SA 4.0, and the Data Access License Agreement
+# forbids reposting them): scripts/score_water_floodnet.py writes them under
+# outputs/ and commits only the aggregate summary beside this path.
+data/experimental/water_coastal_floodnet.json

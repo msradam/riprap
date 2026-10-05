@@ -35,10 +35,17 @@ to September 2024), scored the same way at the Sentinel-1 moments they cover.
     uv run python scripts/score_water_floodnet.py --inputs   # pick negatives and scenes, fetch them
     python3 gpu_lock.py uv run python scripts/score_water_floodnet.py --models
 
-Every stage rewrites data/experimental/water_coastal_floodnet.json. FloodNet
-responses, scene lists, scenes and model outputs are cached under
-outputs/water_coastal/ (git-ignored) and never fetched twice; delete that
-folder to start over.
+Every stage rewrites two files. The full result, with every moment, its
+sensor, event times and depth, goes to outputs/water_coastal/ (git-ignored):
+FloodNet's Data Access License Agreement forbids reposting the data in part
+or in its entirety, so those rows are never committed. The aggregate result
+(counts, rates and the verdict, with no per-event or per-sensor record) goes
+to data/experimental/water_coastal_floodnet_summary.json. FloodNet data is
+CC BY-NC-SA 4.0: FloodNet (New York University and The City University of
+New York); Mydlarz et al. (2024), https://doi.org/10.1029/2023WR036806.
+FloodNet responses, scene lists, scenes and model outputs are cached under
+outputs/water_coastal/ too and never fetched twice; delete that folder to
+start over.
 """
 
 from __future__ import annotations
@@ -67,7 +74,8 @@ from app.context import floodnet  # noqa: E402
 from app.eo import prithvi  # noqa: E402
 
 CACHE = ROOT / "outputs" / "water_coastal"
-OUT = ROOT / "data" / "experimental" / "water_coastal_floodnet.json"
+RAW = CACHE / "water_coastal_floodnet.json"  # per-event rows: git-ignored, never committed
+OUT = ROOT / "data" / "experimental" / "water_coastal_floodnet_summary.json"
 SINCE = "2020-10-01"  # the first sensor was deployed on 2020-10-05
 S1, S2 = "sentinel-1-rtc", "sentinel-2-l2a"
 PX, RADII, SEED, NEGATIVES = 256, (50, 100, 250), 20261002, 5  # SEED is quoted in METHOD
@@ -119,7 +127,7 @@ def utc(s: str) -> datetime:
 
 
 def sensors() -> dict[str, dict]:
-    """Sensors FloodNet has in good working order (`floodnet.is_good`), with a location."""
+    """Sensors whose status in FloodNet's API is good (`floodnet.is_good`), with a location."""
     rows = gql("{ deployments(limit: 5000) { deployment_id name sensor_address_street sensor_address_borough "
                "sensor_address_neighborhood sensor_status date_deployed date_down deploy_type mounted_over location "
                "nearest_tidal_id } }")["deployments"]
@@ -610,6 +618,23 @@ def score(ms: list[dict], model: str) -> dict:
     return out
 
 
+# Keys that hold a FloodNet record: one row per moment, or a value per sensor or per event.
+_RECORDS = ("positive_moments", "moments", "not_ground_share_by_sensor", "positive_depths_mm")
+
+
+def aggregate(out: dict) -> dict:
+    """The result without FloodNet records: counts, rates, dates and the
+    verdict. Sensor ids become a count."""
+    def strip(v):
+        if not isinstance(v, dict):
+            return v
+        return {("n_hit_sensors" if k == "hit_sensors" else k): (len(x) if k == "hit_sensors" else strip(x))
+                for k, x in v.items() if k not in _RECORDS}
+
+    return {**strip(out), "floodnet_licence": f"{floodnet.ATTRIBUTION}, {floodnet.LICENSE}, {floodnet.LICENSE_URL}",
+            "run_at": out.get("run_at") or out.get("run_date")}
+
+
 def _check() -> None:
     """The skill rule on made-up moments: 6 hits of 10 on two dates against
     2 false alarms of 50 is skill; the same hits on one date are not."""
@@ -620,6 +645,8 @@ def _check() -> None:
     ms = [m(True, k < 6, 1 + k % 2) for k in range(10)] + [m(False, k < 2, 3) for k in range(50)]
     assert score(ms, "x")["shows_skill"] and score(ms, "x")["100m"]["hits"] == 6
     assert not score([{**a, "time": "2024-01-01"} for a in ms], "x")["shows_skill"]
+    agg = aggregate({"moments": ms, "x": score(ms, "x"), "positive_depths_mm": [60]})
+    assert "sensor" not in json.dumps(agg).replace("n_hit_sensors", "") and agg["x"]["100m"]["n_hit_sensors"] == 1
 
 
 def main() -> int:
@@ -653,8 +680,11 @@ def main() -> int:
             out["verdict"] = ("skill: keep as a coastal and tidal layer"
                               if out["prithvi"]["shows_skill"] or out["terramind"]["shows_skill"] else "no skill")
         out["moments"] = ms
-    OUT.write_text(json.dumps(out, indent=1) + "\n")
-    print(json.dumps({k: v for k, v in out.items() if k not in ("positive_moments", "moments")}, indent=1))
+    out["run_at"] = datetime.now(UTC).strftime("%Y-%m-%dT%H:%MZ")  # the time stamp FloodNet's licence asks for
+    RAW.parent.mkdir(parents=True, exist_ok=True)
+    RAW.write_text(json.dumps(out, indent=1) + "\n")
+    OUT.write_text(json.dumps(aggregate(out), indent=1) + "\n")
+    print(json.dumps(aggregate(out), indent=1))
     return 0
 
 

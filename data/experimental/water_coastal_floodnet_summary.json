@@ -1,0 +1,289 @@
+{
+ "what": "FloodNet flood events held against every Sentinel-1 and Sentinel-2 pass over New York City",
+ "run_date": "2026-10-02",
+ "rule": "Fewer than 10 positive moments on fewer than 3 distinct dates across both satellites, after the clear-sky filter, is 'too few moments to tell'. Otherwise a model shows skill when, at 100 m, it has at least 5 hits on at least 2 distinct dates, a hit rate at least twice the false-alarm rate, and a one-sided Fisher exact p below 0.05. The verdict is 'skill' when either model shows it.",
+ "method": {
+  "positive": "a FloodNet event labelled flood spans the pass time, at a sensor in good working order that was deployed, inside the scene's footprint and reporting within 15 minutes; for Sentinel-2 the scene classification at the sensor is clear",
+  "negative": "five passes per positive of the same sensor, satellite and relative orbit, with no flood event within three hours, a reading of zero within 15 minutes and (Sentinel-2) a clear view; within 45 days of the positive's day of the year where there are enough; seeded random order",
+  "hit": "model water within the radius of the sensor on a 10 m grid, on land (inside a neighbourhood tabulation area) that the scene classification of the dry Sentinel-2 scene just before does not call water",
+  "box": "2.56 km square of 10 m pixels around the sensor; gaps at tile and slice edges filled from the same pass",
+  "radar": "8 HH and HV scenes are left out; Sentinel-1 RTC passes only",
+  "seed": 20261002
+ },
+ "n_sensors": 374,
+ "n_sensors_with_flood_events": 261,
+ "n_flood_events": 3219,
+ "date_range": [
+  "2021-03-05",
+  "2026-10-02"
+ ],
+ "satellites": {
+  "sentinel-1": {
+   "collection": "sentinel-1-rtc",
+   "n_items": 417,
+   "n_passes": 194,
+   "n_moments": 20899,
+   "n_positive_before_checks": 11,
+   "n_positive_reporting": 11,
+   "n_positive": 11
+  },
+  "sentinel-2": {
+   "collection": "sentinel-2-l2a",
+   "n_items": 4324,
+   "n_passes": 851,
+   "n_moments": 95496,
+   "n_positive_before_checks": 164,
+   "n_positive_reporting": 164,
+   "n_positive": 33
+  }
+ },
+ "n_positive": 44,
+ "n_positive_dates": 28,
+ "positive_dates": {
+  "2022-09-07": 2,
+  "2022-10-29": 1,
+  "2022-11-26": 1,
+  "2023-08-05": 1,
+  "2023-09-26": 4,
+  "2023-12-11": 1,
+  "2024-02-09": 1,
+  "2024-03-25": 1,
+  "2024-08-03": 1,
+  "2024-08-22": 1,
+  "2024-09-21": 5,
+  "2024-10-18": 4,
+  "2024-11-17": 2,
+  "2024-12-30": 1,
+  "2025-03-06": 1,
+  "2025-08-22": 1,
+  "2025-09-28": 1,
+  "2025-10-06": 1,
+  "2025-11-05": 1,
+  "2025-12-07": 3,
+  "2026-02-05": 1,
+  "2026-02-08": 1,
+  "2026-02-18": 1,
+  "2026-04-19": 1,
+  "2026-07-23": 1,
+  "2026-08-12": 2,
+  "2026-08-16": 2,
+  "2026-09-11": 1
+ },
+ "n_positive_sensors": 12,
+ "positive_neighbourhoods": {
+  "Seaside": 15,
+  "City Island": 11,
+  "Howard Beach": 10,
+  "Rosedale": 3,
+  "Coney Island": 1,
+  "Richmond": 1,
+  "Hunts Point": 1,
+  "East Flatbush": 1,
+  "Eltingville": 1
+ },
+ "step1_passes": true,
+ "n_negative": 220,
+ "model_seconds": {
+  "terramind": 132,
+  "prithvi": 153
+ },
+ "ai4g_flood": {
+  "dataset": "ai-for-good-lab/ai4g-flood-dataset",
+  "revision": "d594d7a72f9719abff2df375dd3734a912b80595",
+  "file": "N39/N39W075/N39W075-post-processing.parquet",
+  "licence": "MIT (dataset card)",
+  "sha256": "6b62266edd349aaccf091c417d4b0884f0d2095702beb566da6b9664200af6e7",
+  "covers": "October 2014 to September 2024; this tile's last detection is dated 2024-09-27",
+  "n_positive": 7,
+  "n_negative": 21,
+  "50m": {
+   "hits": 0,
+   "hit_dates": [],
+   "n_hit_sensors": 0,
+   "false_alarms": 0,
+   "hit_rate": 0.0,
+   "false_alarm_rate": 0.0,
+   "fisher_p": 1.0
+  },
+  "100m": {
+   "hits": 0,
+   "hit_dates": [],
+   "n_hit_sensors": 0,
+   "false_alarms": 0,
+   "hit_rate": 0.0,
+   "false_alarm_rate": 0.0,
+   "fisher_p": 1.0
+  },
+  "250m": {
+   "hits": 0,
+   "hit_dates": [],
+   "n_hit_sensors": 0,
+   "false_alarms": 0,
+   "hit_rate": 0.0,
+   "false_alarm_rate": 0.0,
+   "fisher_p": 1.0
+  },
+  "shows_skill": false
+ },
+ "prithvi": {
+  "n_positive": 33,
+  "n_negative": 162,
+  "50m": {
+   "hits": 1,
+   "hit_dates": [
+    "2026-02-08"
+   ],
+   "n_hit_sensors": 1,
+   "false_alarms": 9,
+   "hit_rate": 0.03,
+   "false_alarm_rate": 0.056,
+   "fisher_p": 0.8508
+  },
+  "100m": {
+   "hits": 1,
+   "hit_dates": [
+    "2026-02-08"
+   ],
+   "n_hit_sensors": 1,
+   "false_alarms": 11,
+   "hit_rate": 0.03,
+   "false_alarm_rate": 0.068,
+   "fisher_p": 0.8994
+  },
+  "250m": {
+   "hits": 10,
+   "hit_dates": [
+    "2023-12-11",
+    "2024-09-21",
+    "2024-10-18",
+    "2024-11-17",
+    "2025-12-07",
+    "2026-02-08"
+   ],
+   "n_hit_sensors": 6,
+   "false_alarms": 44,
+   "hit_rate": 0.303,
+   "false_alarm_rate": 0.272,
+   "fisher_p": 0.4306
+  },
+  "shows_skill": false
+ },
+ "terramind": {
+  "n_positive": 41,
+  "n_negative": 199,
+  "50m": {
+   "hits": 0,
+   "hit_dates": [],
+   "n_hit_sensors": 0,
+   "false_alarms": 0,
+   "hit_rate": 0.0,
+   "false_alarm_rate": 0.0,
+   "fisher_p": 1.0
+  },
+  "100m": {
+   "hits": 0,
+   "hit_dates": [],
+   "n_hit_sensors": 0,
+   "false_alarms": 0,
+   "hit_rate": 0.0,
+   "false_alarm_rate": 0.0,
+   "fisher_p": 1.0
+  },
+  "250m": {
+   "hits": 0,
+   "hit_dates": [],
+   "n_hit_sensors": 0,
+   "false_alarms": 0,
+   "hit_rate": 0.0,
+   "false_alarm_rate": 0.0,
+   "fisher_p": 1.0
+  },
+  "shows_skill": false
+ },
+ "terramind_sentinel1_moments": {
+  "n_positive": 10,
+  "n_negative": 51,
+  "50m": {
+   "hits": 0,
+   "hit_dates": [],
+   "n_hit_sensors": 0,
+   "false_alarms": 0,
+   "hit_rate": 0.0,
+   "false_alarm_rate": 0.0,
+   "fisher_p": 1.0
+  },
+  "100m": {
+   "hits": 0,
+   "hit_dates": [],
+   "n_hit_sensors": 0,
+   "false_alarms": 0,
+   "hit_rate": 0.0,
+   "false_alarm_rate": 0.0,
+   "fisher_p": 1.0
+  },
+  "250m": {
+   "hits": 0,
+   "hit_dates": [],
+   "n_hit_sensors": 0,
+   "false_alarms": 0,
+   "hit_rate": 0.0,
+   "false_alarm_rate": 0.0,
+   "fisher_p": 1.0
+  },
+  "shows_skill": false
+ },
+ "terramind_sentinel2_moments": {
+  "n_positive": 31,
+  "n_negative": 148,
+  "50m": {
+   "hits": 0,
+   "hit_dates": [],
+   "n_hit_sensors": 0,
+   "false_alarms": 0,
+   "hit_rate": 0.0,
+   "false_alarm_rate": 0.0,
+   "fisher_p": 1.0
+  },
+  "100m": {
+   "hits": 0,
+   "hit_dates": [],
+   "n_hit_sensors": 0,
+   "false_alarms": 0,
+   "hit_rate": 0.0,
+   "false_alarm_rate": 0.0,
+   "fisher_p": 1.0
+  },
+  "250m": {
+   "hits": 0,
+   "hit_dates": [],
+   "n_hit_sensors": 0,
+   "false_alarms": 0,
+   "hit_rate": 0.0,
+   "false_alarm_rate": 0.0,
+   "fisher_p": 1.0
+  },
+  "shows_skill": false
+ },
+ "terramind_other_satellite_event_image_hours_from_moment_median": {
+  "sentinel-1-rtc": 78.9,
+  "sentinel-2-l2a": 40.9
+ },
+ "models": {
+  "prithvi": {
+   "repo": "msradam/Prithvi-EO-2.0-NYC-Pluvial",
+   "revision": "25ce564199d8cfa8fefd5ac0e80e2d911b65ea60",
+   "file": "Prithvi_EO_2.0_NYC_Pluvial.safetensors"
+  },
+  "terramind": {
+   "repo": "ibm-esa-geospatial/TerraMind-base-Flood",
+   "revision": "1e4b2429d17234922f8d92beb0d725af4db85c08",
+   "file": "TerraMind_v1_base_ImpactMesh_flood.pt",
+   "sha256": "22627584c2db618c2f6ddb64b411a95762a893becb25104e3f66bfebecaa71e9",
+   "threshold": "flood probability 0.5"
+  }
+ },
+ "prithvi_finds_open_water_pct": 22.3,
+ "verdict": "no skill",
+ "floodnet_licence": "FloodNet (New York University and The City University of New York), CC BY-NC-SA 4.0, https://creativecommons.org/licenses/by-nc-sa/4.0/",
+ "run_at": "2026-10-02"
+}
