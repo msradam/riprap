@@ -95,6 +95,12 @@ def test_the_period_is_the_one_the_sensors_could_have_recorded_in(monkeypatch):
     assert "since it was installed on 2025-09-17; it is listed as down since 2026-08-13, the most recent" in n
 
 
+def test_no_sensor_in_range_is_still_a_sentence(monkeypatch):
+    monkeypatch.setattr(floodnet, "sensors_near", lambda *a, **k: [])
+    v = floodnet.summary_for_point(40.71, -73.78)
+    assert v["narrative"] == "No FloodNet sensors deployed within 600 m of this address." and v["license"] == "CC BY-NC-SA 4.0"
+
+
 def test_only_events_a_person_verified_are_counted(monkeypatch):
     """The API marks review state in annotated_by; "for-review" and
     unannotated events are named, not counted, and give no depth."""

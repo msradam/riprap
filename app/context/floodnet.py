@@ -202,7 +202,7 @@ def _period(sensors: list[Sensor], since: datetime) -> tuple[str, str]:
     dates = sorted(s.deployed_at[:10] for s in sensors if s.deployed_at)
     young = [d for d in dates if d > window]
     one = len(sensors) == 1
-    if len(young) == len(sensors):  # no sensor is as old as the window
+    if sensors and len(young) == len(sensors):  # no sensor is as old as the window
         start = dates[0]
         if one:
             phrase = f"since it was installed on {start}"
