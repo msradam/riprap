@@ -244,6 +244,10 @@ def _final(state) -> dict:
 
     out["models"] = for_briefing(out)  # which models took part, where they ran, how long
     out["answer_path"] = answer_path(out)
+    # Beside the path, whether the question was answered: `answer_path` says "rules" for a question the
+    # rules read and could not answer, so a consumer could not tell the two apart. True, False, or None
+    # when no question was asked (a place alone, a refusal).
+    out["answered"] = (out.get("grounding") or {}).get("answered")
     return attach_disclosure_checks(out)
 
 
@@ -425,4 +429,5 @@ def run_compare(query: str, plan: dict, runner=None) -> dict:
         targets=[{"label": lab, "address": addr, "state": res} for lab, addr, res in results],
     )
     out["answer_path"] = answer_path(out)
+    out["answered"] = None  # two records side by side: nothing is ranked, so the question's "which" gets no answer
     return attach_disclosure_checks(out)

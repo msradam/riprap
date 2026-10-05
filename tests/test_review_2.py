@@ -65,14 +65,17 @@ def test_a_register_gives_no_yes_or_no_about_fema_zones(question):
     assert ra.answer(question, texts, v)[0] == "facts"
 
 
-def test_events_only_at_a_sensor_not_listed_as_good_are_not_a_yes():
+def test_a_verified_event_counts_whatever_the_sensors_status_is_today():
+    """Review round 1 (A5): every counted event is one a person at FloodNet
+    verified, and the status is of the sensor now, not of the event then. So
+    events at a sensor listed "noisy" give a yes as events at a "good" one do
+    (the highest reading in the city's own published table is such an event)."""
     texts = {"floodnet": "1 FloodNet sensor within 600 m has recorded 5 flood events in the last 3 "
-                         "years. 1 sensor with a status other than good recorded 5 of the 5 events."}
-    flagged = {"floodnet": {"n_sensors": 1, "n_flood_events_3y": 5, "n_flood_events_good_3y": 0}}
+                         "years. 1 of the 1 sensor is listed with a status other than \"good\"."}
     focus = {"time_frame": "past"}
-    assert ac.past_event_lead("Has 80 Pioneer Street flooded?", focus, ["floodnet"], texts, flagged)[0] == "cannot_answer"
-    good = {"floodnet": {"n_sensors": 1, "n_flood_events_3y": 5, "n_flood_events_good_3y": 5}}
-    assert ac.past_event_lead("Has 80 Pioneer Street flooded?", focus, ["floodnet"], texts, good)[0] == "yes"
+    for good in (0, 5):
+        v = {"floodnet": {"n_sensors": 1, "n_flood_events_3y": 5, "n_flood_events_good_3y": good}}
+        assert ac.past_event_lead("Has 80 Pioneer Street flooded?", focus, ["floodnet"], texts, v)[0] == "yes"
 
 
 def test_floodnet_counts_events_at_sensors_in_good_order(monkeypatch):

@@ -40,8 +40,22 @@ A question about outdoor heat is answered by the heat rules
 (heat_answer.py), which `answer` hands it to; everything below is the
 flood half.
 
-Returns None when no rule names what the question is about. The caller
-then asks the model, if one is configured, or shows the evidence.
+Three rules sit in front of all of these:
+
+  * a question not written in English is not read at all, and says so
+    (`not_english`);
+  * insurance, price, buying, renting, safety: Riprap gives none of that
+    advice, says so, and quotes the record (`asks_advice`);
+  * a question that asks for something Riprap does not hold (people,
+    income, basements, law, benefits, advice to an agency, a score, a
+    ranking, a trend, the rain on a past day, another 311 topic) is told
+    which in its first sentence and marked unanswered (`NOT_HELD`).
+
+Returns None when no rule names what the question is about: a word the
+rules did not read ("endorse", "fault") leaves a question unanswered and
+never under the neutral lead. The caller then asks the model, if one is
+configured, or shows the evidence under a line that says it is not an
+answer.
 """
 
 from __future__ import annotations
@@ -50,6 +64,7 @@ import re
 
 from riprap.core.burr import answer_checks as ac
 from riprap.core.burr import heat_answer
+from riprap.core.pebbles.shapers.dep_scenario import code as dep_code
 
 ASSET_DOCS = ("mta_entrance_exposure", "doe_school_exposure", "nycha_development_exposure", "doh_hospital_exposure")
 # What reports the present, and what a forecast question is answered with, in order.
@@ -62,7 +77,7 @@ DEP = ("dep_limited_current", "dep_moderate_current", "dep_moderate_2050", "dep_
        "dep_limited_current_nta", "dep_moderate_current_nta", "dep_moderate_2050_nta", "dep_extreme_2080_nta")
 # Sources a question can name beyond answer_checks.RELEVANT, most specific first.
 TOPICS = (
-    (re.compile(r"\bfema\b|flood ?zones?\b|flood ?plain|\bfirm\b|flood insurance rate", re.I),
+    (re.compile(r"\bfema\b|flood ?zones?\b|flood ?plain|\bfirm\b|flood insurance rate|\b[15]00[- ]year\b", re.I),
      ("fema_nfhl", "fema_pfirm", "dcp_floodplain_nta")),
     (re.compile(r"\bsandy\b", re.I), ("sandy_inundation", "sandy_nta")),
     (re.compile(r"stormwater|storm water|\bdep\b|scenarios?\b|(extreme|moderate) (rain|flood)|rain(fall)? (flood )?maps?"
@@ -112,9 +127,16 @@ _ADVICE_RE = re.compile(
     r"|\bshould (?:i|we) (?:buy|rent|sell|move|live|stay|sign|lease)\b"
     r"|\b(?:good|bad|smart|wise) (?:idea|place|time) to (?:buy|rent|live|move|sign)\b"
     r"|\b(?:is|would) it (?:be )?safe\b|\bsafe to (?:buy|rent|live|stay|move)\b"
+    r"|\bsafe (?:from|against|in|during) (?:a |the |any |heavy )?(?:flood\w*|storms?|rain\w*|hurricanes?)\b"
+    r"|\b(?:dangerous|unsafe)\b"
     r"|\b(?:is|are|will|would)\b[^.?!]*\b(?:homes?|houses?|apartments?|basements?|buildings?|blocks?|street|st|avenue|ave)\b[^.?!]*\bsafe\b",
     re.I)
 ADVICE_FACTS = ("fema_nfhl", "fema_pfirm", "dcp_floodplain_nta")
+# "Is it safe", a basement: the decline, then what was observed, then the stormwater maps, then FEMA. Never the
+# FEMA zone alone: "zone X (an area of minimal flood hazard)" once stood as the whole answer at an address with
+# 10 sensor events and 81 complaints beside it.
+_SAFETY_RE = re.compile(r"\b(?:un)?safe(?:ty)?\b|\bbasements?\b|\bcellars?\b|\bdanger", re.I)
+SAFETY_FACTS = ("floodnet", "nyc311", "nyc311_nta", "ida_hwm", "sandy_inundation", "sandy_nta", *DEP, *ADVICE_FACTS)
 # Records read around a street address only, by what the question calls them.
 ADDRESS_ONLY = ("ida_hwm",)
 # A change over time in land cover: the city's map is one year and the model is not compared across years.
@@ -125,6 +147,181 @@ _CHANGE_RE = re.compile(r"\bsince (?:19|20)\d\d\b|\bover (?:the )?(?:time|years|
                         re.I)
 NO_PREDICTION_FACTS = ("nws_alerts", "nws_water_forecast", "fema_nfhl", "dcp_floodplain_nta",
                        "dep_moderate_current", "dep_moderate_current_nta", "sandy_inundation", "sandy_nta")
+
+
+# What Riprap does not hold, by the words a question uses to ask for it: (topic, words, the sentence that opens
+# the answer, flood questions only). A question that asks for one of these is unanswered: the sentence says so
+# first, and the records for the place follow. Heat has its own leads for a score and a ranking (heat_answer.py),
+# and a trend in hot days is in the station record, so those three rows are for flood questions.
+HELP_POINTERS = ("The city's own services: 311 (https://portal.311.nyc.gov), Notify NYC "
+                 "(https://a858-nycnotify.nyc.gov) and FloodHelpNY (https://www.floodhelpny.org).")
+_COUNT_OF = (r"\b(?:how many|how much|number of|count of|share of|percent(?:age)? of|proportion of"
+             r"|what (?:share|percent(?:age)?|proportion|fraction))\b")
+_PEOPLE = (r"(?:people|persons?|residents?|households?|famil(?:y|ies)|adults?|seniors?|elderly|child(?:ren)?|kids?"
+           r"|tenants?|renters?|owners?|homeowners?|immigrants?|speakers?|workers?|new yorkers)")
+_OTHER_311 = (r"(?:noise|rodents?|rats?|mice|potholes?|parking|graffiti|garbage|trash|litter|dumping|homeless\w*"
+              r"|street ?lights?|mold|bed ?bugs?|pests?|heat(?:ing)?|hot water|sidewalks?|taxis?|vendors?|construction)")
+NOT_HELD = (
+    ("people", re.compile(
+        # (Not "how many complaints have people filed": the thing counted there is complaints.)
+        rf"{_COUNT_OF}(?:(?!\b(?:complaints?|reports?|requests?|calls?|sensors?|events?|marks?|floods?)\b)[^.?!])*\b{_PEOPLE}\b|\bwho (?:lives?|lived|resides?|owns?|rents?|floods|gets? flooded|(?:is|are) (?:most|more|at|affected|vulnerable|exposed|hit))\b"
+        r"|\bpopulation\b|\bdemographic|\bcensus\b|\bby (?:age|race|ethnicity)\b|\bhow old\b"
+        r"|\bage (?:groups?|of (?:the )?(?:residents|people))\b|\blanguages?\b|\b(?:speak|speaks|spoken)\b"
+        r"|\b(?:black|latino|latina|hispanic|asian|white) (?:residents|people|households|new yorkers|population)\b"
+        r"|\bliv(?:e|es|ing) alone\b", re.I),
+     "Riprap holds no records about the people or households at a place: not who lives there, how many, their "
+     "age, race or language, or whether they rent or own. The one count of residents it quotes is City Planning's "
+     "for a community district's floodplain.", False),
+    ("income", re.compile(r"\bincomes?\b|\bpoverty\b|\brent[- ]burden|\bwealth\w*\b|\bearnings?\b|\bwages?\b", re.I),
+     "Riprap reports no income or poverty figures for a place.", False),
+    ("basements", re.compile(r"\bbasements?\b|\bcellars?\b|\bbelow[- ]grade\b", re.I),
+     "Riprap holds no records of basements or of the inside of any building: no list of basement apartments, legal "
+     "or not, and no record of water inside a home.", False),
+    ("law", re.compile(r"\bevict\w*|\blandlords?\b|\bleases?\b|\b(?:il)?legal(?:ly)?\b|\blaws?\b|\blawful\w*|\b(?:tenants?'?|legal|my|our|their|renters?'?) rights\b"
+                       r"|\bliab(?:le|ility)\b|\bviolations?\b|\bdisclos\w+|\brequired to\b|\bsue\b|\blawsuit", re.I),
+     "Riprap holds no legal records and gives no legal advice: nothing here says what a landlord, a tenant or an "
+     f"owner may or must do. {HELP_POINTERS}", False),
+    ("benefits", re.compile(r"\beligib\w+|\bqualif(?:y|ies|ied)\b|\bbuy-?outs?\b|\bgrants?\b|\bbenefits?\b|\bassistance\b"
+                            r"|\b(?:disaster|fema|federal|city) (?:aid|relief)\b|\breimburs\w+|\bcompensat\w+"
+                            r"|\bvouchers?\b|\b(?:get|find|need|for|seek) help\b|\bhelp (?:after|with|paying)\b", re.I),
+     "Riprap holds no records of aid, buyouts or benefits, and cannot say who is eligible for a programme or where "
+     f"to get help. {HELP_POINTERS}", False),
+    ("advice", re.compile(r"\bshould\b(?! (?:worry|be worried|care)\b)|\bprioriti[sz]\w+|\brecommend\w*|\bought to\b|\bfix first\b|\bworth it\b"
+                          r"|\bbest (?:way|option|approach|place)\b|\bwhat (?:can|could|must) [^.?!]*\bdo\b", re.I),
+     "Riprap gives no advice and sets no priorities: it does not say what an agency, a board or a resident should "
+     "do, or do first.", False),
+    ("score", re.compile(r"\b(?:scores?|ratings?|rated|grades?)\b|^\s*rate\b|\byou rate\b|\bon a scale\b|\bscale of \d", re.I),
+     "Riprap computes no flood score or rating of its own, and quotes none.", True),
+    ("ranking", re.compile(
+        r"\b(?:which|what)\s+(?:community\s+)?(?:parts?|areas?|neighbou?rhoods?|blocks?|districts?|streets?|places?|boroughs?)\b"
+        r"|\brank(?:ed|ing|s)?\b|\btop (?:five|ten|\d+)\b|\b(?:most|worst|least)[- ]flood\w*|\bfloods? (?:the )?(?:most|worst|least)\b"
+        r"|\b(?:most|worst|least) (?:flooding|floods|flooded)\b|\bwhere\b[^?.]*\b(?:worst|most)\b"
+        r"|\b(?:worst|best|safest|driest|wettest)\s+(?:blocks?|streets?|areas?|parts?|places?|neighbou?rhoods?)\b", re.I),
+     "Riprap does not rank places against each other or single out one block, street or part of a place.", True),
+    ("trend", re.compile(r"\bgetting (?:worse|better|more|less)\b|\bgot(?:ten)? (?:worse|better)\b|\bworsen\w*|\btrend\w*"
+                         r"|\b(?:increas|decreas|declin)\w+|\bmore (?:often|frequent\w*|common)\b"
+                         r"|\bover (?:the )?(?:time|years|decades?)\b"
+                         r"|\bthan (?:it )?(?:used to|before|in the past|(?:\d+|a few|ten|five) years ago)\b", re.I),
+     "Riprap holds no record that shows a trend in flooding at a place: FloodNet's sensors were installed at "
+     "different times, many of them inside the period counted, so a rising count can be new sensors, and 311 "
+     "counts by year are counts of reports filed.", True),
+    ("rain_on_a_day", re.compile(
+        r"\bhow much (?:rain|precipitation)\b[^.?!]*\b(?:fell|fall|did|was|were|came|got|during|on)\b"
+        r"|\b(?:rainfall|rain|precipitation) (?:totals?|amounts?|intensit\w+|rates?|records?)\b"
+        r"|\b(?:storm|rain\w*|downpour)\b[^.?!]*\b(?:match\w*|exceed\w*|equal\w*|compar\w+|as (?:big|bad|heavy|strong|intense) as"
+        r"|bigger than|worse than|meet)\b[^.?!]*\b(?:scenarios?|design storm|maps?)\b", re.I),
+     "Riprap holds no rainfall record for a past day or storm, so it cannot set a storm against the city's "
+     "stormwater scenarios: the only rain figure it reads is the Weather Service's latest hourly observation.", True),
+    ("other_311", re.compile(rf"\b{_OTHER_311}\b[^.?!]*\b(?:311|complaints?|service requests?)\b"
+                             rf"|\b(?:311|complaints?|service requests?)\b[^.?!]*\b(?:about|for|of|on)\s+(?:\w+\s+)?{_OTHER_311}\b", re.I),
+     "Riprap reads four kinds of 311 complaint, all about water: sewer backups, catch basins, street flooding and "
+     "manhole overflows. It holds no other 311 topic.", False),
+)
+_RAIN_SO_FAR_RE = re.compile(r"\btoday\b|\bso far\b|\b(?:last|past) (?:hour|\d+ hours|few hours)\b|\bis falling\b", re.I)
+
+
+def _asks(clause: str) -> bool:
+    """A clause that asks something: it ends with a question mark or opens
+    with a question word. ("My basement flooded last year." is a preamble.)"""
+    c = (clause or "").strip()
+    first = re.match(r"\W*([A-Za-z']+)", c)
+    return c.endswith("?") or bool(first and first.group(1).lower() in _ASKS)
+
+
+def not_held(question: str) -> tuple[str, str] | None:
+    """(topic, sentence) for the first thing the question asks for that
+    Riprap does not hold (NOT_HELD), or None. Only clauses that ask are
+    read, so a preamble ("I rent a basement on Pioneer Street. Has the
+    block flooded?") names nothing."""
+    q = question or ""
+    heat = heat_answer.hazard_of(q) == "heat"
+    for c in _clauses(q):
+        if not _asks(c):
+            continue
+        for topic, pattern, sentence, flood_only in NOT_HELD:
+            if (flood_only and heat) or not pattern.search(c):
+                continue
+            if topic == "people" and TOPICS[0][0].search(c):
+                continue  # "how many people live in the floodplain": City Planning's district profile counts them
+            if topic == "advice" and asks_now(q):
+                continue  # "is the street passable right now, or should I move my car": the live readings
+            if topic == "trend" and EXPERIMENTAL[0][0].search(c):
+                continue  # paving over time has its own lead (no_change_record)
+            if topic == "rain_on_a_day" and (asks_now(q) or _RAIN_SO_FAR_RE.search(c)):
+                continue  # "how much rain has fallen today": the latest observation
+            if topic == "ranking" and any(i in ASSET_DOCS for i in _named_ids(c)):
+                continue  # "which schools are in the flood zone": the register lists them
+            return topic, sentence
+    return None
+
+
+# A question Riprap cannot read: it reads English only. Another script anywhere in the text, inverted Spanish
+# punctuation, or two Spanish words that English place names do not use ("El Barrio" and "La Guardia" are places).
+# ponytail: a word list for Spanish and script ranges for the rest; a language-identification model is the
+# upgrade if questions in other Latin-script languages (Haitian Creole, Polish) keep passing as bare addresses.
+_OTHER_SCRIPT_RE = re.compile(r"[Ѐ-ӿ֐-ۿऀ-෿฀-໿ᄀ-ᇿ぀-ヿ"
+                              r"㐀-鿿가-힯]|[¿¡]")
+# One word that only Spanish has, or two that a place name could hold one of. (No "se", "mi", "es", "ha" or
+# "como": "123 SE Main St, Detroit, MI" is an address.)
+_SPANISH_RE = re.compile(r"\b(?:inund(?:a|an|ó|ado|ada|ados|adas|ación|acion|aciones)|huracán|lluvia|sótano|cuánt\w+|dónde|qué|cómo|está|están|aquí|después)\b", re.I)
+_SPANISH_WEAK_RE = re.compile(r"\b(?:desde|durante|calle|zona|agua|calor|seguro|segura|tiene|puede|donde|cuant\w+"
+                              r"|huracan|riesgo|sotano|alguna)\b", re.I)
+ENGLISH_ONLY = ("Riprap reads questions in English only, and this one was not read as English, so it is not answered. "
+                "FloodHelpNY (https://www.floodhelpny.org) and 311 serve other languages. "
+                "Español: Riprap solo lee preguntas en inglés. FloodHelpNY y el 311 atienden en otros idiomas. "
+                "中文：Riprap 只能阅读英文问题。FloodHelpNY 和 311 提供其他语言的服务。 "
+                "বাংলা: Riprap শুধু ইংরেজি প্রশ্ন পড়ে। FloodHelpNY এবং 311 অন্যান্য ভাষায় সেবা দেয়।")
+
+
+def not_english(text: str) -> bool:
+    """True when the text holds a question in a language Riprap does not
+    read. A bare address stays a bare address whatever script surrounds it."""
+    t = text or ""
+    return bool(_OTHER_SCRIPT_RE.search(t) or _SPANISH_RE.search(t)
+                or len({m.group(0).lower() for m in _SPANISH_WEAK_RE.finditer(t)}) >= 2)
+
+
+# The words of a plain question about flooding at a place ("Does Hollis flood?", "How bad is the flooding on my
+# block?", "tell me about flooding near 80 Pioneer Street"). The observed record answers such a question, and no
+# other: a word outside this list is something no rule read ("endorse", "fault", "lawsuit"), and the question is
+# then left unanswered instead of being given the record under the neutral lead.
+# ponytail: a word list; a question classifier is the upgrade if plain questions keep falling outside it.
+_PLAIN = frozenset("""
+a about actually after again ago all also always am an and any anything are area around as at bad badly be been
+before being big block blocks briefing building by can common concern concerns could damage data details did do does
+during event events ever evidence experience experienced exposed exposure flood flooded flooding floods for frequent frequently
+from get gets getting give going got had happen happened happens has have hazard hazards heavy here high history
+hit home house how hurricane i ida if in info information is issue issues it its just kind know known last lately
+like look lot lots low major many me minor much my near nearby neighborhood neighbourhood normally occur occurred
+of often on or our overview past place please problem problems prone rain rains rainstorm rainstorms really recent
+recently record recorded records regularly report risk risks risky sandy see seen serious severe show significant
+since so some sometimes status still storm storms street streets summary superstorm tell that the there these they
+thing things this time times to too tropical typically up us usually very vulnerable want was water we were wet
+what when where whether with would year years you your
+""".split())
+_PLACE_WORD_RE = re.compile(r"\b(?:new york|nyc|ny|manhattan|brooklyn|queens|bronx|staten island|street|st|avenue|ave"
+                            r"|boulevard|blvd|road|rd|place|pl|drive|dr|lane|ln|parkway|pkwy|court|ct|terrace)\b", re.I)
+
+
+def plain_flood_question(question: str) -> bool:
+    """True when the clause that asks is a plain question about flooding
+    at the place, every word of it one the generic rule reads (_PLAIN), the
+    place's own words aside. A search phrase with no asking clause ("hollis
+    flooding history") is read whole."""
+    from riprap.core.burr.place import resolve_query
+
+    q = question or ""
+    place = resolve_query(q).get("text") or ""
+    clauses = [c for c in _clauses(q) if _asks(c)] or [q]
+    for c in clauses:
+        rest = re.sub(re.escape(place), " ", c, flags=re.I) if place else c
+        rest = _PLACE_WORD_RE.sub(" ", rest)
+        # A capitalised word after the first is a name (a place, a storm), not part of what is asked.
+        words = re.findall(r"[A-Za-z']+", rest)
+        asked = [w.lower().removesuffix("'s") for i, w in enumerate(words) if i == 0 or not w[0].isupper()]
+        if all(w in _PLAIN for w in asked):
+            return True
+    return False
 
 
 def asks_advice(question: str) -> bool:
@@ -154,11 +351,15 @@ def experimental(question: str, texts: dict[str, str]) -> tuple[list[str], list[
 # Words for the present. Weather words alone ("it's pouring") are not
 # enough: people say them before asking about the past.
 # "Is there flooding risk" and "is it flooding often" are not about now.
-_FLOODING_NOW_RE = re.compile(r"\bis (it|anything|the street|the block|there|this) (now )?flooding\b"
+# ("Is the street flooded" is the present too: "can I get to the subway stop, is the street flooded?")
+_FLOODING_NOW_RE = re.compile(r"\bis (it|anything|the street|the block|the road|my street|my block|there|this) (now )?"
+                              r"(flooding|flooded(?! (before|in|during|by|since|on)\b))\b"
                               r"(?!\s+(risk|history|often|usually|regularly|a lot|problems?|issues?|records?|complaints?"
                               r"|common|frequent))", re.I)
 _NOW_RE = re.compile(r"\b(right now|rite now|rn|currently|tonight|at the moment|current conditions|live conditions"
-                     r"|happening now|going on now|as we speak)\b|" + _FLOODING_NOW_RE.pattern, re.I)
+                     r"|happening now|going on now|as we speak|passable|impassable"
+                     r"|can (?:i|we) (?:get|drive|walk|bike|cross) (?:to|through|across|down|home|there|out))\b|"
+                     + _FLOODING_NOW_RE.pattern, re.I)
 _FUTURE_RE = re.compile(r"\b(forecasts?|forecasting|projections?|projected|outlook|predictions?|what is coming|what's coming"
                         r"|in the (coming|next) (years|decades)|in the future|by (the )?20\d\ds?|20[5-9]0s?|2100"
                         r"|(next|coming) (few |couple of |\w+ )?(hours|days)|tomorrow|next week|this (coming )?weekend)\b", re.I)
@@ -314,6 +515,47 @@ _NEAR_RE = re.compile(r"\b(hours?|days?|tonight|tomorrow|this week(end)?|next we
 _FAR_RE = re.compile(r"\b20[3-9]\ds?\b|\b2100\b|decades?|century|sea.level", re.I)
 
 
+# A cause asked about: "does rain flood ...", "is the flooding from the tide". FloodNet's events are not labelled
+# by cause. ("Does it flood after heavy rain" names the setting, and the record answers it as before.)
+_CAUSE_RE = re.compile(r"\b(?:rain\w*|downpours?|cloudbursts?|tid(?:e|es|al)|storm ?water|surges?)\b[^.?!]*\bflood"
+                       r"|\bflood\w*\b[^.?!]*\b(?:from|by|because of|due to|caused by) "
+                       r"(?:the |a |heavy |high |hard )*(?:rain\w*|tid(?:e|es|al)|surges?|downpours?)\b", re.I)
+CAUSE_NOTE = ("FloodNet's API does not label a flood event by its cause, so the sensor record above does not say "
+              "whether the water came from rain, a tide or a surge.")
+
+
+def asks_cause(question: str) -> bool:
+    return bool(_CAUSE_RE.search(question or ""))
+
+
+FEMA_POINTER = ("This is a reading of FEMA's maps at one point, not a flood zone determination. For a regulatory "
+                "flood determination, FEMA's Flood Map Service Center is at https://msc.fema.gov.")
+
+
+def closing(question: str, lead: str, facts: list[str], values: dict | None, texts: dict[str, str]) -> str:
+    """What follows the quoted facts of an answer: that the sensors give no
+    cause when the question names one; under a FEMA zone that was asked
+    about, that the reading is no determination and where one is made; and
+    NYC Emergency Management's "outside does not mean safe" when the zone
+    read is outside the Special Flood Hazard Area or the question asked
+    whether a place is safe. Each is added only when the facts do not
+    already say it."""
+    from app.flood_layers.dep_stormwater import OUTSIDE_CAVEAT
+
+    out = []
+    if asks_cause(question) and "floodnet" in facts:
+        out.append(CAUSE_NOTE)
+    fema = (values or {}).get("fema_nfhl") if "fema_nfhl" in facts else None
+    asked = lead == "no_advice" or bool(TOPICS[0][0].search(question or ""))
+    if isinstance(fema, dict) and asked:
+        out.append(FEMA_POINTER)
+    safety = lead == "no_advice" and bool(_SAFETY_RE.search(question or ""))
+    said = any(OUTSIDE_CAVEAT[:42] in texts.get(f, "") for f in facts)  # an outside stormwater reading carries it
+    if (safety or (isinstance(fema, dict) and asked and not fema.get("sfha"))) and not said:
+        out.append(OUTSIDE_CAVEAT)
+    return " ".join(out)
+
+
 def asks_something(text: str) -> bool:
     """True when words beside a place name a source or a time frame
     ("200 Water Street Manhattan FEMA flood zone"): a question typed as a
@@ -419,12 +661,20 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     of each part, and the first part's yes or no when it has one."""
     if not question:
         return None
-    if heat_answer.hazard_of(question) == "heat":
+    if not_english(question):
+        return "not_english", []
+    heat = heat_answer.hazard_of(question) == "heat"
+    if not heat:
+        question = _HOUSE_YEAR_RE.sub("", question)
+    if not heat and asks_advice(question) and not asks_now(question):
+        # Out of scope, said first. Safety and basements: the observed record, the stormwater maps, then FEMA.
+        # Insurance and price: the FEMA zone, the effective map before the preliminary one. ("Is the street
+        # passable right now, or should I move my car" is a question about now: the live readings answer.)
+        return "no_advice", [d for d in (SAFETY_FACTS if _SAFETY_RE.search(question) else ADVICE_FACTS) if texts.get(d)]
+    if not_held(question):
+        return "not_held", []  # the sentence that says what is not held is synthesis's to print (not_held again)
+    if heat:
         return heat_answer.answer(question, texts, values)
-    question = _HOUSE_YEAR_RE.sub("", question)
-    if asks_advice(question):
-        # Out of scope, said first; then the FEMA zone, the effective map before the preliminary one.
-        return "no_advice", [d for d in ADVICE_FACTS if texts.get(d)]
     parts = [(c, _answer_one(c, texts, values, generic=False)) for c in _clauses(question)]
     parts = [(c, a) for c, a in parts if a and a[1]]
     if len(_clauses(question)) > 1 and parts and time_frame(question) != "now":
@@ -480,8 +730,17 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
         lead = _asset_lead(question, assets, values)
         if lead != "facts" and tf == "future" and not _MAP_SHOWS_RE.search(question):
             lead = "facts"  # "will the schools flood by 2080": a scenario is not an observation
+        if _WILL_FLOOD_RE.search(question) and not (_MAP_SHOWS_RE.search(question) or _FAR_RE.search(question)
+                                                     or _SCENARIO_RE.search(question)):
+            # "Which schools in BK18 will flood?": a prediction, declined for an area's assets as for an
+            # address, before the register that says which sit inside a mapped extent.
+            lead = "no_prediction_register"
         return lead, assets
     happened = _happened_clause(question) if tf == "past" else None
+    if happened and not ac.storm_of_day(question) and (day := ac.day_lead(question, texts, values)):
+        # "Did it flood on May 20, 2026?": the sensor events dated that day. (A day of Ida or Sandy is
+        # the storm's own record's to answer, below.)
+        return day[0], day[2]
     if _SATELLITE_RE.search(question) and not models and not official and tf != "future":
         # "What did satellite imagery show after Ida": no source here says. The
         # storm's own surveyed record first, then the rest of the observed record.
@@ -541,11 +800,11 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
     if tf == "future":
         asked = ac.dep_scenario_asked(question)
         shown = (values or {}).get(asked) if asked else None
-        if isinstance(shown, dict) and shown.get("depth_class") is not None and texts.get(asked) \
+        if isinstance(shown, dict) and dep_code(shown) is not None and texts.get(asked) \
                 and ac.is_yes_no_question(question) and _MAP_SHOWS_RE.search(question):
             # "Does the 2080 map show water here": what the map shows is a fact
             # about the map. "Will it flood" stays without a yes or no.
-            return ("yes" if shown["depth_class"] else "no"), [asked]
+            return ("yes" if dep_code(shown) else "no"), [asked]
         far = _FAR_RE.search(question)  # a question about the 2050s is not about this week's tide,
         near = _NEAR_RE.search(question)  # and one about the next few days is not about the 2050s
         docs = ([d for d in texts if asked and d.startswith(asked)]
@@ -553,6 +812,12 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
                 or [i for i in FORECAST_FACTS if texts.get(i) and not (far and i == "nws_water_forecast")
                     and not (near and not far and i != "nws_water_forecast")][:4])
         return with_named("facts", docs) if docs else None
+    if asks_cause(question) and not [d for d in subjects if d not in DEP]:
+        # "Does rain flood 20 West 12th Road?": the sensors' events carry no cause (synthesis says so after
+        # them), and the city's stormwater maps say which category is mapped there, rainfall or tidal.
+        seen = [i for i in (*OBSERVED, *DEP) if texts.get(i)]
+        if seen:
+            return "facts", seen
     n = _count_of(subjects[0], question, (values or {}).get(subjects[0])) if subjects else None
     if (isinstance(n, int) and ac.is_yes_no_question(question) and _ANY_RE.search(question)
             and _COUNTED[subjects[0]].search(question)):
@@ -574,7 +839,7 @@ def _answer_one(question: str, texts: dict[str, str], values: dict | None = None
             # and what to type (it once ended "Here is what they show." and showed nothing).
             return "needs_address", []
         return "cannot_answer", mapped
-    if generic and _FLOOD_RE.search(question):
+    if generic and _FLOOD_RE.search(question) and plain_flood_question(question):
         seen = [i for i in OBSERVED if texts.get(i)]
         return ("facts", seen) if seen else None
     return None

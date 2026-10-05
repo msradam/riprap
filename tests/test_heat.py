@@ -410,7 +410,7 @@ def test_the_heat_index_sentence_says_it_is_a_rank_and_gives_no_address_level_re
     assert v["hvi"] in (1, 2, 3, 4, 5) and v["year"] == 2023 and v["area_code"].startswith("QN12")
     n = v["narrative"]
     assert f"at {v['hvi']} out of 5" in n and "ranks neighbourhoods against each other" in n
-    assert "not a measurement of heat at an address" in n and "every neighbourhood has residents at risk" in n
+    assert "not a measurement of heat at an address" in n and "All neighborhoods have residents at risk" in n
     assert "no risk" not in n  # the disclosure check reads that phrase as reassurance
     park = dohmh.hvi_for_point(40.7775, -73.9695)  # Central Park: no index
     assert park["available"] is False and "publishes no Heat Vulnerability Index for Central Park" in park["narrative"]
@@ -728,7 +728,7 @@ def test_what_a_blind_judge_found_in_the_second_round(monkeypatch):
     # A heat answer's footer is about heat.
     out = _render([], [], [], question="How hot is Hunts Point?")
     assert "temperature inside a building" in out and "zoning" not in out
-    assert "zoning" in _render([], [], [], question="Has Hunts Point flooded?")
+    assert "flood zone determination" in _render([], [], [], question="Has Hunts Point flooded?")
     # Words beside a borough that ask nothing name something in it; a question about the borough does not.
     plan = heuristic_plan("heat briefing for around curtis high school staten island")
     assert plan["intent"] == "single_address" and plan["targets"][0]["text"] == "curtis high school, Staten Island, NY"

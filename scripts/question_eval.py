@@ -125,6 +125,7 @@ def cmd_run(outdir: Path, only: list[str] | None = None, suffix: str = "") -> No
             "values": _doc_values(out) if out else {},
             "checks": g.get("checks"),
             "answer_mode": g.get("answer_mode"), "answer_lead": g.get("answer_lead"),
+            "answered": g.get("answered"),
             "answer_flags": g.get("answer_flags") or [],
         }
         (outdir / f"{q['id']}{suffix}.json").write_text(json.dumps(rec, indent=1, default=str))

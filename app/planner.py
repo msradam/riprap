@@ -119,13 +119,14 @@ Choose sources whose description answers the question: history questions need pa
 # These patterns are well-defined feature gaps. Returning a graceful message
 # is better than routing them into an intent that silently fails.
 
+# What Riprap would have reported on an earlier date. A question about what happened on a named day ("Did it
+# flood on September 1, 2021?") is not one: the records dated that day answer it (answer_checks.day_lead), and
+# it was once declined here although the Ida marks and the sensor events of the day were in the records.
 _RETROSPECTIVE_RE = re.compile(
     r"(?:what\s+would\s+(?:riprap|you|it)\s+have\s+said"
-    r"|what\s+(?:was|were)\s+(?:the\s+)?(?:flood|risk|status)"
-    r"|(?:as\s+of|on)\s+(?:august|september|october|november|december|january|"
+    r"|what\s+(?:was|were)\s+(?:the\s+)?(?:flood\s+)?(?:risk|status|exposure)"
+    r"|as\s+of\s+(?:august|september|october|november|december|january|"
     r"february|march|april|may|june|july)\s+\d"
-    r"|on\s+(?:the\s+date\s+of|hurricane\s+ida|hurricane\s+sandy)"
-    r"|(?:september|august|october)\s+\d{1,2},?\s+20\d{2}"
     r")",
     re.IGNORECASE,
 )
@@ -265,6 +266,10 @@ def is_bare_place(raw_query: str, targets: list[dict[str, str]]) -> bool:
     for t in targets:
         rest = re.sub(re.escape(t.get("text", "")), " ", rest, flags=re.IGNORECASE) if t.get("text") else rest
     rest = _ADDRESS_RE.sub(" ", rest)  # "12 School Street" names a place, not the schools
+    if rule_answer.not_english(rest):
+        # Words beside the place in a language Riprap does not read are a question it cannot read,
+        # not a bare address: the answer says so (rule_answer.ENGLISH_ONLY).
+        return False
     if any(w in _QUESTION_WORDS for w in re.findall(r"[a-z]+", rest.lower())):
         return False
     # A search phrase beside the place asks something too: "200 Water Street

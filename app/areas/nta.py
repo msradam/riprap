@@ -242,6 +242,32 @@ def resolution_note(typed: str, area: dict, borough: str | None = None) -> str |
     return " ".join(out)
 
 
+# City Planning's tabulation area types other than residential (ntatype "0"): areas with few or no homes.
+_AREA_TYPES = {"5": "a jail island", "6": "a special area with few or no homes", "7": "a cemetery", "8": "an airport",
+               "9": "a park"}
+
+
+def type_note(code: str) -> str | None:
+    """What a reader must be told when the area briefed is a park, a
+    cemetery, an airport or another area with few or no homes: that it is
+    one, and which residential areas adjoin it. ("Does Kissena Park flood?"
+    was answered with the park's 2 complaints and no word that the blocks
+    beside it, in other tabulation areas, had filed 81.) None for a
+    residential area or a code that is not a tabulation area's."""
+    g = load()
+    hit = g[g["nta2020"] == code]
+    if hit.empty or hit.iloc[0]["ntatype"] not in _AREA_TYPES:
+        return None
+    row = hit.iloc[0]
+    # ponytail: "adjoins" is within about 30 m of the boundary, in degrees; reproject if that ever needs to be exact.
+    near = g[(g["ntatype"] == "0") & g.intersects(row.geometry.buffer(0.0003))]
+    beside = "; ".join(sorted(near["ntaname"])) or "none Riprap could name"
+    return (f"City Planning classes {row['ntaname']} as {_AREA_TYPES[row['ntatype']]}, a tabulation area of its own "
+            "with few or no homes inside it, so records that residents file (311 complaints especially) are "
+            f"counted in the residential areas beside it and not here. Those are: {beside}. Ask about one of them, "
+            "or about a street address, for the blocks around it.")
+
+
 DISTRICT_NOTE = ("The shape used for {code} is City Planning's Community District Tabulation Area, an approximation of the "
                  "official community district. Counts of facilities inside it can differ from counts for the official "
                  "district boundary.")

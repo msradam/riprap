@@ -211,10 +211,16 @@ def get_district_summary(community_district: str, hazard: str = "flood") -> dict
     the city's, its Heat Vulnerability Index and heat illness visits, tree
     canopy, the station record, the forecast and NYC Parks cooling features."""
     from riprap.core.burr.app import district_summary
+    from riprap.core.burr.place import parse_district
 
     if hazard not in ("flood", "heat"):
         return {"error": f"hazard must be 'flood' or 'heat', not {hazard!r}"}
-    return _evidence_payload(district_summary(community_district, no_llm=True, hazard=hazard))
+    # The check the HTTP route makes: "QN99" once came back as a full briefing for the
+    # nearest name match, Astoria (North)-Ditmars-Steinway.
+    found, refusal = parse_district(community_district)
+    if not found:
+        return {"error": refusal or f"{community_district!r} is not a community district code such as QN12"}
+    return _evidence_payload(district_summary(found, no_llm=True, hazard=hazard))
 
 
 @mcp.tool()
@@ -224,8 +230,10 @@ def nyc311_flood_requests(address: str | None = None, lat: float | None = None,
     """Flood-related NYC 311 requests (street flooding, sewer backup, catch
     basin, manhole overflow) over the last `days`, either within `radius_m`
     of a point (give lat/lon or an address) or inside a community district
-    (e.g. QN12). Returns exact counts by descriptor and by month and the
-    ten most recent requests. Source: NYC Open Data erm2-nwe9."""
+    (e.g. QN12). Returns exact counts by descriptor and by month, the ten
+    most recent requests (each at its block: street and cross streets,
+    never a house number) and the exact query as `query_url`. Source: NYC
+    Open Data erm2-nwe9."""
     from app.context.nyc311 import flood_requests
 
     if address and (lat is None or lon is None) and not community_district:

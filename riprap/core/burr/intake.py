@@ -41,6 +41,7 @@ from riprap.core.burr.rule_answer import (  # one definition of "now"
     _clauses,
     asks_advice,
     asks_now,
+    not_held,
     recognised,
 )
 
@@ -110,6 +111,8 @@ NO_PLACE_NOW = ("Riprap reads the records for one place at a time, and this ques
                 "flooding across the city right now, use the FloodNet sensor dashboard (dataviz.floodnet.nyc); "
                 "official warnings come from the National Weather Service (weather.gov/okx) and Notify NYC. "
                 "Add an address or a neighbourhood to get the readings near it.")
+ONE_PLACE = ("Riprap reads the records for one place at a time, and this question names none: ask about a street "
+             "address, a neighbourhood or a community district such as QN12.")
 NO_PLACE_HEAT = ("Riprap reads the records for one place at a time, and this question names none it could find. "
                  "Add a street address, a neighbourhood, a community district such as QN12, or a borough. Official "
                  "heat warnings for the whole city come from the National Weather Service (weather.gov/okx) and "
@@ -170,6 +173,9 @@ _HEAT_COMPARE_RE = re.compile(
     r"^\W*(?:why\s+)?(?:is|are|was|were)\s+(?:it\s+)?(.+?)\s+(?:any\s+|much\s+)?(?:hott?er|warmer|cooler|(?:rated\s+)?more [\w ]+?|less [\w ]+?)\s+than\s+(.+?)\s*[?.,]"
     # "compare heat vulnerability BK16 vs BK06", "compare Hunts Point and Riverdale heat" (a free run of words
     # before the first place once swallowed "Hunts").
+    # "Does Hollis flood more than Forest Hills?", "Has Red Hook had more flooding than Gowanus?"
+    r"|^\W*(?:does|do|did|has|have)\s+(.+?)\s+(?:flood(?:ed|s)?|gets?|got|had|have|seen?)\b[^?.,]*?\b(?:more|worse|less|fewer)\b"
+    r"[^?.,]*?\bthan\s+(.+?)\s*[?.,]"
     r"|^\W*compare\s+(?:the\s+)?(?:(?:extreme\s+)?heat(?:\s+(?:vulnerability|risk|exposure|index|records?))?|surface temperatures?"
     r"|(?:tree\s+)?canopy)?\s*(?:(?:in|at|of|for|between)\s+)?(.+?)\s+(?:to|with|and|vs\.?|versus)\s+(.+?)\s*(?:[?.,]|$)"
     # "hunts point compared to park slope for heat", "difference in heat between QN12 and jamaica",
@@ -367,6 +373,10 @@ def _plan_for(q: str, hazard: str) -> dict:
     place = resolve_query(q)
     if place["kind"] == "invalid":
         return {"intent": "not_implemented", "rationale": place["message"], "targets": [], "place": place}
+    if not heat and place["kind"] is None and not landmark_phrase(q) and (held := not_held(q)):
+        # "Which community district has the most flooding?": no place, and a thing Riprap does not hold. It was
+        # once told only that "Which community district has the most" matched no place.
+        return {"intent": "not_implemented", "rationale": f"{held[1]} {ONE_PLACE}", "targets": [], "place": place}
     area_intent = "development_check" if _DEVELOPMENT_RE.search(q) else "neighborhood"
     if place["kind"] == "district":
         return {"intent": area_intent, "rationale": f"Heuristic match: community district {place['text']}.",
@@ -685,6 +695,8 @@ def resolve_area(state: State) -> State:
             note = nta.DISTRICT_NOTE.format(code=t["nta_code"])
         else:
             note = None if district or half else nta.resolution_note(name, t, boro or None)
+            # A park, cemetery or airport area says so, with the residential areas beside it.
+            note = " ".join(filter(None, (note, nta.type_note(t["nta_code"])))) or None
         geocode = {"address": f"{t['nta_name']}, {t['borough']}", "borough": t["borough"],
                    "lat": c.y, "lon": c.x,
                    "match": "exact" if exact else "closest", "note": note}

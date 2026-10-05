@@ -24,7 +24,9 @@ import time
 from burr.core import State, action
 
 from riprap.core.burr import evidence
+from riprap.core.pebbles.shapers.dep_scenario import code as dep_code
 from riprap.core.pebbles.shapers.dep_scenario import result as dep_result
+from riprap.core.pebbles.shapers.dep_scenario import shared_edge as dep_shared_edge
 
 OUTSIDE_COVERAGE = ("This place is outside the cities Riprap covers. Only federal sources were read (FEMA flood "
                     "zones, the Weather Service, USGS gauges); no local record of past flooding, complaints or "
@@ -127,15 +129,19 @@ def refusal(state) -> str:
     return SCOPE_REFUSAL
 
 
+# (It once read "does not assess title, structural condition, or compliance with specific zoning rules": the
+# words of a property report, in a tool that says it is not for real estate.)
 NON_SCOPE_FOOTER = (
-    "**Out of scope.** This briefing does not assess title, structural "
-    "condition, or compliance with specific zoning rules. Where a probe "
-    "was offline at run time, the relevant section omits that signal."
+    "**Out of scope.** This briefing is not a flood zone determination, an engineering assessment or advice. "
+    "Where a probe was offline at run time, the relevant section omits that signal."
 )
+# The portal's makers as BetaNYC's announcement of it names them (beta.nyc, 2025-05-28: "led by Dr. Mehdi Heris
+# and BetaNYC"); its layers include "the new Outdoor Heat Exposure Index" and "Air Temperature".
 HEAT_NON_SCOPE_FOOTER = (
     "**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or "
-    "predict the heat on a given day at a given address. Where a source was offline at run time, the relevant "
-    "section omits that signal."
+    "predict the heat on a given day at a given address. Air temperature and an outdoor heat exposure index are "
+    "mapped on the NYC Urban Heat Portal (https://urbanheat.nyc), by BetaNYC with Dr. Mehdi Heris. Where a source "
+    "was offline at run time, the relevant section omits that signal."
 )
 
 
@@ -158,17 +164,19 @@ def _dep_sentence(state, items) -> str | None:
     from app.flood_layers.dep_stormwater import OUTSIDE_CAVEAT, named
 
     parts, outside = [], []
-    for pid in _DEP_POINT:
-        e = next((e for e in items if e.pebble_id == pid), None)
-        v = state.get(pid) if e else None
-        if isinstance(v, dict) and "depth_class" in v:
-            parts.append(f"{named(pid)}, {dep_result(v, pid)} [{e.doc_id}]")
-            if not v["depth_class"]:
-                outside.append(e.doc_id)
+    shown = {pid: state.get(pid) for pid in _DEP_POINT
+             if any(e.pebble_id == pid for e in items) and dep_code(state.get(pid)) is not None}
+    # A mapped edge that two or more maps share is said once, after the list.
+    edge = dep_shared_edge(shown)
+    for pid, v in shown.items():
+        e = next(e for e in items if e.pebble_id == pid)
+        parts.append(f"{named(pid)}, {dep_result(v, pid, edge=not edge)} [{e.doc_id}]")
+        if not dep_code(v):
+            outside.append(e.doc_id)
     if len(parts) < 2:
         return None
     out = ("The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), "
-           f"not forecasts; at the point mapped for this address they show: {'; '.join(parts)}. Their rainfall "
+           f"not forecasts; at the point mapped for this address they show: {'; '.join(parts)}{edge}. Their rainfall "
            "flooding categories cover public areas and rain only, and the city says the map \"does not provide the "
            "exact depth of flooding at any location\"; it is not a flood plain determination.")
     return f"{out} {OUTSIDE_CAVEAT[:-1]} {''.join(f'[{i}]' for i in outside)}." if outside else out
@@ -230,11 +238,11 @@ def _lead(state, items) -> str | None:
     dep = {p: state[p] for p in _DEP_POINT if p in by_pebble and isinstance(state.get(p), dict)}
     if dep:
         ids = [by_pebble[p].doc_id for p in dep]
-        wet = [p for p, v in dep.items() if v.get("depth_class")]
+        wet = [p for p, v in dep.items() if dep_code(v)]
         # Class 3 is the scenario's future high tide area (tidal inundation),
         # not its rainfall flooding, so it gets its own clause.
-        rain = [p for p in wet if dep[p]["depth_class"] != TIDE_CLASS]
-        tide = [p for p in wet if dep[p]["depth_class"] == TIDE_CLASS]
+        rain = [p for p in wet if dep_code(dep[p]) != TIDE_CLASS]
+        tide = [p for p in wet if dep_code(dep[p]) == TIDE_CLASS]
 
         def horizons(ps) -> str:
             """'current, 2050 and 2080 sea-level rise': the disclosure check needs a horizon."""
@@ -246,7 +254,8 @@ def _lead(state, items) -> str | None:
         # What the city's map shows at the mapped point, never a finding for the lot.
         maps = "the city's stormwater flood maps (modelled scenarios, not forecasts)"
         if not wet:
-            add("", f"outside every flooding category on {maps} for {horizons(dep)}", ids)
+            add("", f"outside every flooding category on {maps} for {horizons(dep)}"
+                    + (", at a mapped edge" if any(v.get("edge_m") for v in dep.values()) else ""), ids)
         if rain:
             add("", f"inside a rainfall flooding category on {maps} for {horizons(rain)}",
                 [by_pebble[p].doc_id for p in rain])
@@ -367,9 +376,13 @@ def _heat_lead(state, items, area: bool) -> str | None:
 
 def no_place(state) -> str:
     """The briefing when the query named no place the geocoder could find."""
+    from riprap.core.burr.rule_answer import ENGLISH_ONLY, not_english
+
     asked = (state.get("first_target") or state.get("query") or "").strip()
-    return (f"{_scope_header()}\n\nRiprap could not match \"{asked}\" to a place. Give a street address with "
-            "its city or borough, such as 90-01 183rd Street, Queens, or an NYC community district such as QN12.")
+    out = (f"{_scope_header()}\n\nRiprap could not match \"{asked}\" to a place. Give a street address with "
+           "its city or borough, such as 90-01 183rd Street, Queens, or an NYC community district such as QN12.")
+    # A question in another language with no address in it lands here: it is told why in its own language too.
+    return f"{out} {ENGLISH_ONLY}" if not_english(state.get("query") or "") else out
 
 
 def nothing_built(state) -> str:

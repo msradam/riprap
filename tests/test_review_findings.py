@@ -208,7 +208,9 @@ def test_an_ida_mark_far_from_the_block_does_not_say_the_block_flooded():
     texts = {"ida_hwm": "USGS surveyed 1 Hurricane Ida high-water mark within 800 m of this address (691 m away)."}
     q = "Did 61-20 Woodside Ave flood during Ida?"
     assert ra.answer(q, texts, {"ida_hwm": {"n_within_radius": 1, "nearest_dist_m": 691}})[0] != "yes"
-    assert ra.answer(q, texts, {"ida_hwm": {"n_within_radius": 2, "nearest_dist_m": 174}})[0] == "yes"
+    # Review round 1 (B3): 174 m is not the block either. Within answer_checks.BLOCK_M it is.
+    assert ra.answer(q, texts, {"ida_hwm": {"n_within_radius": 2, "nearest_dist_m": 174}})[0] == "near"
+    assert ra.answer(q, texts, {"ida_hwm": {"n_within_radius": 2, "nearest_dist_m": 60}})[0] == "yes"
 
 
 def test_a_hospital_just_outside_the_sandy_outline_is_named_not_counted_as_dry():
@@ -333,7 +335,8 @@ def test_register_name_lists_carry_the_scenario_year():
     from riprap.core.compliance.predicates import projection_has_horizon
 
     v = exposure.summary_for_point(40.5757, -73.986, "mta_entrances")
-    assert "Inside the modeled DEP extreme scenario (2080 sea-level rise), by station:" in v["narrative"]
+    assert ('In a rainfall flooding category of the modelled "Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise" map, '
+            "by station:") in v["narrative"] or "future high tides category of the modelled" in v["narrative"]
     assert projection_has_horizon(v["narrative"]).passed
 
 

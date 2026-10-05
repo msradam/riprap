@@ -54,6 +54,16 @@ NO_ADVICE = ("Riprap reports public records about a place. It does not price flo
              "advice on buying, renting or whether a home is safe.")
 ADVICE_POINTER = ("For flood insurance questions, NYC Emergency Management points to FloodHelpNY "
                   "(https://www.floodhelpny.org).")
+# Beside it for a question about safety or a basement. The name is Notify NYC's own (its FAQ: "Basement Alerts:
+# Notifications specifically designed to alert those living in basement apartment about life-threatening weather
+# conditions").
+SAFETY_POINTER = ("Notify NYC (https://a858-nycnotify.nyc.gov) is the city's emergency notification program; one of "
+                  "its notification types is Basement Alerts, for people who live in basement apartments.")
+# An unanswered question says so in the text itself, where the answer would be: the text is what people print
+# and what the MCP tools return, and only the page used to say it.
+NOT_RECOGNISED = "Riprap's rules did not recognise what this question asks, so it is not answered."
+RECORDS_FOLLOW = "The public records for this place follow; none of them is an answer to the question."
+_STORM_NAMES = {"ida": "Hurricane Ida", "sandy": "Hurricane Sandy"}
 
 # A number is not preceded by a letter, digit or '.', so 'Extreme-2080'
 # gives 2080 and a FIRM panel '3604970203F' gives 3604970203.
@@ -309,7 +319,7 @@ LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From
                                       "named day: no source here does that. What the Weather Service expects for the "
                                       "area over the next 7 days, and what has been measured here:",
                 "no_advice": f"{NO_ADVICE} The FEMA flood zone here, from the effective map (the one FEMA uses "
-                             "for the National Flood Insurance Program) first:",
+                             "for the National Flood Insurance Program) first:",  # as ADVICE_THEN[False]
                 "needs_address": "Riprap read this question for the neighbourhood or district as a whole, because it "
                                  "names no house number, and the USGS high-water marks surveyed after Hurricane Ida "
                                  "are read around a street address. Type the address with its house number, such as "
@@ -328,7 +338,19 @@ LEAD_PHRASES = {"yes": "Yes.", "no": "No.", "partly": "In part.", "count": "From
                                    "finder.nyc.gov/coolingcenters, so none are listed here. What NYC Parks lists:",
                 "no_score": "Riprap computes no score or rating of its own. The Health Department publishes an index "
                             "for the neighbourhood, quoted here with what it is and is not:",
-                "surface_yes": "At the surface, yes.", "surface_no": "At the surface, no."}
+                "surface_yes": "At the surface, yes.", "surface_no": "At the surface, no.",
+                "no_prediction_register": "Riprap cannot predict which places will flood: no source or model here "
+                                          "does that. What the register lists is which of them sit inside a mapped "
+                                          "flood extent:",
+                "no_advice_heat": f"{NO_ADVICE} No source here measures the temperature inside a building. What was "
+                                  "measured outdoors and published for this place:",
+                "no_air_temp": "Riprap has no air temperature at an address: the air readings it quotes come from "
+                               "the weather stations named below, and Landsat measures the temperature of surfaces, "
+                               "not of the air. What those show:"}
+# no_advice opens the same way for every such question; what follows it depends on which records come first.
+ADVICE_THEN = {True: "What has been recorded and mapped for this place, the observed record first:",
+               False: "The FEMA flood zone here, from the effective map (the one FEMA uses for the National Flood "
+                      "Insurance Program) first:"}
 
 
 def _documents(state) -> tuple[list[Doc], list, object]:
@@ -398,7 +420,7 @@ HEAT_LIVE_POINTER = ("Riprap reads records, not the street. Official heat warnin
 
 def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: str = "",
             lead: str = "", empty: dict[str, list[str]] | None = None, brief: str | None = None,
-            now: bool = False, place: str = "", advice: bool = False) -> str:
+            now: bool = False, place: str = "", advice: str = "", closing: str = "") -> str:
     """Scope header, then the answer (when a question was asked), then one
     section per Stone that ran, then the footer. Only verified claims.
 
@@ -438,6 +460,8 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
     if question:
         body = sentences(ANSWER_SECTION)
         # With no fact to quote, the lead's own statement stands alone, or the line that says nothing is shown.
+        # `closing` is what the rules add after the quoted facts (rule_answer.closing).
+        body = f"{body} {closing}" if body and closing else body
         parts.append("**Answer.**\n" + ((f"{lead} " if lead else "") + body if body else lead or NOTHING_TO_SHOW))
     for sec in sections:
         body = sentences(sec)
@@ -459,8 +483,8 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
     pointer = HEAT_LIVE_POINTER if heat else LIVE_POINTER
     footer = HEAT_NON_SCOPE_FOOTER if heat else NON_SCOPE_FOOTER
     footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {pointer} ", 1) if now else footer
-    if advice:
-        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {ADVICE_POINTER} ", 1)
+    if advice:  # the pointers a declined question gets, as plain links
+        footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {advice} ", 1)
     footer = with_place_notes(footer, question, place, heat)
     if question and re.search(r"\bflood", question, re.I) and re.search(r"\bheat\b|\bhott?(?:er|est)?\b", question, re.I) \
             and not heat_answer.INDOOR_HEATING_RE.search(question):
@@ -468,6 +492,18 @@ def _render(kept: list[dict], docs: list[Doc], sections: list[str], question: st
         footer = footer.replace("**Out of scope.** ", f"**Out of scope.** {BOTH_HAZARDS} ", 1)
     parts.append(footer)
     return "\n\n".join(parts)
+
+
+def _unanswered(state, statement: str, grounding: dict) -> dict:
+    """The result for a question that is not answered: the statement of
+    why where the answer would be, then the evidence briefing for the place.
+    `grounding.answered` is False, and the text says so itself."""
+    paragraph, cites = compose_briefing(state)
+    head, block = _scope_header(state), f"**Answer.**\n{statement} {RECORDS_FOLLOW}"
+    paragraph = paragraph.replace(head, f"{head}\n\n{block}", 1) if head in paragraph else f"{block}\n\n{paragraph}"
+    return {"paragraph": paragraph, "citations": cites,
+            "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": 0, "llm_calls": [],
+                          "question": (state.get("plan") or {}).get("question") or "", "answered": False, **grounding}}
 
 
 def synthesize(state, use_llm: bool = True) -> dict:
@@ -511,6 +547,9 @@ def synthesize(state, use_llm: bool = True) -> dict:
                                    *(d.section for d in docs)]))
     # Structured pebble values by doc_id, for the headline figure checks.
     values = {e.doc_id: state.get(e.pebble_id) for e in items if isinstance(state.get(e.pebble_id), dict)}
+    if not state.get("nta") and state.get("lat") is not None:
+        # The queried address, for the rules that ask how far a record is from it (answer_checks.BLOCK_M).
+        values["_point"] = (state["lat"], state["lon"])
     texts: dict[str, str] = {}
     for d in docs:
         texts[d.doc_id] = f"{texts.get(d.doc_id, '')} {d.text}".strip()
@@ -573,13 +612,22 @@ def synthesize(state, use_llm: bool = True) -> dict:
     if ruled is None and (fallback_reason or not use_llm):
         # No rule names what the question asks and no model answered: the
         # evidence for the place, and the page says it was not answered.
-        paragraph, cites = compose_briefing(state)
-        return {"paragraph": paragraph, "citations": cites,
-                "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": attempts,
-                              "llm_calls": calls, "question": question, "answered": False if question else None,
-                              # Nothing answered: neither a rule nor the model.
-                              "answer_mode": None,
-                              **({"fallback_reason": fallback_reason} if fallback_reason else {})}}
+        if not question:
+            paragraph, cites = compose_briefing(state)
+            return {"paragraph": paragraph, "citations": cites,
+                    "grounding": {"tier": "no_llm", "claims": [], "dropped_claims": [], "attempts": attempts,
+                                  "llm_calls": calls, "question": question, "answered": None, "answer_mode": None}}
+        # Nothing answered: neither a rule nor the model.
+        return _unanswered(state, NOT_RECOGNISED, {
+            "attempts": attempts, "llm_calls": calls, "answer_mode": None, "answer_lead": "not_recognised",
+            **({"fallback_reason": fallback_reason} if fallback_reason else {})})
+    if ruled is not None and ruled[0] in ("not_held", "not_english"):
+        # A rule read the question and what it asks for is not here: said first, then the place's records.
+        topic, statement = rule_answer.not_held(question) or ("language", rule_answer.ENGLISH_ONLY)
+        if ruled[0] == "not_english":
+            topic, statement = "language", rule_answer.ENGLISH_ONLY
+        return _unanswered(state, statement, {"attempts": attempts, "llm_calls": calls, "answer_mode": "rules",
+                                              "answer_lead": ruled[0], "not_held": topic})
     if ruled is not None:
         focus = {"time_frame": rule_answer.time_frame(question)}
         lead, facts = ruled
@@ -605,8 +653,26 @@ def synthesize(state, use_llm: bool = True) -> dict:
         facts = sorted(facts, key=lambda f: f in experimental)  # the rule's order, experimental sources last
         kept = [{"section": ANSWER_SECTION, "text": texts[f], "doc_ids": [f], "numbers": []} for f in facts]
         lead_phrase = CANNOT_ANSWER if lead == "cannot_answer" and facts else LEAD_PHRASES.get(lead, "")
-        if lead == "no_advice" and not facts:
-            lead_phrase = NO_ADVICE  # no FEMA reading for this place: the statement alone, and the pointer below
+        if lead == "no_advice":
+            # With no record for this place: the statement alone, and the pointers below.
+            lead_phrase = f"{NO_ADVICE} {ADVICE_THEN[facts[0] not in rule_answer.ADVICE_FACTS]}" if facts else NO_ADVICE
+        if lead == "near":
+            lead_phrase = answer_checks.near_lead(facts[0], values) if facts else ""
+        if lead == "day":
+            lead_phrase = (answer_checks.day_lead(question, texts, values) or ("", "", []))[1]
+        if lead == "yes" and state.get("nta"):
+            # A yes about an area names the area: "Has Gowanus flooded?" is answered for a tabulation
+            # area four neighbourhoods wide, and a bare "Yes." read as a yes about Gowanus alone.
+            lead_phrase = f"Yes, in {state['nta'].get('nta_name') or 'this area'}:"
+        if lead == "cannot_answer" and state.get("deployment") == "__none__":
+            # "Has 1 Washington Street, Hoboken, NJ flooded?": the reason there is nothing to quote.
+            lead_phrase = ("This place is outside the cities Riprap covers, so Riprap holds no local record of past "
+                           "flooding, complaints or sensors for it and cannot answer this question."
+                           + (" What the federal sources it read show:" if facts else ""))
+        if lead in ("yes", "near", "cannot_answer") and (storm := answer_checks.storm_of_day(question)):
+            day = answer_checks.named_day(question)
+            lead_phrase = (f"{lead_phrase} {day.isoformat()} is a day of {_STORM_NAMES[storm]}'s flooding in the "
+                           "city, so this is read from the record of that storm.")
         if lead == "no_change_record":
             lead_phrase = _change_lead(facts, values)
         if lead == "count" and rel in facts:
@@ -691,9 +757,14 @@ def synthesize(state, use_llm: bool = True) -> dict:
     brief = None
     if not question and state.get("intent") == "single_address":
         brief = _heat_lead(state, items, area=False) if hazard_of(plan) == "heat" else _lead(state, items)
+    pointers = ADVICE_POINTER if lead == "no_advice" else ""
+    if lead in ("no_advice", "no_advice_heat") and rule_answer._SAFETY_RE.search(question):
+        pointers = f"{SAFETY_POINTER} {pointers}".strip()
+    closing = rule_answer.closing(question, lead or "", [c["doc_ids"][0] for c in kept if c["section"] == ANSWER_SECTION
+                                                         and len(c["doc_ids"]) == 1], values, texts) if question else ""
     paragraph = _render(kept, docs, sections, question, lead_phrase, empty, brief,
                         now=bool(question) and (focus or {}).get("time_frame") == "now",
-                        place=(state.get("geocode") or {}).get("address") or "", advice=lead == "no_advice")
+                        place=(state.get("geocode") or {}).get("address") or "", advice=pointers, closing=closing)
     paragraph = paragraph.replace(_scope_header(), _scope_header(state), 1)  # outside every city: say what was not read
     # Every consulted source with a value is citable (its evidence row gets a
     # number), the ones the text cites first, in order of appearance, so the
@@ -715,7 +786,8 @@ def synthesize(state, use_llm: bool = True) -> dict:
                       **({"fallback_reason": fallback_reason} if fallback_reason else {}),
                       "answer_lead": lead, "lead_fact": lead_fact,
                       "answer_flags": answer_flags, "checks": checks,
-                      "answered": (lead != "cannot_answer" and any(c["section"] == ANSWER_SECTION for c in kept))
+                      "answered": (lead not in answer_checks.UNANSWERED_LEADS
+                                   and any(c["section"] == ANSWER_SECTION for c in kept))
                       if question else None},
     }
 

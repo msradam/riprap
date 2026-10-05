@@ -362,6 +362,11 @@ def answer(question: str, texts: dict[str, str], values: dict | None = None) -> 
     # The model's estimate follows the city's map, as in a flood answer.
     subjects = sorted(subjects, key=lambda d: d in EXPERIMENTAL)
     tf = time_frame(q)
+    if re.search(r"\b(?:un)?safe\b|\bdangerous\b", q, re.I) and (docs := have(SURFACE, HVI, STATION)):
+        # "Is my apartment too hot to be safe?": the same decline a flood "is it safe" gets, then what was measured.
+        return "no_advice_heat", docs
+    if re.search(r"\bair temp(?:erature)?s?\b", q, re.I) and tf != "future" and (docs := have(OBS, SURFACE)):
+        return "no_air_temp", docs  # no source here holds an air temperature at an address
     if _SCORE_RE.search(q):
         if docs := have(HVI):
             return "no_score", docs

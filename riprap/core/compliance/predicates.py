@@ -206,8 +206,9 @@ def hundred_year_flood_clarified(paragraph: str, context: dict | None = None) ->
 
 
 # 1.5 — FIRM citation has vintage
+# ("Not a flood zone determination" cites no map: it is the briefing's fixed disclaimer.)
 _FIRM_TOKENS_RE = re.compile(
-    r"\b(FEMA flood map|FIRM|flood insurance rate map|flood zone)\b",
+    r"\b(FEMA flood map|FIRM|flood insurance rate map|flood zone(?! determination))\b",
     re.IGNORECASE,
 )
 _YEAR_RE = re.compile(r"\b(19|20)\d{2}\b")

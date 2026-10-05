@@ -339,10 +339,12 @@ def test_no_sentence_riprap_writes_judges_a_place_or_adopts_the_questions_word_f
     assert "computes no score or rating" in head and "records can be missing where people report less" in head
     # A question that uses such a word is answered without it.
     docs = [Doc("nyc311", "Live Observer", T["nyc311"], False), Doc("floodnet", "Live Observer", T["floodnet"], False)]
-    for q in ("Is 80 Pioneer Street in a high risk, flood prone area?", "Is this the worst block for flooding in Red Hook?",
-              "How dangerous is flooding at 80 Pioneer Street?"):
+    for q in ("Is 80 Pioneer Street in a high risk, flood prone area?", "How dangerous is flooding at 80 Pioneer Street?"):
         out = _synthesize(monkeypatch, docs, q)
         assert out["grounding"]["answered"] and not re.search(JUDGEMENT, out["paragraph"], re.I), q
+    # A ranking is declined in the answer's first sentence, in Riprap's words and not the question's.
+    out = _synthesize(monkeypatch, docs, "Is this the worst block for flooding in Red Hook?")
+    assert out["grounding"]["answer_lead"] == "not_held" and not re.search(JUDGEMENT, out["paragraph"], re.I)
 
 
 def test_every_result_says_which_path_produced_it(monkeypatch):
