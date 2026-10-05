@@ -750,7 +750,16 @@ def period_lead(question: str, docs: dict[str, str], values: dict | None, today=
         since = _iso_date(c.get("since"))
         whole = first.year == last.year and (first.month, first.day) == (1, 1) and (
             (last.month, last.day) == (12, 31) or last == today)
-        if whole and since and since <= first:
+        # "In the last five years" is the 311 count's own window (a day's slack: the window is cut at midnight UTC).
+        window = bool(since) and last == today and abs((first - since).days) <= 1
+        if window and not said and verdict is None:
+            return None  # nothing else was read for the period: the general rule answers from the window's total
+        if window:
+            k = int(c.get("n") or 0)
+            said.append(f"{k} complaint{'' if k == 1 else 's'} to 311 about flooding and sewer backups {'was' if k == 1 else 'were'} "
+                        f"filed in {label}, the whole window of the count quoted here; a count of reports, not of floods "
+                        f"[{complaints}].")
+        elif whole and since and since <= first:
             k = int((c.get("by_year") or {}).get(str(first.year), 0))
             if names_311 and verdict is None:
                 verdict = "yes" if k else "no"

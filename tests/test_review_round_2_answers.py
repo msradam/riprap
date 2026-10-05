@@ -563,3 +563,17 @@ def test_no_ida_mark_nearby_is_not_called_a_dry_street():
     text = shape({"n_within_radius": 0, "radius_m": 800, "features": [], "nearest": None})["narrative"]
     assert text == f"No Hurricane Ida (Sept 2021) high-water marks were surveyed within 800 m of this address. {FEW_MARKS}"
     assert "not a record that the place stayed dry" in text
+
+
+def test_the_311_windows_own_period_is_answered_from_its_total():
+    """"Have people near 355 Food Center Drive reported flooding to 311 in the last five years?" was told the
+    count "gives no count for the last 5 years (since 2021-10-06)", the very window it covers."""
+    q = f"Have people near {A} reported flooding to 311 in the last five years?"
+    assert ac.asked_period(q, TODAY)[0] == datetime.date(2021, 10, 6)
+    assert ac.period_lead(q, ADDRESS, V, TODAY) is None  # the general rule reads the window's total
+    # Beside a sensor's verdict, the count is stated for its window, not withheld.
+    sentence = ac.period_lead(f"Did {A} flood in the last five years?", ADDRESS, V, TODAY)[1]
+    assert "88 complaints to 311 about flooding and sewer backups were filed in the last 5 years (since 2021-10-06)" in sentence
+    assert "gives no count" not in sentence
+    # A shorter period is still not the window.
+    assert "gives no count for the last 2 years" in ac.period_lead(f"Did {A} flood in the last two years?", ADDRESS, V, TODAY)[1]
