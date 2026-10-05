@@ -38,7 +38,6 @@ VERTICAL_DATUM = "NAVD88"
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 DEM_PATH = DATA_DIR / "nyc_dem_30m.tif"
-TWI_PATH = DATA_DIR / "twi.tif"
 HAND_PATH = DATA_DIR / "hand.tif"
 
 
@@ -52,9 +51,10 @@ class Microtopo:
     aoi_max_m: float
     aoi_radius_m: int
     resolution_m: int
-    # Hydrology indices computed on the same DEM (whitebox-workflows)
-    twi: float | None = None              # Topographic Wetness Index, ln(SCA / tan(slope))
-    hand_m: float | None = None           # Height Above Nearest Drainage (m)
+    # Height Above Nearest Drainage (m), from synthetic channels on the same DEM
+    # (whitebox-workflows). Not said in a sentence or shown on the page; kept because
+    # the asset registers store it per asset (app/register_builder.py).
+    hand_m: float | None = None
     # Templatable narrative the manifest's narration.template renders.
     narrative: str = ""
 
@@ -91,9 +91,9 @@ def _read_full_raster(path: Path) -> tuple[np.ndarray | None, dict | None]:
 
 
 def _load_dem():
-    """Read the precomputed NYC DEM + TWI + HAND rasters into memory.
+    """Read the precomputed NYC DEM and HAND rasters into memory.
 
-    All three are aligned (same grid, same transform). We hold them as
+    They are aligned (same grid, same transform). We hold them as
     numpy arrays so per-query slicing is safe under threading.
     """
     if "arr" in _DEM_CACHE:
@@ -102,15 +102,13 @@ def _load_dem():
     if arr is None:
         log.warning("microtopo DEM not found at %s — run scripts/fetch_nyc_dem.py", DEM_PATH)
         return None
-    twi, _   = _read_full_raster(TWI_PATH)
     hand, _  = _read_full_raster(HAND_PATH)
     _DEM_CACHE.update({
         "arr": arr, "H": meta["H"], "W": meta["W"],
         "transform": meta["transform"], "crs": meta["crs"],
-        "twi": twi, "hand": hand,
+        "hand": hand,
     })
     note = []
-    if twi is not None:  note.append(f"TWI {TWI_PATH.name}")
     if hand is not None: note.append(f"HAND {HAND_PATH.name}")
     log.info("microtopo: loaded NYC DEM %s (%dx%d, %s); aux: %s",
              DEM_PATH.name, meta["H"], meta["W"], meta["crs"],
@@ -191,13 +189,8 @@ def microtopo_at(lat: float, lon: float, radius_m: int = 750) -> Microtopo | Non
     cells_200m = max(1, int(round(200 / max(res_m, 1.0))))
     pct_200 = _percentile_in_window(arr, iy, ix, point_elev, cells_200m)
 
-    twi_arr = state.get("twi")
     hand_arr = state.get("hand")
-    twi_v: float | None = None
     hand_v: float | None = None
-    if twi_arr is not None and 0 <= row < H and 0 <= col < W:
-        v = float(twi_arr[row, col])
-        twi_v = round(v, 2) if np.isfinite(v) else None
     if hand_arr is not None and 0 <= row < H and 0 <= col < W:
         v = float(hand_arr[row, col])
         hand_v = round(v, 2) if np.isfinite(v) else None
@@ -209,8 +202,9 @@ def microtopo_at(lat: float, lon: float, radius_m: int = 750) -> Microtopo | Non
     pct = round(pct_200)
     bits.append(f"; this point is higher than {pct}% of the ground within 200 m (the {_ordinal(pct)} "
                 f"percentile; a low percentile means a local low spot where water collects)")
-    # HAND, TWI and basin relief stay in the value (the evidence table):
-    # two decimals from a 30 m raster read as precision the data lacks.
+    # Basin relief stays in the value (the evidence table): two decimals
+    # from a 30 m raster read as precision the data lacks. The wetness index
+    # is not returned at all: it rests on synthetic channels and nothing read it.
     narrative = "".join(bits) + "."
     return Microtopo(
         point_elev_m=elev,
@@ -221,16 +215,15 @@ def microtopo_at(lat: float, lon: float, radius_m: int = 750) -> Microtopo | Non
         aoi_max_m=round(aoi_max, 2),
         aoi_radius_m=radius_m,
         resolution_m=int(round(res_m)),
-        twi=twi_v,
         hand_m=hand_v,
         narrative=narrative,
     )
 
 
 def microtopo_for_polygon(polygon, polygon_crs: str = "EPSG:4326") -> dict | None:
-    """Polygon-mode aggregation: distributional summary of the DEM/HAND/TWI
-    rasters clipped to the polygon. Returns medians + fraction of cells
-    in flood-prone bands. Used for neighborhood-mode queries."""
+    """Polygon-mode aggregation: the DEM clipped to the polygon, as its
+    minimum, median, 10th percentile and maximum elevation. Used for
+    neighborhood-mode queries."""
     state = _load_dem()
     if state is None:
         return None
@@ -269,26 +262,16 @@ def microtopo_for_polygon(polygon, polygon_crs: str = "EPSG:4326") -> dict | Non
             return None
 
     elev = _stats(DEM_PATH)
-    hand = _stats(HAND_PATH)
-    twi = _stats(TWI_PATH)
     if elev is None:
         return None
-
-    # Fraction of polygon cells in canonical flood-prone bands
-    frac_hand_lt1 = (
-        round(float((hand["raw"] < 1.0).mean()), 4) if hand else None
-    )
-    frac_twi_gt10 = (
-        round(float((twi["raw"] > 10.0).mean()), 4) if twi else None
-    )
+    # Elevation only. The area's height above nearest drainage and wetness
+    # index (their medians, and the share of cells under 1 m or over 10) are
+    # not returned: the channels are synthetic, on a 30 m grid that includes
+    # harbour cells, and inland QN12 read 28.8% "less than 1 m above".
     return {
         "n_cells": elev["n_cells"],
         "elev_min_m":     round(elev["min"], 2),
         "elev_median_m":  round(elev["median"], 2),
         "elev_p10_m":     round(elev["p10"], 2),
         "elev_max_m":     round(elev["max"], 2),
-        "hand_median_m":  round(hand["median"], 2) if hand else None,
-        "twi_median":     round(twi["median"], 2) if twi else None,
-        "frac_hand_lt1":  frac_hand_lt1,
-        "frac_twi_gt10":  frac_twi_gt10,
     }

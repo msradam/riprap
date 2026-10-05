@@ -253,3 +253,19 @@ def test_named_lists_carry_their_extent_and_say_modeled_for_a_scenario():
             assert "2012 Sandy extent" in label or "modeled DEP extreme scenario (2080 sea-level rise)" in label, label
     hospitals = exposure.summary_for_point(*coney, "doh_hospitals")["narrative"]
     assert "each read at the one point the state file gives for it" in hospitals
+
+
+def test_the_terrain_value_carries_no_wetness_index_or_area_drainage_share():
+    """The district clause "less than 1 m above the nearest drainage
+    channel" was removed, but the JSON still gave the same figure
+    (frac_hand_lt1) and the address value a wetness index, from the same
+    synthetic channels."""
+    import dataclasses
+
+    from app.areas import nta
+    from app.context import microtopo
+
+    assert "twi" not in {f.name for f in dataclasses.fields(microtopo.Microtopo)}
+    area = nta.resolve("Hollis")[0]["geometry"]
+    v = microtopo.microtopo_for_polygon(area)
+    assert v is None or set(v) == {"n_cells", "elev_min_m", "elev_median_m", "elev_p10_m", "elev_max_m"}

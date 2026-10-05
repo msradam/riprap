@@ -54,8 +54,8 @@ const FIELD_LABELS: Record<string, string> = {
   aoi_min_m: 'Lowest elevation in the area (m)',
   aoi_max_m: 'Highest elevation in the area (m)',
   resolution_m: 'DEM resolution (m)',
-  hand_m: 'Height above nearest drainage (m)',
-  twi: 'TWI',
+  // No label, so no row, for height above nearest drainage or the wetness
+  // index: both rest on synthetic drainage channels on a 30 m grid.
   // fema_nfhl
   effective_year: 'FIRM panel effective year',
   // dcp_floodplain_nta (no parentheses: a closing one reads as a unit)
