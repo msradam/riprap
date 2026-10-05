@@ -176,32 +176,42 @@ describe('Landing smoke', () => {
     expect(text(independent)).toContain('does not warrant its completeness, accuracy, content or fitness for any use');
   });
 
-  it('says the two experimental models are there, labelled experimental, each with a baseline, and that the satellite water layer was retired', () => {
+  it('shows the land-cover model as experimental and the surge forecast as a negative result, out of default briefings, with no gallery link', () => {
     const { container } = render(LandFrontier);
-    expect(text(container)).toContain(
-      'Each is labelled experimental, states its tested accuracy in every sentence, and has a measured baseline to beat.'
-    );
-    expect(text(container)).not.toContain('days and years ahead');
-    expect(text(container)).toContain(
-      "it reads a typical district's paved share 1.7 points above the city's own 2021 map"
-    );
-    expect(text(container)).not.toContain('WorldCover');
-    expect(text(container)).toContain('I fine-tuned two open models for New York');
+    const t = text(container);
+    expect(t).toContain('One, a surge forecast, lost to its baseline and was taken out.');
+    expect(t).not.toContain('has a measured baseline to beat');
+    expect(t).not.toMatch(/11\.5 cm|13\.3 cm|635 four-day/);
+    expect(t).toContain("it reads a typical district's paved share 1.7 points above The Nature Conservancy's 2021 map");
+    expect(t).not.toContain("the city's own 2021 map");
+    expect(t).not.toContain('WorldCover');
     expect([...container.querySelectorAll('h3')].map((h) => h.textContent)).toEqual([
-      'Storm surge at the Battery',
-      'Paved, green and tree canopy'
+      'Paved, green and tree canopy',
+      'Storm surge at the Battery'
     ]);
-    expect([...container.querySelectorAll('.exp-badge')].map((b) => b.textContent)).toEqual(['Experimental', 'Experimental']);
+    expect([...container.querySelectorAll('.exp-badge')].map((b) => b.textContent)).toEqual([
+      'Experimental',
+      'Negative result, off by default'
+    ]);
+    const surge = container.querySelectorAll('li.land-card')[1];
+    expect(text(surge)).toContain('It is out of default briefings since 2026-10-05.');
+    expect(text(surge)).toContain('On 639 held-out four-day windows');
+    expect(text(surge)).toContain('Damped persistence, a one-line rule, scored 0.108 m and beats it.');
+    expect(text(surge)).toContain('It foresaw 1 of the 23 windows that reached flood stage, which are 5 distinct events.');
+    expect([...surge.querySelectorAll('a')].map((a) => [a.textContent, a.getAttribute('href')])).toEqual([
+      ['Corrected model card', 'https://github.com/msradam/riprap/blob/main/docs/model-cards/Granite-TTM-r2-Battery-Surge.md']
+    ]);
     expect([...container.querySelectorAll('dt')].filter((d) => d.textContent === 'The open problem')).toHaveLength(2);
     // The city's map is the record; the model's estimate comes after it.
-    expect(text(container)).toContain("A briefing quotes that map first, and the model's estimate follows it.");
+    expect(t).toContain("A briefing quotes that map first, and the model's estimate follows it.");
     // The retired layer: one sentence, no card and no gallery link.
     expect(text(container.querySelector('.frontier-retired')!)).toMatch(
       /A third model, a satellite water layer, was retired on 2026-10-02 after two tests.*no more often than chance\./
     );
-    expect(text(container)).not.toContain('Prithvi');
+    expect(t).not.toContain('Prithvi');
     const hrefs = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href'));
     expect(hrefs).not.toContain('/gallery/bk18-satellite/');
+    expect(hrefs).not.toContain('/gallery/battery-surge/');
     expect(hrefs).toContain('https://github.com/msradam/riprap/blob/main/docs/MODELS.md');
   });
 
@@ -224,7 +234,7 @@ describe('Landing smoke', () => {
   it('LandStones names all five Stones, with its sources, at #methodology', () => {
     const { container } = render(LandStones);
     expect(container.querySelector('section')?.id).toBe('methodology');
-    expect(container.querySelector('h2')?.textContent).toBe('Built on 33 public sources');
+    expect(container.querySelector('h2')?.textContent).toBe('Built on 34 public sources');
     const t = text(container);
     for (const name of ['Cornerstone', 'Touchstone', 'Keystone', 'Lodestone', 'Capstone']) {
       expect(t).toContain(name);

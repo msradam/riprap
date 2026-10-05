@@ -67,11 +67,19 @@
 
 <h2 id="models">Experimental models</h2>
 <p>
-  Two other open models can add sentences: a forecast of surge at the Battery, and an estimate of
-  paved and green land from recent satellite images. They are fine-tunes made by Riprap's
-  maintainer and are not official products. Every sentence from one opens with "Experimental",
-  states the model's limits and its tested accuracy, and names the official source to rely on. A
-  third model, a satellite water layer, was tested twice and retired. The heat briefing uses no
+  One other open model can add sentences: an estimate of paved and green land from recent
+  satellite images. It is a fine-tune made by Riprap's maintainer and is not an official product.
+  Every sentence from it opens with "Experimental", states the model's limits and its tested
+  accuracy, and follows the sentence from the city's own land cover map.
+</p>
+<p>
+  Two more were tested and taken out. A forecast of surge at the Battery is out of default
+  briefings since 5 October 2026: on 639 held-out four-day windows its mean error was 0.115 m,
+  and damped persistence, a one-line rule, scored 0.108 m and beats it. It foresaw 1 of the 23
+  windows that reached flood stage. A person running their own copy can switch it back on. The
+  model card hosted on Hugging Face is out of date; the
+  <a href="{DOCS}/model-cards/Granite-TTM-r2-Battery-Surge.md">corrected card</a> is in the
+  repository. A satellite water layer was tested twice and retired. The heat briefing uses no
   model: its forecast is the National Weather Service's.
   <a href="{DOCS}/MODELS.md">What each model was tested against, and the results</a>.
 </p>
@@ -89,16 +97,25 @@
   <li>an independent sanity check on 5 October 2026, which worked from the code, the public sources and the app's output before reading any project document. It re-derived 487 briefing sentences from the public sources with separate code: 475 were confirmed, 10 were wrong and 2 sat on the edge of a map cell. The 10 wrong sentences came from three defects (an address elevation read from a neighbouring map cell, hospitals counted twice, and a construction permits count). The first two have since been corrected in the code, and the permits sentence was taken out of plain briefings.</li>
 </ul>
 <p>
+  That check was itself run by AI coding agents, working read-only and independently of the agents
+  that wrote the code, under the maintainer's direction.
+  <a href="{DOCS}/history/SANITY-CHECK-2026-10-05.md">Its method, its figures, and what was done about each problem it found</a>.
   The repository records no audit by a person outside the project. Riprap's checks are patterns
   and rules: they do not read meaning, and they can miss a wrong inference.
+</p>
+<p>
+  Riprap is built by one person. No community group, agency or resident has yet shaped or tested
+  it. To send a correction, or an account of flooding or heat that the records miss, use
+  <a href="#corrections">the issue tracker</a>.
 </p>
 
 <h2 id="limits">What the data cannot say</h2>
 <ul>
   <li>311 counts are complaints filed, not floods measured. Published research finds that some neighbourhoods report less often for the same conditions, so a low count is not evidence of a dry block.</li>
-  <li>The city's stormwater maps are modelled scenarios, not forecasts or observations. The city says its map "does not provide the exact depth of flooding at any location".</li>
+  <li>The city's four stormwater flood maps are modelled scenarios, not forecasts or observations. The city says its map "does not provide the exact depth of flooding at any location".</li>
   <li>Outside a mapped area is not safe. NYC Emergency Management reports that during Hurricane Ida the most heavily impacted areas, "representing over half of all damaged buildings, were also outside of any flood risk scenario".</li>
-  <li>A FloodNet depth is a measurement at one point under one sensor. It is not the depth across a street or at a building.</li>
+  <li>A FloodNet depth is a measurement at one point under one sensor. It is not the depth across a street or at a building. Riprap counts only the events FloodNet has verified, and it quotes a sensor's status as FloodNet lists it today without interpreting it.</li>
+  <li>A neighbourhood name can be answered for a larger official area, or for part of one. The line under the briefing's title says which area was used.</li>
   <li>Surface temperature is not air temperature, and the Heat Vulnerability Index is a rank among neighbourhoods. The Health Department says "a neighborhood with low vulnerability does not mean no risk".</li>
   <li>A briefing describes public records about a place. It is not a judgement on a property or on the people who live there, and it is not advice.</li>
   <li>Riprap is in English only.</li>
@@ -114,7 +131,8 @@
   is not endorsed by or affiliated with FloodNet, New York University, the City University of New
   York, FEMA, NOAA, USGS or the City. The City publishes its open data for information only and
   does not warrant its completeness, accuracy, content or fitness for any use (Local Law 11 of
-  2012). Every NYC Open Data dataset Riprap reads is listed with its ID and what Riprap does to it
+  2012). FloodNet's data, and the sentences and figures made from it, are licensed CC BY-NC-SA
+  4.0 and are not under Riprap's Apache-2.0 licence. Every NYC Open Data dataset Riprap reads is listed with its ID and what Riprap does to it
   in <a href="{DOCS}/DATA-SOURCES.md">docs/DATA-SOURCES.md</a>, and other tools for the same
   records are credited in <a href="{DOCS}/BACKGROUND.md#related-work">Related work</a>.
 </p>
@@ -125,5 +143,7 @@
   <a href="{REPO}/issues/new/choose">open an issue on the project's tracker</a> with the address or
   question and the sentence. Corrections are made in the code and recorded in the
   <a href="{REPO}/blob/main/CHANGELOG.md">changelog</a>. If the error is in a source dataset, the
-  issue will say so and point to the publisher.
+  issue will say so and point to the publisher. An account of flooding or heat that the records
+  miss is welcome on the same tracker; Riprap has no way yet to put one into a briefing, so it is
+  kept there.
 </p>

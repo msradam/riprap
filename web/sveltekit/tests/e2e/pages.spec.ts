@@ -46,7 +46,7 @@ const CITIES: CityCase[] = [
 
 const NYC_NEEDLES = [
   'Sandy Inundation', 'Ida HWM', 'MTA subway entrances',
-  'NYCHA developments', 'DOE schools', 'DOH hospitals',
+  'NYCHA developments', 'Public schools', 'DOH hospitals',
   'FloodHelpNY', 'FloodNet NYC', "what NYC's ground remembers",
 ];
 

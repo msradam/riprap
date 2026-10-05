@@ -1,7 +1,7 @@
 <script lang="ts">
   /** The public sources behind a briefing, grouped by the five Stones:
    *  a plain label leads each row, the Stone's name is its tag. The count
-   *  in the heading is docs/DATA-SOURCES.md's: 24 flood sources and 11
+   *  in the heading is docs/DATA-SOURCES.md's: 25 flood sources and 11
    *  heat sources, less the two read for both.
    *  Source names are the manifests' own (deployments/nyc/manifests and
    *  deployments/federal/manifests); the experimental model layers are in
@@ -11,11 +11,11 @@
 
   const SOURCES: Record<StoneKey, string> = {
     cornerstone:
-      "FEMA's effective and preliminary flood maps, NYC DEP stormwater scenarios for today, 2050 and 2080, the 2012 Sandy inundation extent, USGS Hurricane Ida high-water marks, USGS terrain",
+      "FEMA's effective and preliminary flood maps, the city's four modelled stormwater flood maps for today, 2050 and 2080, the 2012 Sandy inundation extent, USGS Hurricane Ida high-water marks, USGS terrain",
     touchstone:
       'FloodNet street sensors, NYC 311 flood complaints, NOAA tide gauges, USGS stream gauges, National Weather Service observations',
     keystone:
-      "NYC public schools, MTA subway entrances, NYCHA developments, hospitals, DOB construction permits, NYC Planning's floodplain counts",
+      "NYC public schools, MTA subway entrances, NYCHA developments, hospitals, NYC Planning's floodplain counts; DOB construction permits only when a question asks",
     lodestone: 'National Weather Service alerts and water-level forecasts, NPCC4 sea-level projections',
     capstone:
       "Code turns each record into one cited sentence, and rules set the answer's lead (Yes, No, a count). An optional open Granite model may route a question the rules do not match and choose among those sentences; it never writes one, and code checks its choice."
@@ -41,10 +41,10 @@
 
 <section class="land-section" id="methodology" aria-labelledby="stones-h">
   <div class="land-frame">
-    <h2 id="stones-h" class="land-h2">Built on 33 public sources</h2>
+    <h2 id="stones-h" class="land-h2">Built on 34 public sources</h2>
     <p class="land-intro">
       City, state and federal records, read live or from their published files and sorted into five
-      Stones: 24 for a flood briefing and 11 for a heat briefing, two of them shared. No commercial
+      Stones: 25 for a flood briefing and 11 for a heat briefing, two of them shared. No commercial
       data and no scores. Each record has its own portal; Riprap reads them together for one
       place and links back to each.
     </p>
