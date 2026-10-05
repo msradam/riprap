@@ -107,7 +107,8 @@ def geocode(text: str, limit: int = 5) -> list[GeocodeHit]:
             )
         return out
     except Exception as e:
-        log.warning("Geosearch failed: %r", e)
+        # The exception's type only: its text can hold the request URL, and so the address typed.
+        log.warning("Geosearch failed: %s", type(e).__name__)
         return []
 
 
@@ -166,7 +167,7 @@ def geocode_nominatim(
     try:
         rows = _nominatim_search(params)
     except Exception as e:  # noqa: BLE001 — log + None per the rest of this module
-        log.warning("Nominatim fetch failed: %r", e)
+        log.warning("Nominatim fetch failed: %s", type(e).__name__)  # not its text: see geocode()
         return None
     if not rows:
         return None
@@ -327,8 +328,9 @@ def geocode_one(text: str, *, scope_hint: str | None = None) -> GeocodeHit | Non
         check = geocode_nominatim(text, country_codes=None)
         cc = ((check.raw.get("address") or {}).get("country_code") or "").lower() if check else ""
         if cc != "us":
-            log.info("geocode_one: %r named a non-US place (resolved country=%r) — "
-                     "out of scope, not forcing a US match", text, cc or None)
+            # The text typed is never logged.
+            log.info("geocode_one: a non-US place (resolved country=%r) is out of scope, not forcing a US match",
+                     cc or None)
             return None
     # Region-bias the resolver to the active deployment so ambiguous names
     # land in-area. bounded=True returns only in-region hits; if the query is
@@ -364,7 +366,7 @@ def geocode_one(text: str, *, scope_hint: str | None = None) -> GeocodeHit | Non
         # "closest match": "90-01 183rd Steet, Quens" once became a Harlem
         # corner, and a house number that does not exist became a point on
         # the street 7 km away. Not resolved is the honest answer.
-        log.info("geocode_one: %r names a house number but the nearest hit is %r; not resolved", text, primary.address)
+        log.info("geocode_one: a house number whose nearest hit is another street; not resolved")
         return None
     # Enrich with NYC Geosearch when the resolved point is inside the
     # NYC bbox. Geosearch may add bbl/bin/borough refinements we

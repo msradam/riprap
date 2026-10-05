@@ -223,7 +223,7 @@ def plan(query: str, on_token=None, ledger: list | None = None, registry=None) -
     """
     msg = _not_implemented_message(query)
     if msg:
-        log.info("planner: short-circuit not_implemented for query %r", query[:80])
+        log.info("planner: short-circuit not_implemented")  # the query itself is never logged
         if on_token:
             on_token(json.dumps({"intent": "not_implemented", "message": msg}))
         return Plan(intent="not_implemented", targets=[], rationale=msg)

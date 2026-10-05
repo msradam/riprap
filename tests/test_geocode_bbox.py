@@ -211,3 +211,23 @@ def test_a_query_naming_another_city_skips_the_region_biased_lookup(monkeypatch)
     monkeypatch.setattr(gc, "geocode", lambda text, limit=5: [])
     hit = gc.geocode_one("Ferry Building, San Francisco")
     assert hit is not None and hit.lat == 37.7955 and calls == [False]
+
+
+def test_a_geocoder_failure_logs_no_typed_text(monkeypatch, caplog):
+    """An httpx error's text holds the request URL, and the URL holds the
+    address typed. Only the exception's type is logged."""
+    import logging
+
+    import httpx
+
+    typed = "12 Privet Lane, Brooklyn"
+
+    def boom(*a, **k):
+        raise httpx.ConnectTimeout(f"timed out: https://geosearch.planninglabs.nyc/v2/search?text={typed}")
+
+    monkeypatch.setattr(gc.http, "get", boom)
+    monkeypatch.setattr(gc, "_nominatim_search", boom)
+    with caplog.at_level(logging.DEBUG):
+        assert gc.geocode(typed) == [] and gc.geocode_nominatim(typed) is None
+    assert [r.getMessage() for r in caplog.records] == ["Geosearch failed: ConnectTimeout",
+                                                         "Nominatim fetch failed: ConnectTimeout"]
