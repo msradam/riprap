@@ -6,7 +6,8 @@ that landed on the hackathon-period production deploys.
 
 ## [Unreleased] (the review fix pass) - 2026-10-05
 
-An independent sanity check re-derived 487 briefing sentences from the
+A sanity check, run by AI agents separate from those that wrote the code,
+re-derived 487 briefing sentences from the
 public sources: 475 were confirmed, 10 were wrong and 2 sat on a raster edge
 ([docs/history/SANITY-CHECK-2026-10-05.md](docs/history/SANITY-CHECK-2026-10-05.md)).
 This pass fixes what it found and says in the documents what it could not
@@ -141,6 +142,52 @@ fix. Branch `review/fix-pass`; not tagged, and the version is unchanged.
 - The README's thanks to FloodNet by name; a data credit in the form FloodNet
   asks for replaces it.
 
+### After nine audience reviews (documents, landing, repository files)
+
+Nine reviewers read Riprap as its audiences would (FloodNet, NYU CUSP,
+BetaNYC, the City's Open Data team, a civic technologist, planners, city
+climate staff, community groups, a data journalist). The changes to the
+app's answers are in the commits of the same day; these are the documents
+and pages.
+
+- **Stale images removed.** The landing sets the saved Hollis answer as
+  text read at build time, with no screenshot and no map; the README's
+  screenshot is gone and its quoted examples were read again from the app.
+- **Landing cards.** The 311 "No." card says it is a No about reports,
+  carries the under-reporting caveat and says the address is in the
+  wholesale food markets; the heat card for the same address says so too.
+  The gallery question now asks about "the last five years", the window its
+  sentence counts. Cards lead with a count and extent, facility names below.
+- **Plain headings.** Briefing sections are headed "Mapped hazards", "Live
+  readings", "Places and facilities" and "Projections" (stone taglines in
+  every deployment), "Trace, by Stone" is "What each source returned", and
+  the page glossary explains PFIRM and METAR.
+- **FloodNet's licence** is linked and its clauses quoted in `NOTICE` and
+  `docs/DATA-SOURCES.md`, with what Riprap does about each and the plain
+  statement that FloodNet has not been asked and has not approved the use.
+  The README badge and `CITATION.cff` point to the exception.
+- **What the checks are.** "Head-to-head comparison" is explained (rule path
+  against model path, judged by AI agents); the sanity check is described
+  as the work of separate AI agents; the absence of any validation against
+  observed flooding is stated in the README, the methodology and the about
+  page.
+- **A count can be rerun.** `docs/METHODOLOGY.md` lists the eleven 311
+  descriptors as the portal spells them, the 1,825 day window and the
+  duplicate rule, and recounts the Hollis example (90, 89, 88). The plain
+  descriptor names are not new in 2026: 2,791 rows of 2023 carry them.
+- **`docs/API-FIELDS.md`**, a data dictionary for the JSON and each MCP
+  tool's result, read from live responses.
+- **A plain correction form** (`.github/ISSUE_TEMPLATE/correction.yml`) with
+  no technical fields; blank issues are on; the chooser's dead links are
+  gone; `CONTRIBUTING.md` opens with residents, students and researchers.
+- `CITATION.cff` and `NOTICE` no longer describe the surge forecast as in
+  briefings, the gallery as made with a model, or the project as only
+  "assisted" by language models.
+- The NYC Urban Heat Portal is in the README's table of official sources;
+  the about page lists the NYC Open Data datasets by ID; `docs/PRIVACY.md`
+  says 311 complaints are shown at the block; `docs/BACKGROUND.md` is
+  rewritten for the readers the README names; source counts agree (25).
+
 ### Still open
 
 - The hosted surge model card is unchanged.
@@ -150,9 +197,15 @@ fix. Branch `review/fix-pass`; not tagged, and the version is unchanged.
   department.
 - A pool just outside an area's outline is still missed by the cooling
   sentence.
-- The landing's preview image and the README screenshot were taken on 1
-  October and show the Hollis answer's earlier sentences; they need a browser
-  to retake.
+- The landing's preview image and the README screenshot showed the Hollis
+  answer's earlier sentences and a map of sensor points. Both were removed
+  (see below); a new screenshot needs a browser.
+- The public site still serves the earlier build, and the gallery's saved
+  briefings were last built before the audience-review fixes, so the
+  landing's quoted cards follow the gallery as it was then.
+- Nothing tests the joined evidence against observed flooding.
+- FloodNet has not been asked about Riprap's use of its data. Event rows
+  removed from the tree on 2026-10-05 remain in git history.
 
 ## [Unreleased] (a heat briefing, and the models settled) - 2026-10-02
 

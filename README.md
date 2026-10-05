@@ -57,43 +57,46 @@ A real answer, from the gallery entry
 >
 > Yes. 2 FloodNet sensors within 600 m have recorded 6 flood events (each a
 > series of depth readings above 10 mm at the sensor, FloodNet's definition)
-> since they were installed on 2023-10-26, the most recent starting 2026-08-20
-> 22:57 UTC [floodnet]. FloodNet's API lists 8 more events labelled flood here
-> that are still to be verified by a person; Riprap counts verified events
-> only [floodnet]. The highest depth in FloodNet's record for these sensors in
-> that period is 1172 mm (46.1 in) on 2026-05-20, at a sensor listed as
-> "noisy" in FloodNet's API when this was read (2026-10-05); that is the
-> sensor's status now, which the API does not give for the day of the event
-> [floodnet]. Among the sensors listed as good, the highest depth is 815 mm
-> (32.1 in) on 2026-05-20 [floodnet]. 1 sensor with a status other than good
-> recorded 3 of the 6 events; Riprap, not FloodNet, chooses to rest a yes or
-> no answer only on events from sensors listed as good [floodnet]. USGS
-> surveyed 2 Hurricane Ida high-water marks within 800 m of this address; the
-> highest stood 0.76 ft above ground [ida_hwm]. Nearest mark: Intersection of
-> 182nd St. and 90th Ave., Jamaica, Queens (174 m away, 0.7 ft above ground)
-> [ida_hwm]. 88 NYC 311 flood-related complaints filed within 200 m of this
-> location in the last 5 years: 48 sewer backup, 27 catch basin, 10 street
-> flooding, 3 manhole overflow [nyc311]. A count of complaints is a count of
-> reports filed, not of floods: a low count can mean under-reporting and not
-> the absence of flooding, because the propensity to file a 311 request
-> varies with income, language and demographics (Kontokosta, Hong and
-> Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill, Annals of
-> Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003) [nyc311].
+> on 3 separate days since they were installed on 2023-10-26, the most recent
+> starting 2026-08-20 22:57 UTC (every date here is a UTC day) [floodnet]. By
+> UTC calendar year: 2 in 2025 and 4 in 2026 [floodnet]. FloodNet's API lists
+> 8 more events labelled flood here that are still to be verified by a person;
+> Riprap counts verified events only [floodnet]. The highest depth in
+> FloodNet's record for these sensors in that period is 1172 mm (46.1 in) on
+> 2026-05-20, in an event the API marks as verified by a person, at a sensor
+> listed as "noisy" in FloodNet's API when this was read (2026-10-05); that is
+> the sensor's status now, which the API does not give for the day of the
+> event [floodnet]. 1 of the 2 sensors is listed with a status other than
+> "good" in FloodNet's API when this was read ("noisy") and recorded 3 of the
+> 6 events [floodnet]. USGS surveyed 2 Hurricane Ida high-water marks within
+> 800 m of this address; the highest stood 0.76 ft above ground [ida_hwm].
+> Nearest mark: Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174
+> m away, 0.7 ft above ground) [ida_hwm]. 88 NYC 311 flood and sewer
+> complaints filed within 200 m of this location in the last 5 years (since
+> 2021-10-06): 48 sewer backup, 27 catch basin, 10 street flooding, 3 manhole
+> overflow [nyc311]. A count of complaints is a count of reports filed, not of
+> floods: a low count can mean under-reporting and not the absence of
+> flooding, because the propensity to file a 311 request varies with income,
+> language and demographics (studies of other 311 complaint types: Kontokosta,
+> Hong and Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill,
+> Annals of Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003) [nyc311].
 
 (Read from the app on 5 October 2026. The gallery page shows the answer as it
 stood when the gallery was last built.)
 
 The "Yes." is set by a rule: at least one observed source reports flooding
-since Ida, on 1 September 2021. This answer, like every gallery entry, was
-made by the rules alone: no language model ran. The two depths are the same
-storm at two sensors. FloodNet's API lists the sensor that read 46.1 in as
-"noisy" today and does not say what its status was on the day, so Riprap
-gives both readings, says which sensor each is from, and rests its yes or no
-only on sensors listed as good. That last choice is Riprap's, not FloodNet's.
-Riprap counts only the events FloodNet's API marks as verified by a person
-(6 here) and says how many more the API labels flood but has not verified (8
-here), which is why its count can sit below a count of everything the API
-returns.
+since Ida, on 1 September 2021, within 100 m of the address. Farther off,
+the answer opens "Flooding was recorded near this address, not at it" with
+the distance, and not "Yes." This answer, like every gallery entry, was made
+by the rules alone: no language model ran. The 6 events fell on 3 separate
+days, so they are not six storms. The event that
+read 46.1 in is one FloodNet marks as verified by a person; its sensor is
+listed as "noisy" in FloodNet's API today, and the API does not say what
+the status was on the day, so Riprap quotes both facts and interprets
+neither. Riprap counts only the events FloodNet's API marks as verified
+(6 here) and says how many more the API labels flood but has not verified
+(8 here), which is why its count can sit below a count of everything the
+API returns.
 
 A heat answer, from
 [Brighton Beach, "heat score"](https://msradam.github.io/riprap/gallery/brighton-heat-score/):
@@ -102,16 +105,26 @@ A heat answer, from
 >
 > Riprap computes no score or rating of its own. The Health Department
 > publishes an index for the neighbourhood, quoted here with what it is and is
-> not: The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to
-> 2020 data) scores Brighton Beach, the neighbourhood around this address, at
-> 4 out of 5 [hvi]. The index ranks neighbourhoods against each other by a
-> model of heat deaths, from surface temperature, green space, air
-> conditioning, income and the share of Black residents; it is not a
-> measurement of heat at an address, and the department notes that every
-> neighbourhood has residents at risk, whatever its score. For Brighton Beach
-> the department's file gives 86.6% of households with air conditioning (a
-> survey estimate it shares across neighbouring neighbourhoods) and 14.1%
-> green space [hvi].
+> not: The NYC Health Department's Heat Vulnerability Index (2023, from 2016
+> to 2020 data) scores Brighton Beach, the neighbourhood around this address,
+> at 4 out of 5 [hvi]. The index ranks neighbourhoods against each other: the
+> department says it "uses a statistical model to summarize the most important
+> factors of neighborhood heat risk: surface temperature, green space, home
+> air conditioning, and income". It is not a measurement of heat at an
+> address, and the department says "All neighborhoods have residents at risk
+> for heat illness and death". For Brighton Beach the department's file gives
+> 86.6% of households with air conditioning (a survey estimate it shares
+> across neighbouring neighbourhoods) and 14.1% green space [hvi]. The area is
+> the 2020 Neighborhood Tabulation Area the index is published for, which can
+> carry another name than the neighbourhood in the address above [hvi]. Of who
+> heat harms most, the department writes that Black New Yorkers suffer
+> disproportionate health impacts from heat "due to social and economic
+> disparities", and that "These disparities stem from structural racism, which
+> includes neighborhood disinvestment, racist housing policies, fewer job
+> opportunities and lower pay, and less access to high-quality education and
+> health care" (NYC Health Department, Interactive Heat Vulnerability Index).
+
+(Read from the app on 5 October 2026.)
 
 A query about outdoor heat gets the heat briefing; a bare address or district
 gets its flood briefing, with a link to the heat one. The heat briefing was
@@ -205,7 +218,8 @@ is sourced in [docs/METHODOLOGY.md](docs/METHODOLOGY.md#10-what-the-data-cannot-
   Hurricane Ida the most heavily impacted areas, "representing over half of
   all damaged buildings, were also outside of any flood risk scenario".
 - A FloodNet depth is a point measurement under one sensor, not the depth
-  along a street. "Within 600 m" is not "on this block".
+  along a street. "Within 600 m" is not "on this block", so a "Yes." about
+  an address needs a sensor event or an Ida mark within 100 m of it.
 - Surface temperature is not air temperature, and the Heat Vulnerability
   Index is a rank: the Health Department says "a neighborhood with low
   vulnerability does not mean no risk".
@@ -252,8 +266,10 @@ uv run uvicorn web.main:app --port 7860
 Open <http://localhost:7860> and type an address (`90-01 183rd Street, Queens`),
 a district (`QN12`) or a question (`Has 80 Pioneer Street, Brooklyn flooded?`).
 A question is answered by rules, with no model (the JSON reports
-`answer_path` as `rules`); one the rules do not recognise gets the
-cited evidence for its place, and the page says it was not answered. The first
+`answer_path` as `rules`). A question the records cannot answer, or one
+the rules do not recognise, gets the cited evidence for its place under a
+first sentence that says what Riprap does not hold; the JSON reports
+`answered` as `false`. The first
 district query on a cold server takes about half a
 minute while the layers load. Every briefing text opens, after its scope
 statement, with a "Place described: ..." paragraph that names the place it was
@@ -286,7 +302,9 @@ their own licence (`license_notices`), and `place_note` says which area a
 neighbourhood name was answered for. Over HTTP the same note is
 `geocode.note`, `answer_path` (`rules` or `llm`) says which path answered,
 `failed` lists the sources that were tried and did not answer, and
-`not_checked` lists the sources that were not read.
+`not_checked` lists the sources that were not read. Every field of the JSON
+and of each tool's result, with its unit and source dataset, is in
+[docs/API-FIELDS.md](docs/API-FIELDS.md).
 Try one from the command line with the MCP Inspector (needs Node):
 
 ```bash
@@ -297,8 +315,9 @@ npx @modelcontextprotocol/inspector --cli uv run riprap-mcp \
 **Gallery.** `uv run python scripts/build_gallery.py` rebuilds every entry in
 `web/sveltekit/src/lib/gallery/` (35 entries: for flood 12 addresses, 3
 community districts and 10 questions; for heat 3 places and 7 questions),
-with no model. FloodNet's per-sensor and per-event records are taken out of
-each saved file, since its licence forbids reposting them. To see them in the app, rebuild the frontend (needs
+with no model. FloodNet's per-sensor and per-event records are served by
+nothing (the page, the JSON, MCP) and saved in no file, since its licence
+forbids reposting them. To see them in the app, rebuild the frontend (needs
 Node and [pnpm](https://pnpm.io)): `cd web/sveltekit && pnpm install && pnpm
 build`. The landing's scrolling preview is the text of the Hollis "since Ida"
 entry, read from its saved file at build time, so it follows a rebuild with
@@ -435,7 +454,8 @@ vintage. The full list is in [docs/DATA-SOURCES.md](docs/DATA-SOURCES.md).
 
 No accounts, no cookies and no analytics. The server keeps a short-lived local
 cache of public-data responses and no database of queries (a web server's access
-log, if you keep one, holds the URLs asked). 311 free text is
+log, if you keep one, holds the URLs asked). A 311 complaint is shown at its block, with no house number and with
+coordinates rounded to about 100 m. 311 free text is
 redacted of email addresses and phone numbers when it is fetched; names are not
 redacted. Addresses are sent to geocoders, the map loads its background tiles
 from CARTO, and a configured LLM receives the question and evidence. Details and a do-no-harm note:

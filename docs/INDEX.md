@@ -7,6 +7,7 @@ you're new; jump directly if you know what you need.
 |---|---|
 | [BACKGROUND.md](BACKGROUND.md) | Why Riprap exists, who it is for and not for, related work and how Riprap differs from or defers to it, the Five Stones in full and how they generalise beyond NYC. |
 | [DATA-SOURCES.md](DATA-SOURCES.md) | The public sources behind the NYC deployment and what each is used for; every NYC Open Data dataset by name and ID, with what Riprap does to it. |
+| [API-FIELDS.md](API-FIELDS.md) | A data dictionary for the `/api/agent` JSON and each MCP tool's result: every field, its unit and the dataset it comes from. |
 | [ACCESSIBILITY.md](ACCESSIBILITY.md) | The accessibility statement: the standard (WCAG 2.2 AA), how it was tested, what the code review found, known limitations and how to report a barrier. |
 | [MODELS.md](MODELS.md) | The optional LLM, the experimental land-cover model, the surge forecast that is out of default briefings (with its backtest against six baselines), the retired satellite water layer and its two tests, and how energy is recorded. The corrected surge model card is in [model-cards/](model-cards/Granite-TTM-r2-Battery-Surge.md). |
 | [REPOSITORY.md](REPOSITORY.md) | Code map: the pipeline at a glance, source-of-truth paths and the repository tree. |

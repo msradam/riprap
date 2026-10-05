@@ -64,10 +64,13 @@ sources' sentences word for word. They are tried in a fixed order:
    the lead from the record and the model's sentence only follows it
    ([MODELS.md](MODELS.md));
 5. "has it flooded": the past-event rule described below sets yes, no or
-   cannot say. An Ida high-water mark says the block flooded only when it is
-   within 250 m; a point within 50 m of the mapped Sandy edge gets no flat
-   yes or no; events only at sensors whose status in FloodNet's API is other
-   than good do not make a yes (the choice is Riprap's, not FloodNet's);
+   cannot say. A sensor event or an Ida high-water mark makes a "Yes." about
+   an address only within 100 m of it; farther off the lead is "Flooding was
+   recorded near this address, not at it", with the distance (`near`). A
+   point within 50 m of the mapped Sandy edge gets no flat yes or no. An
+   event FloodNet marks as verified by a person counts whatever its
+   sensor's status is today. A question about a named past day is read from
+   the records dated that day;
 6. "how many": the counted source, and the count of the 311 kind the question
    names. "Since 2024" sums the years from then; "since Ida" starts mid-year
    and gets the source's own window, stated, with no count as the lead;
@@ -218,6 +221,19 @@ and reported none, and `cannot_answer` otherwise. Silence is not a "no": a
 FloodNet query with no sensor in range, or no Ida mark nearby, cannot say the
 place stayed dry. The source the rule relies on is added to the facts when
 the model left it out, so the lead is always cited.
+
+A question the records cannot answer is not given the neutral lead. When
+it asks for something Riprap does not hold (a trend, a ranking of places, a
+score, figures about people or households, advice to an agency, law or
+benefits, another 311 topic; the table is `rule_answer.NOT_HELD`), the
+answer's first sentence says what is not held, the lead is `not_held` and
+`answered` is `false`, in `grounding` and at the top of the result. A
+question not written in English gets `not_english` and one fixed line each
+in Spanish, Chinese and Bengali. A question with a place and an ask no rule
+recognises gets `not_recognised`. In each case the evidence for the place
+follows, under a sentence that says none of it answers the question.
+`answer_path` still reads `rules` for these, since it names the path that
+ran, not whether it answered.
 
 An asset register "reports a result" when any of its inside counts is above
 zero. An invalid lead is retried once, then replaced by the cannot-answer

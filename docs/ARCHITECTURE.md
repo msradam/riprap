@@ -228,7 +228,7 @@ Point pebbles:
 | **microtopo** | Elevation and low-spot percentile from the USGS 3DEP DEM in the sentence; basin relief in the evidence table. HAND stays in the JSON value for an address and is not printed; TWI is no longer in the value. | proxy |
 | **mta_entrances**, **nycha_developments**, **doe_schools**, **doh_hospitals** | Transit entrances, public housing, schools and hospitals within range. The sentence names the exposed ones. | empirical |
 | **floodnet** *(live)* | FloodNet depth sensors near this address and their flood events, the newest one dated. | empirical |
-| **nyc311** *(live)* | NYC 311 flood-related complaints near this address over the past 5 years, counted under both the old and the new descriptor names. | proxy |
+| **nyc311** *(live)* | NYC 311 flood and sewer complaints near this address over the past 5 years, counted under both the old and the new descriptor names. | proxy |
 | **noaa_tides** *(live)* | Latest NOAA water level, predicted tide and the residual (roughly the surge) at the nearest station. | empirical |
 | **nws_water_forecast** *(live)* | The National Weather Service's forecast peak water level at the nearest of The Battery, Kings Point and Bergen Point, and the flood stage it reaches. | modeled |
 | **npcc4_slr** | NPCC4 (2024) sea-level rise projections for New York City. | modeled |
