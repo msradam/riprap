@@ -55,39 +55,50 @@ A real answer, from the gallery entry
 
 > **Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?**
 >
-> Yes. 2 FloodNet sensors within 600 m have recorded 6 flood events (each a
-> series of depth readings above 10 mm at the sensor, FloodNet's definition)
-> on 3 separate days since they were installed on 2023-10-26, the most recent
-> starting 2026-08-20 22:57 UTC (every date here is a UTC day) [floodnet]. By
-> UTC calendar year: 2 in 2025 and 4 in 2026 [floodnet]. FloodNet's API lists
-> 8 more events labelled flood here that are still to be verified by a person;
-> Riprap counts verified events only [floodnet]. The highest depth in
-> FloodNet's record for these sensors in that period is 1172 mm (46.1 in) on
-> 2026-05-20, in an event the API marks as verified by a person, at a sensor
-> listed as "noisy" in FloodNet's API when this was read (2026-10-05); that is
-> the sensor's status now, which the API does not give for the day of the
-> event [floodnet]. 1 of the 2 sensors is listed with a status other than
-> "good" in FloodNet's API when this was read ("noisy") and recorded 3 of the
-> 6 events [floodnet]. USGS surveyed 2 Hurricane Ida high-water marks within
-> 800 m of this address; the highest stood 0.76 ft above ground [ida_hwm].
-> Nearest mark: Intersection of 182nd St. and 90th Ave., Jamaica, Queens (174
-> m away, 0.7 ft above ground) [ida_hwm]. 88 NYC 311 flood and sewer
-> complaints filed within 200 m of this location in the last 5 years (since
-> 2021-10-06): 48 sewer backup, 27 catch basin, 10 street flooding, 3 manhole
+> Yes. The record this rests on is a FloodNet sensor with a verified flood
+> event 22 m from this address [floodnet]. 2 FloodNet sensors within 600 m
+> have recorded 6 flood events (each a series of depth readings above 10 mm at
+> the sensor, FloodNet's definition) on 3 separate days since they were
+> installed on 2023-10-26, the most recent starting 2026-08-20 22:57 UTC
+> (every date here is a UTC day) [floodnet]. By UTC calendar year: 2 in 2025
+> and 4 in 2026 [floodnet]. FloodNet's API lists 8 more events labelled flood
+> here that are still to be verified by a person; Riprap counts verified
+> events only [floodnet]. The highest depth in FloodNet's record for these
+> sensors in that period is 1172 mm (46.1 in) on 2026-05-20, in an event the
+> API marks as verified by a person, at a sensor listed as "noisy" in
+> FloodNet's API when this was read (2026-10-05); that is the sensor's status
+> now, which the API does not give for the day of the event [floodnet]. 1 of
+> the 2 sensors is listed with a status other than "good" in FloodNet's API
+> when this was read ("noisy") and recorded 3 of the 6 events [floodnet]. USGS
+> surveyed 2 Hurricane Ida high-water marks within 800 m of this address; the
+> highest stood 0.76 ft above ground [ida_hwm]. Nearest mark: Intersection of
+> 182nd St. and 90th Ave., Jamaica, Queens (174 m away, 0.7 ft above ground)
+> [ida_hwm]. 88 NYC 311 complaints about flooding and sewer backups filed
+> within 200 m of this location in the last 5 years (since 2021-10-06; eleven
+> descriptors; other sewer complaints, such as odors or missing covers, are
+> not counted): 48 sewer backup, 27 catch basin, 10 street flooding, 3 manhole
 > overflow [nyc311]. A count of complaints is a count of reports filed, not of
 > floods: a low count can mean under-reporting and not the absence of
 > flooding, because the propensity to file a 311 request varies with income,
 > language and demographics (studies of other 311 complaint types: Kontokosta,
 > Hong and Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill,
 > Annals of Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003) [nyc311].
+> For the days of Hurricane Ida, which the briefing's 311 window does not
+> reach: 5 NYC 311 complaints about flooding and sewer backups were filed
+> within 200 m of this location from 2021-09-01 to 2021-09-03: 4 sewer backup,
+> 1 manhole overflow [nyc311]. A count of complaints is a count of reports
+> filed, not of floods, and a low count can mean under-reporting [nyc311].
 
 (Read from the app on 5 October 2026. The gallery page shows the answer as it
 stood when the gallery was last built.)
 
 The "Yes." is set by a rule: at least one observed source reports flooding
-since Ida, on 1 September 2021, within 100 m of the address. Farther off,
-the answer opens "Flooding was recorded near this address, not at it" with
-the distance, and not "Yes." This answer, like every gallery entry, was made
+since Ida, on 1 September 2021, within 100 m of the address, and the
+sentence after it names that record and its distance. Farther off, the
+answer opens "Flooding was recorded near this address, not at it" with the
+distance, and not "Yes." The 311 count covers five years and so starts a
+month after Ida; the last two sentences count the complaints filed on the
+storm's own days, 1 to 3 September 2021. This answer, like every gallery entry, was made
 by the rules alone: no language model ran. The 6 events fell on 3 separate
 days, so they are not six storms. The event that
 read 46.1 in is one FloodNet marks as verified by a person; its sensor is

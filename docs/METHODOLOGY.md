@@ -318,7 +318,7 @@ it.
 |---|---|---|---|---|
 | 311 complaints at an address (`erm2-nwe9`) | Within 200 m of the geocoded point (`within_circle`) | The last 1,825 days (5 times 365, so leap days are not added), counted back from midnight UTC of the day of the query | `complaint_type` "Sewer" or "Sewer Maintenance" and one of eleven flood descriptors, listed below the table; a complaint filed under both names within ten minutes at one place counts once (`app/context/nyc311.py`) | About the blocks around an address; wider circles mix in other streets' drains |
 | 311 complaints in a district or neighbourhood | A community district by the record's own `community_board` field; a neighbourhood by its exact outline | The last 1,095 days, by the same rule | The same filter; the lead gives the breakdown by descriptor group, and every count ends with the under-reporting caveat | The district is the unit the city files the complaint under |
-| FloodNet sensors at an address | Sensors within 600 m | The period since the sensors were installed, stated with the install date, within the last 3 years | Events the API labels `flood` and marks `annotated_by: human` (verified by a person); a flood event is a series of depth readings above 10 mm at the sensor, FloodNet's definition. The sentence gives the count, the number of separate UTC days and each year's count, then the highest depth on record, saying that its event is verified and quoting that sensor's status as the API lists it when read. Tide gauges in FloodNet's deployments table (`deploy_type` "tidal") are left out | Sensors are sparse (a few hundred citywide), so a block-sized circle would usually hold none |
+| FloodNet sensors at an address | Sensors within 600 m | The period since the sensors were installed, stated with the install date, within the last 3 years | Events the API labels `flood` and marks `annotated_by: human` (verified by a person); a flood event is a series of depth readings above 10 mm at the sensor, FloodNet's definition. The sentence gives the count, the number of separate UTC days and each year's count (its dates are UTC days and it says so); a question about a named past day, month, season or year is matched on each event's date in New York time, and the answer says so, then the highest depth on record, saying that its event is verified and quoting that sensor's status as the API lists it when read. Tide gauges in FloodNet's deployments table (`deploy_type` "tidal") are left out | Sensors are sparse (a few hundred citywide), so a block-sized circle would usually hold none |
 | FloodNet sensors in an area | Sensors inside the outline | The same | The same | |
 | Hurricane Ida high-water marks | USGS marks within 800 m; a mark counts toward a "Yes." about an address only within 100 m, the same distance as for a sensor | 1 to 2 September 2021 | All 159 New York marks in the USGS file | The marks are few and were surveyed where crews went; 800 m finds the nearest ones, 100 m keeps a "Yes." at the block |
 | Sandy inundation zone (`5xsi-dfpx`) | The cell under the point; the distance to the edge is stated within 50 m of it | 2012 | | The mapped outline is not exact to a building |
@@ -359,6 +359,20 @@ they replaced the coded names. Three rules follow from that:
 - **Duplicates.** A row with a plain descriptor is dropped when a row with
   the coded descriptor of the same kind, at the same `incident_address` or
   the same coordinates, was created within ten minutes of it.
+- **A storm's own days.** Five years back from October 2026 starts a month
+  after Hurricane Ida. A question about Ida, or about a named day older
+  than the window, gets a second count by the same filter and duplicate
+  rule: complaints within 200 m created from 1 to 3 September 2021 for Ida
+  (`created_date >= '2021-09-01T00:00:00'` and `< '2021-09-04T00:00:00'`),
+  or on the day asked. For the Hollis address that count is 5 (4 sewer
+  backup, 1 manhole overflow). For an area, or when that request fails, the
+  answer says the count quoted starts after the storm.
+
+The sentence says what the count leaves out: "eleven descriptors; other
+sewer complaints, such as odors or missing covers, are not counted". The
+citation's `query_url` is the same request with no house number or
+coordinate selected, so it returns the counted rows before the duplicate
+rule (89 for the Hollis example, not 88).
 
 A worked recount, for the README's Hollis example (90-01 183rd Street,
 Queens, geocoded to 40.711001, -73.777712), run against the portal on

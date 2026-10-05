@@ -14,8 +14,8 @@ This pass fixes what it found and says in the documents what it could not
 fix. Nine reviewers then read the result as its audiences would (FloodNet,
 NYU CUSP, BetaNYC, the City's Open Data team, a civic technologist,
 planners, city climate staff, community groups, a data journalist), and
-what they raised is fixed here too. Where a later fix replaced an earlier
-one, the entry gives the final state. Branch `review/fix-pass`; not tagged,
+what they raised is fixed here too, in two rounds. Where a later fix
+replaced an earlier one, the entry gives the final state. Branch `review/fix-pass`; not tagged,
 and the version is unchanged.
 
 ### Fixed
@@ -48,10 +48,11 @@ and the version is unchanged.
   total and its rate the department's average annual age-adjusted rate. The
   cooling sentence names wading pools as wading pools, from a list copied
   again on 5 October, and gives that date.
-- **Gallery.** All 35 entries were rebuilt twice on 5 October with no model,
-  the second time after the audience-review fixes. Each saved file has
-  FloodNet's per-sensor and per-event records and every 311 house number
-  taken out, and is marked so. In the second build USGS refused the stream
+- **Gallery.** All 35 entries were rebuilt three times on 5 October with no
+  model, the last time after the second round of audience-review fixes.
+  Each saved file has FloodNet's per-sensor and per-event records and every
+  311 house number taken out, and is marked so, and every saved briefing
+  passes its 13 disclosure checks. In the last build USGS refused the stream
   gauge request (HTTP 429) for the 19 address entries that ask it, and each
   lists the gauge as not answered; no other source failed. The surge entry
   is removed, and the blurbs were read against the briefings under them
@@ -101,16 +102,22 @@ and the version is unchanged.
 - **Four stormwater maps, in the city's own words.** The fourth, "Limited
   Flood (1.77 inches/hr) with Current Sea Levels", is read from the vector
   tiles of DEP's viewer. Sentences use the city's map names, call them
-  modelled scenarios and not forecasts, carry the city's disclaimer, say
-  near a boundary that the point is "at the edge of flooding mapped on it
+  modelled scenarios and not forecasts, carry the city's disclaimer and the
+  Stormwater Resiliency Plan's annual-chance wording, say within about 10 m
+  of a boundary that the point is "at the edge of flooding mapped on it
   (within about N m)", and say "Outside a mapped extent does not mean safe"
   with NYC Emergency Management's Ida finding, quoted in full. The JSON
   gives a `category` and `category_code`, never a depth.
 - **311.** Every count ends with an under-reporting caveat, a lead says "a
   count of reports", and a district lead carries the breakdown by descriptor
-  group. The count is named "flood and sewer complaints" in the sentence
-  and in the leads, with the window's first day, and the citation carries
-  the exact Socrata query, which the page's source list links.
+  group. The count is named "complaints about flooding and sewer backups"
+  in the sentence, the leads and the source's title, with the window's
+  first day and what is left out ("eleven descriptors; other sewer
+  complaints, such as odors or missing covers, are not counted"). The
+  citation carries the Socrata query for the counted rows, with no house
+  number or coordinate selected, and the page's source list links it. A
+  question about Ida, or a day older than the window, gets a second count
+  for those days, cited like the first.
 - **311 complaints are placed at the block.** No house number and no
   per-house coordinate is served or saved: each complaint has its street
   and cross streets, with coordinates rounded to three decimal places
@@ -199,14 +206,26 @@ and the version is unchanged.
   dated that day (`day`); "right now" questions get the live readings;
   "which schools will flood" gets the no-prediction lead before the list
   (`no_prediction_register`).
-- **One year of sensor events.** A question about FloodNet events in one
-  year leads with that year's count.
+- **A named period.** A question about a year, a season, a month or a named
+  day is answered from the records dated in it, with FloodNet events
+  matched on their New York date, and a no is worded for the sensors'
+  record and not for the place. A count of FloodNet events in one year
+  leads with that year. A question about the last five years of 311
+  complaints, the count's own window, is answered from its total.
+- **What a yes rests on.** A since-Ida yes is followed by "The record this
+  rests on is a FloodNet sensor with a verified flood event N m from this
+  address". A depth question is told Riprap gives no flood depth
+  (`no_depth`), and when a named spot was not found the answer says so
+  and gives no yes or no about it.
+- **Where to turn.** Help pointers (Notify NYC, FloodHelpNY) have their own
+  section in the text and on the page, apart from "Out of scope".
 - **Heat.** The Heat Vulnerability Index sentence gives the Health
   Department's four factors in its words and quotes its sentence on
   structural racism. A heat "safe" question is declined first
   (`no_advice_heat`), and an air temperature question is told Riprap has
   none at an address (`no_air_temp`). The out-of-scope line points to the
-  NYC Urban Heat Portal for air temperature.
+  NYC Urban Heat Portal for air temperature. `hvi.median_income` is no
+  longer served.
 - **Other.** The MCP district tool rejects a code that is not a district; a
   park, cemetery or airport area says so; a failed source's reason is in
   plain words; the fixed out-of-scope line no longer speaks of title and
@@ -265,7 +284,7 @@ and the version is unchanged.
   answer's earlier sentences and a map of sensor points. Both were removed,
   with the scripts that captured them; a new screenshot needs a browser.
 - The public site still serves the earlier build.
-- The USGS stream gauge did not answer during the second gallery build, so
+- The USGS stream gauge did not answer during the last gallery build, so
   no saved address briefing quotes a gauge.
 - The hero line says every sentence comes word for word from a public
   record, and the about page says the sentences are written by Riprap's

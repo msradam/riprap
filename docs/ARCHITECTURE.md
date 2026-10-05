@@ -228,7 +228,7 @@ Point pebbles:
 | **microtopo** | Elevation and low-spot percentile from the USGS 3DEP DEM in the sentence; basin relief in the evidence table. HAND stays in the JSON value for an address and is not printed; TWI is no longer in the value. | proxy |
 | **mta_entrances**, **nycha_developments**, **doe_schools**, **doh_hospitals** | Transit entrances, public housing, schools and hospitals within range. The sentence names the exposed ones. | empirical |
 | **floodnet** *(live)* | FloodNet depth sensors near this address and their flood events, the newest one dated. | empirical |
-| **nyc311** *(live)* | NYC 311 flood and sewer complaints near this address over the past 5 years, counted under both the old and the new descriptor names. | proxy |
+| **nyc311** *(live)* | NYC 311 complaints about flooding and sewer backups near this address over the past 5 years, counted under both the old and the new descriptor names. | proxy |
 | **noaa_tides** *(live)* | Latest NOAA water level, predicted tide and the residual (roughly the surge) at the nearest station. | empirical |
 | **nws_water_forecast** *(live)* | The National Weather Service's forecast peak water level at the nearest of The Battery, Kings Point and Bergen Point, and the flood stage it reaches. | modeled |
 | **npcc4_slr** | NPCC4 (2024) sea-level rise projections for New York City. | modeled |
@@ -262,11 +262,11 @@ Values read from the app on 5 October 2026, to show what the pebbles return:
 | fema_nfhl | Zone AE |
 | dep_moderate_2050, dep_extreme_2080 | No flooding category on either map; the 2080 map has mapped flooding within about 3 m (a category and an edge distance, never a depth) |
 | floodnet | 3 sensors within 600 m: 26 verified flood events on 14 separate days since 2024-08-07, the highest 114 mm on 2025-10-30 |
-| nyc311 | 57 flood and sewer complaints within 200 m since 2021-10-06: 33 sewer backup, 16 catch basin, 7 street flooding, 1 manhole overflow |
-| noaa_tides | +0.46 ft residual at Sandy Hook at the time of the run |
+| nyc311 | 57 complaints about flooding and sewer backups within 200 m since 2021-10-06: 33 sewer backup, 16 catch basin, 7 street flooding, 1 manhole overflow |
+| noaa_tides | +0.51 ft residual at Sandy Hook at the time of the run |
 | nws_alerts | 0 active alerts |
 | microtopo | Elevation about 2 m from a cell about 22 m across; higher than 16% of the ground within 200 m |
-| ida_hwm | 0 high-water marks within 800 m |
+| ida_hwm | 0 high-water marks within 800 m, with the note that the USGS file holds 159 marks for all of New York State, and the nearest mark 3,503 m away |
 
 The briefing opens with an "In brief" lead (the Sandy
 footprint, the FEMA zone, the DEP scenarios and the 311 count, each part
