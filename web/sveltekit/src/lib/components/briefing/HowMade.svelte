@@ -45,10 +45,10 @@
     {/if}
 
     {#if stones.some((s) => s.members.length)}
-      <h3>Trace, by Stone</h3>
+      <h3>What each source returned</h3>
       {#each stones.filter((s) => s.members.length) as s (s.key)}
         <details class="how-made-stone">
-          <summary>{STONE_META[s.key].name}, {STONE_META[s.key].role} ({s.members.length} source function{s.members.length === 1 ? '' : 's'})</summary>
+          <summary>{STONE_META[s.key].role} ({STONE_META[s.key].name}, {s.members.length} source function{s.members.length === 1 ? '' : 's'})</summary>
           <ProvenanceTrace members={s.members} />
         </details>
       {/each}

@@ -10,26 +10,26 @@ coverage:
 stones:
   - id: cornerstone
     name: Cornerstone
-    tagline: The Hazard Reader
+    tagline: Mapped hazards
     description: Reads the FEMA flood zone for the address.
     order: 1
   - id: touchstone
     name: Touchstone
-    tagline: The Live Observer
+    tagline: Live readings
     description: Reads Chicago 311 flood requests, the Lake Michigan water-level gauge, stream gauges and weather observations.
     order: 2
   - id: keystone
     name: Keystone
-    tagline: The Asset Register
+    tagline: Places and facilities
     description: No asset register is read for Chicago yet.
     order: 3
   - id: lodestone
     name: Lodestone
-    tagline: The Projector
+    tagline: Projections
     description: Quotes active Weather Service alerts.
     order: 4
   - id: capstone
     name: Capstone
-    tagline: The Synthesiser
+    tagline: The briefing
     description: Assembles the cited briefing from the evidence by fixed rules; an optional language model may only choose among the cited sentences.
     order: 5

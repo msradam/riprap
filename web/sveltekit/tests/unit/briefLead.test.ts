@@ -26,10 +26,11 @@ describe('boldFirstSentence', () => {
 });
 
 describe('stoneHead', () => {
-  it('names a role head with its Stone and keeps other heads', () => {
-    expect(stoneHead('Hazard Reader')).toBe('Cornerstone, the hazard reader');
-    expect(stoneHead('Live Observer.')).toBe('Touchstone, the live observer');
-    expect(stoneHead('Projector')).toBe('Lodestone, the projector');
+  it('reads an old role head as its plain label and keeps other heads', () => {
+    expect(stoneHead('Hazard Reader')).toBe('Mapped hazards');
+    expect(stoneHead('Live Observer.')).toBe('Live readings');
+    expect(stoneHead('Projector')).toBe('Projections');
+    expect(stoneHead('Mapped hazards')).toBe('Mapped hazards');
     expect(stoneHead('Something else')).toBe('Something else');
   });
 });

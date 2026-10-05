@@ -15,26 +15,26 @@
 stones:
   - id: cornerstone
     name: Cornerstone
-    tagline: The Hazard Reader
+    tagline: Mapped hazards
     description: Federal hazard sources.
     order: 1
   - id: touchstone
     name: Touchstone
-    tagline: The Live Observer
+    tagline: Live readings
     description: Federal live observations.
     order: 2
   - id: keystone
     name: Keystone
-    tagline: The Asset Register
+    tagline: Places and facilities
     description: Federal asset registers.
     order: 3
   - id: lodestone
     name: Lodestone
-    tagline: The Projector
+    tagline: Projections
     description: Federal forecast and alert sources.
     order: 4
   - id: capstone
     name: Capstone
-    tagline: The Synthesiser
+    tagline: The briefing
     description: Reconciler.
     order: 5

@@ -49,13 +49,18 @@ function sections(blocks: BriefingBlock[]): Section[] {
 const text = (parts: ClaimPart[]) => parts.map((p) => p.text).join('');
 const sentence = (s: string | null) => (s && !s.endsWith('.') ? `${s}.` : s);
 
-/** A report section head named after a Stone's role ("Hazard Reader")
- *  takes the Stone's name with it ("Cornerstone, the hazard reader"), as
- *  the evidence table's group rows do. Other heads stay as written. */
+/** Section heads of briefings saved before the Stones took plain labels
+ *  ("Hazard Reader"), by Stone. */
+const OLD_HEADS: Record<string, keyof typeof STONE_META> = {
+  'hazard reader': 'cornerstone', 'asset register': 'keystone', 'live observer': 'touchstone', projector: 'lodestone'
+};
+
+/** A report section head in plain words: a head written before the
+ *  Stones took plain labels ("Hazard Reader") reads as its Stone's label
+ *  ("Mapped hazards"). Other heads stay as written. */
 export function stoneHead(label: string): string {
-  const l = label.replace(/\.$/, '').trim().toLowerCase();
-  const m = Object.values(STONE_META).find((s) => s.role.replace(/^the /, '') === l);
-  return m ? `${m.name}, ${m.role}` : label;
+  const key = OLD_HEADS[label.replace(/\.$/, '').trim().toLowerCase()];
+  return key ? STONE_META[key].role : label;
 }
 
 /** The first sentence of a paragraph marked bold, split inside the part

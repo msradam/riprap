@@ -31,15 +31,15 @@ export type CityFixture = {
 };
 
 const STONES: PebbleStone[] = [
-  { id: 'cornerstone', name: 'Cornerstone', tagline: 'The Hazard Reader',
+  { id: 'cornerstone', name: 'Cornerstone', tagline: 'Mapped hazards',
     description: '', order: 1 },
-  { id: 'touchstone',  name: 'Touchstone',  tagline: 'The Live Observer',
+  { id: 'touchstone',  name: 'Touchstone',  tagline: 'Live readings',
     description: '', order: 2 },
-  { id: 'keystone',    name: 'Keystone',    tagline: 'The Asset Register',
+  { id: 'keystone',    name: 'Keystone',    tagline: 'Places and facilities',
     description: '', order: 3 },
-  { id: 'lodestone',   name: 'Lodestone',   tagline: 'The Projector',
+  { id: 'lodestone',   name: 'Lodestone',   tagline: 'Projections',
     description: '', order: 4 },
-  { id: 'capstone',    name: 'Capstone',    tagline: 'The Synthesiser',
+  { id: 'capstone',    name: 'Capstone',    tagline: 'The briefing',
     description: '', order: 5 },
 ];
 

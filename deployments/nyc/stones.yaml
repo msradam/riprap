@@ -26,26 +26,26 @@ coverage:
 stones:
   - id: cornerstone
     name: Cornerstone
-    tagline: The Hazard Reader
+    tagline: Mapped hazards
     description: Reads what NYC's ground remembers about flooding.
     order: 1
   - id: touchstone
     name: Touchstone
-    tagline: The Live Observer
+    tagline: Live readings
     description: Reads the city's flood sensors, 311 requests, gauges and weather observations.
     order: 2
   - id: keystone
     name: Keystone
-    tagline: The Asset Register
+    tagline: Places and facilities
     description: Counts the public assets and built fabric exposed to the hazards.
     order: 3
   - id: lodestone
     name: Lodestone
-    tagline: The Projector
+    tagline: Projections
     description: Quotes what is published about what is coming, alerts, water-level forecasts and sea-level projections.
     order: 4
   - id: capstone
     name: Capstone
-    tagline: The Synthesiser
+    tagline: The briefing
     description: Assembles the cited briefing from the evidence by fixed rules; an optional language model may only choose among the cited sentences.
     order: 5

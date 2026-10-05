@@ -176,7 +176,7 @@
     {@const gid = `${uid}-group-${gi}`}
     <tbody>
       <tr class="ev-group">
-        <th colspan="6" scope="rowgroup" id={gid}>{g.name}{#if g.role}, {g.role}{/if}</th>
+        <th colspan="6" scope="rowgroup" id={gid}>{#if g.role}{g.role} ({g.name}){:else}{g.name}{/if}</th>
       </tr>
       {#each g.cards as c (c.id)}{@render row(c, 'main', gid)}{/each}
     </tbody>

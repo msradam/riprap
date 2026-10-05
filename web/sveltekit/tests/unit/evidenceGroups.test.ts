@@ -25,7 +25,7 @@ describe('evidenceGroups', () => {
   it('groups the rest by Stone in Stone order with name and role, skipping empty Stones', () => {
     const groups = evidenceGroups(cards, ['ida']);
     expect(groups.map((g) => g.key)).toEqual(['answer', 'cornerstone', 'touchstone', 'lodestone']);
-    expect(groups[1]).toMatchObject({ name: 'Cornerstone', role: 'the hazard reader' });
+    expect(groups[1]).toMatchObject({ name: 'Cornerstone', role: 'Mapped hazards' });
     expect(groups[1].cards.map((c) => c.id)).toEqual(['sandy']);
     // Every card appears exactly once.
     expect(groups.flatMap((g) => g.cards).length).toBe(cards.length);

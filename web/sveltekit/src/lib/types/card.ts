@@ -22,6 +22,8 @@ export const STONE_ORDER: StoneKey[] = [
   'cornerstone', 'keystone', 'touchstone', 'lodestone', 'capstone',
 ];
 
+/** `role` is the plain label a reader sees first; `name` is the project's
+ *  own word for the group and comes second, in brackets. */
 export type StoneMeta = { name: string; role: string; tag: string };
 
 // Stone taglines — kept city-agnostic here since they're the *fallback*
@@ -30,11 +32,11 @@ export type StoneMeta = { name: string; role: string; tag: string };
 // pebbleManifest.stones[].description, applied by StoneRegion and
 // MapLegend so a per-query render reflects the routed deployment.
 export const STONE_META: Record<StoneKey, StoneMeta> = {
-  cornerstone: { name: 'Cornerstone', role: 'the hazard reader',  tag: "what the ground remembers" },
-  keystone:    { name: 'Keystone',    role: 'the asset register', tag: "what's exposed" },
-  touchstone:  { name: 'Touchstone',  role: 'the live observer',  tag: 'what has been reported and measured' },
-  lodestone:   { name: 'Lodestone',   role: 'the projector',      tag: "what's coming" },
-  capstone:    { name: 'Capstone',    role: 'the synthesizer',    tag: 'writes it all down with citations' },
+  cornerstone: { name: 'Cornerstone', role: 'Mapped hazards',        tag: "what the ground remembers" },
+  keystone:    { name: 'Keystone',    role: 'Places and facilities', tag: "what's exposed" },
+  touchstone:  { name: 'Touchstone',  role: 'Live readings',         tag: 'what has been reported and measured' },
+  lodestone:   { name: 'Lodestone',   role: 'Projections',           tag: "what's coming" },
+  capstone:    { name: 'Capstone',    role: 'The briefing',          tag: 'writes it all down with citations' },
 };
 
 /** Card body variants, one renderer per shape. */

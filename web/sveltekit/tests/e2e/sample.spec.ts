@@ -18,10 +18,10 @@ test.describe('/gallery/hollis/ (prerendered worked example)', () => {
     await expect(page.locator('h1.brief-title')).toContainText('183');
 
     // Four report sections in one closed disclosure after the evidence
-    // table, each headed with its Stone name and role, unnumbered.
+    // table, each headed with its plain label, unnumbered.
     const heads = page.locator('.brief-written .brief-section h3');
     await expect(heads).toHaveCount(4);
-    await expect(heads.nth(0)).toHaveText('Cornerstone, the hazard reader');
+    await expect(heads.nth(0)).toHaveText('Mapped hazards');
 
     // Tier marks moved out of the prose into the evidence table.
     expect(await page.locator('.ev-mark svg').count()).toBeGreaterThan(5);

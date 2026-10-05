@@ -179,6 +179,17 @@ export const GLOSSARY: { term: string; re: RegExp; reading: string }[] = [
   },
   { term: 'SLR', re: /\bSLR\b/, reading: 'sea-level rise.' },
   {
+    term: 'PFIRM',
+    re: /\bPFIRM\b/,
+    reading:
+      "a Preliminary Flood Insurance Rate Map: FEMA's proposed update to its flood map, published for review and not yet the map in force for flood insurance."
+  },
+  {
+    term: 'METAR',
+    re: /\bMETAR\b/,
+    reading: 'the routine weather report an airport station issues, usually once an hour.'
+  },
+  {
     term: 'MLLW',
     re: /\bMLLW\b/,
     reading: "mean lower low water, the average of each day's lower low tide; NOAA tide readings are measured against it."
