@@ -23,7 +23,8 @@ With no LLM endpoint configured, the briefing is the evidence itself, built by
 `riprap/core/burr/templated_reconciler.py`. A bare address opens with an "In
 brief" lead: the Sandy footprint, the FEMA zone, the DEP scenarios and the 311
 count, each cited and each passed through the claim verifier below (a part
-that fails is left out). Then comes one section per Stone with evidence, one
+that fails is left out), after a "Place described: ..." paragraph that names
+the place the briefing was answered for. Then comes one section per Stone with evidence, one
 cited sentence per pebble, with the four point DEP scenarios merged into one
 sentence. A plain place briefing leaves out a live reading that is not notable
 (an observation with no rain, a tide less than a foot above prediction, a
@@ -138,8 +139,9 @@ no-LLM evidence, and `grounding.fallback_reason` says why.
 
 With a model configured, the rules still go first: a question the rules
 recognise, at a place the parser can read, is planned and answered with no
-model call, and the model is asked only for the rest. `grounding.answer_mode`
-is `rules` or `extractive` and records which one answered.
+model call, and the model is asked only for the rest. `answer_path` (`rules`
+or `llm`) at the top of the result says which one answered;
+`grounding.answer_mode` (`rules` or `extractive`) records the same.
 `RIPRAP_RULES_FIRST=0` puts the model first.
 
 The order was set by measurement. An agent that could not read the repository

@@ -52,16 +52,17 @@
   open-weight model that runs on a laptop. With a model connected:
 </p>
 <ul>
-  <li>The rules still answer first. The model is asked only when the rules do not match a question or cannot read the place in it.</li>
-  <li>The model may choose which sources to read, pick up to four of the existing sentences, and propose a lead from a fixed list: yes, no, partly, a count, or cannot answer.</li>
-  <li>The model never writes a sentence. It cannot change a number, a date or a citation, because the sentences it picks are shown as code wrote them.</li>
-  <li>No yes or no stands on the model's word. For a question about past flooding, a rule sets it from the observed records. Any other yes or no the model proposes is kept only when code finds it supported by the cited figures; otherwise the answer has no yes or no.</li>
-  <li>Each answer says which path produced it, for example: "Answered by rules over the question's words; no language model was used."</li>
+  <li>The rules still answer first. The model is called only when no rule handles the query.</li>
+  <li>In planning, the model may set the intent among six (code overrides it when the parser found an address or a district), the target text, the focus, and which sources run beyond a fixed floor. It also writes a rationale of at most 300 characters, which appears only in the JSON plan and the stream's plan event, never in the briefing.</li>
+  <li>In answering, the model may propose a lead from a fixed list (yes, no, partly, a count, or cannot answer) and pick up to four existing sentences and their order.</li>
+  <li>By default the model cannot write a sentence or a number in a briefing: the sentences it picks are shown as code wrote them.</li>
+  <li>No yes or no stands on the model's word. Code overrides the lead for questions about a past event, about now and about a forecast, requires a yes-or-no question shape, and checks the lead against the cited figures. A failure is sent back to the model once; after that the lead and the picks are dropped.</li>
+  <li>Each answer says which path produced it (<code>answer_path</code> in the JSON, <code>rules</code> or <code>llm</code>), for example: "Answered by rules over the question's words; no language model was used."</li>
 </ul>
 <p class="site-small">
-  One developer setting, off by default (<code>RIPRAP_LLM_BARE=1</code>), restores an older mode
-  in which the model rewrites the evidence as claims and code checks each claim's citations and
-  numbers. It is not used on the public site or in the gallery.
+  One developer setting, off by default (<code>RIPRAP_LLM_BARE=1</code>), is the one mode in
+  which a model rewrites evidence as sentences, checked for citation ids and numbers. It is not
+  used on the public site or in the gallery.
   <a href="{DOCS}/GROUNDING.md">How answers are checked</a>.
 </p>
 

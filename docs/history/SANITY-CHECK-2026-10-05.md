@@ -82,15 +82,15 @@ briefing or the documents now say it) or **open**.
 |---|---|---|---|
 | 1 | Rockaway Park, Broad Channel, Belle Harbor and City Island by name returned "could not build this briefing" | Stops a demo | Fixed: an area is routed by a point inside it |
 | 2 | "1 Bowling Green" and "87 Dover Green, Staten Island" were answered for Greenpoint; "15 Central Park West" for Central Park | Stops a demo | Fixed: a house number and a name is an address, whatever the street type |
-| 3 | Address elevation read a neighbouring cell ("Elevation 0.0 m" at 400 Carroll Street) and stated no datum | Should be fixed before a demo | Fixed: reads the containing cell and states NAVD88 (1.07 m there). The saved gallery page changes when the gallery is rebuilt |
+| 3 | Address elevation read a neighbouring cell ("Elevation 0.0 m" at 400 Carroll Street) and stated no datum | Should be fixed before a demo | Fixed: reads the containing cell and states NAVD88 (1.07 m there). The gallery was rebuilt on 5 October 2026 and its saved page says so too |
 | 4 | Permits counted from the older DOB file only, and "active" untested | Should be fixed or removed | Fixed and disclosed: out of plain briefings; a construction question gets a sentence that names the older file, tests expiry and says DOB NOW is not counted |
 | 5 | The hospitals file held 67 rows for 61 hospitals, so counts doubled | Should be fixed | Fixed: each hospital counted once |
 | 6 | A comparison of two named areas silently dropped the second | Should be fixed | Fixed: both are shown side by side under a note that nothing is scored or ranked; a place outside the city is named as not matched |
 | 7 | An insurance question got no out-of-scope statement and no FEMA zone | Should be fixed | Fixed: it opens with the out-of-scope statement, then the FEMA zone, then a pointer to FloodHelpNY |
 | 8 | A street with no house number plus Ida: "Here is what they show." followed by nothing | Should be fixed | Fixed: the reader is told to add a house number for the Ida marks |
-| 9 | A failed FEMA preliminary query was dropped with an empty not-checked list | Should be fixed | Fixed for the FEMA queries: a failure is listed under "Not checked". Other sources were not re-tested for the same fault |
+| 9 | A failed FEMA preliminary query was dropped with an empty not-checked list | Should be fixed | Fixed: for every source, one that was tried and did not answer is listed under "Not checked" in the text and in a `failed` list in the JSON and MCP results, and a failed reply is no longer kept in the HTTP cache |
 | 10 | A neighbourhood name was answered for a larger area or one half, called only "this area" | Should be fixed or disclosed | Disclosed: the place line, `geocode.note` and `place_note` say which tabulation area was used |
-| 11 | The gallery index blurb for East Harlem contradicted the briefing under it | Should be fixed | Open until the gallery is rebuilt |
+| 11 | The gallery index blurb for East Harlem contradicted the briefing under it | Should be fixed | Fixed: the gallery was rebuilt, and the blurb now gives the figures of the briefing under it (East Harlem (North), the tabulation area the name was answered for) |
 | 12 | "wind alerts" were claimed and none was checked | Should be fixed | Fixed: "flood, coastal or tropical storm alerts" |
 | 13 | "above-curb" is not in FloodNet's data; unreviewed and very shallow events were counted; "last 3 years" with younger sensors | Should be fixed or disclosed | Fixed: FloodNet's own definition, only events verified by a person, the period from the install date, and the sensor's status as the API lists it |
 | 14 | Public housing counted as inside the Sandy extent only by its centre point | Should be fixed or disclosed | Fixed for Sandy (10% or more of the outline; 39 developments, was 20). Disclosed for stormwater scenarios, which still test the centre point |
@@ -100,21 +100,20 @@ briefing or the documents now say it) or **open**.
 | 18 | The public model card claims a 41.4% improvement and an impossible data split | Should be fixed | Open: a corrected card is at `docs/model-cards/Granite-TTM-r2-Battery-Surge.md`; the hosted card is unchanged and the documents say it is out of date |
 | 19 | Land cover: tree canopy reads low, unstated; "more paved since 2018" read as a rise | Should be fixed or disclosed | Fixed: the sentence states the canopy difference, and a change question is told first that the two figures are from different methods |
 | 20 | A district is City Planning's tabulation approximation, which changes counts of points | Should be disclosed | Disclosed: the place note and `docs/METHODOLOGY.md` section 11 |
-| 21 | In the Health Department's heat illness file the count and the rate disagree | Should be disclosed and reported upstream | Open |
+| 21 | In the Health Department's heat illness file the count and the rate disagree | Should be disclosed and reported upstream | Disclosed: the sentence says the count is the five-year total and the rate the department's average annual age-adjusted rate, and for a district that the two do not reconcile, that the file does not say why, and that both are printed as published. The portal's metadata was read and does not explain the gap. Not yet reported to the department |
 | 22 | An address without a borough could resolve far outside the city | Should be fixed | Fixed: the city's address file is searched first, and a note says which borough was chosen |
 | 23 | The neighbourhood 311 count used a simplified outline and undercounted | Should be fixed | Fixed: the exact outline |
 | 24 | NYC Planning floodplain zeros that look like missing values were printed | Should be disclosed | Fixed: unsupported zeros are not printed |
 | 25 | Schools file is from 2019 to 2020, charter schools labelled "DOE", wrong dataset link | Minor | Fixed and disclosed: "public schools", charter schools included, dataset `a3nt-yts4`. The file is still the 2019 to 2020 one |
-| 26 | Cooling sentence: wading pools counted as pools, a stale list, pools just offshore missed | Minor | Open |
+| 26 | Cooling sentence: wading pools counted as pools, a stale list, pools just offshore missed | Minor | Partly fixed: the 23 wading pools are named and counted as wading pools, the list was copied again (1,133 spray shower rows) and the sentence gives the day it was copied. A pool just outside an area's outline is still missed |
 | 27 | A district's "In brief" led with the 311 total and no breakdown | Minor | Fixed: the lead gives the breakdown by descriptor group and says it is a count of reports |
 | 28 | Low-value sentences: a distant stream gauge, a hillside mark's elevation, a Sound tide station for an inland district, a district area that read as a flooded area | Minor | Fixed: no gauge beyond 5 km, the tide station's distance and water body, Ida heights above ground, the flooded area beside the area's total |
 | 29 | The `models` block listed models no sentence used; a docstring said the language model is the only model run | Minor | Fixed |
 | 30 | Surge and land cover details: 23 windows are fewer events; 2.96 million parameters, not 1.5 million; the 2021 map is The Nature Conservancy's | Minor | Fixed in the documents: 5 distinct events, 2,964,960 parameters, the map's owner named |
 | 31 | Other place cases: "100 Broadway, Brooklyn" refused; "Murray Hill" and "100 Broadway" chose a borough silently; the nearest weather station is one of three | Minor | Partly fixed: the two names now carry a note. The weather station choice is unchanged, and its distance is printed |
 
-Of the 31: 23 are fixed or fixed and disclosed, 2 are disclosed only (10 and
-20), 2 are partly fixed (9 and 31), and 4 are open (11, 18, 21 and 26; 11
-closes when the gallery is rebuilt).
+Of the 31: 25 are fixed or fixed and disclosed, 3 are disclosed only (10, 20
+and 21), 2 are partly fixed (26 and 31), and 1 is open (18).
 
 ## Checks the report could not run
 

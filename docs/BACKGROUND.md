@@ -128,7 +128,7 @@ deployment directory and groups them into five roles, the **Five Stones**:
 
 | Stone | Role | NYC pebbles |
 |---|---|---|
-| **Cornerstone** | What the ground remembers | Sandy 2012 inundation extent, NYC DEP stormwater scenarios, FEMA effective and preliminary flood zones, 2021 Ida USGS high-water marks, USGS 3DEP DEM with HAND and TWI |
+| **Cornerstone** | What the ground remembers | Sandy 2012 inundation extent, NYC DEP stormwater scenarios, FEMA effective and preliminary flood zones, 2021 Ida USGS high-water marks, USGS 3DEP elevation |
 | **Keystone** | What is exposed | MTA subway entrances, NYCHA developments, public schools, NYS DOH hospitals, named when inside a mapped flood extent; for a district, NYC Planning's floodplain counts (DOB permits only when a question asks about construction) |
 | **Touchstone** | Current state of the city | FloodNet depth sensors, NYC 311 flood complaints, NWS hourly observations, NOAA tide-gauge water levels, USGS stream gauges |
 | **Lodestone** | What is coming | NWS flood alerts, the NWS water-level forecast at the nearest harbor gauge, NPCC4 sea-level projections |

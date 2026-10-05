@@ -15,9 +15,19 @@ Rules or an open Granite model read your question and choose the evidence.
 Every sentence you read comes word for word from a public record, with its
 source and date. In full: code writes one sentence from each record, and
 those sentences are shown unchanged. Rules answer a question first. An
-optional open Granite model, off by default, may route a question the rules
-do not match and may only choose among the sentences that already exist; it
-never writes one, and no yes or no stands on its word
+optional open Granite model, off by default, is called only when no rule
+handles the query. In planning it may set the intent among six (code
+overrides it when the parser found an address or a district), the target
+text, the focus and which sources run beyond a fixed floor, and it writes a
+rationale of at most 300 characters that appears only in the JSON plan and
+the stream's plan event, never in the briefing. In answering it may propose a
+lead (yes, no, partly, a count, cannot answer) and pick up to four existing
+sentences and their order. Code overrides the lead for past-event, now and
+forecast questions, requires a yes-or-no question shape, and checks the lead
+against the cited figures (a failure is sent back once, then the lead and the
+picks are dropped). By default it cannot write a sentence or a number in a
+briefing; `RIPRAP_LLM_BARE=1`, off by default, is the one mode in which a
+model rewrites evidence as sentences, checked for citation ids and numbers
 ([GROUNDING.md](GROUNDING.md), [MODELS.md](MODELS.md)). The sentences are
 Riprap's wording of a record, not a publisher's own prose, and some state a
 figure Riprap computed from a record (a share of a district, a percentile of
@@ -59,7 +69,10 @@ A school, subway entrance or hospital is in a register when its point is
 inside the 2012 Sandy inundation zone or inside a modelled DEP stormwater
 scenario. A public housing development counts as inside the Sandy zone when
 10% or more of its outline is, and is tested against a stormwater scenario
-by its centre point; the sentence says which. There is no other rule.
+by its centre point; the sentence says which. The school and public housing
+registers test three of the city's four stormwater maps (Moderate Flood with
+current and with 2050 sea levels, Extreme Flood with 2080) and not the
+Limited Flood map, and their sentences say so. There is no other rule.
 
 - `riprap-register --asset-class {schools,nycha,mta_entrances}` writes a
   CSV with one row per asset and a 0 or 1 per layer
@@ -81,8 +94,10 @@ address, or inside a neighbourhood or district.
 
 Both are computed from the USGS 3DEP elevation model. They say where water
 would pool on terrain alone, and nothing about drainage capacity. The
-terrain sentence gives the elevation and the low-spot percentile; HAND and
-TWI are in the evidence table.
+terrain sentence gives the elevation and the low-spot percentile. Neither
+index is printed in a briefing or on the page: an address's HAND stays in
+the JSON value (`hand_m`), and TWI and the district drainage figures are no
+longer in the values.
 
 ## 5. The Sandy edge
 

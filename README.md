@@ -21,6 +21,10 @@ source and date.
 
 ![Riprap answering "Has the block around 90-01 183rd Street, Queens flooded since Hurricane Ida?" with a cited "Yes."](assets/screenshots/hero.png)
 
+(Screenshot taken 1 October 2026. The sentences under the "Yes." have been
+reworded since and now count only the events FloodNet marks as verified; the
+current text is quoted below.)
+
 **[Browse the briefings](https://msradam.github.io/riprap/)** ·
 **[Run it on your laptop](#quickstart)** ·
 **[Build with us](#get-involved)**
@@ -220,7 +224,7 @@ put it into a briefing.
 | New York City flood | Production: 25 public sources (22 read for an address, 20 for a neighbourhood or district), questions, and all 59 community districts |
 | New York City heat | New in October 2026: 10 public sources for an address and 11 for a district or borough, questions, comparisons of two places, and all 59 community districts. No model: the forecast is the National Weather Service's |
 | Chicago, Seattle, Albany | Experimental: federal sources plus a reviewed 311 flood filter and a water-level gauge ([docs/multi-city.md](docs/multi-city.md)) |
-| Models | None required, and none runs by default. An optional open LLM (Granite) routes questions the rules do not recognise and chooses among existing sentences; it writes none, and no yes or no stands on its word. One experimental model (paved and green land) adds sentences, always labelled; a second (a surge forecast) is off unless a server opts in, because a simple rule beat it ([below](#experimental-models)) |
+| Models | None required, and none runs by default. An optional open LLM (Granite) routes questions the rules do not recognise and chooses among existing sentences; it writes no sentence or number of a briefing, and no yes or no stands on its word. One experimental model (paved and green land) adds sentences, always labelled; a second (a surge forecast) is off unless a server opts in, because a simple rule beat it ([below](#experimental-models)) |
 | Checks | Citations and numbers on every claim, rules on answer leads, 13 disclosure checks. They are patterns and rules: they do not read meaning and can miss a wrong inference ([docs/GROUNDING.md](docs/GROUNDING.md)) |
 
 ## Quickstart
@@ -238,17 +242,19 @@ uv run uvicorn web.main:app --port 7860
 Open <http://localhost:7860> and type an address (`90-01 183rd Street, Queens`),
 a district (`QN12`) or a question (`Has 80 Pioneer Street, Brooklyn flooded?`).
 A question is answered by rules, with no model (the JSON reports
-`grounding.answer_mode` as `rules`); one the rules do not recognise gets the
+`answer_path` as `rules`); one the rules do not recognise gets the
 cited evidence for its place, and the page says it was not answered. The first
 district query on a cold server takes about half a
-minute while the layers load. The same briefing from the command line:
+minute while the layers load. Every briefing text opens, after its scope
+statement, with a "Place described: ..." paragraph that names the place it was
+answered for. The same briefing from the command line:
 
 ```bash
 curl -s "http://localhost:7860/api/agent?q=QN12" | python3 -c "import json, sys; print(json.load(sys.stdin)['paragraph'])"
 ```
 
-**With an LLM (optional).** The rules answer first; a model is asked only
-when they do not recognise a question or cannot read its place. Any
+**With an LLM (optional).** The rules answer first; a model is called only
+when no rule handles the query. Any
 OpenAI-compatible endpoint works. With
 [Ollama](https://ollama.com):
 
@@ -268,7 +274,8 @@ carries a `record` block (query, time, version, commit, SHA-256 of the body)
 and a `failed` list naming sources that did not answer. FloodNet items carry
 their own licence (`license_notices`), and `place_note` says which area a
 neighbourhood name was answered for. Over HTTP the same note is
-`geocode.note`, `answer_path` says whether rules or the LLM answered, and
+`geocode.note`, `answer_path` (`rules` or `llm`) says which path answered,
+`failed` lists the sources that were tried and did not answer, and
 `not_checked` lists the sources that were not read.
 Try one from the command line with the MCP Inspector (needs Node):
 
@@ -278,8 +285,10 @@ npx @modelcontextprotocol/inspector --cli uv run riprap-mcp \
 ```
 
 **Gallery.** `uv run python scripts/build_gallery.py` rebuilds every entry in
-`web/sveltekit/src/lib/gallery/` (12 addresses, 3 community districts and 12
-questions), with no model. To see them in the app, rebuild the frontend (needs
+`web/sveltekit/src/lib/gallery/` (35 entries: for flood 12 addresses, 3
+community districts and 10 questions; for heat 3 places and 7 questions),
+with no model. FloodNet's per-sensor and per-event records are taken out of
+each saved file, since its licence forbids reposting them. To see them in the app, rebuild the frontend (needs
 Node and [pnpm](https://pnpm.io)): `cd web/sveltekit && pnpm install && pnpm
 build`. The landing's scrolling preview is a screenshot of the Hollis "since
 Ida" entry: after rebuilding that entry, retake it with the app running
@@ -319,18 +328,22 @@ was used, what for, and who checked it.
 
 **In a briefing.** By default no language model runs: the public gallery and
 a fresh install answer by rules. A person running their own copy can connect
-an open model (tested with IBM's Granite 4.1 8B on a laptop). The rules still
-answer first. The model is asked only when the rules do not match a question
-or cannot read its place, and then it may choose which sources to read, pick
-up to four of the existing sentences, and propose a lead from a fixed list
-(yes, no, partly, a count, cannot answer). It never writes a sentence and
-cannot change a number, a date or a citation. For a question about past
-flooding a rule sets the yes or no; any other yes or no the model proposes is
-kept only when code finds it supported by the cited figures. Each answer says
-which path made it (`grounding.answer_mode`, and a line on the page). One
-developer setting, off by default (`RIPRAP_LLM_BARE=1`), restores an older
-mode in which the model rewrites the evidence as claims that code checks
-number by number ([docs/GROUNDING.md](docs/GROUNDING.md#llm-mode)).
+an open model (tested with IBM's Granite 4.1 8B on a laptop). It is called
+only when no rule handles the query. In planning it may set the intent among
+six (code overrides it when the parser found an address or a district), the
+target text, the focus, and which sources run beyond a fixed floor; it also
+writes a rationale of at most 300 characters, which appears only in the JSON
+plan and the stream's plan event, never in the briefing. In answering it may
+propose a lead (yes, no, partly, a count, cannot answer) and pick up to four
+existing sentences and their order. Code overrides the lead for questions
+about a past event, about now and about a forecast, requires a yes-or-no
+question shape, and checks the lead against the cited figures: a failure is
+sent back once, then the lead and the picks are dropped. By default it cannot
+write a sentence or a number in a briefing. Each answer says which path made
+it (`answer_path`, also `grounding.answer_mode`, and a line on the page).
+`RIPRAP_LLM_BARE=1`, off by default, is the one mode in which a model
+rewrites evidence as sentences, checked for citation ids and numbers
+([docs/GROUNDING.md](docs/GROUNDING.md#llm-mode)).
 
 **Experimental models.** One fine-tuned open model adds labelled sentences;
 a second is off by default after losing to a simple rule, and a third was

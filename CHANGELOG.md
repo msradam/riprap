@@ -33,6 +33,18 @@ fix. Branch `review/fix-pass`; not tagged, and the version is unchanged.
   by nothing. A failed FEMA query is listed under "Not checked."
 - NYC Planning floodplain zeros that the source does not support are no
   longer printed.
+- **Failed sources.** For every source, one that was tried and did not
+  answer is listed under "Not checked." in the text and in a `failed` list
+  in the JSON, and a failed reply is not kept in the HTTP cache.
+- **Heat sentences.** The heat illness sentence says its count is a five-year
+  total and its rate the department's average annual age-adjusted rate. The
+  cooling sentence names wading pools as wading pools, from a list copied
+  again on 5 October, and gives that date.
+- **Gallery.** All 35 entries were rebuilt on 5 October with no model and no
+  failed source. Each saved file has FloodNet's per-sensor and per-event
+  records taken out. The surge entry is removed, and the blurbs were read
+  against the briefings under them (East Harlem's now gives the figures of
+  East Harlem (North)).
 - Accessibility barriers found by reading the code: a focused control could
   sit under the sticky header (WCAG 2.4.11), the landing's moving preview
   had no stop control (2.2.2), the map could be panned only by dragging
@@ -131,10 +143,16 @@ fix. Branch `review/fix-pass`; not tagged, and the version is unchanged.
 
 ### Still open
 
-- The hosted surge model card is unchanged. The Health Department's heat
-  illness count and rate still disagree in its file, and Riprap prints both.
-  The cooling sentence counts wading pools as pools. The gallery pages keep
-  their old sentences until the gallery is rebuilt.
+- The hosted surge model card is unchanged.
+- The Health Department's heat illness count and rate still disagree in its
+  file for most districts. The sentence now says what each figure is and
+  that both are printed as published; the gap has not been reported to the
+  department.
+- A pool just outside an area's outline is still missed by the cooling
+  sentence.
+- The landing's preview image and the README screenshot were taken on 1
+  October and show the Hollis answer's earlier sentences; they need a browser
+  to retake.
 
 ## [Unreleased] (a heat briefing, and the models settled) - 2026-10-02
 

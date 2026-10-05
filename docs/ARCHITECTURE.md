@@ -93,14 +93,16 @@ hydrological literature's canonical exposure proxies:
 
 - **HAND (Height Above Nearest Drainage)**. Vertical distance from
   the address up to the nearest river/drainage channel. **<1 m** = at
-  drainage level (water *will* reach here in flood). **>10 m** =
-  hillslope (very dry). Nobre et al. 2011.
+  drainage level on the terrain model, whose channels are synthetic in a
+  sewered city. **>10 m** = hillslope. Nobre et al. 2011.
 - **TWI (Topographic Wetness Index)**. `ln(catchment_area / tan
   slope)`. **High TWI** = water tends to accumulate here (large
   contributing area, gentle slope). Beven & Kirkby 1979.
 
 Neither is a flood prediction; both are exposure indicators that say
-"water *would* pool here based on terrain alone."
+"water *would* pool here based on terrain alone." Since 2026-10-05 neither
+is printed in a briefing or on the page: an address's HAND stays in the JSON
+value, and TWI is no longer in it.
 
 ---
 
@@ -221,9 +223,9 @@ Point pebbles:
 | **sandy** | Did Hurricane Sandy flood this address in 2012? Read from the NYC Sandy Inundation Zone. Within 50 m of the mapped edge, the sentence gives the distance. | empirical |
 | **fema_nfhl** | FEMA National Flood Hazard Layer effective zone at this point, with the FIRM panel vintage. | modeled |
 | **fema_pfirm** | FEMA preliminary flood zone (2015 PFIRM) and base flood elevation, with the datum the service reports. | modeled |
-| **dep_moderate_current**, **dep_moderate_2050**, **dep_extreme_2080** | Three NYC DEP stormwater scenarios. Each reports a depth class at this point. | modeled |
+| **dep_limited_current**, **dep_moderate_current**, **dep_moderate_2050**, **dep_extreme_2080** | The four NYC DEP stormwater flood maps. Each reports a flooding category at this point. | modeled |
 | **ida_hwm** | USGS Hurricane Ida 2021 high-water marks near this address. | empirical |
-| **microtopo** | Elevation and low-spot percentile from the USGS 3DEP DEM in the sentence; HAND, TWI and basin relief in the evidence table. | proxy |
+| **microtopo** | Elevation and low-spot percentile from the USGS 3DEP DEM in the sentence; basin relief in the evidence table. HAND stays in the JSON value for an address and is not printed; TWI is no longer in the value. | proxy |
 | **mta_entrances**, **nycha_developments**, **doe_schools**, **doh_hospitals** | Transit entrances, public housing, schools and hospitals within range. The sentence names the exposed ones. | empirical |
 | **floodnet** *(live)* | FloodNet depth sensors near this address and their flood events, the newest one dated. | empirical |
 | **nyc311** *(live)* | NYC 311 flood-related complaints near this address over the past 5 years, counted under both the old and the new descriptor names. | proxy |
@@ -262,7 +264,7 @@ Values from a May 2026 run, to show what the pebbles return:
 | nyc311 | 11 flood-related complaints within 200 m, 5-year window |
 | noaa_tides | +0.49 ft residual at the time of the run |
 | nws_alerts | 0 active alerts |
-| microtopo | Elevation 2.36 m, HAND 0.7 m, TWI 11.3, percentile 8 |
+| microtopo | Elevation 2.36 m, percentile 8 |
 | ida_hwm | 0 high-water marks within 800 m |
 
 The briefing opens with an "In brief" lead (the Sandy
@@ -328,6 +330,12 @@ asked. The district route and the MCP tools take `hazard=heat`. The heat
 rules and refusals are in [GROUNDING.md](GROUNDING.md) ("Heat questions"),
 the traps each sentence carries in [METHODOLOGY.md](METHODOLOGY.md).
 
+The `/api/agent` JSON carries `answer_path` (`rules` or `llm`; also
+`grounding.answer_mode`), a `failed` list of the sources that were tried and
+did not answer (id, title, reason, time tried), and `not_checked`. Its
+`paragraph` opens, after the scope statement, with a "Place described: ..."
+paragraph naming the place the briefing was answered for.
+
 HTTP routes: `/api/agent` (JSON), `/api/agent/stream` (SSE),
 `/api/agent/batch` (up to 25 addresses), `/api/district/{code}` (with
 `?hazard=heat` for the heat evidence),
@@ -348,7 +356,9 @@ MCP server (`riprap/mcp/server.py`) exposes `list_sources`,
 Riprap has no scoring rubric. An asset is in a register when its point is
 inside the 2012 Sandy inundation zone or inside a modelled DEP stormwater
 scenario; a public housing development counts for Sandy at 10% or more of
-its outline ([`METHODOLOGY.md`](METHODOLOGY.md)).
+its outline. The school and public housing registers test three of the four
+stormwater maps (not the Limited Flood map), and their sentences say so
+([`METHODOLOGY.md`](METHODOLOGY.md)).
 
 - `riprap-register --asset-class {schools,nycha,mta_entrances}` writes a
   CSV with one row per asset and a 0 or 1 per layer.
