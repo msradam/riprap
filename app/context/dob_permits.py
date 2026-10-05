@@ -1,8 +1,11 @@
 """NYC DOB construction-permit specialist — "what are they building".
 
-Pulls active NYC DOB Permit Issuance records (Socrata `ipu4-2q9a`)
-inside a polygon, filtered to recent New Building (NB), major
-Alteration (A1), and Demolition (DM) jobs. Each project is then
+Pulls NYC DOB Permit Issuance records (Socrata `ipu4-2q9a`, the
+Buildings Department's older BIS file) inside a polygon, filtered to
+recent New Building (NB), major Alteration (A1), and Demolition (DM)
+jobs. Jobs filed in DOB NOW (`rbx6-tga4`) are not read, and the
+sentence says so: for QN12 this file held 74 jobs where DOB NOW held
+1,011 General Construction permits for the same window. Each project is then
 cross-referenced against the static flood layers (Sandy 2012, DEP
 Stormwater scenarios) so the reconciler can write things like:
 
@@ -30,8 +33,8 @@ log = logging.getLogger("riprap.dob_permits")
 
 URL = "https://data.cityofnewyork.us/resource/ipu4-2q9a.json"
 DOC_ID = "dob_permits"
-CITATION = ("NYC DOB Permit Issuance (NYC OpenData ipu4-2q9a): "
-            "issued/in-progress construction permits")
+CITATION = ("NYC DOB Permit Issuance (NYC OpenData ipu4-2q9a, the older BIS file; "
+            "DOB NOW filings are not included)")
 
 JOB_TYPE_LABELS = {
     "NB": "new building",
@@ -205,7 +208,7 @@ def cross_reference_flood(permits: list[Permit]) -> list[dict[str, Any]]:
 def summary_for_polygon(polygon, polygon_crs: str = "EPSG:4326",
                         since_days: int = 540,
                         top_n: int = 8) -> dict:
-    """Full polygon-mode summary: list active permits, cross-reference each
+    """Full polygon-mode summary: list recently permitted jobs, cross-reference each
     with flood layers, return aggregate counts + a top-N projects-of-concern
     list (those that hit at least one flood layer, ranked by max DEP class
     + Sandy hit)."""
@@ -216,6 +219,10 @@ def summary_for_polygon(polygon, polygon_crs: str = "EPSG:4326",
     by_type: Counter = Counter(e["job_type_label"] for e in enriched)
     by_status: Counter = Counter(e["permit_status"] for e in enriched)
     n_total = len(enriched)
+    # "Not expired" is tested, never assumed: about a third of QN12's jobs
+    # had a latest permit already past its expiration date.
+    today = date.today().isoformat()
+    n_unexpired = sum(1 for e in enriched if (e["expiration_date"] or "") >= today)
     n_sandy = sum(1 for e in enriched if e["in_sandy"])
     n_dep_any = sum(1 for e in enriched if e["dep_max_class"] > 0)
     n_dep_severe = sum(1 for e in enriched if e["dep_max_class"] >= 2)
@@ -247,6 +254,7 @@ def summary_for_polygon(polygon, polygon_crs: str = "EPSG:4326",
     return {
         "since":           since.isoformat(),
         "n_total":         n_total,
+        "n_unexpired":     n_unexpired,
         "n_in_sandy":      n_sandy,
         "n_in_dep_any":    n_dep_any,
         "n_in_dep_severe": n_dep_severe,

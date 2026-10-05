@@ -1,7 +1,7 @@
 id: dob_permits_nta
 type: baked
-title: Active DOB construction permits inside the neighborhood
-answers: "active construction permits in the area and how many sit in Sandy or DEP flood extents"
+title: Construction jobs in the older DOB permit file inside the neighborhood
+answers: "construction jobs with a recent permit in the Buildings Department's older file (not DOB NOW) and how many sit in Sandy or DEP flood extents"
 stone: keystone
 tier: empirical
 adapter: python_call
@@ -22,14 +22,14 @@ config:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: NYC DOB Permit Issuance (NYC Open Data)
+  source_name: NYC DOB Permit Issuance (NYC Open Data; the older BIS file, without DOB NOW filings)
   source_url: https://data.cityofnewyork.us/Housing-Development/DOB-Permit-Issuance/ipu4-2q9a
   license: NYC Open Data Terms of Use
   doc_id: dob_permits_nta
-  citation: NYC DOB permits issued inside the neighborhood, cross-referenced with Sandy 2012 and DEP scenarios
+  citation: NYC DOB Permit Issuance (ipu4-2q9a; DOB NOW filings not included) inside the neighborhood, cross-referenced with Sandy 2012 and DEP scenarios
 
 narration:
-  short: Active construction permits inside this neighborhood and their flood exposure.
+  short: Recently permitted construction jobs in the older DOB permit file inside this neighborhood and their flood exposure.
   template: "{narrative}"
 
 display:

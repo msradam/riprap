@@ -101,10 +101,11 @@ def select_pebbles(plan: dict | None, registry) -> list[str]:
     ids = [p.id for p in registry.all() if p.stone != "capstone" and _wants(p.manifest, intent, hazard_of(plan))]
     chosen = plan.get("pebbles")
     if not plan.get("question") or chosen is None:
-        if plan.get("question") and intent != "development_check":
-            # A question the rules plan has no planner choice, so every source
-            # runs, except this one: a question that names no construction does
-            # not wait for the permits query (it can take the whole 45 s budget).
+        if intent != "development_check":
+            # Every source runs, except this one: permits are tangential to
+            # flood history and read the older DOB file only, so they are left
+            # out of a plain briefing and of a question that names no
+            # construction (the query can also take the whole 45 s budget).
             ids = [i for i in ids if i != "dob_permits_nta"]
         return ids
     if not set(plan.get("catalog") or []).issuperset(ids):

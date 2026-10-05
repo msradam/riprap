@@ -48,5 +48,5 @@ def test_a_district_question_does_not_wait_for_the_permits_source():
     nyc = get_registry("nyc")
     asked = {"intent": "neighborhood", "question": "Which schools in QN12 are exposed?", "pebbles": None}
     assert "dob_permits_nta" not in select_pebbles(asked, nyc) and "doe_schools_nta" in select_pebbles(asked, nyc)
-    assert "dob_permits_nta" in select_pebbles({"intent": "neighborhood", "pebbles": None}, nyc)  # a plain briefing
+    assert "dob_permits_nta" not in select_pebbles({"intent": "neighborhood", "pebbles": None}, nyc)  # nor a plain briefing
     assert "dob_permits_nta" in select_pebbles({**asked, "intent": "development_check"}, nyc)

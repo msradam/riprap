@@ -41,3 +41,36 @@ def test_area_terrain_sentence_has_no_drainage_share(monkeypatch):
     v = nta_evidence.terrain(None)
     assert v["narrative"] == "Median ground elevation 10.55 m NAVD88 (10th percentile 5.43 m)."
     assert "drainage" not in v["narrative"] and "HAND" not in v["narrative"]
+
+
+def test_permits_sentence_tests_expiry_and_names_the_file_it_reads(monkeypatch):
+    from datetime import date, timedelta
+
+    from shapely.geometry import box
+
+    from app.areas import nta_evidence
+    from app.context import dob_permits
+
+    day = date.today()
+    live, lapsed = (day + timedelta(days=30)).isoformat(), (day - timedelta(days=30)).isoformat()
+    permits = [dob_permits.Permit(job_id=str(i), job_type="NB", job_type_label="new building", permit_status="ISSUED",
+                                  issuance_date="2026-01-01", expiration_date=exp, address="", borough="Queens", bbl=None,
+                                  lat=40.7, lon=-73.8, owner_business=None, permittee_business=None, nta_name=None)
+               for i, exp in enumerate((live, lapsed, None))]
+    monkeypatch.setattr(dob_permits, "permits_in_polygon", lambda *a, **k: permits)
+    monkeypatch.setattr(dob_permits, "cross_reference_flood", lambda ps: [
+        {**p.__dict__, "in_sandy": False, "dep_max_class": 0, "dep_scenarios": [], "any_flood_layer_hit": False} for p in ps])
+    v = nta_evidence.permits(box(-73.9, 40.6, -73.7, 40.8))
+    assert v["n_total"] == 3 and v["n_unexpired"] == 1
+    assert "active" not in v["narrative"] and "active" not in v["headline_value"]
+    assert "for 1 the latest permit has not expired" in v["narrative"]
+    assert "DOB NOW" in v["narrative"] and "not every permit" in v["narrative"]
+
+
+def test_a_plain_district_briefing_leaves_permits_out():
+    from riprap.core.burr.stones import select_pebbles
+    from riprap.core.pebbles.bridge import get_registry
+
+    nyc = get_registry("nyc")
+    assert "dob_permits_nta" not in select_pebbles({"intent": "neighborhood", "pebbles": None}, nyc)
+    assert "dob_permits_nta" in select_pebbles({"intent": "development_check", "pebbles": None}, nyc)

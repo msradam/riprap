@@ -75,12 +75,18 @@ def terrain(polygon) -> dict | None:
 
 def permits(polygon) -> dict:
     v = dob_permits.summary_for_polygon(polygon, top_n=5)
+    n = v["n_total"]
+    jobs = "construction job" if n == 1 else "construction jobs"
     v["narrative"] = (
-        f"{v['n_total']} active NYC DOB construction permits inside this area since "
-        f"{v['since']}: {v['n_in_sandy']} inside the 2012 Sandy extent and {v['n_in_dep_any']} "
-        "inside at least one DEP stormwater scenario (current conditions to 2080 sea-level rise)."
+        f"{n} {jobs} inside this area (new building, major alteration or demolition) "
+        f"{'has' if n == 1 else 'have'} a permit issued since {v['since']} in the NYC Buildings "
+        f"Department's older permit file (DOB Permit Issuance); for {v['n_unexpired']} the latest permit "
+        f"has not expired. Of the {n}, {v['n_in_sandy']} {'is' if v['n_in_sandy'] == 1 else 'are'} inside the "
+        f"2012 Sandy extent and {v['n_in_dep_any']} inside at least one modeled DEP stormwater scenario "
+        "(current conditions to 2080 sea-level rise). Permits filed in DOB NOW, the department's newer "
+        "system, are in a separate file and are not counted, so this is not every permit in the area."
     )
-    v["headline_value"] = f"{v['n_total']} active permit{'s' if v['n_total'] != 1 else ''}"
+    v["headline_value"] = f"{n} job{'s' if n != 1 else ''} in the older DOB permit file"
     return v
 
 
