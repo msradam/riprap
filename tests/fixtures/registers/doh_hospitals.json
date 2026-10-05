@@ -27,7 +27,7 @@
 "n_hospitals": 1,
 "n_in_dep_extreme_2080": 1,
 "n_inside_sandy_2012": 1,
-"narrative": "1 hospital within 3000 m of this address: 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: South Brooklyn Health (2094 m). Inside the DEP extreme scenario (2080 sea-level rise): South Brooklyn Health (2094 m)",
+"narrative": "1 hospital within 3000 m of this address (each read at the one point the state file gives for it, not across its campus): 1 inside the 2012 Sandy inundation extent and 1 inside the DEP extreme stormwater scenario (2080 sea-level rise). Inside the 2012 Sandy extent: South Brooklyn Health (2094 m). Inside the modeled DEP extreme scenario (2080 sea-level rise): South Brooklyn Health (2094 m)",
 "radius_m": 3000
 },
 "40.6436,-74.0781": {
@@ -76,7 +76,7 @@
 "n_hospitals": 2,
 "n_in_dep_extreme_2080": 0,
 "n_inside_sandy_2012": 0,
-"narrative": "2 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+"narrative": "2 hospitals within 3000 m of this address (each read at the one point the state file gives for it, not across its campus): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
 "radius_m": 3000
 },
 "40.677,-74.0105": {
@@ -125,7 +125,7 @@
 "n_hospitals": 2,
 "n_in_dep_extreme_2080": 0,
 "n_inside_sandy_2012": 0,
-"narrative": "2 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+"narrative": "2 hospitals within 3000 m of this address (each read at the one point the state file gives for it, not across its campus): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
 "radius_m": 3000
 },
 "40.707431,-74.00476": {
@@ -192,7 +192,7 @@
 "n_hospitals": 3,
 "n_in_dep_extreme_2080": 0,
 "n_inside_sandy_2012": 0,
-"narrative": "3 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+"narrative": "3 hospitals within 3000 m of this address (each read at the one point the state file gives for it, not across its campus): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
 "radius_m": 3000
 },
 "40.711001,-73.777712": {
@@ -223,7 +223,7 @@
 "n_hospitals": 1,
 "n_in_dep_extreme_2080": 0,
 "n_inside_sandy_2012": 0,
-"narrative": "1 hospital within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+"narrative": "1 hospital within 3000 m of this address (each read at the one point the state file gives for it, not across its campus): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
 "radius_m": 3000
 },
 "40.8296,-73.9262": {
@@ -308,7 +308,7 @@
 "n_hospitals": 4,
 "n_in_dep_extreme_2080": 0,
 "n_inside_sandy_2012": 0,
-"narrative": "4 hospitals within 3000 m of this address: 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
+"narrative": "4 hospitals within 3000 m of this address (each read at the one point the state file gives for it, not across its campus): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)",
 "radius_m": 3000
 }
 }

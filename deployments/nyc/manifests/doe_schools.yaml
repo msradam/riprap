@@ -1,6 +1,6 @@
 id: doe_schools
 type: baked
-title: Public schools in mapped flood extents nearby
+title: Public schools exposed nearby
 answers: "public schools nearby, charter schools included, from the 2019 to 2020 school locations (only schools inside an extent are listed), and how many sit in the Sandy extent or the modeled DEP 2080 scenario"
 stone: keystone
 tier: empirical

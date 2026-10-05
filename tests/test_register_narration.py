@@ -30,7 +30,7 @@ def test_exposed_only_register_names_its_scope():
     assert "not every school" in s["narrative"]
     assert _register_counts(s["narrative"] + ".") == (0, 0, 0)
     n = exposure.summary_for_point(*ROCKAWAY, "nycha")
-    assert "flood-exposed NYCHA development" in n["narrative"] and "not every development" in n["narrative"]
+    assert "NYCHA developments inside a mapped flood extent within" in n["narrative"] and "not every development" in n["narrative"]
 
 
 def test_exposed_register_counts_every_row_in_range_and_lists_the_nearest():
@@ -87,7 +87,7 @@ def test_district_register_names_the_exposed_assets():
     bk06 = nta.by_district("BK06")["geometry"]
     n = exposure.summary_for_polygon(bk06, "nycha")
     assert n["n_inside_sandy_2012"] == 2
-    assert n["narrative"].startswith("2 flood-exposed NYCHA developments in this area (the register lists only")
+    assert n["narrative"].startswith("2 NYCHA developments inside a mapped flood extent in this area (the register lists only")
     assert ("Inside the 2012 Sandy extent: RED HOOK EAST, RED HOOK WEST. Under 10% of the outline inside "
             "the 2012 Sandy extent (not counted): GOWANUS") in n["narrative"]
     assert _register_counts(n["narrative"] + ".") == (2, 2, 0)

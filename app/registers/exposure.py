@@ -125,7 +125,8 @@ CLASSES: dict[str, Spec] = {
         citation="NYS DOH Health Facility Certification (vn5v-hh5r) + NYC Sandy 2012 Inundation "
                  "Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
         head=_hospital, name=lambda f: f["facility_name"],
-        geojson=DATA / "hospitals.geojson", buffer_m=BUFFER_DOH_HOSPITAL_M, raster=True, unique="fac_id"),
+        geojson=DATA / "hospitals.geojson", buffer_m=BUFFER_DOH_HOSPITAL_M, raster=True, unique="fac_id",
+        scope=" (each read at the one point the state file gives for it, not across its campus)"),
     "doe_schools": Spec(
         singular="public school inside a mapped flood extent", plural="public schools inside a mapped flood extent",
         radius_m=1500, max_n=6,
@@ -138,7 +139,8 @@ CLASSES: dict[str, Spec] = {
               "schools included; the register lists only schools whose location point is inside the 2012 Sandy "
               "extent or a modeled DEP stormwater scenario, not every school)"),
     "nycha": Spec(
-        singular="flood-exposed NYCHA development", plural="flood-exposed NYCHA developments", radius_m=2000, max_n=5,
+        singular="NYCHA development inside a mapped flood extent",
+        plural="NYCHA developments inside a mapped flood extent", radius_m=2000, max_n=5,
         count_key="n_developments", list_key="developments",
         citation="Pre-computed from NYC Open Data NYCHA Developments (phvi-damg) joined to Sandy 2012 "
                  "Inundation Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. "
@@ -269,7 +271,9 @@ def _named(spec: Spec, findings: list[dict], limit: int = 20) -> str:
                         lambda f: f.get("sandy_edge_m") is not None),
                        (f"Under {SANDY_MIN_SHARE:.0%} of the outline inside the 2012 Sandy extent (not counted)",
                         lambda f: not f["inside_sandy_2012"] and (f.get("sandy_share") or 0) > 0),
-                       ("Inside the DEP extreme scenario (2080 sea-level rise)", lambda f: (f["dep_extreme_2080_class"] or 0) > 0)):
+                       # A list of names carries its extent: the event, or the scenario and the word modeled.
+                       ("Inside the modeled DEP extreme scenario (2080 sea-level rise)",
+                        lambda f: (f["dep_extreme_2080_class"] or 0) > 0)):
         nearest: dict[str, float | None] = {}  # one station has several entrances: its nearest one
         for f in findings:
             if hit(f) and spec.name(f) not in nearest:

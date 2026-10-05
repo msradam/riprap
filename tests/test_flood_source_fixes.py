@@ -212,3 +212,23 @@ def test_sandy_area_sentence_gives_the_flooded_area_and_the_whole(monkeypatch):
     n = nta_evidence.sandy(None)["narrative"]
     assert n == ("0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent "
                  "(0.19 km² of the area's 24.7 km²).")
+
+
+def test_named_lists_carry_their_extent_and_say_modeled_for_a_scenario():
+    """A list of named facilities is a statement about a mapped extent: the
+    event or the scenario is named, a scenario is called modeled, and the
+    count is not of "flood-exposed" facilities."""
+    import re
+
+    from app.registers import exposure
+
+    coney = (40.5757, -73.986)
+    for asset_class in exposure.CLASSES:
+        n = exposure.summary_for_point(*coney, asset_class)["narrative"]
+        assert "flood-exposed" not in n
+        lists = re.findall(r"\. ([^.:]+): ", n)  # the label before each list of names
+        assert lists, asset_class
+        for label in lists:
+            assert "2012 Sandy extent" in label or "modeled DEP extreme scenario (2080 sea-level rise)" in label, label
+    hospitals = exposure.summary_for_point(*coney, "doh_hospitals")["narrative"]
+    assert "each read at the one point the state file gives for it" in hospitals

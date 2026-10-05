@@ -1,6 +1,6 @@
 id: doh_hospitals_nta
 type: baked
-title: NYC DOH hospitals exposed in the area
+title: NYS DOH hospitals exposed in the area
 answers: "hospitals in the area and how many sit in the Sandy extent or the DEP 2080 scenario"
 stone: keystone
 tier: empirical
@@ -36,7 +36,7 @@ provenance:
 
 narration:
   template: "{narrative}"
-  short: NYC DOH-licensed hospitals inside this area and their flood exposure.
+  short: Hospitals in the NYS DOH facility file inside this area and their flood exposure.
 
 display:
   variant: register

@@ -1,7 +1,7 @@
 id: nycha_developments_nta
 type: baked
 title: NYCHA developments exposed in the area
-answers: "flood-exposed NYCHA public housing in the area (the register lists only exposed developments) and how many sit in the Sandy extent or the DEP 2080 scenario"
+answers: "NYCHA public housing in the area inside a mapped flood extent (10% or more of a development's outline inside the 2012 Sandy extent, or its centre point inside a modeled DEP scenario; others are not listed) and how many sit in the Sandy extent or the DEP 2080 scenario"
 stone: keystone
 tier: empirical
 adapter: python_call
@@ -36,7 +36,7 @@ provenance:
 
 narration:
   template: "{narrative}"
-  short: Flood-exposed NYCHA developments inside this area, from a register that lists only exposed developments.
+  short: NYCHA developments inside this area that are inside a mapped flood extent, from a register that lists only those.
 
 display:
   variant: register
