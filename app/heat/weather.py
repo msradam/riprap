@@ -182,7 +182,9 @@ def _at_centre(fn):
     """The area version of a point source that is the same for a place and
     the district around it: read at the area's centre."""
     def area(polygon):
-        c = polygon.centroid
+        from app.areas.nta import centre
+
+        c = centre(polygon)  # a point inside the area: the centroid of Rockaway Park's area is in Jamaica Bay
         v = fn(c.y, c.x)
         if isinstance(v, dict) and v.get("narrative"):
             v = {**v, "narrative": (v["narrative"].replace("at this point", "for this area").replace("around this place", "at the centre of this area")

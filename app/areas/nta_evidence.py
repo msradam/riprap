@@ -8,6 +8,7 @@ Each takes a WGS84 shapely polygon (the resolved NTA).
 
 from __future__ import annotations
 
+from app.areas import nta
 from app.context import dob_permits, microtopo, nyc311
 from app.flood_layers import dep_stormwater, sandy_inundation
 
@@ -154,7 +155,7 @@ def alerts(polygon) -> dict:
     (alerts are issued by forecast zone, far larger than a district)."""
     from app.context import nws_alerts
 
-    c = polygon.centroid
+    c = nta.centre(polygon)  # a point inside the area, never its centroid in the water
     v = nws_alerts.summary_for_point(c.y, c.x)
     if v.get("narrative"):
         v["narrative"] = v["narrative"].replace(" at this point", " for this area (read at its centre)")

@@ -674,11 +674,7 @@ def resolve_area(state: State) -> State:
             return state.update(geocode=None, lat=None, lon=None, nta=None, polygon_wkt=None,
                                 trace=trace)
         t = matches[0]
-        c = t["geometry"].centroid
-        if not t["geometry"].contains(c):
-            # The centre of Breezy Point-Belle Harbor-Rockaway Park-Broad Channel is in Jamaica Bay, outside
-            # every deployment, so four neighbourhoods got no briefing: a point the area does contain.
-            c = t["geometry"].representative_point()
+        c = nta.centre(t["geometry"])  # inside the area even when its centroid is in the water
         info = {"nta_code": t["nta_code"], "nta_name": t["nta_name"], "borough": t["borough"],
                 "bbox": list(t["geometry"].bounds), "n_matches": len(matches)}
         rec["ok"], rec["result"] = True, info

@@ -29,6 +29,27 @@ def test_every_tabulation_area_and_district_routes_to_new_york():
         assert dep is not None and dep.name == "nyc", name
 
 
+def test_area_sources_read_at_one_point_use_a_point_inside_the_area(monkeypatch):
+    """The area alerts and the heat sources that take one point read it at
+    the centroid, which for the same 5 areas is in the water."""
+    from app.areas import nta_evidence
+    from app.context import nws_alerts
+    from app.heat import weather
+
+    area = nta.resolve("Rockaway Park")[0]["geometry"]
+    assert not area.contains(area.centroid) and area.contains(nta.centre(area))
+    square = nta.resolve("Hollis")[0]["geometry"]
+    assert nta.centre(square).equals(square.centroid)  # the centroid, wherever it is inside
+    seen = []
+    monkeypatch.setattr(nws_alerts, "summary_for_point", lambda lat, lon, **k: seen.append((lon, lat)) or {})
+    nta_evidence.alerts(area)
+    weather.alerts_area(area)
+    weather._at_centre(lambda lat, lon: seen.append((lon, lat)) or {})(area)
+    from shapely.geometry import Point
+
+    assert len(seen) == 3 and all(area.contains(Point(p)) for p in seen)
+
+
 @pytest.mark.parametrize("query,span", [
     ("1 Bowling Green", "1 Bowling Green"),  # was Greenpoint, by the letters of "Green"
     ("87 Dover Green, Staten Island", "87 Dover Green, Staten Island"),

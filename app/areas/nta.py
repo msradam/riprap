@@ -247,6 +247,16 @@ DISTRICT_NOTE = ("The shape used for {code} is City Planning's Community Distric
                  "district boundary.")
 
 
+def centre(geometry):
+    """The point an area is read at when a source takes one point: its
+    centroid, or, when the centroid falls outside the area, a point the
+    area does contain. The centre of Breezy Point-Belle Harbor-Rockaway
+    Park-Broad Channel is in Jamaica Bay, outside every deployment, and so
+    are the centres of four other areas made of islands or a curved shore."""
+    c = geometry.centroid
+    return c if geometry.contains(c) else geometry.representative_point()
+
+
 def polygon_for(code: str) -> Polygon | None:
     hit = by_code(code)
     return hit["geometry"] if hit else None
