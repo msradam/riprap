@@ -77,6 +77,22 @@ def _normalize(s: str) -> str:
     return re.sub(r"[^a-z]+", "", (s or "").lower())
 
 
+def _words(s: str) -> str:
+    return re.sub(r"[^a-z]+", " ", re.sub(r"['’]", "", (s or "").lower())).strip()
+
+
+def _holds(names, query: str):
+    """Which names hold the query as whole words: "Green" is in "Green-Wood
+    Cemetery" and not in "Greenpoint" (a match on letters alone once briefed
+    "1 Bowling Green" as Greenpoint). Spacing inside the query is free, so
+    "La Guardia" still finds "LaGuardia Airport"."""
+    words = _words(query).split()
+    if not words:
+        return names.map(lambda _s: False)
+    pattern = re.compile(r"\b" + r"\s*".join(map(re.escape, words)) + r"\b")
+    return names.fillna("").map(lambda s: bool(pattern.search(_words(s))))
+
+
 @lru_cache(maxsize=1)
 def load() -> gpd.GeoDataFrame:
     """Load the NTA 2020 GeoJSON; coerce CRS to EPSG:4326. Cached."""
@@ -151,10 +167,10 @@ def resolve(query: str) -> list[dict[str, Any]]:
       2. Alias map → exact NTA name match.
       3. Case-insensitive EXACT name match (so 'Kew Gardens' wins over
          'Kew Gardens Hills' when both exist).
-      4. Substring match on normalized NTA name. When multiple match,
+      4. The query as whole words of the NTA name. When multiple match,
          prefer the one whose normalized name length is closest to the
          query — avoids 'Kew Gardens' resolving to 'Kew Gardens Hills'.
-      5. CDTA-name substring fallback.
+      5. CDTA-name fallback, whole words again.
     """
     g = load()
     q = (query or "").strip()
@@ -180,8 +196,7 @@ def resolve(query: str) -> list[dict[str, Any]]:
     qn = _normalize(q)
     if not qn:
         return []
-    name_norm = g["ntaname"].fillna("").map(_normalize)
-    contains = g[name_norm.str.contains(qn, na=False)].copy()
+    contains = g[_holds(g["ntaname"], q)].copy()
     if not contains.empty:
         contains["_diff"] = contains["ntaname"].fillna("").map(
             lambda s: abs(len(_normalize(s)) - len(qn))
@@ -189,12 +204,47 @@ def resolve(query: str) -> list[dict[str, Any]]:
         contains = contains.sort_values("_diff")
         return [_row_to_dict(r) for _, r in contains.iterrows()]
 
-    cdta_norm = g["cdtaname"].fillna("").map(_normalize)
-    contains = g[cdta_norm.str.contains(qn, na=False)]
+    contains = g[_holds(g["cdtaname"], q)]
     if not contains.empty:
         return [_row_to_dict(r) for _, r in contains.iterrows()]
 
     return []
+
+
+def resolution_note(typed: str, area: dict, borough: str | None = None) -> str | None:
+    """What a reader must be told when the name they typed is not the name
+    of the area briefed: which tabulation area it is, that it is wider than
+    the name ("Roosevelt Island" is briefed with the Upper East Side), and
+    which other areas carry the name ("East Harlem" is two areas, "Murray
+    Hill" is in two boroughs). None when the typed name is the area's own.
+    `borough` is the borough the query named, which already chose among them."""
+    name = area["nta_name"]
+    if _normalize(typed) == _normalize(name):
+        return None
+    g = load()
+    others = g[_holds(g["ntaname"], typed) & (g["nta2020"] != area["nta_code"])]
+    if borough:
+        others = others[others["boroname"] == borough]
+    listed = [f"{r.ntaname} ({r.boroname})" for r in others.itertuples()]
+    parts = [re.sub(r"\s*\(.*?\)", "", p).strip() for p in name.split("-")]
+    rest = [p for p in parts if _words(p) != _words(typed)]
+    described = f"{name} ({area['borough']})"
+    out = [f"The name {typed} matches {len(listed) + 1} of City Planning's 2020 Neighborhood Tabulation Areas. This "
+           f"briefing describes {described} only." if listed else
+           f"This briefing describes City Planning's 2020 Neighborhood Tabulation Area {described}, the area Riprap "
+           f"matched to the name {typed}."]
+    if rest and len(rest) < len(parts):
+        also = " and ".join([", ".join(rest[:-1]), rest[-1]] if len(rest) > 1 else rest)
+        out.append(f"That area also takes in {also}: Riprap holds no boundary for {typed} alone.")
+    if listed:
+        more = f" and {len(listed) - 5} more" if len(listed) > 5 else ""
+        out.append(f"The {'others are' if len(listed) > 1 else 'other is'} {'; '.join(listed[:5])}{more}.")
+    return " ".join(out)
+
+
+DISTRICT_NOTE = ("The shape used for {code} is City Planning's Community District Tabulation Area, an approximation of the "
+                 "official community district. Counts of facilities inside it can differ from counts for the official "
+                 "district boundary.")
 
 
 def polygon_for(code: str) -> Polygon | None:

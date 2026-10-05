@@ -128,15 +128,59 @@ def parse_district(text: str) -> tuple[str | None, str | None]:
     return None, None
 
 
+# A house number and a street whose type nobody listed ("1 Bowling Green", "15 Central Park West", "10 Hudson
+# Yards"). These once fell through to the neighbourhood lookup and were briefed as Greenpoint and as all of
+# Central Park. A capitalised run after the number, or in any case the text from its start to a comma or its end.
+_HOUSE = r"(?<![\w-])(\d{1,6}(?:-\d{1,4})?[A-Za-z]?)\s+"
+_UNLISTED_RES = (
+    re.compile(_HOUSE + r"([A-Z][A-Za-z'.]*(?:\s+[A-Z][A-Za-z0-9'.]*){0,4})"),
+    re.compile(r"^\W*" + _HOUSE + rf"({_STREET_WORD}(?:\s+{_STREET_WORD}){{0,4}})(?=\s*(?:,|[?.!]*\s*$))", re.IGNORECASE))
+# The word before a house number, when there is one: a question word or a preposition, never a label ("PS 15",
+# "Pier 6", "top 10").
+_BEFORE_HOUSE = {"at", "near", "around", "for", "about", "to", "and", "on", "by", "of", "from", "with", "outside"}
+# ponytail: a fixed list of things that are counted ("100 year floodplain", "20 homes"); a count it misses is
+# sent to the geocoder as an address and comes back unmatched, not as another place.
+_COUNTED = {"year", "years", "yr", "feet", "foot", "ft", "inch", "inches", "percent", "degree", "degrees", "complaints",
+            "calls", "hours", "day", "days", "minutes", "miles", "blocks", "homes", "houses", "buildings", "people",
+            "boroughs", "times",
+            "sandy", "ida", "hurricane", "flood", "floods", "flooding", "flooded", "heat", "stormwater"}
+_YEAR_RE = re.compile(r"(?:19|20)\d\d|2100")
+
+
+def _not_a_house_number(number: str, after: str) -> bool:
+    """311 is the complaint line, five digits are a ZIP code ("11212 hot"),
+    and a year before a neighbourhood's name is a year ("2080 Coney Island",
+    "since 2012 Red Hook", "the 2050s Red Hook")."""
+    return number == "311" or bool(re.fullmatch(r"\d{5}", number)) or bool(
+        _YEAR_RE.fullmatch(number.lower().rstrip("s")) and any(
+            re.search(rf"\b{re.escape(n)}\b", after.lower()) for n in _known_neighbourhoods()))
+
+
+def _unlisted_address(text: str) -> tuple[str, int] | None:
+    """(span, where it ends) for a house number and a name with no listed
+    street type, or None."""
+    for pattern in _UNLISTED_RES:
+        for m in pattern.finditer(text):
+            before = re.findall(r"[A-Za-z']+", text[:m.start()])
+            first = m.group(2).split()[0].lower().strip(".'")
+            if before and before[-1].lower() not in _NOT_PLACE | _BEFORE_HOUSE:
+                continue
+            if first in _COUNTED or re.fullmatch(_SUFFIX, first) or _not_a_house_number(m.group(1), m.group(2)):
+                continue  # "311 street flooding" is no address
+            return text[m.start(1):m.end()], m.end()
+    return None
+
+
 def extract_address(text: str) -> str | None:
     """The street-address span in free text, with its borough,
     neighbourhood, state and ZIP when they follow it; None when there is no
     house number plus street."""
     text = _ORDINAL_STREET_RE.sub(lambda m: m.group(1) + _ordinal_suffix(int(m.group(1))), text or "")
     m = _ADDRESS_RE.search(text)
-    if not m:
+    found = (m.group(0), m.end()) if m else _unlisted_address(text)
+    if not found:
         return None
-    span, rest = m.group(0).rstrip("."), (text or "")[m.end():]
+    span, rest = found[0].rstrip("."), (text or "")[found[1]:]
     for _ in range(3):  # up to two area names and a borough: ", Red Hook, Brooklyn"
         if b := _TAIL_BORO_RE.match(rest):
             span += f", {_BORO_FULL[b.group(1).lower()]}"
@@ -231,7 +275,10 @@ def place_phrase(text: str) -> str | None:
     if ELSEWHERE_RE.search(low):
         return found[0] if found else None
     known = [n for n in _known_neighbourhoods()
-             if re.search(rf"\b{re.escape(n)}\b(?!\s+(?:{_SUFFIX}|{_LANDMARK})\b)", low)]
+             if (m := re.search(rf"\b{re.escape(n)}\b(?!\s+(?:{_SUFFIX}|{_LANDMARK})\b)", low))
+             # "what about 15 central park west": a name right after a house number is a street's
+             and not ((h := re.search(r"(?<![\w-])(\d{1,6}(?:-\d{1,4})?[a-z]?)\s+$", low[:m.start()]))
+                      and not _not_a_house_number(h.group(1), n))]
     if known:
         return max(known, key=len).title()
     words = re.findall(r"[a-z']+", low)
@@ -298,8 +345,9 @@ def _known_neighbourhoods() -> list[str]:
     if not _NEIGHBOURHOODS:
         from app.areas import nta  # noqa: PLC0415
 
+        # Green-Wood is one word: split, it made "Green" a neighbourhood, and "Bowling Green" was Greenpoint.
         parts = {re.sub(r"\s*\(.*?\)", "", p).strip().lower()
-                 for name in nta.load()["ntaname"].dropna() for p in name.split("-")}
+                 for name in nta.load()["ntaname"].dropna() for p in name.replace("Green-Wood", "Green Wood").split("-")}
         _NEIGHBOURHOODS.extend(sorted(p for p in parts | set(nta.ALIASES) if len(p) >= 5 and p not in _BOROUGH))
     return _NEIGHBOURHOODS
 
