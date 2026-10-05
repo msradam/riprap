@@ -138,7 +138,7 @@ def test_count_of_zero_from_an_unavailable_source_is_refused():
 
 def test_extractive_no_from_an_unavailable_source_falls_back_to_cannot_answer(monkeypatch):
     from riprap.core.burr import synthesis as syn
-    from riprap.core.burr.synthesis import CANNOT_ANSWER, Doc
+    from riprap.core.burr.synthesis import CANNOT_ANSWER, NOTHING_TO_SHOW, Doc
 
     monkeypatch.setattr(syn, "_documents", lambda state: (
         [Doc("nws_alerts", "Projector", "NWS alerts unavailable for this point.", False)], [], None))
@@ -146,7 +146,10 @@ def test_extractive_no_from_an_unavailable_source_falls_back_to_cannot_answer(mo
     reply = {"claims": [], "answer": {"lead": "no", "facts": ["nws_alerts"]}}
     monkeypatch.setattr(syn.llm, "chat_json", lambda *a, **k: (reply, "scripted"))
     out = syn.synthesize({"intent": "live_now", "plan": {"question": "Is there a flood warning here?"}})
-    assert CANNOT_ANSWER in out["paragraph"] and "No." not in out["paragraph"]
+    # The "no" is dropped with its only fact, so there is nothing to show: the line that promises
+    # "Here is what they show." is not printed over nothing.
+    assert NOTHING_TO_SHOW in out["paragraph"] and CANNOT_ANSWER not in out["paragraph"]
+    assert "No." not in out["paragraph"] and out["grounding"]["answer_lead"] == "cannot_answer"
 
 
 # Refactor 6: say why a source said nothing.
