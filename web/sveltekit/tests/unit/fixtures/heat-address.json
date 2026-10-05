@@ -461,7 +461,6 @@
    "year": 2023,
    "ac_pct": 84.9,
    "green_pct": 14.7,
-   "median_income": 59511,
    "narrative": "The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Jamaica, the neighbourhood around this address, at 5 out of 5, the highest risk group. The index ranks neighbourhoods against each other: the department says it \"uses a statistical model to summarize the most important factors of neighborhood heat risk: surface temperature, green space, home air conditioning, and income\". It is not a measurement of heat at an address, and the department says \"All neighborhoods have residents at risk for heat illness and death\". For Jamaica the department's file gives 84.9% of households with air conditioning (a survey estimate it shares across neighbouring neighbourhoods) and 14.7% green space. The area is the 2020 Neighborhood Tabulation Area the index is published for, which can carry another name than the neighbourhood in the address above. Of who heat harms most, the department writes that Black New Yorkers suffer disproportionate health impacts from heat \"due to social and economic disparities\", and that \"These disparities stem from structural racism, which includes neighborhood disinvestment, racist housing policies, fewer job opportunities and lower pay, and less access to high-quality education and health care\" (NYC Health Department, Interactive Heat Vulnerability Index).",
    "headline_value": "5 of 5 (Jamaica)"
   },

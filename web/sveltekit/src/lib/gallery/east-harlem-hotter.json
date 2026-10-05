@@ -4,8 +4,8 @@
  "address": "East Harlem",
  "question": "Is East Harlem hotter than the rest of the city?",
  "hazard": "heat",
- "generated_at": "2026-10-05T16:39Z",
- "riprap_commit": "5ecd4015",
+ "generated_at": "2026-10-05T17:35Z",
+ "riprap_commit": "b0398f64",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -961,7 +961,7 @@
      "source_name": "FloodNet (New York University and The City University of New York)",
      "source_url": "https://dataviz.floodnet.nyc/",
      "license": "CC BY-NC-SA 4.0",
-     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
+     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Riprap names no sensor, because FloodNet's licence forbids reposting its records: each verified event can be found by its date and depth in FloodNet's own table on NYC Open Data, \"FloodNet: Street Flooding Events Measured by FloodNet Sensors\" (https://data.cityofnewyork.us/d/aq7i-eu5q), and on its dashboard (https://dataviz.floodnet.nyc). Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
      "doc_id": "floodnet",
      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
      "attribution": "FloodNet (New York University and The City University of New York)",
@@ -1002,7 +1002,7 @@
      "source_name": "FloodNet (New York University and The City University of New York)",
      "source_url": "https://dataviz.floodnet.nyc/",
      "license": "CC BY-NC-SA 4.0",
-     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
+     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Riprap names no sensor, because FloodNet's licence forbids reposting its records: each verified event can be found by its date and depth in FloodNet's own table on NYC Open Data, \"FloodNet: Street Flooding Events Measured by FloodNet Sensors\" (https://data.cityofnewyork.us/d/aq7i-eu5q), and on its dashboard (https://dataviz.floodnet.nyc). Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
      "doc_id": "floodnet",
      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
      "attribution": "FloodNet (New York University and The City University of New York)",
@@ -1022,7 +1022,7 @@
    {
     "id": "nyc311",
     "type": "live",
-    "title": "NYC 311 flood and sewer complaints (5y)",
+    "title": "NYC 311 complaints about flooding and sewer backups (5y)",
     "stone": "touchstone",
     "hazard": "flood",
     "tier": "proxy",
@@ -1036,14 +1036,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "NYC 311 flood and sewer complaints filed near this address over the past 5 years.",
+     "short": "NYC 311 complaints about flooding and sewer backups filed near this address over the past 5 years.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), flood and sewer complaints within 200 m of the point. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. The exact Socrata query is this citation's query_url. Complaints are shown at the block, never the house number.",
+     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), complaints about flooding and sewer backups within 200 m of the point. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. This citation's query_url is the Socrata query for the counted rows, with no house number or coordinate selected. Complaints are shown at the block, never the house number.",
      "doc_id": "nyc311",
      "date_modified": "2026-10-05T01:38:25+0000",
      "retrieved_at": "live"
@@ -1056,7 +1056,7 @@
    {
     "id": "nyc311_nta",
     "type": "baked",
-    "title": "NYC 311 flood complaints in the area",
+    "title": "NYC 311 complaints about flooding and sewer backups in the area (3y)",
     "stone": "touchstone",
     "hazard": "flood",
     "tier": "proxy",
@@ -1070,14 +1070,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "Flood and sewer 311 complaints in this area.",
+     "short": "NYC 311 complaints about flooding and sewer backups in this area.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), flood and sewer complaints in the area (the sentence states how the area was counted, and the window). A neighbourhood is counted from the rows in its bounding box that fall inside its outline; a community district by the record's community_board field. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. The exact Socrata query is this citation's query_url. Complaints are shown at the block, never the house number.",
+     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), complaints about flooding and sewer backups in the area (the sentence states how the area was counted, and the window). A neighbourhood is counted from the rows in its bounding box that fall inside its outline; a community district by the record's community_board field. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. This citation's query_url is the Socrata query for the counted rows, with no house number or coordinate selected. Complaints are shown at the block, never the house number.",
      "doc_id": "nyc311_nta",
      "date_modified": "2026-10-05T01:38:25+0000",
      "retrieved_at": "live"
@@ -2267,9 +2267,9 @@
     "title": "NWS station observations (api.weather.gov/stations/{id}/observations/latest): air temperature, relative humidity and heat index at the nearest of the region's airport and Central Park stations.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T16:39Z",
-    "retrieved_at": "2026-10-05T16:39Z",
-    "vintage": "2026-10-05T16:39Z",
+    "date_modified": "2026-10-05T17:35Z",
+    "retrieved_at": "2026-10-05T17:35Z",
+    "vintage": "2026-10-05T17:35Z",
     "maturity": "production"
    },
    "heat_station_nta": {
@@ -2278,9 +2278,9 @@
     "title": "NOAA Regional Climate Centers, ACIS web services (data.rcc- acis.org/StnData): daily maximum temperature at the threaded station records for Central Park, LaGuardia Airport and JFK Airport; yearly counts of days at or above 90\u00b0F and yearly maxima.",
     "url": "https://www.rcc-acis.org/docs_webservices.html",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T16:39Z",
-    "retrieved_at": "2026-10-05T16:39Z",
-    "vintage": "2026-10-05T16:39Z",
+    "date_modified": "2026-10-05T17:35Z",
+    "retrieved_at": "2026-10-05T17:35Z",
+    "vintage": "2026-10-05T17:35Z",
     "maturity": "production"
    },
    "cool_features_nta": {
@@ -2300,9 +2300,9 @@
     "title": "NWS active alerts at the place (api.weather.gov/alerts/active), heat events only: Heat Advisory, Extreme Heat Watch, Extreme Heat Warning.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T16:39Z",
-    "retrieved_at": "2026-10-05T16:39Z",
-    "vintage": "2026-10-05T16:39Z",
+    "date_modified": "2026-10-05T17:35Z",
+    "retrieved_at": "2026-10-05T17:35Z",
+    "vintage": "2026-10-05T17:35Z",
     "maturity": "production"
    },
    "nws_heat_forecast_nta": {
@@ -2311,9 +2311,9 @@
     "title": "NWS gridpoint forecast for the 2.5 km cell containing the place (api.weather.gov/gridpoints): daytime high temperatures and hourly apparent temperature. Advisory criteria from the New York office's definitions page (weather.gov/okx/wwa_definitions, read 2026-10-02).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T16:39Z",
-    "retrieved_at": "2026-10-05T16:39Z",
-    "vintage": "2026-10-05T16:39Z",
+    "date_modified": "2026-10-05T17:35Z",
+    "retrieved_at": "2026-10-05T17:35Z",
+    "vintage": "2026-10-05T17:35Z",
     "maturity": "production"
    },
    "npcc4_heat_nta": {
@@ -2610,7 +2610,6 @@
    "year": 2023,
    "ac_pct": 84.9,
    "green_pct": 27.5,
-   "median_income": 30740,
    "narrative": "The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores East Harlem (North) at 5 out of 5, the highest risk group. The index ranks neighbourhoods against each other: the department says it \"uses a statistical model to summarize the most important factors of neighborhood heat risk: surface temperature, green space, home air conditioning, and income\". It is not a measurement of heat at an address, and the department says \"All neighborhoods have residents at risk for heat illness and death\". For East Harlem (North) the department's file gives 84.9% of households with air conditioning (a survey estimate it shares across neighbouring neighbourhoods) and 27.5% green space. Of who heat harms most, the department writes that Black New Yorkers suffer disproportionate health impacts from heat \"due to social and economic disparities\", and that \"These disparities stem from structural racism, which includes neighborhood disinvestment, racist housing policies, fewer job opportunities and lower pay, and less access to high-quality education and health care\" (NYC Health Department, Interactive Heat Vulnerability Index).",
    "headline_value": "5 of 5 (East Harlem (North))"
   },
@@ -2893,8 +2892,8 @@
   "nws_heat_alerts_nta": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS heat advisory, watch or warning for this area, checked 2026-10-05 16:39 UTC.",
-   "retrieved_at": "2026-10-05T16:39:40Z",
+   "narrative": "No active NWS heat advisory, watch or warning for this area, checked 2026-10-05 17:35 UTC.",
+   "retrieved_at": "2026-10-05T17:35:03Z",
    "error": null
   },
   "nws_heat_forecast_nta": {
@@ -2903,7 +2902,7 @@
    "issued": "2026-10-05 09:10",
    "highs": [
     {
-     "day": "Today",
+     "day": "This Afternoon",
      "date": "2026-10-05",
      "high_f": 71
     },
@@ -2942,7 +2941,7 @@
    "max_high_date": "2026-10-08",
    "max_apparent_f": 75,
    "max_apparent_at": "2026-10-08 15:00",
-   "narrative": "Over the next 7 days the National Weather Service expects daytime highs of 71\u00b0F today, 64\u00b0F Tuesday, 69\u00b0F Wednesday, 75\u00b0F Thursday, 72\u00b0F Friday, 70\u00b0F Saturday, 68\u00b0F Sunday in the 2.5 km grid cell at the centre of this area (issued 2026-10-05 09:10 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 75\u00b0F on Thursday October 8. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours. The Weather Service wrote this for an area; it is not a prediction for a building.",
+   "narrative": "Over the next 7 days the National Weather Service expects daytime highs of 71\u00b0F this afternoon, 64\u00b0F Tuesday, 69\u00b0F Wednesday, 75\u00b0F Thursday, 72\u00b0F Friday, 70\u00b0F Saturday, 68\u00b0F Sunday in the 2.5 km grid cell at the centre of this area (issued 2026-10-05 09:10 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 75\u00b0F on Thursday October 8. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours. The Weather Service wrote this for an area; it is not a prediction for a building.",
    "headline_value": "high of 75\u00b0F forecast in the next week"
   },
   "npcc4_heat_nta": {
@@ -3020,7 +3019,7 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1791218380.033447,
+    "started_at": 1791221702.840962,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -3039,8 +3038,8 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1791218380.034985,
-    "elapsed_s": 0.2174,
+    "started_at": 1791221702.842411,
+    "elapsed_s": 0.2156,
     "err": null,
     "result": {
      "deployment": "nyc",
@@ -3051,7 +3050,7 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1791218380.3019872,
+    "started_at": 1791221703.107211,
     "elapsed_s": 0.03,
     "err": null,
     "result": {}
@@ -3059,7 +3058,7 @@
    {
     "step": "heat_surface_nta",
     "ok": true,
-    "started_at": 1791218380.302378,
+    "started_at": 1791221703.10725,
     "elapsed_s": 0.11,
     "err": null,
     "result": {}
@@ -3067,7 +3066,7 @@
    {
     "step": "hvi_nta",
     "ok": true,
-    "started_at": 1791218380.303052,
+    "started_at": 1791221703.1072881,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -3075,7 +3074,7 @@
    {
     "step": "heat_visits_nta",
     "ok": true,
-    "started_at": 1791218380.303412,
+    "started_at": 1791221703.107939,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -3083,15 +3082,15 @@
    {
     "step": "city_landcover_nta",
     "ok": true,
-    "started_at": 1791218380.303363,
-    "elapsed_s": 0.1,
+    "started_at": 1791221703.1082041,
+    "elapsed_s": 0.09,
     "err": null,
     "result": {}
    },
    {
     "step": "landcover_nta",
     "ok": true,
-    "started_at": 1791218380.3042529,
+    "started_at": 1791221703.1088982,
     "elapsed_s": 0.11,
     "err": null,
     "result": {}
@@ -3099,47 +3098,47 @@
    {
     "step": "heat_obs_nta",
     "ok": true,
-    "started_at": 1791218380.304689,
-    "elapsed_s": 0.2,
+    "started_at": 1791221703.108992,
+    "elapsed_s": 0.21,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_station_nta",
     "ok": true,
-    "started_at": 1791218380.305357,
-    "elapsed_s": 0.2,
+    "started_at": 1791221703.109728,
+    "elapsed_s": 0.23,
     "err": null,
     "result": {}
    },
    {
     "step": "cool_features_nta",
     "ok": true,
-    "started_at": 1791218380.305492,
-    "elapsed_s": 0.02,
+    "started_at": 1791221703.1098182,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_alerts_nta",
     "ok": true,
-    "started_at": 1791218380.306554,
-    "elapsed_s": 0.58,
+    "started_at": 1791221703.1107771,
+    "elapsed_s": 0.51,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_forecast_nta",
     "ok": true,
-    "started_at": 1791218380.3072839,
-    "elapsed_s": 0.47,
+    "started_at": 1791221703.111945,
+    "elapsed_s": 0.25,
     "err": null,
     "result": {}
    },
    {
     "step": "npcc4_heat_nta",
     "ok": true,
-    "started_at": 1791218380.3075972,
+    "started_at": 1791221703.112088,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -3147,7 +3146,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1791218380.931781,
+    "started_at": 1791221703.6709728,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -3156,7 +3155,7 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1791218380.931916,
+    "started_at": 1791221703.6711,
     "ok": true,
     "result": {
      "n_chars": 1706,
@@ -3164,7 +3163,7 @@
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.1791
+    "elapsed_s": 0.1745
    }
   ],
   "failed": [],

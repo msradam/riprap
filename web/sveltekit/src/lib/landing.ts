@@ -78,10 +78,10 @@ export const PROOF: Proof[] = [
     figure: {
       text: 'No.',
       label: 'No complaint was filed. That is not a finding that the place stays dry.',
-      from: 'No. 0 NYC 311 flood and sewer complaints'
+      from: 'No. 0 NYC 311 complaints about flooding and sewer backups'
     },
     quotes: [
-      '0 NYC 311 flood and sewer complaints filed within 200 m of this location in the last 5 years (since 2021-10-06; the 311 service answered and none matched).',
+      '0 NYC 311 complaints about flooding and sewer backups filed within 200 m of this location in the last 5 years (since 2021-10-06; eleven descriptors; other sewer complaints, such as odors or missing covers, are not counted; the 311 service answered and none matched).',
       'A count of complaints is a count of reports filed, not of floods: a low count can mean under-reporting and not the absence of flooding, because the propensity to file a 311 request varies with income, language and demographics'
     ],
     note: 'The address is in the Hunts Point wholesale food markets, not on a residential block.'

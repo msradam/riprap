@@ -4,8 +4,8 @@
  "address": "Astoria Park, Queens, NY",
  "question": "Should I go running in Astoria Park in this heat today?",
  "hazard": "heat",
- "generated_at": "2026-10-05T16:40Z",
- "riprap_commit": "5ecd4015",
+ "generated_at": "2026-10-05T17:35Z",
+ "riprap_commit": "b0398f64",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -961,7 +961,7 @@
      "source_name": "FloodNet (New York University and The City University of New York)",
      "source_url": "https://dataviz.floodnet.nyc/",
      "license": "CC BY-NC-SA 4.0",
-     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
+     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Riprap names no sensor, because FloodNet's licence forbids reposting its records: each verified event can be found by its date and depth in FloodNet's own table on NYC Open Data, \"FloodNet: Street Flooding Events Measured by FloodNet Sensors\" (https://data.cityofnewyork.us/d/aq7i-eu5q), and on its dashboard (https://dataviz.floodnet.nyc). Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
      "doc_id": "floodnet",
      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
      "attribution": "FloodNet (New York University and The City University of New York)",
@@ -1002,7 +1002,7 @@
      "source_name": "FloodNet (New York University and The City University of New York)",
      "source_url": "https://dataviz.floodnet.nyc/",
      "license": "CC BY-NC-SA 4.0",
-     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
+     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Riprap names no sensor, because FloodNet's licence forbids reposting its records: each verified event can be found by its date and depth in FloodNet's own table on NYC Open Data, \"FloodNet: Street Flooding Events Measured by FloodNet Sensors\" (https://data.cityofnewyork.us/d/aq7i-eu5q), and on its dashboard (https://dataviz.floodnet.nyc). Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
      "doc_id": "floodnet",
      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
      "attribution": "FloodNet (New York University and The City University of New York)",
@@ -1022,7 +1022,7 @@
    {
     "id": "nyc311",
     "type": "live",
-    "title": "NYC 311 flood and sewer complaints (5y)",
+    "title": "NYC 311 complaints about flooding and sewer backups (5y)",
     "stone": "touchstone",
     "hazard": "flood",
     "tier": "proxy",
@@ -1036,14 +1036,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "NYC 311 flood and sewer complaints filed near this address over the past 5 years.",
+     "short": "NYC 311 complaints about flooding and sewer backups filed near this address over the past 5 years.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), flood and sewer complaints within 200 m of the point. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. The exact Socrata query is this citation's query_url. Complaints are shown at the block, never the house number.",
+     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), complaints about flooding and sewer backups within 200 m of the point. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. This citation's query_url is the Socrata query for the counted rows, with no house number or coordinate selected. Complaints are shown at the block, never the house number.",
      "doc_id": "nyc311",
      "date_modified": "2026-10-05T01:38:25+0000",
      "retrieved_at": "live"
@@ -1056,7 +1056,7 @@
    {
     "id": "nyc311_nta",
     "type": "baked",
-    "title": "NYC 311 flood complaints in the area",
+    "title": "NYC 311 complaints about flooding and sewer backups in the area (3y)",
     "stone": "touchstone",
     "hazard": "flood",
     "tier": "proxy",
@@ -1070,14 +1070,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "Flood and sewer 311 complaints in this area.",
+     "short": "NYC 311 complaints about flooding and sewer backups in this area.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), flood and sewer complaints in the area (the sentence states how the area was counted, and the window). A neighbourhood is counted from the rows in its bounding box that fall inside its outline; a community district by the record's community_board field. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. The exact Socrata query is this citation's query_url. Complaints are shown at the block, never the house number.",
+     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), complaints about flooding and sewer backups in the area (the sentence states how the area was counted, and the window). A neighbourhood is counted from the rows in its bounding box that fall inside its outline; a community district by the record's community_board field. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. This citation's query_url is the Socrata query for the counted rows, with no house number or coordinate selected. Complaints are shown at the block, never the house number.",
      "doc_id": "nyc311_nta",
      "date_modified": "2026-10-05T01:38:25+0000",
      "retrieved_at": "live"
@@ -2150,7 +2150,7 @@
   "trace": [
    {
     "step": "reconcile_templated",
-    "started_at": 1791218402.244756,
+    "started_at": 1791221724.408376,
     "ok": true,
     "result": {
      "n_chars": 512,

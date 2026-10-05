@@ -15,11 +15,11 @@ const cites = (paras: ClaimPart[][]) => paras.flat().flatMap((p) => (p.cite ? [p
 
 const QN12 =
   '533 street flooding complaints, counting the 311 descriptors "Street Flooding (SJ)" and "Flooding on Street". ' +
-  'From the sources consulted: 4273 NYC 311 flood and sewer complaints filed inside this area in the last 3 years: 2663 sewer backup, 932 catch basin, 533 street flooding, 145 manhole overflow [nyc311_nta].';
+  'From the sources consulted: 4273 NYC 311 complaints about flooding and sewer backups filed inside this area in the last 3 years: 2663 sewer backup, 932 catch basin, 533 street flooding, 145 manhole overflow [nyc311_nta].';
 const IDA =
   'Yes. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this address [ida_hwm]. ' +
   'Nearest mark: 174 m away [ida_hwm]. 2 FloodNet sensors within 600 m have recorded 14 flood events in the last 3 years [floodnet]. ' +
-  '82 NYC 311 flood and sewer complaints filed within 200 m of this location in the last 5 years [nyc311]. Peak depth: 1172 mm [floodnet].';
+  '82 NYC 311 complaints about flooding and sewer backups filed within 200 m of this location in the last 5 years [nyc311]. Peak depth: 1172 mm [floodnet].';
 
 describe('keySentence', () => {
   it('in_lead: the lead sentence before "From the sources consulted:", with the total as support', () => {
@@ -36,7 +36,7 @@ describe('keySentence', () => {
   it('not in the lead: the first sentence citing the doc leads, the rest keep their order', () => {
     const answer = answerOf(IDA);
     const k = keySentence(answer, { doc_id: 'nyc311', in_lead: false })!;
-    expect(words(k.key)).toBe('82 NYC 311 flood and sewer complaints filed within 200 m of this location in the last 5 years.');
+    expect(words(k.key)).toBe('82 NYC 311 complaints about flooding and sewer backups filed within 200 m of this location in the last 5 years.');
     expect(cites([k.key])).toEqual(['nyc311']);
     expect(cites(k.rest)).toEqual(['ida_hwm', 'ida_hwm', 'floodnet', 'floodnet']);
     // No words lost or added.

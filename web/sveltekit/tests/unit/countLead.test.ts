@@ -6,7 +6,7 @@ import { RunState } from '$lib/client/runState.svelte';
 import type { FinalResult } from '$lib/client/agentStream';
 
 const SENTENCE =
-  'From the sources consulted: 34 NYC 311 flood and sewer complaints filed within 200 m of this location in the last 5 years: 16 catch basin, 12 sewer backup, 6 street flooding';
+  'From the sources consulted: 34 NYC 311 complaints about flooding and sewer backups filed within 200 m of this location in the last 5 years: 16 catch basin, 12 sewer backup, 6 street flooding';
 const QUESTION = 'How many flooding complaints have people near 2017 East 17th Street, Brooklyn made to 311?';
 
 /** A question briefing whose count sits inside its key sentence. */
@@ -46,7 +46,7 @@ describe('countLead', () => {
 
 describe('a place briefing that opens with a figure', () => {
   const BRIEF = '0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_inundation]. ' +
-    '4226 flood and sewer 311 complaints were filed in Community District QN12 in the last 3 years [nyc311_nta].';
+    '4226 complaints to 311 about flooding and sewer backups were filed in Community District QN12 in the last 3 years [nyc311_nta].';
   const brief = (intent: string, place: string) => briefingModel(RunState.fromFinal({
     intent, paragraph: `**In brief.**\n${BRIEF}`, citations: {}, grounding: { tier: 'no_llm', note: 'no question' }
   } as unknown as FinalResult, place), place);

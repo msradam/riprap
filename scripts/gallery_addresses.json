@@ -3,7 +3,7 @@
   "slug": "brooklyn-heights",
   "neighborhood": "Brooklyn Heights, Brooklyn",
   "address": "189 Atlantic Avenue, Brooklyn, NY",
-  "reason": "Dry on the maps: outside the Sandy extent, in FEMA zone X and outside every flooding category on the city's four stormwater flood maps, yet 311 flood and sewer complaints were filed within 200 m.",
+  "reason": "Dry on the maps: outside the Sandy extent, in FEMA zone X and outside every flooding category on the city's four stormwater flood maps, yet complaints about flooding and sewer backups were filed to 311 within 200 m.",
   "feature_doc": "nyc311"
  },
  {
@@ -87,7 +87,7 @@
   "slug": "qn12",
   "neighborhood": "Community district QN12, Queens",
   "address": "QN12",
-  "reason": "A district on one page: 311 flood and sewer complaints by type, the share inside the Sandy extent and the city's stormwater scenarios, and the exposed schools, subway entrances and public housing by name."
+  "reason": "A district on one page: 311 complaints about flooding and sewer backups by type, the share inside the Sandy extent and the city's stormwater scenarios, and the exposed schools, subway entrances and public housing by name."
  },
  {
   "slug": "bk06",
@@ -134,7 +134,7 @@
   "neighborhood": "Hunts Point, Bronx",
   "address": "355 Food Center Drive, Bronx, NY",
   "question": "Have people near 355 Food Center Drive, Bronx reported flooding to 311 in the last five years?",
-  "reason": "A No about reports, not about flooding: the 311 service answered with no flood or sewer complaint within 200 m in the last 5 years. The address is in the Hunts Point wholesale food markets, not on a residential block, and a low count can mean under-reporting."
+  "reason": "A No about reports, not about flooding: the 311 service answered with no complaint about flooding or sewer backups within 200 m in the last 5 years. The address is in the Hunts Point wholesale food markets, not on a residential block, and a low count can mean under-reporting."
  },
  {
   "slug": "brooklyn-heights-sensors",

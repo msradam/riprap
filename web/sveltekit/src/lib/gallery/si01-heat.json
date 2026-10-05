@@ -4,8 +4,8 @@
  "address": "SI01",
  "question": null,
  "hazard": "heat",
- "generated_at": "2026-10-05T16:39Z",
- "riprap_commit": "5ecd4015",
+ "generated_at": "2026-10-05T17:35Z",
+ "riprap_commit": "b0398f64",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -961,7 +961,7 @@
      "source_name": "FloodNet (New York University and The City University of New York)",
      "source_url": "https://dataviz.floodnet.nyc/",
      "license": "CC BY-NC-SA 4.0",
-     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
+     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Riprap names no sensor, because FloodNet's licence forbids reposting its records: each verified event can be found by its date and depth in FloodNet's own table on NYC Open Data, \"FloodNet: Street Flooding Events Measured by FloodNet Sensors\" (https://data.cityofnewyork.us/d/aq7i-eu5q), and on its dashboard (https://dataviz.floodnet.nyc). Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
      "doc_id": "floodnet",
      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
      "attribution": "FloodNet (New York University and The City University of New York)",
@@ -1002,7 +1002,7 @@
      "source_name": "FloodNet (New York University and The City University of New York)",
      "source_url": "https://dataviz.floodnet.nyc/",
      "license": "CC BY-NC-SA 4.0",
-     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
+     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Riprap names no sensor, because FloodNet's licence forbids reposting its records: each verified event can be found by its date and depth in FloodNet's own table on NYC Open Data, \"FloodNet: Street Flooding Events Measured by FloodNet Sensors\" (https://data.cityofnewyork.us/d/aq7i-eu5q), and on its dashboard (https://dataviz.floodnet.nyc). Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
      "doc_id": "floodnet",
      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
      "attribution": "FloodNet (New York University and The City University of New York)",
@@ -1022,7 +1022,7 @@
    {
     "id": "nyc311",
     "type": "live",
-    "title": "NYC 311 flood and sewer complaints (5y)",
+    "title": "NYC 311 complaints about flooding and sewer backups (5y)",
     "stone": "touchstone",
     "hazard": "flood",
     "tier": "proxy",
@@ -1036,14 +1036,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "NYC 311 flood and sewer complaints filed near this address over the past 5 years.",
+     "short": "NYC 311 complaints about flooding and sewer backups filed near this address over the past 5 years.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), flood and sewer complaints within 200 m of the point. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. The exact Socrata query is this citation's query_url. Complaints are shown at the block, never the house number.",
+     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), complaints about flooding and sewer backups within 200 m of the point. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. This citation's query_url is the Socrata query for the counted rows, with no house number or coordinate selected. Complaints are shown at the block, never the house number.",
      "doc_id": "nyc311",
      "date_modified": "2026-10-05T01:38:25+0000",
      "retrieved_at": "live"
@@ -1056,7 +1056,7 @@
    {
     "id": "nyc311_nta",
     "type": "baked",
-    "title": "NYC 311 flood complaints in the area",
+    "title": "NYC 311 complaints about flooding and sewer backups in the area (3y)",
     "stone": "touchstone",
     "hazard": "flood",
     "tier": "proxy",
@@ -1070,14 +1070,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "Flood and sewer 311 complaints in this area.",
+     "short": "NYC 311 complaints about flooding and sewer backups in this area.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), flood and sewer complaints in the area (the sentence states how the area was counted, and the window). A neighbourhood is counted from the rows in its bounding box that fall inside its outline; a community district by the record's community_board field. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. The exact Socrata query is this citation's query_url. Complaints are shown at the block, never the house number.",
+     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), complaints about flooding and sewer backups in the area (the sentence states how the area was counted, and the window). A neighbourhood is counted from the rows in its bounding box that fall inside its outline; a community district by the record's community_board field. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. This citation's query_url is the Socrata query for the counted rows, with no house number or coordinate selected. Complaints are shown at the block, never the house number.",
      "doc_id": "nyc311_nta",
      "date_modified": "2026-10-05T01:38:25+0000",
      "retrieved_at": "live"
@@ -2156,9 +2156,9 @@
    "n_matches": 1
   },
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment. These are public records about a place, not an assessment of any property or of the people who live there. Riprap computes no score or rating, and records can be missing where people report less.\n\nPlace described: SI01 North Shore (CD 1 Equivalent), Staten Island. The shape used for SI01 is City Planning's Community District Tabulation Area, an approximation of the official community district. Counts of facilities inside it can differ from counts for the official district boundary.\n\n**In brief.**\nThe surface of this area ran 1.1\u00b0F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature) [heat_surface_nta]. 27.8% of this area is under tree canopy and 51.4% is paved or built over on the city's 2017 land cover map [city_landcover_nta]. This area scores 2 out of 5 on the Health Department's Heat Vulnerability Index, a rank among neighbourhoods and not a measurement [hvi_nta].\n\n**Mapped hazards.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. Landsat measured the surface of this area (its parks and open land included) at 1.1\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.5\u00b0F cooler to 2.6\u00b0F warmer [heat_surface_nta]. In the latest image, on 2026-08-08, the surface here read 99.5\u00b0F against a city average of 97.9\u00b0F [heat_surface_nta]. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels. The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Staten Island community district 1 at 2 out of 5; its neighbourhoods score Port Richmond 4, Tompkinsville-Stapleton-Clifton-Fox Hills 4, Rosebank-Shore Acres-Park Hill 3, St. George-New Brighton 3, Mariner's Harbor-Arlington-Graniteville 2, Westerleigh-Castleton Corners 2, West New Brighton-Silver Lake-Grymes Hill 1 [hvi_nta]. The index ranks neighbourhoods against each other: the department says it \"uses a statistical model to summarize the most important factors of neighborhood heat risk: surface temperature, green space, home air conditioning, and income\". It is not a measurement of heat at an address, and the department says \"All neighborhoods have residents at risk for heat illness and death\". Of who heat harms most, the department writes that Black New Yorkers suffer disproportionate health impacts from heat \"due to social and economic disparities\", and that \"These disparities stem from structural racism, which includes neighborhood disinvestment, racist housing policies, fewer job opportunities and lower pay, and less access to high-quality education and health care\" (NYC Health Department, Interactive Heat Vulnerability Index). Residents of Staten Island community district 1 made 114 emergency department visits for heat illness in May to September of 2018 to 2022 (the five-year total), and the NYC Health Department gives an average annual age-adjusted rate of 18.3 per 100,000 residents against 6.0 citywide (from state hospital records) [heat_visits_nta]. The count and the rate are separate figures in the department's file: for most community districts the count divided by residents and years does not give the printed rate, the file does not say why, and both are printed here as published. Visits are counted by where the patient lives, and only when diagnosed as heat illness. New York City's 2017 land cover map (6 inch, from LiDAR and aerial imagery) shows that 51.4% of this area is paved or built over and 46.2% is green (27.8% tree canopy); the rest is 1.8% water [city_landcover_nta].\n\n**Live readings.**\nAt Central Park, the nearest long-record weather station (21.2 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-04 and on 14 in 2025; a full year averaged 17 in 1991 to 2020 [heat_station_nta]. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869) [heat_station_nta]. These are the station's readings, not this area's.\n\n**Places and facilities.**\nNYC Parks lists spray showers at 18 parks or playgrounds, 4 outdoor pools and 1 wading pool in this area (lists updated 2026-10-03 and 2026-09-15, copied 2026-10-05); the pools are Faber Pool, Lyons Pool, Maggie Howard Mini Pool, West Brighton Pool, West Brighton Wading Pool [cool_features_nta]. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311) [cool_features_nta].\n\n**Projections.**\nNo active NWS heat advisory, watch or warning for this area, checked 2026-10-05 16:39 UTC [nws_heat_alerts_nta]. NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010 (a baseline that matches Central Park's record, not an airport's); the 90th percentile is 69 days by the 2050s and 108 by the 2080s [npcc4_heat_nta]. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9 [npcc4_heat_nta]. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood [npcc4_heat_nta].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Air temperature and an outdoor heat exposure index are mapped on the NYC Urban Heat Portal (https://urbanheat.nyc), by BetaNYC. Where a source was offline at run time, the relevant section omits that signal.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment. These are public records about a place, not an assessment of any property or of the people who live there. Riprap computes no score or rating, and records can be missing where people report less.\n\nPlace described: SI01 North Shore (CD 1 Equivalent), Staten Island. The shape used for SI01 is City Planning's Community District Tabulation Area, an approximation of the official community district. Counts of facilities inside it can differ from counts for the official district boundary.\n\n**In brief.**\nThe surface of this area ran 1.1\u00b0F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature) [heat_surface_nta]. 27.8% of this area is under tree canopy and 51.4% is paved or built over on the city's 2017 land cover map [city_landcover_nta]. This area scores 2 out of 5 on the Health Department's Heat Vulnerability Index, a rank among neighbourhoods and not a measurement [hvi_nta].\n\n**Mapped hazards.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. Landsat measured the surface of this area (its parks and open land included) at 1.1\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.5\u00b0F cooler to 2.6\u00b0F warmer [heat_surface_nta]. In the latest image, on 2026-08-08, the surface here read 99.5\u00b0F against a city average of 97.9\u00b0F [heat_surface_nta]. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels. The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Staten Island community district 1 at 2 out of 5; its neighbourhoods score Port Richmond 4, Tompkinsville-Stapleton-Clifton-Fox Hills 4, Rosebank-Shore Acres-Park Hill 3, St. George-New Brighton 3, Mariner's Harbor-Arlington-Graniteville 2, Westerleigh-Castleton Corners 2, West New Brighton-Silver Lake-Grymes Hill 1 [hvi_nta]. The index ranks neighbourhoods against each other: the department says it \"uses a statistical model to summarize the most important factors of neighborhood heat risk: surface temperature, green space, home air conditioning, and income\". It is not a measurement of heat at an address, and the department says \"All neighborhoods have residents at risk for heat illness and death\". Of who heat harms most, the department writes that Black New Yorkers suffer disproportionate health impacts from heat \"due to social and economic disparities\", and that \"These disparities stem from structural racism, which includes neighborhood disinvestment, racist housing policies, fewer job opportunities and lower pay, and less access to high-quality education and health care\" (NYC Health Department, Interactive Heat Vulnerability Index). Residents of Staten Island community district 1 made 114 emergency department visits for heat illness in May to September of 2018 to 2022 (the five-year total), and the NYC Health Department gives an average annual age-adjusted rate of 18.3 per 100,000 residents against 6.0 citywide (from state hospital records) [heat_visits_nta]. The count and the rate are separate figures in the department's file: for most community districts the count divided by residents and years does not give the printed rate, the file does not say why, and both are printed here as published. Visits are counted by where the patient lives, and only when diagnosed as heat illness. New York City's 2017 land cover map (6 inch, from LiDAR and aerial imagery) shows that 51.4% of this area is paved or built over and 46.2% is green (27.8% tree canopy); the rest is 1.8% water [city_landcover_nta].\n\n**Live readings.**\nAt Central Park, the nearest long-record weather station (21.2 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-04 and on 14 in 2025; a full year averaged 17 in 1991 to 2020 [heat_station_nta]. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869) [heat_station_nta]. These are the station's readings, not this area's.\n\n**Places and facilities.**\nNYC Parks lists spray showers at 18 parks or playgrounds, 4 outdoor pools and 1 wading pool in this area (lists updated 2026-10-03 and 2026-09-15, copied 2026-10-05); the pools are Faber Pool, Lyons Pool, Maggie Howard Mini Pool, West Brighton Pool, West Brighton Wading Pool [cool_features_nta]. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311) [cool_features_nta].\n\n**Projections.**\nNo active NWS heat advisory, watch or warning for this area, checked 2026-10-05 17:34 UTC [nws_heat_alerts_nta]. NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010 (a baseline that matches Central Park's record, not an airport's); the 90th percentile is 69 days by the 2050s and 108 by the 2080s [npcc4_heat_nta]. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9 [npcc4_heat_nta]. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood [npcc4_heat_nta].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Air temperature and an outdoor heat exposure index are mapped on the NYC Urban Heat Portal (https://urbanheat.nyc), by BetaNYC. Where a source was offline at run time, the relevant section omits that signal.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment. These are public records about a place, not an assessment of any property or of the people who live there. Riprap computes no score or rating, and records can be missing where people report less.\n\nPlace described: SI01 North Shore (CD 1 Equivalent), Staten Island. The shape used for SI01 is City Planning's Community District Tabulation Area, an approximation of the official community district. Counts of facilities inside it can differ from counts for the official district boundary.\n\n**In brief.**\nThe surface of this area ran 1.1\u00b0F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature) [heat_surface_nta]. 27.8% of this area is under tree canopy and 51.4% is paved or built over on the city's 2017 land cover map [city_landcover_nta]. This area scores 2 out of 5 on the Health Department's Heat Vulnerability Index, a rank among neighbourhoods and not a measurement [hvi_nta].\n\n**Mapped hazards.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. Landsat measured the surface of this area (its parks and open land included) at 1.1\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.5\u00b0F cooler to 2.6\u00b0F warmer [heat_surface_nta]. In the latest image, on 2026-08-08, the surface here read 99.5\u00b0F against a city average of 97.9\u00b0F [heat_surface_nta]. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels. The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Staten Island community district 1 at 2 out of 5; its neighbourhoods score Port Richmond 4, Tompkinsville-Stapleton-Clifton-Fox Hills 4, Rosebank-Shore Acres-Park Hill 3, St. George-New Brighton 3, Mariner's Harbor-Arlington-Graniteville 2, Westerleigh-Castleton Corners 2, West New Brighton-Silver Lake-Grymes Hill 1 [hvi_nta]. The index ranks neighbourhoods against each other: the department says it \"uses a statistical model to summarize the most important factors of neighborhood heat risk: surface temperature, green space, home air conditioning, and income\". It is not a measurement of heat at an address, and the department says \"All neighborhoods have residents at risk for heat illness and death\". Of who heat harms most, the department writes that Black New Yorkers suffer disproportionate health impacts from heat \"due to social and economic disparities\", and that \"These disparities stem from structural racism, which includes neighborhood disinvestment, racist housing policies, fewer job opportunities and lower pay, and less access to high-quality education and health care\" (NYC Health Department, Interactive Heat Vulnerability Index). Residents of Staten Island community district 1 made 114 emergency department visits for heat illness in May to September of 2018 to 2022 (the five-year total), and the NYC Health Department gives an average annual age-adjusted rate of 18.3 per 100,000 residents against 6.0 citywide (from state hospital records) [heat_visits_nta]. The count and the rate are separate figures in the department's file: for most community districts the count divided by residents and years does not give the printed rate, the file does not say why, and both are printed here as published. Visits are counted by where the patient lives, and only when diagnosed as heat illness. New York City's 2017 land cover map (6 inch, from LiDAR and aerial imagery) shows that 51.4% of this area is paved or built over and 46.2% is green (27.8% tree canopy); the rest is 1.8% water [city_landcover_nta].\n\n**Live readings.**\nAt Central Park, the nearest long-record weather station (21.2 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-04 and on 14 in 2025; a full year averaged 17 in 1991 to 2020 [heat_station_nta]. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869) [heat_station_nta]. These are the station's readings, not this area's.\n\n**Places and facilities.**\nNYC Parks lists spray showers at 18 parks or playgrounds, 4 outdoor pools and 1 wading pool in this area (lists updated 2026-10-03 and 2026-09-15, copied 2026-10-05); the pools are Faber Pool, Lyons Pool, Maggie Howard Mini Pool, West Brighton Pool, West Brighton Wading Pool [cool_features_nta]. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311) [cool_features_nta].\n\n**Projections.**\nNo active NWS heat advisory, watch or warning for this area, checked 2026-10-05 16:39 UTC [nws_heat_alerts_nta]. NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010 (a baseline that matches Central Park's record, not an airport's); the 90th percentile is 69 days by the 2050s and 108 by the 2080s [npcc4_heat_nta]. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9 [npcc4_heat_nta]. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood [npcc4_heat_nta].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Air temperature and an outdoor heat exposure index are mapped on the NYC Urban Heat Portal (https://urbanheat.nyc), by BetaNYC. Where a source was offline at run time, the relevant section omits that signal.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment. These are public records about a place, not an assessment of any property or of the people who live there. Riprap computes no score or rating, and records can be missing where people report less.\n\nPlace described: SI01 North Shore (CD 1 Equivalent), Staten Island. The shape used for SI01 is City Planning's Community District Tabulation Area, an approximation of the official community district. Counts of facilities inside it can differ from counts for the official district boundary.\n\n**In brief.**\nThe surface of this area ran 1.1\u00b0F warmer than the city's land average over 18 clear summer Landsat images (surface temperature, not air temperature) [heat_surface_nta]. 27.8% of this area is under tree canopy and 51.4% is paved or built over on the city's 2017 land cover map [city_landcover_nta]. This area scores 2 out of 5 on the Health Department's Heat Vulnerability Index, a rank among neighbourhoods and not a measurement [hvi_nta].\n\n**Mapped hazards.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. Landsat measured the surface of this area (its parks and open land included) at 1.1\u00b0F warmer than the city's land average, over 18 clear summer images from 2023-07-23 to 2026-08-08, each taken at about 11:35 am Eastern Daylight Time; image by image it ran from 0.5\u00b0F cooler to 2.6\u00b0F warmer [heat_surface_nta]. In the latest image, on 2026-08-08, the surface here read 99.5\u00b0F against a city average of 97.9\u00b0F [heat_surface_nta]. This is the temperature of roofs, pavement and treetops seen from orbit on clear late mornings, not the air temperature a person feels. The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Staten Island community district 1 at 2 out of 5; its neighbourhoods score Port Richmond 4, Tompkinsville-Stapleton-Clifton-Fox Hills 4, Rosebank-Shore Acres-Park Hill 3, St. George-New Brighton 3, Mariner's Harbor-Arlington-Graniteville 2, Westerleigh-Castleton Corners 2, West New Brighton-Silver Lake-Grymes Hill 1 [hvi_nta]. The index ranks neighbourhoods against each other: the department says it \"uses a statistical model to summarize the most important factors of neighborhood heat risk: surface temperature, green space, home air conditioning, and income\". It is not a measurement of heat at an address, and the department says \"All neighborhoods have residents at risk for heat illness and death\". Of who heat harms most, the department writes that Black New Yorkers suffer disproportionate health impacts from heat \"due to social and economic disparities\", and that \"These disparities stem from structural racism, which includes neighborhood disinvestment, racist housing policies, fewer job opportunities and lower pay, and less access to high-quality education and health care\" (NYC Health Department, Interactive Heat Vulnerability Index). Residents of Staten Island community district 1 made 114 emergency department visits for heat illness in May to September of 2018 to 2022 (the five-year total), and the NYC Health Department gives an average annual age-adjusted rate of 18.3 per 100,000 residents against 6.0 citywide (from state hospital records) [heat_visits_nta]. The count and the rate are separate figures in the department's file: for most community districts the count divided by residents and years does not give the printed rate, the file does not say why, and both are printed here as published. Visits are counted by where the patient lives, and only when diagnosed as heat illness. New York City's 2017 land cover map (6 inch, from LiDAR and aerial imagery) shows that 51.4% of this area is paved or built over and 46.2% is green (27.8% tree canopy); the rest is 1.8% water [city_landcover_nta].\n\n**Live readings.**\nAt Central Park, the nearest long-record weather station (21.2 km away), the air temperature reached 90\u00b0F on 12 days in 2026 through 2026-10-04 and on 14 in 2025; a full year averaged 17 in 1991 to 2020 [heat_station_nta]. The highest reading of 2026 was 100\u00b0F on 2026-07-02, and the station's record is 106\u00b0F, set on 1936-07-09 (records from 1869) [heat_station_nta]. These are the station's readings, not this area's.\n\n**Places and facilities.**\nNYC Parks lists spray showers at 18 parks or playgrounds, 4 outdoor pools and 1 wading pool in this area (lists updated 2026-10-03 and 2026-09-15, copied 2026-10-05); the pools are Faber Pool, Lyons Pool, Maggie Howard Mini Pool, West Brighton Pool, West Brighton Wading Pool [cool_features_nta]. Spray showers and outdoor pools run in summer only, and the list does not say whether one is working today. Cooling centers are separate: the city opens them only during a heat emergency and lists them then at finder.nyc.gov/coolingcenters (or call 311) [cool_features_nta].\n\n**Projections.**\nNo active NWS heat advisory, watch or warning for this area, checked 2026-10-05 17:34 UTC [nws_heat_alerts_nta]. NPCC4 (2024) projects 38 to 62 days a year at or above 90\u00b0F in New York City by the 2050s and 46 to 85 by the 2080s, as its middle range (25th to 75th percentile), against 17 a year in 1981-2010 (a baseline that matches Central Park's record, not an airport's); the 90th percentile is 69 days by the 2050s and 108 by the 2080s [npcc4_heat_nta]. Days at or above 95\u00b0F go from 4 a year to 14 to 32 by the 2050s and 17 to 54 by the 2080s, and heat waves from 2 a year to 5 to 8 and then 6 to 9 [npcc4_heat_nta]. The ranges pool 16 climate models and two emissions scenarios (SSP2-4.5 and SSP5-8.5), and are for the city as a whole, not for a neighbourhood [npcc4_heat_nta].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Air temperature and an outdoor heat exposure index are mapped on the NYC Urban Heat Portal (https://urbanheat.nyc), by BetaNYC. Where a source was offline at run time, the relevant section omits that signal.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -2240,9 +2240,9 @@
     "title": "NWS station observations (api.weather.gov/stations/{id}/observations/latest): air temperature, relative humidity and heat index at the nearest of the region's airport and Central Park stations.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T16:39Z",
-    "retrieved_at": "2026-10-05T16:39Z",
-    "vintage": "2026-10-05T16:39Z",
+    "date_modified": "2026-10-05T17:35Z",
+    "retrieved_at": "2026-10-05T17:35Z",
+    "vintage": "2026-10-05T17:35Z",
     "maturity": "production"
    },
    "heat_station_nta": {
@@ -2251,9 +2251,9 @@
     "title": "NOAA Regional Climate Centers, ACIS web services (data.rcc- acis.org/StnData): daily maximum temperature at the threaded station records for Central Park, LaGuardia Airport and JFK Airport; yearly counts of days at or above 90\u00b0F and yearly maxima.",
     "url": "https://www.rcc-acis.org/docs_webservices.html",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T16:39Z",
-    "retrieved_at": "2026-10-05T16:39Z",
-    "vintage": "2026-10-05T16:39Z",
+    "date_modified": "2026-10-05T17:35Z",
+    "retrieved_at": "2026-10-05T17:35Z",
+    "vintage": "2026-10-05T17:35Z",
     "maturity": "production"
    },
    "cool_features_nta": {
@@ -2273,9 +2273,9 @@
     "title": "NWS active alerts at the place (api.weather.gov/alerts/active), heat events only: Heat Advisory, Extreme Heat Watch, Extreme Heat Warning.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T16:39Z",
-    "retrieved_at": "2026-10-05T16:39Z",
-    "vintage": "2026-10-05T16:39Z",
+    "date_modified": "2026-10-05T17:35Z",
+    "retrieved_at": "2026-10-05T17:35Z",
+    "vintage": "2026-10-05T17:35Z",
     "maturity": "production"
    },
    "nws_heat_forecast_nta": {
@@ -2284,9 +2284,9 @@
     "title": "NWS gridpoint forecast for the 2.5 km cell containing the place (api.weather.gov/gridpoints): daytime high temperatures and hourly apparent temperature. Advisory criteria from the New York office's definitions page (weather.gov/okx/wwa_definitions, read 2026-10-02).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T16:39Z",
-    "retrieved_at": "2026-10-05T16:39Z",
-    "vintage": "2026-10-05T16:39Z",
+    "date_modified": "2026-10-05T17:35Z",
+    "retrieved_at": "2026-10-05T17:35Z",
+    "vintage": "2026-10-05T17:35Z",
     "maturity": "production"
    },
    "npcc4_heat_nta": {
@@ -3735,12 +3735,12 @@
    "station": "Newark Liberty",
    "station_id": "KEWR",
    "distance_km": 7.5,
-   "observed": "2026-10-05 12:20",
-   "temp_f": 68,
+   "observed": "2026-10-05 13:15",
+   "temp_f": 72,
    "heat_index_f": null,
-   "humidity_pct": 56,
-   "narrative": "The air at Newark Liberty, the nearest weather station (7.5 km away), was 68\u00b0F at 12:20 Eastern on 2026-10-05, with 56% humidity and no heat index reported (the station reports one only when it is hot). This is the station's reading, not this area's.",
-   "headline_value": "68\u00b0F at Newark Liberty"
+   "humidity_pct": null,
+   "narrative": "The air at Newark Liberty, the nearest weather station (7.5 km away), was 72\u00b0F at 13:15 Eastern on 2026-10-05. This is the station's reading, not this area's.",
+   "headline_value": "72\u00b0F at Newark Liberty"
   },
   "heat_station_nta": {
    "station": "Central Park",
@@ -3984,8 +3984,8 @@
   "nws_heat_alerts_nta": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS heat advisory, watch or warning for this area, checked 2026-10-05 16:39 UTC.",
-   "retrieved_at": "2026-10-05T16:39:36Z",
+   "narrative": "No active NWS heat advisory, watch or warning for this area, checked 2026-10-05 17:34 UTC.",
+   "retrieved_at": "2026-10-05T17:34:59Z",
    "error": null
   },
   "nws_heat_forecast_nta": {
@@ -4111,7 +4111,7 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1791218376.17589,
+    "started_at": 1791221699.189024,
     "elapsed_s": 0.05,
     "err": null,
     "result": {
@@ -4130,8 +4130,8 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1791218376.2272651,
-    "elapsed_s": 0.218,
+    "started_at": 1791221699.2397308,
+    "elapsed_s": 0.2155,
     "err": null,
     "result": {
      "deployment": "nyc",
@@ -4142,7 +4142,7 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1791218376.4942589,
+    "started_at": 1791221699.505517,
     "elapsed_s": 0.03,
     "err": null,
     "result": {}
@@ -4150,7 +4150,7 @@
    {
     "step": "heat_surface_nta",
     "ok": true,
-    "started_at": 1791218376.495744,
+    "started_at": 1791221699.505984,
     "elapsed_s": 0.12,
     "err": null,
     "result": {}
@@ -4158,15 +4158,15 @@
    {
     "step": "hvi_nta",
     "ok": true,
-    "started_at": 1791218376.495805,
-    "elapsed_s": 0.01,
+    "started_at": 1791221699.505576,
+    "elapsed_s": 0.0,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_visits_nta",
     "ok": true,
-    "started_at": 1791218376.495716,
+    "started_at": 1791221699.5056262,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -4174,7 +4174,7 @@
    {
     "step": "city_landcover_nta",
     "ok": true,
-    "started_at": 1791218376.495682,
+    "started_at": 1791221699.5056,
     "elapsed_s": 0.11,
     "err": null,
     "result": {}
@@ -4182,23 +4182,23 @@
    {
     "step": "landcover_nta",
     "ok": true,
-    "started_at": 1791218376.495645,
-    "elapsed_s": 0.2,
+    "started_at": 1791221699.505548,
+    "elapsed_s": 0.17,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_obs_nta",
     "ok": true,
-    "started_at": 1791218376.496767,
-    "elapsed_s": 0.23,
+    "started_at": 1791221699.5054772,
+    "elapsed_s": 0.19,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_station_nta",
     "ok": true,
-    "started_at": 1791218376.4967391,
+    "started_at": 1791221699.50646,
     "elapsed_s": 0.22,
     "err": null,
     "result": {}
@@ -4206,7 +4206,7 @@
    {
     "step": "cool_features_nta",
     "ok": true,
-    "started_at": 1791218376.496704,
+    "started_at": 1791221699.5063941,
     "elapsed_s": 0.01,
     "err": null,
     "result": {}
@@ -4214,31 +4214,31 @@
    {
     "step": "nws_heat_alerts_nta",
     "ok": true,
-    "started_at": 1791218376.4971478,
-    "elapsed_s": 0.47,
+    "started_at": 1791221699.5069382,
+    "elapsed_s": 0.39,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_forecast_nta",
     "ok": true,
-    "started_at": 1791218376.497649,
-    "elapsed_s": 0.61,
+    "started_at": 1791221699.507377,
+    "elapsed_s": 0.36,
     "err": null,
     "result": {}
    },
    {
     "step": "npcc4_heat_nta",
     "ok": true,
-    "started_at": 1791218376.497828,
-    "elapsed_s": 0.0,
+    "started_at": 1791221699.5079691,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1791218377.1552372,
+    "started_at": 1791221699.924479,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -4247,7 +4247,7 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1791218377.155371,
+    "started_at": 1791221699.924562,
     "ok": true,
     "result": {
      "n_chars": 6286,
@@ -4255,7 +4255,7 @@
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.0912
+    "elapsed_s": 0.0831
    }
   ],
   "failed": [],

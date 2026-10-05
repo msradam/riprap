@@ -4,8 +4,8 @@
  "address": "QN12",
  "question": null,
  "hazard": "flood",
- "generated_at": "2026-10-05T16:38Z",
- "riprap_commit": "5ecd4015",
+ "generated_at": "2026-10-05T17:33Z",
+ "riprap_commit": "b0398f64",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -961,7 +961,7 @@
      "source_name": "FloodNet (New York University and The City University of New York)",
      "source_url": "https://dataviz.floodnet.nyc/",
      "license": "CC BY-NC-SA 4.0",
-     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
+     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Riprap names no sensor, because FloodNet's licence forbids reposting its records: each verified event can be found by its date and depth in FloodNet's own table on NYC Open Data, \"FloodNet: Street Flooding Events Measured by FloodNet Sensors\" (https://data.cityofnewyork.us/d/aq7i-eu5q), and on its dashboard (https://dataviz.floodnet.nyc). Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
      "doc_id": "floodnet",
      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
      "attribution": "FloodNet (New York University and The City University of New York)",
@@ -1002,7 +1002,7 @@
      "source_name": "FloodNet (New York University and The City University of New York)",
      "source_url": "https://dataviz.floodnet.nyc/",
      "license": "CC BY-NC-SA 4.0",
-     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
+     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Riprap names no sensor, because FloodNet's licence forbids reposting its records: each verified event can be found by its date and depth in FloodNet's own table on NYC Open Data, \"FloodNet: Street Flooding Events Measured by FloodNet Sensors\" (https://data.cityofnewyork.us/d/aq7i-eu5q), and on its dashboard (https://dataviz.floodnet.nyc). Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
      "doc_id": "floodnet",
      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
      "attribution": "FloodNet (New York University and The City University of New York)",
@@ -1022,7 +1022,7 @@
    {
     "id": "nyc311",
     "type": "live",
-    "title": "NYC 311 flood and sewer complaints (5y)",
+    "title": "NYC 311 complaints about flooding and sewer backups (5y)",
     "stone": "touchstone",
     "hazard": "flood",
     "tier": "proxy",
@@ -1036,14 +1036,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "NYC 311 flood and sewer complaints filed near this address over the past 5 years.",
+     "short": "NYC 311 complaints about flooding and sewer backups filed near this address over the past 5 years.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), flood and sewer complaints within 200 m of the point. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. The exact Socrata query is this citation's query_url. Complaints are shown at the block, never the house number.",
+     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), complaints about flooding and sewer backups within 200 m of the point. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. This citation's query_url is the Socrata query for the counted rows, with no house number or coordinate selected. Complaints are shown at the block, never the house number.",
      "doc_id": "nyc311",
      "date_modified": "2026-10-05T01:38:25+0000",
      "retrieved_at": "live"
@@ -1056,7 +1056,7 @@
    {
     "id": "nyc311_nta",
     "type": "baked",
-    "title": "NYC 311 flood complaints in the area",
+    "title": "NYC 311 complaints about flooding and sewer backups in the area (3y)",
     "stone": "touchstone",
     "hazard": "flood",
     "tier": "proxy",
@@ -1070,14 +1070,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "Flood and sewer 311 complaints in this area.",
+     "short": "NYC 311 complaints about flooding and sewer backups in this area.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), flood and sewer complaints in the area (the sentence states how the area was counted, and the window). A neighbourhood is counted from the rows in its bounding box that fall inside its outline; a community district by the record's community_board field. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. The exact Socrata query is this citation's query_url. Complaints are shown at the block, never the house number.",
+     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), complaints about flooding and sewer backups in the area (the sentence states how the area was counted, and the window). A neighbourhood is counted from the rows in its bounding box that fall inside its outline; a community district by the record's community_board field. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. This citation's query_url is the Socrata query for the counted rows, with no house number or coordinate selected. Complaints are shown at the block, never the house number.",
      "doc_id": "nyc311_nta",
      "date_modified": "2026-10-05T01:38:25+0000",
      "retrieved_at": "live"
@@ -2151,9 +2151,9 @@
    "n_matches": 1
   },
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment. These are public records about a place, not an assessment of any property or of the people who live there. Riprap computes no score or rating, and records can be missing where people report less.\n\nPlace described: QN12 Jamaica-St. Albans-Hollis (CD 12 Approximation), Queens. The shape used for QN12 is City Planning's Community District Tabulation Area, an approximation of the official community district. Counts of facilities inside it can differ from counts for the official district boundary.\n\n**In brief.**\n4499 flood and sewer 311 complaints were filed in Community District QN12 (by the record's community board field) in the last 3 years, since 2023-10-06, by 311 descriptor group: 2731 sewer backup, 1083 catch basin, 532 street flooding, 153 manhole overflow (a count of reports; a low count can mean under-reporting, not the absence of flooding) [nyc311_nta]. 16.4% of this area is in a rainfall flooding category of the city's modelled stormwater scenario \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", 3.3% of this area is in a rainfall flooding category of the city's modelled stormwater scenario \"Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise\" [dep_extreme_2080_nta][dep_moderate_2050_nta]. 0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Mapped hazards.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (0.19 km\u00b2 of the area's 24.7 km\u00b2) [sandy_nta]. On the city's stormwater flood map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", 16.4% of this area is in a rainfall flooding category: 7.5% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 8.8% in \"Deep and Contiguous Flooding (1 ft. and greater)\"; 0.0% is in its \"Future High Tides 2080\" category, which is coastal tidal inundation projected for 2080 [dep_extreme_2080_nta]. On the city's stormwater flood map \"Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise\", 3.3% of this area is in a rainfall flooding category: 1.9% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 1.5% in \"Deep and Contiguous Flooding (1 ft. and greater)\"; 0.0% is in its \"Future High Tides 2050\" category, which is coastal tidal inundation projected for 2050 [dep_moderate_2050_nta]. On the city's stormwater flood map \"Moderate Flood (2.13 inches/hr) with Current Sea Levels\" (the near term), 3.1% of this area is in a rainfall flooding category: 1.8% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 1.3% in \"Deep and Contiguous Flooding (1 ft. and greater)\" [dep_moderate_current_nta]. On the city's stormwater flood map \"Limited Flood (1.77 inches/hr) with Current Sea Levels\" (the near term), 1.4% of this area is in a rainfall flooding category: 0.9% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 0.5% in \"Deep and Contiguous Flooding (1 ft. and greater)\" [dep_limited_current_nta]. The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination [dep_extreme_2080_nta][dep_moderate_2050_nta][dep_moderate_current_nta][dep_limited_current_nta]. Median ground elevation 10.55 m NAVD88 (10th percentile 5.43 m) [microtopo_nta].\n\n**Live readings.**\n21 FloodNet sensors inside this area have recorded 40 flood events (each a series of depth readings above 10 mm at the sensor, FloodNet's definition) on 8 separate days in the last 3 years (16 of them installed during that period, the latest on 2026-07-09), the most recent starting 2026-08-23 11:15 UTC (every date here is a UTC day) [floodnet]. By UTC calendar year: 2 in 2024, 11 in 2025 and 27 in 2026 [floodnet]. FloodNet's API lists 14 more events labelled flood here that are still to be verified by a person; Riprap counts verified events only [floodnet]. The highest depth in FloodNet's record for these sensors in that period is 1172 mm (46.1 in) on 2026-05-20, in an event the API marks as verified by a person, at a sensor listed as \"noisy\" in FloodNet's API when this was read (2026-10-05); that is the sensor's status now, which the API does not give for the day of the event [floodnet]. 6 of the 21 sensors are listed with a status other than \"good\" in FloodNet's API when this was read (\"dead\", \"driverail_altered\", \"low_charge\", \"needs_sensor\", \"noisy\") and recorded 8 of the 40 events [floodnet]. 4499 NYC 311 flood and sewer complaints filed in Community District QN12 (by the record's community board field) in the last 3 years (since 2023-10-06): 2731 sewer backup, 1083 catch basin, 532 street flooding, 153 manhole overflow [nyc311_nta]. A count of complaints is a count of reports filed, not of floods: a low count can mean under-reporting and not the absence of flooding, because the propensity to file a 311 request varies with income, language and demographics (studies of other 311 complaint types: Kontokosta, Hong and Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill, Annals of Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003) [nyc311_nta].\n\n**Places and facilities.**\nNYC Planning's Community District Profile counts 5 buildings in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps) [dcp_floodplain_nta]. The profile prints 0 residential units and 0 residents for this district, a zero that does not fit its own count of 5 buildings, so it is not repeated here as a count [dcp_floodplain_nta]. 36 MTA subway entrances in this area (each entrance read at its own point on the maps, with no buffer): 0 inside the 2012 Sandy inundation extent and 17 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario (17 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding) [mta_entrance_exposure]. In a rainfall flooding category of the modelled \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\" map, by station: Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z) [mta_entrance_exposure]. 1 NYCHA development inside a mapped flood extent in this area (the register lists only developments with 10% or more of their mapped outline inside the 2012 Sandy extent, or their centre point inside one of three modeled DEP stormwater scenarios (Moderate Flood with current and with 2050 sea levels, Extreme Flood with 2080; the Limited Flood map is not tested), not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario (1 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding) [nycha_development_exposure]. Under 10% of the outline inside the 2012 Sandy extent (not counted): FHA REPOSSESSED HOUSES (GROUP X) [nycha_development_exposure]. In a rainfall flooding category of the modelled \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\" map: CONLON LIHFE TOWER [nycha_development_exposure]. 1 public school inside a mapped flood extent in this area (from the NYC Department of Education's school locations for the 2019 to 2020 school year, charter schools included; the register lists only schools whose location point is inside the 2012 Sandy extent or one of three modeled DEP stormwater scenarios (Moderate Flood with current and with 2050 sea levels, Extreme Flood with 2080; the Limited Flood map is not tested), not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario (1 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding) [doe_school_exposure]. In a rainfall flooding category of the modelled \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\" map: I.S. 059 Springfield Gardens [doe_school_exposure]. 0 hospitals in this area (each read at the one point the state file gives for it, not across its campus): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario [doh_hospital_exposure]. The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination [mta_entrance_exposure][nycha_development_exposure][doe_school_exposure][doh_hospital_exposure].\n\n**Projections.**\nNo active NWS flood, coastal or tropical storm alerts for this area (read at its centre), checked 2026-10-05 16:38 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise in New York City of 14 to 19 in (0.36 to 0.48 m) by the 2050s and 30 to 50 in (0.76 to 1.27 m) by 2100, relative to 1995-2014, as its middle range (25th to 75th percentile); the 90th percentile is 23 in (0.58 m) by the 2050s and 65 in (1.65 m) by 2100 [npcc4_slr].\n\n**Out of scope.** This briefing is not a flood zone determination, an engineering assessment or advice. Where a probe was offline at run time, the relevant section omits that signal.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment. These are public records about a place, not an assessment of any property or of the people who live there. Riprap computes no score or rating, and records can be missing where people report less.\n\nPlace described: QN12 Jamaica-St. Albans-Hollis (CD 12 Approximation), Queens. The shape used for QN12 is City Planning's Community District Tabulation Area, an approximation of the official community district. Counts of facilities inside it can differ from counts for the official district boundary.\n\n**In brief.**\n4499 complaints to 311 about flooding and sewer backups were filed in Community District QN12 (by the record's community board field) in the last 3 years, since 2023-10-06, by 311 descriptor group: 2731 sewer backup, 1083 catch basin, 532 street flooding, 153 manhole overflow (a count of reports; a low count can mean under-reporting, not the absence of flooding) [nyc311_nta]. 16.4% of this area is in a rainfall flooding category of the city's modelled stormwater scenario \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", 3.3% of this area is in a rainfall flooding category of the city's modelled stormwater scenario \"Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise\" [dep_extreme_2080_nta][dep_moderate_2050_nta]. 0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Mapped hazards.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (0.19 km\u00b2 of the area's 24.7 km\u00b2) [sandy_nta]. On the city's stormwater flood map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", 16.4% of this area is in a rainfall flooding category: 7.5% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 8.8% in \"Deep and Contiguous Flooding (1 ft. and greater)\"; 0.0% is in its \"Future High Tides 2080\" category, which is coastal tidal inundation projected for 2080 [dep_extreme_2080_nta]. On the city's stormwater flood map \"Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise\", 3.3% of this area is in a rainfall flooding category: 1.9% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 1.5% in \"Deep and Contiguous Flooding (1 ft. and greater)\"; 0.0% is in its \"Future High Tides 2050\" category, which is coastal tidal inundation projected for 2050 [dep_moderate_2050_nta]. On the city's stormwater flood map \"Moderate Flood (2.13 inches/hr) with Current Sea Levels\" (the near term), 3.1% of this area is in a rainfall flooding category: 1.8% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 1.3% in \"Deep and Contiguous Flooding (1 ft. and greater)\" [dep_moderate_current_nta]. On the city's stormwater flood map \"Limited Flood (1.77 inches/hr) with Current Sea Levels\" (the near term), 1.4% of this area is in a rainfall flooding category: 0.9% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 0.5% in \"Deep and Contiguous Flooding (1 ft. and greater)\" [dep_limited_current_nta]. The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination [dep_extreme_2080_nta][dep_moderate_2050_nta][dep_moderate_current_nta][dep_limited_current_nta]. The city's Stormwater Resiliency Plan (2021) calls its moderate storm \"the 10-year storm, with approximately 10 percent chance of occurrence in any given year\" and its extreme storm \"the 100-year storm, with approximately 1 percent chance of occurrence in any given year\" [dep_extreme_2080_nta][dep_moderate_2050_nta][dep_moderate_current_nta][dep_limited_current_nta]. Median ground elevation 10.55 m NAVD88 (10th percentile 5.43 m) [microtopo_nta].\n\n**Live readings.**\n21 FloodNet sensors inside this area have recorded 40 flood events (each a series of depth readings above 10 mm at the sensor, FloodNet's definition) on 8 separate days in the last 3 years (16 of them installed during that period, the latest on 2026-07-09), the most recent starting 2026-08-23 11:15 UTC (every date here is a UTC day) [floodnet]. By UTC calendar year: 2 in 2024, 11 in 2025 and 27 in 2026 [floodnet]. FloodNet's API lists 14 more events labelled flood here that are still to be verified by a person; Riprap counts verified events only [floodnet]. The highest depth in FloodNet's record for these sensors in that period is 1172 mm (46.1 in) on 2026-05-20, in an event the API marks as verified by a person, at a sensor listed as \"noisy\" in FloodNet's API when this was read (2026-10-05); that is the sensor's status now, which the API does not give for the day of the event [floodnet]. 6 of the 21 sensors are listed with a status other than \"good\" in FloodNet's API when this was read (\"dead\", \"driverail_altered\", \"low_charge\", \"needs_sensor\", \"noisy\") and recorded 8 of the 40 events [floodnet]. 4499 NYC 311 complaints about flooding and sewer backups filed in Community District QN12 (by the record's community board field) in the last 3 years (since 2023-10-06; eleven descriptors; other sewer complaints, such as odors or missing covers, are not counted): 2731 sewer backup, 1083 catch basin, 532 street flooding, 153 manhole overflow [nyc311_nta]. A count of complaints is a count of reports filed, not of floods: a low count can mean under-reporting and not the absence of flooding, because the propensity to file a 311 request varies with income, language and demographics (studies of other 311 complaint types: Kontokosta, Hong and Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill, Annals of Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003) [nyc311_nta].\n\n**Places and facilities.**\nNYC Planning's Community District Profile counts 5 buildings in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps) [dcp_floodplain_nta]. The profile prints 0 residential units and 0 residents for this district, a zero that does not fit its own count of 5 buildings, so it is not repeated here as a count [dcp_floodplain_nta]. 36 MTA subway entrances in this area (each entrance read at its own point on the maps, with no buffer): 0 inside the 2012 Sandy inundation extent and 17 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario (17 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding) [mta_entrance_exposure]. In a rainfall flooding category of the modelled \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\" map, by station: Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z) [mta_entrance_exposure]. 1 NYCHA development inside a mapped flood extent in this area (the register lists only developments with 10% or more of their mapped outline inside the 2012 Sandy extent, or their centre point inside one of three modeled DEP stormwater scenarios (Moderate Flood with current and with 2050 sea levels, Extreme Flood with 2080; the Limited Flood map is not tested), not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario (1 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding) [nycha_development_exposure]. Under 10% of the outline inside the 2012 Sandy extent (not counted): FHA REPOSSESSED HOUSES (GROUP X) [nycha_development_exposure]. In a rainfall flooding category of the modelled \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\" map: CONLON LIHFE TOWER [nycha_development_exposure]. 1 public school inside a mapped flood extent in this area (from the NYC Department of Education's school locations for the 2019 to 2020 school year, charter schools included; the register lists only schools whose location point is inside the 2012 Sandy extent or one of three modeled DEP stormwater scenarios (Moderate Flood with current and with 2050 sea levels, Extreme Flood with 2080; the Limited Flood map is not tested), not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario (1 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding) [doe_school_exposure]. In a rainfall flooding category of the modelled \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\" map: I.S. 059 Springfield Gardens [doe_school_exposure]. 0 hospitals in this area (each read at the one point the state file gives for it, not across its campus): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario [doh_hospital_exposure]. The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination [mta_entrance_exposure][nycha_development_exposure][doe_school_exposure][doh_hospital_exposure].\n\n**Projections.**\nNo active NWS flood, coastal or tropical storm alerts for this area (read at its centre), checked 2026-10-05 17:33 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise in New York City of 14 to 19 in (0.36 to 0.48 m) by the 2050s and 30 to 50 in (0.76 to 1.27 m) by 2100, relative to 1995-2014, as its middle range (25th to 75th percentile); the 90th percentile is 23 in (0.58 m) by the 2050s and 65 in (1.65 m) by 2100 [npcc4_slr].\n\n**Out of scope.** This briefing is not a flood zone determination, an engineering assessment or advice. Where a probe was offline at run time, the relevant section omits that signal.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment. These are public records about a place, not an assessment of any property or of the people who live there. Riprap computes no score or rating, and records can be missing where people report less.\n\nPlace described: QN12 Jamaica-St. Albans-Hollis (CD 12 Approximation), Queens. The shape used for QN12 is City Planning's Community District Tabulation Area, an approximation of the official community district. Counts of facilities inside it can differ from counts for the official district boundary.\n\n**In brief.**\n4499 flood and sewer 311 complaints were filed in Community District QN12 (by the record's community board field) in the last 3 years, since 2023-10-06, by 311 descriptor group: 2731 sewer backup, 1083 catch basin, 532 street flooding, 153 manhole overflow (a count of reports; a low count can mean under-reporting, not the absence of flooding) [nyc311_nta]. 16.4% of this area is in a rainfall flooding category of the city's modelled stormwater scenario \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", 3.3% of this area is in a rainfall flooding category of the city's modelled stormwater scenario \"Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise\" [dep_extreme_2080_nta][dep_moderate_2050_nta]. 0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Mapped hazards.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (0.19 km\u00b2 of the area's 24.7 km\u00b2) [sandy_nta]. On the city's stormwater flood map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", 16.4% of this area is in a rainfall flooding category: 7.5% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 8.8% in \"Deep and Contiguous Flooding (1 ft. and greater)\"; 0.0% is in its \"Future High Tides 2080\" category, which is coastal tidal inundation projected for 2080 [dep_extreme_2080_nta]. On the city's stormwater flood map \"Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise\", 3.3% of this area is in a rainfall flooding category: 1.9% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 1.5% in \"Deep and Contiguous Flooding (1 ft. and greater)\"; 0.0% is in its \"Future High Tides 2050\" category, which is coastal tidal inundation projected for 2050 [dep_moderate_2050_nta]. On the city's stormwater flood map \"Moderate Flood (2.13 inches/hr) with Current Sea Levels\" (the near term), 3.1% of this area is in a rainfall flooding category: 1.8% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 1.3% in \"Deep and Contiguous Flooding (1 ft. and greater)\" [dep_moderate_current_nta]. On the city's stormwater flood map \"Limited Flood (1.77 inches/hr) with Current Sea Levels\" (the near term), 1.4% of this area is in a rainfall flooding category: 0.9% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 0.5% in \"Deep and Contiguous Flooding (1 ft. and greater)\" [dep_limited_current_nta]. The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination [dep_extreme_2080_nta][dep_moderate_2050_nta][dep_moderate_current_nta][dep_limited_current_nta]. Median ground elevation 10.55 m NAVD88 (10th percentile 5.43 m) [microtopo_nta].\n\n**Live readings.**\n21 FloodNet sensors inside this area have recorded 40 flood events (each a series of depth readings above 10 mm at the sensor, FloodNet's definition) on 8 separate days in the last 3 years (16 of them installed during that period, the latest on 2026-07-09), the most recent starting 2026-08-23 11:15 UTC (every date here is a UTC day) [floodnet]. By UTC calendar year: 2 in 2024, 11 in 2025 and 27 in 2026 [floodnet]. FloodNet's API lists 14 more events labelled flood here that are still to be verified by a person; Riprap counts verified events only [floodnet]. The highest depth in FloodNet's record for these sensors in that period is 1172 mm (46.1 in) on 2026-05-20, in an event the API marks as verified by a person, at a sensor listed as \"noisy\" in FloodNet's API when this was read (2026-10-05); that is the sensor's status now, which the API does not give for the day of the event [floodnet]. 6 of the 21 sensors are listed with a status other than \"good\" in FloodNet's API when this was read (\"dead\", \"driverail_altered\", \"low_charge\", \"needs_sensor\", \"noisy\") and recorded 8 of the 40 events [floodnet]. 4499 NYC 311 flood and sewer complaints filed in Community District QN12 (by the record's community board field) in the last 3 years (since 2023-10-06): 2731 sewer backup, 1083 catch basin, 532 street flooding, 153 manhole overflow [nyc311_nta]. A count of complaints is a count of reports filed, not of floods: a low count can mean under-reporting and not the absence of flooding, because the propensity to file a 311 request varies with income, language and demographics (studies of other 311 complaint types: Kontokosta, Hong and Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill, Annals of Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003) [nyc311_nta].\n\n**Places and facilities.**\nNYC Planning's Community District Profile counts 5 buildings in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps) [dcp_floodplain_nta]. The profile prints 0 residential units and 0 residents for this district, a zero that does not fit its own count of 5 buildings, so it is not repeated here as a count [dcp_floodplain_nta]. 36 MTA subway entrances in this area (each entrance read at its own point on the maps, with no buffer): 0 inside the 2012 Sandy inundation extent and 17 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario (17 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding) [mta_entrance_exposure]. In a rainfall flooding category of the modelled \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\" map, by station: Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z) [mta_entrance_exposure]. 1 NYCHA development inside a mapped flood extent in this area (the register lists only developments with 10% or more of their mapped outline inside the 2012 Sandy extent, or their centre point inside one of three modeled DEP stormwater scenarios (Moderate Flood with current and with 2050 sea levels, Extreme Flood with 2080; the Limited Flood map is not tested), not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario (1 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding) [nycha_development_exposure]. Under 10% of the outline inside the 2012 Sandy extent (not counted): FHA REPOSSESSED HOUSES (GROUP X) [nycha_development_exposure]. In a rainfall flooding category of the modelled \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\" map: CONLON LIHFE TOWER [nycha_development_exposure]. 1 public school inside a mapped flood extent in this area (from the NYC Department of Education's school locations for the 2019 to 2020 school year, charter schools included; the register lists only schools whose location point is inside the 2012 Sandy extent or one of three modeled DEP stormwater scenarios (Moderate Flood with current and with 2050 sea levels, Extreme Flood with 2080; the Limited Flood map is not tested), not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario (1 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding) [doe_school_exposure]. In a rainfall flooding category of the modelled \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\" map: I.S. 059 Springfield Gardens [doe_school_exposure]. 0 hospitals in this area (each read at the one point the state file gives for it, not across its campus): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario [doh_hospital_exposure]. The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination [mta_entrance_exposure][nycha_development_exposure][doe_school_exposure][doh_hospital_exposure].\n\n**Projections.**\nNo active NWS flood, coastal or tropical storm alerts for this area (read at its centre), checked 2026-10-05 16:38 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise in New York City of 14 to 19 in (0.36 to 0.48 m) by the 2050s and 30 to 50 in (0.76 to 1.27 m) by 2100, relative to 1995-2014, as its middle range (25th to 75th percentile); the 90th percentile is 23 in (0.58 m) by the 2050s and 65 in (1.65 m) by 2100 [npcc4_slr].\n\n**Out of scope.** This briefing is not a flood zone determination, an engineering assessment or advice. Where a probe was offline at run time, the relevant section omits that signal.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment. These are public records about a place, not an assessment of any property or of the people who live there. Riprap computes no score or rating, and records can be missing where people report less.\n\nPlace described: QN12 Jamaica-St. Albans-Hollis (CD 12 Approximation), Queens. The shape used for QN12 is City Planning's Community District Tabulation Area, an approximation of the official community district. Counts of facilities inside it can differ from counts for the official district boundary.\n\n**In brief.**\n4499 complaints to 311 about flooding and sewer backups were filed in Community District QN12 (by the record's community board field) in the last 3 years, since 2023-10-06, by 311 descriptor group: 2731 sewer backup, 1083 catch basin, 532 street flooding, 153 manhole overflow (a count of reports; a low count can mean under-reporting, not the absence of flooding) [nyc311_nta]. 16.4% of this area is in a rainfall flooding category of the city's modelled stormwater scenario \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", 3.3% of this area is in a rainfall flooding category of the city's modelled stormwater scenario \"Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise\" [dep_extreme_2080_nta][dep_moderate_2050_nta]. 0.8% of this area lies inside the 2012 Sandy inundation extent [sandy_nta].\n\n**Mapped hazards.**\nThe outline on the map is this area's boundary from the NYC Department of City Planning's 2020 Neighborhood Tabulation Areas; a community district is drawn as the union of its tabulation areas, which approximates the district [area_boundary]. 0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (0.19 km\u00b2 of the area's 24.7 km\u00b2) [sandy_nta]. On the city's stormwater flood map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", 16.4% of this area is in a rainfall flooding category: 7.5% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 8.8% in \"Deep and Contiguous Flooding (1 ft. and greater)\"; 0.0% is in its \"Future High Tides 2080\" category, which is coastal tidal inundation projected for 2080 [dep_extreme_2080_nta]. On the city's stormwater flood map \"Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise\", 3.3% of this area is in a rainfall flooding category: 1.9% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 1.5% in \"Deep and Contiguous Flooding (1 ft. and greater)\"; 0.0% is in its \"Future High Tides 2050\" category, which is coastal tidal inundation projected for 2050 [dep_moderate_2050_nta]. On the city's stormwater flood map \"Moderate Flood (2.13 inches/hr) with Current Sea Levels\" (the near term), 3.1% of this area is in a rainfall flooding category: 1.8% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 1.3% in \"Deep and Contiguous Flooding (1 ft. and greater)\" [dep_moderate_current_nta]. On the city's stormwater flood map \"Limited Flood (1.77 inches/hr) with Current Sea Levels\" (the near term), 1.4% of this area is in a rainfall flooding category: 0.9% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 0.5% in \"Deep and Contiguous Flooding (1 ft. and greater)\" [dep_limited_current_nta]. The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination [dep_extreme_2080_nta][dep_moderate_2050_nta][dep_moderate_current_nta][dep_limited_current_nta]. The city's Stormwater Resiliency Plan (2021) calls its moderate storm \"the 10-year storm, with approximately 10 percent chance of occurrence in any given year\" and its extreme storm \"the 100-year storm, with approximately 1 percent chance of occurrence in any given year\" [dep_extreme_2080_nta][dep_moderate_2050_nta][dep_moderate_current_nta][dep_limited_current_nta]. Median ground elevation 10.55 m NAVD88 (10th percentile 5.43 m) [microtopo_nta].\n\n**Live readings.**\n21 FloodNet sensors inside this area have recorded 40 flood events (each a series of depth readings above 10 mm at the sensor, FloodNet's definition) on 8 separate days in the last 3 years (16 of them installed during that period, the latest on 2026-07-09), the most recent starting 2026-08-23 11:15 UTC (every date here is a UTC day) [floodnet]. By UTC calendar year: 2 in 2024, 11 in 2025 and 27 in 2026 [floodnet]. FloodNet's API lists 14 more events labelled flood here that are still to be verified by a person; Riprap counts verified events only [floodnet]. The highest depth in FloodNet's record for these sensors in that period is 1172 mm (46.1 in) on 2026-05-20, in an event the API marks as verified by a person, at a sensor listed as \"noisy\" in FloodNet's API when this was read (2026-10-05); that is the sensor's status now, which the API does not give for the day of the event [floodnet]. 6 of the 21 sensors are listed with a status other than \"good\" in FloodNet's API when this was read (\"dead\", \"driverail_altered\", \"low_charge\", \"needs_sensor\", \"noisy\") and recorded 8 of the 40 events [floodnet]. 4499 NYC 311 complaints about flooding and sewer backups filed in Community District QN12 (by the record's community board field) in the last 3 years (since 2023-10-06; eleven descriptors; other sewer complaints, such as odors or missing covers, are not counted): 2731 sewer backup, 1083 catch basin, 532 street flooding, 153 manhole overflow [nyc311_nta]. A count of complaints is a count of reports filed, not of floods: a low count can mean under-reporting and not the absence of flooding, because the propensity to file a 311 request varies with income, language and demographics (studies of other 311 complaint types: Kontokosta, Hong and Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill, Annals of Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003) [nyc311_nta].\n\n**Places and facilities.**\nNYC Planning's Community District Profile counts 5 buildings in the 1% annual chance floodplain of this district (the floodplain of FEMA's 2015 preliminary and 2007 maps) [dcp_floodplain_nta]. The profile prints 0 residential units and 0 residents for this district, a zero that does not fit its own count of 5 buildings, so it is not repeated here as a count [dcp_floodplain_nta]. 36 MTA subway entrances in this area (each entrance read at its own point on the maps, with no buffer): 0 inside the 2012 Sandy inundation extent and 17 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario (17 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding) [mta_entrance_exposure]. In a rainfall flooding category of the modelled \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\" map, by station: Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z) [mta_entrance_exposure]. 1 NYCHA development inside a mapped flood extent in this area (the register lists only developments with 10% or more of their mapped outline inside the 2012 Sandy extent, or their centre point inside one of three modeled DEP stormwater scenarios (Moderate Flood with current and with 2050 sea levels, Extreme Flood with 2080; the Limited Flood map is not tested), not every development): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario (1 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding) [nycha_development_exposure]. Under 10% of the outline inside the 2012 Sandy extent (not counted): FHA REPOSSESSED HOUSES (GROUP X) [nycha_development_exposure]. In a rainfall flooding category of the modelled \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\" map: CONLON LIHFE TOWER [nycha_development_exposure]. 1 public school inside a mapped flood extent in this area (from the NYC Department of Education's school locations for the 2019 to 2020 school year, charter schools included; the register lists only schools whose location point is inside the 2012 Sandy extent or one of three modeled DEP stormwater scenarios (Moderate Flood with current and with 2050 sea levels, Extreme Flood with 2080; the Limited Flood map is not tested), not every school): 0 inside the 2012 Sandy inundation extent and 1 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario (1 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding) [doe_school_exposure]. In a rainfall flooding category of the modelled \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\" map: I.S. 059 Springfield Gardens [doe_school_exposure]. 0 hospitals in this area (each read at the one point the state file gives for it, not across its campus): 0 inside the 2012 Sandy inundation extent and 0 inside the DEP stormwater map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", a modelled scenario [doh_hospital_exposure]. The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination [mta_entrance_exposure][nycha_development_exposure][doe_school_exposure][doh_hospital_exposure].\n\n**Projections.**\nNo active NWS flood, coastal or tropical storm alerts for this area (read at its centre), checked 2026-10-05 17:33 UTC [nws_alerts]. NPCC4 (2024) projects sea-level rise in New York City of 14 to 19 in (0.36 to 0.48 m) by the 2050s and 30 to 50 in (0.76 to 1.27 m) by 2100, relative to 1995-2014, as its middle range (25th to 75th percentile); the 90th percentile is 23 in (0.58 m) by the 2050s and 65 in (1.65 m) by 2100 [npcc4_slr].\n\n**Out of scope.** This briefing is not a flood zone determination, an engineering assessment or advice. Where a probe was offline at run time, the relevant section omits that signal.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -2265,12 +2265,12 @@
    "floodnet": {
     "doc_id": "floodnet",
     "source": "FloodNet (New York University and The City University of New York)",
-    "title": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
+    "title": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Riprap names no sensor, because FloodNet's licence forbids reposting its records: each verified event can be found by its date and depth in FloodNet's own table on NYC Open Data, \"FloodNet: Street Flooding Events Measured by FloodNet Sensors\" (https://data.cityofnewyork.us/d/aq7i-eu5q), and on its dashboard (https://dataviz.floodnet.nyc). Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
     "url": "https://dataviz.floodnet.nyc/",
     "license": "CC BY-NC-SA 4.0",
-    "date_modified": "2026-10-05T16:38Z",
-    "retrieved_at": "2026-10-05T16:38Z",
-    "vintage": "2026-10-05T16:38Z",
+    "date_modified": "2026-10-05T17:33Z",
+    "retrieved_at": "2026-10-05T17:33Z",
+    "vintage": "2026-10-05T17:33Z",
     "maturity": "production",
     "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
     "attribution": "FloodNet (New York University and The City University of New York)",
@@ -2283,14 +2283,14 @@
    "nyc311_nta": {
     "doc_id": "nyc311_nta",
     "source": "NYC 311 Service Requests (NYC Open Data)",
-    "title": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), flood and sewer complaints in the area (the sentence states how the area was counted, and the window). A neighbourhood is counted from the rows in its bounding box that fall inside its outline; a community district by the record's community_board field. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. The exact Socrata query is this citation's query_url. Complaints are shown at the block, never the house number.",
+    "title": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), complaints about flooding and sewer backups in the area (the sentence states how the area was counted, and the window). A neighbourhood is counted from the rows in its bounding box that fall inside its outline; a community district by the record's community_board field. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. This citation's query_url is the Socrata query for the counted rows, with no house number or coordinate selected. Complaints are shown at the block, never the house number.",
     "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2026-10-05T01:38:25+0000",
-    "retrieved_at": "2026-10-05T16:38Z",
+    "retrieved_at": "2026-10-05T17:33Z",
     "vintage": "2026-10-05T01:38:25+0000",
     "maturity": "production",
-    "query_url": "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=unique_key%2C+descriptor%2C+created_date%2C+incident_address%2C+status%2C+latitude%2C+longitude%2C+street_name%2C+cross_street_1%2C+cross_street_2&%24where=%28descriptor%3D%27Street+Flooding+%28SJ%29%27+OR+descriptor%3D%27Flooding+on+Street%27+OR+descriptor%3D%27Sewer+Backup+%28Use+Comments%29+%28SA%29%27+OR+descriptor%3D%27Backup%27+OR+descriptor%3D%27Catch+Basin+Clogged%2FFlooding+%28Use+Comments%29+%28SC%29%27+OR+descriptor%3D%27Catch+Basin+Clogged%27+OR+descriptor%3D%27Highway+Flooding+%28SH%29%27+OR+descriptor%3D%27Flooding+on+Highway%27+OR+descriptor%3D%27Manhole+Overflow+%28Use+Comments%29+%28SA1%29%27+OR+descriptor%3D%27Manhole+Overflow%27+OR+descriptor%3D%27RAIN+GARDEN+FLOODING+%28SRGFLD%29%27%29+AND+%28complaint_type%3D%27Sewer%27+OR+complaint_type%3D%27Sewer+Maintenance%27%29+AND+community_board%3D%2712+QUEENS%27+AND+created_date+%3E%3D+%272023-10-06T00%3A00%3A00%27&%24order=created_date+desc&%24limit=20000"
+    "query_url": "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=unique_key%2C+created_date%2C+descriptor%2C+street_name%2C+cross_street_1%2C+cross_street_2&%24where=%28descriptor%3D%27Street+Flooding+%28SJ%29%27+OR+descriptor%3D%27Flooding+on+Street%27+OR+descriptor%3D%27Sewer+Backup+%28Use+Comments%29+%28SA%29%27+OR+descriptor%3D%27Backup%27+OR+descriptor%3D%27Catch+Basin+Clogged%2FFlooding+%28Use+Comments%29+%28SC%29%27+OR+descriptor%3D%27Catch+Basin+Clogged%27+OR+descriptor%3D%27Highway+Flooding+%28SH%29%27+OR+descriptor%3D%27Flooding+on+Highway%27+OR+descriptor%3D%27Manhole+Overflow+%28Use+Comments%29+%28SA1%29%27+OR+descriptor%3D%27Manhole+Overflow%27+OR+descriptor%3D%27RAIN+GARDEN+FLOODING+%28SRGFLD%29%27%29+AND+%28complaint_type%3D%27Sewer%27+OR+complaint_type%3D%27Sewer+Maintenance%27%29+AND+community_board%3D%2712+QUEENS%27+AND+created_date+%3E%3D+%272023-10-06T00%3A00%3A00%27&%24order=created_date+desc&%24limit=20000"
    },
    "noaa_tides": {
     "doc_id": "noaa_tides",
@@ -2298,9 +2298,9 @@
     "title": "NOAA CO-OPS tide-gauge water level observations, nearest station to address.",
     "url": "https://tidesandcurrents.noaa.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T16:38Z",
-    "retrieved_at": "2026-10-05T16:38Z",
-    "vintage": "2026-10-05T16:38Z",
+    "date_modified": "2026-10-05T17:33Z",
+    "retrieved_at": "2026-10-05T17:33Z",
+    "vintage": "2026-10-05T17:33Z",
     "maturity": "production"
    },
    "dcp_floodplain_nta": {
@@ -2310,7 +2310,7 @@
     "url": "https://communityprofiles.planning.nyc.gov/",
     "license": "NYC Open Data Terms of Use",
     "date_modified": "2024-02-01",
-    "retrieved_at": "2026-10-05T16:38Z",
+    "retrieved_at": "2026-10-05T17:33Z",
     "vintage": "2024-02-01",
     "maturity": "production"
    },
@@ -2364,9 +2364,9 @@
     "title": "NWS active alerts for the area (flood / coastal / tropical storm).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T16:38Z",
-    "retrieved_at": "2026-10-05T16:38Z",
-    "vintage": "2026-10-05T16:38Z",
+    "date_modified": "2026-10-05T17:33Z",
+    "retrieved_at": "2026-10-05T17:33Z",
+    "vintage": "2026-10-05T17:33Z",
     "maturity": "production"
    },
    "nws_water_forecast": {
@@ -2375,9 +2375,9 @@
     "title": "National Weather Service, National Water Prediction Service, official water-level forecast and flood stages for the nearest harbor gauge.",
     "url": "https://water.noaa.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T16:38Z",
-    "retrieved_at": "2026-10-05T16:38Z",
-    "vintage": "2026-10-05T16:38Z",
+    "date_modified": "2026-10-05T17:33Z",
+    "retrieved_at": "2026-10-05T17:33Z",
+    "vintage": "2026-10-05T17:33Z",
     "maturity": "production"
    },
    "npcc4_slr": {
@@ -2445,7 +2445,7 @@
    },
    {
     "id": "nyc311_nta",
-    "title": "NYC 311 flood complaints in the area",
+    "title": "NYC 311 complaints about flooding and sewer backups in the area (3y)",
     "stone": "touchstone"
    },
    {
@@ -2694,7 +2694,7 @@
     "3": 0.0
    },
    "polygon_area_m2": 24698643.1,
-   "narrative": "On the city's stormwater flood map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", 16.4% of this area is in a rainfall flooding category: 7.5% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 8.8% in \"Deep and Contiguous Flooding (1 ft. and greater)\"; 0.0% is in its \"Future High Tides 2080\" category, which is coastal tidal inundation projected for 2080. The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination.",
+   "narrative": "On the city's stormwater flood map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", 16.4% of this area is in a rainfall flooding category: 7.5% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 8.8% in \"Deep and Contiguous Flooding (1 ft. and greater)\"; 0.0% is in its \"Future High Tides 2080\" category, which is coastal tidal inundation projected for 2080. The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination. The city's Stormwater Resiliency Plan (2021) calls its moderate storm \"the 10-year storm, with approximately 10 percent chance of occurrence in any given year\" and its extreme storm \"the 100-year storm, with approximately 1 percent chance of occurrence in any given year\".",
    "headline_value": "16.4% modeled to flood from rainfall, 0.0% future high tide"
   },
   "dep_moderate_2050_nta": {
@@ -2707,7 +2707,7 @@
     "3": 0.0
    },
    "polygon_area_m2": 24698643.1,
-   "narrative": "On the city's stormwater flood map \"Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise\", 3.3% of this area is in a rainfall flooding category: 1.9% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 1.5% in \"Deep and Contiguous Flooding (1 ft. and greater)\"; 0.0% is in its \"Future High Tides 2050\" category, which is coastal tidal inundation projected for 2050. The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination.",
+   "narrative": "On the city's stormwater flood map \"Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise\", 3.3% of this area is in a rainfall flooding category: 1.9% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 1.5% in \"Deep and Contiguous Flooding (1 ft. and greater)\"; 0.0% is in its \"Future High Tides 2050\" category, which is coastal tidal inundation projected for 2050. The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination. The city's Stormwater Resiliency Plan (2021) calls its moderate storm \"the 10-year storm, with approximately 10 percent chance of occurrence in any given year\" and its extreme storm \"the 100-year storm, with approximately 1 percent chance of occurrence in any given year\".",
    "headline_value": "3.3% modeled to flood from rainfall, 0.0% future high tide"
   },
   "dep_moderate_current_nta": {
@@ -2720,7 +2720,7 @@
     "3": 0.0
    },
    "polygon_area_m2": 24698643.1,
-   "narrative": "On the city's stormwater flood map \"Moderate Flood (2.13 inches/hr) with Current Sea Levels\" (the near term), 3.1% of this area is in a rainfall flooding category: 1.8% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 1.3% in \"Deep and Contiguous Flooding (1 ft. and greater)\". The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination.",
+   "narrative": "On the city's stormwater flood map \"Moderate Flood (2.13 inches/hr) with Current Sea Levels\" (the near term), 3.1% of this area is in a rainfall flooding category: 1.8% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 1.3% in \"Deep and Contiguous Flooding (1 ft. and greater)\". The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination. The city's Stormwater Resiliency Plan (2021) calls its moderate storm \"the 10-year storm, with approximately 10 percent chance of occurrence in any given year\" and its extreme storm \"the 100-year storm, with approximately 1 percent chance of occurrence in any given year\".",
    "headline_value": "3.1% modeled to flood from rainfall"
   },
   "dep_limited_current_nta": {
@@ -2733,7 +2733,7 @@
     "3": 0.0
    },
    "polygon_area_m2": 24698643.1,
-   "narrative": "On the city's stormwater flood map \"Limited Flood (1.77 inches/hr) with Current Sea Levels\" (the near term), 1.4% of this area is in a rainfall flooding category: 0.9% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 0.5% in \"Deep and Contiguous Flooding (1 ft. and greater)\". The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination.",
+   "narrative": "On the city's stormwater flood map \"Limited Flood (1.77 inches/hr) with Current Sea Levels\" (the near term), 1.4% of this area is in a rainfall flooding category: 0.9% in \"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)\" and 0.5% in \"Deep and Contiguous Flooding (1 ft. and greater)\". The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map \"does not provide the exact depth of flooding at any location\", and it is not a flood plain determination. The city's Stormwater Resiliency Plan (2021) calls its moderate storm \"the 10-year storm, with approximately 10 percent chance of occurrence in any given year\" and its extreme storm \"the 100-year storm, with approximately 1 percent chance of occurrence in any given year\".",
    "headline_value": "1.4% modeled to flood from rainfall"
   },
   "microtopo_nta": {
@@ -2795,7 +2795,7 @@
    },
    "latest_event_start": "2026-08-23T11:15",
    "n_events_open_24h": 0,
-   "status_read_at": "2026-10-05T16:38Z",
+   "status_read_at": "2026-10-05T17:33Z",
    "license": "CC BY-NC-SA 4.0",
    "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
    "attribution": "FloodNet (New York University and The City University of New York)",
@@ -3279,10 +3279,10 @@
      "lon": -73.747
     }
    ],
-   "query_url": "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=unique_key%2C+descriptor%2C+created_date%2C+incident_address%2C+status%2C+latitude%2C+longitude%2C+street_name%2C+cross_street_1%2C+cross_street_2&%24where=%28descriptor%3D%27Street+Flooding+%28SJ%29%27+OR+descriptor%3D%27Flooding+on+Street%27+OR+descriptor%3D%27Sewer+Backup+%28Use+Comments%29+%28SA%29%27+OR+descriptor%3D%27Backup%27+OR+descriptor%3D%27Catch+Basin+Clogged%2FFlooding+%28Use+Comments%29+%28SC%29%27+OR+descriptor%3D%27Catch+Basin+Clogged%27+OR+descriptor%3D%27Highway+Flooding+%28SH%29%27+OR+descriptor%3D%27Flooding+on+Highway%27+OR+descriptor%3D%27Manhole+Overflow+%28Use+Comments%29+%28SA1%29%27+OR+descriptor%3D%27Manhole+Overflow%27+OR+descriptor%3D%27RAIN+GARDEN+FLOODING+%28SRGFLD%29%27%29+AND+%28complaint_type%3D%27Sewer%27+OR+complaint_type%3D%27Sewer+Maintenance%27%29+AND+community_board%3D%2712+QUEENS%27+AND+created_date+%3E%3D+%272023-10-06T00%3A00%3A00%27&%24order=created_date+desc&%24limit=20000",
+   "query_url": "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=unique_key%2C+created_date%2C+descriptor%2C+street_name%2C+cross_street_1%2C+cross_street_2&%24where=%28descriptor%3D%27Street+Flooding+%28SJ%29%27+OR+descriptor%3D%27Flooding+on+Street%27+OR+descriptor%3D%27Sewer+Backup+%28Use+Comments%29+%28SA%29%27+OR+descriptor%3D%27Backup%27+OR+descriptor%3D%27Catch+Basin+Clogged%2FFlooding+%28Use+Comments%29+%28SC%29%27+OR+descriptor%3D%27Catch+Basin+Clogged%27+OR+descriptor%3D%27Highway+Flooding+%28SH%29%27+OR+descriptor%3D%27Flooding+on+Highway%27+OR+descriptor%3D%27Manhole+Overflow+%28Use+Comments%29+%28SA1%29%27+OR+descriptor%3D%27Manhole+Overflow%27+OR+descriptor%3D%27RAIN+GARDEN+FLOODING+%28SRGFLD%29%27%29+AND+%28complaint_type%3D%27Sewer%27+OR+complaint_type%3D%27Sewer+Maintenance%27%29+AND+community_board%3D%2712+QUEENS%27+AND+created_date+%3E%3D+%272023-10-06T00%3A00%3A00%27&%24order=created_date+desc&%24limit=20000",
    "headline_value": "4499 complaints",
    "subhead_text": "2731 sewer backup, 1083 catch basin, 532 street flooding, 153 manhole overflow",
-   "narrative": "4499 NYC 311 flood and sewer complaints filed in Community District QN12 (by the record's community board field) in the last 3 years (since 2023-10-06): 2731 sewer backup, 1083 catch basin, 532 street flooding, 153 manhole overflow. A count of complaints is a count of reports filed, not of floods: a low count can mean under-reporting and not the absence of flooding, because the propensity to file a 311 request varies with income, language and demographics (studies of other 311 complaint types: Kontokosta, Hong and Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill, Annals of Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003).",
+   "narrative": "4499 NYC 311 complaints about flooding and sewer backups filed in Community District QN12 (by the record's community board field) in the last 3 years (since 2023-10-06; eleven descriptors; other sewer complaints, such as odors or missing covers, are not counted): 2731 sewer backup, 1083 catch basin, 532 street flooding, 153 manhole overflow. A count of complaints is a count of reports filed, not of floods: a low count can mean under-reporting and not the absence of flooding, because the propensity to file a 311 request varies with income, language and demographics (studies of other 311 complaint types: Kontokosta, Hong and Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill, Annals of Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003).",
    "caveat": "A count of complaints is a count of reports filed, not of floods: a low count can mean under-reporting and not the absence of flooding, because the propensity to file a 311 request varies with income, language and demographics (studies of other 311 complaint types: Kontokosta, Hong and Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill, Annals of Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003).",
    "histogram": [
     364,
@@ -3298,12 +3298,12 @@
    "station_lon": -73.7649,
    "distance_km": 13.2,
    "datum": "MLLW",
-   "observed_ft": 1.48,
-   "observed_ft_mllw": 1.48,
-   "predicted_ft_mllw": 1.68,
-   "residual_ft": -0.2,
-   "obs_time": "2026-10-05 16:24",
-   "narrative": "Latest reading at Kings Point, NY, the nearest NOAA tide station in a straight line (13.2 km away, on Long Island Sound): 1.48 ft above MLLW (-0.2 ft vs predicted tide), observed 2026-10-05 16:24 UTC.",
+   "observed_ft": 1.26,
+   "observed_ft_mllw": 1.26,
+   "predicted_ft_mllw": 1.13,
+   "residual_ft": 0.13,
+   "obs_time": "2026-10-05 17:24",
+   "narrative": "Latest reading at Kings Point, NY, the nearest NOAA tide station in a straight line (13.2 km away, on Long Island Sound): 1.26 ft above MLLW (+0.13 ft vs predicted tide), observed 2026-10-05 17:24 UTC.",
    "error": null
   },
   "dcp_floodplain_nta": {
@@ -3989,8 +3989,8 @@
   "nws_alerts_nta": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS flood, coastal or tropical storm alerts for this area (read at its centre), checked 2026-10-05 16:38 UTC.",
-   "retrieved_at": "2026-10-05T16:38:31Z",
+   "narrative": "No active NWS flood, coastal or tropical storm alerts for this area (read at its centre), checked 2026-10-05 17:33 UTC.",
+   "retrieved_at": "2026-10-05T17:33:56Z",
    "error": null
   },
   "nws_water_forecast": {
@@ -4091,7 +4091,7 @@
    {
     "step": "nta_resolve",
     "ok": true,
-    "started_at": 1791218309.637158,
+    "started_at": 1791221634.683611,
     "elapsed_s": 0.05,
     "err": null,
     "result": {
@@ -4110,8 +4110,8 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1791218309.6860218,
-    "elapsed_s": 0.2449,
+    "started_at": 1791221634.732234,
+    "elapsed_s": 0.2152,
     "err": null,
     "result": {
      "deployment": "nyc",
@@ -4122,7 +4122,7 @@
    {
     "step": "dob_permits_nta",
     "ok": true,
-    "started_at": 1791218309.9835079,
+    "started_at": 1791221634.995866,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -4132,80 +4132,80 @@
    {
     "step": "area_boundary",
     "ok": true,
-    "started_at": 1791218309.9842298,
-    "elapsed_s": 0.01,
+    "started_at": 1791221634.99778,
+    "elapsed_s": 0.19,
     "err": null,
     "result": {}
    },
    {
     "step": "sandy_nta",
     "ok": true,
-    "started_at": 1791218309.9850612,
-    "elapsed_s": 1.32,
+    "started_at": 1791221634.9977531,
+    "elapsed_s": 1.25,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_extreme_2080_nta",
     "ok": true,
-    "started_at": 1791218309.9855082,
-    "elapsed_s": 1.45,
+    "started_at": 1791221634.9978461,
+    "elapsed_s": 1.4,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_2050_nta",
     "ok": true,
-    "started_at": 1791218309.986038,
-    "elapsed_s": 1.21,
+    "started_at": 1791221634.997726,
+    "elapsed_s": 1.14,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_moderate_current_nta",
     "ok": true,
-    "started_at": 1791218309.9859781,
-    "elapsed_s": 1.19,
+    "started_at": 1791221634.997696,
+    "elapsed_s": 1.09,
     "err": null,
     "result": {}
    },
    {
     "step": "dep_limited_current_nta",
     "ok": true,
-    "started_at": 1791218309.986822,
-    "elapsed_s": 1.14,
+    "started_at": 1791221634.9976509,
+    "elapsed_s": 0.19,
     "err": null,
     "result": {}
    },
    {
     "step": "microtopo_nta",
     "ok": true,
-    "started_at": 1791218309.9869492,
-    "elapsed_s": 1.47,
+    "started_at": 1791221634.998312,
+    "elapsed_s": 1.39,
     "err": null,
     "result": {}
    },
    {
     "step": "city_landcover_nta",
     "ok": true,
-    "started_at": 1791218309.988847,
-    "elapsed_s": 1.33,
+    "started_at": 1791221634.9990149,
+    "elapsed_s": 1.25,
     "err": null,
     "result": {}
    },
    {
     "step": "landcover_nta",
     "ok": true,
-    "started_at": 1791218309.989305,
-    "elapsed_s": 1.35,
+    "started_at": 1791221634.999138,
+    "elapsed_s": 1.29,
     "err": null,
     "result": {}
    },
    {
     "step": "floodnet_nta",
     "ok": true,
-    "started_at": 1791218309.989366,
-    "elapsed_s": 1.66,
+    "started_at": 1791221634.999437,
+    "elapsed_s": 1.64,
     "err": null,
     "result": {
      "n_sensors": 21,
@@ -4215,27 +4215,27 @@
    {
     "step": "nyc311_nta",
     "ok": true,
-    "started_at": 1791218309.990145,
-    "elapsed_s": 1.61,
+    "started_at": 1791221634.99982,
+    "elapsed_s": 1.6,
     "err": null,
     "result": {}
    },
    {
     "step": "noaa_tides",
     "ok": true,
-    "started_at": 1791218309.9905548,
+    "started_at": 1791221635.0008152,
     "elapsed_s": 1.66,
     "err": null,
     "result": {
      "station": "8516945",
-     "observed_ft_mllw": 1.48,
-     "residual_ft": -0.2
+     "observed_ft_mllw": 1.26,
+     "residual_ft": 0.13
     }
    },
    {
     "step": "dcp_floodplain_nta",
     "ok": true,
-    "started_at": 1791218309.990898,
+    "started_at": 1791221635.0007858,
     "elapsed_s": 1.59,
     "err": null,
     "result": {
@@ -4246,8 +4246,8 @@
    {
     "step": "mta_entrances_nta",
     "ok": true,
-    "started_at": 1791218309.9914188,
-    "elapsed_s": 1.41,
+    "started_at": 1791221635.00119,
+    "elapsed_s": 1.34,
     "err": null,
     "result": {
      "n_entrances": 36,
@@ -4258,8 +4258,8 @@
    {
     "step": "nycha_developments_nta",
     "ok": true,
-    "started_at": 1791218309.9965498,
-    "elapsed_s": 1.18,
+    "started_at": 1791221635.187031,
+    "elapsed_s": 0.93,
     "err": null,
     "result": {
      "n_developments": 1,
@@ -4270,8 +4270,8 @@
    {
     "step": "doe_schools_nta",
     "ok": true,
-    "started_at": 1791218311.122989,
-    "elapsed_s": 0.12,
+    "started_at": 1791221635.189148,
+    "elapsed_s": 1.0,
     "err": null,
     "result": {
      "n_schools": 1,
@@ -4282,8 +4282,8 @@
    {
     "step": "doh_hospitals_nta",
     "ok": true,
-    "started_at": 1791218311.175238,
-    "elapsed_s": 0.01,
+    "started_at": 1791221636.088424,
+    "elapsed_s": 0.03,
     "err": null,
     "result": {
      "n_hospitals": 0,
@@ -4294,8 +4294,8 @@
    {
     "step": "nws_alerts_nta",
     "ok": true,
-    "started_at": 1791218311.1773598,
-    "elapsed_s": 0.56,
+    "started_at": 1791221636.1192489,
+    "elapsed_s": 0.68,
     "err": null,
     "result": {
      "n_active": 0
@@ -4304,8 +4304,8 @@
    {
     "step": "nws_water_forecast",
     "ok": true,
-    "started_at": 1791218311.181084,
-    "elapsed_s": 0.47,
+    "started_at": 1791221636.121353,
+    "elapsed_s": 0.52,
     "err": null,
     "result": {
      "gauge": "KPTN6",
@@ -4316,7 +4316,7 @@
    {
     "step": "npcc4_slr_nta",
     "ok": true,
-    "started_at": 1791218311.192183,
+    "started_at": 1791221636.134899,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -4324,7 +4324,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1791218311.76206,
+    "started_at": 1791221636.8328161,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -4333,15 +4333,15 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1791218311.762166,
+    "started_at": 1791221636.832939,
     "ok": true,
     "result": {
-     "n_chars": 10120,
+     "n_chars": 10621,
      "n_citations": 20,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.1042
+    "elapsed_s": 0.1092
    }
   ],
   "failed": [],
