@@ -9,7 +9,7 @@
   import { deployment } from '$lib/stores/deployment.svelte';
   import { openAgentStream, hazardLabel, isHeat, NO_BACKEND } from '$lib/client/agentStream';
   import {
-    fetchSandy, fetchDep, fetchProxyDots,
+    fetchSandy, fetchDep,
     fetchIdaHwm, fetchSandyNta, fetchDepNta
   } from '$lib/client/mapLayers';
 
@@ -36,7 +36,7 @@
   let runStartedAt: number | null = null;
 
   // Live-only map layers from /api/layers/*, once the address resolves.
-  // Ida marks, FloodNet sensors and 311 points come from `final` instead
+  // Ida marks and 311 points come from `final` instead
   // (RunState.applyFinal), so the map plots what the answer found.
   // A heat run draws no flood layers (MapFigure adds its own overlay).
   $effect(() => {
@@ -55,7 +55,6 @@
     const { lat, lon } = run.compareAddressA;
     fetchSandy(lat, lon).then((fc) => { run.sandyFcA = fc; });
     fetchDep(lat, lon).then((fc) => { run.depFcA = fc; });
-    fetchProxyDots(lat, lon).then((fc) => { run.proxyFcA = fc; });
     fetchIdaHwm(lat, lon).then((fc) => { run.idaHwmFcA = fc; });
   });
   $effect(() => {
@@ -63,7 +62,6 @@
     const { lat, lon } = run.compareAddressB;
     fetchSandy(lat, lon).then((fc) => { run.sandyFcB = fc; });
     fetchDep(lat, lon).then((fc) => { run.depFcB = fc; });
-    fetchProxyDots(lat, lon).then((fc) => { run.proxyFcB = fc; });
     fetchIdaHwm(lat, lon).then((fc) => { run.idaHwmFcB = fc; });
   });
 

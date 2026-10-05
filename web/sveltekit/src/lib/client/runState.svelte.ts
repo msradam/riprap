@@ -211,15 +211,6 @@ export function compactAddress(a: string): string {
   return out || a;
 }
 
-/** A sensor's status as FloodNet's API lists it, quoted and not
- *  interpreted: what a value such as "signal" or "noisy" means for a
- *  reading is not published. It is the status when the API was read. */
-export function sensorStatusWords(status: unknown): string | null {
-  const s = typeof status === 'string' ? status.trim() : '';
-  if (!s) return null;
-  return `listed as "${s}" in FloodNet's API when this was read`;
-}
-
 /** A 311 descriptor without its internal codes: "Sewer Backup (Use
  *  Comments) (SA)" becomes "Sewer backup". */
 export function plainDescriptor(d: unknown): string | null {
@@ -229,16 +220,11 @@ export function plainDescriptor(d: unknown): string | null {
   return t ? t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() : null;
 }
 
-/** FloodNet street sensors (`final.floodnet.sensors`). */
-export function buildFloodnetFc(fr: Rec): FeatureCollection | undefined {
-  return pointsFc(block(fr, 'floodnet')?.sensors, 'floodnet', (e) => String(e.name ?? 'FloodNet sensor'), (e) =>
-    ['FloodNet flood sensor', e.street && `on ${e.street}`, sensorStatusWords(e.status) ?? e.status_words]
-      .filter(Boolean).join(', '));
-}
-
-/** NYC 311 flood complaints with coordinates (`final.nyc311.points`). */
+/** NYC 311 flood and sewer complaints (`final.nyc311.points`), each at its
+ *  block: the server sends the street and cross streets with coordinates
+ *  rounded to about 100 m, never a house number. */
 export function build311Fc(fr: Rec): FeatureCollection | undefined {
-  return pointsFc(block(fr, 'nyc311')?.points, 'nyc311', (e) => String(e.address ?? '311 complaint'), (e) =>
+  return pointsFc(block(fr, 'nyc311')?.points, 'nyc311', (e) => String(e.block ?? '311 complaint'), (e) =>
     ['311 complaint', plainDescriptor(e.descriptor), e.date].filter(Boolean).join(', '));
 }
 
@@ -335,7 +321,6 @@ export class RunState {
   // Evidence points from `final` (applyFinal), on both routes.
   proxyFc = $state<FeatureCollection | undefined>(undefined);
   idaHwmFc = $state<FeatureCollection | undefined>(undefined);
-  floodnetFc = $state<FeatureCollection | undefined>(undefined);
   radii = $state<SearchRadius[]>([]);
 
   compareAddressA = $state<Place | null>(null);
@@ -369,7 +354,7 @@ export class RunState {
   /** Every point on the map as a list row: measured evidence, the asset
    *  register, then 311 complaints. */
   mapPoints = $derived<EvidencePointRow[]>([
-    ...evidencePointRows(this.idaHwmFc, this.floodnetFc),
+    ...evidencePointRows(this.idaHwmFc),
     ...mapPointRows(this.registerPointsFc).map((r) => ({
       id: r.id, name: r.name, meta: [r.distance, `scenarios: ${r.scenarios}`].filter(Boolean).join('; ')
     })),
@@ -423,8 +408,7 @@ export class RunState {
   /** Per-tier feature counts for the map legend; zero-count layers are
    *  hidden from the legend. */
   mapFeatureCounts = $derived({
-    empirical: (this.sandyFc?.features.length ?? 0) + (this.idaHwmFc?.features.length ?? 0) +
-      (this.floodnetFc?.features.length ?? 0),
+    empirical: (this.sandyFc?.features.length ?? 0) + (this.idaHwmFc?.features.length ?? 0),
     modeled: this.depFc?.features.length ?? 0,
     proxy: this.proxyFc?.features.length ?? 0
   });
@@ -497,7 +481,6 @@ export class RunState {
     const fr = f as unknown as Rec;
     this.registerPointsFc = buildRegisterPointsFc(fr);
     this.idaHwmFc = buildIdaHwmFc(fr);
-    this.floodnetFc = buildFloodnetFc(fr);
     this.proxyFc = build311Fc(fr);
     this.radii = searchRadii(fr);
   }

@@ -23,18 +23,17 @@ test.describe('@layers backend data coverage', () => {
         return { features: (j?.features?.length ?? 0) as number, status: r.status() };
       };
 
-      const [sandy, dep, floodnet] = await Promise.all([
+      const [sandy, dep] = await Promise.all([
         fetchFc(`/api/layers/sandy?lat=${p.lat}&lon=${p.lon}&r=1500`),
-        fetchFc(`/api/layers/dep_extreme_2080?lat=${p.lat}&lon=${p.lon}&r=1500`),
-        fetchFc(`/api/floodnet_near?lat=${p.lat}&lon=${p.lon}&r=1500`)
+        fetchFc(`/api/layers/dep_extreme_2080?lat=${p.lat}&lon=${p.lon}&r=1500`)
       ]);
 
-      console.log(`[${p.name}] sandy=${sandy.features} dep=${dep.features} floodnet=${floodnet.features}`);
+      console.log(`[${p.name}] sandy=${sandy.features} dep=${dep.features}`);
 
       // Each endpoint should respond 200 (or be cleanly skipped on a
       // non-running backend). Coverage at any specific point is the
       // diagnostic: an empty layer is not a bug.
-      for (const fc of [sandy, dep, floodnet]) {
+      for (const fc of [sandy, dep]) {
         expect([200, -1]).toContain(fc.status);
       }
     });

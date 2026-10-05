@@ -40,31 +40,28 @@
       : null
   );
 
-  // A saved gallery page keeps FloodNet's counts and sentences but no
-  // per-sensor record (scripts/build_gallery.py: the licence forbids
-  // reposting the data in part), so its map has no sensor points to draw.
+  // A briefing holds FloodNet's counts and sentences but no per-sensor
+  // record (FloodNet's licence forbids reposting its data in part), so the
+  // map has no sensor points to draw, live or saved.
   let sensorsNotDrawn = $derived.by(() => {
-    const f = (run.finalResult as { floodnet?: { n_sensors?: unknown } } | null)?.floodnet;
-    return typeof f?.n_sensors === 'number' && f.n_sensors > 0 && !(run.floodnetFc?.features.length);
+    const r = run.finalResult as Record<string, { n_sensors?: unknown } | undefined> | null;
+    return [r?.floodnet, r?.floodnet_nta].some((f) => typeof f?.n_sensors === 'number' && f.n_sensors > 0);
   });
 
   /** Opens with a space: it follows the caption's last sentence. */
-  const SENSORS_NOTE = " FloodNet's sensors are not drawn on this saved page; they are shown on ";
+  const SENSORS_NOTE = " FloodNet's sensors are not drawn on this page; they are shown on ";
 
   const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
   /** What is plotted, in counts from the data. */
   let plotted = $derived.by(() => {
     const n = (fc: typeof run.idaHwmFc) => fc?.features.length ?? 0;
-    const measured = [
-      n(run.idaHwmFc) && `${count(n(run.idaHwmFc), 'Ida high-water mark', 'Ida high-water marks')} (amber)`,
-      n(run.floodnetFc) && `${count(n(run.floodnetFc), 'FloodNet sensor', 'FloodNet sensors')} (blue)`
-    ].filter(Boolean);
-    const out = measured.length ? [`${measured.join(' and ')}, measured`] : [];
+    const out = n(run.idaHwmFc)
+      ? [`${count(n(run.idaHwmFc), 'Ida high-water mark', 'Ida high-water marks')} (amber), measured`] : [];
     const p = n(run.proxyFc);
     if (p) {
       const total = (run.finalResult as { nyc311?: { n?: unknown } } | null)?.nyc311?.n;
       const of = typeof total === 'number' && total > p ? `${p} of the ${total}` : `${p}`;
-      out.push(`${of} ${of === '1' ? 'complaint' : 'complaints'} to 311 (hollow rings, proxy)`);
+      out.push(`${of} ${of === '1' ? 'complaint' : 'complaints'} to 311, each placed at its block and not at a house (hollow rings, proxy)`);
     }
     const a = n(run.registerPointsFc);
     if (a) out.push(count(a, 'public asset from the register', 'public assets from the register'));
@@ -83,7 +80,6 @@
         depModeled={run.depFc}
         proxy311={run.proxyFc}
         idaHwm={run.idaHwmFc}
-        floodnet={run.floodnetFc}
         radii={run.radii}
         registerPoints={run.registerPointsFc}
         areaBoundary={run.areaBoundary}

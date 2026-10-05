@@ -46,12 +46,6 @@ export async function fetchDepNta(
   return fetchFc(`/api/layers/dep_clipped?code=${encodeURIComponent(code)}&scenario=${scenario}`);
 }
 
-interface FloodNetSensor {
-  type: 'Feature';
-  geometry: { type: 'Point'; coordinates: [number, number] };
-  properties: { n_events_3y?: number; peak_depth_mm?: number; deployment_id?: string; name?: string; [k: string]: unknown };
-}
-
 /**
  * USGS Hurricane Ida 2021 high-water marks within radius_m of the queried
  * address. Returns Points with site_description, elev_ft,
@@ -60,38 +54,6 @@ interface FloodNetSensor {
  */
 export async function fetchIdaHwm(lat: number, lon: number, r = 1500): Promise<FeatureCollection> {
   return fetchFc(`/api/layers/ida_hwm?lat=${lat}&lon=${lon}&r=${r}`);
-}
-
-/**
- * FloodNet sensor points as a graduated-circle layer. The handoff puts 311
- * complaints on the proxy layer; we don't currently expose 311 as GeoJSON
- * from FastAPI, so floodnet sensor density (event count) drives the dot
- * radius for now. Swap to a real 311 endpoint when one lands.
- */
-export async function fetchProxyDots(
-  lat: number,
-  lon: number,
-  r = 1500
-): Promise<FeatureCollection> {
-  try {
-    const res = await fetch(`/api/floodnet_near?lat=${lat}&lon=${lon}&r=${r}`);
-    if (!res.ok) return EMPTY;
-    const j = (await res.json()) as FeatureCollection;
-    // Map n_events_3y → `count` so the proxy-dots radius interpolation hits.
-    const features = j.features.map((f) => {
-      const p = (f as FloodNetSensor).properties ?? {};
-      return {
-        ...f,
-        properties: {
-          ...p,
-          count: typeof p.n_events_3y === 'number' ? p.n_events_3y : 1
-        }
-      };
-    });
-    return { type: 'FeatureCollection', features };
-  } catch {
-    return EMPTY;
-  }
 }
 
 /** The heat briefing's map overlay (static/heat/surface.json): one

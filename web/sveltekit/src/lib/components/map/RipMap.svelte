@@ -46,8 +46,6 @@
     /** USGS Ida 2021 high-water mark points. Empirical tier; amber fill.
      *  Controlled by EMP master toggle. */
     idaHwm?: GeoJSON.FeatureCollection;
-    /** FloodNet street sensors. Empirical tier; solid tier-blue fill. */
-    floodnet?: GeoJSON.FeatureCollection;
     /** Search radii around the address, drawn as labelled hairline rings
      *  and hidden with their tier's layer. */
     radii?: { label: string; radius_m: number; tier: 'empirical' | 'proxy' }[];
@@ -72,7 +70,6 @@
     proxy311,
     registerPoints,
     idaHwm,
-    floodnet,
     radii = [],
     activeLayers = { empirical: true, modeled: true, proxy: true },
     areaBoundary,
@@ -114,7 +111,7 @@
     String(v).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
   function registerPopupHtml(p: Record<string, unknown>): string {
-    // Evidence points (Ida marks, FloodNet, 311) carry the list row's words.
+    // Evidence points (Ida marks, 311) carry the list row's words.
     if (p.detail != null) {
       return `
           <div style="font-family: 'Sofia Sans', system-ui; font-size: 12px; max-width: 240px;">
@@ -198,7 +195,7 @@
   }
 
   /** Every plotted point, for list selection and the initial view. */
-  const pointSets = () => [registerPoints, idaHwm, floodnet, proxy311];
+  const pointSets = () => [registerPoints, idaHwm, proxy311];
 
   function buildDeckLayers() {
     return [
@@ -239,20 +236,6 @@
           const h = Number((f.properties as Record<string, unknown> | null)?.height_above_gnd_ft ?? 0.5);
           return 5 + Math.min(h, 5) * 1.4;
         },
-        radiusUnits: 'pixels',
-        onClick: pickPoint,
-      }),
-      new ScatterplotLayer({
-        id: 'deck-floodnet',
-        data: floodnet?.features ?? [],
-        visible: activeLayers.empirical,
-        pickable: true,
-        stroked: true,
-        getPosition,
-        getFillColor: tokenColor('--riprap-tier-empirical'),
-        getLineColor: tokenColor('--riprap-white'),
-        lineWidthMinPixels: 1.5,
-        getRadius: 6,
         radiusUnits: 'pixels',
         onClick: pickPoint,
       }),
@@ -336,7 +319,7 @@
   // visibility changes. deck.gl diffs by layer `id` internally, so this
   // is cheap even though it reconstructs the array each time.
   $effect(() => {
-    void sandyEmpirical; void depModeled; void idaHwm; void floodnet; void proxy311; void radii; void activeLayers;
+    void sandyEmpirical; void depModeled; void idaHwm; void proxy311; void radii; void activeLayers;
     if (!overlay || !ready) return;
     overlay.setProps({ layers: buildDeckLayers() });
   });
@@ -355,7 +338,7 @@
   $effect(() => {
     if (!map || !ready || areaBoundary) return;
     const pts: [number, number][] = [[address.lon, address.lat],
-      ...[idaHwm, floodnet, proxy311].flatMap((fc) => (fc?.features ?? []).map(getPosition))];
+      ...[idaHwm, proxy311].flatMap((fc) => (fc?.features ?? []).map(getPosition))];
     const animate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (pts.length === 1) {
       if (animate) map.flyTo({ center: pts[0], zoom: 15, essential: true });

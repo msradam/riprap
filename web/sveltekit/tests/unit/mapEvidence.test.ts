@@ -1,11 +1,11 @@
 /**
- * The evidence points on Figure 1 come from `final`: Ida high-water marks,
- * FloodNet sensors and 311 complaints, each with the words the map popup
+ * The evidence points on Figure 1 come from `final`: Ida high-water marks
+ * and 311 complaints (FloodNet's sensors are never drawn: its licence), each with the words the map popup
  * and the map point list print, plus the answer's search radii.
  */
 import { describe, it, expect } from 'vitest';
 import {
-  build311Fc, buildFloodnetFc, buildIdaHwmFc, evidencePointRows, searchRadii
+  build311Fc, buildIdaHwmFc, evidencePointRows, searchRadii
 } from '$lib/client/runState.svelte';
 
 const final = {
@@ -17,13 +17,10 @@ const final = {
       { site: 'No coordinates', height_above_gnd_ft: 1 }
     ]
   },
-  floodnet: {
-    radius_m: 600,
-    sensors: [{ name: 'Q - 184th St/91st Ave', street: '184th Street', status: 'good', lat: 40.71, lon: -73.77 }]
-  },
+  floodnet: { radius_m: 600, n_sensors: 2 },
   nyc311: {
     radius_m: 200,
-    points: [{ lat: 40.7099, lon: -73.7763, descriptor: 'Sewer Backup', date: '2026-05-25', address: '91-11 184 STREET' }]
+    points: [{ lat: 40.71, lon: -73.776, descriptor: 'Sewer Backup', date: '2026-05-25', block: '184 STREET between 91 AVE and 91 RD' }]
   }
 };
 
@@ -39,29 +36,27 @@ describe('evidence point builders', () => {
     });
   });
 
-  it('builds FloodNet sensors and 311 complaints', () => {
-    expect(buildFloodnetFc(final)!.features[0].properties).toMatchObject({
-      pid: 'floodnet-0', name: 'Q - 184th St/91st Ave',
-      detail: 'FloodNet flood sensor, on 184th Street, listed as "good" in FloodNet\'s API when this was read'
-    });
+  it('builds 311 complaints at the block, never a house number', () => {
     expect(build311Fc(final)!.features[0].properties).toMatchObject({
-      pid: 'nyc311-0', name: '91-11 184 STREET', detail: '311 complaint, Sewer backup, 2026-05-25'
+      pid: 'nyc311-0', name: '184 STREET between 91 AVE and 91 RD', detail: '311 complaint, Sewer backup, 2026-05-25'
     });
+    // A row without a block is not labelled with an address field, should one ever arrive.
+    const old = { nyc311: { points: [{ lat: 40.71, lon: -73.776, address: '91-11 184 STREET' }] } };
+    expect(build311Fc(old)!.features[0].properties?.name).toBe('311 complaint');
   });
 
   it('reads the district (_nta) variant and is undefined without points', () => {
     const district = { nyc311_nta: { radius_m: null, points: [] } };
     expect(build311Fc(district)).toBeUndefined();
     expect(buildIdaHwmFc({})).toBeUndefined();
-    expect(buildFloodnetFc({ floodnet: { sensors: 'bad' } })).toBeUndefined();
     const nta = { ida_hwm_nta: { points: [{ lat: 40.6, lon: -73.9, site: 'S' }] } };
     expect(buildIdaHwmFc(nta)!.features[0].properties?.detail).toBe('Ida high-water mark');
   });
 
   it('lists the plotted points as rows in the order given', () => {
-    const rows = evidencePointRows(buildIdaHwmFc(final), undefined, build311Fc(final));
+    const rows = evidencePointRows(buildIdaHwmFc(final), build311Fc(final));
     expect(rows.map((r) => r.id)).toEqual(['ida-0', 'nyc311-0']);
-    expect(rows[1]).toEqual({ id: 'nyc311-0', name: '91-11 184 STREET', meta: '311 complaint, Sewer backup, 2026-05-25' });
+    expect(rows[1]).toEqual({ id: 'nyc311-0', name: '184 STREET between 91 AVE and 91 RD', meta: '311 complaint, Sewer backup, 2026-05-25' });
   });
 
   it('reports the search radii that the blocks give, skipping missing ones', () => {
