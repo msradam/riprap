@@ -73,7 +73,7 @@ DEP_MAP = '"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise"'
 
 
 def narrative(one: str, many: str, n: int, radius_m: float | None, n_sandy: int, n_rain: int, n_tide: int = 0,
-              *, scope: str = "", n_checked: int | None = None) -> str:
+              *, scope: str = "", n_checked: int | None = None, n_near: int = 0) -> str:
     """The register sentence, for the assets within `radius_m` of an
     address or (radius_m None) inside an area. `scope` says what an
     exposed-only register counted, so its count does not read as every
@@ -83,11 +83,17 @@ def narrative(one: str, many: str, n: int, radius_m: float | None, n_sandy: int,
     tides category, which is coastal tidal inundation: a school in that
     category was once listed "inside the DEP extreme stormwater scenario".
     The shape "N ... within R m ...: a inside the 2012 Sandy ... b inside
-    the DEP" is what answer_checks._REGISTER_RE parses; b is every category."""
+    the DEP" is what answer_checks._REGISTER_RE parses; b is every category.
+    `n_near` assets read just outside the Sandy extent (within 50 m of its
+    edge, or under the counted share) are said in the count clause itself:
+    "0 inside" once stood alone for a district whose two hospitals at the
+    edge were both evacuated in Sandy."""
+    near = (f" at {'its' if n == 1 else 'their'} mapped point{'' if n == 1 else 's'}, {n_near} more within 50 m of "
+            "the extent's mapped edge," if n_near else "")
     of = f"; of the nearest {n_checked}" if n_checked is not None and n_checked < n else ""
     where = "in this area" if radius_m is None else f"within {radius_m:g} m of this address"
     return (f"{n} {one if n == 1 else many} {where}{scope}{of}: "
-            f"{n_sandy} inside the 2012 Sandy inundation extent and {n_rain + n_tide} inside the DEP stormwater map "
+            f"{n_sandy} inside the 2012 Sandy inundation extent{near} and {n_rain + n_tide} inside the DEP stormwater map "
             f"{DEP_MAP}, a modelled scenario"
             + (f" ({n_rain} in a rainfall flooding category and {n_tide} in its future high tides category, which is "
                "coastal tidal inundation projected for 2080 and not rainfall flooding)" if n_rain + n_tide else ""))

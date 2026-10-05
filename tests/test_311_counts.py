@@ -18,9 +18,16 @@ V = _summarize([_c("Street Flooding (SJ)")] * 3 + [_c("Flooding on Street")]
 Q = "How many street flooding complaints has Queens CB 12 had?"
 
 
+def nyc311_scope() -> str:
+    from app.context.nyc311 import KIND, SCOPE
+
+    assert SCOPE.startswith("eleven descriptors") and len(KIND) == 11  # the sentence's own count of them
+    return SCOPE
+
+
 def test_summary_splits_by_kind_and_merges_the_two_street_descriptors():
     assert V["n"] == 6 and V["by_kind"] == {"street flooding": 4, "sewer backup": 2}
-    assert f"in the last 3 years (since {V['since']}): 4 street flooding, 2 sewer backup. " in V["narrative"]
+    assert f"in the last 3 years (since {V['since']}; {nyc311_scope()}): 4 street flooding, 2 sewer backup. " in V["narrative"]
 
 
 def test_every_count_carries_the_under_reporting_caveat():
@@ -38,7 +45,7 @@ def test_every_count_carries_the_under_reporting_caveat():
     zero = _summarize([], years=5, radius_m=200)
     for v in (V, zero):
         assert v["caveat"] == nyc311.CAVEAT and v["narrative"].endswith(nyc311.CAVEAT)
-        assert "complaints filed" in v["narrative"].split(". ")[0]
+        assert "complaints about flooding and sewer backups filed" in v["narrative"].split(". ")[0]
 
 
 def test_the_requests_tool_carries_the_caveat(monkeypatch):
@@ -90,7 +97,7 @@ def test_kind_question_uses_that_kind_count():
     assert ac.relevant_figure("nyc311_nta", docs, values, Q) == 4
     assert ac.relevant_figure("nyc311_nta", docs, values, "How many 311 flood complaints?") == 6
     assert ac.kind_lead(Q, docs, values) == ('4 street flooding complaints in the last 3 years, counting the 311 descriptors '
-                                             '"Street Flooding (SJ)" and "Flooding on Street".')
+                                             '"Street Flooding (SJ)" and "Flooding on Street" [nyc311_nta].')
 
 
 def test_extractive_count_answer_leads_with_the_kind(monkeypatch):
@@ -124,8 +131,8 @@ def test_district_counts_by_community_board_and_says_so(monkeypatch):
     out = nta_evidence.complaints(None, query=q, years=3)
     assert seen["clause"] == "community_board='12 QUEENS'"
     assert out["n"] == 2 and out["where"] == "in Community District QN12 (by the record's community board field)"
-    assert out["narrative"].startswith("2 NYC 311 flood and sewer complaints filed in Community District QN12 "
-                                       f"(by the record's community board field) in the last 3 years (since {out['since']}): ")
+    assert out["narrative"].startswith("2 NYC 311 complaints about flooding and sewer backups filed in Community District QN12 "
+                                       f"(by the record's community board field) in the last 3 years (since {out['since']}; ")
     # The exact query the count was read from travels with it.
     assert out["query_url"].startswith("https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=")
     assert "community_board%3D%2712+QUEENS%27" in out["query_url"] and "created_date+%3E%3D" in out["query_url"]
@@ -194,7 +201,14 @@ def test_no_house_number_or_house_coordinate_is_served(monkeypatch):
     for served in (v, tool):
         text = json.dumps({k: x for k, x in served.items() if k != "query_url"})
         assert "90-12" not in text and "address" not in text and "40.7108929" not in text, text
-    assert "flood and sewer complaints" in v["narrative"] and "studies of other 311 complaint types" in v["caveat"]
+    assert "complaints about flooding and sewer backups" in v["narrative"] and "studies of other 311 complaint types" in v["caveat"]
+    # Review round 2: the published query link returns no house number and no coordinates either.
+    from urllib.parse import unquote_plus
+
+    link = unquote_plus(nyc311.query_url("within_circle(location, 40.71, -73.77, 200)", None, 2000))
+    select = link.split("$select=")[1].split("&")[0]
+    assert "incident_address" not in select and "latitude" not in select and "longitude" not in select
+    assert all(f in select for f in ("created_date", "descriptor", "street_name", "cross_street_1"))
 
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
     from build_gallery import HOUSES_STRIPPED, strip_records

@@ -53,6 +53,10 @@ KIND = {
     "RAIN GARDEN FLOODING (SRGFLD)": "rain garden flooding",
 }
 FLOOD_DESCRIPTORS = list(KIND)
+# What the count is and is not, inside the sentence that states it (a test holds "eleven" to len(KIND)).
+SCOPE = "eleven descriptors; other sewer complaints, such as odors or missing covers, are not counted"
+# The days Hurricane Ida's flooding was reported on. The address window (5 years) now starts after them.
+IDA_DAYS = ("2021-09-01", "2021-09-03")
 COMPLAINT_TYPES = ("Sewer", "Sewer Maintenance")
 # The plain names are common words ("Backup"), so the complaint type is part of the filter.
 _DESC_CLAUSE = ("(" + " OR ".join(f"descriptor='{d}'" for d in FLOOD_DESCRIPTORS) + ") AND ("
@@ -150,15 +154,22 @@ def _num(v) -> float | None:
         return None
 
 
-def _params(clause: str, since: datetime | None, limit: int) -> dict[str, str]:
+# What the fetch reads, and what the published query link selects: the link leaves out the house number and the
+# coordinates (one click on it once returned the house numbers Riprap does not show), and still returns one row
+# per complaint with its date, descriptor and block, so the count can be redone.
+_SELECT = ("unique_key, descriptor, created_date, incident_address, status, latitude, longitude, "
+           "street_name, cross_street_1, cross_street_2")
+_PUBLIC_SELECT = "unique_key, created_date, descriptor, street_name, cross_street_1, cross_street_2"
+
+
+def _params(clause: str, since: datetime | None, limit: int, select: str = _SELECT) -> dict[str, str]:
     where = f"{_DESC_CLAUSE} AND {clause}"
     if since:
         # Socrata floating-timestamp: drop tz suffix
         ts = since.replace(tzinfo=None).isoformat(timespec="seconds")
         where += f" AND created_date >= '{ts}'"
     return {
-        "$select": "unique_key, descriptor, created_date, incident_address, status, latitude, longitude, "
-                   "street_name, cross_street_1, cross_street_2",
+        "$select": select,
         "$where": where,
         "$order": "created_date desc",
         "$limit": str(limit),
@@ -166,12 +177,13 @@ def _params(clause: str, since: datetime | None, limit: int) -> dict[str, str]:
 
 
 def query_url(clause: str, since: datetime | None, limit: int) -> str:
-    """The exact Socrata query a count was read from, for its citation: a
-    reader opens it and gets the rows (a request filed under both descriptor
-    names within ten minutes at one place is then counted once)."""
+    """The Socrata query a count was read from, for its citation: a reader
+    opens it and gets the rows, without house numbers or coordinates
+    (_PUBLIC_SELECT). A request filed under both descriptor names within
+    ten minutes at one place is then counted once."""
     from urllib.parse import urlencode
 
-    return f"{URL}?{urlencode(_params(clause, since, limit))}"
+    return f"{URL}?{urlencode(_params(clause, since, limit, _PUBLIC_SELECT))}"
 
 
 def _complaints_where(clause: str, since: datetime | None, limit: int, timeout: int = 60) -> list[Complaint]:
@@ -280,11 +292,12 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: i
     kinds = dict(by_kind.most_common())
     where = where or (f"within {radius_m:.0f} m of this location" if radius_m else "inside this area")
     # The source answered: 0 here is a true zero, and the sentence says so.
-    # "Flood and sewer": DEP's sewer backup complaints are in the total, and the breakdown says how many.
+    # "About flooding and sewer backups", with what is left out: "flood and sewer complaints" named more than the
+    # filter counts (BX02 had 285 complaints under 311's Sewer types where this counts 181).
     # The window is 365 days a year back from midnight UTC, so its first day is said.
     start = _since(years).date().isoformat()
-    narrative = (f"{'At least ' if capped else ''}{n} NYC 311 flood and sewer complaint{'s' if n != 1 else ''} filed {where} "
-                 f"in the last {years} years (since {start}")
+    narrative = (f"{'At least ' if capped else ''}{n} NYC 311 complaint{'s' if n != 1 else ''} about flooding and sewer "
+                 f"backups filed {where} in the last {years} years (since {start}; {SCOPE}")
     narrative += ("): " + ", ".join(f"{k} {kind}" for kind, k in kinds.items()) + "." if n
                   else "; the 311 service answered and none matched).")
     narrative += f" {CAVEAT}"
@@ -311,6 +324,26 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: i
         "caveat": CAVEAT,
         "histogram": list(by_year_sorted.values()) or [],
     }
+
+
+def days_sentence(lat: float, lon: float, radius_m: float, first: str, last: str, what: str) -> str:
+    """The complaints filed near a point on the days asked about (`first`
+    to `last`, ISO dates), as their own sentence: the same descriptors, the
+    same one-per-incident rule and no house number. For a question about
+    Hurricane Ida or a day older than the briefing's window, whose count
+    does not reach back that far."""
+    from datetime import date
+
+    until = date.fromisoformat(last) + timedelta(days=1)
+    cs = one_per_incident(_complaints_where(
+        f"within_circle(location, {lat}, {lon}, {radius_m}) AND created_date < '{until.isoformat()}T00:00:00'",
+        datetime.fromisoformat(first), 2000, timeout=30))
+    n, kinds = len(cs), Counter(KIND.get(c.descriptor, c.descriptor) for c in cs)
+    days = first if first == last else f"from {first} to {last}"
+    out = (f"For {what}, which the briefing's 311 window does not reach: {n} NYC 311 complaint{'s' if n != 1 else ''} about flooding "
+           f"and sewer backups {'were' if n != 1 else 'was'} filed within {radius_m:.0f} m of this location {days}")
+    out += (": " + ", ".join(f"{k} {kind}" for kind, k in kinds.most_common()) if n else "; the 311 service answered and none matched")
+    return f"{out}. A count of complaints is a count of reports filed, not of floods, and a low count can mean under-reporting."
 
 
 def kind_named(question: str) -> str | None:

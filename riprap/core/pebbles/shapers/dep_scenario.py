@@ -43,7 +43,16 @@ def shared_edge(values: dict) -> str:
     if len(edges) < 2:
         return ""
     which = "each of these maps" if len(edges) == len(values) else f"{len(edges)} of these maps"
-    return f"; on {which} the point is at the edge of mapped flooding (within about {max(edges)} m)"
+    return f"; on {which} the point is {_edge(max(edges), 'mapped flooding')}"
+
+
+EDGE_M = 10  # "at the edge" within this; farther off the distance is said plainly (44 m is not an edge)
+
+
+def _edge(edge_m, of: str) -> str:
+    """'at the edge of <of> (within about 6 m)' or 'about 44 m from the edge of <of>'."""
+    return (f"at the edge of {of} (within about {edge_m} m)" if edge_m <= EDGE_M
+            else f"about {edge_m} m from the edge of {of}")
 
 
 def result(value: dict, scenario: str, edge: bool = True) -> str:
@@ -53,23 +62,23 @@ def result(value: dict, scenario: str, edge: bool = True) -> str:
 
     cls, edge_m = code(value), value.get("edge_m") if edge else None
     if not cls:
-        return "no flooding category" + (f", at the edge of flooding mapped on it (within about {edge_m} m)" if edge_m else "")
+        return "no flooding category" + (f", {_edge(edge_m, 'flooding mapped on it')}" if edge_m else "")
     notes = (["coastal tidal inundation, not rainfall flooding"] if cls == TIDE_CLASS else []) + (
-        [f"at the edge of the mapped flooding (within about {edge_m} m)"] if edge_m else [])
+        [_edge(edge_m, "the mapped flooding")] if edge_m else [])
     return f'the category "{domain(scenario)[cls]}"' + (f" ({'; '.join(notes)})" if notes else "")
 
 
 def shape(value, manifest) -> dict | None:
     if value is None:
         return None  # no raster reading at all: offline, not "outside"
-    from app.flood_layers.dep_stormwater import OUTSIDE_CAVEAT, domain, limits, named
+    from app.flood_layers.dep_stormwater import OUTSIDE_CAVEAT, PLAN_CHANCE, domain, limits, named
 
     value = value if isinstance(value, dict) else {"depth_class": value}
     cls = max(code(value), 0)
     value = {**value, "category_code": cls}
     sid = manifest.id
     narrative = (f"The city's stormwater flood map {named(sid)} shows {result(value, sid)} at the point mapped for "
-                 f"this address. {limits(sid)}")
+                 f"this address. {limits(sid)} {PLAN_CHANCE}")
     if cls == 0:
         narrative += f" {OUTSIDE_CAVEAT}"
     return {

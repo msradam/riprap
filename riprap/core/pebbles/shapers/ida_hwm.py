@@ -7,6 +7,9 @@ without touching downstream code.
 """
 from __future__ import annotations
 
+FEW_MARKS = ("USGS's file holds 159 Ida high-water marks for all of New York State, so no mark nearby is not a "
+             "record that the place stayed dry.")
+
 
 def shape(value: dict | None, manifest=None) -> dict | None:
     if value is None:
@@ -72,9 +75,11 @@ def shape(value: dict | None, manifest=None) -> dict | None:
             )
         narrative = "".join(bits) + "."
     else:
+        # No mark nearby is not a record of a dry street: the file holds 159 marks for the whole state
+        # (data/ida_2021_hwms_ny.geojson, as the USGS query in the citation returns; a test counts them).
         narrative = (
             f"No Hurricane Ida (Sept 2021) high-water marks were surveyed "
-            f"within {radius} m of this address."
+            f"within {radius} m of this address. {FEW_MARKS}"
         )
         if nearest_site and nearest_dist is not None:
             narrative += (

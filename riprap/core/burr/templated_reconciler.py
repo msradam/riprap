@@ -161,7 +161,7 @@ def _dep_sentence(state, items) -> str | None:
     point by the city's own names (each part cited), what the maps do not
     give, and, when any reads outside, that outside does not mean safe.
     None unless two or more maps ran."""
-    from app.flood_layers.dep_stormwater import OUTSIDE_CAVEAT, named
+    from app.flood_layers.dep_stormwater import OUTSIDE_CAVEAT, PLAN_CHANCE, named
 
     parts, outside = [], []
     shown = {pid: state.get(pid) for pid in _DEP_POINT
@@ -178,7 +178,8 @@ def _dep_sentence(state, items) -> str | None:
     out = ("The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), "
            f"not forecasts; at the point mapped for this address they show: {'; '.join(parts)}{edge}. Their rainfall "
            "flooding categories cover public areas and rain only, and the city says the map \"does not provide the "
-           "exact depth of flooding at any location\"; it is not a flood plain determination.")
+           "exact depth of flooding at any location\"; it is not a flood plain determination. "
+           f"{PLAN_CHANCE}")
     return f"{out} {OUTSIDE_CAVEAT[:-1]} {''.join(f'[{i}]' for i in outside)}." if outside else out
 
 
@@ -187,8 +188,13 @@ def failed_sources(state) -> list[dict]:
     error, an unreadable reply), each with its id, title, reason and the
     time it was tried. The briefing's "Not checked." section, the JSON
     result's `failed` and the MCP tools' `failed` all read this."""
+    from riprap.core.pebbles.bridge import plain_reason
+
+    # The reason in a reader's words: the raw error ("python_call: summary_for_point raised: HTTP 429 ...")
+    # stays in the trace and the log.
     down = {t.get("step"): t for t in state.get("trace") or [] if t.get("ok") is False}
-    return [{"id": e["id"], "title": e.get("title"), "reason": down[e["id"]].get("err"),
+    return [{"id": e["id"], "title": e.get("title"),
+             "reason": plain_reason(str(down[e["id"]].get("err") or "")) or "the source did not answer",
              "started_at": down[e["id"]].get("started_at")}
             for e in state.get("consulted") or [] if e["id"] in down]
 
@@ -271,7 +277,8 @@ def _lead(state, items) -> str | None:
     if "nyc311" in by_pebble and isinstance(n311, dict) and "n" in n311:
         n = f"{'At least ' if n311.get('capped') else ''}{n311['n']}"
         # A count of reports, said so where the count is: a low one is not an absence of flooding.
-        add("nyc311", f"{n} flood and sewer 311 complaint{'s were' if n311['n'] != 1 else ' was'} filed within "
+        add("nyc311", f"{n} complaint{'s' if n311['n'] != 1 else ''} to 311 about flooding and sewer backups "
+                      f"{'were' if n311['n'] != 1 else 'was'} filed within "
                       f"{n311['radius_m']:.0f} m in the last {n311['years']} years{_since(n311)} (a count of reports; "
                       "a low count can mean under-reporting, not the absence of flooding)")
     docs = [Doc(e.doc_id, "lead", e.text, False) for e in items]
@@ -310,8 +317,9 @@ def _area_lead(state, items) -> str | None:
         # flooding. So the kinds come with it (311's descriptors, each kind's old and new name together).
         kinds = ", ".join(f"{k} {kind}" for kind, k in (n311.get("by_kind") or {}).items())
         claims.append({"section": "lead", "doc_ids": [by_pebble["nyc311_nta"].doc_id],
-                       "text": f"{'At least ' if n311.get('capped') else ''}{n311['n']} flood and sewer 311 "
-                               f"complaint{'s were' if n311['n'] != 1 else ' was'} filed "
+                       "text": f"{'At least ' if n311.get('capped') else ''}{n311['n']} "
+                               f"complaint{'s' if n311['n'] != 1 else ''} to 311 about flooding and sewer backups "
+                               f"{'were' if n311['n'] != 1 else 'was'} filed "
                                f"{n311.get('where') or 'inside this area'} in the last {n311['years']} years"
                                f"{_since(n311)}"
                                + (f", by 311 descriptor group: {kinds}" if kinds else "")

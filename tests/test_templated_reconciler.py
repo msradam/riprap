@@ -125,7 +125,7 @@ def test_the_address_lead_says_the_311_count_is_a_count_of_reports():
     state = _state()
     lead = compose_briefing(state)[0].split("**In brief.**\n", 1)[1].split("\n\n", 1)[0]
     # The source sentence's own words: "flood and sewer complaints", and the window's first day.
-    assert (f"3 flood and sewer 311 complaints were filed within 200 m in the last 5 years, since "
+    assert (f"3 complaints to 311 about flooding and sewer backups were filed within 200 m in the last 5 years, since "
             f"{state['nyc311']['since']} (a count of reports; a low count can mean under-reporting, not the absence "
             "of flooding) [nyc311].") in lead
 
@@ -144,7 +144,7 @@ def test_a_district_lead_carries_the_311_breakdown():
     paragraph, _ = compose_briefing({"intent": "neighborhood", "deployment": "nyc", "plan": {"question": ""},
                                      "nyc311_nta": v})
     lead = paragraph.split("**In brief.**\n", 1)[1].split("\n\n", 1)[0]
-    assert lead == ("10 flood and sewer 311 complaints were filed in Community District QN12 (by the record's community "
+    assert lead == ("10 complaints to 311 about flooding and sewer backups were filed in Community District QN12 (by the record's community "
                     f"board field) in the last 3 years, since {v['since']}, by 311 descriptor group: 6 sewer backup, 3 catch basin, 1 street "
                     "flooding (a count of reports; a low count can mean under-reporting, not the absence of flooding) "
                     "[nyc311_nta].")
@@ -174,7 +174,8 @@ def test_a_source_that_failed_is_listed_as_not_checked():
 
     out = app._final({**_state(consulted=consulted, trace=trace), "paragraph": paragraph})
     assert out["failed"] == [{"id": "fema_pfirm", "title": consulted[0]["title"], "started_at": 1791212460.0,
-                              "reason": "python_call: preliminary_for_point raised: timed out"}]
+                              # Review round 2: the reason in a reader's words, not the raw error (bridge.plain_reason).
+                              "reason": "the service did not answer in time"}]
     assert app._final({**_state(consulted=consulted, trace=trace[1:]), "paragraph": paragraph})["failed"] == []
     plan = {"intent": "compare", "targets": [{"type": "address", "text": "A"}, {"type": "address", "text": "B"}]}
     both = app.run_compare("A vs B", plan, lambda q, p: {"paragraph": q, "lat": 40.7, "deployment": "nyc",

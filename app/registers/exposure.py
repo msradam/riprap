@@ -330,7 +330,8 @@ def summary_for_polygon(polygon, asset_class: str) -> dict:
     return {"available": True, spec.count_key: n, "n_inside_sandy_2012": n_sandy, "n_in_dep_extreme_2080": n_rain + n_tide,
             "n_in_dep_extreme_2080_rainfall": n_rain, "n_in_dep_extreme_2080_tidal": n_tide,
             "n_near_sandy_edge": sum(1 for f in findings if _near_sandy(f)),
-            "narrative": narrative(spec.singular, spec.plural, n, None, n_sandy, n_rain, n_tide, scope=spec.scope)
+            "narrative": narrative(spec.singular, spec.plural, n, None, n_sandy, n_rain, n_tide, scope=spec.scope,
+                                   n_near=sum(1 for f in findings if f.get("sandy_edge_m") is not None))
                          + _named(spec, findings) + f". {MAP_LIMITS}",
             spec.list_key: findings, "citation": spec.citation}
 
@@ -360,7 +361,9 @@ def summary_for_point(lat: float, lon: float, asset_class: str,
     if any(_near_sandy(f) for f in findings):
         out["n_near_sandy_edge"] = sum(1 for f in findings if _near_sandy(f))
     out["narrative"] = narrative(spec.singular, spec.plural, n, radius_m, n_sandy, n_rain, n_tide,
-                                 scope=spec.scope, n_checked=len(findings) if live else None) + _named(spec, findings) + f". {MAP_LIMITS}"
+                                 scope=spec.scope, n_checked=len(findings) if live else None,
+                                 n_near=sum(1 for f in findings if f.get("sandy_edge_m") is not None)) \
+        + _named(spec, findings) + f". {MAP_LIMITS}"
     for key, flag in spec.rollups.items():
         out[key] = sum(1 for f in findings if f[flag])
     out[spec.list_key] = findings[:max_n]

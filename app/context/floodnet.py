@@ -271,6 +271,16 @@ def _event(e: FloodEvent | None) -> dict | None:
     return {"max_depth_mm": e.max_depth_mm, "date": e.start_time[:10]} if e else None
 
 
+def _local_date(start_time: str) -> str:
+    """The New York calendar day of an event's start. The API's times are
+    UTC: an event that began at 9:59 pm on 11 June in New York is stamped
+    12 June, and a resident asks about the 11th."""
+    from zoneinfo import ZoneInfo
+
+    return (datetime.fromisoformat(start_time[:19]).replace(tzinfo=UTC)
+            .astimezone(ZoneInfo("America/New_York")).date().isoformat())
+
+
 def _summary(sensors: list[Sensor], where: str, none: str) -> dict:
     """The value and the sentence for a set of sensors. `where` places them
     ("within 600 m", "inside this area"); `none` is the sentence when
@@ -399,10 +409,12 @@ def _summary(sensors: list[Sensor], where: str, none: str) -> dict:
         "narrative": narrative,
         # Private: for the answer rules only (the block test, a question about one day). One
         # row per sensor with verified events, nearest first; no id, name, street or coordinate.
+        # Each event carries its New York date beside its UTC one: a named day is matched on it.
         # Every output path drops it (riprap.core.pebbles.bridge.public_value).
         "_rows": sorted(
             ({"distance_m": None if s.distance_m is None else round(s.distance_m, 1), "status": s.status,
-              "events": [_event(e) for e in sorted(by_dep[s.deployment_id], key=lambda e: e.start_time)]}
+              "events": [{**_event(e), "local_date": _local_date(e.start_time)}
+                         for e in sorted(by_dep[s.deployment_id], key=lambda e: e.start_time)]}
              for s in sensors if s.deployment_id in by_dep),
             key=lambda r: (r["distance_m"] is None, r["distance_m"] or 0)),
     }

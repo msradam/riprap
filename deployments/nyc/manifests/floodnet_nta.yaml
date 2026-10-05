@@ -65,6 +65,11 @@ provenance:
     yet or retired" (FloodNet's NYC Open Data description, dataset aq7i-eu5q).
     Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges
     (deploy_type "tidal"); Riprap does not count them as FloodNet sensors.
+    Riprap names no sensor, because FloodNet's licence forbids reposting its
+    records: each verified event can be found by its date and depth in
+    FloodNet's own table on NYC Open Data, "FloodNet: Street Flooding Events
+    Measured by FloodNet Sensors" (https://data.cityofnewyork.us/d/aq7i-eu5q),
+    and on its dashboard (https://dataviz.floodnet.nyc).
     Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806,
     https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water
     Research, 118648, https://doi.org/10.1016/j.watres.2022.118648.

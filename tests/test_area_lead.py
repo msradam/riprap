@@ -20,7 +20,7 @@ def test_district_lead_is_cited_and_checked():
     lead = _area_lead(STATE, ITEMS)
     # The same three sentences, the reported record first: for an inland
     # district the Sandy share is the smallest number and it used to lead.
-    assert lead == ("4263 flood and sewer 311 complaints were filed inside this area in the last 3 years (a count of "
+    assert lead == ("4263 complaints to 311 about flooding and sewer backups were filed inside this area in the last 3 years (a count of "
                     "reports; a low count can mean under-reporting, not the absence of flooding) [nyc311_nta]. "
                     "16.4% of this area is in a rainfall flooding category of the city's modelled stormwater scenario "
                     '"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise" [dep_extreme_2080_nta]. 0.8% of this '

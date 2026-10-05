@@ -230,8 +230,8 @@ def test_no_output_path_serves_a_floodnet_sensor_or_event_record(monkeypatch):
     for s in floodnet.sensors_near():
         s.lat, s.lon, s.distance_m = 40.71, -73.78, 120.0
     v = floodnet.summary_for_point(40.71, -73.78)
-    assert v["_rows"] == [{"distance_m": 120.0, "status": "noisy", "events": [{"max_depth_mm": 1172, "date": "2026-05-20"}]},
-                          {"distance_m": 120.0, "status": "good", "events": [{"max_depth_mm": 300, "date": "2025-07-14"}]}]
+    assert v["_rows"] == [{"distance_m": 120.0, "status": "noisy", "events": [{"max_depth_mm": 1172, "date": "2026-05-20", "local_date": "2026-05-20"}]},
+                          {"distance_m": 120.0, "status": "good", "events": [{"max_depth_mm": 300, "date": "2025-07-14", "local_date": "2025-07-14"}]}]
     public = public_value(v)
     assert "_rows" not in public and not RECORD_RE.search(json.dumps(public)), json.dumps(public)
     assert {"license", "license_url", "attribution", "narrative", "n_sensors", "highest_event"} <= set(public)

@@ -126,7 +126,7 @@ def _hvi_nta(code: str, name: str, where: str) -> dict | None:
     if a["hvi"] >= 4:
         narrative += f" {RACISM}"
     return {"available": True, "hvi": a["hvi"], "area": name, "area_code": code, "year": year, "ac_pct": a["ac_pct"],
-            "green_pct": a["green_pct"], "median_income": a["median_income"], "narrative": narrative,
+            "green_pct": a["green_pct"], "narrative": narrative,
             "headline_value": f"{a['hvi']} of 5 ({name})"}
 
 

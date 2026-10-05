@@ -8,7 +8,8 @@ from app.flood_layers import dep_stormwater
 # One sentence for every map, so a briefing that quotes several prints it once.
 LIMITS = ("The city's stormwater flood maps are modelled scenarios (each a design storm paired with a sea level), not "
           'forecasts: their rainfall flooding categories cover public areas and rain only, the city says the map "does '
-          'not provide the exact depth of flooding at any location", and it is not a flood plain determination.')
+          'not provide the exact depth of flooding at any location", and it is not a flood plain determination. '
+          + dep_stormwater.PLAN_CHANCE)
 
 
 def _share(monkeypatch, scenario, fractions):

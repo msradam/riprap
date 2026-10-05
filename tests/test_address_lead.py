@@ -41,8 +41,8 @@ def test_bare_address_opens_with_a_cited_lead():
     assert lead == ("This address is outside the 2012 Sandy inundation footprint [sandy_inundation], "
                     "in FEMA flood zone X on the 2007 effective map [fema_nfhl], and inside the future high tide category "
                     "(coastal tidal inundation, not rainfall flooding) of the city's stormwater flood maps (modelled "
-                    "scenarios, not forecasts) for 2080 sea-level rise [dep_extreme_2080]. 82 flood and sewer 311 "
-                    f"complaints were filed within 200 m in the last 5 years, since {STATE['nyc311']['since']} (a count "
+                    "scenarios, not forecasts) for 2080 sea-level rise [dep_extreme_2080]. 82 complaints to 311 about flooding and sewer "
+                    f"backups were filed within 200 m in the last 5 years, since {STATE['nyc311']['since']} (a count "
                     "of reports; a low count can mean "
                     "under-reporting, not the absence of flooding) [nyc311].")
     assert every_numeric_claim_cited(paragraph)
@@ -98,6 +98,9 @@ def test_dep_scenario_narration_per_class():
               "not forecasts: their rainfall flooding categories cover public areas and rain only, the city says the "
               'map "does not provide the exact depth of flooding at any location", and it is not a flood plain '
               "determination.")
+    from app.flood_layers.dep_stormwater import PLAN_CHANCE
+
+    limits += f" {PLAN_CHANCE}"  # review round 2: how often the Plan says each design storm comes
     stem = 'The city\'s stormwater flood map "Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise" shows the category '
     assert shape(1, m50)["narrative"] == (stem + '"Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)" at '
                                           "the point mapped for this address." + limits.format(year=2050))

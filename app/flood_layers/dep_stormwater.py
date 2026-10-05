@@ -102,6 +102,13 @@ def named(scenario: str) -> str:
     return f'"{s["name"]}"' + ("" if s["year"] else " (the near term)")
 
 
+# How often the Plan says each design storm comes, in its own words (each quote is a run of words in the
+# manifests' citations of the Stormwater Resiliency Plan, 2021; a test compares them). Said once per briefing.
+PLAN_CHANCE = ("The city's Stormwater Resiliency Plan (2021) calls its moderate storm \"the 10-year storm, with "
+               "approximately 10 percent chance of occurrence in any given year\" and its extreme storm \"the "
+               "100-year storm, with approximately 1 percent chance of occurrence in any given year\".")
+
+
 def limits(scenario: str) -> str:  # noqa: ARG001 - the same for every map
     """What the maps are and are not, in the words of the city's disclaimer
     (the licence text of DEP's own map items, arcgis.com item
@@ -130,7 +137,7 @@ def share_sentence(fraction_class: dict, scenario: str) -> str:
     if TIDE_CLASS in names:
         out += (f"; {pct(c.get(TIDE_CLASS, 0))}% is in its \"{names[TIDE_CLASS]}\" category, which is "
                 f"{tide_words(scenario)}")
-    return f"{out}. {limits(scenario)}"
+    return f"{out}. {limits(scenario)} {PLAN_CHANCE}"
 
 
 def category_kind(cls: int | None) -> str | None:
