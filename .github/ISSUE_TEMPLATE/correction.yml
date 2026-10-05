@@ -1,0 +1,61 @@
+name: Correct a briefing or tell us what the records miss
+description: A sentence is wrong or says too much, or you know of flooding or heat that the records do not show. No technical knowledge needed.
+title: "[correction] "
+labels: ["correction"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. You do not need to know how Riprap works to fill this in, and
+        you can leave any box empty.
+
+        This page is public. Please do not give a name, a house number or
+        anything else that would point to a person or a household. A block, a
+        corner or a neighbourhood is enough.
+
+        Riprap is not an emergency service. To report flooding to the city, use
+        311. For alerts, sign up with Notify NYC.
+  - type: input
+    id: place
+    attributes:
+      label: Which place?
+      description: A block, a corner, a neighbourhood or a community district.
+      placeholder: 183rd Street near 90th Avenue, Hollis
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is this about?
+      options:
+        - A sentence in a briefing is wrong
+        - A sentence says more than its source does, or could mislead
+        - The records miss flooding or heat that happened here
+        - A place was not found, or the wrong place was described
+        - Something on the page is hard to read or understand
+        - Something else
+  - type: textarea
+    id: sentence
+    attributes:
+      label: The sentence, if there is one
+      description: Copy the sentence from the briefing, or say where on the page it is.
+  - type: textarea
+    id: account
+    attributes:
+      label: What do you know?
+      description: >-
+        In your own words. If the records miss something, say what happened
+        and roughly when (a storm, a month, a year). If a sentence is wrong,
+        say what is right and how you know.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Anything we can check it against (optional)
+      description: A news story, a photo you are willing to share publicly, a city record, a meeting's minutes.
+  - type: markdown
+    attributes:
+      value: |
+        What happens next: a correction to a sentence is made in the code and
+        recorded in the changelog. An account of what the records miss is kept
+        here on the tracker. Riprap has no way yet to put it into a briefing,
+        and it will not be shown as a public record.

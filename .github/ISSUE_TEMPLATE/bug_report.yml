@@ -1,5 +1,5 @@
 name: Bug report
-description: A briefing came back wrong, a Stone failed to fire, or the UI broke.
+description: A fault in the software (the page broke, a source failed, an error appeared). For a wrong sentence or something the records miss, use the correction form.
 title: "[bug] "
 labels: ["bug"]
 body:

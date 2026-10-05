@@ -1,25 +1,54 @@
 # Contributing
 
-Riprap is an open-source civic-tech framework that began as the
-AMD × lablab.ai Developer Hackathon submission and now ships under
-Apache 2.0. NYC is the reference deployment; four cities run on the
-same code (NYC, Chicago, Seattle, Albany; all but NYC are experimental).
-The easiest contribution is to add your jurisdiction.
+Riprap answers flood and heat questions about New York City places from
+public records. You do not have to write code to help.
 
-PRs welcome. Three high-leverage paths in:
+## If you live or work in a place Riprap describes
 
-- **Port your city.** Fork the closest existing `deployments/<city>/`
-  and replace the data sources. A city with a Socrata open-data portal
-  needs only manifests. See
-  [`docs/PORT-YOUR-CITY.md`](../docs/PORT-YOUR-CITY.md) for the
-  step-by-step using Chicago as the worked example.
-- **Bring your own data.** Drop a YAML manifest into `${CWD}/.riprap/`
-  or point `RIPRAP_EXTRA_MANIFESTS` at it. No fork needed. See
-  [`docs/byod.md`](../docs/byod.md).
-- **Write a new adapter.** If your data source isn't covered by
-  `socrata_records`, `csv_points`, `baked_vector`, `rest_json`, or
-  `python_call`, drop a new adapter into
+The most useful thing you can tell us is where a briefing is wrong, or what
+the records miss. Flooding that nobody reported to 311, a block with no
+sensor, a sentence that reads as if a place were safe when you know it is
+not: these are what the tool cannot see by itself.
+
+Use the form
+[Correct a briefing or tell us what the records miss](https://github.com/msradam/riprap/issues/new?template=correction.yml).
+It asks for a place and what you know, in your own words, and nothing
+technical. It is public, so leave out names and house numbers. It needs a
+free GitHub account; there is not yet a way in without one.
+
+## If you are a student, a fellow or a researcher
+
+Good first pieces of work, none of which needs the whole codebase:
+
+- Check a briefing against its sources for a place you know, and report
+  what does not hold up. [docs/METHODOLOGY.md](../docs/METHODOLOGY.md)
+  lists the exact filters, with a worked recount.
+- Test the page with a screen reader or on a phone and report barriers
+  ([docs/ACCESSIBILITY.md](../docs/ACCESSIBILITY.md) says what has not been
+  tested).
+- Compare what briefings say with an independent record of where water
+  stood in a storm. Nobody has done this yet, and it is the largest gap
+  in how Riprap has been checked.
+- Review one source's sentence: does it say no more than the record
+  supports, in the publisher's own terms?
+
+## If you write code
+
+- **Add your city.** Copy the closest `deployments/<city>/` and replace the
+  data sources. A city with a Socrata open-data portal needs only
+  manifests. [`docs/PORT-YOUR-CITY.md`](../docs/PORT-YOUR-CITY.md) walks
+  through it with Chicago.
+- **Bring your own data.** Put a YAML manifest in `${CWD}/.riprap/` or point
+  `RIPRAP_EXTRA_MANIFESTS` at it, with no fork
+  ([`docs/byod.md`](../docs/byod.md)).
+- **Write an adapter.** If a source is not covered by `socrata_records`,
+  `csv_points`, `baked_vector`, `rest_json` or `python_call`, add one in
   `riprap/core/pebbles/adapters/` and register it in `__init__.py`.
+
+New York City is the reference deployment; Chicago, Seattle and Albany run
+on the same code and are experimental. The licence is Apache 2.0 for the
+code, and each data source keeps its own terms (FloodNet's are stricter:
+see [NOTICE](../NOTICE)).
 
 ## Quickstart
 
@@ -165,9 +194,12 @@ tests/                     pytest suite; tests/load/ has k6 load scripts
 ## Reporting issues
 
 GitHub issues at <https://github.com/msradam/riprap/issues>.
-Templates:
+Forms:
 
-- [Port your city](https://github.com/msradam/riprap/issues/new?template=port_to_new_city.yml),
-  to scope an add-a-deployment effort.
-- [Bug report](https://github.com/msradam/riprap/issues/new?template=bug_report.yml).
+- [Correct a briefing or tell us what the records miss](https://github.com/msradam/riprap/issues/new?template=correction.yml),
+  with no technical fields.
+- [Bug report](https://github.com/msradam/riprap/issues/new?template=bug_report.yml),
+  for a fault in the software.
 - [Feature request](https://github.com/msradam/riprap/issues/new?template=feature_request.yml).
+- [Port your city](https://github.com/msradam/riprap/issues/new?template=port_to_new_city.yml),
+  to scope a new deployment.

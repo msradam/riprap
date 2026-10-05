@@ -1,5 +1,8 @@
-blank_issues_enabled: false
+blank_issues_enabled: true
 contact_links:
-  - name: Read the architecture docs
-    url: https://github.com/msradam/riprap/tree/main/docs
-    about: ARCHITECTURE, METHODOLOGY, EMISSIONS, DEPLOY, BENCHMARKS, RESEARCH.
+  - name: Read how a briefing is made and what it cannot say
+    url: https://github.com/msradam/riprap/blob/main/docs/METHODOLOGY.md
+    about: The sources, the distances and time windows behind each count, and the limits of the records.
+  - name: Report flooding to the city, or get help
+    url: https://portal.311.nyc.gov/
+    about: Riprap is not an emergency or city service. Use 311 to report flooding and Notify NYC for alerts.
