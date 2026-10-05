@@ -24,7 +24,10 @@ config:
   args:
     - {source: lat}
     - {source: lon}
-  on_none: offline
+  # None means the service answered and no preliminary study covers the
+  # point: that does not apply here, it is not a failure. A failed query
+  # raises and is listed as not checked.
+  on_none: passthrough
 
 trace_summary:
   zone: fld_zone
@@ -39,13 +42,24 @@ provenance:
   source_url: https://hazards.fema.gov/arcgis/rest/services/PrelimPending/Prelim_NFHL/MapServer
   license: U.S. Public Domain
   doc_id: fema_pfirm
-  citation: FEMA preliminary flood-zone polygon (PFIRM) intersecting the address point, with the issue date from the service's Preliminary Data Availability layer.
+  citation: >-
+    FEMA preliminary flood-zone polygon (PFIRM) intersecting the address point, with the issue date
+    from the service's Preliminary Data Availability layer. Which map is used for what is from the
+    NYC Hazard Mitigation Plan, flooding profile
+    (https://nychazardmitigation.com/documentation/hazard-profiles/flooding/): "New York City
+    applies whichever map (2015 PFIRMs or 2007 FIRMs) is the more restrictive of the two for
+    Building Code and zoning purposes" and "FEMA uses the 2007 FIRMs for compliance with NFIP".
   # The citation's vintage is the date FEMA issued the preliminary study.
   date_modified_field: issue_date
 
 narration:
   short: FEMA preliminary flood map (PFIRM) zone at this address.
-  template: "{narrative}"
+  # The second sentence is New York City's own account of which map is used
+  # for what (NYC Hazard Mitigation Plan, flooding profile; nyc.gov/site/floodmaps).
+  template: >-
+    {narrative} New York City applies whichever of the 2015 preliminary maps or the 2007 effective
+    maps is more restrictive for Building Code and zoning purposes, and FEMA uses the 2007 effective
+    maps for the National Flood Insurance Program (NYC Hazard Mitigation Plan, flooding profile).
 
 display:
   order: 13
@@ -55,4 +69,4 @@ display:
 
 fallback:
   on_offline: skip
-  message: FEMA's preliminary NFHL service was unreachable, or no preliminary study covers this point.
+  message: FEMA's preliminary NFHL service did not answer when this briefing ran.

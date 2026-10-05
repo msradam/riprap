@@ -6,9 +6,11 @@ layer 3 (S_FIRM_Pan) for the FIRM panel and its effective date — the
 map vintage that FEMA 1.5 (and the `firm_citation_has_vintage`
 compliance predicate) requires alongside any flood-map claim.
 
-Returns None when the point is unmapped (open water / no effective
-FIRM); the manifest's `on_none: offline` + `fallback.on_offline: skip`
-then drop the pebble cleanly.
+Returns None only when the service answered and maps nothing at the point
+(open water, no effective FIRM). A failed query (a timeout, an HTTP error,
+a reset connection, an empty or malformed reply, an ArcGIS error body)
+raises, so the run records the source as failed and the briefing lists it
+as not checked. A failure never reads as "no zone here".
 """
 
 from __future__ import annotations
@@ -41,8 +43,15 @@ def _point_query(
         f"&spatialRel=esriSpatialRelIntersects"
         f"&outFields={out_fields}&returnGeometry=false&f=json"
     )
-    data = fetch_url_json(url, cache_ttl_s=cache_ttl_s, timeout_s=20.0)
-    return data.get("features") or []
+    try:
+        data = fetch_url_json(url, cache_ttl_s=cache_ttl_s, timeout_s=20.0)
+    except ValueError as e:  # the service answers some failures with HTTP 200 and an empty or broken body
+        raise httpx.HTTPError(f"FEMA's map service sent an unreadable reply for layer {layer}: {e}") from e
+    if not isinstance(data, dict) or not isinstance(data.get("features"), list):
+        # An ArcGIS error arrives as HTTP 200 with {"error": ...} and no "features".
+        why = data.get("error") if isinstance(data, dict) else data
+        raise httpx.HTTPError(f"FEMA's map service sent no features list for layer {layer}: {str(why)[:200]}")
+    return data["features"]
 
 
 # Zone X covers both the 0.2% annual chance floodplain and areas of minimal
@@ -62,10 +71,7 @@ def zone_reading(subtype: str | None) -> str | None:
 
 
 def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> dict[str, Any] | None:
-    try:
-        zones = _point_query(_ZONE_LAYER, lat, lon, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,DFIRM_ID", cache_ttl_s)
-    except httpx.HTTPError:
-        return None
+    zones = _point_query(_ZONE_LAYER, lat, lon, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,DFIRM_ID", cache_ttl_s)
     if not zones:
         return None
     zone = zones[0]["attributes"]
@@ -97,9 +103,17 @@ def summary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> dict[
         bits.append(" (a Special Flood Hazard Area)")
     elif (reading := zone_reading(zone.get("ZONE_SUBTY"))):
         bits.append(f" ({reading})")
+    # Which map and its date, and what it is for. The effective FIRM is the
+    # National Flood Insurance Program's official map (44 CFR 59.1: "an
+    # official map of a community, on which the Federal Insurance
+    # Administrator has delineated both the special hazard areas and the risk
+    # premium zones"); in New York City, "FEMA uses the 2007 FIRMs for
+    # compliance with NFIP" (NYC Hazard Mitigation Plan, flooding profile).
     if panel_id and eff_year:
-        bits.append(f", per NFHL FIRM panel {panel_id}, effective {eff_year}")
-    bits.append(".")
+        bits.append(f" on FEMA's effective flood map (FIRM panel {panel_id}, effective {eff_date})")
+    else:
+        bits.append(" on FEMA's effective flood map")
+    bits.append(", the map in force for the National Flood Insurance Program.")
     return {
         "fld_zone": fld_zone,
         "zone_subty": zone.get("ZONE_SUBTY"),
@@ -115,14 +129,12 @@ def preliminary_for_point(lat: float, lon: float, cache_ttl_s: int = 86400) -> d
     """The preliminary flood zone (PFIRM) at a point, with the date FEMA
     issued the preliminary study, read from the service's own availability
     layer (the panel records carry no date until the map goes to print).
-    None when no preliminary study covers the point."""
-    try:
-        zones = _point_query(_ZONE_LAYER, lat, lon, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,STATIC_BFE,V_DATUM",
-                             cache_ttl_s, PRELIM_URL)
-        studies = _point_query(_PRELIM_AVAILABILITY_LAYER, lat, lon, "DFIRM_ID,PRELM_ISSUE_DATE",
-                               cache_ttl_s, PRELIM_URL)
-    except httpx.HTTPError:
-        return None
+    None when the service answered and no preliminary study covers the
+    point; a failed query raises (see the module docstring)."""
+    zones = _point_query(_ZONE_LAYER, lat, lon, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,STATIC_BFE,V_DATUM",
+                         cache_ttl_s, PRELIM_URL)
+    studies = _point_query(_PRELIM_AVAILABILITY_LAYER, lat, lon, "DFIRM_ID,PRELM_ISSUE_DATE",
+                           cache_ttl_s, PRELIM_URL)
     if not zones or not studies:
         return None
     zone, study = zones[0]["attributes"], studies[0]["attributes"]
