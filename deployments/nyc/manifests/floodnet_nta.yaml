@@ -24,16 +24,43 @@ trace_summary:
 provenance:
   date_modified: at_fetch
   retrieved_at: at_fetch
-  source_name: FloodNet NYC, ultrasonic depth sensor network (CUNY/NYU/Brooklyn College)
-  source_url: https://www.floodnet.nyc/data-downloads
-  license: CC-BY-NC-SA 4.0
+  # The project name FloodNet asks for in a credit.
+  source_name: FloodNet (New York University and The City University of New York)
+  # The API has no page per sensor or event; the dashboard shows both.
+  source_url: https://dataviz.floodnet.nyc/
+  license: CC BY-NC-SA 4.0
+  license_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
+  attribution: FloodNet (New York University and The City University of New York)
+  references:
+    - >-
+      Mydlarz, C., et al. (2024). FloodNet: Low-cost ultrasonic sensors for
+      real-time measurement of hyperlocal, street-level floods in New York
+      City. Water Resources Research, 60, e2023WR036806.
+      https://doi.org/10.1029/2023WR036806
+    - >-
+      Silverman et al. (2022). Making Waves. Water Research, 118648.
+      https://doi.org/10.1016/j.watres.2022.118648
+  license_notice: >-
+    FloodNet data and the content derived from it in this response (the
+    FloodNet sentences and figures) are licensed CC BY-NC-SA 4.0, for
+    non-commercial use with attribution and under the same licence. They
+    are not covered by Riprap's Apache-2.0 licence. Riprap is independent
+    of FloodNet, New York University and The City University of New York,
+    and is not endorsed by them.
   doc_id: floodnet
   citation: >-
-    FloodNet NYC, community-led real-time street-flood sensor network.
-    Data CC-BY-NC-SA 4.0; derivatives must carry the same license.
-    Readings come from the FloodNet API (api.floodnet.nyc), which has no
-    stable page per sensor or event, so the link is the project's data
-    download page. https://www.floodnet.nyc/data-downloads
+    FloodNet street flood sensors. Flood events and sensor status read from
+    the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the
+    retrieval time shown. A flood event is a series of depth measurements
+    greater than 10 mm at the sensor (FloodNet's definition); a depth is
+    measured at one point and does not show the depth on every part of the
+    street. Riprap counts the events the API marks as verified by a person.
+    Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806,
+    https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water
+    Research, 118648, https://doi.org/10.1016/j.watres.2022.118648.
+    Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0
+    (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's
+    Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.
 
 narration:
   short: FloodNet sensors and historical flood events inside this area.

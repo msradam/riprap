@@ -54,12 +54,35 @@ Public-record data sources (no commercial APIs):
     floodplain indicators (NYC Open Data Terms of Use)
   - New York State open data: MTA subway entrances and exits, Health
     Facility General Information (the publishers' open data terms)
-  - FloodNet NYC sensor data (CC BY-NC-SA 4.0)
+  - FloodNet (New York University and The City University of New York)
+    street flood sensor data, read from the FloodNet Data API at the
+    time of each briefing (CC BY-NC-SA 4.0,
+    https://creativecommons.org/licenses/by-nc-sa/4.0/, under FloodNet's
+    Data Access License Agreement). Cite: Mydlarz et al. (2024), Water
+    Resources Research 60, e2023WR036806,
+    https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water
+    Research, 118648, https://doi.org/10.1016/j.watres.2022.118648.
+    See "FloodNet-derived content" below.
   - New York City Panel on Climate Change 2024 Report, NPCC4, Annals of
     the New York Academy of Sciences vol. 1539 (CC BY-NC 4.0)
   - Experimental deployments: Chicago Data Portal and Seattle Open Data
     311 service requests (each portal's terms of use), SeeClickFix
     public API for Albany, NY
+
+FloodNet-derived content:
+  The Apache-2.0 licence above covers Riprap's code. It does not cover
+  FloodNet data or the content Riprap derives from it: the FloodNet
+  sentences and figures in a briefing, in the JSON API, in MCP tool
+  results and in the gallery snapshots (web/sveltekit/src/lib/gallery/).
+  That content is licensed CC BY-NC-SA 4.0: non-commercial use only,
+  with the attribution above, and under the same licence. Each response
+  that contains it says so in its floodnet citation record (license,
+  license_url, attribution, references, license_notice, retrieved_at).
+  The script that scores models against FloodNet events
+  (scripts/score_water_floodnet.py) writes the event rows to a
+  git-ignored folder and commits aggregate results only.
+  Riprap is independent of FloodNet, New York University and The City
+  University of New York, and is not endorsed by them.
 
 Earth-observation data:
   - Contains modified Copernicus Sentinel data (Sentinel-2 L2A, 2017 to

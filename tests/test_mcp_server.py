@@ -77,6 +77,38 @@ def test_get_evidence_lists_manifest_sentences(monkeypatch):
             "source_url": "https://www.usgs.gov/3dep", "vintage": "2018"} in out["evidence"]
 
 
+def test_floodnet_content_is_labelled_in_every_tool_result(monkeypatch):
+    """FloodNet-derived content is CC BY-NC-SA 4.0, not Apache-2.0: a client
+    that reads only one tool result sees the licence, the credit, the
+    papers to cite, the retrieval time and the notice."""
+    from riprap.core.burr import evidence
+    from riprap.mcp.server import get_district_summary, get_evidence
+
+    _, registry = evidence.load("nyc")
+    cite = evidence.citation(registry.get("floodnet").manifest)
+    stub = {"deployment": "nyc", "intent": "single_address", "geocode": {"address": "90-11 183 STREET"},
+            "paragraph": "2 FloodNet sensors within 600 m have recorded 6 flood events [floodnet].",
+            "floodnet": {"narrative": "2 FloodNet sensors within 600 m have recorded 6 flood events.", "n_sensors": 2,
+                         "license": "CC BY-NC-SA 4.0"},
+            "citations": {"floodnet": cite, "microtopo": {"url": "https://www.usgs.gov/3dep", "license": "public domain"}}}
+    monkeypatch.setattr("riprap.core.burr.app.run", lambda q, *a, **k: stub)
+    monkeypatch.setattr("riprap.core.burr.app.district_summary", lambda code, **k: stub)
+    for out in (get_evidence("90-11 183 St, Queens"), get_district_summary("QN12"), get_briefing("90-11 183 St, Queens")):
+        (notice,) = out["license_notices"]
+        assert notice["doc_id"] == "floodnet" and notice["license"] == "CC BY-NC-SA 4.0"
+        assert notice["license_url"] == "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+        assert notice["attribution"] == "FloodNet (New York University and The City University of New York)"
+        assert "10.1029/2023WR036806" in notice["references"][0] and "10.1016/j.watres.2022.118648" in notice["references"][1]
+        assert "not covered by Riprap's Apache-2.0" in notice["notice"] and notice["retrieved_at"]
+        assert out["citations"]["floodnet"]["license_notice"] == notice["notice"]
+    item = next(e for e in get_evidence("90-11 183 St, Queens")["evidence"] if e["doc_id"] == "floodnet")
+    assert item["license"] == "CC BY-NC-SA 4.0" and item["value"]["license"] == "CC BY-NC-SA 4.0"
+    assert get_citation("nyc", "floodnet")["license_notice"] == cite["license_notice"]
+    # A result with no FloodNet content carries no notice.
+    monkeypatch.setattr("riprap.core.burr.app.run", lambda q, *a, **k: {**stub, "floodnet": None, "citations": {}})
+    assert get_briefing("90-11 183 St, Queens")["license_notices"] == []
+
+
 def test_server_imports_and_lists_tools():
     """Fresh-install guard: the server module imports on the pinned SDK
     and registers its tools."""

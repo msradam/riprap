@@ -40,7 +40,9 @@ mcp = MCPServer(
         "NPCC4): pass hazard='heat', or ask get_briefing a heat question. "
         "Every evidence item carries its sentence, the source's own "
         "figures (value), its source URL and data vintage, and a doc_id "
-        "resolvable via get_citation. Riprap "
+        "resolvable via get_citation. FloodNet-derived items are licensed "
+        "CC BY-NC-SA 4.0, not Apache-2.0: results that include them carry "
+        "license_notices. Riprap "
         "is an informational reference, not a FEMA flood zone determination, "
         "a professional engineering opinion, or a substitute for the NFIP "
         "appeal process. Start with get_evidence (an address) or "
@@ -113,6 +115,7 @@ def _value(v) -> dict | None:
 
 def _evidence_payload(out: dict) -> dict:
     from riprap.core.burr import evidence
+    from riprap.core.pebbles.vintage import license_notices
 
     # A place outside every city ran the federal sources: `deployment` is null.
     stones, registry = evidence.load(out.get("deployment") or "__none__")
@@ -127,6 +130,7 @@ def _evidence_payload(out: dict) -> dict:
     body = {
         "place": (out.get("geocode") or {}).get("address"),
         "place_match": _place_match(out),
+        "place_note": (out.get("geocode") or {}).get("note"),  # which area or borough was chosen, and the others
         "lat": out.get("lat"),
         "lon": out.get("lon"),
         "deployment": out.get("deployment"),
@@ -134,8 +138,12 @@ def _evidence_payload(out: dict) -> dict:
         "evidence": [{"doc_id": e.doc_id, "stone": heading.get(e.stone_id, e.stone_id),
                       "text": e.text, "value": _value(e.value), "maturity": e.maturity,
                       "source_url": (cites.get(e.doc_id) or {}).get("url"),
-                      "vintage": (cites.get(e.doc_id) or {}).get("vintage")} for e in items],
+                      "vintage": (cites.get(e.doc_id) or {}).get("vintage"),
+                      # Only where the source's licence binds this item (FloodNet).
+                      **({"license": cites[e.doc_id].get("license")}
+                         if (cites.get(e.doc_id) or {}).get("license_notice") else {})} for e in items],
         "citations": cites,
+        "license_notices": license_notices(cites),
         "failed": _failed(out),
     }
     return {**body, "record": _record(out, body)}
@@ -270,6 +278,7 @@ def get_briefing(address: str, question: str | None = None) -> dict:
     listed under dropped_claims, not shown). `consulted`, `not_checked`
     and `failed` list the sources."""
     from riprap.core.burr.app import run
+    from riprap.core.pebbles.vintage import license_notices
 
     out = run(_query(address, question))
     g = out.get("grounding") or {}
@@ -278,6 +287,7 @@ def get_briefing(address: str, question: str | None = None) -> dict:
         "question": question,
         "place": (out.get("geocode") or {}).get("address"),
         "place_match": _place_match(out),
+        "place_note": (out.get("geocode") or {}).get("note"),  # which area or borough was chosen, and the others
         "deployment": out.get("deployment"),
         "intent": out.get("intent"),
         "paragraph": out.get("paragraph"),
@@ -290,6 +300,7 @@ def get_briefing(address: str, question: str | None = None) -> dict:
         "answer_lead": g.get("answer_lead"),
         "dropped_claims": g.get("dropped_claims") or [],
         "citations": out.get("citations") or {},
+        "license_notices": license_notices(out.get("citations")),
         "consulted": out.get("consulted") or [],
         "not_checked": out.get("not_checked") or [],
         "failed": _failed(out),

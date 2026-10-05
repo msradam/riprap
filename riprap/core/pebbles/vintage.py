@@ -93,4 +93,16 @@ def citation(manifest, *, fetched: bool = True, doc_id: str | None = None,
         "retrieved_at": v["retrieved_at"],
         "vintage": vintage,
         "maturity": manifest.maturity,
+        # Only for a source that declares them (see Provenance).
+        **{k: v for k in ("license_url", "attribution", "references", "license_notice") if (v := getattr(prov, k))},
     }
+
+
+def license_notices(cites: dict | None) -> list[dict]:
+    """The licence notices of the cited sources whose licence binds what is
+    derived from them (FloodNet, CC BY-NC-SA 4.0), for the top of a JSON or
+    MCP result: a client that reads only that result sees them."""
+    return [{"doc_id": d, "license": c.get("license"), "license_url": c.get("license_url"),
+             "attribution": c.get("attribution"), "references": c.get("references"),
+             "retrieved_at": c.get("retrieved_at"), "notice": c["license_notice"]}
+            for d, c in (cites or {}).items() if isinstance(c, dict) and c.get("license_notice")]

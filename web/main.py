@@ -532,7 +532,8 @@ def layer_ida_hwm(lat: float, lon: float, r: float = 1500):
 def floodnet_near(lat: float, lon: float, r: float = 1000):
     sensors = floodnet.sensors_near(lat, lon, r)
     ids = [s.deployment_id for s in sensors]
-    events = floodnet.flood_events_for(ids)
+    # Verified events only, as in the briefing's count.
+    events = [e for e in floodnet.flood_events_for(ids) if floodnet.is_reviewed(e)]
     by_dep: dict = {}
     for e in events:
         by_dep.setdefault(e.deployment_id, []).append(e)
@@ -557,7 +558,14 @@ def floodnet_near(lat: float, lon: float, r: float = 1000):
                 },
             }
         )
-    return JSONResponse({"type": "FeatureCollection", "features": features})
+    # FloodNet-derived, so the response carries FloodNet's licence and credit
+    # (the same record the briefing's citation carries).
+    from riprap.core.pebbles.vintage import citation
+
+    cite = citation(_stones_pebbles_for_deployment("nyc")[1].get("floodnet").manifest)
+    return JSONResponse({"type": "FeatureCollection", "features": features,
+                         **{k: cite[k] for k in ("license", "license_url", "attribution", "references",
+                                                 "license_notice", "retrieved_at") if k in cite}})
 
 
 # The SvelteKit build (adapter-static): index.html at /, the prerendered

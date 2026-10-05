@@ -42,6 +42,14 @@ class Provenance(BaseModel):
     source_name: str
     source_url: str | None = None
     license: str | None = None
+    # For a source whose licence binds what is derived from it (FloodNet,
+    # CC BY-NC-SA 4.0): the licence's URL, the credit the publisher asks
+    # for, the works to cite, and a notice. The citation record carries
+    # them to every output (JSON API, MCP, the page's source list).
+    license_url: str | None = None
+    attribution: str | None = None
+    references: list[str] | None = None
+    license_notice: str | None = None
     date_modified: Vintage | None = None
     retrieved_at: Vintage | None = None
     citation: str | None = None
