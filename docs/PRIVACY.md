@@ -65,6 +65,19 @@ every string before anything else reads them (`riprap/core/redact.py`).
 **Names are not removed**: telling a name from a street or an agency takes
 more than a pattern. NYC's 311 query does not fetch free text at all.
 
+## Where a 311 complaint is shown
+
+A dated complaint at a house number is a record about a household, so
+Riprap serves none. Each New York City 311 complaint in the JSON, in an MCP
+result, in the page's list of map points and in a saved gallery file is
+placed at its block: the street and cross streets from the record's own
+fields, with no house number, and coordinates rounded to three decimal
+places (about 100 m), so two houses on a block are not told apart. Counts
+are of the unrounded records and do not change. A geocoded address no
+longer carries the tax lot (BBL) or building number (BIN). The same
+complaints remain public, with their addresses, on NYC Open Data; Riprap
+does not repeat them at that precision.
+
 ## Do no harm
 
 Riprap reports public flood and heat evidence for a place, with every
@@ -82,8 +95,9 @@ service: for alerts in New York City use
   ([GROUNDING.md](GROUNDING.md)). A briefing can omit a relevant source,
   and a source can be out of date; each citation shows the source's
   vintage.
-- Aggregated counts (311 complaints, sensor events) describe places, not
-  people. Do not use them to single out an individual or a household.
+- Counts (311 complaints, sensor events) and complaints placed at a block
+  describe places, not people. Do not use them to single out an individual
+  or a household.
 
 Report a privacy problem through the process in
 [SECURITY.md](../.github/SECURITY.md).
