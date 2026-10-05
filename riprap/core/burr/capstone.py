@@ -15,7 +15,6 @@ from burr.core import State, action
 
 from riprap.core.burr.pebble import trace_rec_for
 
-
 _DEP = ("dep_extreme_2080", "dep_moderate_2050", "dep_moderate_current", "dep_limited_current")
 
 

@@ -23,10 +23,9 @@ per-sensor and per-event records are taken out before a file is written
 any house number or per-house coordinate of a 311 complaint: a dated
 complaint is baked at its block, with coordinates rounded to about 100 m.
 
-The landing's briefing preview is a screenshot of hollis-since-ida. After
-rebuilding that entry, rebuild the frontend, serve it, and retake it:
-
-    cd web/sveltekit && node scripts/capture-hero-preview.mjs http://127.0.0.1:7860
+The landing quotes hollis-since-ida and four other entries as text
+(`web/sveltekit/src/lib/landing.ts`). After rebuilding them, bring those
+quotes in line with the new files and rebuild the frontend.
 """
 
 from __future__ import annotations
