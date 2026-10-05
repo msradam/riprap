@@ -20,7 +20,58 @@ Q = "How many street flooding complaints has Queens CB 12 had?"
 
 def test_summary_splits_by_kind_and_merges_the_two_street_descriptors():
     assert V["n"] == 6 and V["by_kind"] == {"street flooding": 4, "sewer backup": 2}
-    assert V["narrative"].endswith("in the last 3 years: 4 street flooding, 2 sewer backup.")
+    assert "in the last 3 years: 4 street flooding, 2 sewer backup. " in V["narrative"]
+
+
+def test_every_count_carries_the_under_reporting_caveat():
+    """A complaint count is a count of reports. The caveat is one sentence,
+    in the sentence a reader sees and in the value a program reads (JSON,
+    MCP), for a count of zero as for any other."""
+    from app.context import nyc311
+    from riprap.core.compliance.predicates import _sentences
+
+    assert len(_sentences(nyc311.CAVEAT)) == 1
+    assert "a low count can mean under-reporting and not the absence of flooding" in nyc311.CAVEAT
+    # Both references were read on 2026-10-05: arxiv.org/abs/1710.02452 and doi.org/10.1214/24-AOAS2003.
+    assert "Kontokosta, Hong and Korsberg, arXiv:1710.02452" in nyc311.CAVEAT
+    assert "Boxer, Hong, Kontokosta and Neill, Annals of Applied Statistics 19(2), 2025" in nyc311.CAVEAT
+    zero = _summarize([], years=5, radius_m=200)
+    for v in (V, zero):
+        assert v["caveat"] == nyc311.CAVEAT and v["narrative"].endswith(nyc311.CAVEAT)
+        assert "complaints filed" in v["narrative"].split(". ")[0]
+
+
+def test_the_requests_tool_carries_the_caveat(monkeypatch):
+    from app.context import nyc311
+
+    monkeypatch.setattr(nyc311, "_complaints_where", lambda clause, since, limit: [_c("Street Flooding (SJ)")])
+    assert nyc311.flood_requests(community_district="QN12")["caveat"] == nyc311.CAVEAT
+
+
+def test_a_neighbourhood_is_counted_with_its_exact_outline(monkeypatch):
+    """Socrata is asked for the outline's bounding box and the rows are
+    tested against the outline itself. A simplified outline in the query
+    undercounted (Red Hook's area: 483 against 515)."""
+    from shapely.geometry import Polygon
+
+    from app.context import nyc311
+
+    # An L: the notch at the top right is inside the bounding box and outside the outline.
+    outline = Polygon([(-74.0, 40.0), (-73.0, 40.0), (-73.0, 40.5), (-73.5, 40.5), (-73.5, 41.0), (-74.0, 41.0)])
+    seen = {}
+
+    def fake(clause, since, limit):
+        seen["clause"] = clause
+
+        def at(key, lat, lon):
+            return Complaint(key, "Street Flooding (SJ)", "2025-06-01", None, None, lat=lat, lon=lon)
+        return [at("in the foot", 40.25, -73.25), at("in the stem", 40.75, -73.75),
+                at("in the notch", 40.75, -73.25), Complaint("no point", "Backup", "2025-06-01", None, None)]
+
+    monkeypatch.setattr(nyc311, "_complaints_where", fake)
+    got = nyc311.complaints_in_polygon(outline)
+    assert seen["clause"] == "within_box(location, 41.0, -74.0, 40.0, -73.0)"
+    assert [c.unique_key for c in got] == ["in the foot", "in the stem"]
 
 
 def test_true_zero_says_the_source_answered():

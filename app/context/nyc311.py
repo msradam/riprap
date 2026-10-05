@@ -16,6 +16,17 @@ URL = "https://data.cityofnewyork.us/resource/erm2-nwe9.json"
 DOC_ID = "nyc311"
 CITATION = "NYC 311 service requests (Socrata erm2-nwe9, 2020 to present)"
 
+# What a count of complaints is not. One sentence, and it travels with every
+# count: in the sentence, and as `caveat` in the value for JSON and MCP readers.
+# Kontokosta, Hong and Korsberg (arXiv:1710.02452) find that "socioeconomic
+# status, household characteristics, and language proficiency have a
+# non-trivial effect on the propensity to use 311"; the second reference is
+# The Annals of Applied Statistics 19(2), 2025.
+CAVEAT = ("A count of complaints is a count of reports filed, not of floods: a low count can mean under-reporting "
+          "and not the absence of flooding, because the propensity to file a 311 request varies with income, language "
+          "and demographics (Kontokosta, Hong and Korsberg, arXiv:1710.02452; Boxer, Hong, Kontokosta and Neill, "
+          "Annals of Applied Statistics 19(2), 2025, doi:10.1214/24-AOAS2003).")
+
 # The kind of complaint each descriptor records, in the words a question
 # uses ("street flooding"). NYC renamed the descriptors: complaint type
 # "Sewer" (coded names) ends on 2026-07-29 and "Sewer Maintenance" (plain
@@ -70,22 +81,24 @@ def summary_for_point(lat: float, lon: float, radius_m: float = 200,
 
 def complaints_in_polygon(polygon, polygon_crs: str = "EPSG:4326",
                           since: datetime | None = None,
-                          limit: int = 5000,
-                          simplify_tolerance: float = 0.0005) -> list[Complaint]:
-    """Pull flood-related complaints inside an arbitrary polygon via
-    Socrata's `within_polygon(location, 'MULTIPOLYGON(...)')` predicate.
-
-    NYC NTA polygons can have thousands of vertices and exceed Socrata's
-    URL length limit (414). We simplify in EPSG:4326 with a default
-    ~50 m tolerance, which collapses vertex count ~10-20× without
-    materially changing the contained-points result.
-
-    Polygon must be EPSG:4326 (lat/lon) for the Socrata query.
-    """
+                          limit: int = 50000) -> list[Complaint]:
+    """Flood-related complaints inside a polygon, counted with its exact
+    outline. An NTA outline has thousands of vertices, too long for a query
+    URL, so Socrata is asked for the polygon's bounding box and the rows
+    are tested against the outline here. (A simplified outline in the query
+    once undercounted: Red Hook's area read 483 against 515.)"""
     import geopandas as gpd
-    g = gpd.GeoDataFrame(geometry=[polygon], crs=polygon_crs).to_crs("EPSG:4326")
-    geom = g.iloc[0].geometry.simplify(simplify_tolerance, preserve_topology=True)
-    return _complaints_where(f"within_polygon(location, '{geom.wkt}')", since, limit)
+    import shapely
+
+    geom = gpd.GeoSeries([polygon], crs=polygon_crs).to_crs("EPSG:4326").iloc[0]
+    west, south, east, north = geom.bounds
+    rows = _complaints_where(f"within_box(location, {north}, {west}, {south}, {east})", since, limit)
+    if len(rows) >= limit:
+        # ponytail: one fetch of the box; page through it if a box ever holds this many rows.
+        raise ValueError(f"more than {limit} flood-related 311 requests in the area's bounding box; not counted")
+    rows = [c for c in rows if c.lat is not None and c.lon is not None]
+    inside = shapely.contains_xy(geom, [c.lon for c in rows], [c.lat for c in rows])
+    return [c for c, ok in zip(rows, inside, strict=True) if ok]
 
 
 def complaints_in_board(board: str, since: datetime | None = None, limit: int = 5000) -> list[Complaint]:
@@ -139,8 +152,8 @@ def summary_for_polygon(polygon, polygon_crs: str = "EPSG:4326",
                         years: int = 5) -> dict:
     """Polygon-mode aggregation: counts of flood-related 311 complaints
     inside the polygon over the trailing window."""
-    cs = complaints_in_polygon(polygon, polygon_crs=polygon_crs, since=_since(years), limit=5000)
-    return _summarize(cs, years=years, radius_m=None, limit=5000)
+    cs = complaints_in_polygon(polygon, polygon_crs=polygon_crs, since=_since(years))
+    return _summarize(cs, years=years, radius_m=None)
 
 
 def summary_for_district(code: str, years: int = 3) -> dict:
@@ -225,6 +238,7 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: i
                  f"in the last {years} years")
     narrative += (": " + ", ".join(f"{k} {kind}" for kind, k in kinds.items()) + "." if n
                   else " (the 311 service answered and none matched).")
+    narrative += f" {CAVEAT}"
     return {
         "n": n,
         "capped": capped,
@@ -247,6 +261,7 @@ def _summarize(cs: list[Complaint], years: int, radius_m: float | None, limit: i
         "headline_value": f"{n} complaint{'s' if n != 1 else ''}",
         "subhead_text": ", ".join(f"{k} {kind}" for kind, k in kinds.items()) or "no flood-related complaints",
         "narrative": narrative,
+        "caveat": CAVEAT,
         "histogram": list(by_year_sorted.values()) or [],
     }
 
@@ -308,6 +323,7 @@ def flood_requests(*, lat: float | None = None, lon: float | None = None,
         "by_month": dict(sorted(by_month.items())),
         "most_recent": [{"date": c.created_date[:10], "descriptor": c.descriptor,
                          "address": c.address, "status": c.status} for c in cs[:10]],
+        "caveat": CAVEAT,
         "source": CITATION,
         "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
     }
