@@ -18,10 +18,9 @@ page against `web/main.py`, the logging calls and the frontend on
   reporting or tag-manager script. Fonts are served from the app itself
   (`web/sveltekit/src/lib/fonts.css`), not from a font CDN.
 - **No database of queries.** The application writes no record of who
-  asked what. It does not log the addresses or questions people type. Two
-  things outside the application's own code can still hold them, and both
-  are in the table below: the web server's access log, and an error line
-  when a geocoder call fails.
+  asked what. It does not log the addresses or questions people type. One
+  thing outside the application's own code can still hold them, and it is
+  in the table below: the web server's access log.
 
 ## What is stored, and where
 
@@ -29,7 +28,7 @@ page against `web/main.py`, the logging calls and the frontend on
 |---|---|---|
 | HTTP cache | `~/.cache/riprap/http.sqlite` on the machine running the server (`riprap/core/http.py`; `RIPRAP_HTTP_CACHE=off` disables it) | Responses from public data APIs, kept for 10 minutes by default (`RIPRAP_HTTP_CACHE_TTL_S`). 311 records are never written to it (see below). |
 | Run logs | `.burr/`, only when `RIPRAP_BURR_TRACKING=1` | Each pipeline run, including the query, for the Burr tracking UI. Off by default. |
-| Server output | Standard output and standard error of the process | Startup messages. The web server (uvicorn) writes an access log by default, and its request URLs carry the address or question typed; run it with `--no-access-log` to turn that off. When a geocoder request fails, the warning that is logged (`app/geocode.py`) can include the failed request's URL, which holds the text typed. Where these lines go, and how long they are kept, depends on how you run the server. |
+| Server output | Standard output and standard error of the process | Startup messages. The web server (uvicorn) writes an access log by default, and its request URLs carry the address or question typed; run it with `--no-access-log` to turn that off. A failed geocoder request is logged by its error type only (`app/geocode.py`), without the request or the text typed. Where these lines go, and how long they are kept, depends on how you run the server. |
 | Print snapshots | The visitor's own browser (`localStorage`, one entry per query under `riprap:print:`, `web/sveltekit/src/lib/stores/briefingState.svelte.ts`) | Each briefing run in that browser, so the print page can render it. Entries stay until the visitor clears the site's data. They never leave the browser. |
 
 ## What is sent to other services
@@ -39,7 +38,10 @@ page against `web/main.py`, the logging calls and the frontend on
   (`app/geocode.py`).
 - **Public data APIs.** Coordinates or an area outline are sent to the
   city, state and federal APIs each manifest names (NYC Open Data, NOAA,
-  NWS, USGS, FEMA, FloodNet and the city portals).
+  NWS, USGS, FEMA, FloodNet and the city portals). Every request, the
+  geocoders' included, carries the User-Agent `Riprap/0.8 (civic
+  flood-evidence tool)`: a product name, with no contact address or
+  personal identifier (`riprap/core/http.py`).
 - **Map tiles.** The browser loads basemap tiles from CARTO
   (`basemaps.cartocdn.com`), which sees the map area being viewed.
 - **An LLM, only if you configure one.** With `RIPRAP_LLM_BASE_URL` set,

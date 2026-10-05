@@ -238,7 +238,7 @@ def plan(query: str, on_token=None, ledger: list | None = None, registry=None) -
 
     ids = [c["id"] for c in cat]
     d, _model = llm.chat_json(messages, plan_schema(ids), name="plan", ledger=ledger)
-    log.info("planner plan: %s", str(d)[:400])
+    log.info("planner plan: intent=%s", d.get("intent"))  # not the plan: its targets hold the text typed
     if on_token:
         on_token(json.dumps(d))
     return _validate(d, raw_query=query, catalog_ids=ids)
