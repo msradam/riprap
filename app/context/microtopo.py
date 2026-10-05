@@ -33,6 +33,9 @@ DOC_ID = "microtopo"
 # No resolution in the label: the cells are about 22 m east-west and 29 m north-south.
 CITATION = "USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)"
 
+# The DEM's own tag (vertical_datum, written by py3dep from 3DEP) says NAVD88.
+VERTICAL_DATUM = "NAVD88"
+
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 DEM_PATH = DATA_DIR / "nyc_dem_30m.tif"
 TWI_PATH = DATA_DIR / "twi.tif"
@@ -120,9 +123,15 @@ def warm():
 
 
 def _row_col(transform, lat: float, lon: float) -> tuple[int, int]:
-    """WGS84 (lat, lon) to the nearest raster (row, col)."""
-    x, y = ~transform @ (lon, lat)
-    return int(round(y)), int(round(x))
+    """WGS84 (lat, lon) to the (row, col) of the cell that contains it.
+
+    rasterio's own index takes the floor. Rounding the pixel coordinate
+    read the next cell for a point in the far half of its own: 400 Carroll
+    Street printed the Gowanus Canal's 0.0 m, not its cell's 1.07 m."""
+    from rasterio.transform import rowcol
+
+    row, col = rowcol(transform, lon, lat)
+    return int(row), int(col)
 
 
 def _ordinal(n: int) -> str:
@@ -196,7 +205,7 @@ def microtopo_at(lat: float, lon: float, radius_m: int = 750) -> Microtopo | Non
     elev = round(point_elev, 2)
     pct_200_r = round(pct_200, 1)
     relief = round(aoi_max - point_elev, 2)
-    bits = [f"Elevation {elev} m"]
+    bits = [f"Elevation {elev} m ({VERTICAL_DATUM})"]
     pct = round(pct_200)
     bits.append(f"; this point is higher than {pct}% of the ground within 200 m (the {_ordinal(pct)} "
                 f"percentile; a low percentile means a local low spot where water collects)")

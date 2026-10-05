@@ -63,12 +63,13 @@ def terrain(polygon) -> dict | None:
     v = microtopo.microtopo_for_polygon(polygon)
     if not v:
         return None
-    bits = [f"Median ground elevation {v['elev_median_m']} m (10th percentile {v['elev_p10_m']} m)"]
-    if v.get("frac_hand_lt1") is not None:
-        bits.append(f"{_pct(v['frac_hand_lt1'])}% of the area sits less than 1 m above the "
-                    "nearest drainage channel (HAND, height above nearest drainage)")
-    v["narrative"] = "; ".join(bits) + "."
-    v["headline_value"] = f"median ground elevation {v['elev_median_m']} m"
+    # Elevation only. The share of cells "less than 1 m above the nearest
+    # drainage channel" is not said: the channels are synthetic, on a 30 m
+    # grid that includes harbour cells, and inland QN12 read 28.8%.
+    datum = microtopo.VERTICAL_DATUM
+    v["narrative"] = (f"Median ground elevation {v['elev_median_m']} m {datum} "
+                      f"(10th percentile {v['elev_p10_m']} m).")
+    v["headline_value"] = f"median ground elevation {v['elev_median_m']} m {datum}"
     return v
 
 
