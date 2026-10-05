@@ -34,7 +34,8 @@
   <span class="source-entry-title">{c.title}</span>
   <span class="source-entry-line">
     {#if c.maturity === 'experimental'}{TIER_WORDS[c.tier] ?? c.tier} <span class="exp-badge">Experimental</span>{:else}{TIER_WORDS[c.tier] ?? c.tier}{/if}, {@render asOf(c)},
-    <span class="data">{c.docId}</span>
+    <span class="data">{c.docId}</span>{#if c.queryUrl?.startsWith('https://')},
+      <a href={c.queryUrl} target="_blank" rel="noopener noreferrer">the exact query</a>{/if}
   </span>
 {/snippet}
 
@@ -94,6 +95,9 @@
   .source-entry-name a {
     color: var(--riprap-text-link);
     text-decoration: none;
+  }
+  .source-entry-line a {
+    color: var(--riprap-text-link);
   }
   .source-entry-name a:hover,
   .source-entry-name a:focus-visible {

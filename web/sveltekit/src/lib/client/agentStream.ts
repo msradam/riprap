@@ -93,6 +93,7 @@ export interface CitationMeta {
   retrieved_at?: string;
   vintage?: string;
   maturity?: Maturity;
+  query_url?: string;
 }
 
 export interface GroundedClaim {

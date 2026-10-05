@@ -52,7 +52,8 @@ export function briefingFromFinal(
       url: c.url,
       vintage: c.vintage,
       retrieved: c.retrieved_at,
-      maturity: c.maturity
+      maturity: c.maturity,
+      queryUrl: c.query_url
     });
   });
   const r = parseBriefing(f.paragraph, seed);

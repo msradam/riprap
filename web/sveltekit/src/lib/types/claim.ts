@@ -10,6 +10,8 @@ export interface Citation {
   url: string;
   vintage: string;
   retrieved: string;
+  /** The exact request the count came from (the 311 Socrata query), when the source gives one. */
+  queryUrl?: string;
   /** 'experimental' layers get a visible badge in the citation list. */
   maturity?: 'production' | 'experimental';
 }

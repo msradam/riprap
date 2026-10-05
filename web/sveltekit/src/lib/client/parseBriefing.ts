@@ -63,7 +63,7 @@ export interface ParseResult {
 export function citationFromMeta(
   n: number,
   docId: string,
-  meta?: Partial<Pick<Citation, 'source' | 'title' | 'url' | 'vintage' | 'retrieved' | 'maturity'>>
+  meta?: Partial<Pick<Citation, 'source' | 'title' | 'url' | 'vintage' | 'retrieved' | 'maturity' | 'queryUrl'>>
 ): Citation {
   // Most live-API pebbles don't have a baked `date_modified` in
   // their manifest because the data IS live — the timestamp is the
@@ -84,6 +84,7 @@ export function citationFromMeta(
     vintage: meta?.vintage || 'live',
     retrieved: meta?.retrieved || today,
     maturity: meta?.maturity,
+    ...(meta?.queryUrl ? { queryUrl: meta.queryUrl } : {}),
   };
 }
 
