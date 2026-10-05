@@ -67,6 +67,27 @@ def test_permits_sentence_tests_expiry_and_names_the_file_it_reads(monkeypatch):
     assert "DOB NOW" in v["narrative"] and "not every permit" in v["narrative"]
 
 
+def test_permit_dates_compare_as_dates(monkeypatch):
+    """The file writes 'MM/DD/YYYY'; as text '12/29/2025' sorts after
+    '04/01/2026', so the older permit of a job was kept as its latest."""
+    from shapely.geometry import box
+
+    from app.context import dob_permits
+
+    class R:
+        def raise_for_status(self): pass
+
+        def json(self):
+            base = {"job__": "1", "job_type": "NB", "gis_latitude": "40.7", "gis_longitude": "-73.8"}
+            return [{**base, "issuance_date": "12/29/2025", "expiration_date": "01/15/2026"},
+                    {**base, "issuance_date": "04/01/2026", "expiration_date": "04/01/2099"}]
+
+    monkeypatch.setattr(dob_permits.http, "get", lambda *a, **k: R())
+    assert dob_permits._iso("12/29/2025") == "2025-12-29" and dob_permits._iso("2020-06-05T00:00:00") == "2020-06-05"
+    (job,) = dob_permits.permits_in_polygon(box(-73.9, 40.6, -73.7, 40.8))
+    assert (job.issuance_date, job.expiration_date) == ("2026-04-01", "2099-04-01")
+
+
 def test_a_plain_district_briefing_leaves_permits_out():
     from riprap.core.burr.stones import select_pebbles
     from riprap.core.pebbles.bridge import get_registry

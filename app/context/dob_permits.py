@@ -70,6 +70,16 @@ class Permit:
     nta_name: str | None
 
 
+def _iso(value: str | None) -> str | None:
+    """A date of this file as YYYY-MM-DD. Rows carry 'MM/DD/YYYY' or an ISO
+    timestamp; as text the first does not sort or compare by date, which
+    picked the wrong "latest" permit of a job and cannot test an expiry."""
+    v = (value or "")[:10]
+    if len(v) == 10 and v[2] == "/" and v[5] == "/":
+        return f"{v[6:]}-{v[:2]}-{v[3:5]}"
+    return v or None
+
+
 def permits_in_bbox(min_lat: float, min_lon: float,
                     max_lat: float, max_lon: float,
                     job_types: tuple[str, ...] = DEFAULT_JOB_TYPES,
@@ -135,8 +145,8 @@ def permits_in_bbox(min_lat: float, min_lon: float,
             job_type=row.get("job_type", ""),
             job_type_label=JOB_TYPE_LABELS.get(row.get("job_type", ""), row.get("job_type", "")),
             permit_status=row.get("permit_status", ""),
-            issuance_date=(row.get("issuance_date") or "")[:10],
-            expiration_date=(row.get("expiration_date") or "")[:10] or None,
+            issuance_date=_iso(row.get("issuance_date")) or "",
+            expiration_date=_iso(row.get("expiration_date")),
             address=addr,
             borough=(row.get("borough") or "").title(),
             bbl=bbl,
