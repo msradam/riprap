@@ -124,3 +124,35 @@ def test_a_point_no_map_covers_is_an_answer_not_a_failure(monkeypatch):
     monkeypatch.setattr(_http.http, "get", lambda *a, **k: _Reply('{"features": []}'))
     assert fema_nfhl.summary_for_point(40.30, -73.50) is None
     assert fema_nfhl.preliminary_for_point(40.30, -73.50) is None
+
+
+def test_a_failed_reply_is_not_served_again_from_the_cache(monkeypatch, tmp_path):
+    """FEMA's service answers some failures with HTTP 200 and an empty body
+    or an error object. The HTTP cache kept any 200 for the call's lifetime
+    (a day for FEMA), so one bad minute read as a failed source for a day."""
+    import httpx
+
+    from riprap.core import http
+
+    replies = iter([httpx.Response(200, content=b""),
+                    httpx.Response(200, json={"error": {"code": 500, "message": "Error performing query operation"}}),
+                    httpx.Response(200, json={"features": [{"attributes": {"FLD_ZONE": "AE"}}]})])
+    sent = []
+
+    def handler(request):
+        sent.append(request)
+        return next(replies)
+
+    monkeypatch.setenv("RIPRAP_HTTP_CACHE", str(tmp_path / "http.sqlite"))
+    monkeypatch.setattr(http.httpx, "HTTPTransport", lambda: httpx.MockTransport(handler))
+    http.client.cache_clear()
+    try:
+        for _ in range(2):  # the empty body, then the error object: each raises and neither is kept
+            with pytest.raises(httpx.HTTPError):
+                fema_nfhl._point_query(28, 40.58, -73.84, "FLD_ZONE", 86400)
+        assert fema_nfhl._point_query(28, 40.58, -73.84, "FLD_ZONE", 86400) == [{"attributes": {"FLD_ZONE": "AE"}}]
+        assert fema_nfhl._point_query(28, 40.58, -73.84, "FLD_ZONE", 86400) == [{"attributes": {"FLD_ZONE": "AE"}}]
+        assert len(sent) == 3  # the good reply is cached; the failures were not
+    finally:
+        http.client.cache_clear()
+        http._STORAGE.clear()

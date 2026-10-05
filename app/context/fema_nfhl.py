@@ -44,13 +44,12 @@ def _point_query(
         f"&outFields={out_fields}&returnGeometry=false&f=json"
     )
     try:
-        data = fetch_url_json(url, cache_ttl_s=cache_ttl_s, timeout_s=20.0)
-    except ValueError as e:  # the service answers some failures with HTTP 200 and an empty or broken body
-        raise httpx.HTTPError(f"FEMA's map service sent an unreadable reply for layer {layer}: {e}") from e
-    if not isinstance(data, dict) or not isinstance(data.get("features"), list):
-        # An ArcGIS error arrives as HTTP 200 with {"error": ...} and no "features".
-        why = data.get("error") if isinstance(data, dict) else data
-        raise httpx.HTTPError(f"FEMA's map service sent no features list for layer {layer}: {str(why)[:200]}")
+        # The service answers some failures with HTTP 200 and an empty or broken body, and an ArcGIS error
+        # arrives as HTTP 200 with {"error": ...} and no "features". Either is dropped from the cache and raises.
+        data = fetch_url_json(url, cache_ttl_s=cache_ttl_s, timeout_s=20.0,
+                              valid=lambda d: isinstance(d, dict) and isinstance(d.get("features"), list))
+    except ValueError as e:
+        raise httpx.HTTPError(f"FEMA's map service sent no features list for layer {layer}: {e}") from e
     return data["features"]
 
 

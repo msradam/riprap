@@ -4,7 +4,9 @@
   * caching: hishel stores successful responses in a local SQLite file and
     serves them for `ttl_s` seconds (default 600, 10 minutes, for live
     sources) whatever the upstream cache headers say; POST bodies are part
-    of the key, so GraphQL queries cache per query;
+    of the key, so GraphQL queries cache per query. A 200 the caller finds
+    to be a failure (an empty body, an error object) is dropped with
+    `forget`, so it is not served again for the rest of its TTL;
   * retries: stamina retries transport errors, 429 and 5xx with backoff
     and jitter, 3 attempts within 30 s. 4xx responses are returned to the
     caller, which decides what they mean.
@@ -16,6 +18,7 @@ RIPRAP_HTTP_CACHE_TTL_S the default TTL; RIPRAP_HTTP_CACHE=off disables it.
 from __future__ import annotations
 
 import functools
+import hashlib
 import os
 import sqlite3
 from pathlib import Path
@@ -38,6 +41,9 @@ class _OkOnly(hishel.BaseFilter[hishel.Response]):
         return item.status_code == 200
 
 
+_STORAGE: list = []  # the cache storage of client(), for forget()
+
+
 @functools.cache
 def client() -> httpx.Client:
     setting = os.environ.get("RIPRAP_HTTP_CACHE", "")
@@ -51,6 +57,7 @@ def client() -> httpx.Client:
         policy = hishel.FilterPolicy(response_filters=[_OkOnly()])
         policy.use_body_key = True
         transport = SyncCacheTransport(transport, storage=storage, policy=policy)
+        _STORAGE[:] = [storage]
     return httpx.Client(transport=transport, timeout=TIMEOUT, follow_redirects=True,
                         headers={"User-Agent": USER_AGENT})
 
@@ -87,6 +94,19 @@ def request(method: str, url: str, *, ttl_s: float | None = None, store: bool = 
     if resp.status_code == 429 or resp.status_code >= 500:
         resp.raise_for_status()
     return resp
+
+
+def forget(resp: httpx.Response) -> None:
+    """Drop a response from the cache. For a caller that finds an HTTP 200
+    to be a failure: FEMA's map service answers some failures with 200 and
+    an empty body, which was then served from the cache for a day."""
+    if not _STORAGE:
+        return
+    req = resp.request
+    # The key hishel files an entry under with use_body_key: the hash of the request body.
+    for entry in _STORAGE[0].get_entries(hashlib.sha256(req.content).hexdigest()):
+        if str(entry.request.url) == str(req.url) and entry.request.method == req.method:
+            _STORAGE[0].remove_entry(entry.id)
 
 
 def get(url: str, **kwargs) -> httpx.Response:
