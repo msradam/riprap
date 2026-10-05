@@ -4,8 +4,8 @@
  "address": "90-01 183rd Street, Queens, NY 11423",
  "question": "Will it be dangerously hot this week at 90-01 183rd Street, Queens?",
  "hazard": "heat",
- "generated_at": "2026-10-05T15:38Z",
- "riprap_commit": "e297d0d",
+ "generated_at": "2026-10-05T16:39Z",
+ "riprap_commit": "5ecd4015",
  "mode": "no_llm",
  "model": null,
  "quantization": null,
@@ -19,35 +19,35 @@
    {
     "id": "cornerstone",
     "name": "Cornerstone",
-    "tagline": "The Hazard Reader",
+    "tagline": "Mapped hazards",
     "description": "Reads what NYC's ground remembers about flooding.",
     "order": 1
    },
    {
     "id": "touchstone",
     "name": "Touchstone",
-    "tagline": "The Live Observer",
+    "tagline": "Live readings",
     "description": "Reads the city's flood sensors, 311 requests, gauges and weather observations.",
     "order": 2
    },
    {
     "id": "keystone",
     "name": "Keystone",
-    "tagline": "The Asset Register",
+    "tagline": "Places and facilities",
     "description": "Counts the public assets and built fabric exposed to the hazards.",
     "order": 3
    },
    {
     "id": "lodestone",
     "name": "Lodestone",
-    "tagline": "The Projector",
+    "tagline": "Projections",
     "description": "Quotes what is published about what is coming, alerts, water-level forecasts and sea-level projections.",
     "order": 4
    },
    {
     "id": "capstone",
     "name": "Capstone",
-    "tagline": "The Synthesiser",
+    "tagline": "The briefing",
     "description": "Assembles the cited briefing from the evidence by fixed rules; an optional language model may only choose among the cited sentences.",
     "order": 5
    }
@@ -312,7 +312,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NYC Stormwater Flood Maps, Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise",
+     "source_name": "NYC Stormwater Flood Maps (method of the 2021 Stormwater Resiliency Plan; Open Data files of 2024), Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC Stormwater Flood Maps (NYC Open Data 9i7c-xyvv, Department of Environmental Protection), map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\", share of the area by the map's flooding categories. The Stormwater Resiliency Plan (2021) describes its extreme scenario as \"approximately 3.5 inches of rain falling in one hour (also referred to as the 100-year storm, with approximately 1 percent chance of occurrence in any given year) combined with 4.8 feet of SLR\". Map disclaimer, from DEP's own map items (arcgis.com/home/item.html?id=5b82c08be55d4f30bf28d265ab8e4a49): the map \"is intended to be an informational tool and does not provide the exact depth of flooding at any location\", shows \"the relative risk of flooding in public areas from stormwater runoff due to rain only\", and \"shall not be used for the design, modification, or construction of improvements to real property or for flood plain determination\". The caveat on an outside reading quotes NYC Emergency Management, Hazard Mitigation Plan, flooding profile (https://nychazardmitigation.com/documentation/hazard-profiles/flooding/).",
@@ -414,7 +414,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NYC Stormwater Flood Maps, Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise",
+     "source_name": "NYC Stormwater Flood Maps (method of the 2021 Stormwater Resiliency Plan; Open Data files of 2024), Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC Stormwater Flood Maps (NYC Open Data 9i7c-xyvv, Department of Environmental Protection), map \"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise\". The Stormwater Resiliency Plan (2021) describes its extreme scenario as \"approximately 3.5 inches of rain falling in one hour (also referred to as the 100-year storm, with approximately 1 percent chance of occurrence in any given year) combined with 4.8 feet of SLR\". Map disclaimer, from DEP's own map items (arcgis.com/home/item.html?id=5b82c08be55d4f30bf28d265ab8e4a49): the map \"is intended to be an informational tool and does not provide the exact depth of flooding at any location\", shows \"the relative risk of flooding in public areas from stormwater runoff due to rain only\", and \"shall not be used for the design, modification, or construction of improvements to real property or for flood plain determination\". The caveat on an outside reading quotes NYC Emergency Management, Hazard Mitigation Plan, flooding profile (https://nychazardmitigation.com/documentation/hazard-profiles/flooding/).",
@@ -448,7 +448,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NYC Stormwater Flood Maps, Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise",
+     "source_name": "NYC Stormwater Flood Maps (method of the 2021 Stormwater Resiliency Plan; Open Data files of 2024), Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC Stormwater Flood Maps (NYC Open Data 9i7c-xyvv, Department of Environmental Protection), map \"Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise\", share of the area by the map's flooding categories. The Stormwater Resiliency Plan (2021) describes its moderate scenario as \"approximately two inches of rain falling in one hour (also referred to as the 10-year storm, with approximately 10 percent chance of occurrence in any given year) combined with 2.5 feet of SLR\". Map disclaimer, from DEP's own map items (arcgis.com/home/item.html?id=5b82c08be55d4f30bf28d265ab8e4a49): the map \"is intended to be an informational tool and does not provide the exact depth of flooding at any location\", shows \"the relative risk of flooding in public areas from stormwater runoff due to rain only\", and \"shall not be used for the design, modification, or construction of improvements to real property or for flood plain determination\". The caveat on an outside reading quotes NYC Emergency Management, Hazard Mitigation Plan, flooding profile (https://nychazardmitigation.com/documentation/hazard-profiles/flooding/).",
@@ -482,7 +482,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NYC Stormwater Flood Maps, Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise",
+     "source_name": "NYC Stormwater Flood Maps (method of the 2021 Stormwater Resiliency Plan; Open Data files of 2024), Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC Stormwater Flood Maps (NYC Open Data 9i7c-xyvv, Department of Environmental Protection), map \"Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise\". The Stormwater Resiliency Plan (2021) describes its moderate scenario as \"approximately two inches of rain falling in one hour (also referred to as the 10-year storm, with approximately 10 percent chance of occurrence in any given year) combined with 2.5 feet of SLR\". Map disclaimer, from DEP's own map items (arcgis.com/home/item.html?id=5b82c08be55d4f30bf28d265ab8e4a49): the map \"is intended to be an informational tool and does not provide the exact depth of flooding at any location\", shows \"the relative risk of flooding in public areas from stormwater runoff due to rain only\", and \"shall not be used for the design, modification, or construction of improvements to real property or for flood plain determination\". The caveat on an outside reading quotes NYC Emergency Management, Hazard Mitigation Plan, flooding profile (https://nychazardmitigation.com/documentation/hazard-profiles/flooding/).",
@@ -516,7 +516,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NYC Stormwater Flood Maps, Moderate Flood (2.13 inches/hr) with Current Sea Levels",
+     "source_name": "NYC Stormwater Flood Maps (method of the 2021 Stormwater Resiliency Plan; Open Data files of 2024), Moderate Flood (2.13 inches/hr) with Current Sea Levels",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC Stormwater Flood Maps (NYC Open Data 9i7c-xyvv, Department of Environmental Protection), map \"Moderate Flood (2.13 inches/hr) with Current Sea Levels\", share of the area by the map's flooding categories. Map disclaimer, from DEP's own map items (arcgis.com/home/item.html?id=5b82c08be55d4f30bf28d265ab8e4a49): the map \"is intended to be an informational tool and does not provide the exact depth of flooding at any location\", shows \"the relative risk of flooding in public areas from stormwater runoff due to rain only\", and \"shall not be used for the design, modification, or construction of improvements to real property or for flood plain determination\". The caveat on an outside reading quotes NYC Emergency Management, Hazard Mitigation Plan, flooding profile (https://nychazardmitigation.com/documentation/hazard-profiles/flooding/).",
@@ -550,7 +550,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NYC Stormwater Flood Maps, Limited Flood (1.77 inches/hr) with Current Sea Levels",
+     "source_name": "NYC Stormwater Flood Maps (method of the 2021 Stormwater Resiliency Plan; Open Data files of 2024), Limited Flood (1.77 inches/hr) with Current Sea Levels",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC Stormwater Flood Maps (NYC Open Data 9i7c-xyvv, Department of Environmental Protection), map \"Limited Flood (1.77 inches/hr) with Current Sea Levels\", share of the area by the map's flooding categories. Riprap reads this map from the vector tiles of DEP's own map viewer (nyc.gov/stormwater-map, tile service Moderate_5yearMHHW_updateOB_VTile1_61424), because the NYC Open Data file for it is a compressed geodatabase that open tools cannot read; the other three maps are read from the NYC Open Data files. The viewer's tiles and the Open Data files are not identical where both can be read (for the Moderate map with current sea levels the deep and contiguous category matches and the nuisance category differs by about a tenth of its area), so this reading may differ from the Open Data file for the Limited map. Map disclaimer, from DEP's own map items (arcgis.com/home/item.html?id=5b82c08be55d4f30bf28d265ab8e4a49): the map \"is intended to be an informational tool and does not provide the exact depth of flooding at any location\", shows \"the relative risk of flooding in public areas from stormwater runoff due to rain only\", and \"shall not be used for the design, modification, or construction of improvements to real property or for flood plain determination\". The caveat on an outside reading quotes NYC Emergency Management, Hazard Mitigation Plan, flooding profile (https://nychazardmitigation.com/documentation/hazard-profiles/flooding/).",
@@ -584,7 +584,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NYC Stormwater Flood Maps, Moderate Flood (2.13 inches/hr) with Current Sea Levels",
+     "source_name": "NYC Stormwater Flood Maps (method of the 2021 Stormwater Resiliency Plan; Open Data files of 2024), Moderate Flood (2.13 inches/hr) with Current Sea Levels",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC Stormwater Flood Maps (NYC Open Data 9i7c-xyvv, Department of Environmental Protection), map \"Moderate Flood (2.13 inches/hr) with Current Sea Levels\". Map disclaimer, from DEP's own map items (arcgis.com/home/item.html?id=5b82c08be55d4f30bf28d265ab8e4a49): the map \"is intended to be an informational tool and does not provide the exact depth of flooding at any location\", shows \"the relative risk of flooding in public areas from stormwater runoff due to rain only\", and \"shall not be used for the design, modification, or construction of improvements to real property or for flood plain determination\". The caveat on an outside reading quotes NYC Emergency Management, Hazard Mitigation Plan, flooding profile (https://nychazardmitigation.com/documentation/hazard-profiles/flooding/).",
@@ -618,7 +618,7 @@
      "template": "{narrative}"
     },
     "provenance": {
-     "source_name": "NYC Stormwater Flood Maps, Limited Flood (1.77 inches/hr) with Current Sea Levels",
+     "source_name": "NYC Stormwater Flood Maps (method of the 2021 Stormwater Resiliency Plan; Open Data files of 2024), Limited Flood (1.77 inches/hr) with Current Sea Levels",
      "source_url": "https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv",
      "license": "NYC Open Data Terms of Use",
      "citation": "NYC Stormwater Flood Maps (NYC Open Data 9i7c-xyvv, Department of Environmental Protection), map \"Limited Flood (1.77 inches/hr) with Current Sea Levels\". Riprap reads this map from the vector tiles of DEP's own map viewer (nyc.gov/stormwater-map, tile service Moderate_5yearMHHW_updateOB_VTile1_61424), because the NYC Open Data file for it is a compressed geodatabase that open tools cannot read; the other three maps are read from the NYC Open Data files. The viewer's tiles and the Open Data files are not identical where both can be read (for the Moderate map with current sea levels the deep and contiguous category matches and the nuisance category differs by about a tenth of its area), so this reading may differ from the Open Data file for the Limited map. Map disclaimer, from DEP's own map items (arcgis.com/home/item.html?id=5b82c08be55d4f30bf28d265ab8e4a49): the map \"is intended to be an informational tool and does not provide the exact depth of flooding at any location\", shows \"the relative risk of flooding in public areas from stormwater runoff due to rain only\", and \"shall not be used for the design, modification, or construction of improvements to real property or for flood plain determination\". The caveat on an outside reading quotes NYC Emergency Management, Hazard Mitigation Plan, flooding profile (https://nychazardmitigation.com/documentation/hazard-profiles/flooding/).",
@@ -757,7 +757,7 @@
      "source_name": "USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)",
      "source_url": "https://www.usgs.gov/3d-elevation-program",
      "license": "USGS, public domain",
-     "citation": "USGS 3DEP DEM (precomputed citywide GeoTIFF, WGS84)",
+     "citation": "USGS 3DEP DEM: the 3D Elevation Program's elevation model, read from the 3DEP elevation service (scripts/fetch_nyc_dem.py) and stored in WGS84, where a cell is about 22 m east to west and 29 m north to south; heights are NAVD88. The service mosaics the best available surveys and the file carries no survey date, so the date shown is when Riprap's copy was made. One cell holds one value for all the ground in it: a survey point can differ from it by a metre or more.",
      "doc_id": "microtopo",
      "date_modified": null,
      "retrieved_at": "2026-07-11"
@@ -961,7 +961,7 @@
      "source_name": "FloodNet (New York University and The City University of New York)",
      "source_url": "https://dataviz.floodnet.nyc/",
      "license": "CC BY-NC-SA 4.0",
-     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
+     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
      "doc_id": "floodnet",
      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
      "attribution": "FloodNet (New York University and The City University of New York)",
@@ -1002,7 +1002,7 @@
      "source_name": "FloodNet (New York University and The City University of New York)",
      "source_url": "https://dataviz.floodnet.nyc/",
      "license": "CC BY-NC-SA 4.0",
-     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
+     "citation": "FloodNet street flood sensors. Flood events and sensor status read from the FloodNet Data API (api.floodnet.nyc, an early-access beta) at the retrieval time shown. A flood event is a series of depth measurements greater than 10 mm at the sensor (FloodNet's definition); a depth is measured at one point and does not show the depth on every part of the street. Riprap counts the events the API marks as verified by a person. FloodNet's published cautions about a depth: \"most FloodNet sensors are mounted over sidewalks and are thus unable to measure floods in the roadbed until the water rises above the height of the curb\"; the depth at the street's lowest point differs from the reading by the sensor's height above that point; \"a single anomalous data point, measured during a flood event\" may exaggerate a maximum depth; and a sensor may miss a flood \"if it was offline and awaiting repair or had not been deployed yet or retired\" (FloodNet's NYC Open Data description, dataset aq7i-eu5q). Ten rows of FloodNet's deployments table are NOAA and USGS tide gauges (deploy_type \"tidal\"); Riprap does not count them as FloodNet sensors. Cite: Mydlarz et al. (2024), Water Resources Research 60, e2023WR036806, https://doi.org/10.1029/2023WR036806; Silverman et al. (2022), Water Research, 118648, https://doi.org/10.1016/j.watres.2022.118648. Licence: FloodNet data and content derived from it are CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), not Riprap's Apache-2.0. Riprap is independent of FloodNet and not endorsed by it.",
      "doc_id": "floodnet",
      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
      "attribution": "FloodNet (New York University and The City University of New York)",
@@ -1022,7 +1022,7 @@
    {
     "id": "nyc311",
     "type": "live",
-    "title": "NYC 311 flood-related complaints (5y)",
+    "title": "NYC 311 flood and sewer complaints (5y)",
     "stone": "touchstone",
     "hazard": "flood",
     "tier": "proxy",
@@ -1036,14 +1036,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "NYC 311 flood-related complaints filed near this address over the past 5 years.",
+     "short": "NYC 311 flood and sewer complaints filed near this address over the past 5 years.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests, flood-related complaints (5-year window).",
+     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), flood and sewer complaints within 200 m of the point. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. The exact Socrata query is this citation's query_url. Complaints are shown at the block, never the house number.",
      "doc_id": "nyc311",
      "date_modified": "2026-10-05T01:38:25+0000",
      "retrieved_at": "live"
@@ -1070,14 +1070,14 @@
      "icon": "\ud83d\udcde"
     },
     "narration": {
-     "short": "Flood-related 311 complaints in this area.",
+     "short": "Flood and sewer 311 complaints in this area.",
      "template": "{narrative}"
     },
     "provenance": {
      "source_name": "NYC 311 Service Requests (NYC Open Data)",
      "source_url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9",
      "license": "NYC Open Data Terms of Use",
-     "citation": "NYC 311 Service Requests, flood-related complaints in the area (the sentence states how the area was counted, and the window).",
+     "citation": "NYC 311 Service Requests from 2020 to Present (NYC Open Data dataset erm2-nwe9), flood and sewer complaints in the area (the sentence states how the area was counted, and the window). A neighbourhood is counted from the rows in its bounding box that fall inside its outline; a community district by the record's community_board field. Counted: requests of complaint type \"Sewer\" or \"Sewer Maintenance\" whose descriptor is one of eleven flood and sewer descriptors (street flooding, sewer backup, catch basin, highway flooding, manhole overflow and rain garden flooding, under their coded and plain names; the list is in app/context/nyc311.py), created on or after the start date the sentence gives (midnight UTC, 365 days for each year of the window). A request filed under both descriptor names at the same place within ten minutes is counted once. The exact Socrata query is this citation's query_url. Complaints are shown at the block, never the house number.",
      "doc_id": "nyc311_nta",
      "date_modified": "2026-10-05T01:38:25+0000",
      "retrieved_at": "live"
@@ -2139,8 +2139,6 @@
    "borough": "Queens",
    "lat": 40.711001,
    "lon": -73.777712,
-   "bbl": "4099040046",
-   "bin": "4211957",
    "match": "exact",
    "note": null
   },
@@ -2148,9 +2146,9 @@
   "lon": -73.777712,
   "nta": null,
   "dep": {},
-  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment. These are public records about a place, not an assessment of any property or of the people who live there. Riprap computes no score or rating, and records can be missing where people report less.\n\nPlace described: 90-01 183 STREET, Hollis, NY, USA.\n\n**Answer.**\nFrom the National Weather Service, as issued for the next 7 days; Riprap predicts nothing itself: Over the next 7 days the National Weather Service expects daytime highs of 72\u00b0F today, 65\u00b0F Tuesday, 68\u00b0F Wednesday, 73\u00b0F Thursday, 71\u00b0F Friday, 69\u00b0F Saturday, 66\u00b0F Sunday in the 2.5 km grid cell around this place (issued 2026-10-05 09:10 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 73\u00b0F on Thursday October 8 [nws_heat_forecast]. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours [nws_heat_forecast]. The Weather Service wrote this for an area; it is not a prediction for a building. No active NWS heat advisory, watch or warning at this point, checked 2026-10-05 15:38 UTC [nws_heat_alerts].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+  "paragraph": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment. These are public records about a place, not an assessment of any property or of the people who live there. Riprap computes no score or rating, and records can be missing where people report less.\n\nPlace described: 90-01 183 STREET, Hollis, NY, USA.\n\n**Answer.**\nFrom the National Weather Service, as issued for the next 7 days; Riprap predicts nothing itself: Over the next 7 days the National Weather Service expects daytime highs of 72\u00b0F this afternoon, 65\u00b0F Tuesday, 68\u00b0F Wednesday, 73\u00b0F Thursday, 71\u00b0F Friday, 69\u00b0F Saturday, 66\u00b0F Sunday in the 2.5 km grid cell around this place (issued 2026-10-05 09:10 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 73\u00b0F on Thursday October 8 [nws_heat_forecast]. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours [nws_heat_forecast]. The Weather Service wrote this for an area; it is not a prediction for a building. No active NWS heat advisory, watch or warning at this point, checked 2026-10-05 16:39 UTC [nws_heat_alerts].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Air temperature and an outdoor heat exposure index are mapped on the NYC Urban Heat Portal (https://urbanheat.nyc), by BetaNYC. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
   "audit": {
-   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment. These are public records about a place, not an assessment of any property or of the people who live there. Riprap computes no score or rating, and records can be missing where people report less.\n\nPlace described: 90-01 183 STREET, Hollis, NY, USA.\n\n**Answer.**\nFrom the National Weather Service, as issued for the next 7 days; Riprap predicts nothing itself: Over the next 7 days the National Weather Service expects daytime highs of 72\u00b0F today, 65\u00b0F Tuesday, 68\u00b0F Wednesday, 73\u00b0F Thursday, 71\u00b0F Friday, 69\u00b0F Saturday, 66\u00b0F Sunday in the 2.5 km grid cell around this place (issued 2026-10-05 09:10 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 73\u00b0F on Thursday October 8 [nws_heat_forecast]. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours [nws_heat_forecast]. The Weather Service wrote this for an area; it is not a prediction for a building. No active NWS heat advisory, watch or warning at this point, checked 2026-10-05 15:38 UTC [nws_heat_alerts].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
+   "raw": "This is an automated hazard-exposure briefing produced by Riprap from live and precomputed data sources. It is informational only and not a substitute for a professional risk assessment. These are public records about a place, not an assessment of any property or of the people who live there. Riprap computes no score or rating, and records can be missing where people report less.\n\nPlace described: 90-01 183 STREET, Hollis, NY, USA.\n\n**Answer.**\nFrom the National Weather Service, as issued for the next 7 days; Riprap predicts nothing itself: Over the next 7 days the National Weather Service expects daytime highs of 72\u00b0F this afternoon, 65\u00b0F Tuesday, 68\u00b0F Wednesday, 73\u00b0F Thursday, 71\u00b0F Friday, 69\u00b0F Saturday, 66\u00b0F Sunday in the 2.5 km grid cell around this place (issued 2026-10-05 09:10 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 73\u00b0F on Thursday October 8 [nws_heat_forecast]. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours [nws_heat_forecast]. The Weather Service wrote this for an area; it is not a prediction for a building. No active NWS heat advisory, watch or warning at this point, checked 2026-10-05 16:39 UTC [nws_heat_alerts].\n\n**Out of scope.** This briefing does not measure the temperature inside a building, give health advice, or predict the heat on a given day at a given address. Air temperature and an outdoor heat exposure index are mapped on the NYC Urban Heat Portal (https://urbanheat.nyc), by BetaNYC. Where a source was offline at run time, the relevant section omits that signal.\n\nChecks run: citations and numbers on every claim; lead rules on the answer, which is the cited text word for word.",
    "dropped": [],
    "tier": "no_llm"
   },
@@ -2161,7 +2159,7 @@
    "claims": [
     {
      "section": "answer",
-     "text": "Over the next 7 days the National Weather Service expects daytime highs of 72\u00b0F today, 65\u00b0F Tuesday, 68\u00b0F Wednesday, 73\u00b0F Thursday, 71\u00b0F Friday, 69\u00b0F Saturday, 66\u00b0F Sunday in the 2.5 km grid cell around this place (issued 2026-10-05 09:10 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 73\u00b0F on Thursday October 8. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours. The Weather Service wrote this for an area; it is not a prediction for a building.",
+     "text": "Over the next 7 days the National Weather Service expects daytime highs of 72\u00b0F this afternoon, 65\u00b0F Tuesday, 68\u00b0F Wednesday, 73\u00b0F Thursday, 71\u00b0F Friday, 69\u00b0F Saturday, 66\u00b0F Sunday in the 2.5 km grid cell around this place (issued 2026-10-05 09:10 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 73\u00b0F on Thursday October 8. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours. The Weather Service wrote this for an area; it is not a prediction for a building.",
      "doc_ids": [
       "nws_heat_forecast"
      ],
@@ -2169,7 +2167,7 @@
     },
     {
      "section": "answer",
-     "text": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-05 15:38 UTC.",
+     "text": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-05 16:39 UTC.",
      "doc_ids": [
       "nws_heat_alerts"
      ],
@@ -2200,9 +2198,9 @@
     "title": "NWS gridpoint forecast for the 2.5 km cell containing the place (api.weather.gov/gridpoints): daytime high temperatures and hourly apparent temperature. Advisory criteria from the New York office's definitions page (weather.gov/okx/wwa_definitions, read 2026-10-02).",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T15:38Z",
-    "retrieved_at": "2026-10-05T15:38Z",
-    "vintage": "2026-10-05T15:38Z",
+    "date_modified": "2026-10-05T16:39Z",
+    "retrieved_at": "2026-10-05T16:39Z",
+    "vintage": "2026-10-05T16:39Z",
     "maturity": "production"
    },
    "nws_heat_alerts": {
@@ -2211,9 +2209,9 @@
     "title": "NWS active alerts at the place (api.weather.gov/alerts/active), heat events only: Heat Advisory, Extreme Heat Watch, Extreme Heat Warning.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T15:38Z",
-    "retrieved_at": "2026-10-05T15:38Z",
-    "vintage": "2026-10-05T15:38Z",
+    "date_modified": "2026-10-05T16:39Z",
+    "retrieved_at": "2026-10-05T16:39Z",
+    "vintage": "2026-10-05T16:39Z",
     "maturity": "production"
    },
    "heat_surface": {
@@ -2277,9 +2275,9 @@
     "title": "NWS station observations (api.weather.gov/stations/{id}/observations/latest): air temperature, relative humidity and heat index at the nearest of the region's airport and Central Park stations.",
     "url": "https://api.weather.gov/",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T15:38Z",
-    "retrieved_at": "2026-10-05T15:38Z",
-    "vintage": "2026-10-05T15:38Z",
+    "date_modified": "2026-10-05T16:39Z",
+    "retrieved_at": "2026-10-05T16:39Z",
+    "vintage": "2026-10-05T16:39Z",
     "maturity": "production"
    },
    "heat_station": {
@@ -2288,9 +2286,9 @@
     "title": "NOAA Regional Climate Centers, ACIS web services (data.rcc- acis.org/StnData): daily maximum temperature at the threaded station records for Central Park, LaGuardia Airport and JFK Airport; yearly counts of days at or above 90\u00b0F and yearly maxima.",
     "url": "https://www.rcc-acis.org/docs_webservices.html",
     "license": "U.S. Public Domain",
-    "date_modified": "2026-10-05T15:38Z",
-    "retrieved_at": "2026-10-05T15:38Z",
-    "vintage": "2026-10-05T15:38Z",
+    "date_modified": "2026-10-05T16:39Z",
+    "retrieved_at": "2026-10-05T16:39Z",
+    "vintage": "2026-10-05T16:39Z",
     "maturity": "production"
    },
    "cool_features": {
@@ -2419,7 +2417,7 @@
    "ac_pct": 84.9,
    "green_pct": 14.7,
    "median_income": 59511,
-   "narrative": "The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Jamaica, the neighbourhood around this address, at 5 out of 5, the highest risk group. The index ranks neighbourhoods against each other by a model of heat deaths, from surface temperature, green space, air conditioning, income and the share of Black residents; it is not a measurement of heat at an address, and the department notes that every neighbourhood has residents at risk, whatever its score. For Jamaica the department's file gives 84.9% of households with air conditioning (a survey estimate it shares across neighbouring neighbourhoods) and 14.7% green space.",
+   "narrative": "The NYC Health Department's Heat Vulnerability Index (2023, from 2016 to 2020 data) scores Jamaica, the neighbourhood around this address, at 5 out of 5, the highest risk group. The index ranks neighbourhoods against each other: the department says it \"uses a statistical model to summarize the most important factors of neighborhood heat risk: surface temperature, green space, home air conditioning, and income\". It is not a measurement of heat at an address, and the department says \"All neighborhoods have residents at risk for heat illness and death\". For Jamaica the department's file gives 84.9% of households with air conditioning (a survey estimate it shares across neighbouring neighbourhoods) and 14.7% green space. The area is the 2020 Neighborhood Tabulation Area the index is published for, which can carry another name than the neighbourhood in the address above. Of who heat harms most, the department writes that Black New Yorkers suffer disproportionate health impacts from heat \"due to social and economic disparities\", and that \"These disparities stem from structural racism, which includes neighborhood disinvestment, racist housing policies, fewer job opportunities and lower pay, and less access to high-quality education and health care\" (NYC Health Department, Interactive Heat Vulnerability Index).",
    "headline_value": "5 of 5 (Jamaica)"
   },
   "heat_visits": {
@@ -2461,12 +2459,12 @@
    "station": "JFK Airport",
    "station_id": "KJFK",
    "distance_km": 8.1,
-   "observed": "2026-10-05 11:15",
-   "temp_f": 66,
+   "observed": "2026-10-05 12:10",
+   "temp_f": 68,
    "heat_index_f": null,
-   "humidity_pct": 68,
-   "narrative": "The air at JFK Airport, the nearest weather station (8.1 km away), was 66\u00b0F at 11:15 Eastern on 2026-10-05, with 68% humidity and no heat index reported (the station reports one only when it is hot). This is the station's reading, not this address's.",
-   "headline_value": "66\u00b0F at JFK Airport"
+   "humidity_pct": 64,
+   "narrative": "The air at JFK Airport, the nearest weather station (8.1 km away), was 68\u00b0F at 12:10 Eastern on 2026-10-05, with 64% humidity and no heat index reported (the station reports one only when it is hot). This is the station's reading, not this address's.",
+   "headline_value": "68\u00b0F at JFK Airport"
   },
   "heat_station": {
    "station": "JFK Airport",
@@ -2688,8 +2686,8 @@
   "nws_heat_alerts": {
    "n_active": 0,
    "alerts": [],
-   "narrative": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-05 15:38 UTC.",
-   "retrieved_at": "2026-10-05T15:38:34Z",
+   "narrative": "No active NWS heat advisory, watch or warning at this point, checked 2026-10-05 16:39 UTC.",
+   "retrieved_at": "2026-10-05T16:39:44Z",
    "error": null
   },
   "nws_heat_forecast": {
@@ -2698,7 +2696,7 @@
    "issued": "2026-10-05 09:10",
    "highs": [
     {
-     "day": "Today",
+     "day": "This Afternoon",
      "date": "2026-10-05",
      "high_f": 72
     },
@@ -2737,7 +2735,7 @@
    "max_high_date": "2026-10-08",
    "max_apparent_f": 73,
    "max_apparent_at": "2026-10-08 14:00",
-   "narrative": "Over the next 7 days the National Weather Service expects daytime highs of 72\u00b0F today, 65\u00b0F Tuesday, 68\u00b0F Wednesday, 73\u00b0F Thursday, 71\u00b0F Friday, 69\u00b0F Saturday, 66\u00b0F Sunday in the 2.5 km grid cell around this place (issued 2026-10-05 09:10 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 73\u00b0F on Thursday October 8. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours. The Weather Service wrote this for an area; it is not a prediction for a building.",
+   "narrative": "Over the next 7 days the National Weather Service expects daytime highs of 72\u00b0F this afternoon, 65\u00b0F Tuesday, 68\u00b0F Wednesday, 73\u00b0F Thursday, 71\u00b0F Friday, 69\u00b0F Saturday, 66\u00b0F Sunday in the 2.5 km grid cell around this place (issued 2026-10-05 09:10 Eastern); the highest apparent temperature it gives, which is the heat index when it is hot, is 73\u00b0F on Thursday October 8. The Weather Service's New York office issues a Heat Advisory when it expects the heat index to reach 95\u00b0F for two days in a row or 100\u00b0F at any time, and an Extreme Heat Warning at 105\u00b0F for two hours. The Weather Service wrote this for an area; it is not a prediction for a building.",
    "headline_value": "high of 73\u00b0F forecast in the next week"
   },
   "npcc4_heat": {
@@ -2815,7 +2813,7 @@
    {
     "step": "geocode",
     "ok": true,
-    "started_at": 1791214713.906028,
+    "started_at": 1791218383.801259,
     "elapsed_s": 0.04,
     "err": null,
     "result": {
@@ -2828,8 +2826,8 @@
    {
     "step": "select_deployment",
     "ok": true,
-    "started_at": 1791214713.9489431,
-    "elapsed_s": 0.2424,
+    "started_at": 1791218383.840728,
+    "elapsed_s": 0.2327,
     "err": null,
     "result": {
      "deployment": "nyc",
@@ -2840,15 +2838,15 @@
    {
     "step": "heat_surface",
     "ok": true,
-    "started_at": 1791214714.24201,
-    "elapsed_s": 0.13,
+    "started_at": 1791218384.1238332,
+    "elapsed_s": 0.14,
     "err": null,
     "result": {}
    },
    {
     "step": "hvi",
     "ok": true,
-    "started_at": 1791214714.243836,
+    "started_at": 1791218384.124267,
     "elapsed_s": 0.07,
     "err": null,
     "result": {}
@@ -2856,7 +2854,7 @@
    {
     "step": "heat_visits",
     "ok": true,
-    "started_at": 1791214714.243809,
+    "started_at": 1791218384.125215,
     "elapsed_s": 0.06,
     "err": null,
     "result": {}
@@ -2864,7 +2862,7 @@
    {
     "step": "city_landcover",
     "ok": true,
-    "started_at": 1791214714.243385,
+    "started_at": 1791218384.125182,
     "elapsed_s": 0.12,
     "err": null,
     "result": {}
@@ -2872,15 +2870,15 @@
    {
     "step": "landcover",
     "ok": true,
-    "started_at": 1791214714.243496,
-    "elapsed_s": 0.14,
+    "started_at": 1791218384.125584,
+    "elapsed_s": 0.18,
     "err": null,
     "result": {}
    },
    {
     "step": "heat_obs",
     "ok": true,
-    "started_at": 1791214714.243571,
+    "started_at": 1791218384.12588,
     "elapsed_s": 0.18,
     "err": null,
     "result": {}
@@ -2888,39 +2886,39 @@
    {
     "step": "heat_station",
     "ok": true,
-    "started_at": 1791214714.243925,
-    "elapsed_s": 0.21,
+    "started_at": 1791218384.126841,
+    "elapsed_s": 0.2,
     "err": null,
     "result": {}
    },
    {
     "step": "cool_features",
     "ok": true,
-    "started_at": 1791214714.244355,
-    "elapsed_s": 0.0,
+    "started_at": 1791218384.126955,
+    "elapsed_s": 0.01,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_alerts",
     "ok": true,
-    "started_at": 1791214714.244684,
-    "elapsed_s": 0.25,
+    "started_at": 1791218384.1272829,
+    "elapsed_s": 0.36,
     "err": null,
     "result": {}
    },
    {
     "step": "nws_heat_forecast",
     "ok": true,
-    "started_at": 1791214714.2454798,
-    "elapsed_s": 0.23,
+    "started_at": 1791218384.1276999,
+    "elapsed_s": 0.47,
     "err": null,
     "result": {}
    },
    {
     "step": "npcc4_heat",
     "ok": true,
-    "started_at": 1791214714.245434,
+    "started_at": 1791218384.128256,
     "elapsed_s": 0.0,
     "err": null,
     "result": {}
@@ -2928,7 +2926,7 @@
    {
     "step": "assemble_legacy_state",
     "ok": true,
-    "started_at": 1791214714.51886,
+    "started_at": 1791218384.622764,
     "elapsed_s": 0.0,
     "err": null,
     "result": {
@@ -2937,20 +2935,21 @@
    },
    {
     "step": "reconcile_templated",
-    "started_at": 1791214714.5189388,
+    "started_at": 1791218384.622858,
     "ok": true,
     "result": {
-     "n_chars": 1699,
+     "n_chars": 1836,
      "n_citations": 11,
      "tier": "no_llm"
     },
     "err": null,
-    "elapsed_s": 0.002
+    "elapsed_s": 0.0031
    }
   ],
   "failed": [],
   "models": [],
   "answer_path": "rules",
+  "answered": true,
   "compliance": {
    "passed": true,
    "n_passed": 13,
@@ -2972,5 +2971,6 @@
    "method": "Each LLM call is labelled measured (Apple SoC counters), estimated (declared watts times duration) or unknown; hosted endpoints are always unknown. See app/emissions.py."
   }
  },
- "floodnet_records_stripped": true
+ "floodnet_records_stripped": true,
+ "house_numbers_stripped": true
 }
