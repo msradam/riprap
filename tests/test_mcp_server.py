@@ -18,6 +18,18 @@ def test_list_sources_known_deployment():
     assert {"id", "type", "title", "stone", "provenance"} <= out["pebbles"][0].keys()
 
 
+def test_list_sources_carries_the_licence_of_a_source_that_has_one():
+    """FloodNet's licence, credit, references and notice reached a
+    citation but not the source list (/api/pebbles, list_sources)."""
+    prov = {p["id"]: p["provenance"] for p in list_sources("nyc")["pebbles"]}
+    for pid in ("floodnet", "floodnet_nta"):
+        assert prov[pid]["license"] == "CC BY-NC-SA 4.0"
+        assert prov[pid]["license_url"] == "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+        assert prov[pid]["attribution"] == "FloodNet (New York University and The City University of New York)"
+        assert len(prov[pid]["references"]) == 2 and "not covered by Riprap's Apache-2.0" in prov[pid]["license_notice"]
+    assert "license_notice" not in prov["sandy"]
+
+
 def test_list_sources_unknown_deployment():
     out = list_sources("atlantis")
     assert "error" in out

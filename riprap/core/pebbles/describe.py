@@ -61,6 +61,9 @@ def describe_deployment(stones_reg: StoneRegistry, pebble_reg: Registry) -> dict
                     "license": m.provenance.license,
                     "citation": m.provenance.citation,
                     "doc_id": m.provenance.doc_id,
+                    # Where a source's licence binds what is built from it (FloodNet), as in a citation.
+                    **{k: v for k in ("license_url", "attribution", "references", "license_notice")
+                       if (v := getattr(m.provenance, k))},
                     **resolve(m.provenance, fetched=False),
                 },
                 "fallback": {
