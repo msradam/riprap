@@ -105,7 +105,7 @@
 </ul>
 <p>
   The sources for each of these statements, and the distances and time windows Riprap uses, are
-  in <a href="{DOCS}/METHODOLOGY.md#what-the-data-cannot-say">docs/METHODOLOGY.md</a>.
+  in <a href="{DOCS}/METHODOLOGY.md#10-what-the-data-cannot-say">docs/METHODOLOGY.md</a>.
 </p>
 
 <h2 id="independent">Whose project this is</h2>
