@@ -609,6 +609,7 @@ def geocode_target(state: State) -> State:
             # "exact" when the geocoder returned the house number and street
             # asked for; "closest" for a landmark or a nearby or similar match.
             "match": "exact" if geocode_matches(target, h.address) else "closest",
+            "note": h.note,  # an address that exists in more than one borough: which was chosen
         }
         rec["ok"] = True
         # The UI reads lat/lon out of this trace `result` to drive its
@@ -636,8 +637,9 @@ def resolve_area(state: State) -> State:
     """Neighbourhood intents: resolve the target to a 2020 NTA polygon, or
     to a community district (a CDTA code such as QN12, the union of its
     NTAs).
-    Writes the polygon (WKT, WGS84) for polygon-scope pebbles and its
-    centroid as lat/lon for deployment routing and the map."""
+    Writes the polygon (WKT, WGS84) for polygon-scope pebbles and a point
+    inside it as lat/lon for deployment routing and the map, and a note
+    when the area is not simply the place that was typed."""
     from app.areas import nta  # noqa: PLC0415
 
     trace = list(state.get("trace", []))
@@ -664,14 +666,24 @@ def resolve_area(state: State) -> State:
                                 trace=trace)
         t = matches[0]
         c = t["geometry"].centroid
+        if not t["geometry"].contains(c):
+            # The centre of Breezy Point-Belle Harbor-Rockaway Park-Broad Channel is in Jamaica Bay, outside
+            # every deployment, so four neighbourhoods got no briefing: a point the area does contain.
+            c = t["geometry"].representative_point()
         info = {"nta_code": t["nta_code"], "nta_name": t["nta_name"], "borough": t["borough"],
                 "bbox": list(t["geometry"].bounds), "n_matches": len(matches)}
         rec["ok"], rec["result"] = True, info
         trace.append(rec)
         exact = bool(district) or nta._normalize(name) == nta._normalize(t["nta_name"])
+        # What the reader is told about the place, with the JSON and MCP output: the tabulation area a name
+        # was answered for and the others of that name, or that a district's shape is the approximation.
+        if re.fullmatch(r"[A-Z]{2}\d{2}", t["nta_code"]):
+            note = nta.DISTRICT_NOTE.format(code=t["nta_code"])
+        else:
+            note = None if district or half else nta.resolution_note(name, t, boro or None)
         geocode = {"address": f"{t['nta_name']}, {t['borough']}", "borough": t["borough"],
                    "lat": c.y, "lon": c.x, "bbl": None, "bin": None,
-                   "match": "exact" if exact else "closest"}
+                   "match": "exact" if exact else "closest", "note": note}
         return state.update(geocode=geocode, lat=c.y, lon=c.x, nta=info,
                             polygon_wkt=t["geometry"].wkt, trace=trace)
     finally:
