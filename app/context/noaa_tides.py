@@ -43,6 +43,12 @@ STATIONS = [
 ]
 
 
+# The water each New York station stands on, said in the sentence: the
+# nearest station in a straight line is not always the water a place drains
+# to (inland QN12 reads Kings Point on the Sound and drains to Jamaica Bay).
+_WATER = {"8518750": "New York Harbor", "8516945": "Long Island Sound", "8531680": "Sandy Hook Bay"}
+
+
 @dataclass
 class TideReading:
     station_id: str
@@ -149,8 +155,9 @@ def summary_for_point(lat: float, lon: float) -> dict:
     # failed entirely; the manifest's `narration.short` then takes over.
     narrative: str | None = None
     if r.observed_ft is not None:
-        bits = [f"Latest reading at {r.station_name}: "
-                f"{r.observed_ft} ft above {datum}"]
+        water = f", on {_WATER[r.station_id]}" if r.station_id in _WATER else ""
+        bits = [f"Latest reading at {r.station_name}, the nearest NOAA tide station in a straight line "
+                f"({r.distance_km} km away{water}): {r.observed_ft} ft above {datum}"]
         if r.predicted_ft is not None and r.residual_ft is not None:
             sign = "+" if r.residual_ft >= 0 else ""
             bits.append(f" ({sign}{r.residual_ft} ft vs predicted tide)")

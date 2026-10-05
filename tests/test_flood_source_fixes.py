@@ -166,3 +166,49 @@ def test_schools_are_public_schools_with_their_vintage_and_the_right_link():
         m = get_registry("nyc").get(pebble_id).manifest
         assert m.provenance.source_url.endswith("/2019-2020-School-Point-Locations/a3nt-yts4")
         assert "DOE school" not in m.title
+
+
+def test_a_distant_stream_gauge_is_not_quoted(monkeypatch):
+    """350 Fifth Avenue was given the Bronx River, 15.7 km away."""
+    from datetime import UTC, datetime
+
+    import dataretrieval.waterdata as wd
+    import pandas as pd
+    from shapely.geometry import Point
+
+    from app.context import usgs_gauges
+
+    def one_gauge_at(lat, lon):
+        df = pd.DataFrame([{"monitoring_location_id": "USGS-01302020", "geometry": Point(lon, lat),
+                            "parameter_code": "00065", "value": 0.61, "time": pd.Timestamp(datetime.now(UTC))}])
+        monkeypatch.setattr(wd, "get_latest_continuous", lambda **k: (df, None))
+        monkeypatch.setattr(wd, "get_monitoring_locations", lambda **k: (
+            pd.DataFrame([{"monitoring_location_name": "BRONX RIVER AT NY BOTANICAL GARDEN AT BRONX NY"}]), None))
+
+    one_gauge_at(40.8623, -73.8744)
+    far = usgs_gauges.summary_for_point(40.7484, -73.9857)  # 350 Fifth Avenue
+    assert far["n_gauges_in_area"] == 0 and "Bronx River" not in far["narrative"]
+    assert far["narrative"].endswith("within 5 km of this address.")
+    near = usgs_gauges.summary_for_point(40.8600, -73.8800)
+    assert near["n_gauges_in_area"] == 1 and "Bronx River" in near["narrative"]
+
+
+def test_tide_sentence_says_the_station_is_the_nearest_and_where_it_is(monkeypatch):
+    from app.context import noaa_tides
+
+    monkeypatch.setattr(noaa_tides, "_fetch", lambda sid, product: (
+        {"data": [{"v": "4.31", "t": "2026-10-05 14:36"}]} if product == "water_level"
+        else {"predictions": [{"v": "4.05", "t": "2026-10-05 14:36"}]}))
+    n = noaa_tides.summary_for_point(40.6936, -73.7822)["narrative"]  # the centre of QN12
+    assert n.startswith("Latest reading at Kings Point, NY, the nearest NOAA tide station in a straight line (")
+    assert " km away, on Long Island Sound): 4.31 ft above MLLW" in n
+
+
+def test_sandy_area_sentence_gives_the_flooded_area_and_the_whole(monkeypatch):
+    from app.areas import nta_evidence
+
+    monkeypatch.setattr(nta_evidence.sandy_inundation, "coverage_for_polygon", lambda polygon: {
+        "overlap_area_m2": 190_000.0, "polygon_area_m2": 24_700_000.0, "fraction": 0.0077, "inside": True})
+    n = nta_evidence.sandy(None)["narrative"]
+    assert n == ("0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent "
+                 "(0.19 km² of the area's 24.7 km²).")

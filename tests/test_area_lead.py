@@ -4,7 +4,7 @@ from riprap.core.burr.templated_reconciler import _area_lead
 
 ITEMS = [
     Evidence(pebble_id="sandy_nta", doc_id="sandy_nta", stone_id="cornerstone", maturity="production", manifest=None,
-             text="0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (area 24.7 km²)."),
+             text="0.8% of this area lies inside the 2012 Hurricane Sandy inundation extent (0.19 km² of the area's 24.7 km²)."),
     Evidence(pebble_id="dep_extreme_2080_nta", doc_id="dep_extreme_2080_nta", stone_id="cornerstone", maturity="production", manifest=None,
              text="DEP Extreme Stormwater (3.66 in/hr, 2080 SLR): 16.4% of this area is modeled to flood from rainfall."),
     Evidence(pebble_id="nyc311_nta", doc_id="nyc311_nta", stone_id="touchstone", maturity="production", manifest=None,

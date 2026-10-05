@@ -20,7 +20,8 @@ def sandy(polygon) -> dict:
     v = sandy_inundation.coverage_for_polygon(polygon)
     v["narrative"] = (
         f"{_pct(v['fraction'])}% of this area lies inside the 2012 Hurricane Sandy "
-        f"inundation extent (area {round(v['polygon_area_m2'] / 1e6, 2)} km²)."
+        f"inundation extent ({round(v['overlap_area_m2'] / 1e6, 2)} km² of the area's "
+        f"{round(v['polygon_area_m2'] / 1e6, 2)} km²)."
     )
     # The figure the evidence card leads with (the card's big line).
     v["headline_value"] = f"{_pct(v['fraction'])}% inside the 2012 Sandy extent"

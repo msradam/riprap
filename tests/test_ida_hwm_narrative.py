@@ -1,5 +1,5 @@
-"""Ida high-water marks lead with height above ground and give the
-elevation only with its datum."""
+"""Ida high-water marks give height above ground, and a water surface
+elevation only when no mark in range has one."""
 
 from riprap.core.pebbles.shapers.ida_hwm import shape
 
@@ -13,11 +13,17 @@ def _value(datum="NAVD88", above=2.05):
             "features": [{"lat": 40.6, "lon": -74.1, "distance_m": 120, "properties": props}]}
 
 
-def test_height_above_ground_first_then_elevation_with_datum():
+def test_height_above_ground_replaces_the_water_surface_elevation():
     n = shape(_value())["narrative"]
-    assert n.index("2.05 ft above ground") < n.index("48.2 ft NAVD88")
+    assert "the highest stood 2.05 ft above ground" in n and "48.2" not in n and "NAVD88" not in n
+    assert n.endswith("Nearest mark: Barrett Ave. (120 m away, 2.05 ft above ground).")
+
+
+def test_elevation_only_without_a_ground_height_and_said_to_be_no_depth():
+    n = shape(_value(above=None))["narrative"]
+    assert "48.2 ft NAVD88 (an elevation above the survey datum, not a depth of water)" in n
+    assert n.endswith("Nearest mark: Barrett Ave. (120 m away).")
 
 
 def test_no_datum_means_no_elevation():
-    n = shape(_value(datum=None))["narrative"]
-    assert "48.2" not in n and "2.05 ft above ground" in n
+    assert "48.2" not in shape(_value(datum=None, above=None))["narrative"]

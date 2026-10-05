@@ -23,6 +23,10 @@ DOC_ID = "usgs_gauges"
 CITATION = "USGS Water Data OGC API, latest continuous values (api.waterdata.usgs.gov)"
 
 _BOX_DEG = 0.125  # search half-width; ~14 km N-S
+# A stage reading describes one stream. A gauge farther than this is not
+# quoted: 350 Fifth Avenue got the Bronx River, 15.7 km away in another
+# borough. 5 km is a judgement, not a hydrologic boundary.
+_MAX_KM = 5.0
 _PARAM_STAGE = "00065"  # gage height, ft
 _PARAM_DISCHARGE = "00060"  # discharge, ft³/s
 # latest-continuous keeps the last value of retired gauges too (some date
@@ -46,11 +50,11 @@ def _pretty_name(raw: str) -> str:
 
 
 def _none_nearby() -> dict[str, Any]:
-    """The API answered and no gauge in the box reported stage in the last
-    two days: a true zero."""
+    """The API answered and no gauge within _MAX_KM reported stage in the
+    last two days: a true zero."""
     return {"n_gauges_in_area": 0,
             "narrative": "No active USGS stream gauge reported a stage reading in the last 2 days "
-                         "within about 10 to 14 km of this address."}
+                         f"within {_MAX_KM:g} km of this address."}
 
 
 def summary_for_point(lat: float, lon: float) -> dict[str, Any] | None:
@@ -79,6 +83,9 @@ def summary_for_point(lat: float, lon: float) -> dict[str, Any] | None:
         return _none_nearby()
     for s in gauged:
         s["distance_km"] = round(_haversine_km(lat, lon, s["lat"], s["lon"]), 1)
+    gauged = [s for s in gauged if s["distance_km"] <= _MAX_KM]
+    if not gauged:
+        return _none_nearby()
     nearest = min(gauged, key=lambda s: s["distance_km"])
 
     site_no = nearest["site_id"].removeprefix("USGS-")

@@ -47,10 +47,13 @@ def shape(value: dict | None, manifest=None) -> dict | None:
     # honest-negative case ("no marks within radius — the nearest is X").
     # The latter matches the NWS "no active alerts" all-clear card; users
     # see Riprap asked the question and the answer was reassuring.
-    # Height above ground is what a reader means by "how deep"; the
+    # Height above ground is what a reader means by "how deep", so it is
+    # what the sentence gives, for the highest mark and for the nearest. The
     # elevation is a water surface above a survey datum (NAVD88 for every
-    # NY Ida mark), so it is stated only with its datum. The two maxima
-    # can come from different marks, so they get separate clauses.
+    # NY Ida mark) with no ground reference: 30.6 ft beside 400 Carroll
+    # Street was a mark up the hill in Park Slope, next to an address at
+    # about 2 m. It is stated only when no mark in range has a height above
+    # ground, with its datum and what it is.
     datums = {(f.get("properties") or {}).get("vertical_datum") for f in features}
     datum = datums.pop() if len(datums) == 1 else None
     if n and n > 0:
@@ -58,11 +61,14 @@ def shape(value: dict | None, manifest=None) -> dict | None:
                 f" {radius} m of this address"]
         if max_above is not None:
             bits.append(f"; the highest stood {max_above} ft above ground")
-        if max_elev is not None and datum:
-            bits.append(f"; the highest water surface elevation was {max_elev} ft {datum}")
+        elif max_elev is not None and datum:
+            bits.append(f"; none has a recorded height above ground, and the highest water surface stood at "
+                        f"{max_elev} ft {datum} (an elevation above the survey datum, not a depth of water)")
         if nearest_site and nearest_dist is not None:
+            above = nearest_props.get("height_above_gnd")
+            height = f", {_round(above, 2)} ft above ground" if above is not None else ""
             bits.append(
-                f". Nearest mark: {nearest_site} ({int(nearest_dist)} m away)"
+                f". Nearest mark: {nearest_site} ({int(nearest_dist)} m away{height})"
             )
         narrative = "".join(bits) + "."
     else:
