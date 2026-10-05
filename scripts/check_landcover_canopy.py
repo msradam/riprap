@@ -41,7 +41,7 @@ def words(diff: dict[int, float]) -> str:
     return out + (f" and {span(rest)} points more in {named(rest)}" if rest else "")
 
 
-def main() -> int:
+def main(out_path: Path = OUT) -> int:
     import rasterio
 
     from app.eo import landcover as lc
@@ -57,7 +57,7 @@ def main() -> int:
         diff[year] = round(float(ours[both].mean()) - float(city[both].mean()), 1)
     out = {"canopy_minus_city_map_2017_points": {str(y): d for y, d in diff.items()},
            "canopy_vs_city_map_2017_words": words(diff)}
-    OUT.write_text(json.dumps({**json.loads(OUT.read_text()), **out}, indent=1) + "\n")
+    out_path.write_text(json.dumps({**json.loads(out_path.read_text()), **out}, indent=1) + "\n")
     print(json.dumps(out, indent=1))
     return 0
 

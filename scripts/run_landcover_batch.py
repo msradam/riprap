@@ -352,6 +352,13 @@ def main() -> int:
             # A run without 2021 or without the 2021 key rescored no accuracy: the
             # saved evaluation, which every land-cover sentence quotes, stays.
             print(f"{args.eval_out} left as it was: this run did not rescore accuracy", flush=True)
+        if args.out.resolve() == (ROOT / "data" / "eo").resolve():
+            # The canopy comparison with the city's 2017 map is measured from the yearly maps just written, and a
+            # rewritten evaluation has lost it: measure it again, so the caveat every canopy sentence quotes
+            # is never stale or missing.
+            import check_landcover_canopy
+
+            check_landcover_canopy.main(args.eval_out)
     return 0
 
 
