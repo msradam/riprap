@@ -19,7 +19,7 @@ const IDA =
   'Yes. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this address [ida_hwm]. ' +
   'Experimental: the nearest gauge read 579.4 ft, 18.1 km from this address [lake_michigan_water_level]. ' +
   'The reading is for the lake, not for this street [lake_michigan_water_level]. ' +
-  '82 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years [nyc311].';
+  '82 NYC 311 flood and sewer complaints filed within 200 m of this location in the last 5 years [nyc311].';
 
 describe('keyedAnswer', () => {
   it('puts paragraphs from experimental sources last, each opening with the badge', () => {

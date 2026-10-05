@@ -32,7 +32,7 @@ const VALUES: Record<string, Record<string, unknown>> = {
   dep_moderate_2050_nta: { fraction_any: 0.033, headline_value: '3.3% modeled to flood', narrative: 'DEP Moderate 2050: 3.3% of this area is modeled to flood.' },
   dep_moderate_current_nta: { fraction_any: 0.02, headline_value: '2.0% modeled to flood', narrative: 'DEP Moderate current: 2.0% of this area is modeled to flood.' },
   microtopo_nta: { elev_median_m: 12.3, headline_value: 'median ground elevation 12.3 m', narrative: 'Median ground elevation 12.3 m.' },
-  nyc311_nta: { n: 4376, headline_value: '4376 calls', narrative: '4376 NYC 311 flood-related complaints filed inside this area in the last 3 years.' },
+  nyc311_nta: { n: 4376, headline_value: '4376 calls', narrative: '4376 NYC 311 flood and sewer complaints filed inside this area in the last 3 years.' },
   dob_permits_nta: { n_total: 57, headline_value: '57 active permits', narrative: '57 active NYC DOB construction permits inside this area.' },
 };
 

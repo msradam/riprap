@@ -23,12 +23,12 @@ describe('leadSentence', () => {
 describe('standfirst', () => {
   const answer =
     'Preamble.\n\n**Answer.**\nYes. USGS surveyed 2 Hurricane Ida high-water marks within 800 m of this address [ida_hwm]. ' +
-    '82 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years [nyc311].\n\n**Out of scope.** No.';
+    '82 NYC 311 flood and sewer complaints filed within 200 m of this location in the last 5 years [nyc311].\n\n**Out of scope.** No.';
 
   it('with a lead fact, sets the lead word before the key sentence the page shows', () => {
     const lead_fact = { doc_id: 'nyc311', in_lead: false };
     expect(standfirst({ paragraph: answer, grounding: { lead_fact } as never })).toBe(
-      'Yes. 82 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years.'
+      'Yes. 82 NYC 311 flood and sewer complaints filed within 200 m of this location in the last 5 years.'
     );
   });
 

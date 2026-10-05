@@ -50,13 +50,13 @@ export const PROOF: Proof[] = [
     kind: 'A whole district',
     figure: {
       text: '17 of 36',
-      label: "QN12 subway entrances inside the city's 2080 extreme stormwater scenario",
-      from: '36 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 17 inside the DEP extreme stormwater scenario (2080 sea-level rise).'
+      label: 'QN12 subway entrances in a rainfall flooding category of the city\'s modelled stormwater map "Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise"',
+      from: '36 MTA subway entrances in this area (each entrance read at its own point on the maps, with no buffer): 0 inside the 2012 Sandy inundation extent and 17 inside the DEP stormwater map "Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise", a modelled scenario (17 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding).'
     },
     quotes: [
-      '36 MTA subway entrances in this area: 0 inside the 2012 Sandy inundation extent and 17 inside the DEP extreme stormwater scenario (2080 sea-level rise).',
+      '36 MTA subway entrances in this area (each entrance read at its own point on the maps, with no buffer): 0 inside the 2012 Sandy inundation extent and 17 inside the DEP stormwater map "Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise", a modelled scenario (17 in a rainfall flooding category and 0 in its future high tides category, which is coastal tidal inundation projected for 2080 and not rainfall flooding).',
       'Jamaica Center-Parsons/Archer (E J Z), Jamaica-179 St (F), Parsons Blvd (F), Sutphin Blvd (F), Sutphin Blvd-Archer Av-JFK Airport (E J Z)',
-      'Inside the modeled DEP extreme scenario (2080 sea-level rise): I.S. 059 Springfield Gardens'
+      'In a rainfall flooding category of the modelled "Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise" map: I.S. 059 Springfield Gardens'
     ]
   },
   {
@@ -65,10 +65,10 @@ export const PROOF: Proof[] = [
     figure: {
       text: '2',
       label: 'BK06 public housing developments inside the 2012 Sandy inundation extent',
-      from: '2 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)'
+      from: '2 inside the 2012 Sandy inundation extent and 0 inside the DEP stormwater map "Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise", a modelled scenario'
     },
     quotes: [
-      '2 inside the 2012 Sandy inundation extent and 0 inside the DEP extreme stormwater scenario (2080 sea-level rise)',
+      '2 inside the 2012 Sandy inundation extent and 0 inside the DEP stormwater map "Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise", a modelled scenario',
       'Inside the 2012 Sandy extent: RED HOOK EAST, RED HOOK WEST'
     ]
   },
@@ -78,10 +78,10 @@ export const PROOF: Proof[] = [
     figure: {
       text: 'No.',
       label: 'No complaint was filed. That is not a finding that the place stays dry.',
-      from: 'No. 0 NYC 311 flood-related complaints'
+      from: 'No. 0 NYC 311 flood and sewer complaints'
     },
     quotes: [
-      '0 NYC 311 flood-related complaints filed within 200 m of this location in the last 5 years (the 311 service answered and none matched).',
+      '0 NYC 311 flood and sewer complaints filed within 200 m of this location in the last 5 years (since 2021-10-06; the 311 service answered and none matched).',
       'A count of complaints is a count of reports filed, not of floods: a low count can mean under-reporting and not the absence of flooding, because the propensity to file a 311 request varies with income, language and demographics'
     ],
     note: 'The address is in the Hunts Point wholesale food markets, not on a residential block.'
@@ -90,7 +90,7 @@ export const PROOF: Proof[] = [
     slug: 'gowanus-2050',
     kind: 'A city scenario for 2050',
     quotes: [
-      'The city\'s stormwater flood map "Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise" shows the category "Future High Tides 2050" (coastal tidal inundation, not rainfall flooding; about 3 m from the edge of the mapped flooding) at the point mapped for this address.'
+      'The city\'s stormwater flood map "Moderate Flood (2.13 inches/hr) with 2050 Sea Level Rise" shows the category "Future High Tides 2050" (coastal tidal inundation, not rainfall flooding; at the edge of the mapped flooding (within about 3 m)) at the point mapped for this address.'
     ]
   },
   {

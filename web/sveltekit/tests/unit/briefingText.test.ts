@@ -64,7 +64,7 @@ describe('figureOf', () => {
     // A bare headline value takes the noun from the dataset's title.
     expect(figureOf(card({ headline: '73', title: 'Active DOB construction permits inside the neighborhood' }))?.value).toBe('73 permits');
     // "filed" ends the phrase: no noun rather than a wrong one.
-    expect(figureOf(card({ headline: '82 NYC 311 flood-related complaints filed within 200 m of this location.', title: 'NYC 311 flood-related complaints (5y)' }))?.value).toBe('82');
+    expect(figureOf(card({ headline: '82 NYC 311 flood and sewer complaints filed within 200 m of this location.', title: 'NYC 311 flood and sewer complaints (5y)' }))?.value).toBe('82');
   });
   it('shows no figure for a gauge count: it is not a reading', () => {
     expect(figureOf(card({ scalars: [{ value: '0', label: 'Gauges in the area' }] }))).toBeNull();
