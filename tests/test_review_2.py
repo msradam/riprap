@@ -230,3 +230,16 @@ def test_advice_and_other_hazards_are_declined_however_they_are_phrased(query, h
     assert hot["intent"] == "single_address" and hot["focus"]["hazard"] == "heat"
     # A question about the flood record that mentions summer is still answered.
     assert heuristic_plan("Did 80 Pioneer Street, Brooklyn flood last summer?")["intent"] == "single_address"
+
+
+def test_a_floodnet_count_for_one_year_comes_from_that_year():
+    """"How many flood events did the FloodNet sensors near 400 Carroll Street record in 2024?" led with
+    the three-year total."""
+    docs = {"floodnet": "4 FloodNet sensors within 600 m have recorded 21 flood events in the last 3 years."}
+    v = {"floodnet": {"n_flood_events_3y": 21, "by_year": {"2023": 2, "2024": 9, "2025": 6, "2026": 4},
+                      "period_start": "2023-10-05"}}
+    q = "How many flood events did the FloodNet sensors near 400 Carroll Street, Brooklyn record in {}?"
+    assert ac.count_lead(q.format(2024), docs, v, TODAY) == (
+        "9 flood events recorded in 2024, by the UTC year each event started.", False)
+    assert ac.count_lead(q.format(2026), docs, v, TODAY)[0].startswith("4 flood events recorded in 2026 so far")
+    assert ac.count_lead(q.format(2023), docs, v, TODAY) == (None, True)  # the period starts inside 2023

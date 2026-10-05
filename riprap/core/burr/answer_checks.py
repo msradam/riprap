@@ -220,10 +220,19 @@ def count_lead(question: str, docs: dict[str, str], values: dict | None, today=N
     q = question or ""
     rel = relevant_doc(q, docs)
     v = (values or {}).get(rel) if rel else None
-    if rel not in ("nyc311", "nyc311_nta") or not isinstance(v, dict) or "by_year" not in v:
-        return kind_lead(q, docs, values), False
     today = today or datetime.date.today()
     m = _YEAR_RE.search(q)
+    if rel == "floodnet" and m and isinstance(v, dict) and "by_year" in v:
+        # "How many flood events did the sensors record in 2024?": that year's count, when the sensors'
+        # period covers the whole year (or it is this year so far); otherwise no count as the answer.
+        year, start = int(m.group(1)), str(v.get("period_start") or "9999")[:10]
+        if year > today.year or (year < today.year and start > f"{year}-01-01"):
+            return None, True
+        n = int(v["by_year"].get(str(year), 0))
+        return (f"{n} flood event{'s' if n != 1 else ''} recorded in {year}{' so far' if year == today.year else ''}, "
+                "by the UTC year each event started."), False
+    if rel not in ("nyc311", "nyc311_nta") or not isinstance(v, dict) or "by_year" not in v:
+        return kind_lead(q, docs, values), False
     year = (today.year - 1 if re.search(r"\blast year\b", q, re.I) else today.year if re.search(r"\bthis year\b", q, re.I)
             else int(m.group(1)) if m else None)
     since = _period_start_date(q)
