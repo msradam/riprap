@@ -108,7 +108,9 @@ def test_dep_scenario_narration_per_class():
                                           'Level Rise" shows the category "Future High Tides 2080" (coastal tidal '
                                           "inundation, not rainfall flooding) at the point mapped for this address."
                                           + limits.format(year=2080))
-    assert shape(3, m80)["depth_label"] == "future high tides: coastal tidal inundation projected for 2080"
+    # The value names the map's category by code and by the city's name; no key calls it a depth.
+    v = shape(3, m80)
+    assert (v["category_code"], v["category"]) == (3, "Future High Tides 2080") and not [k for k in v if "depth" in k]
     for cls in (1, 2, 3):
         assert "4 ft" not in shape(cls, m50)["narrative"]
 

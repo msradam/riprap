@@ -12,7 +12,10 @@ data/registers/ that lists exposed assets only, with the flags computed
 by scripts/build_register.py, so every row in range counts and the
 nearest max_n are listed. MTA entrances and hospitals read the full
 GeoJSON layer and look exposure up per hit, so every asset in range
-counts and exposure is checked for the nearest max_n only. A layer or
+counts and exposure is checked for the nearest max_n only. Every asset is
+read at its own point, with no buffer, for an address and for an area
+alike: a station once had 8 of 8 entrances inside by one path (each
+entrance buffered by 8 m) and 5 of 9 by the other. A layer or
 register that cannot be read raises and the step is reported as failed:
 none in range is a true zero, never a failure printed as one.
 """
@@ -28,20 +31,16 @@ from pathlib import Path
 
 from app.assets.nycha import SANDY_MIN_SHARE
 from app.flood_layers import dep_stormwater, sandy_inundation
-from app.flood_layers.dep_stormwater import class_label
-from app.registers._footprint import (
-    BUFFER_DOE_SCHOOL_M,
-    BUFFER_DOH_HOSPITAL_M,
-    BUFFER_MTA_ENTRANCE_M,
-    dep_class_buffered,
-    inside_sandy_buffered,
-)
-from app.registers._loader import load_register, narrative, nearest_n
+from app.flood_layers.dep_stormwater import category_kind
+from app.registers._loader import DEP_MAP, load_register, narrative, nearest_n
 
 log = logging.getLogger("riprap.registers")
 
 DATA = Path(__file__).resolve().parents[2] / "data"
 SCENARIOS = ("dep_extreme_2080", "dep_moderate_2050")
+# What the stormwater map is and is not, in the city's words: it travels with every list of assets
+# (a briefing that prints several lists, or the maps themselves, prints it once: evidence.cite_each).
+MAP_LIMITS = dep_stormwater.limits("dep_extreme_2080")
 ADA_ACCESSIBLE_TYPES = {"Elevator", "Ramp"}
 COUNTY_TO_BOROUGH = {
     "New York": "MANHATTAN", "Kings": "BROOKLYN", "Bronx": "BRONX",
@@ -65,8 +64,6 @@ class Spec:
     geojson: Path | None = None   # live layer; exposure is looked up per hit
     lat_lon: Callable[[dict], tuple[float, float]] = (
         lambda f: (f["geometry"]["coordinates"][1], f["geometry"]["coordinates"][0]))
-    buffer_m: int | None = None   # reported; the buffered join also buffers the point by it
-    raster: bool = False          # live exposure from the baked rasters, not the buffered GDB join
     scope: str = ""               # what an exposed-only register counted
     missing_class: int | None = None  # DEP class when the register has none for a scenario
     scenarios: tuple[str, ...] = SCENARIOS
@@ -95,7 +92,7 @@ def _hospital(r: dict, lat: float, lon: float, distance_m: float) -> dict:
 def _school(r: dict, lat: float, lon: float, distance_m: float) -> dict:
     return {"loc_code": str(r.get("loc_code", "")), "loc_name": str(r.get("name", "")),
             "address": str(r.get("address", "")).strip(), "borough": str(r.get("borough", "")),
-            "bin": str(r.get("bin", "")), "bbl": str(r.get("bbl", "")), "managed_by": str(r.get("managed_by") or ""),
+            "managed_by": str(r.get("managed_by") or ""),
             "school_lat": round(lat, 5), "school_lon": round(lon, 5), "distance_m": distance_m}
 
 
@@ -118,14 +115,15 @@ CLASSES: dict[str, Spec] = {
                  "NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
         head=_entrance, name=lambda f: f"{f['station_name']} ({f['daytime_routes']})",
         geojson=DATA / "mta_entrances.geojson", lat_lon=_mta_lat_lon,
-        buffer_m=BUFFER_MTA_ENTRANCE_M, rollups={"n_ada_accessible": "ada_accessible"}),
+        rollups={"n_ada_accessible": "ada_accessible"},
+        scope=" (each entrance read at its own point on the maps, with no buffer)"),
     "doh_hospitals": Spec(
         singular="hospital", plural="hospitals", radius_m=3000, max_n=5,
         count_key="n_hospitals", list_key="hospitals",
         citation="NYS DOH Health Facility Certification (vn5v-hh5r) + NYC Sandy 2012 Inundation "
                  "Zone (5xsi-dfpx) + NYC DEP Stormwater Flood Maps + USGS 3DEP DEM",
         head=_hospital, name=lambda f: f["facility_name"],
-        geojson=DATA / "hospitals.geojson", buffer_m=BUFFER_DOH_HOSPITAL_M, raster=True, unique="fac_id",
+        geojson=DATA / "hospitals.geojson", unique="fac_id",
         scope=" (each read at the one point the state file gives for it, not across its campus)"),
     "doe_schools": Spec(
         singular="public school inside a mapped flood extent", plural="public schools inside a mapped flood extent",
@@ -134,7 +132,7 @@ CLASSES: dict[str, Spec] = {
         citation="Pre-computed from NYC DOE 2019 - 2020 School Point Locations (a3nt-yts4; public schools, charter "
                  "schools included) joined to Sandy 2012 Inundation Zone (5xsi-dfpx) + "
                  "NYC DEP Stormwater Flood Maps + USGS 3DEP DEM. See data/registers/schools.json.",
-        head=_school, name=lambda f: f["loc_name"], register="schools", buffer_m=BUFFER_DOE_SCHOOL_M,
+        head=_school, name=lambda f: f["loc_name"], register="schools",
         scope=" (from the NYC Department of Education's school locations for the 2019 to 2020 school year, charter "
               "schools included; the register lists only schools whose location point is inside the 2012 Sandy "
               "extent or one of three modeled DEP stormwater scenarios (Moderate Flood with current and with 2050 sea "
@@ -200,21 +198,18 @@ def _sample_raster(raster_path: Path, lat: float, lon: float) -> float | None:
 
 
 def _exposure(spec: Spec, lat: float, lon: float) -> tuple[bool, dict[str, int], int | None]:
-    """Sandy flag, DEP class per scenario and, for an asset sampled at its
-    point, its distance to the mapped Sandy edge when within 50 m (Bellevue's
-    point is 46 m outside the outline of a flood that closed it). A failed
-    join raises: counting the asset as outside would print a failure as a
-    zero."""
-    if spec.raster:
-        import geopandas as gpd
-        from shapely.geometry import Point
-        pt = (gpd.GeoDataFrame(geometry=[Point(lon, lat)], crs="EPSG:4326")
-              .to_crs("EPSG:2263").iloc[0].geometry)
-        sandy = sandy_inundation.at_point(pt)
-        return (sandy["inside"], {s: dep_stormwater.join_raster(pt, s) for s in spec.scenarios},
-                None if sandy["inside"] else sandy["edge_m"])
-    return (inside_sandy_buffered(lat, lon, spec.buffer_m),
-            {s: dep_class_buffered(lat, lon, spec.buffer_m, s)[0] for s in spec.scenarios}, None)
+    """Sandy flag, DEP category code per scenario and the asset's distance
+    to the mapped Sandy edge when within 50 m (Bellevue's point is 46 m
+    outside the outline of a flood that closed it), all read at the asset's
+    own point. A failed read raises: counting the asset as outside would
+    print a failure as a zero."""
+    import geopandas as gpd
+    from shapely.geometry import Point
+    pt = (gpd.GeoDataFrame(geometry=[Point(lon, lat)], crs="EPSG:4326")
+          .to_crs("EPSG:2263").iloc[0].geometry)
+    sandy = sandy_inundation.at_point(pt)
+    return (sandy["inside"], {s: dep_stormwater.join_raster(pt, s) for s in spec.scenarios},
+            None if sandy["inside"] else sandy["edge_m"])
 
 
 def _sandy_edge_m(lat: float, lon: float) -> int | None:
@@ -259,10 +254,21 @@ def _finding(spec: Spec, distance_m: float | None, row: dict) -> dict:
     f[spec.hand_key] = round(float(hand), 2) if hand is not None else None
     f["inside_sandy_2012"] = sandy
     for scen in spec.scenarios:
-        c = classes[scen]
-        f[f"{scen}_class"] = c
-        f[f"{scen}_label"] = None if c is None else class_label(c, scen)
+        # Inside or outside and which kind of category, never a depth: a row names a structure.
+        f[f"{scen}_category"] = category_kind(classes[scen])
     return f
+
+
+def _rain(f: dict, scen: str = "dep_extreme_2080") -> bool:
+    return f[f"{scen}_category"] == "rainfall flooding"
+
+
+def _tide(f: dict, scen: str = "dep_extreme_2080") -> bool:
+    return f[f"{scen}_category"] == "future high tides"
+
+
+def _mapped(f: dict, scen: str) -> bool:
+    return f[f"{scen}_category"] not in (None, "outside")
 
 
 def _named(spec: Spec, findings: list[dict], limit: int = 20) -> str:
@@ -274,9 +280,11 @@ def _named(spec: Spec, findings: list[dict], limit: int = 20) -> str:
                         lambda f: f.get("sandy_edge_m") is not None),
                        (f"Under {SANDY_MIN_SHARE:.0%} of the outline inside the 2012 Sandy extent (not counted)",
                         lambda f: not f["inside_sandy_2012"] and (f.get("sandy_share") or 0) > 0),
-                       # A list of names carries its extent: the event, or the scenario and the word modeled.
-                       ("Inside the modeled DEP extreme scenario (2080 sea-level rise)",
-                        lambda f: (f["dep_extreme_2080_class"] or 0) > 0)):
+                       # A list of names carries its extent: the event, or the map by the city's name and the
+                       # word modelled. Rainfall flooding and the tidal category are different hazards: two lists.
+                       (f"In a rainfall flooding category of the modelled {DEP_MAP} map", _rain),
+                       (f"In the future high tides category of the modelled {DEP_MAP} map (coastal tidal inundation "
+                        "projected for 2080, not rainfall flooding)", _tide)):
         nearest: dict[str, float | None] = {}  # one station has several entrances: its nearest one
         for f in findings:
             if hit(f) and spec.name(f) not in nearest:
@@ -293,7 +301,7 @@ def _n_exposed(spec: Spec, findings: list[dict]) -> int:
     """How many of a baked register's rows are exposed. The register also
     keeps assets within 50 m of the Sandy edge; those are named, not counted."""
     return sum(1 for f in findings
-               if f["inside_sandy_2012"] or any((f[f"{s}_class"] or 0) > 0 for s in spec.scenarios))
+               if f["inside_sandy_2012"] or any(_mapped(f, s) for s in spec.scenarios))
 
 
 def _near_sandy(f: dict) -> bool:
@@ -308,8 +316,6 @@ def summary_for_polygon(polygon, asset_class: str) -> dict:
     Schools and NYCHA come from the baked registers, which list exposed
     assets only; subway entrances and hospitals are every asset in the
     polygon, each checked against the baked rasters at its own point."""
-    from dataclasses import replace
-
     from shapely.geometry import Point
     from shapely.prepared import prep
 
@@ -317,16 +323,15 @@ def summary_for_polygon(polygon, asset_class: str) -> dict:
     inside = prep(polygon)
     rows = [r for r in _rows(asset_class, spec)
             if r.get("lat") is not None and inside.contains(Point(float(r["lon"]), float(r["lat"])))]
-    at_point = spec if spec.register else replace(spec, raster=True)
-    findings = sorted((_finding(at_point, None, r) for r in rows), key=spec.name)
+    findings = sorted((_finding(spec, None, r) for r in rows), key=spec.name)
     n_sandy = sum(1 for f in findings if f["inside_sandy_2012"])
-    n_dep = sum(1 for f in findings if (f["dep_extreme_2080_class"] or 0) > 0)
+    n_rain, n_tide = sum(map(_rain, findings)), sum(map(_tide, findings))
     n = _n_exposed(spec, findings) if spec.register else len(findings)
-    return {"available": True, spec.count_key: n, "n_inside_sandy_2012": n_sandy, "n_in_dep_extreme_2080": n_dep,
+    return {"available": True, spec.count_key: n, "n_inside_sandy_2012": n_sandy, "n_in_dep_extreme_2080": n_rain + n_tide,
+            "n_in_dep_extreme_2080_rainfall": n_rain, "n_in_dep_extreme_2080_tidal": n_tide,
             "n_near_sandy_edge": sum(1 for f in findings if _near_sandy(f)),
-            "narrative": (f"{n} {spec.singular if n == 1 else spec.plural} in this area{spec.scope}: {n_sandy} inside "
-                          f"the 2012 Sandy inundation extent and {n_dep} inside the DEP extreme stormwater "
-                          f"scenario (2080 sea-level rise)" + _named(spec, findings)),
+            "narrative": narrative(spec.singular, spec.plural, n, None, n_sandy, n_rain, n_tide, scope=spec.scope)
+                         + _named(spec, findings) + f". {MAP_LIMITS}",
             spec.list_key: findings, "citation": spec.citation}
 
 
@@ -341,20 +346,21 @@ def summary_for_point(lat: float, lon: float, asset_class: str,
     live = spec.register is None
     findings = [_finding(spec, d, r) for d, r in (hits[:max_n] if live else hits)]
     n_sandy = sum(1 for f in findings if f["inside_sandy_2012"])
-    n_dep = sum(1 for f in findings if (f["dep_extreme_2080_class"] or 0) > 0)
+    n_rain, n_tide = sum(map(_rain, findings)), sum(map(_tide, findings))
     n = len(hits) if live else _n_exposed(spec, findings)
     out: dict = {"available": True, spec.count_key: n}
     if live:
         out["n_checked"] = len(findings)
     out["radius_m"] = radius_m
-    if spec.buffer_m is not None and live:  # a baked register tested the bare point
-        out["footprint_buffer_m"] = spec.buffer_m
     out["n_inside_sandy_2012"] = n_sandy
-    out["n_in_dep_extreme_2080"] = n_dep
+    # Any category of the map, then its two kinds: rainfall flooding is not the tidal category.
+    out["n_in_dep_extreme_2080"] = n_rain + n_tide
+    out["n_in_dep_extreme_2080_rainfall"] = n_rain
+    out["n_in_dep_extreme_2080_tidal"] = n_tide
     if any(_near_sandy(f) for f in findings):
         out["n_near_sandy_edge"] = sum(1 for f in findings if _near_sandy(f))
-    out["narrative"] = narrative(spec.singular, spec.plural, n, radius_m, n_sandy, n_dep,
-                                 scope=spec.scope, n_checked=len(findings) if live else None) + _named(spec, findings)
+    out["narrative"] = narrative(spec.singular, spec.plural, n, radius_m, n_sandy, n_rain, n_tide,
+                                 scope=spec.scope, n_checked=len(findings) if live else None) + _named(spec, findings) + f". {MAP_LIMITS}"
     for key, flag in spec.rollups.items():
         out[key] = sum(1 for f in findings if f[flag])
     out[spec.list_key] = findings[:max_n]

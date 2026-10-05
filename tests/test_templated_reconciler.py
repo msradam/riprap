@@ -84,10 +84,12 @@ def test_stormwater_sentence_names_each_map_as_a_scenario_at_the_mapped_point():
             "not forecasts; at the point mapped for this address they show: "
             '"Limited Flood (1.77 inches/hr) with Current Sea Levels" (the near term), no flooding category '
             "[dep_limited_current]; "
-            '"Moderate Flood (2.13 inches/hr) with Current Sea Levels" (the near term), no flooding category (about 6 m '
-            "from the nearest flooding mapped on it) [dep_moderate_current]; ") in paragraph
-    assert ('"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise", no flooding category (about 4 m from the '
-            "nearest flooding mapped on it) [dep_extreme_2080]. Their rainfall flooding categories cover public areas "
+            '"Moderate Flood (2.13 inches/hr) with Current Sea Levels" (the near term), no flooding category '
+            "[dep_moderate_current]; ") in paragraph
+    # A mapped edge that several maps share is said once, after the list, and carried into the In brief.
+    assert paragraph.count("within about") == 1 and "at a mapped edge [dep_limited_current]" in paragraph
+    assert ('"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise", no flooding category [dep_extreme_2080]; on 3 of '
+            "these maps the point is at the edge of mapped flooding (within about 6 m). Their rainfall flooding categories cover public areas "
             'and rain only, and the city says the map "does not provide the exact depth of flooding at any location"; '
             "it is not a flood plain determination.") in paragraph
     assert "DEP stormwater scenarios at this address" not in paragraph and "in/hr" not in paragraph
@@ -112,7 +114,7 @@ def test_an_address_outside_every_mapped_extent_is_not_called_safe():
     assert [r.name for r in check_briefing(paragraph).failed] == []
     # Inside a mapped extent, the lead makes no outside reading to qualify.
     wet = _state()
-    wet["dep_extreme_2080"] = {**wet["dep_extreme_2080"], "depth_class": 2}
+    wet["dep_extreme_2080"] = {**wet["dep_extreme_2080"], "category_code": 2}
     lead = compose_briefing(wet)[0].split("**In brief.**\n", 1)[1].split("\n\n", 1)[0]
     assert "does not mean safe" not in lead and "inside a rainfall flooding category on the city's" in lead
 

@@ -118,6 +118,9 @@ type Rec = Record<string, unknown>;
  *  points, carrying the properties the map click popup and the map point
  *  list show. `pid` is unique per point (doc_id is shared by the entrances
  *  of one station). */
+const mappedCategory = (c: unknown): string | false =>
+  typeof c === 'string' && c !== 'outside' ? c : false;
+
 export function buildRegisterPointsFc(fr: Rec): FeatureCollection {
   const features: GeoJSON.Feature[] = [];
   const add = (
@@ -136,9 +139,10 @@ export function buildRegisterPointsFc(fr: Rec): FeatureCollection {
           pid: `${kind}-${i}`, kind, name: name(e), doc_id: docId(e),
           distance_m: typeof e['distance_m'] === 'number' ? e['distance_m'] : null,
           inside_sandy_2012: e['inside_sandy_2012'] === true,
-          // Depth class 0 or missing means outside the scenario.
-          dep_extreme_2080: Number(e['dep_extreme_2080_class'] ?? 0) > 0,
-          dep_moderate_2050: Number(e['dep_moderate_2050_class'] ?? 0) > 0
+          // Which kind of category the row is in, or false outside the map
+          // (rainfall flooding and the tidal category are different hazards).
+          dep_extreme_2080: mappedCategory(e['dep_extreme_2080_category']),
+          dep_moderate_2050: mappedCategory(e['dep_moderate_2050_category'])
         }
       });
     });
@@ -256,8 +260,8 @@ export function evidencePointRows(...fcs: (FeatureCollection | undefined)[]): Ev
 
 const POINT_SCENARIOS: [string, string][] = [
   ['inside_sandy_2012', 'Sandy 2012 extent'],
-  ['dep_extreme_2080', 'DEP 2080 extreme stormwater'],
-  ['dep_moderate_2050', 'DEP 2050 moderate stormwater']
+  ['dep_extreme_2080', 'Extreme Flood 2080 stormwater map'],
+  ['dep_moderate_2050', 'Moderate Flood 2050 stormwater map']
 ];
 
 export interface MapPointRow { id: string; name: string; distance: string; scenarios: string }
@@ -266,7 +270,8 @@ export interface MapPointRow { id: string; name: string; distance: string; scena
 export function mapPointRows(fc: FeatureCollection | undefined): MapPointRow[] {
   return (fc?.features ?? []).map((f) => {
     const p = f.properties ?? {};
-    const inside = POINT_SCENARIOS.filter(([k]) => p[k] === true).map(([, label]) => label);
+    const inside = POINT_SCENARIOS.filter(([k]) => p[k])
+      .map(([k, label]) => (typeof p[k] === 'string' ? `${label} (${p[k]})` : label));
     return {
       id: String(p.pid),
       name: String(p.name ?? '?'),

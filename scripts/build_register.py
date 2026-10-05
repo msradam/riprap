@@ -17,7 +17,7 @@ from app.register_builder import build_register  # noqa: E402
 
 META_KEYS = {
     "nycha": ("name", "address", "borough", "tds_num"),
-    "schools": ("name", "address", "borough", "bbl", "bin"),
+    "schools": ("name", "address", "borough"),
 }
 
 if __name__ == "__main__":

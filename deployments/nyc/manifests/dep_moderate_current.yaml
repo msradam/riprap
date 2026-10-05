@@ -23,14 +23,14 @@ config:
   on_none: passthrough
 
 trace_summary:
-  depth_label: depth_label
-  depth_class: depth_class
+  category: category
+  category_code: category_code
   edge_m: edge_m
 
 provenance:
   date_modified: 2024-07-03
   retrieved_at: 2026-07-11
-  source_name: NYC Stormwater Flood Maps, Moderate Flood (2.13 inches/hr) with Current Sea Levels
+  source_name: NYC Stormwater Flood Maps (method of the 2021 Stormwater Resiliency Plan; Open Data files of 2024), Moderate Flood (2.13 inches/hr) with Current Sea Levels
   source_url: https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv
   license: NYC Open Data Terms of Use
   doc_id: dep_moderate_current

@@ -40,7 +40,7 @@ def test_mta_failed_sandy_join_is_unavailable_not_outside(monkeypatch):
     from app.flood_layers import sandy_inundation
     from app.registers import exposure
 
-    monkeypatch.setattr(sandy_inundation, "join", _broken)
+    monkeypatch.setattr(sandy_inundation, "at_point", _broken)  # every asset is read at its own point
     with pytest.raises(OSError):
         exposure.summary_for_point(40.7557, -73.9870, "mta_entrances")  # Times Square
 
@@ -195,7 +195,7 @@ def test_a_failed_fema_map_is_a_failed_step_not_a_silence(monkeypatch, pebble, d
 
     monkeypatch.setattr(_http.http, "get", reset)
     value, _, err = fetch_pebble(pebble, 40.5795, -73.8375, deployment=deployment)
-    assert value is None and "connection reset by peer" in err
+    assert value is None and err == "the service could not be reached"  # a failure, said in plain words
 
 
 def test_no_preliminary_study_at_a_point_does_not_apply_and_is_no_failure(monkeypatch):
@@ -209,10 +209,12 @@ def test_no_preliminary_study_at_a_point_does_not_apply_and_is_no_failure(monkey
 @pytest.mark.parametrize("row,said,missing", [
     # QN06: 448 residential units and "0" residents.
     ({"fp_100_bldg": 19, "fp_100_resunits": 448, "fp_100_pop": 0}, "counts 19 buildings and 448 residential units in",
-     "The profile gives no resident count for this district."),
+     "The profile prints 0 residents for this district, a zero that does not fit its own count of 19 buildings and 448 "
+     "residential units, so it is not repeated here as a count."),
     # QN12: buildings, and "0" for both.
     ({"fp_100_bldg": 5, "fp_100_resunits": 0, "fp_100_pop": 0}, "counts 5 buildings in",
-     "The profile gives no residential unit or resident count for this district."),
+     "The profile prints 0 residential units and 0 residents for this district, a zero that does not fit its own count of "
+     "5 buildings, so it is not repeated here as a count."),
 ])
 def test_floodplain_zero_the_table_cannot_support_is_not_printed(monkeypatch, row, said, missing):
     from types import SimpleNamespace
@@ -230,4 +232,5 @@ def test_floodplain_zero_the_table_cannot_support_is_not_printed(monkeypatch, ro
     monkeypatch.setattr(http, "get", lambda *a, **k: R())
     v = nta_evidence.floodplain(None, SimpleNamespace(extras={"area_code": "QN12"}))
     assert said in v["narrative"] and v["narrative"].endswith(missing)
-    assert "0 resident" not in v["narrative"] and v["n_residents_2010"] is None
+    # The zero is said to be what the profile prints, never given as a count of this district.
+    assert "counts 0" not in v["narrative"] and " and 0 resident" not in said and v["n_residents_2010"] is None

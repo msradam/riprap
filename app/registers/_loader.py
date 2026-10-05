@@ -68,14 +68,26 @@ def nearest_n(rows: list[dict], lat: float, lon: float,
     return candidates[:n]
 
 
-def narrative(one: str, many: str, n: int, radius_m: float, n_sandy: int, n_dep: int,
+# The city's own name for the map the registers count against.
+DEP_MAP = '"Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise"'
+
+
+def narrative(one: str, many: str, n: int, radius_m: float | None, n_sandy: int, n_rain: int, n_tide: int = 0,
               *, scope: str = "", n_checked: int | None = None) -> str:
-    """The register sentence. `scope` says what an exposed-only register
-    counted, so its count does not read as every asset in range; when
-    `n_checked` is below `n`, the exposure counts cover only the nearest
-    `n_checked`. The shape "N ... within R m ...: a inside the 2012 Sandy
-    ... b inside the DEP" is what answer_checks._REGISTER_RE parses."""
+    """The register sentence, for the assets within `radius_m` of an
+    address or (radius_m None) inside an area. `scope` says what an
+    exposed-only register counted, so its count does not read as every
+    asset in range; when `n_checked` is below `n`, the exposure counts cover
+    only the nearest `n_checked`. The map is named as the city names it, and
+    its rainfall flooding categories are counted apart from its future high
+    tides category, which is coastal tidal inundation: a school in that
+    category was once listed "inside the DEP extreme stormwater scenario".
+    The shape "N ... within R m ...: a inside the 2012 Sandy ... b inside
+    the DEP" is what answer_checks._REGISTER_RE parses; b is every category."""
     of = f"; of the nearest {n_checked}" if n_checked is not None and n_checked < n else ""
-    return (f"{n} {one if n == 1 else many} within {radius_m:g} m of this address{scope}{of}: "
-            f"{n_sandy} inside the 2012 Sandy inundation extent and {n_dep} inside the DEP "
-            "extreme stormwater scenario (2080 sea-level rise)")
+    where = "in this area" if radius_m is None else f"within {radius_m:g} m of this address"
+    return (f"{n} {one if n == 1 else many} {where}{scope}{of}: "
+            f"{n_sandy} inside the 2012 Sandy inundation extent and {n_rain + n_tide} inside the DEP stormwater map "
+            f"{DEP_MAP}, a modelled scenario"
+            + (f" ({n_rain} in a rainfall flooding category and {n_tide} in its future high tides category, which is "
+               "coastal tidal inundation projected for 2080 and not rainfall flooding)" if n_rain + n_tide else ""))

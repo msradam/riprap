@@ -55,11 +55,10 @@ def test_dep_pebble_matches_legacy(registry, scenario):
     assert result.error is None, result.error
     # Class 0 (outside the scenario) is reported as an "outside" record.
     assert isinstance(result.value, dict)
-    assert result.value["depth_class"] == legacy_cls
-    assert "depth_label" in result.value
+    assert result.value["category_code"] == legacy_cls
     assert "narrative" in result.value
     if legacy_cls == 0:
-        assert result.value["depth_label"] == "outside"
+        assert result.value["category"] is None
         assert "shows no flooding category" in result.value["narrative"]
     assert result.value["citation"].startswith("NYC Stormwater Flood Maps (NYC Open Data 9i7c-xyvv")
 
@@ -110,7 +109,8 @@ def test_an_outside_reading_carries_the_emergency_management_caveat():
 
     # NYC Emergency Management's words (nychazardmitigation.com/documentation/hazard-profiles/flooding/, read 2026-10-05).
     assert ('"The most heavily impacted areas, representing over half of all damaged buildings, were also outside of '
-            'any flood risk scenario, including FEMA floodplain maps"') in OUTSIDE_CAVEAT
+            'any flood risk scenario, including FEMA floodplain maps and the NYC Stormwater Resiliency Plan\'s Extreme and '
+            'Moderate stormwater scenarios"') in OUTSIDE_CAVEAT  # the sentence in full, not cut inside the quotation marks
     assert "nychazardmitigation.com" in OUTSIDE_CAVEAT and "does not mean safe" in OUTSIDE_CAVEAT
     outside = shape({"depth_class": 0, "edge_m": None}, _manifest("dep_moderate_2050"))["narrative"]
     inside = shape({"depth_class": 1, "edge_m": None}, _manifest("dep_moderate_2050"))["narrative"]
@@ -130,9 +130,9 @@ def test_a_point_near_the_mapped_edge_states_the_distance(registry):
     assert carroll["depth_class"] == 3 and 1 <= carroll["edge_m"] <= 4
     v = registry.get("dep_extreme_2080").fetch(SpatialQuery(lat=40.678113, lon=-74.009514)).value
     assert v["edge_m"] == pioneer["edge_m"]
-    assert f"(about {v['edge_m']} m from the nearest flooding mapped on it)" in v["narrative"]
+    assert f"no flooding category, at the edge of flooding mapped on it (within about {v['edge_m']} m)" in v["narrative"]
     v = registry.get("dep_extreme_2080").fetch(SpatialQuery(lat=40.678299, lon=-73.989605)).value
-    assert f"about {v['edge_m']} m from the edge of the mapped flooding" in v["narrative"]
+    assert f"at the edge of the mapped flooding (within about {v['edge_m']} m)" in v["narrative"]
 
 
 def test_a_point_far_from_any_mapped_flooding_says_nothing_more():

@@ -8,7 +8,7 @@ describe('registerSentence', () => {
     const items = [{}, {}];
     const v = { radius_m: 2000, n_inside_sandy_2012: 2, n_in_dep_extreme_2080: 0 };
     expect(registerSentence('NYCHA developments', v, items, [row('RED HOOK WEST', '267 m'), row('RED HOOK EAST', '546 m')])).toBe(
-      '2 NYCHA developments listed within 2000 m, 2 inside the 2012 Sandy extent and 0 in the DEP 2080 scenario: RED HOOK WEST (267 m), RED HOOK EAST (546 m).'
+      '2 NYCHA developments listed within 2000 m, 2 inside the 2012 Sandy extent and 0 in a category of the Extreme Flood 2080 stormwater map: RED HOOK WEST (267 m), RED HOOK EAST (546 m).'
     );
   });
 

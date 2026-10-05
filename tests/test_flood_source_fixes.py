@@ -18,7 +18,11 @@ def test_address_elevation_reads_the_cell_that_contains_the_point(monkeypatch):
                                                   "crs": "EPSG:4326", "twi": None, "hand": None})
     m = microtopo.microtopo_at(lat, lon)
     assert m.point_elev_m == 32.0
-    assert m.narrative.startswith("Elevation 32.0 m (NAVD88);")  # the datum is in the sentence
+    # The datum and the cell's size are in the sentence; whole metres with "about", not centimetres from a cell.
+    assert m.narrative.startswith("Elevation about 32 m (NAVD88), read from one cell about ") and " m across of the USGS 3DEP" in m.narrative
+    # A point at the bottom of its window is "among the lowest", not "higher than 0% (the 0th percentile)".
+    low = microtopo.microtopo_at(41.0 - 0.5 * 0.01, -74.0 + 0.5 * 0.01)
+    assert "among the lowest ground within 200 m (below the 5th percentile" in low.narrative and "0%" not in low.narrative
 
 
 def test_the_stated_datum_is_the_one_the_dem_file_declares():
@@ -247,10 +251,15 @@ def test_named_lists_carry_their_extent_and_say_modeled_for_a_scenario():
     for asset_class in exposure.CLASSES:
         n = exposure.summary_for_point(*coney, asset_class)["narrative"]
         assert "flood-exposed" not in n
-        lists = re.findall(r"\. ([^.:]+): ", n)  # the label before each list of names
+        named, limits = n.split(" The city's stormwater flood maps are modelled scenarios")
+        assert limits.endswith("it is not a flood plain determination.")  # the map's limits travel with every list
+        lists = re.findall(r"\. ([^:]+): ", named)  # the label before each list of names
         assert lists, asset_class
         for label in lists:
-            assert "2012 Sandy extent" in label or "modeled DEP extreme scenario (2080 sea-level rise)" in label, label
+            # The event, or the map by the city's own name and the word modelled; rainfall apart from the tidal category.
+            assert "2012 Sandy extent" in label or re.match(
+                r'In (a rainfall flooding|the future high tides) category of the modelled "Extreme Flood \(3\.66 inches/hr\) '
+                r'with 2080 Sea Level Rise" map', label), label
     hospitals = exposure.summary_for_point(*coney, "doh_hospitals")["narrative"]
     assert "each read at the one point the state file gives for it" in hospitals
 

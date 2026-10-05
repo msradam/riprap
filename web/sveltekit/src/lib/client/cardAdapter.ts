@@ -372,7 +372,7 @@ export function registerSentence(
   const dep = num(v.n_in_dep_extreme_2080);
   const flags = [
     sandy != null && `${sandy} inside the 2012 Sandy extent`,
-    dep != null && `${dep} in the DEP 2080 scenario`,
+    dep != null && `${dep} in a category of the Extreme Flood 2080 stormwater map`,
   ].filter(Boolean).join(' and ');
   const names = listed.map((r) => (r.detail ? `${r.label} (${r.detail})` : r.label)).join(', ');
   const nearest = listed.length < items.length ? `; the nearest ${listed.length}: ${names}` : `: ${names}`;

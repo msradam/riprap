@@ -11,10 +11,10 @@ describe('mapPointRows', () => {
     mta_entrances: {
       entrances: [
         { station_name: 'Carroll St', daytime_routes: 'F G', station_id: 'F21', entrance_lat: 40.68,
-          entrance_lon: -73.99, distance_m: 212.4, inside_sandy_2012: true, dep_extreme_2080_class: 2,
-          dep_moderate_2050_class: 0 },
+          entrance_lon: -73.99, distance_m: 212.4, inside_sandy_2012: true, dep_extreme_2080_category: 'future high tides',
+          dep_moderate_2050_category: 'outside' },
         { station_name: 'Carroll St', daytime_routes: 'F G', station_id: 'F21', entrance_lat: 40.681,
-          entrance_lon: -73.991, distance_m: 250, inside_sandy_2012: false, dep_extreme_2080_class: null }
+          entrance_lon: -73.991, distance_m: 250, inside_sandy_2012: false, dep_extreme_2080_category: null }
       ]
     },
     doh_hospitals: { hospitals: [{ facility_name: 'No coords' }] }
@@ -23,7 +23,8 @@ describe('mapPointRows', () => {
   it('gives one row per mapped point, with a unique id, distance and scenarios', () => {
     expect(mapPointRows(fc)).toEqual([
       { id: 'subway-0', name: 'Carroll St (F G)', distance: '212 m',
-        scenarios: 'Sandy 2012 extent, DEP 2080 extreme stormwater' },
+        // The kind of category is said: the tidal category is not stormwater flooding.
+        scenarios: 'Sandy 2012 extent, Extreme Flood 2080 stormwater map (future high tides)' },
       { id: 'subway-1', name: 'Carroll St (F G)', distance: '250 m', scenarios: 'none' }
     ]);
   });
@@ -37,7 +38,7 @@ describe('mapPointRows', () => {
       paragraph: '',
       doe_schools_nta: {
         schools: [{ loc_name: 'P.S. 15', loc_code: 'K015', school_lat: 40.676, school_lon: -74.01,
-          distance_m: null, inside_sandy_2012: true, dep_extreme_2080_class: 0 }]
+          distance_m: null, inside_sandy_2012: true, dep_extreme_2080_category: 'outside' }]
       }
     };
     const areaFc = buildRegisterPointsFc(final);

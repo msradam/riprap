@@ -57,10 +57,10 @@ def test_exposed_assets_are_named_nearest_first():
     assert ("Inside the 2012 Sandy extent: P.S. 015 Patrick F. Daly (116 m), "
             "South Brooklyn Community High School (328 m). ") in s["narrative"]
     # A school within 50 m of the outline is named after them, and not counted as exposed.
-    assert s["narrative"].endswith("Outside the 2012 Sandy extent but within 50 m of its mapped edge (the outline is not "
-                                   "exact to a building): Red Hook Neighborhood School (462 m), PAVE Academy Charter "
-                                   "School (570 m)")
-    assert _register_counts(s["narrative"] + ".") == (2, 2, 0)  # the counts still parse
+    assert ("Outside the 2012 Sandy extent but within 50 m of its mapped edge (the outline is not "
+            "exact to a building): Red Hook Neighborhood School (462 m), PAVE Academy Charter "
+            "School (570 m). The city's stormwater flood maps are modelled scenarios") in s["narrative"]
+    assert _register_counts(s["narrative"]) == (2, 2, 0)  # the counts still parse
 
 
 def test_a_station_with_several_entrances_is_named_once():
@@ -121,3 +121,82 @@ def test_district_floodplain_counts_come_from_the_planning_profile(monkeypatch):
                                      "residential units and 580 residents in the 1% annual chance floodplain")
     assert "2010 census" in v["narrative"] and "2015 preliminary" in v["narrative"]
     assert nta_evidence.floodplain(None, SimpleNamespace(extras={"area_code": "BK0603"})) is None  # a neighbourhood
+
+
+def test_the_tidal_category_is_not_counted_as_stormwater_flooding():
+    """Class 3 of the Extreme map is "Future High Tides 2080", coastal tidal
+    inundation. Four schools near Coney Island in that category were listed
+    "Inside the modeled DEP extreme scenario". The sentence names the map as
+    the city does, splits its count, and lists the two kinds apart; the
+    map's limits travel with the list."""
+    from app.registers import exposure
+
+    s = exposure.summary_for_point(40.5757, -73.986, "doe_schools")
+    assert (s["n_in_dep_extreme_2080"], s["n_in_dep_extreme_2080_rainfall"], s["n_in_dep_extreme_2080_tidal"]) == (4, 0, 4)
+    assert ('and 4 inside the DEP stormwater map "Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise", a modelled '
+            "scenario (0 in a rainfall flooding category and 4 in its future high tides category, which is coastal tidal "
+            "inundation projected for 2080 and not rainfall flooding)") in s["narrative"]
+    assert ('In the future high tides category of the modelled "Extreme Flood (3.66 inches/hr) with 2080 Sea Level Rise" map '
+            "(coastal tidal inundation projected for 2080, not rainfall flooding): ") in s["narrative"]
+    assert "In a rainfall flooding category of the modelled" not in s["narrative"]
+    assert "extreme stormwater scenario" not in s["narrative"]
+    assert s["narrative"].endswith('"does not provide the exact depth of flooding at any location", and it is not a '
+                                   "flood plain determination.")
+    assert _register_counts(s["narrative"])[2] == 4  # the lead rules still read every category
+
+
+def test_a_station_gets_one_exposure_count_for_an_address_and_for_an_area():
+    """Jamaica-179 St had 8 of 8 entrances inside for an address (each
+    buffered by 8 m) and 5 of 9 for a district (the bare point). Every asset
+    is now read at its own point by both paths, the sentence says so, no
+    buffer is reported, and a row carries the kind of category, never a
+    depth class for a structure."""
+    from shapely.geometry import box
+
+    from app.registers import exposure
+
+    at = exposure.summary_for_point(40.711001, -73.777712, "mta_entrances")
+    area = exposure.summary_for_polygon(box(-73.80, 40.70, -73.76, 40.72), "mta_entrances")
+    by_point = {(e["entrance_lat"], e["entrance_lon"]): e["dep_extreme_2080_category"] for e in area["entrances"]}
+    assert at["entrances"] and all(by_point[e["entrance_lat"], e["entrance_lon"]] == e["dep_extreme_2080_category"]
+                                   for e in at["entrances"])
+    for v in (at, area, exposure.summary_for_point(40.711001, -73.777712, "doh_hospitals")):
+        assert "footprint_buffer_m" not in v
+    assert "(each entrance read at its own point on the maps, with no buffer)" in at["narrative"]
+    assert "(each entrance read at its own point on the maps, with no buffer)" in area["narrative"]
+    row = at["entrances"][0]
+    assert row["dep_extreme_2080_category"] in ("rainfall flooding", "future high tides", "outside")
+    assert not [k for k in row if k.endswith(("_class", "_label"))]
+
+
+def test_a_printed_zero_that_does_not_fit_is_said_to_be_printed(monkeypatch):
+    """BX02's profile prints 0 residential units beside 848 residents. "The
+    profile gives no residential unit count" was not what a reader saw in
+    the table: the sentence says the profile prints a zero that does not fit."""
+    from types import SimpleNamespace
+
+    from app.areas import nta_evidence
+    from riprap.core import http
+
+    class R:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"rows": [{"fp_100_bldg": 189, "fp_100_resunits": 0, "fp_100_pop": 848.0, "fp_100_area": 1.14}]}
+
+    monkeypatch.setattr(http, "get", lambda url, **k: R())
+    v = nta_evidence.floodplain(None, SimpleNamespace(extras={"area_code": "BX02"}))
+    assert v["n_residential_units"] is None and "gives no" not in v["narrative"]
+    assert v["narrative"].endswith("The profile prints 0 residential units for this district, a zero that does not fit its "
+                                   "own count of 189 buildings and 848 residents, so it is not repeated here as a count.")
+
+
+def test_an_initial_inside_a_name_in_capitals_does_not_end_the_sentence():
+    """"JUDITH S [doe_school_exposure]. KAYE SCHOOL": the citation mark landed inside a school's name."""
+    from riprap.core.burr.evidence import cite
+    from riprap.core.compliance.predicates import _sentences
+
+    text = "Inside the 2012 Sandy extent: JUDITH S. KAYE SCHOOL (120 m), P.S. 015 (300 m)."
+    assert cite(text, "doe_school_exposure") == text[:-1] + " [doe_school_exposure]."
+    assert _sentences("in FEMA flood zone X. FEMA uses the 2007 maps.") == ["in FEMA flood zone X.", "FEMA uses the 2007 maps."]

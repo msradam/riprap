@@ -26,7 +26,7 @@ config:
 provenance:
   date_modified: 2024-07-03
   retrieved_at: 2026-10-05
-  source_name: NYC Stormwater Flood Maps, Limited Flood (1.77 inches/hr) with Current Sea Levels
+  source_name: NYC Stormwater Flood Maps (method of the 2021 Stormwater Resiliency Plan; Open Data files of 2024), Limited Flood (1.77 inches/hr) with Current Sea Levels
   source_url: https://data.cityofnewyork.us/Environment/NYC-Stormwater-Flood-Maps/9i7c-xyvv
   license: NYC Open Data Terms of Use
   doc_id: dep_limited_current_nta

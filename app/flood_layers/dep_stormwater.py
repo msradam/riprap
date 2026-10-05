@@ -70,8 +70,8 @@ SCENARIOS = {
 OUTSIDE_CAVEAT = (
     "Outside a mapped extent does not mean safe: NYC Emergency Management reports that during Hurricane Ida in "
     "2021 \"The most heavily impacted areas, representing over half of all damaged buildings, were also outside of "
-    "any flood risk scenario, including FEMA floodplain maps\" (NYC Hazard Mitigation Plan, flooding profile, "
-    "nychazardmitigation.com).")
+    "any flood risk scenario, including FEMA floodplain maps and the NYC Stormwater Resiliency Plan's Extreme and "
+    "Moderate stormwater scenarios\" (NYC Hazard Mitigation Plan, flooding profile, nychazardmitigation.com).")
 
 # Flooding_Category as each file's domain spells it (read from data/dep/*.gdb).
 _DOMAIN = {1: "Nuisance Flooding (greater or equal to 4 in. and less than 1 ft.)",
@@ -131,6 +131,15 @@ def share_sentence(fraction_class: dict, scenario: str) -> str:
         out += (f"; {pct(c.get(TIDE_CLASS, 0))}% is in its \"{names[TIDE_CLASS]}\" category, which is "
                 f"{tide_words(scenario)}")
     return f"{out}. {limits(scenario)}"
+
+
+def category_kind(cls: int | None) -> str | None:
+    """Which kind of category a code is, for an asset row: "rainfall
+    flooding", "future high tides" or "outside". No depth: a row names a
+    structure, and the city says the map gives no exact depth at a location."""
+    if cls is None:
+        return None
+    return "future high tides" if cls == TIDE_CLASS else "rainfall flooding" if cls > 0 else "outside"
 
 
 def class_label(cls: int, scenario: str) -> str:
