@@ -67,7 +67,8 @@ For a community district a briefing names the schools, subway entrances,
 public housing developments and hospitals inside the mapped flood extents.
 A school, subway entrance or hospital is in a register when its point is
 inside the 2012 Sandy inundation zone or inside a modelled DEP stormwater
-scenario. A public housing development counts as inside the Sandy zone when
+scenario. Every asset is read at its own point, with no buffer around it,
+for an address and for a district alike. A public housing development counts as inside the Sandy zone when
 10% or more of its outline is, and is tested against a stormwater scenario
 by its centre point; the sentence says which. The school and public housing
 registers test three of the city's four stormwater maps (Moderate Flood with

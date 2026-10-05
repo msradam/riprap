@@ -104,7 +104,7 @@ replaced by an aggregate, but it is still in the repository's git history.
 | NYCHA developments | NYC Housing Authority (`phvi-damg`) | Public housing |
 | School locations | NYC Department of Education (`a3nt-yts4`, 2019 to 2020) | Public schools, charter schools included |
 | Health facilities | New York State Department of Health (`vn5v-hh5r`) | Hospitals |
-| 3DEP elevation model | USGS | Elevation and low-spot percentile |
+| 3DEP elevation model | USGS | Elevation of the cell that contains the point (about 22 m across), stated as "about N m", and how low that cell sits among the ground within 200 m |
 | DOB permits | NYC Department of Buildings (`ipu4-2q9a`) | Only a question about construction |
 | Community District Profiles | NYC Department of City Planning | Buildings, residential units and residents in a district's 1% annual chance floodplain |
 | 2020 Neighborhood Tabulation Areas | NYC Department of City Planning (`9nt8-h7nd`) | Area outlines |

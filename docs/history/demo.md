@@ -127,6 +127,11 @@ condition, or compliance with specific zoning rules. Where a probe
 was offline at run time, the relevant section omits that signal.
 ```
 
+(This is the May 2026 text. The out-of-scope line has since been replaced:
+it now reads "This briefing is not a flood zone determination, an
+engineering assessment or advice", and the section headings are plain
+labels such as "Mapped hazards" and "Live readings".)
+
 13/13 disclosure checks present. Section headings (`Heat Hazard Reader`, `Live Observer`,
 `Projector`) auto-derived from `deployments/heat/stones.yaml`.
 

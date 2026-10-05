@@ -45,7 +45,7 @@ the axe tests cover it.
 
 | Criterion | Finding |
 |---|---|
-| 1.1.1 Non-text content | Holds. The hero image has a text alternative, decorative marks are hidden, and the map has the equivalents listed under "The map" below |
+| 1.1.1 Non-text content | Holds. The landing's example answer is text, not an image; decorative marks are hidden, and the map has the equivalents listed under "The map" below |
 | 1.3.1, 2.4.1, 2.4.6 Structure, bypass, headings | Holds. One `h1` a page, `header`, `main` and `footer` landmarks, labelled sections, and a skip link to the main content. The map has its own "Skip the map" link |
 | 1.4.1 Use of colour | Holds. Evidence classes carry a glyph and a word as well as a colour; the heat ramp has a numbered scale |
 | 1.4.3, 1.4.11 Contrast | Holds for the colour roles (the gate above). Hairline rules around some boxes are fainter than 3 to 1; none is the only sign of a control |

@@ -6,11 +6,15 @@ gives the `/api/agent` response as an open object, so this page is the
 description of it.
 
 Every field name below was read from live responses of a local server with
-no language model on 5 October 2026, for four queries: an address
-(`90-01 183rd Street, Queens`), a community district (`QN12`), a heat
-briefing for an address (`heat 2940 Brighton 3rd St, Brooklyn`) and one for
-a district (`heat QN12`). A response holds only the sources that ran for its
-query, so no single response has every field. The interface has no version
+no language model on 5 October 2026: an address
+(`90-01 183rd Street, Queens`), a community district (`QN12`), two
+comparisons (`Compare Red Hook and Hollis`, `Is Mott Haven hotter than
+Riverdale?`), answered questions with a `yes` and a `near` lead, a question
+the records cannot answer (`What is the median income in Hunts Point?`), and
+heat briefings for an address (`heat 2940 Brighton 3rd St, Brooklyn`) and a
+district (`heat QN12`). Each MCP tool was called in the same process. A
+response holds only the sources that ran for its query, so no single
+response has every field. The interface has no version
 of its own yet and is not frozen: a field can be renamed between releases,
 and the [changelog](../CHANGELOG.md) says when one is.
 
@@ -35,7 +39,8 @@ Three rules hold for every source block:
 | `deployment` | string | Which city's sources ran: `nyc`, `chicago`, `seattle`, `albany` or `federal` |
 | `paragraph` | string | The whole briefing as text, in Markdown: the scope statement, "Place described: ...", the answer or "In brief", the sections, "Out of scope" and "Not checked". This is the text to print or quote |
 | `answer_path` | string | Which path ran: `rules` or `llm`. With no model configured it is always `rules`, also when the question was not answered |
-| `answered` | boolean | On a question: `false` when the records cannot answer it. The text then opens with what Riprap does not hold and gives the evidence for the place. Absent on a bare place |
+| `answered` | boolean or null | On a question: `false` when the records cannot answer it. The text then opens with what Riprap does not hold and gives the evidence for the place. Null on a bare place and on a comparison |
+| `targets` | list | On a comparison only (`intent` is `compare`): one item per place with `label` ("PLACE A", "PLACE B"), `address` (the name as asked) and `state`, that place's own result with the fields of this table. The top-level source blocks are the first place's |
 | `grounding` | object | How the text was made and checked; see [Grounding](#grounding) |
 | `audit` | object | The same check in its older form: `raw` (text before checking), `dropped` (sentences removed) and `tier` |
 | `citations` | object | One record per cited source, keyed by the id in the text's `[doc_id]` markers; see [A citation](#a-citation) |
@@ -55,8 +60,8 @@ Three rules hold for every source block:
 | `tier` | `no_llm` when no model wrote or chose anything |
 | `model` | The model's name, or null |
 | `answer_mode` | `rules` or `extractive` (a model chose among existing sentences) |
-| `answer_lead` | The kind of opening: `yes`, `no`, `partly`, `count`, `facts`, `near` (a record was found, farther than 100 m from the address), `day`, `cannot_answer`, `not_held`, `not_english`, `not_recognised`, or a fixed phrase kind such as `no_prediction` or `no_advice` |
-| `not_held` | With the `not_held` lead: the topic the question asked for that Riprap does not hold |
+| `answer_lead` | The kind of opening: `yes`, `no`, `partly`, `count`, `facts`, `near` (a record was found, farther than 100 m from the address; the lead gives the distance), `day` (a question about a named past day, read from the records dated that day), `cannot_answer`, `not_held`, `not_english`, `not_recognised`, or the kind of a fixed phrase: `no_prediction`, `no_prediction_register` (which places will flood, before an asset list), `no_advice`, `no_score`, `no_ranking`, `needs_address`, `no_satellite`, `no_change_record`, `experimental`, and for heat `heat_forecast`, `no_prediction_heat`, `no_prediction_far`, `no_advice_heat` (whether a home is safe in the heat), `no_air_temp` (no air temperature at an address), `no_deaths`, `cooling_centers`, `surface_yes`, `surface_no` |
+| `not_held` | With the `not_held` lead: the topic the question asked for that Riprap does not hold, one of `people`, `income`, `basements`, `law`, `benefits`, `advice`, `score`, `ranking`, `trend`, `rain_on_a_day`, `other_311`. With the `not_english` lead it is `language` |
 | `answered` | Whether the question was answered. `false` means the briefing gives the evidence for the place and says it does not answer the question |
 | `lead_fact` | The source and figure the opening rests on |
 | `claims` | Each sentence kept: `section`, `text`, `doc_ids`, `numbers` |
@@ -64,13 +69,18 @@ Three rules hold for every source block:
 | `checks`, `answer_flags` | The rules that were applied to the opening, and any that fired |
 | `question`, `n_documents`, `attempts`, `llm_calls` | The question as read, how many source sentences were available, and model calls made |
 
+For a bare place, which asks nothing, `grounding` holds only `tier`,
+`claims` and `dropped_claims`.
+
 ### A citation
 
 `citations.<doc_id>` holds `doc_id`, `source` (the publisher's name), `title`
 (the full citation text, with the source's own caveats), `url`, `license`,
 `date_modified` (the date of the data, from the publisher where it gives
 one), `retrieved_at` (when Riprap read it), `vintage` (the date shown beside
-the sentence) and `maturity` (`production` or `experimental`). The FloodNet
+the sentence) and `maturity` (`production` or `experimental`). The 311
+record for an address or a community district adds `query_url`, the exact
+Socrata request the count came from. The FloodNet
 record adds `license_url`, `attribution`, `references` and `license_notice`:
 FloodNet content is CC BY-NC-SA 4.0 and is not under Riprap's Apache-2.0
 licence.
@@ -85,15 +95,15 @@ licence.
 | `dep_extreme_2080`, `dep_moderate_2050`, `dep_moderate_current`, `dep_limited_current` | NYC Stormwater Flood Maps, NYC Open Data `9i7c-xyvv` (the Limited map from DEP's viewer tiles) | `category_code` (0 outside, 1 and 2 the two rainfall categories, 3 the future high tides category), `category` (the city's words for it, or null outside), `edge_m` (metres to the nearest mapped flooding when close). A modelled scenario, not a forecast, and no depth beyond the category |
 | `ida_hwm` | USGS Short-Term Network, Hurricane Ida 2021 high-water marks | `n_within_radius`, `radius_m` (800), `max_elev_ft` (water surface, feet, in `vertical_datum`), `max_height_above_gnd_ft`, `nearest_dist_m`, `nearest_site`, `nearest_elev_ft`, `sample_sites`, `points` (the marks, for the map) |
 | `microtopo` | USGS 3DEP elevation model | `point_elev_m` (metres, NAVD88, from the cell that contains the point; a cell's value can differ from a survey point by a metre or more), `resolution_m` (the cell size, about 22), `rel_elev_pct_200m` and `rel_elev_pct_750m` (the share of ground within that distance that is lower), `basin_relief_m`, `aoi_min_m`, `aoi_max_m`, `aoi_radius_m`, `hand_m` (height above the nearest drainage channel, metres) |
-| `floodnet` | FloodNet Data API (`api.floodnet.nyc`), CC BY-NC-SA 4.0 | Counts and summaries only: `n_sensors` within `radius_m` (600), `n_flood_events_3y` (events FloodNet marks as verified by a person), `n_flood_events_good_3y` (those at sensors listed as good), `n_event_days` (distinct UTC days), `by_year`, `n_events_unreviewed`, `period_start`, `n_sensors_with_events`, `n_sensors_not_good`, `highest_event`, `peak_event` and `other_status_peak_event` (each a depth in mm and its UTC date), `latest_event_start`, `n_events_open_24h`, `status_read_at`, `license`, `license_url`, `attribution`. No sensor id, name, street or coordinate, and no event row, is served |
-| `nyc311` | 311 Service Requests, NYC Open Data `erm2-nwe9` | `n` (complaints after the duplicate rule), `radius_m` (200), `years`, `since` (first day of the window), `where`, `capped` (true if the query limit was reached), `by_year`, `by_descriptor` (the portal's descriptor strings), `by_kind`, `histogram`, `most_recent` and `points` (each a `date`, `descriptor` and `block`, with `lat` and `lon` rounded to three decimal places; no house number), `query_url` (the exact Socrata query), `caveat` (the under-reporting caveat) |
+| `floodnet` | FloodNet Data API (`api.floodnet.nyc`), CC BY-NC-SA 4.0 | Counts and summaries only: `n_sensors` within `radius_m` (600), `n_flood_events_3y` (events FloodNet marks as verified by a person), `n_flood_events_good_3y` (those at sensors listed as good), `n_event_days` (distinct UTC days with an event), `by_year` (events by the UTC year they started), `n_events_unreviewed` (labelled flood, not yet verified, not counted), `period_start` (the first day the count covers), `n_sensors_with_events`, `n_sensors_not_good` (sensors with a status other than good when read), `highest_event`, `peak_event` and `other_status_peak_event` (each a depth in mm and its UTC date), `latest_event_start`, `n_events_open_24h`, `status_read_at`, `license`, `license_url`, `attribution`. No sensor id, name, street or coordinate, and no event row, is served |
+| `nyc311` | 311 Service Requests, NYC Open Data `erm2-nwe9` | `n` (complaints after the duplicate rule), `radius_m` (200), `years`, `since` (first day of the window), `where`, `capped` (true if the query limit was reached), `by_year`, `by_descriptor` (the portal's descriptor strings), `by_kind`, `histogram`, `most_recent` (each a `date`, `descriptor` and `block`) and `points` (the same, with `lat` and `lon` rounded to three decimal places; `block` is the street and its cross streets, never a house number), `query_url` (the exact Socrata query; absent for a neighbourhood, which is counted inside its outline after a wider request), `caveat` (the under-reporting caveat) |
 | `nws_obs` | National Weather Service, latest observation at the nearest station | `station_id`, `station_name`, `distance_km`, `obs_time`, `weather`, `raining`, `temp_c`, `precip_last_hour_mm`, `precip_last_3h_mm`, `precip_last_6h_mm`, `error` |
 | `noaa_tides` | NOAA CO-OPS water levels and tide predictions | `station_id`, `station_name`, `station_lat`, `station_lon`, `distance_km`, `datum`, `observed_ft`, `observed_ft_mllw` and `predicted_ft_mllw` (feet above mean lower low water), `residual_ft` (observed less predicted), `obs_time`, `error` |
 | `usgs_gauges` | USGS Water Data, latest continuous values | `site_no`, `site_name`, `distance_km`, `stage_ft` (feet), `discharge_cfs` (cubic feet per second, where published), `obs_time`, `n_gauges_in_area`. Field names read from `app/context/usgs_gauges.py`: the service refused the requests on the day this page was written, so no live block was seen. No gauge is quoted beyond 5 km |
 | `nws_alerts` | National Weather Service active alerts | `n_active`, `alerts` (flood, coastal and tropical storm alerts at the point), `retrieved_at`, `error` |
 | `nws_water_forecast` | NWS National Water Prediction Service | `gauge_id`, `gauge_name`, `distance_km`, `forecast_peak_ft_mllw`, `forecast_peak_time_utc`, `issued_utc`, `forecast_until_utc`, `flood_stages_ft` (the gauge's flood stages, feet), `flood_category` |
 | `npcc4_slr` | NPCC4 (2024), sea-level rise projections, Table 1 | `baseline`, `place`, and for `2030s`, `2050s`, `2080s` and `2100` the projected rise. Citywide, not for the address |
-| `mta_entrances` | MTA Subway Entrances and Exits, data.ny.gov `i9wp-a4ja` | `n_entrances` within `radius_m` (800), `n_checked`, `n_ada_accessible`, `n_inside_sandy_2012`, `n_in_dep_extreme_2080` with `n_in_dep_extreme_2080_rainfall` and `n_in_dep_extreme_2080_tidal` (the map's rainfall categories and its future high tides category, counted apart), `entrances` (each with its station, routes, coordinates, `inside_sandy_2012` and the category name on each map; each entrance is read at its own point, with no buffer) |
+| `mta_entrances` | MTA Subway Entrances and Exits, data.ny.gov `i9wp-a4ja` | `n_entrances` within `radius_m` (800), `n_checked`, `n_ada_accessible`, `n_inside_sandy_2012`, `n_in_dep_extreme_2080` with `n_in_dep_extreme_2080_rainfall` and `n_in_dep_extreme_2080_tidal` (the map's rainfall categories and its future high tides category, counted apart), `entrances` (each with its station, routes, coordinates, `distance_m`, `elevation_m`, `hand_m`, `inside_sandy_2012` and, as `dep_extreme_2080_category` and `dep_moderate_2050_category`, `outside` or the category name; each entrance is read at its own point, with no buffer) |
 | `nycha_developments` | NYCHA Public Housing Developments, NYC Open Data `phvi-damg` | `n_developments` within `radius_m` (2,000), `n_inside_sandy_2012` (10% or more of the outline), `n_in_dep_extreme_2080` (centre point) with its `_rainfall` and `_tidal` parts, `developments` |
 | `doe_schools` | 2019 - 2020 School Point Locations, NYC Open Data `a3nt-yts4` | `n_schools` within `radius_m` (1,500), `n_inside_sandy_2012`, `n_in_dep_extreme_2080` with its `_rainfall` and `_tidal` parts, `schools` |
 | `doh_hospitals` | Health Facility General Information, health.data.ny.gov `vn5v-hh5r` | `n_hospitals` within `radius_m` (3,000), `n_checked`, `n_inside_sandy_2012`, `n_in_dep_extreme_2080` with its `_rainfall` and `_tidal` parts, `hospitals` (each read at the one point the state file gives) |
@@ -151,10 +161,10 @@ briefing returns a `record` (`query`, `run_at`, `riprap_version`, `commit`,
 
 | Tool | Returns |
 |---|---|
-| `get_evidence(address, hazard)` | `place`, `place_match`, `place_note`, `lat`, `lon`, `deployment`, `intent`; `evidence`, one item per source with `doc_id`, `stone`, `text` (the sentence), `value` (the source block above, without display strings), `maturity`, `source_url`, `vintage`; `citations`; `license_notices` (for FloodNet: `doc_id`, `license`, `license_url`, `attribution`, `references`, `retrieved_at`, `notice`); `failed`; `record` |
-| `get_district_summary(community_district, hazard)` | The same shape, for a community district such as `QN12` |
+| `get_evidence(address, hazard)` | `place`, `place_match`, `place_note`, `lat`, `lon`, `deployment`, `intent`; `evidence`, one item per source with `doc_id`, `stone`, `text` (the sentence), `value` (the source block above, without `narrative`, `headline_value` and `citation`), `maturity`, `source_url`, `vintage`; `citations`; `license_notices` (for FloodNet: `doc_id`, `license`, `license_url`, `attribution`, `references`, `retrieved_at`, `notice`); `failed`; `record` |
+| `get_district_summary(community_district, hazard)` | The same shape, for a community district such as `QN12`. A code that is not a district (`QN99`) returns only `error`, which names the borough's range |
 | `get_briefing(address, question)` | `address`, `question`, `place`, `place_match`, `place_note`, `deployment`, `intent`, `paragraph` (the briefing text), `mode`, `answered`, `answer_mode`, `answer_lead`, `answer_path`, `dropped_claims`, `citations`, `license_notices`, `consulted`, `not_checked`, `failed`, `disclosure_checks`, `record` |
 | `nyc311_flood_requests(address or lat and lon, radius_m, days)` | `lat`, `lon`, `radius_m`, `definition`, `days`, `n`, `capped`, `by_descriptor`, `by_kind`, `by_month`, `most_recent` (each a `date`, `descriptor`, `block` and `status`; no house number), `query_url`, `caveat`, `source`, `source_url`. Dataset `erm2-nwe9` |
 | `plan_query(question, address)` | How a query would be read, without running it: `planner`, `intent`, `targets`, `place`, `question`, `focus`, `chosen`, `floor`, `selected` (the sources that would run), `deployment`, `rationale` |
-| `list_sources(deployment)` | `stones` (the five groups) and `pebbles`, one per source manifest with its `id`, `title`, `stone`, `hazard`, `tier`, `maturity`, `scope`, `narration`, `provenance` (URL, licence, dates) and `fallback` |
+| `list_sources(deployment)` | `stones` (the five groups) and `pebbles`, one per source manifest with its `id`, `title`, `stone`, `hazard`, `tier`, `maturity`, `scope`, `narration`, `type`, `display`, `provenance` (URL, licence, dates) and `fallback` |
 | `get_citation(deployment, doc_id)` | One citation record: `doc_id`, `source`, `title`, `url`, `license`, `date_modified`, `retrieved_at`, `vintage`, `maturity`, or `error` when the id is unknown |

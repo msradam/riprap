@@ -49,7 +49,10 @@ sources' sentences word for word. They are tried in a fixed order:
 2. a named asset class (subway, schools, public housing, hospitals): its
    register. Yes or no comes from the register's own count for what the
    question names (inside the Sandy extent, inside the DEP extreme scenario);
-   "is the school safe" and "has it flooded since Ida" get no yes or no;
+   "is the school safe" and "has it flooded since Ida" get no yes or no.
+   "Which schools in BK18 will flood?" is a prediction: the lead says
+   Riprap cannot predict which places will flood, and the register follows
+   as the list of those inside a mapped extent (`no_prediction_register`);
 3. "will it flood" at a place or on a day: no yes or no and no refusal. The
    lead says no source or model here predicts that, and the alerts, the
    Weather Service's water-level forecast, the current stormwater scenario and
@@ -70,14 +73,17 @@ sources' sentences word for word. They are tried in a fixed order:
    point within 50 m of the mapped Sandy edge gets no flat yes or no. An
    event FloodNet marks as verified by a person counts whatever its
    sensor's status is today. A question about a named past day is read from
-   the records dated that day;
+   the records dated that day (`day`);
 6. "how many": the counted source, and the count of the 311 kind the question
    names. "Since 2024" sums the years from then; "since Ida" starts mid-year
-   and gets the source's own window, stated, with no count as the lead;
+   and gets the source's own window, stated, with no count as the lead. A
+   question about FloodNet events in one year ("in 2024") leads with that
+   year's count from the sensors' record by UTC year, when their period
+   covers the whole year or it is the current year so far;
 7. forecasts, projections and scenarios: those sources, with no yes or no. A
    question about the next hours or days gets the water-level forecast, one
    about the 2050s the projections. "Does the 2080 map show water here" is a
-   fact about the map and takes yes or no from the scenario's depth class;
+   fact about the map and takes yes or no from the scenario's category;
 8. "are there any marks, complaints, sensors": yes or no from the named
    source's own count, only when the question asks about the thing counted
    ("did any water reach it" asks whether it flooded, and gets no yes from a
@@ -223,9 +229,11 @@ place stayed dry. The source the rule relies on is added to the facts when
 the model left it out, so the lead is always cited.
 
 A question the records cannot answer is not given the neutral lead. When
-it asks for something Riprap does not hold (a trend, a ranking of places, a
-score, figures about people or households, advice to an agency, law or
-benefits, another 311 topic; the table is `rule_answer.NOT_HELD`), the
+it asks for something Riprap does not hold (figures about people or
+households, income, basements, law, aid and benefits, advice to an agency or
+a resident, a flood score, a ranking of places, a trend, rainfall on a past
+day, another 311 topic; the table is `rule_answer.NOT_HELD`, and the topic
+is returned as `grounding.not_held`), the
 answer's first sentence says what is not held, the lead is `not_held` and
 `answered` is `false`, in `grounding` and at the top of the result. A
 question not written in English gets `not_english` and one fixed line each
@@ -305,6 +313,8 @@ lead and the facts in this order:
 
 | The question asks for | Lead | Facts |
 |---|---|---|
+| Whether a home or a place is safe or dangerously hot | "Riprap reports public records about a place ... No source here measures the temperature inside a building." (`no_advice_heat`) | The surface measurement, the index, the station record |
+| The air temperature at an address | "Riprap has no air temperature at an address ..." (`no_air_temp`) | The latest station observation, the surface measurement |
 | A score, a rating, a grade or a ranking | "Riprap computes no score or rating of its own ..." | The Health Department's index, as the department's |
 | The hottest or worst part of a place | "Riprap does not rank places against each other or single out one part of a place ..." | The record for the whole place named |
 | One apartment, one block or a calendar date in the future | "Riprap cannot predict what will happen in one building, on one block or on a named day ..." | The Weather Service's forecast and alerts, the surface measurement; for a day the 7-day forecast cannot reach (next July, next summer), what was measured here and the station record instead |

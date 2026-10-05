@@ -253,18 +253,19 @@ annual chance floodplain. `dob_permits_nta` lists DOB permits, and
 
 ### 3.2 Worked example: 2940 Brighton 3rd St, Brooklyn
 
-Values from a May 2026 run, to show what the pebbles return:
+Values read from the app on 5 October 2026, to show what the pebbles return:
 
 | Pebble | What it returned |
 |---|---|
-| geocode | `(40.5780, -73.9617)`, BBL `3-08660-0001`, Brooklyn |
+| geocode | `(40.5798, -73.9653)`, Brooklyn, an exact match (no tax lot or building number is returned) |
 | sandy | Inside the 2012 Sandy Inundation Zone |
-| dep_moderate_2050, dep_extreme_2080 | depth 0.4 to 0.8 ft; depth 0.8 to 2.0 ft |
-| floodnet | 2 sensors within 600 m, with their count of flood events and the highest depth (since October 2026 only events FloodNet marks as verified by a person are counted) |
-| nyc311 | 11 flood-related complaints within 200 m, 5-year window |
-| noaa_tides | +0.49 ft residual at the time of the run |
+| fema_nfhl | Zone AE |
+| dep_moderate_2050, dep_extreme_2080 | No flooding category on either map; the 2080 map has mapped flooding within about 3 m (a category and an edge distance, never a depth) |
+| floodnet | 3 sensors within 600 m: 26 verified flood events on 14 separate days since 2024-08-07, the highest 114 mm on 2025-10-30 |
+| nyc311 | 57 flood and sewer complaints within 200 m since 2021-10-06: 33 sewer backup, 16 catch basin, 7 street flooding, 1 manhole overflow |
+| noaa_tides | +0.46 ft residual at Sandy Hook at the time of the run |
 | nws_alerts | 0 active alerts |
-| microtopo | Elevation 2.36 m, percentile 8 |
+| microtopo | Elevation about 2 m from a cell about 22 m across; higher than 16% of the ground within 200 m |
 | ida_hwm | 0 high-water marks within 800 m |
 
 The briefing opens with an "In brief" lead (the Sandy

@@ -11,7 +11,12 @@ re-derived 487 briefing sentences from the
 public sources: 475 were confirmed, 10 were wrong and 2 sat on a raster edge
 ([docs/history/SANITY-CHECK-2026-10-05.md](docs/history/SANITY-CHECK-2026-10-05.md)).
 This pass fixes what it found and says in the documents what it could not
-fix. Branch `review/fix-pass`; not tagged, and the version is unchanged.
+fix. Nine reviewers then read the result as its audiences would (FloodNet,
+NYU CUSP, BetaNYC, the City's Open Data team, a civic technologist,
+planners, city climate staff, community groups, a data journalist), and
+what they raised is fixed here too. Where a later fix replaced an earlier
+one, the entry gives the final state. Branch `review/fix-pass`; not tagged,
+and the version is unchanged.
 
 ### Fixed
 
@@ -20,8 +25,10 @@ fix. Branch `review/fix-pass`; not tagged, and the version is unchanged.
   address whatever the street type ("1 Bowling Green", "15 Central Park
   West"). An address with no borough is looked up in the city's address file
   first, and a note says which borough was chosen when several have it.
-- **Address elevation** reads the cell that contains the point and states
-  NAVD88 (400 Carroll Street: 1.07 m, was 0.0 m).
+- **Address elevation** reads the cell that contains the point, states
+  NAVD88 and is rounded to what a cell about 22 m across supports (400
+  Carroll Street: "about 1 m", was 0.0 m). A point in the lowest ground
+  nearby is said to be "among the lowest ground within 200 m".
 - **Hospitals** are counted once each (61, where the file's 67 rows had
   doubled some counts).
 - **Public housing** counts as inside the Sandy extent when 10% or more of
@@ -41,11 +48,14 @@ fix. Branch `review/fix-pass`; not tagged, and the version is unchanged.
   total and its rate the department's average annual age-adjusted rate. The
   cooling sentence names wading pools as wading pools, from a list copied
   again on 5 October, and gives that date.
-- **Gallery.** All 35 entries were rebuilt on 5 October with no model and no
-  failed source. Each saved file has FloodNet's per-sensor and per-event
-  records taken out. The surge entry is removed, and the blurbs were read
-  against the briefings under them (East Harlem's now gives the figures of
-  East Harlem (North)).
+- **Gallery.** All 35 entries were rebuilt twice on 5 October with no model,
+  the second time after the audience-review fixes. Each saved file has
+  FloodNet's per-sensor and per-event records and every 311 house number
+  taken out, and is marked so. In the second build USGS refused the stream
+  gauge request (HTTP 429) for the 19 address entries that ask it, and each
+  lists the gauge as not answered; no other source failed. The surge entry
+  is removed, and the blurbs were read against the briefings under them
+  (East Harlem's now gives the figures of East Harlem (North)).
 - Accessibility barriers found by reading the code: a focused control could
   sit under the sticky header (WCAG 2.4.11), the landing's moving preview
   had no stop control (2.2.2), the map could be panned only by dragging
@@ -57,12 +67,23 @@ fix. Branch `review/fix-pass`; not tagged, and the version is unchanged.
 - **FloodNet sentences use FloodNet's terms.** No "above-curb", no
   "community sensors", no "flagged by FloodNet for maintenance". A sentence
   gives FloodNet's definition of a flood event (depth readings above 10 mm at
-  the sensor), the period from the sensors' install dates, the highest depth
-  on record with the sensor's status as the API lists it today, and the
-  highest among sensors listed as good. Only events the API marks as verified
-  by a person are counted, and the sentence says how many more are labelled
-  flood but unverified (Hollis: 6 events, was 14; QN12: 40, was 54). Resting
-  a yes or no on sensors listed as good is named as Riprap's choice.
+  the sensor), the period from the sensors' install dates, the number of
+  separate UTC days and each year's count, and the highest depth on record,
+  saying that its event is verified and quoting the sensor's status as the
+  API lists it today. Only events the API marks as verified by a person are
+  counted, and the sentence says how many more are labelled flood but
+  unverified (Hollis: 6 events on 3 days, was 14; QN12: 40, was 54). A
+  verified event counts toward a yes whatever its sensor's status today.
+  The ten tide gauges in FloodNet's deployments table are not counted as
+  sensors. A sentence about now says no event labelled flood was open and
+  that one under way may not be labelled yet, and FloodNet's own depth
+  caveats are quoted in its citation.
+- **No FloodNet record is served.** The JSON, the MCP results, the page and
+  the saved gallery files hold sentences, counts and each highest depth
+  with its date: no deployment id, sensor name, street, coordinate or event
+  row. `/api/floodnet_near` is removed (404), the map draws no sensor points
+  and points to FloodNet's dashboard, and `flagged_peak_event` is
+  `other_status_peak_event`.
 - **FloodNet-derived output carries its licence.** Citations, JSON, MCP
   results (`license_notices`), the page's source list and NOTICE say the
   FloodNet sentences and figures are CC BY-NC-SA 4.0 and not under
@@ -80,12 +101,26 @@ fix. Branch `review/fix-pass`; not tagged, and the version is unchanged.
 - **Four stormwater maps, in the city's own words.** The fourth, "Limited
   Flood (1.77 inches/hr) with Current Sea Levels", is read from the vector
   tiles of DEP's viewer. Sentences use the city's map names, call them
-  modelled scenarios and not forecasts, carry the city's disclaimer and an
-  edge distance near a boundary, and say "Outside a mapped extent does not
-  mean safe" with NYC Emergency Management's Ida finding.
+  modelled scenarios and not forecasts, carry the city's disclaimer, say
+  near a boundary that the point is "at the edge of flooding mapped on it
+  (within about N m)", and say "Outside a mapped extent does not mean safe"
+  with NYC Emergency Management's Ida finding, quoted in full. The JSON
+  gives a `category` and `category_code`, never a depth.
 - **311.** Every count ends with an under-reporting caveat, a lead says "a
   count of reports", and a district lead carries the breakdown by descriptor
-  group.
+  group. The count is named "flood and sewer complaints" in the sentence
+  and in the leads, with the window's first day, and the citation carries
+  the exact Socrata query, which the page's source list links.
+- **311 complaints are placed at the block.** No house number and no
+  per-house coordinate is served or saved: each complaint has its street
+  and cross streets, with coordinates rounded to three decimal places
+  (about 100 m). Counts do not change. A geocoded address no longer carries
+  a tax lot or building number.
+- **Asset lists.** Every school, subway entrance and hospital is read at its
+  own point with no buffer, for an address and a district alike, so the two
+  agree. Counts inside the city's "Extreme Flood (3.66 inches/hr) with 2080
+  Sea Level Rise" map split its rainfall categories from its future high
+  tides category, and each list carries the scenario caveat.
 - **Construction permits** are out of plain briefings. A construction
   question gets a sentence that names the older DOB file, tests expiry and
   says DOB NOW is not counted.
@@ -142,13 +177,42 @@ fix. Branch `review/fix-pass`; not tagged, and the version is unchanged.
 - The README's thanks to FloodNet by name; a data credit in the form FloodNet
   asks for replaces it.
 
-### After nine audience reviews (documents, landing, repository files)
+### Answers after the audience reviews
 
-Nine reviewers read Riprap as its audiences would (FloodNet, NYU CUSP,
-BetaNYC, the City's Open Data team, a civic technologist, planners, city
-climate staff, community groups, a data journalist). The changes to the
-app's answers are in the commits of the same day; these are the documents
-and pages.
+- **A plain yes needs a record on the block.** For an address, "Yes." needs
+  a verified sensor event or an Ida high-water mark within 100 m.
+  Farther off the lead reads "Flooding was recorded near this address, not
+  at it", with the distance (`near`). A yes about an area names the
+  tabulation area in the lead.
+- **Unanswered questions say so.** A question the records cannot answer
+  (people and households, income, basements, law, aid, advice to an agency,
+  a flood score, a ranking, a trend, rainfall on a past day, another 311
+  topic) opens with what Riprap does not hold, in the text as well as on
+  the page, with `answered: false` and `grounding.not_held`. A question not
+  in English gets one line each in Spanish, Chinese and Bengali
+  (`not_english`); a place with an ask no rule reads is `not_recognised`.
+- **Safety, flood zone and now.** A "safe?" or basement question is declined
+  and then shown the observed record first, the stormwater maps, FEMA and
+  "Outside a mapped extent does not mean safe", with a pointer to Notify
+  NYC. A flood zone answer says it is not a determination and points to
+  FEMA's Map Service Center. A named past day is read from the records
+  dated that day (`day`); "right now" questions get the live readings;
+  "which schools will flood" gets the no-prediction lead before the list
+  (`no_prediction_register`).
+- **One year of sensor events.** A question about FloodNet events in one
+  year leads with that year's count.
+- **Heat.** The Heat Vulnerability Index sentence gives the Health
+  Department's four factors in its words and quotes its sentence on
+  structural racism. A heat "safe" question is declined first
+  (`no_advice_heat`), and an air temperature question is told Riprap has
+  none at an address (`no_air_temp`). The out-of-scope line points to the
+  NYC Urban Heat Portal for air temperature.
+- **Other.** The MCP district tool rejects a code that is not a district; a
+  park, cemetery or airport area says so; a failed source's reason is in
+  plain words; the fixed out-of-scope line no longer speaks of title and
+  zoning.
+
+### Documents, landing and repository files after the audience reviews
 
 - **Stale images removed.** The landing sets the saved Hollis answer as
   text read at build time, with no screenshot and no map; the README's
@@ -198,11 +262,15 @@ and pages.
 - A pool just outside an area's outline is still missed by the cooling
   sentence.
 - The landing's preview image and the README screenshot showed the Hollis
-  answer's earlier sentences and a map of sensor points. Both were removed
-  (see below); a new screenshot needs a browser.
-- The public site still serves the earlier build, and the gallery's saved
-  briefings were last built before the audience-review fixes, so the
-  landing's quoted cards follow the gallery as it was then.
+  answer's earlier sentences and a map of sensor points. Both were removed,
+  with the scripts that captured them; a new screenshot needs a browser.
+- The public site still serves the earlier build.
+- The USGS stream gauge did not answer during the second gallery build, so
+  no saved address briefing quotes a gauge.
+- The hero line says every sentence comes word for word from a public
+  record, and the about page says the sentences are written by Riprap's
+  code from records. Seven reviewers read the two as in conflict; the
+  wording is the owner's to settle.
 - Nothing tests the joined evidence against observed flooding.
 - FloodNet has not been asked about Riprap's use of its data. Event rows
   removed from the tree on 2026-10-05 remain in git history.
