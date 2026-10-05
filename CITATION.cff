@@ -23,14 +23,17 @@ abstract: >-
   by rules over its words. An optional open Granite model, off by default,
   may route a question the rules do not match and may only choose among
   the existing sentences; it never writes a sentence, and no yes or no
-  stands on its word. Two experimental
-  models fine-tuned by the author (a surge forecast for the Battery and
-  a land-cover model) add labelled sentences; their
-  output is always labelled experimental, with its limits and tested
-  accuracy. Thirteen disclosure checks drawn from
+  stands on its word. One experimental
+  model fine-tuned by the author (a land-cover model) adds sentences,
+  always labelled experimental, with its limits and tested accuracy. A
+  second, a surge forecast for the Battery, lost to a one-line rule on
+  held-out data and is out of default briefings unless a server opts in;
+  a third, a satellite water layer, was tested and retired. Thirteen disclosure checks drawn from
   FEMA, IPCC AR6, TCFD, ASTM E1527-21, EPA/CDC CERC, the AP Stylebook
   and the SPJ Code report on every briefing. Riprap reports evidence; it
-  does not give advice or make regulatory flood determinations.
+  does not give advice or make regulatory flood determinations. The
+  code is Apache-2.0. FloodNet data and the sentences and counts derived
+  from it are CC BY-NC-SA 4.0, not Apache-2.0 (see NOTICE).
 keywords:
   - civic-tech
   - flood-risk
@@ -42,6 +45,9 @@ keywords:
   - fema-nfhl
   - noaa-coops
   - npcc4
+# The licence of the code. FloodNet data and the sentences and counts
+# Riprap derives from it are CC BY-NC-SA 4.0 and are not covered by it:
+# see "FloodNet-derived content" in NOTICE.
 license: Apache-2.0
 version: 0.8.0
 date-released: "2026-10-01"
@@ -56,13 +62,13 @@ references:
     authors:
       - name: "IBM Research"
     year: 2025
-    notes: "An optional LLM, used when the gallery's question entries were made with a model. Apache-2.0. https://huggingface.co/ibm-granite"
+    notes: "An optional LLM, off by default, that may route a question the rules do not recognise and choose among existing sentences. The public gallery is made by the rules alone, with no model. Apache-2.0. https://huggingface.co/ibm-granite"
   - type: software
     title: "Granite TimeSeries TTM r2 (Tiny Time Mixers)"
     authors:
       - name: "IBM Research"
     year: 2024
-    notes: "Base of the experimental Battery surge forecast, msradam/Granite-TTM-r2-Battery-Surge. Apache-2.0. https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2"
+    notes: "Base of the experimental Battery surge forecast, msradam/Granite-TTM-r2-Battery-Surge, out of default briefings since 2026-10-05. Apache-2.0. https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2"
   - type: software
     title: "Prithvi-EO-2.0: A Versatile Multi-Temporal Foundation Model for Earth Observation Applications"
     authors:

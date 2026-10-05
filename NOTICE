@@ -7,6 +7,10 @@ file at the root of this repository or at:
 
     http://www.apache.org/licenses/LICENSE-2.0
 
+One exception: FloodNet data and the sentences and counts Riprap derives
+from it are not under the Apache License. See "FloodNet-derived content"
+below.
+
 ================================================================================
 Third-party components and data
 ================================================================================
@@ -84,6 +88,41 @@ FloodNet-derived content:
   Riprap is independent of FloodNet, New York University and The City
   University of New York, and is not endorsed by them.
 
+  FloodNet's Data Access License Agreement (non-commercial), which binds
+  anyone who accesses the data, is at
+  https://docs.google.com/document/d/1jd5Q2UYj_0PwMRplFISmhT6LswpS08D9/edit
+  (linked from FloodNet's data access guide). FloodNet has not been asked
+  about Riprap's use of its data and has not approved it. The clauses
+  Riprap acts on, and what it does about each:
+  - Section 1c: derivative works must be "appropriately contextualized,
+    and not misleading", and must not "comprise a full copy of the Data"
+    or "falsely insert additional measurements". Each FloodNet sentence
+    gives FloodNet's definition of a flood event, the period it covers
+    and the sensor status the API lists; no reading is added or altered.
+  - Section 2a: use is "only for non-commercial purposes" and "Licensee
+    is prohibited from publishing or reposting the Data in part or its
+    entirety". Section 2c: no sharing of "the original Data, in part or
+    its entirety, publicly or to any third party without the prior
+    written consent of NYU". Riprap serves and stores no per-sensor or
+    per-event record: its pages, JSON, MCP results and saved gallery
+    files carry sentences and counts only. A file of per-event rows
+    (data/experimental/water_coastal_floodnet.json) was committed in
+    earlier versions and removed on 2026-10-05; it is still in this
+    repository's git history.
+  - Section 2b: derivative works are licensed "under the Creative
+    Commons Attribution-NonCommercial-ShareAlike 4.0 International
+    license". The sentences and counts are labelled so, as above.
+  - Section 3c: a use must identify "the Effective Date of this
+    Agreement or comparable time stamp related to downloading the Data".
+    Each FloodNet citation carries the time it was read (retrieved_at).
+  - Section 5 names Silverman et al. (2022) for academic citation; it is
+    cited above with Mydlarz et al. (2024).
+  - Section 8.3: no use of the licensors' names "or the name of any of
+    Licensor's personnel in any advertising, promotional or sales
+    literature without the prior written consent". Riprap names FloodNet,
+    New York University and The City University of New York only to
+    credit the data and to say that it is independent of them.
+
 Earth-observation data:
   - Contains modified Copernicus Sentinel data (Sentinel-2 L2A, 2017 to
     2026), accessed through Microsoft Planetary Computer (Copernicus
@@ -133,11 +172,11 @@ Logo attribution:
 AI-assisted authoring
 ================================================================================
 
-Portions of the source code, configuration, prompt templates, and
-documentation in this repository were drafted with the assistance of large
-language models. All output was reviewed and accepted by Adam Rahman, who
-takes responsibility for the resulting code, claims, and reproducibility
-guarantees made by this project.
+AI coding agents wrote most of Riprap's code, tests and documents, working
+from prompts written by the maintainer, and agent sessions also reviewed
+that work. The maintainer, Adam Munawar Rahman, directed it, decides what
+Riprap claims, and is accountable for all of it. The README says how the
+output was checked ("How Riprap was built and where a model runs").
 
 This repository's initial commit consolidates work developed across many
 commits in the project's working repository (msradam/riprap-nyc) between
