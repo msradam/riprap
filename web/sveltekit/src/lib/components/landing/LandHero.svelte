@@ -65,8 +65,8 @@
         Riprap joins street sensors, 311 complaints, flood maps and storm records for an address or
         community district into one page. For heat it reads satellite surface temperature, tree
         canopy, the Health Department's Heat Vulnerability Index and the Weather Service forecast.
-        Every sentence carries its source and date, and the answer is the record's own words: no
-        language model writes it.
+        Rules or an open Granite model read your question and choose the evidence. Every sentence
+        you read comes word for word from a public record, with its source and date.
       </p>
 
       {#if STATIC_SITE}
@@ -85,6 +85,7 @@
               bind:value={q}
               oninput={() => (empty = false)}
               aria-describedby={empty ? 'land-query-hint' : undefined}
+              aria-invalid={empty || undefined}
               placeholder="90-01 183rd Street, Queens or QN12"
               autocomplete="off"
               enterkeyhint="search"

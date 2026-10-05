@@ -6,6 +6,7 @@
    *  Source names are the manifests' own (deployments/nyc/manifests and
    *  deployments/federal/manifests); the experimental model layers are in
    *  LandFrontier. */
+  import { resolve } from '$app/paths';
   import { STONE_META, STONE_ORDER, type StoneKey } from '$lib/types/card';
 
   const SOURCES: Record<StoneKey, string> = {
@@ -14,10 +15,10 @@
     touchstone:
       'FloodNet street sensors, NYC 311 flood complaints, NOAA tide gauges, USGS stream gauges, National Weather Service observations',
     keystone:
-      "NYC public schools, MTA subway entrances, NYCHA developments, hospitals, active DOB construction permits, NYC Planning's floodplain counts",
+      "NYC public schools, MTA subway entrances, NYCHA developments, hospitals, DOB construction permits, NYC Planning's floodplain counts",
     lodestone: 'National Weather Service alerts and water-level forecasts, NPCC4 sea-level projections',
     capstone:
-      "Turns each record into one cited sentence and sets the answer's lead (Yes, No, a count) by fixed rules, not a language model."
+      "Code turns each record into one cited sentence, and rules set the answer's lead (Yes, No, a count). An optional open Granite model may route a question the rules do not match and choose among those sentences; it never writes one, and code checks its choice."
   };
   /** The heat briefing's sources, set under each Stone's flood sources.
    *  The land cover map is read for both. */
@@ -44,8 +45,8 @@
     <p class="land-intro">
       City, state and federal records, read live or from their published files and sorted into five
       Stones: 24 for a flood briefing and 11 for a heat briefing, two of them shared. No commercial
-      data and no scores. Each record has its own portal; we know of no other
-      tool that reads them together for one address.
+      data and no scores. Each record has its own portal; Riprap reads them together for one
+      place and links back to each.
     </p>
     <dl class="stones">
       {#each STONE_ORDER as key (key)}
@@ -64,6 +65,9 @@
     </p>
     <p class="land-small stones-links">
       <a class="land-link" href="{DOCS}/METHODOLOGY.md">How a briefing is made</a>
+    </p>
+    <p class="land-small stones-links">
+      <a class="land-link" href="{resolve('/(site)/about')}/">Where a language model can run, what the data cannot say, and how Riprap was built</a>
     </p>
   </div>
 </section>
