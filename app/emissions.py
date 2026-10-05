@@ -13,8 +13,11 @@ Every call record says how its energy figure was obtained:
              report no energy, and power times duration on shared
              hardware would be invented.
 
-The LLM is the only model Riprap runs, so the ledger covers every model
-call in a briefing.
+The ledger covers the LLM only. A default briefing runs no other model: the
+land-cover model ran earlier, in a batch, and its saved maps are read. A
+server that opts in to the experimental surge forecast (app/experimental.py)
+also runs that model per request, on CPU (2.96 million parameters, about
+0.1 s); its energy is not in this ledger.
 """
 
 from __future__ import annotations
